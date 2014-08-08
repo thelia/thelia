@@ -169,7 +169,7 @@ class ExportTableMap extends TableMap
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addForeignKey('EXPORT_CATEGORY_ID', 'ExportCategoryId', 'INTEGER', 'export_category', 'ID', true, null, null);
-        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'CLOB', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -179,7 +179,7 @@ class ExportTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ExportCategory', '\\Thelia\\Model\\ExportCategory', RelationMap::MANY_TO_ONE, array('export_category_id' => 'id', ), null, null);
+        $this->addRelation('ExportCategory', '\\Thelia\\Model\\ExportCategory', RelationMap::MANY_TO_ONE, array('export_category_id' => 'id', ), 'RESTRICT', 'CASCADE');
         $this->addRelation('ExportI18n', '\\Thelia\\Model\\ExportI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportI18ns');
     } // buildRelations()
 

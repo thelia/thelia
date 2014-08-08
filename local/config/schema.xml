@@ -1537,11 +1537,11 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
-    <column name="description" type="LONGVARCHAR" />
+    <column name="description" type="CLOB" />
     <column name="position" required="true" type="INTEGER" />
     <column name="export_category_id" required="true" type="INTEGER" />
-    <column name="handle_class" required="true" type="LONGVARCHAR" />
-    <foreign-key foreignTable="export_category" name="fk_export_export_category_id">
+    <column name="handle_class" required="true" type="CLOB" />
+    <foreign-key foreignTable="export_category" name="fk_export_export_category_id" onDelete="RESTRICT" onUpdate="CASCADE">
       <reference foreign="id" local="export_category_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">
@@ -1572,11 +1572,11 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
     <column name="title" required="true" size="255" type="VARCHAR" />
-    <column name="description" type="LONGVARCHAR" />
+    <column name="description" type="CLOB" />
     <column name="position" required="true" type="INTEGER" />
     <column name="import_category_id" required="true" type="INTEGER" />
-    <column name="handle_class" required="true" type="LONGVARCHAR" />
-    <foreign-key foreignTable="import_category" name="fk_import_import_category_id">
+    <column name="handle_class" required="true" type="CLOB" />
+    <foreign-key foreignTable="import_category" name="fk_import_import_category_id" onDelete="RESTRICT" onUpdate="CASCADE">
       <reference foreign="id" local="import_category_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">

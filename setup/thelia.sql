@@ -1902,7 +1902,7 @@ CREATE TABLE `export`
     `ref` VARCHAR(255) NOT NULL,
     `position` INTEGER NOT NULL,
     `export_category_id` INTEGER NOT NULL,
-    `handle_class` TEXT NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1911,6 +1911,8 @@ CREATE TABLE `export`
     CONSTRAINT `fk_export_export_category_id`
         FOREIGN KEY (`export_category_id`)
         REFERENCES `export_category` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -1942,7 +1944,7 @@ CREATE TABLE `import`
     `ref` VARCHAR(255) NOT NULL,
     `position` INTEGER NOT NULL,
     `import_category_id` INTEGER NOT NULL,
-    `handle_class` TEXT NOT NULL,
+    `handle_class` LONGTEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1951,6 +1953,8 @@ CREATE TABLE `import`
     CONSTRAINT `fk_import_import_category_id`
         FOREIGN KEY (`import_category_id`)
         REFERENCES `import_category` (`id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -2677,7 +2681,7 @@ CREATE TABLE `export_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `export_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -2714,7 +2718,7 @@ CREATE TABLE `import_i18n`
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
     `title` VARCHAR(255) NOT NULL,
-    `description` TEXT,
+    `description` LONGTEXT,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `import_i18n_FK_1`
         FOREIGN KEY (`id`)
