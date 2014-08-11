@@ -23,7 +23,7 @@ before_script:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3
-  - php -S localhost:8000 -t web/ &
+  - php -S localhost:8000 -t web/ >/dev/null 2>&1 &
   - sleep 3
   - cd ..
   - git clone https://github.com/n1k0/casperjs.git
