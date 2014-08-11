@@ -29,7 +29,7 @@ casper.test.begin('Login', 5, function suite(test) {
 
     });
 
-    casper.wait(2000, function(){
+    casper.wait(4000, function(){
 
         this.capture(screenshot_dir + 'front/30_login-ko.png');
 
@@ -47,7 +47,7 @@ casper.test.begin('Login', 5, function suite(test) {
     });
 
 
-    casper.wait(2000, function(){
+    casper.wait(4000, function(){
 
         this.capture(screenshot_dir + 'front/30_login-ok.png');
         test.assertExists('a.logout', 'Logout button exists');
@@ -57,7 +57,7 @@ casper.test.begin('Login', 5, function suite(test) {
         this.click('a.logout');
     });
 
-    casper.wait(2000, function(){
+    casper.wait(4000, function(){
 
         test.assertExists('a.login', 'Login button exists');
 

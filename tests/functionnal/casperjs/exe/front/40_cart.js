@@ -6,8 +6,6 @@ casper.test.begin('Cart', 4, function suite(test) {
 
     casper.start(thelia2_base_url, function() {
 
-        casper.viewport(1280, 1024)
-
         productUrl = this.getElementAttribute('a.product-info', 'href');
 
         this.echo("product : " + productUrl);
@@ -18,12 +16,12 @@ casper.test.begin('Cart', 4, function suite(test) {
 
     });
 
-    casper.wait(2000, function(){
+    casper.wait(4000, function(){
         this.capture(screenshot_dir + 'front/40_product.png');
         this.click("#pse-submit");
     });
 
-    casper.wait(2000, function() {
+    casper.wait(4000, function() {
         this.captureSelector(screenshot_dir + 'front/40_added-to-cart.png', '.bootbox');
         test.assertSelectorHasText('.bootbox h3', 'The product has been added to your cart');
     });
@@ -42,7 +40,6 @@ casper.test.begin('Cart', 4, function suite(test) {
         });
 
     });
-
 
     casper.run(function() {
         test.done();
