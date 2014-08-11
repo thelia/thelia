@@ -31,7 +31,7 @@ before_script:
   - git checkout tags/1.1-beta3
 
 script:
-  - "DISPLAY=:99.0 ./bin/casperjs test ../test/tests/functionnal/casperjs/exe/front/ --pre=../test/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url='http://localhost:8000/index.php/'"
+  - "DISPLAY=:99.0 ./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/front/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url='http://localhost:8000/index.php/'"
 
 
 matrix:
