@@ -18,7 +18,9 @@ if (casper.cli.has('thelia2_base_url')){
 }
 
 var screenshot_dir = 'tests/functionnal/casperjs/screenshot/';
-
+if (casper.cli.has('thelia2_screenshot_path')){
+    screenshot_dir = casper.cli.get('thelia2_screenshot_path');
+}
 
 casper.options.viewportSize = {width: 1024, height: 768};
 
