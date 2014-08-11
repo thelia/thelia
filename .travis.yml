@@ -28,7 +28,7 @@ before_script:
   - cd ..
   - git clone https://github.com/n1k0/casperjs.git
   - cd casperjs
-  - git checkout tags/1.0.4
+  - git checkout tags/1.1-beta3
 
 script:
   - "DISPLAY=:99.0 ./bin/casperjs test ../test/tests/functionnal/casperjs/exe/front/ --pre=../test/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url='http://localhost:8000/index.php/'"
