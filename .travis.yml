@@ -29,10 +29,9 @@ before_script:
   - git clone https://github.com/n1k0/casperjs.git
   - cd casperjs
   - git checkout tags/1.1-beta3
+  - cd ../thelia
 
-script:
-  - phpunit
-  - "DISPLAY=:99.0 ./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/front/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url='http://localhost:8000/index.php/' --thelia2_screenshot_path='../thelia/tests/functionnal/casperjs/screenshot/'"
+script: "./run-tests.sh"
 
 matrix:
   allow_failures:
