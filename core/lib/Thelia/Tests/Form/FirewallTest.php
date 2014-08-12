@@ -88,11 +88,11 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
 
             if ($i > 6) {
                 $this->assertFalse(
-                    $this->form->isFirewallOk()
+                    $this->form->isFirewallOk("prod")
                 );
             } else {
                 $this->assertTrue(
-                    $this->form->isFirewallOk()
+                    $this->form->isFirewallOk("prod")
                 );
             }
 
@@ -145,7 +145,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
     public function testAutoDelete()
     {
         /** Add two rows */
-        $this->form->isFirewallOk();
+        $this->form->isFirewallOk("prod");
 
         $this->form
             ->expects($this->any())
@@ -153,7 +153,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue("test_form_firewall_2"))
         ;
 
-        $this->form->isFirewallOk();
+        $this->form->isFirewallOk("prod");
 
         /** Set the time to 1h and 1s after the limit */
         FormFirewallQuery::create()
@@ -162,7 +162,7 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             ->save()
         ;
 
-        $this->form->isFirewallOk();
+        $this->form->isFirewallOk("prod");
 
         /** Assert that the table is empty */
         $this->assertEquals(
