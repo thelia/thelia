@@ -432,9 +432,10 @@
         <requirement key="typeId">\d+</requirement>
     </route>
 
-    <route id="admin.product_sale_elements.document_image_assoc.get_assoc" path="/admin/product_sale_elements/ajax_image_document/{id}" methods="get">
+    <route id="admin.product_sale_elements.document_image_assoc.get_assoc" path="/admin/product_sale_elements/ajax/{type}/{id}" methods="get">
         <default key="_controller">Thelia\Controller\Admin\ProductController::getAjaxProductSaleElementsImagesDocuments</default>
         <requirement key="id">\d+</requirement>
+        <requirement key="type">.+</requirement>
     </route>
 
 

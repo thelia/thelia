@@ -1,0 +1,54 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+<div class="modal fade" id="pse-image-document-assoc-modal" tabindex="-1" role="dialog" aria-labelledby="associate_images_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="associate_images_label">{$modal_title}</h4>
+            </div>
+            <div class="modal-body">
+                {if empty($items)}
+                    <div class="alert alert-danger">
+                        {if $error_message}
+                            {$error_message}
+                        {else}
+                            {intl l="An unknow error happend"}
+                        {/if}
+                    </div>
+                {else}
+                    {if $type == "image"}
+                        <div class='images-container'>
+                            <div class="row">
+                            {foreach from=$items key=key item=item}
+                                {if key % 4 == 0 and key != 0}
+                                    </div>
+                                    <div class="row">
+                                {/if}
+                                <div class='col-md-4'>
+                                    <div class='product-pse-image-container'>
+                                        {if $item.is_associated}
+                                            <span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>
+                                        {/if}
+                                        <img data-id='{$item.id}' class='img-responsive img-do-associate {if $item.is_associated}is-associated{/if}' src='{$item.url}' alt='{$item.title}' />
+                                    </div>
+                                </div>
+
+                            {/foreach}
+                            </div>
+                        </div>
+                    {elseif $type == "document"}
+                        <div class='documents-container'>
+                            {foreach from=$items key=key item=item}
+
+                            {/foreach}
+                        </div>
+                    {/if}
+                {/if}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
