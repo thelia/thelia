@@ -234,16 +234,13 @@
 
         $('select.textarea-toggle').change(function(ev) {
             if ($(this).val() != '') {
-                editor = ace.edit($(this).data('toggle-textarea'));
-                editor.setReadOnly(true);
-            }
-            else {
-                editor = ace.edit($(this).data('toggle-textarea'));
-                editor.setReadOnly(true);
+                aceEditor.setReadOnly(true);
+            } else {
+                aceEditor.setReadOnly(false);
             }
         });
 
-        var elems = ["thelia_message_modification[html_message]", "thelia_message_modification[text_message]"]
+        var elems = ["html_message", "text_message"];
         $.each(elems, function(index, value){
             editor = ace.edit(value);
             var textarea = $('textarea[name="' + value + '"]').hide();
