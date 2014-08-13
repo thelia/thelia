@@ -1,0 +1,8 @@
+database:
+  connection:
+    driver: mysql
+    user: root
+    password: julien
+    dsn: mysql:host=localhost;dbname=thelia_bug
+
+
