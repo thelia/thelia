@@ -116,7 +116,7 @@
 				                                {form_field form=$form field='html_template_file_name'}
 				                                <div class="form-group {if $error}has-error{/if}">
 				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="thelia_message_modification[html_message]" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                        <select data-toggle-textarea="html_message" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
 			                                            <option value="">{intl l='Use HTML message defined below'}</option>
 	                                                    {foreach $html_template_list as $template}
 	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -168,7 +168,7 @@
 			                                    {form_field form=$form field='text_template_file_name'}
 			                                    <div class="form-group {if $error}has-error{/if}">
 			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="thelia_message_modification[text_message]" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                        <select data-toggle-textarea="text_message" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
 			                                            <option value="">{intl l='Use Text message defined below'}</option>
 	                                                    {foreach $text_template_list as $template}
 	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -230,33 +230,37 @@
 <script>
     (function($) {
 
-        var editor;
+        var editor = {
+            "text_message": null,
+            "html_message": null
+        };
 
         $('select.textarea-toggle').change(function(ev) {
+            var aceEditor = editor[$(this).data('toggle-textarea')];
             if ($(this).val() != '') {
-                editor = ace.edit($(this).data('toggle-textarea'));
-                editor.setReadOnly(true);
+                aceEditor.setReadOnly(true);
             }
             else {
-                editor = ace.edit($(this).data('toggle-textarea'));
-                editor.setReadOnly(true);
+                aceEditor.setReadOnly(false);
             }
         });
 
-        var elems = ["thelia_message_modification[html_message]", "thelia_message_modification[text_message]"]
+        var elems = ["html_message", "text_message"]
         $.each(elems, function(index, value){
-            editor = ace.edit(value);
-            var textarea = $('textarea[name="' + value + '"]').hide();
+            editor[value] = ace.edit('thelia_message_modification[' + value + ']');
+            var textarea = $('textarea[name="thelia_message_modification[' + value + ']"]').hide();
 
-            editor.setTheme("ace/theme/monokai");
-            editor.getSession().setMode("ace/mode/smarty");
+            editor[value].setTheme("ace/theme/monokai");
+            editor[value].getSession().setMode("ace/mode/smarty");
 
-            editor.getSession().on("change", function () {
-                textarea.val(editor.getSession().getValue());
+            editor[value].getSession().on("change", function () {
+                textarea.val(editor[value].getSession().getValue());
             });
 
-            textarea.val(editor.getSession().getValue());
+            textarea.val(editor[value].getSession().getValue());
         });
+
+        $('select.textarea-toggle').change();
 
     })(jQuery);
 </script>
