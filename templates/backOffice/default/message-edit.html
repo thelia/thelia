@@ -239,13 +239,12 @@
             var aceEditor = editor[$(this).data('toggle-textarea')];
             if ($(this).val() != '') {
                 aceEditor.setReadOnly(true);
-            }
-            else {
+            } else {
                 aceEditor.setReadOnly(false);
             }
         });
 
-        var elems = ["html_message", "text_message"]
+        var elems = ["html_message", "text_message"];
         $.each(elems, function(index, value){
             editor[value] = ace.edit('thelia_message_modification[' + value + ']');
             var textarea = $('textarea[name="thelia_message_modification[' + value + ']"]').hide();
