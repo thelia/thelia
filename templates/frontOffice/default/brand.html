@@ -1,0 +1,207 @@
+{extends file="layout.tpl"}
+
+{block name="init"}
+{$brand_id={brand attr="id"}}
+{/block}
+
+{* Body Class *}
+{block name="body-class"}page-brand{/block}
+
+{* Page Title *}
+{block name='no-return-functions' append}
+{if $brand_id}
+    {loop name="brand.seo.title" type="brand" id=$brand_id limit="1"}
+    {$page_title = {$META_TITLE}}
+    {/loop}
+{/if}
+{/block}
+
+{* Meta *}
+{block name="meta"}
+{if $brand_id}
+    {loop name="brand.seo.meta" type="brand" id=$brand_id limit="1"}
+        {include file="includes/meta-seo.html"}
+    {/loop}
+{/if}
+{/block}
+
+{* Feeds *}
+{block name="feeds"}
+{if $brand_id}
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/{lang attr='locale'}/{$brand_id}"}"/>
+{/if}
+{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+{if $brand_id}
+    {$breadcrumbs = []}
+    {if $brand_id}
+        {loop type="brand" name="brand-breadcrumb" id=$brand_id limit="1"}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+        {/loop}
+    {else}
+        {$breadcrumbs[] = ['title' => {intl l="All brands"}, 'url'=> '']}
+    {/if}
+{/if}
+{/block}
+
+{block name="main-content"}
+    {if $brand_id}
+    <div class="main layout-col-2-left">
+        {$limit={$smarty.get.limit|default:8}}
+        {$product_page={$smarty.get.page|default:1}}
+        {$product_order={$smarty.get.order|default:'alpha'}}
+        {$mode=$smarty.get.mode|default:'grid'}
+
+        <article class="col-main {$mode}" role="main" aria-labelledby="main-label">
+            {loop name="brand.info" type="brand" id=$brand_id limit="1"}
+                <section class="brand-description">
+                    <h1 id="main-label" class="page-header">{$TITLE}</h1>
+
+                    {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
+                        <p><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></p>
+                    {/loop}
+
+                    {if $CHAPO}
+                        <div class="chapo">
+                            {$CHAPO}
+                        </div>
+                    {/if}
+                    {if $DESCRIPTION}
+                        <div class="description">
+                            {$DESCRIPTION nofilter}
+                        </div>
+                    {/if}
+                    {if $POSTSCRIPTUM}
+                        <small class="postscriptum">
+                            {$POSTSCRIPTUM}
+                        </small>
+                    {/if}
+                </section>
+
+                {ifloop rel="product_list"}
+                    <hr/>
+                    {assign var="amount" value="{count type="product" brand="$ID"}"}
+                    <div class="toolbar toolbar-top" role="toolbar">
+                        <div class="sorter-container">
+                            <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
+
+                            <span class="limiter">
+                                <label for="limit-top">{intl l="Show"}</label>
+                                <select id="limit-top" name="limit">
+                                    <option value="{url path={navigate to="current"} limit="4"}" {if $limit==4}selected{/if}>4</option>
+                                    <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
+                                    <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
+                                    <option value="{url path={navigate to="current"} limit="50"}" {if $limit==50}selected{/if}>50</option>
+                                    <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>All
+                                    </option>
+                                </select>
+                                <span class="per-page">{intl l="per page"}</span>
+                            </span><!-- /.limiter -->
+
+                            <span class="sort-by">
+                                <label for="sortby-top">{intl l="Sort By"}</label>
+                                <select id="sortby-top" name="sortby">
+                                    {*<option value="{url path="{brand attr="url"}" order="manual"}">{intl l="Position"}</option>*}
+                                    <option value="{url path={navigate to="current"} limit=$limit order="alpha"}" {if $product_order=="alpha"}selected{/if}>{intl l="Name ascending"}</option>
+                                    <option value="{url path={navigate to="current"} limit=$limit order="alpha_reverse"}" {if $product_order=="alpha_reverse"}selected{/if}>{intl l="Name descending"}</option>
+                                    <option value="{url path={navigate to="current"} limit=$limit order="min_price"}" {if $product_order=="min_price"}selected{/if}>{intl l="Price ascending"}</option>
+                                    <option value="{url path={navigate to="current"} limit=$limit order="max_price"}" {if $product_order=="max_price"}selected{/if}>{intl l="Price descending"}</option>
+                                </select>
+                            </span><!-- /.sort-by -->
+
+                            <span class="view-mode">
+                                <span class="view-mode-label">{intl l="View as"}:</span>
+                                <span class="view-mode-btn">
+                                    <a href="{url path={navigate to="current"} mode="grid"}" data-toggle="view" role="button" title="{intl l='Grid'}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
+                                    <a href="{url path={navigate to="current"} mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
+                                </span>
+                            </span><!-- /.view-mode -->
+                        </div><!-- /.sorter -->
+                    </div><!-- /.sorter-container -->
+
+                    <div id="category-products">
+                        <div class="products-content">
+                            <ul class="product-col-4">
+                                {loop type="product" name="product_list" brand=$ID limit=$limit page=$product_page order=$product_order}
+                                    {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
+                                {/loop}
+                            </ul>
+                        </div>
+                    </div><!-- /#category-products -->
+
+                    <div class="toolbar toolbar-bottom" role="toolbar">
+                        {if $amount > $limit}
+                            <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
+                                <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
+                                <ul class="pagination">
+                                    <li{if $product_page le 1} class="disabled"{/if}>
+                                        <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a>
+                                    </li>
+                                    {pageloop rel="product_list"}
+                                        <li{if $PAGE eq $CURRENT} class="active"{/if}>
+                                            <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a></li>
+                                    {if $PAGE eq $LAST}
+                                        <li{if $CURRENT eq $LAST} class="disabled"{/if}>
+                                            <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
+                                        </li>
+                                    {/if}
+                                    {/pageloop}
+                                </ul>
+                            </div>
+                        {/if}
+                    </div><!-- /.toolbar toolbar-bottom -->
+                {/ifloop}
+
+                {elseloop rel="product_list"}
+                    <div class="address-warning">
+                        {intl l="No products available in this brand"}
+                    </div>
+                {/elseloop}
+
+            {/loop}
+        </article>
+
+        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+            {include file="includes/brand-menu.html"}
+        </aside>
+
+    </div><!-- /.layout -->
+    {else}
+    <div class="main" id="brands">
+        <div class="col-main brands" role="main" aria-labelledby="main-label">
+            {ifloop rel="brands"}
+            <ul>
+                {loop name="brands" type="brand"}
+                <li class="item">
+                    <article>
+                        <div class="brand-info">
+                            {ifloop rel="brand_logo"}
+                            <a href="{$URL}" tabindex="-1" class="brand-image">
+                                {loop name="brand_logo" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders" limit="1"}
+                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                {/loop}
+                                <span class="mask"></span>
+                            </a>
+                            {/ifloop}
+
+                            <h2 class="name"><a href="{$URL}">{$TITLE}</a></h2>
+                            {if $CHAPO}
+                            <div class="short-description">
+                                {$CHAPO}
+                            </div>
+                            {/if}
+                        </div>
+                    </article>
+                </li>
+                {/loop}
+            </ul>
+            {/ifloop}
+            {elseloop rel="brand_logo"}
+
+            {/elseloop}
+        </div>
+    </div>
+    {/if}
+{/block}

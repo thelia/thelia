@@ -65,9 +65,11 @@
         </service>
 
         <service id="thelia.action.image" class="Thelia\Action\Image">
+            <argument type="service" id="thelia.file_manager"/>
              <tag name="kernel.event_subscriber"/>
         </service>
         <service id="thelia.action.document" class="Thelia\Action\Document">
+            <argument type="service" id="thelia.file_manager"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -131,6 +133,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.brand" class="Thelia\Action\Brand">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.pdf" class="Thelia\Action\Pdf">
 
             <tag name="kernel.event_subscriber"/>
@@ -166,6 +172,16 @@
 
         <service id="thelia.action.lang" class="Thelia\Action\Lang">
             <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.export.change_position" class="Thelia\Action\Export">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="thelia.import.change_position" class="Thelia\Action\Import">
+            <argument>%kernel.cache_dir%</argument>
+            <tag name="kernel.event_subscriber" />
         </service>
     </services>
 

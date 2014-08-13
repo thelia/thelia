@@ -1,0 +1,22 @@
+{default_translation_domain domain='bo.default'}
+
+{block name="discount-field"}{/block}
+
+<div class="form-group input-coupon-categories-id">
+
+    <label for="coupon-categories-id">{intl l="Applies to products in categories :"}</label>
+
+    <select required multiple size="10" class="form-control" id="coupon-categories-id" name="{$categories_field_name}[]">
+        {loop type="category-tree" category=0 name="list-of-categories" backend_context="1"}
+            <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if in_array($ID, $categories_values)}selected="selected"{/if}>{$TITLE}</option>
+        {/loop}
+    </select>
+
+    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one category'}</span>
+</div>
+
+<script>
+    function couponInputFormSetup() {
+        {block name="javascript-init"}{/block}
+    }
+</script>

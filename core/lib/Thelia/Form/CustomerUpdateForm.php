@@ -164,6 +164,12 @@ class CustomerUpdateForm extends BaseForm
                     'for' => 'discount'
                 )
             ))
+            ->add('reseller', 'integer', array(
+                'label' => Translator::getInstance()->trans('Reseller'),
+                'label_attr' => array(
+                    'for' => 'reseller'
+                )
+            ))
         ;
     }
 

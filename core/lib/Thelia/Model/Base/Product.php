@@ -19,6 +19,8 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Accessory as ChildAccessory;
 use Thelia\Model\AccessoryQuery as ChildAccessoryQuery;
+use Thelia\Model\Brand as ChildBrand;
+use Thelia\Model\BrandQuery as ChildBrandQuery;
 use Thelia\Model\CartItem as ChildCartItem;
 use Thelia\Model\CartItemQuery as ChildCartItemQuery;
 use Thelia\Model\Category as ChildCategory;
@@ -121,6 +123,12 @@ abstract class Product implements ActiveRecordInterface
     protected $template_id;
 
     /**
+     * The value for the brand_id field.
+     * @var        int
+     */
+    protected $brand_id;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -160,6 +168,11 @@ abstract class Product implements ActiveRecordInterface
      * @var        Template
      */
     protected $aTemplate;
+
+    /**
+     * @var        Brand
+     */
+    protected $aBrand;
 
     /**
      * @var        ObjectCollection|ChildProductCategory[] Collection to store aggregation of ChildProductCategory objects.
@@ -696,6 +709,17 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
+     * Get the [brand_id] column value.
+     *
+     * @return   int
+     */
+    public function getBrandId()
+    {
+
+        return $this->brand_id;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -912,6 +936,31 @@ abstract class Product implements ActiveRecordInterface
     } // setTemplateId()
 
     /**
+     * Set the value of [brand_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Product The current object (for fluent API support)
+     */
+    public function setBrandId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->brand_id !== $v) {
+            $this->brand_id = $v;
+            $this->modifiedColumns[ProductTableMap::BRAND_ID] = true;
+        }
+
+        if ($this->aBrand !== null && $this->aBrand->getId() !== $v) {
+            $this->aBrand = null;
+        }
+
+
+        return $this;
+    } // setBrandId()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1083,28 +1132,31 @@ abstract class Product implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductTableMap::translateFieldName('TemplateId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->template_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductTableMap::translateFieldName('BrandId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->brand_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ProductTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -1114,7 +1166,7 @@ abstract class Product implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 11; // 11 = ProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Product object", 0, $e);
@@ -1141,6 +1193,9 @@ abstract class Product implements ActiveRecordInterface
         }
         if ($this->aTemplate !== null && $this->template_id !== $this->aTemplate->getId()) {
             $this->aTemplate = null;
+        }
+        if ($this->aBrand !== null && $this->brand_id !== $this->aBrand->getId()) {
+            $this->aBrand = null;
         }
     } // ensureConsistency
 
@@ -1183,6 +1238,7 @@ abstract class Product implements ActiveRecordInterface
 
             $this->aTaxRule = null;
             $this->aTemplate = null;
+            $this->aBrand = null;
             $this->collProductCategories = null;
 
             $this->collFeatureProducts = null;
@@ -1359,6 +1415,13 @@ abstract class Product implements ActiveRecordInterface
                     $affectedRows += $this->aTemplate->save($con);
                 }
                 $this->setTemplate($this->aTemplate);
+            }
+
+            if ($this->aBrand !== null) {
+                if ($this->aBrand->isModified() || $this->aBrand->isNew()) {
+                    $affectedRows += $this->aBrand->save($con);
+                }
+                $this->setBrand($this->aBrand);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1684,6 +1747,9 @@ abstract class Product implements ActiveRecordInterface
         if ($this->isColumnModified(ProductTableMap::TEMPLATE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`TEMPLATE_ID`';
         }
+        if ($this->isColumnModified(ProductTableMap::BRAND_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`BRAND_ID`';
+        }
         if ($this->isColumnModified(ProductTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1727,6 +1793,9 @@ abstract class Product implements ActiveRecordInterface
                         break;
                     case '`TEMPLATE_ID`':
                         $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
+                        break;
+                    case '`BRAND_ID`':
+                        $stmt->bindValue($identifier, $this->brand_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1824,18 +1893,21 @@ abstract class Product implements ActiveRecordInterface
                 return $this->getTemplateId();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getBrandId();
                 break;
             case 7:
-                return $this->getUpdatedAt();
+                return $this->getCreatedAt();
                 break;
             case 8:
-                return $this->getVersion();
+                return $this->getUpdatedAt();
                 break;
             case 9:
-                return $this->getVersionCreatedAt();
+                return $this->getVersion();
                 break;
             case 10:
+                return $this->getVersionCreatedAt();
+                break;
+            case 11:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1873,11 +1945,12 @@ abstract class Product implements ActiveRecordInterface
             $keys[3] => $this->getVisible(),
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getTemplateId(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
-            $keys[8] => $this->getVersion(),
-            $keys[9] => $this->getVersionCreatedAt(),
-            $keys[10] => $this->getVersionCreatedBy(),
+            $keys[6] => $this->getBrandId(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
+            $keys[9] => $this->getVersion(),
+            $keys[10] => $this->getVersionCreatedAt(),
+            $keys[11] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1890,6 +1963,9 @@ abstract class Product implements ActiveRecordInterface
             }
             if (null !== $this->aTemplate) {
                 $result['Template'] = $this->aTemplate->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aBrand) {
+                $result['Brand'] = $this->aBrand->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collProductCategories) {
                 $result['ProductCategories'] = $this->collProductCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1977,18 +2053,21 @@ abstract class Product implements ActiveRecordInterface
                 $this->setTemplateId($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setBrandId($value);
                 break;
             case 7:
-                $this->setUpdatedAt($value);
+                $this->setCreatedAt($value);
                 break;
             case 8:
-                $this->setVersion($value);
+                $this->setUpdatedAt($value);
                 break;
             case 9:
-                $this->setVersionCreatedAt($value);
+                $this->setVersion($value);
                 break;
             case 10:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 11:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -2021,11 +2100,12 @@ abstract class Product implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setTemplateId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setVersion($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedAt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setVersionCreatedBy($arr[$keys[10]]);
+        if (array_key_exists($keys[6], $arr)) $this->setBrandId($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersion($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setVersionCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setVersionCreatedBy($arr[$keys[11]]);
     }
 
     /**
@@ -2043,6 +2123,7 @@ abstract class Product implements ActiveRecordInterface
         if ($this->isColumnModified(ProductTableMap::VISIBLE)) $criteria->add(ProductTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(ProductTableMap::POSITION)) $criteria->add(ProductTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ProductTableMap::TEMPLATE_ID)) $criteria->add(ProductTableMap::TEMPLATE_ID, $this->template_id);
+        if ($this->isColumnModified(ProductTableMap::BRAND_ID)) $criteria->add(ProductTableMap::BRAND_ID, $this->brand_id);
         if ($this->isColumnModified(ProductTableMap::CREATED_AT)) $criteria->add(ProductTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductTableMap::UPDATED_AT)) $criteria->add(ProductTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(ProductTableMap::VERSION)) $criteria->add(ProductTableMap::VERSION, $this->version);
@@ -2116,6 +2197,7 @@ abstract class Product implements ActiveRecordInterface
         $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setTemplateId($this->getTemplateId());
+        $copyObj->setBrandId($this->getBrandId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -2323,6 +2405,57 @@ abstract class Product implements ActiveRecordInterface
         }
 
         return $this->aTemplate;
+    }
+
+    /**
+     * Declares an association between this object and a ChildBrand object.
+     *
+     * @param                  ChildBrand $v
+     * @return                 \Thelia\Model\Product The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setBrand(ChildBrand $v = null)
+    {
+        if ($v === null) {
+            $this->setBrandId(NULL);
+        } else {
+            $this->setBrandId($v->getId());
+        }
+
+        $this->aBrand = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildBrand object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProduct($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildBrand object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildBrand The associated ChildBrand object.
+     * @throws PropelException
+     */
+    public function getBrand(ConnectionInterface $con = null)
+    {
+        if ($this->aBrand === null && ($this->brand_id !== null)) {
+            $this->aBrand = ChildBrandQuery::create()->findPk($this->brand_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aBrand->addProducts($this);
+             */
+        }
+
+        return $this->aBrand;
     }
 
 
@@ -5492,6 +5625,7 @@ abstract class Product implements ActiveRecordInterface
         $this->visible = null;
         $this->position = null;
         $this->template_id = null;
+        $this->brand_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
@@ -5609,6 +5743,7 @@ abstract class Product implements ActiveRecordInterface
         $this->collProductsRelatedByProductId = null;
         $this->aTaxRule = null;
         $this->aTemplate = null;
+        $this->aBrand = null;
     }
 
     /**
@@ -5956,6 +6091,7 @@ abstract class Product implements ActiveRecordInterface
         $version->setVisible($this->getVisible());
         $version->setPosition($this->getPosition());
         $version->setTemplateId($this->getTemplateId());
+        $version->setBrandId($this->getBrandId());
         $version->setCreatedAt($this->getCreatedAt());
         $version->setUpdatedAt($this->getUpdatedAt());
         $version->setVersion($this->getVersion());
@@ -6004,6 +6140,7 @@ abstract class Product implements ActiveRecordInterface
         $this->setVisible($version->getVisible());
         $this->setPosition($version->getPosition());
         $this->setTemplateId($version->getTemplateId());
+        $this->setBrandId($version->getBrandId());
         $this->setCreatedAt($version->getCreatedAt());
         $this->setUpdatedAt($version->getUpdatedAt());
         $this->setVersion($version->getVersion());

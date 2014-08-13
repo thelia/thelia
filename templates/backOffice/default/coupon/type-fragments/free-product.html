@@ -1,0 +1,69 @@
+{extends file="coupon/type-fragments/base-remove-on-products.html"}
+
+{block name="discount-field"}
+    <div class="form-group input-free-product-category-id">
+
+        <label for="free-product-category-id">{intl l="Select offrered product category :"}</label>
+
+        <select required class="form-control" id="free-product-category-id" name="{$offered_category_field_name}">
+            <option value="0">{intl l="Please select..."}</option>
+            {loop type="category-tree" category=0 name="list-of-category" backend_context="1"}
+                <option style="padding-left: {$LEVEL * 10}px" value="{$ID}" {if $ID == $offered_category_value}selected="selected"{/if}>{$TITLE}</option>
+            {/loop}
+        </select>
+    </div>
+
+    <div class="loading" id="input-free-products-id-loading" style="display: none"></div>
+
+    <div class="form-group" id="input-free-products-id" {if $offered_category_value == 0}style="display: none"{/if}>
+
+        <label for="free-products-id">{intl l="Select offered product :"}</label>
+
+        <select required class="form-control" id="free-products-id" name="{$offered_product_field_name}">
+            {loop type="product" category=$offered_category_value|default:0 name="list-of-products" backend_context="1"}
+                <option value="{$ID}" {if $ID == $offered_product_value}selected="selected"{/if}>{$TITLE}</option>
+            {/loop}
+        </select>
+    </div>
+{/block}
+
+{block name="javascript-init"}
+
+    // Hide selected products category selection if the
+    // offered product is not yet selected.
+    if ({$offered_category_value|default:0} == 0) {
+        $('.input-coupon-category-id').hide();
+    }
+
+    var $freeCatSelect = $('#free-product-category-id');
+
+    $freeCatSelect.change(function(ev) {
+
+        var $category_id = $(this).val();
+
+        $('.input-coupon-category-id').hide();
+        $('#input-free-products-id').hide();
+        $('#free-products-id').html('');
+
+        if ($category_id != 0) {
+
+            $('#input-free-products-id-loading').show();
+
+            $.ajax({
+                url: "{url path='/admin/coupon/type-fragments/ajax-products-list'}",
+                type: 'POST',
+                data: {
+                    category_id: $category_id
+                },
+                success: function(options) {
+                    $('.input-coupon-category-id').show();
+                    $('#free-products-id').html(options);
+                    $('#input-free-products-id').show();
+                },
+                complete: function() {
+                    $('#input-free-products-id-loading').hide();
+                }
+            });
+        }
+    });
+{/block}

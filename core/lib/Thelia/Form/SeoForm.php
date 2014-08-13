@@ -25,35 +25,20 @@ class SeoForm extends BaseForm
     use SeoFieldsTrait;
 
     /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
+     * @inheritdoc
      */
     protected function buildForm()
     {
 
         $this->formBuilder
             ->add("id", "hidden", array(
+                'required' => true,
                 "constraints" => array(
                     new GreaterThan(array('value' => 0))
                 )
             ))
             ->add("locale", "hidden", array(
+                'required' => true,
                 "constraints" => array(
                     new NotBlank()
                 )

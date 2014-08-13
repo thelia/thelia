@@ -51,6 +51,8 @@ final class AdminResources
 
     const ATTRIBUTE = "admin.configuration.attribute";
 
+    const BRAND = "admin.brand";
+
     const CATEGORY = "admin.category";
 
     const CONFIG = "admin.configuration";
@@ -107,7 +109,7 @@ final class AdminResources
 
     const EXPORT = "admin.export";
 
-    const EXPORT_CUSTOMER_NEWSLETTER = "admin.export.customer.newsletter";
+    const IMPORT = "admin.import";
 
     const TOOLS = "admin.tools";
 }

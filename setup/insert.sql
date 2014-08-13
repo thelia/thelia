@@ -35,22 +35,32 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('pdf_invoice_file', 'invoice', 0, 0, NOW(), NOW()),
 ('pdf_delivery_file', 'delivery', 0, 0, NOW(), NOW()),
 ('unknown-flag-path','assets/img/flags/unknown.png', 0, 0, NOW(), NOW()),
+('html_output_trim_level','1', 0, 0, NOW(), NOW()),
+('default_available_stock', '100', 0, 0, NOW(), NOW()),
+('information_folder_id', '', 0, 0, NOW(), NOW()),
+('terms_conditions_content_id', '', 0, 0, NOW(), NOW()),
 
 ('session_config.default', '1', 1, 1, NOW(), NOW()),
 ('default_lang_without_translation', '1', 1, 1, NOW(), NOW()),
 ('store_name','', 0, 1, NOW(), NOW()),
+('store_description','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-('thelia_version','2.0.1', 1, 1, NOW(), NOW()),
+('thelia_version','2.0.3-beta2', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','0', 1, 1, NOW(), NOW()),
-('thelia_release_version','1', 1, 1, NOW(), NOW()),
-('thelia_extra_version','', 1, 1, NOW(), NOW()),
+('thelia_release_version','3', 1, 1, NOW(), NOW()),
+('thelia_extra_version','beta2', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_name','fcccn', 1, 1, NOW(), NOW()),
 ('front_cart_country_cookie_expires','2592000', 1, 1, NOW(), NOW()),
 ('sitemap_ttl','7200', 1, 1, NOW(), NOW()),
-('feed_ttl','7200', 1, 1, NOW(), NOW());
+('feed_ttl','7200', 1, 1, NOW(), NOW()),
 
+('form_firewall_bruteforce_time_to_wait', '10', 0, 0, NOW(), NOW()),
+('form_firewall_time_to_wait', '60', 0, 0, NOW(), NOW()),
+('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
+('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
+('from_firewall_active', '1', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),
@@ -80,7 +90,44 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (25, 'en_US', 'Base URL of the shop (e.g. http://www.yourshopdomain.com)', NULL, NULL, NULL),
 (26, 'en_US', 'Name of the invoice view in the current PDF template (without extension)', NULL, NULL, NULL),
 (27, 'en_US', 'Name of the delivery view in the current PDF template (without extension)', NULL, NULL, NULL),
-(28, 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL);
+(28, 'en_US', 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country', NULL, NULL, NULL),
+(29, 'en_US', 'Whitespace trim level of the generated HTML code (0 = none, 1 = medium, 2 = maximum)', NULL, NULL, NULL),
+(30, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
+(31, 'en_US', 'The ID of the folder containing your information pages : terms, imprint, ...', NULL, NULL, NULL),
+(32, 'en_US', 'The ID of the ''Terms & Conditions'' content.', NULL, NULL, NULL),
+(1, 'fr_FR', 'Nom de la classe du gestionnaire de session', NULL, NULL, NULL),
+(2, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l''ignorer (0) lors de l''affichage et la modification des quantités commandées', NULL, NULL, NULL),
+(3, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
+(4, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
+(5, 'fr_FR', 'Nom du modèle PDF actif', NULL, NULL, NULL),
+(6, 'fr_FR', 'Nom du modèle d''e-mail actif', NULL, NULL, NULL),
+(7, 'fr_FR', 'Activer (1) ou désactiver (0) la réécriture d''URL', NULL, NULL, NULL),
+(8, 'fr_FR', 'Nom du pilote graphique utilisé par la bibliothèque Imagine (voir https://imagine.readthedocs.org)', NULL, NULL, NULL),
+(9, 'fr_FR', 'La qualité par défaut (en %) dans les images générées', NULL, NULL, NULL),
+(10, 'fr_FR', 'Comment les images originales (pleine résolution) sont-elles fournises dans l''espace web (lien symbolique ou copie)', NULL, NULL, NULL),
+(11, 'fr_FR', 'Comment les documents sont-ils fournis dans l''espace web (lien symbolique ou copie)', NULL, NULL, NULL),
+(12, 'fr_FR', 'Chemin vers le répertoire où les images sont stockées', NULL, NULL, NULL),
+(13, 'fr_FR', 'Chemin vers le répertoire où sont stockés les documents', NULL, NULL, NULL),
+(14, 'fr_FR', 'Chemin vers le répertoire de cache d''image dans l''espace web', NULL, NULL, NULL),
+(15, 'fr_FR', 'Chemin d''accès au répertoire de cache de document dans l''espace web', NULL, NULL, NULL),
+(16, 'fr_FR', 'L''URL pour mettre à jour les taux de change', NULL, NULL, NULL),
+(17, 'fr_FR', 'Nom de la page 404 (introuvable) dans le modèle actuel (avec l''extension, par exemple, 404.html)', NULL, NULL, NULL),
+(18, 'fr_FR', 'Nom de la page du modèle retournée lorsqu''une URL obsolète (ou inactive) est invoquée', NULL, NULL, NULL),
+(19, 'fr_FR', 'Affiche et traite les prix avec(0) ou sans (1) les taxes', NULL, NULL, NULL),
+(20, 'fr_FR', 'Compiler les resources du modèle actif à chaque changement (1 = oui, 2 = non)', NULL, NULL, NULL),
+(21, 'fr_FR', 'Nom du cookie "Remember me" pour les utilisateurs d''administration', NULL, NULL, NULL),
+(22, 'fr_FR', 'Délai d''expiration du cookie "Remember me", en secondes, pour les utilisateurs d''administration', NULL, NULL, NULL),
+(23, 'fr_FR', 'Nom du cookie "Remember me" pour les clients', NULL, NULL, NULL),
+(24, 'fr_FR', 'Délai d''expiration du cookie "Remember me", en secondes, pour les clients', NULL, NULL, NULL),
+(25, 'fr_FR', 'URL de base pour la boutique (par exemple http://www.yourshopdomain.com)', NULL, NULL, NULL),
+(26, 'fr_FR', 'Nom de la vue de la facture dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL),
+(27, 'fr_FR', 'Nom de la vue de la livraison dans le modèle PDF en cours (sans extension)', NULL, NULL, NULL),
+(28, 'fr_FR', 'Le chemin (par rapport au modèle de back-office par défaut) vers l''image utilisée lorsque aucune image de drapeau ne peut être trouvée pour un pays', NULL, NULL, NULL),
+(29, 'fr_FR', 'Niveau de découpe des espaces dans le code HTML généré (0 = aucun, 1 = moyen, 2 = maximum)', NULL, NULL, NULL),
+(30, 'fr_FR', 'Stock disponible par défaut quand check-available-stock est à 0.', NULL, NULL, NULL),
+(31, 'fr_FR', 'L''ID du dossier contenant vos pages d''informations : CGV, mentions légales, ...', NULL, NULL, NULL),
+(32, 'fr_FR', 'L''ID du contenu de vos ''CGV''.', NULL, NULL, NULL);
+
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
 (1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),
@@ -973,7 +1020,8 @@ INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by
 (265, 7, '540', 'NC', 'NCL', 0, 0, NOW(), NOW()),
 (266, 7, '258', 'PF', 'PYF', 0, 0, NOW(), NOW()),
 (267, 7, '876', 'WF', 'WLF', 0, 0, NOW(), NOW()),
-(268, 4, '840', 'US', 'USA', 0, 0, NOW(), NOW());
+(268, 4, '840', 'US', 'USA', 0, 0, NOW(), NOW()),
+(269, 5, '344', 'HK', 'HKG', 0, 0, NOW(), NOW());
 
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Afghanistan', '', '', ''),
@@ -1764,7 +1812,10 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (267, 'fr_FR', 'Wallis-et-Futuna', '', '', ''),
 (268, 'en_US', 'USA - Alabama', '', '', ''),
 (268, 'es_ES', 'USA - Alabama', '', '', ''),
-(268, 'fr_FR', 'USA - Alabama', '', '', '');
+(268, 'fr_FR', 'USA - Alabama', '', '', ''),
+(269, 'en_US', 'Hong Kong', '', '', ''),
+(269, 'es_ES', 'Hong Kong', '', '', ''),
+(269, 'fr_FR', 'Hong Kong', '', '', '');
 
 INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
   VALUES
@@ -1850,7 +1901,8 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (31, 'admin.configuration.advanced', NOW(), NOW()),
 (32, 'admin.configuration.translations', NOW(), NOW()),
 (33, 'admin.export', NOW(), NOW()),
-(34, 'admin.tools', NOW(), NOW());
+(34, 'admin.tools', NOW(), NOW()),
+(35, 'admin.brand', NOW(), NOW());
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql-i18n
@@ -1935,3 +1987,36 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 (1, 'fr_FR', 'Confirmation de commande', 'Commande : {$order_ref}', '{assign var="order_id" value=1}\\r\\n\\r\\n{loop name="order.invoice" type="order" id=$order_id customer="*"}\\r\\n    {loop name="currency.order" type="currency" id=$CURRENCY}\\r\\n        {assign "orderCurrency" $CODE}\\r\\n    {/loop}\\r\\n{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}\\r\\n{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\\\\r\\\\n\\r\\n{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\\\\r\\\\n\\r\\n{$ZIPCODE} {$CITY}\\\\r\\\\n\\r\\n{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\\\\r\\\\n\\r\\n{/loop}\\r\\nConfirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\\\\r\\\\n\\\\r\\\\n\\r\\nLes articles commandés:\\\\r\\\\n\\r\\n{loop type="order_product" name="order-products" order=$ID}\\r\\n{if $WAS_IN_PROMO == 1}\\r\\n    {assign "realPrice" $PROMO_PRICE}\\r\\n    {assign "realTax" $PROMO_PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}\\r\\n{else}\\r\\n    {assign "realPrice" $PRICE}\\r\\n    {assign "realTax" $PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PRICE}\\r\\n{/if}\\r\\n    \\\\r\\\\n\\r\\n    Article : {$TITLE}\\r\\n{ifloop rel="combinations"}\\r\\n    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}\\r\\n    {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\\\\r\\\\n\\r\\n{/loop}\\r\\n{/ifloop}\\\\r\\\\n\\r\\n    Quantité : {$QUANTITY}\\\\r\\\\n\\r\\n    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\\\\r\\\\n\\r\\n{/loop}\\r\\n\\\\r\\\\n-----------------------------------------\\\\r\\\\n\\r\\nMontant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nFrais de port TTC :    {$POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nSomme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \\\\r\\\\n\\r\\n==================================\\\\r\\\\n\\\\r\\\\n\\r\\nVotre facture est disponible dans la rubrique mon compte sur {config key="url_site"}\\r\\n{/loop}', NULL),
 (2, 'en_US', 'Your new password', 'Your new password', 'Your new passord is : {$password}', NULL),
 (2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe est : {$password}', NULL);
+
+-- Add firewall i18n
+SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';
+SELECT @time := `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
+SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_attempts';
+SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
+SELECT @active := `id` FROM `config` WHERE `name` =  'from_firewall_active';
+
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@time, 'en_US', '[Firewall] Time to wait between X attempts', NULL, NULL, NULL),
+  (@time, 'fr_FR', '[Pare-feu] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_time, 'en_US', '[Firewall/Bruteforce] Time to wait between X attempts', NULL, NULL, NULL),
+  (@bf_time, 'fr_FR', '[Pare-feu/Bruteforce] Temps à attendre entre X essais', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@attempts, 'en_US', '[Firewall] Number of allowed attemps', NULL, NULL, NULL),
+  (@attempts, 'fr_FR', '[Pare-feu] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@bf_attempts, 'en_US', '[Firewall/Bruteforce] Number of allowed attemps', NULL, NULL, NULL),
+  (@bf_attempts, 'fr_FR', '[Pare-feu/Bruteforce] Nombre de tentatives autorisées', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@active, 'en_US', '[Firewall] Activate the firewall', NULL, NULL, NULL),
+  (@active, 'fr_FR', '[Pare-feu] Activer le pare-feu', NULL, NULL, NULL)
+;

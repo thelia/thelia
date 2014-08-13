@@ -216,12 +216,16 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function theliaElseloop($params, $content, /** @noinspection PhpUnusedParameterInspection */ $template, &$repeat)
     {
-        // When encountering close tag, check if loop has results.
-        if ($repeat === false) {
-            return $this->checkEmptyLoop($params) ? $content : '';
+        //Block the smarty interpretation in the elseloop
+        if ($content === null) {
+            if ( ! $this->checkEmptyLoop($params)) {
+                $repeat = false;
+
+                return '';
+            }
         }
 
-        return '';
+        return $content;
     }
 
     /**

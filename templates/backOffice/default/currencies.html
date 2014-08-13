@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Currencies'}{/block}
 
 {block name="check-resource"}admin.configuration.currency{/block}
@@ -139,7 +143,7 @@
                                                 <td class="text-center">
                                                     {admin_position_block
                                                         resource="admin.configuration.currency"
-                                                        access="update"
+                                                        access="UPDATE"
                                                         path="/admin/configuration/currencies/update-position"
                                                         url_parameter="currency_id"
                                                         in_place_edit_class="currencyPositionChange"

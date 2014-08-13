@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Edit a mailing template'}{/block}
 
 {block name="check-resource"}admin.configuration.message{/block}
@@ -112,7 +116,7 @@
 				                                {form_field form=$form field='html_template_file_name'}
 				                                <div class="form-group {if $error}has-error{/if}">
 				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="html-message-content" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                        <select data-toggle-textarea="thelia_message_modification[html_message]" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
 			                                            <option value="">{intl l='Use HTML message defined below'}</option>
 	                                                    {foreach $html_template_list as $template}
 	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -128,11 +132,12 @@
 											<div class="col-md-12">
 												{form_field form=$form field='html_message'}
 												<div class="form-group {if $error}has-error{/if}">
-												    <label for="html-message-content" class="control-label">
+												    <label for="{$label_attr.for}" class="control-label">
 												    	{$label}{if $required} <span class="required">*</span>{/if} :
 												      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
 												    </label>
-												    <textarea {$disable_html} {if $required}required="required"{/if} name="{$name}" id="html-message-content" rows="10" class="fixedfont form-control">{$value}</textarea>
+												    <textarea {$disable_html} {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
+                                                    <div id="{$name}" style="height: 500px;">{$value}</div>
 												</div>
 												{/form_field}
 											</div>
@@ -163,7 +168,7 @@
 			                                    {form_field form=$form field='text_template_file_name'}
 			                                    <div class="form-group {if $error}has-error{/if}">
 			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="text-message-content" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+			                                        <select data-toggle-textarea="thelia_message_modification[text_message]" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
 			                                            <option value="">{intl l='Use Text message defined below'}</option>
 	                                                    {foreach $text_template_list as $template}
 	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
@@ -179,11 +184,12 @@
 	                                        <div class="col-md-12">
 				                                {form_field form=$form field='text_message'}
 				                                <div class="form-group {if $error}has-error{/if}">
-				                                    <label for="text-message-content" class="control-label">
+				                                    <label for="{$label_attr.for}" class="control-label">
 				                                    	{$label}{if $required} <span class="required">*</span>{/if} :
 				                                      <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
 				                                    </label>
-				                                    <textarea {$disable_text} id="text-message-content" {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
+				                                    <textarea {$disable_text} {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
+                                                    <div id="{$name}" style="height: 500px;">{$value}</div>
 				                                </div>
 				                                {/form_field}
 			                                </div>
@@ -220,18 +226,39 @@
 {/block}
 
 {block name="javascript-initialization"}
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
 <script>
-	(function($) {
-	   $('select.textarea-toggle').change(function(ev) {
-		   if ($(this).val() != '') {
-			   $('#' + $(this).data('toggle-textarea')).addClass("disabled").prop('readonly', true);
-		   }
-		   else {
-               $('#' + $(this).data('toggle-textarea')).removeClass('disabled').prop('readonly', false);
-		   }
-	   });
+    (function($) {
 
-	 })(jQuery);
+        var editor;
+
+        $('select.textarea-toggle').change(function(ev) {
+            if ($(this).val() != '') {
+                editor = ace.edit($(this).data('toggle-textarea'));
+                editor.setReadOnly(true);
+            }
+            else {
+                editor = ace.edit($(this).data('toggle-textarea'));
+                editor.setReadOnly(true);
+            }
+        });
+
+        var elems = ["thelia_message_modification[html_message]", "thelia_message_modification[text_message]"]
+        $.each(elems, function(index, value){
+            editor = ace.edit(value);
+            var textarea = $('textarea[name="' + value + '"]').hide();
+
+            editor.setTheme("ace/theme/monokai");
+            editor.getSession().setMode("ace/mode/smarty");
+
+            editor.getSession().on("change", function () {
+                textarea.val(editor.getSession().getValue());
+            });
+
+            textarea.val(editor.getSession().getValue());
+        });
+
+    })(jQuery);
 </script>
 {/block}
 

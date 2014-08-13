@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Edit a shipping configuration'}{/block}
 
 {block name="check-resource"}admin.configuration.shipping-configuration{/block}

@@ -270,6 +270,6 @@ class Session extends BaseSession
      */
     public function getConsumedCoupons()
     {
-        return $this->get('thelia.consumed_coupons');
+        return $this->get('thelia.consumed_coupons', array());
     }
 }

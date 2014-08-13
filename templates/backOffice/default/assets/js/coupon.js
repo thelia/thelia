@@ -214,10 +214,10 @@ $(function($){
     // ***********************************************
 
     $.couponManager.displayEfffect = function(optionSelected) {
-        var mainDiv = $('#coupon-type');
-        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+        var typeDiv = $('#coupon-type');
+        typeDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
-        var inputsDiv = mainDiv.find('.inputs');
+        var inputsDiv = $('.inputs', $('#coupon-inputs'));
         inputsDiv.html('<div class="loading" ></div>');
         var url = $.couponManager.urlAjaxAdminCouponDrawInputs;
         url = url.replace('couponServiceId', optionSelected.val());
@@ -235,16 +235,24 @@ $(function($){
             }
         }).done(function(data) {
             inputsDiv.html(data);
+
+            // Invoke coupon setup funtion, if any
+            try {
+                couponInputFormSetup();
+            }
+            catch (ex) {
+                // Ignore the error
+            }
         });
     };
 
     // Reload effect inputs when changing effect
     $.couponManager.onEffectChange = function() {
-        var mainDiv = $('#coupon-type');
-        var optionSelected = mainDiv.find('#type option:selected');
-        mainDiv.find('.typeToolTip').html(optionSelected.data('description'));
+        var typeDiv = $('#coupon-type');
+        var optionSelected = typeDiv.find('#type option:selected');
+        typeDiv.find('.typeToolTip').html(optionSelected.data('description'));
 
-        mainDiv.find('#type').on('change', function () {
+        typeDiv.find('#type').on('change', function () {
             var optionSelected = $('option:selected', this);
             $.couponManager.displayEfffect(optionSelected);
 

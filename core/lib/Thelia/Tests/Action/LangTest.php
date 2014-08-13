@@ -172,4 +172,11 @@ class LangTest extends \PHPUnit_Framework_TestCase
             ->update(array('ByDefault' => true));
     }
 
+    protected function tearDown()
+    {
+        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TEST.png");
+        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TES.png");
+    }
+
+
 }

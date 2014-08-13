@@ -9,6 +9,8 @@ use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\OrderAddress;
 
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
@@ -137,17 +139,28 @@ try {
         ->find();
     $productPrice->delete();
 
+    $brand = Thelia\Model\BrandQuery::create()
+        ->find();
+    $brand->delete();
+
+    $brand = Thelia\Model\BrandI18nQuery::create()
+        ->find();
+    $brand->delete();
+
     \Thelia\Model\ProductImageQuery::create()->find()->delete();
     \Thelia\Model\CategoryImageQuery::create()->find()->delete();
     \Thelia\Model\FolderImageQuery::create()->find()->delete();
     \Thelia\Model\ContentImageQuery::create()->find()->delete();
+    \Thelia\Model\BrandImageQuery::create()->find()->delete();
 
     \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
     \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
     \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
     \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
+    \Thelia\Model\BrandDocumentQuery::create()->find()->delete();
 
     \Thelia\Model\CouponQuery::create()->find()->delete();
+    \Thelia\Model\OrderQuery::create()->find()->delete();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
@@ -381,6 +394,30 @@ try {
         }
     }
 
+    echo "Creating brands\n";
+
+    $brandIdList = [];
+
+    for ($k=0; $k<10; $k++) {
+        $brand = new Thelia\Model\Brand();
+
+        $brand->setVisible(1);
+        $brand->setPosition($k+1);
+        setI18n($faker, $brand);
+
+        $brand->save();
+        $brandId = $brand->getId();
+        $brandIdList[] = $brandId;
+
+        $image = new \Thelia\Model\BrandImage();
+        $image->setBrandId($brandId);
+        generate_image($image, 'brand', $brandId);
+
+        $document = new \Thelia\Model\BrandDocument();
+        $document->setBrandId($brandId);
+        generate_document($document, 'brand', $brandId);
+    }
+
     echo "Creating categories and products\n";
 
     //categories and products
@@ -393,12 +430,12 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for ($k=0; $k<rand(0, 20); $k++) {
-                createProduct($faker, $subcategory, $k, $template, $productIdList);
+                createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList);
             }
         }
 
         for ($k=1; $k<rand(1, 50); $k++) {
-            createProduct($faker, $category, $k, $template, $productIdList);
+            createProduct($faker, $category, $k, $template, $brandIdList, $productIdList);
         }
     }
 
@@ -492,6 +529,111 @@ try {
         }
     }
 
+    echo "Creating orders\n";
+
+    $colissimo_id = ModuleQuery::create()->
+        filterByCode("Colissimo")
+        ->findOne()
+        ->getId();
+
+    $cheque_id = ModuleQuery::create()
+        ->filterByCode("Cheque")
+        ->findOne()
+        ->getId();
+
+    for ($i=0; $i < 50; ++$i) {
+        $placedOrder = new \Thelia\Model\Order();
+
+        $deliveryOrderAddress = new OrderAddress();
+        $deliveryOrderAddress
+            ->setCustomerTitleId(mt_rand(1,3))
+            ->setCompany($faker->text(15))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+        ->save($con)
+        ;
+
+        $invoiceOrderAddress = new OrderAddress();
+        $invoiceOrderAddress
+            ->setCustomerTitleId(mt_rand(1,3))
+            ->setCompany($faker->text(15))
+            ->setFirstname($faker->firstname)
+            ->setLastname($faker->lastname)
+            ->setAddress1($faker->streetAddress)
+            ->setAddress2($faker->streetAddress)
+            ->setAddress3($faker->streetAddress)
+            ->setPhone($faker->phoneNumber)
+            ->setZipcode($faker->postcode)
+            ->setCity($faker->city)
+            ->setCountryId(64)
+        ->save($con)
+        ;
+
+        $placedOrder
+            ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
+            ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
+            ->setDeliveryModuleId($colissimo_id)
+            ->setPaymentModuleId($cheque_id)
+            ->setStatusId(mt_rand(1, 5))
+            ->setCurrency(
+                \Thelia\Model\CurrencyQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
+            ->setCustomer(
+                \Thelia\Model\CustomerQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
+            ->setDiscount(mt_rand(0, 10))
+            ->setLang(
+                \Thelia\Model\LangQuery::create()
+                    ->addAscendingOrderByColumn('RAND()')
+                    ->findOne()
+            )
+            ->setPostage(mt_rand(1, 50))
+        ;
+
+        $placedOrder->save($con);
+
+        for ($j=0; $j < mt_rand(1, 10); ++$j) {
+            $pse = \Thelia\Model\ProductSaleElementsQuery::create()
+                ->addAscendingOrderByColumn('RAND()')
+                ->findOne();
+
+            $product = $pse->getProduct();
+
+            $orderProduct = new \Thelia\Model\OrderProduct();
+
+            $orderProduct
+                ->setOrderId($placedOrder->getId())
+                ->setProductRef($product->getRef())
+                ->setProductSaleElementsRef($pse->getRef())
+                ->setTitle($product->getTitle())
+                ->setChapo($product->getChapo())
+                ->setDescription($product->getDescription())
+                ->setPostscriptum($product->getPostscriptum())
+                ->setQuantity(mt_rand(1, 10))
+                ->setPrice($price=mt_rand(1, 100))
+                ->setPromoPrice(mt_rand(1, $price))
+                ->setWasNew($pse->getNewness())
+                ->setWasInPromo(rand(0,1) == 1)
+                ->setWeight($pse->getWeight())
+                ->setTaxRuleTitle($faker->text(20))
+                ->setTaxRuleDescription($faker->text(50))
+                ->setEanCode($pse->getEanCode())
+            ->save($con);
+        }
+
+    }
+
     echo "Generating coupons fixtures\n";
 
     generateCouponFixtures($thelia);
@@ -502,11 +644,13 @@ try {
 
 } catch (Exception $e) {
     echo "error : ".$e->getMessage()."\n";
+    echo "Cause: ".$e->getPrevious()->getMessage()."\n";
     echo $e->getTraceAsString();
+
     $con->rollBack();
 }
 
-function createProduct($faker, Thelia\Model\Category $category, $position, $template, &$productIdList)
+function createProduct($faker, Thelia\Model\Category $category, $position, $template, $brandIdList, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
@@ -520,6 +664,7 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $product->setPosition($position);
     $product->setTaxRuleId(1);
     $product->setTemplate($template);
+    $product->setBrandId($brandIdList[array_rand($brandIdList, 1)]);
 
     setI18n($faker, $product);
 
@@ -685,7 +830,7 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon1->setEffects(array(
-        RemoveXAmount::INPUT_AMOUNT_NAME => 10.00,
+        RemoveXAmount::AMOUNT_FIELD_NAME => 10.00,
     ));
     $coupon1->setIsUsed(true);
     $coupon1->setIsEnabled(true);
@@ -744,8 +889,7 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon2->setEffects(array(
-        RemoveXPercent::INPUT_AMOUNT_NAME => 0.00,
-        RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00,
+        RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00
     ));
     $coupon2->setIsUsed(true);
     $coupon2->setIsEnabled(true);
@@ -790,7 +934,6 @@ Praesent ligula lorem, faucibus ut metus quis, fermentum iaculis erat. Pellentes
 
 Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.');
     $coupon3->setEffects(array(
-        RemoveXPercent::INPUT_AMOUNT_NAME => 0.00,
         RemoveXPercent::INPUT_PERCENTAGE_NAME => 10.00,
     ));
     $coupon3->setIsUsed(false);

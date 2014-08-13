@@ -18,6 +18,10 @@
             <xsd:element name="forms" type="forms" />
             <xsd:element name="routing" type="routing" />
             <xsd:element name="hooks" type="hooks" />
+            <xsd:element name="export_categories" type="export_categories" />
+            <xsd:element name="exports" type="exports" />
+            <xsd:element name="import_categories" type="import_categories" />
+            <xsd:element name="imports" type="imports" />
         </xsd:choice>
     </xsd:complexType>
 
@@ -244,6 +248,100 @@
         <xsd:attribute name="class" type="xsd:string" />
         <xsd:attribute name="method" type="xsd:string" />
         <xsd:attribute name="function" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="export_categories">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="export_category" type="export_category"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="export_category">
+        <xsd:choice maxOccurs="unbounded" minOccurs="1">
+            <xsd:element name="title" type="export_category_title" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" use="required" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="export_category_title">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="locale" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="exports">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="export" type="export"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="export">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="export_descriptive" type="export_descriptive" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="category_id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="export_descriptive">
+        <xsd:sequence minOccurs="1" maxOccurs="1">
+            <xsd:element name="title" type="xsd:string" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="description" type="xsd:string" />
+        </xsd:sequence>
+
+        <xsd:attribute name="locale" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="import_categories">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="import_category" type="import_category"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="import_category">
+        <xsd:choice maxOccurs="unbounded" minOccurs="1">
+            <xsd:element name="title" type="import_category_title" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" use="required" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="import_category_title">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="locale" type="xsd:string" use="required"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="imports">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="import" type="import"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="import">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="import_descriptive" type="import_descriptive" />
+        </xsd:choice>
+
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+        <xsd:attribute name="class" type="xsd:string" use="required"/>
+        <xsd:attribute name="category_id" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="import_descriptive">
+        <xsd:sequence minOccurs="1" maxOccurs="1">
+            <xsd:element name="title" type="xsd:string" />
+            <xsd:element minOccurs="0" maxOccurs="1" name="description" type="xsd:string" />
+        </xsd:sequence>
+
+        <xsd:attribute name="locale" type="xsd:string" use="required" />
     </xsd:complexType>
 
 </xsd:schema>

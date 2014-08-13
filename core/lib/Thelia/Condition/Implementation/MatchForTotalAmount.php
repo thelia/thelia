@@ -93,7 +93,7 @@ class MatchForTotalAmount extends ConditionAbstract
     public function isMatching()
     {
         $condition1 = $this->conditionValidator->variableOpComparison(
-            $this->facade->getCartTotalPrice(),
+            $this->facade->getCartTotalTaxPrice(),
             $this->operators[self::CART_TOTAL],
             $this->values[self::CART_TOTAL]
         );
@@ -120,8 +120,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         return $this->translator->trans(
             'Cart total amount',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -132,8 +131,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'Check the total Cart amount in the given currency',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -155,8 +153,7 @@ class MatchForTotalAmount extends ConditionAbstract
                 '%operator%' => $i18nOperator,
                 '%amount%' => $this->values[self::CART_TOTAL],
                 '%currency%' => $this->values[self::CART_CURRENCY]
-            ),
-            'condition'
+            )
         );
 
         return $toolTip;
@@ -199,7 +196,7 @@ class MatchForTotalAmount extends ConditionAbstract
     {
         $labelPrice = $this->facade
             ->getTranslator()
-            ->trans('Cart total amount is', [], 'condition');
+            ->trans('Cart total amount is', []);
 
         $html = $this->drawBackOfficeBaseInputsText($labelPrice, self::CART_TOTAL);
 

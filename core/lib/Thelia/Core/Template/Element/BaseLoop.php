@@ -33,7 +33,7 @@ use Thelia\Type\TypeCollection;
 abstract class BaseLoop
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
+     * @var \Thelia\Core\HttpFoundation\Request
      */
     protected $request;
 

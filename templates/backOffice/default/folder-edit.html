@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'folder'}
+{/block}
+
 {block name="check-resource"}admin.folder{/block}
 {block name="check-access"}update{/block}
 

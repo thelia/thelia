@@ -21,35 +21,33 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
+use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
+use Propel\Runtime\Propel;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
+use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-
-use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\Config\FileLocator;
-
-use Propel\Runtime\Propel;
-use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Log\Tlog;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.1';
+    const THELIA_VERSION = '2.0.3-beta2';
 
     public function init()
     {
@@ -140,7 +138,7 @@ class Thelia extends Kernel
                 }
             }
         } catch (\UnexpectedValueException $ex) {
-            // The directory does not exists, ignore it.
+             // The directory does not exists, ignore it.
         }
     }
 
@@ -159,12 +157,13 @@ class Thelia extends Kernel
             ->depth(0)
             ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
 
+        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $loader->load($file->getBaseName());
         }
 
         if (defined("THELIA_INSTALL_MODE") === false) {
-            $modules = \Thelia\Model\ModuleQuery::getActivated();
+            $modules = ModuleQuery::getActivated();
 
             $translationDirs = array();
 
@@ -230,12 +229,16 @@ class Thelia extends Kernel
                         $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
                             $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
                     }
+
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
 
                 } catch (\InvalidArgumentException $e) {
+
                     Tlog::getInstance()->addError(
                         sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e
                     );
+
+                    throw $e;
                 }
             }
 

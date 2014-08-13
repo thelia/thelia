@@ -4,12 +4,13 @@ php:
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
 
 env:
   - DB_USER=root
 
 before_script:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y language-pack-fr language-pack-fr-base
   - phpenv config-add travis.php.ini
   - composer self-update
   - composer install --prefer-dist --dev
@@ -21,5 +22,4 @@ before_script:
 
 matrix:
   allow_failures:
-    - php: hhvm
     - php: 5.6

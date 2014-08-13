@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
 
 use Thelia\TaxEngine\Calculator;
@@ -13,7 +14,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\ProductTableMap;
 
-class Product extends BaseProduct
+class Product extends BaseProduct implements FileModelParentInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
@@ -24,7 +25,7 @@ class Product extends BaseProduct
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'product';
     }
@@ -61,7 +62,7 @@ class Product extends BaseProduct
      */
     public function getDefaultSaleElements()
     {
-        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->find();
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->findOne();
     }
 
     /**
@@ -267,7 +268,7 @@ class Product extends BaseProduct
      */
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEPRODUCT, new ProductEvent($this));
     }

@@ -104,8 +104,7 @@ class ForSomeCustomers extends ConditionAbstract
     {
         return $this->translator->trans(
             'For one ore more customers',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -116,8 +115,7 @@ class ForSomeCustomers extends ConditionAbstract
     {
         $toolTip = $this->translator->trans(
             'The coupon applies to some customers only',
-            [],
-            'condition'
+            []
         );
 
         return $toolTip;
@@ -150,7 +148,7 @@ class ForSomeCustomers extends ConditionAbstract
             'Customer is %op% <strong>%customer_list%</strong>', [
                 '%customer_list%' => $custStrList,
                 '%op%' => $i18nOperator
-            ], 'condition'
+            ]
         );
 
         return $toolTip;

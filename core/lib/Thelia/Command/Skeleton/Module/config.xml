@@ -35,4 +35,16 @@
         </hook>
     </hooks>
     -->
+
+    <!--
+    <exports>
+
+    </exports>
+    -->
+
+    <!--
+    <imports>
+
+    </imports>
+    -->
 </config>

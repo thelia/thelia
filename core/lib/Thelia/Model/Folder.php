@@ -4,11 +4,12 @@ namespace Thelia\Model;
 
 use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 
-class Folder extends BaseFolder
+class Folder extends BaseFolder implements FileModelParentInterface
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
@@ -19,7 +20,7 @@ class Folder extends BaseFolder
     /**
      * {@inheritDoc}
      */
-    protected function getRewrittenUrlViewName()
+    public function getRewrittenUrlViewName()
     {
         return 'folder';
     }
@@ -52,6 +53,28 @@ class Folder extends BaseFolder
         }
 
         return $contentsCount;
+
+    }
+
+    /**
+     * Get the root folder
+     * @param  int   $folderId
+     * @return mixed
+     */
+    public function getRoot($folderId)
+    {
+
+        $folder = FolderQuery::create()->findPk($folderId);
+
+        if (0 !== $folder->getParent()) {
+            $parentFolder = FolderQuery::create()->findPk($folder->getParent());
+
+            if (null !== $parentFolder) {
+                $folderId = $this->getRoot($parentFolder->getId());
+            }
+        }
+
+        return $folderId;
 
     }
 
@@ -106,7 +129,7 @@ class Folder extends BaseFolder
 
     public function postDelete(ConnectionInterface $con = null)
     {
-        $this->markRewritenUrlObsolete();
+        $this->markRewrittenUrlObsolete();
 
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFOLDER, new FolderEvent($this));
     }

@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\DependencyInjection\Loader;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
@@ -24,6 +25,19 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
+use Thelia\Log\Tlog;
+use Thelia\Model\Export;
+use Thelia\Model\ExportCategory;
+use Thelia\Model\ExportCategoryQuery;
+use Thelia\Model\ExportQuery;
+use Thelia\Model\Import;
+use Thelia\Model\ImportCategory;
+use Thelia\Model\ImportCategoryQuery;
+use Thelia\Model\ImportQuery;
+use Thelia\Model\Map\ExportCategoryTableMap;
+use Thelia\Model\Map\ExportTableMap;
+use Thelia\Model\Map\ImportCategoryTableMap;
+use Thelia\Model\Map\ImportTableMap;
 
 /**
  *
@@ -66,6 +80,44 @@ class XmlFileLoader extends FileLoader
         $this->parseDefinitions($xml, $path);
 
         $this->parseHooks($xml, $path, $type);
+
+        $this->propelOnlyRun(
+            [$this, "parseExportCategories"],
+            $xml,
+            ExportCategoryTableMap::DATABASE_NAME
+        );
+
+        $this->propelOnlyRun(
+            [$this, "parseExports"],
+            $xml,
+            ExportTableMap::DATABASE_NAME
+        );
+
+        $this->propelOnlyRun(
+            [$this, "parseImportCategories"],
+            $xml,
+            ImportCategoryTableMap::DATABASE_NAME
+        );
+
+        $this->propelOnlyRun(
+            [$this, "parseImports"],
+            $xml,
+            ImportTableMap::DATABASE_NAME
+        );
+    }
+
+    public function propelOnlyRun(callable $method, $arg, $name)
+    {
+        $doRun = false;
+
+        try {
+            Propel::getConnection($name);
+            $doRun = true;
+        } catch (\ErrorException $e) {}
+
+        if ($doRun) {
+            call_user_func($method, $arg);
+        }
     }
 
     protected function parseCommands(SimpleXMLElement $xml)
@@ -318,6 +370,259 @@ class XmlFileLoader extends FileLoader
         }
 
         return $definition;
+    }
+
+    protected function parseExportCategories(SimpleXMLElement $xml)
+    {
+        if (false === $exportCategories = $xml->xpath('//config:export_categories/config:export_category')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ExportCategoryTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $exportCategory */
+            foreach ($exportCategories as $exportCategory) {
+                $id = (string) $exportCategory->getAttributeAsPhp("id");
+
+                $exportCategoryModel = ExportCategoryQuery::create()->findOneByRef($id);
+
+                if ($exportCategoryModel === null) {
+                    $exportCategoryModel = new ExportCategory();
+                    $exportCategoryModel
+                        ->setRef($id)
+                        ->save($con)
+                    ;
+                }
+
+                /** @var SimpleXMLElement $child */
+                foreach ($exportCategory->children() as $child) {
+                    $locale = (string) $child->getAttributeAsPhp("locale");
+                    $value = (string) $child;
+
+                    $exportCategoryModel
+                        ->setLocale($locale)
+                        ->setTitle($value)
+                        ->save($con);
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            Tlog::getInstance()->error($e->getMessage());
+        }
+    }
+
+    protected function parseExports(SimpleXMLElement $xml)
+    {
+        if (false === $exports = $xml->xpath('//config:exports/config:export')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ExportTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+
+            /** @var SimpleXMLElement $export */
+            foreach ($exports as $export) {
+                $id = (string) $export->getAttributeAsPhp("id");
+                $class = (string) $export->getAttributeAsPhp("class");
+                $categoryRef = (string) $export->getAttributeAsPhp("category_id");
+
+                if (!class_exists($class)) {
+                    throw new \ErrorException(
+                        "The class \"$class\" doesn't exist"
+                    );
+                }
+
+                $category = ExportCategoryQuery::create()->findOneByRef($categoryRef);
+
+                if (null === $category) {
+                    throw new \ErrorException(
+                            "The export category \"$categoryRef\" doesn't exist"
+                    );
+                }
+
+                $exportModel = ExportQuery::create()->findOneByRef($id);
+
+                if (null === $exportModel) {
+                    $exportModel = new Export();
+                    $exportModel
+                        ->setRef($id)
+                    ;
+                }
+
+                $exportModel
+                    ->setExportCategory($category)
+                    ->setHandleClass($class)
+                    ->save($con)
+                ;
+
+                /** @var SimpleXMLElement $descriptive */
+                foreach ($export->children() as $descriptive) {
+                    $locale = $descriptive->getAttributeAsPhp("locale");
+                    $title = null;
+                    $description = null;
+
+                    /** @var SimpleXMLElement $row */
+                    foreach ($descriptive->children() as $row) {
+                        switch ($row->getName()) {
+                            case "title":
+                                $title = (string) $row;
+                                break;
+                            case "description":
+                                $description = (string) $row;
+                                break;
+                        }
+                    }
+
+                    $exportModel
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                        ->setDescription($description)
+                        ->save($con)
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            Tlog::getInstance()->error($e->getMessage());
+        }
+    }
+
+    protected function parseImportCategories(SimpleXMLElement $xml)
+    {
+        if (false === $importCategories = $xml->xpath('//config:import_categories/config:import_category')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ImportCategoryTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+
+            /** @var SimpleXMLElement $importCategory */
+            foreach ($importCategories as $importCategory) {
+                $id = (string) $importCategory->getAttributeAsPhp("id");
+
+                $importCategoryModel = ImportCategoryQuery::create()->findOneByRef($id);
+
+                if ($importCategoryModel === null) {
+                    $importCategoryModel = new ImportCategory();
+                    $importCategoryModel
+                        ->setRef($id)
+                        ->save($con)
+                    ;
+                }
+
+                /** @var SimpleXMLElement $child */
+                foreach ($importCategory->children() as $child) {
+                    $locale = (string) $child->getAttributeAsPhp("locale");
+                    $value = (string) $child;
+
+                    $importCategoryModel
+                        ->setLocale($locale)
+                        ->setTitle($value)
+                        ->save($con);
+                    ;
+                }
+
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            Tlog::getInstance()->error($e->getMessage());
+        }
+    }
+
+    protected function parseImports(SimpleXMLElement $xml)
+    {
+        if (false === $imports = $xml->xpath('//config:imports/config:import')) {
+            return;
+        }
+
+        $con = Propel::getWriteConnection(ImportTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            /** @var SimpleXMLElement $import */
+            foreach ($imports as $import) {
+                $id = (string) $import->getAttributeAsPhp("id");
+                $class = (string) $import->getAttributeAsPhp("class");
+                $categoryRef = (string) $import->getAttributeAsPhp("category_id");
+
+                if (!class_exists($class)) {
+                    throw new \ErrorException(
+                            "The class \"$class\" doesn't exist"
+                    );
+                }
+
+                $category = ImportCategoryQuery::create()->findOneByRef($categoryRef);
+
+                if (null === $category) {
+                    throw new \ErrorException(
+                        "The import category \"$categoryRef\" doesn't exist"
+                    );
+                }
+
+                $importModel = ImportQuery::create()->findOneByRef($id);
+
+                if (null === $importModel) {
+                    $importModel = new Import();
+                    $importModel
+                        ->setRef($id)
+                    ;
+                }
+
+                $importModel
+                    ->setImportCategory($category)
+                    ->setHandleClass($class)
+                    ->save($con)
+                ;
+
+                /** @var SimpleXMLElement $descriptive */
+                foreach ($import->children() as $descriptive) {
+                    $locale = $descriptive->getAttributeAsPhp("locale");
+                    $title = null;
+                    $description = null;
+
+                    /** @var SimpleXMLElement $row */
+                    foreach ($descriptive->children() as $row) {
+                        switch ($row->getName()) {
+                            case "title":
+                                $title = (string) $row;
+                                break;
+                            case "description":
+                                $description = (string) $row;
+                                break;
+                        }
+                    }
+
+                    $importModel
+                        ->setLocale($locale)
+                        ->setTitle($title)
+                        ->setDescription($description)
+                        ->save($con)
+                    ;
+                }
+            }
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            Tlog::getInstance()->error($e->getMessage());
+        }
     }
 
     /**

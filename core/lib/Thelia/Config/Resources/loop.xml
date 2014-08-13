@@ -14,6 +14,7 @@
         <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
         <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
+        <loop class="Thelia\Core\Template\Loop\Brand" name="brand"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>
@@ -56,6 +57,12 @@
         <loop class="Thelia\Core\Template\Loop\Tax" name="tax"/>
         <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule"/>
         <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country"/>
+        <loop class="Thelia\Core\Template\Loop\Formatter" name="formatter" />
+        <loop class="Thelia\Core\Template\Loop\ArchiveBuilder" name="archive-builder" />
+        <loop class="Thelia\Core\Template\Loop\ImportCategory" name="import-category" />
+        <loop class="Thelia\Core\Template\Loop\ExportCategory" name="export-category" />
+        <loop class="Thelia\Core\Template\Loop\Import" name="import" />
+        <loop class="Thelia\Core\Template\Loop\Export" name="export" />
     </loops>
 
 

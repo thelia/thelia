@@ -1,4 +1,44 @@
+#2.0.3-beta2
+- fix update process
+- fix coupons trait
+- update schema adding new constraints on foreign keys
+- previous url is now saved in session. use ```{navigate to="previous"}``` in your template
+
+#2.0.3-beta
+- New coupon type: Free product if selected products are in the cart.
+- New feature: Product Brands / Suppliers management
+- New 'brand' loop and substitution. product, image and document loop have been updated.
+- Images and document processing have been refactored.
+- Added store description field for SEO
+- Added code editor on textarea on email templates page
+- Fixed issues on position tests
+- Fixed issues on RSS feed links
+- Update SwiftMailer
+- Fix bugs on customer change password form and module "order by title"
+- Add the ability to place a firewall on forms. To use this in a module, extend Thelia\Form\FirewallForm instead of BaseForm
+- Add Exports and Imports management
+- Default front office template:
+     - Display enhancement
+     - Optimization of the uses of Thelia loops to gain performances and consistency
+     - Optimization for SEO : meta description fallback, title on category page, ...
+     - new PSE layout in product page, attributes are separated
+     - Support of 'check-available-stock' config variable
+     - Terms and conditions agreement is now in the order process
+- Default pdf template:
+     - Added list of amount by tax rule
+     - Display enhancement
+     - Added legal information about the store
+- Demo:
+     - Support for brand
+     - Added folders and contents data.
+
 #2.0.2
+- Coupon UI has been redesigned.
+- New coupon types:
+    - Constant discount on selected products
+    - Constant discount on products of selected categories
+    - Percentage discount on selected products
+    - Percentage discount on products of selected categories
 - New coupon conditions :
     - Start date
     - Billing country
@@ -12,7 +52,15 @@
     - class event : Thelia\Core\Event\SessionEvent
     - example : Thelia\Core\EventListener\SessionListener
 - Creation of Thelia\Core\TheliakernelEvents class for referencing kernel event
-    
+- Add new command line that refresh modules list `Thelia module:refresh`
+- Coupon internals have been simplified and improved.
+- Error messages are displayed in install process
+- Add pagination on catalog page in Back-Office
+- Add Hong Kong to country list
+- Fixed issue #452 when installing Thelia on database with special characters
+- implement search on content, folder and category loop.
+- all form are documented
+- template exists for managing google sitemap : sitemap.html
 
 #2.0.1
 - possibility to apply a permanent discount on a customer

@@ -16,7 +16,7 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.view" path="/admin/latest-thelia-version">
+    <route id="admin.home.latestVersion" path="/admin/latest-thelia-version">
         <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
     </route>
 
@@ -466,7 +466,7 @@
         <default key="_controller">Thelia\Controller\Admin\ContentController::createAction</default>
     </route>
 
-    <route id="admin.content.update" path="admin/content/update/{content_id}">
+    <route id="admin.content.update" path="/admin/content/update/{content_id}">
         <default key="_controller">Thelia\Controller\Admin\ContentController::updateAction</default>
         <requirement key="content_id">\d+</requirement>
     </route>
@@ -1222,14 +1222,88 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
+    <!-- Routes to the Brands controller -->
+
+    <route id="admin.brand.default" path="/admin/brand">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::defaultAction</default>
+    </route>
+
+    <route id="admin.brand.create" path="/admin/brand/create">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::createAction</default>
+    </route>
+
+    <route id="admin.brand.update" path="/admin/brand/update/{brand_id}">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::updateAction</default>
+        <requirement key="brand_id">\d+</requirement>
+    </route>
+
+    <route id="admin.brand.save" path="/admin/brand/save/{brand_id}">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::processUpdateAction</default>
+        <requirement key="brand_id">\d+</requirement>
+    </route>
+
+    <route id="admin.brand.seo.save" path="/admin/brand/seo/save">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::processUpdateSeoAction</default>
+    </route>
+
+    <route id="admin.brand.toggle-online" path="/admin/brand/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::setToggleVisibilityAction</default>
+    </route>
+
+    <route id="admin.brand.update-position" path="/admin/brand/update-position">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::updatePositionAction</default>
+    </route>
+
+    <route id="admin.brand.delete" path="/admin/brand/delete">
+        <default key="_controller">Thelia\Controller\Admin\BrandController::deleteAction</default>
+    </route>
+
     <!-- export management -->
 
-    <route id="export.main" path="/admin/export">
+    <route id="export.list" path="/admin/export">
         <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
     </route>
 
-    <route id="export.customer.newsletter" path="/admin/export/customer/newsletter">
-        <default key="_controller">Thelia\Controller\Admin\CustomerExportController::NewsletterExportAction</default>
+    <route id="export.position" path="/admin/export/position">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
+    </route>
+
+    <route id="export.category.position" path="/admin/export/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="export.mode" path="/admin/export/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.view" path="/admin/export/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <!-- import management -->
+
+    <route id="import.list" path="/admin/import">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
+    </route>
+
+    <route id="import.position" path="/admin/import/position">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
+    </route>
+
+    <route id="import.category.position" path="/admin/import/position/category">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
+    </route>
+
+    <route id="import.mode" path="/admin/import/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="import.view" path="/admin/import/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
+        <requirement key="id">\d+</requirement>
     </route>
 
     <!-- The default route, to display a template -->

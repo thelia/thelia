@@ -24,6 +24,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 
 /**
  *
@@ -95,7 +96,7 @@ class SmartyParser extends Smarty implements ParserInterface
         // The default HTTP status
         $this->status = 200;
 
-        $this->registerFilter('output', array($this, "removeBlankLines"));
+        $this->registerFilter('output', array($this, "trimWhitespaces"));
         $this->registerFilter('variable', array(__CLASS__, "theliaEscape"));
     }
 
@@ -110,12 +111,117 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
+     * Trim whitespaces from the HTML output, preserving required ones in pre, textarea, javascript.
+     * This methois uses 3 levels of trimming :
+     *
+     *    - 0 : whitespaces are not trimmed, code remains as is.
+     *    - 1 : only blank lines are trimmed, code remains indented and human-readable (the default)
+     *    - 2 or more : all unnecessary whitespace are removed. Code is very hard to read.
+     *
+     * The trim level is defined by the configuration variable html_output_trim_level
+     *
+     * @param  string                    $source   the HTML source
+     * @param  \Smarty_Internal_Template $template
+     * @return string
+     */
+    public function trimWhitespaces($source, \Smarty_Internal_Template $template)
+    {
+        $compressionMode = ConfigQuery::read('html_output_trim_level', 1);
+
+        if ($compressionMode == 0) {
+            return $source;
+        }
+
+        $store = array();
+        $_store = 0;
+        $_offset = 0;
+
+        // Unify Line-Breaks to \n
+        $source = preg_replace("/\015\012|\015|\012/", "\n", $source);
+
+        // capture Internet Explorer Conditional Comments
+        if ($compressionMode == 1) {
+            $expressions = array(
+                // remove spaces between attributes (but not in attribute values!)
+                '#(([a-z0-9]\s*=\s*(["\'])[^\3]*?\3)|<[a-z0-9_]+)\s+([a-z/>])#is' => '\1 \4',
+                '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n"
+            );
+        } elseif ($compressionMode >= 2) {
+            if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+                foreach ($matches as $match) {
+                    $store[] = $match[0][0];
+                    $_length = strlen($match[0][0]);
+                    $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
+                    $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
+
+                    $_offset += $_length - strlen($replace);
+                    $_store++;
+                }
+            }
+
+            // Strip all HTML-Comments
+            // yes, even the ones in <script> - see http://stackoverflow.com/a/808850/515124
+            $source = preg_replace( '#<!--.*?-->#ms', '', $source );
+
+            $expressions = array(
+                // replace multiple spaces between tags by a single space
+                // can't remove them entirely, becaue that might break poorly implemented CSS display:inline-block elements
+                '#(:SMARTY@!@|>)\s+(?=@!@SMARTY:|<)#s' => '\1 \2',
+                // remove spaces between attributes (but not in attribute values!)
+                '#(([a-z0-9]\s*=\s*(["\'])[^\3]*?\3)|<[a-z0-9_]+)\s+([a-z/>])#is' => '\1 \4',
+                // note: for some very weird reason trim() seems to remove spaces inside attributes.
+                // maybe a \0 byte or something is interfering?
+                '#^\s+<#Ss' => '<',
+                '#>\s+$#Ss' => '>',
+
+            );
+        } else {
+            $expressions = array();
+        }
+
+        // capture html elements not to be messed with
+        $_offset = 0;
+        if (preg_match_all('#<(script|pre|textarea)[^>]*>.*?</\\1>#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $store[] = $match[0][0];
+                $_length = strlen($match[0][0]);
+                $replace = '@!@SMARTY:' . $_store . ':SMARTY@!@';
+                $source = substr_replace($source, $replace, $match[0][1] - $_offset, $_length);
+
+                $_offset += $_length - strlen($replace);
+                $_store++;
+            }
+        }
+
+        $source = preg_replace( array_keys($expressions), array_values($expressions), $source );
+        // note: for some very weird reason trim() seems to remove spaces inside attributes.
+        // maybe a \0 byte or something is interfering?
+        // $source = trim( $source );
+
+        // capture html elements not to be messed with
+        $_offset = 0;
+        if (preg_match_all('#@!@SMARTY:([0-9]+):SMARTY@!@#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $store[] = $match[0][0];
+                $_length = strlen($match[0][0]);
+                $replace = array_shift($store);
+                $source = substr_replace($source, $replace, $match[0][1] + $_offset, $_length);
+
+                $_offset += strlen($replace) - $_length;
+                $_store++;
+            }
+        }
+
+        return $source;
+    }
+
+    /**
      * Add a template directory to the current template list
      *
      * @param int     $templateType      the template type (a TemplateDefinition type constant)
      * @param string  $templateName      the template name
      * @param string  $templateDirectory path to the template dirtectory
-     * @param unknown $key               ???
+     * @param string  $key               ???
      * @param boolean $unshift           ??? Etienne ?
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
@@ -147,11 +253,6 @@ class SmartyParser extends Smarty implements ParserInterface
         }
 
         return $this->templateDirectories[$templateType];
-    }
-
-    public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
-    {
-        return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
     }
 
     public static function theliaEscape($content, $smarty)

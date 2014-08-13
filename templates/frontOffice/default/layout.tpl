@@ -24,10 +24,12 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 {* -- Define some stuff for Smarty ------------------------------------------ *}
 {config_load file='variables.conf'}
-
+{block name="init"}{/block}
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
+{assign var="store_description" value="{config key="store_description"}"}
 {if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
+{if not $store_description}{assign var="store_description" value="$store_name"}{/if}
 
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
@@ -49,7 +51,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
-        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_name}{/if}">
+        <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
         <meta name="robots" content="noindex,nofollow">
     {/block}
 
@@ -69,6 +71,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/{lang attr="locale"}"}" />
     <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/{lang attr="locale"}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/{lang attr='locale'}"}" />
     {block name="feeds"}{/block}
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
@@ -103,29 +106,32 @@ GNU General Public License : http://www.gnu.org/licenses/
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
-                {nocache}
                 {hook name="main.navbar-secondary"}
                 {elseHook rel="main.navbar-secondary"}
+                {if {count type="currency" exclude={currency attr="id"}} != 0 }
                 <ul class="nav navbar-nav navbar-currency navbar-left">
                     <li class="dropdown">
                         <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
                         <ul class="dropdown-menu">
-                            {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
+                            {loop type="currency" name="currency_available" exclude={currency attr="id"} }
                                 <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
                             {/loop}
                         </ul>
                     </li>
                 </ul>
+                {/if}
+                {if {count type="lang" exclude={lang attr='id'}} != 0 }
                 <ul class="nav navbar-nav navbar-lang navbar-left">
                     <li class="dropdown">
                         <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
                         <ul class="dropdown-menu">
-                            {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
+                            {loop type="lang" name="lang_available" exclude={lang attr="id"}}
                                 <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
                             {/loop}
                         </ul>
                     </li>
                 </ul>
+                {/if}
                 <div class="search-container navbar-form navbar-left">
                     <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
                         <label id="search-label" for="q">{intl l="Search a product"}</label>
@@ -182,7 +188,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {/elseloop}
                 </ul>
                 {/elseHook}
-                {/nocache}
             </nav>
         </div>
     </div>
@@ -343,7 +348,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                             <p>{intl l="Follow us introduction"}</p>
                             <ul role="presentation">
                                 <li>
-                                    <a href="http://facebook.com" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
+                                    <a href="https://www.facebook.com/theliaecommerce" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-facebook icon-light"></span>
@@ -352,7 +357,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://twitter.com" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
+                                    <a href="https://twitter.com/theliaecommerce" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-twitter icon-light"></span>
@@ -370,7 +375,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="http://www.google.com" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
+                                    <a href="https://plus.google.com/+TheliaNet" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-google-plus icon-light"></span>
@@ -388,7 +393,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#rss" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
+                                    <a href="http://thelia.net/feed/" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
                                         <span class="icon-stack">
                                             <span class="icon-circle icon-stack-base"></span>
                                             <span class="icon-rss icon-light"></span>
@@ -473,9 +478,12 @@ GNU General Public License : http://www.gnu.org/licenses/
             <div class="info">
                 <nav class="nav-footer" role="navigation">
                     <ul>
-                        {loop name="footer_links" type="content" folder="2"}
-                            <li><a href="{$URL}">{$TITLE}</a></li>
-                        {/loop}
+                        {$folder_information={config key="information_folder_id"}}
+                        {if $folder_information}
+                            {loop name="footer_links" type="content" folder=$folder_information}
+                                <li><a href="{$URL}">{$TITLE}</a></li>
+                            {/loop}
+                        {/if}
                         <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
                     </ul>
                 </nav>

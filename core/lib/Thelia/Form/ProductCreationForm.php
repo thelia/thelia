@@ -22,17 +22,15 @@ class ProductCreationForm extends BaseForm
 {
     protected function buildForm($change_mode = false)
     {
-        $ref_constraints = array(new NotBlank());
-
-        if (! $change_mode) {
-            $ref_constraints[] = new Callback(array(
-                "methods" => array(array($this, "checkDuplicateRef"))
-            ));
-        }
 
         $this->formBuilder
             ->add("ref", "text", array(
-                "constraints" => $ref_constraints,
+                "constraints" => array(
+                    new NotBlank(),
+                    new Callback(array(
+                        "methods" => array(array($this, "checkDuplicateRef"))
+                    ))
+                ),
                 "label"       => Translator::getInstance()->trans('Product reference *'),
                 "label_attr"  => array("for" => "ref")
             ))

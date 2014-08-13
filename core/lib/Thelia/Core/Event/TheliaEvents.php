@@ -383,6 +383,16 @@ final class TheliaEvents
     const IMAGE_PROCESS = "action.processImage";
 
     /**
+     * Sent just after creating the image object from the image file
+     */
+    const IMAGE_PREPROCESSING = "action.preProcessImage";
+
+    /**
+     * Sent just before saving the processed image object on disk
+     */
+    const IMAGE_POSTPROCESSING = "action.postProcessImage";
+
+    /**
      * Sent on document processing
      */
     const DOCUMENT_PROCESS = "action.processDocument";
@@ -463,6 +473,11 @@ final class TheliaEvents
      * Sent when attempting to use a Coupon
      */
     const COUPON_CONSUME 	= "action.consume_coupon";
+
+    /**
+     * Sent when all coupons in the current session should be cleared
+     */
+    const COUPON_CLEAR_ALL 	= "action.clear_all_coupon";
 
     /**
      * Sent just before an attempt to use a Coupon
@@ -750,4 +765,38 @@ final class TheliaEvents
 
     const BEFORE_DELETELANG                     = 'action.lang.beforeDelete';
     const AFTER_DELETELANG                      = 'action.lang.afterDelete';
+
+    // -- Brands management -----------------------------------------------
+
+    const BRAND_CREATE = "action.createBrand";
+    const BRAND_UPDATE = "action.updateBrand";
+    const BRAND_DELETE = "action.deleteBrand";
+
+    const BRAND_UPDATE_POSITION   = "action.updateBrandPosition";
+    const BRAND_TOGGLE_VISIBILITY = "action.toggleBrandVisibility";
+
+    const BRAND_UPDATE_SEO = "action.updateBrandSeo";
+
+    const BEFORE_CREATEBRAND = "action.before_createBrand";
+    const AFTER_CREATEBRAND	 = "action.after_createBrand";
+
+    const BEFORE_DELETEBRAND = "action.before_deleteBrand";
+    const AFTER_DELETEBRAND  = "action.after_deleteBrand";
+
+    const BEFORE_UPDATEBRAND = "action.before_updateBrand";
+    const AFTER_UPDATEBRAND  = "action.after_updateBrand";
+
+    // -- Export ----------------------------------------------
+
+    const EXPORT_BEFORE_ENCODE = "Thelia.export.encode.before";
+    const EXPORT_AFTER_ENCODE = "Thelia.export.encode.after";
+
+    const EXPORT_CATEGORY_CHANGE_POSITION = "Thelia.export.change_category_position";
+    const EXPORT_CHANGE_POSITION = "Thelia.export.change_position";
+
+    const IMPORT_BEFORE_DECODE = "Thelia.import.decode.before";
+    const IMPORT_AFTER_DECODE = "Thelia.import.decode.after";
+
+    const IMPORT_CATEGORY_CHANGE_POSITION = "Thelia.import.change_category_position";
+    const IMPORT_CHANGE_POSITION = "Thelia.import.change_position";
 }

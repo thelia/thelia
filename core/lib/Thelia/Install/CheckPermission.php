@@ -12,8 +12,6 @@
 
 namespace Thelia\Install;
 
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\Translation\Translator;
 
@@ -175,14 +173,6 @@ class CheckPermission extends BaseInstall
      */
     protected function makeDirectoryWritable($directory)
     {
-        chmod($directory, 0777);
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($directory)
-        );
-        foreach ($iterator as $item) {
-            chmod($item, 0777);
-        }
-
         return (is_writable(THELIA_ROOT . $directory) === true);
     }
 

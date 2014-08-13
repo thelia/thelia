@@ -12,7 +12,7 @@ Parameters:
     <ul id="js-sort-image" class="row list-unstyled">
         {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders"}
             <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
-                <a href="{url path="/admin/image/type/$imageType/$ID/update"}" alt="{intl l='Update this image'}" class="thumbnail">
+                <a href="{url path="/admin/image/type/$imageType/$ID/update"}" title="{intl l='Update this image'}" class="thumbnail">
                     <img src="{$IMAGE_URL}" alt="{$TITLE}">
                 </a>
 

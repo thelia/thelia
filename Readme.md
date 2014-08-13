@@ -67,6 +67,19 @@ SET @@GLOBAL.sql_mode='NO_ENGINE_SUBSTITUTION', @@SESSION.sql_mode='NO_ENGINE_SU
 
 For more information on sql_mode you can consult the [MySQL doc](http://dev.mysql.com/doc/refman/5.0/fr/server-sql-mode.html "sql Mode")
 
+## Archive builders
+Thelia's archive builder's needs external libraries.
+For zip archives, you need PECL zip. See [PHP Doc](http://php.net/manual/en/zip.installation.php)
+
+For tar archives, you need PECL phar. Moreover, you need to deactivate php.ini option "phar.readonly":
+```ini
+phar.readonly = Off
+```
+
+For tar.bz2 archives, you need tar's dependencies and the extension "bzip2". See [PHP Doc](http://php.net/manual/fr/book.bzip2.php)
+
+For tar.gz archives, you need tar's dependencies and the extension "zlib". See [PHP Doc](http://fr2.php.net/manual/fr/book.zlib.php)
+
 ## Download Thelia 2
 
 ``` bash

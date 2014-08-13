@@ -50,8 +50,7 @@ class MatchBillingCountries extends AbstractMatchCountries
     {
         return $this->translator->trans(
             'Billing country',
-            [],
-            'condition'
+            []
         );
     }
 
@@ -61,9 +60,8 @@ class MatchBillingCountries extends AbstractMatchCountries
     public function getToolTip()
     {
         $toolTip = $this->translator->trans(
-            'The coupon applies to the selected delivery countries',
-            [],
-            'condition'
+            'The coupon applies to the selected billing countries',
+            []
         );
 
         return $toolTip;
@@ -75,14 +73,14 @@ class MatchBillingCountries extends AbstractMatchCountries
             'Only if order billing country is %op% <strong>%countries_list%</strong>', [
                 '%countries_list%' => $cntryStrList,
                 '%op%' => $i18nOperator
-            ], 'condition'
+            ]
         );
     }
 
     protected function getFormLabel()
     {
         return $this->translator->trans(
-            'Billing coutry is', [], 'condition'
+            'Billing country is', []
         );
     }
 }

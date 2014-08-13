@@ -20,6 +20,8 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Model\Base\BrandQuery;
+use Thelia\Model\Brand;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
@@ -134,6 +136,19 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 ->filterById($folderId);
 
             return $this->dataAccessWithI18n("Folder",  $params, $search);
+        }
+    }
+
+    public function brandDataAccess($params, &$smarty)
+    {
+        $brandId = $this->request->get('brand_id');
+
+        if ($brandId !== null) {
+
+            $search = BrandQuery::create()
+                ->filterById($brandId);
+
+            return $this->dataAccessWithI18n("Brand",  $params, $search);
         }
     }
 
@@ -402,7 +417,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     return $noGetterData[$keyAttribute];
                 }
 
-                $getter = sprintf("get%s", ucfirst($attribute));
+                $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
                 if (method_exists($data, $getter)) {
                     $return =  $data->$getter();
 
@@ -428,6 +443,27 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
+     * Transcode an underscored string into a camel-cased string, eg. default_folder into DefaultFolder
+     *
+     * @param string $str the string to convert from underscore to camel-case
+     *
+     * @return string the camel cased string.
+     */
+    private function underscoreToCamelcase($str)
+    {
+        // Split string in words.
+        $words = explode('_', strtolower($str));
+
+        $return = '';
+
+        foreach ($words as $word) {
+            $return .= ucfirst(trim($word));
+        }
+
+        return $return;
+    }
+
+    /**
      * Define the various smarty plugins hendled by this class
      *
      * @return an array of smarty plugin descriptors
@@ -441,6 +477,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'category', $this, 'categoryDataAccess'),
             new SmartyPluginDescriptor('function', 'content', $this, 'contentDataAccess'),
             new SmartyPluginDescriptor('function', 'folder', $this, 'folderDataAccess'),
+            new SmartyPluginDescriptor('function', 'brand', $this, 'brandDataAccess'),
             new SmartyPluginDescriptor('function', 'currency', $this, 'currencyDataAccess'),
             new SmartyPluginDescriptor('function', 'country', $this, 'countryDataAccess'),
             new SmartyPluginDescriptor('function', 'lang', $this, 'langDataAccess'),

@@ -24,7 +24,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Form
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class OrderPayment extends BaseForm
+class OrderPayment extends FirewallForm
 {
     protected function buildForm()
     {
@@ -50,6 +50,16 @@ class OrderPayment extends BaseForm
                         )
                     ))
                 )
+            ))
+            // Add terms & conditions
+            ->add("agreed", "checkbox", array(
+                "constraints" => array(
+                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")))
+                ),
+                "label"=>"Agreed",
+                "label_attr" => array(
+                    "for" => "agreed"
+                )
             ));
     }
 
@@ -66,16 +76,12 @@ class OrderPayment extends BaseForm
     public function verifyPaymentModule($value, ExecutionContextInterface $context)
     {
         $module = ModuleQuery::create()
-            ->filterByType(BaseModule::PAYMENT_MODULE_TYPE)
-            ->filterByActivate(1)
-            ->filterById($value)
+            ->filterActivatedByTypeAndId(BaseModule::PAYMENT_MODULE_TYPE, $value)
             ->findOne();
 
         if (null === $module) {
             $context->addViolation("Payment module ID not found");
-        }
-
-        if (! $module->isPayementModule()) {
+        } elseif (! $module->isPayementModule()) {
             $context->addViolation(
                 sprintf(Translator::getInstance()->trans("payment module %s is not a Thelia\Module\PaymentModuleInterface"), $module->getCode())
             );

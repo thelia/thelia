@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'catalog'}
+{/block}
+
 {block name="check-resource"}admin.product{/block}
 {block name="check-access"}update{/block}
 
@@ -22,7 +26,7 @@
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
-                            {intl l='Edit product %title' title={$TITLE}}
+                            {intl l='Edit product %title' title={$TITLE}}{if $REF} ({intl l='ref.:'} {$REF}){/if}
                         </div>
 
                         <div class="col-md-5 actions">
@@ -359,9 +363,15 @@ $(function() {
     	captureLength: 1,
     	wait         : 300,
     	callback     : function () {
-    		update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
+            var price = $(this).val();
+            $(this).val(sanitizeFloat(price));
+            update_price($(this).val(), $(this).data('price-type'), $(this).data('rel-price'));
     	}
     });
+
+    function sanitizeFloat(numVal) {
+        return numVal.replace(",", ".");
+    };
 
     // Count generated combinations in real time
     function countGeneratedCombinations() {

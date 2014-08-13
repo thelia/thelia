@@ -1,3 +1,4 @@
+{default_translation_domain domain='bo.default'}
 <select class="form-control" id="{$inputKey}-value" name="{$inputKey}[value]">
     {foreach $currencies as $key => $currency}
         <option value="{$key}"{if $key == $value}selected="selected"{/if}>{$currency}</option>

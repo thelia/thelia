@@ -18,6 +18,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 
 use Thelia\Action\Document;
 use Thelia\Core\Event\Document\DocumentEvent;
+use Thelia\Files\FileManager;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -39,12 +40,53 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
         $container->set("event_dispatcher", $dispatcher);
 
+        $fileManager = new FileManager([
+            "document.product" => "Thelia\\Model\\ProductDocument",
+            "image.product" => "Thelia\\Model\\ProductImage",
+
+            "document.category" => "Thelia\\Model\\CategoryDocument",
+            "image.category" => "Thelia\\Model\\CategoryImage",
+
+            "document.content" => "Thelia\\Model\\ContentDocument",
+            "image.content" => "Thelia\\Model\\ContentImage",
+
+            "document.folder" => "Thelia\\Model\\FolderDocument",
+            "image.folder" => "Thelia\\Model\\FolderImage",
+
+            "document.brand" => "Thelia\\Model\\BrandDocument",
+            "image.brand" => "Thelia\\Model\\BrandImage",
+        ]);
+
+        $container->set("thelia.file_manager", $this->getFileManager());
+
         $request = new Request();
         $request->setSession($this->session);
 
         $container->set("request", $request);
 
         return $container;
+    }
+
+    public function getFileManager()
+    {
+        $fileManager = new FileManager([
+            "document.product" => "Thelia\\Model\\ProductDocument",
+            "image.product" => "Thelia\\Model\\ProductImage",
+
+            "document.category" => "Thelia\\Model\\CategoryDocument",
+            "image.category" => "Thelia\\Model\\CategoryImage",
+
+            "document.content" => "Thelia\\Model\\ContentDocument",
+            "image.content" => "Thelia\\Model\\ContentImage",
+
+            "document.folder" => "Thelia\\Model\\FolderDocument",
+            "image.folder" => "Thelia\\Model\\FolderImage",
+
+            "document.brand" => "Thelia\\Model\\BrandDocument",
+            "image.brand" => "Thelia\\Model\\BrandImage",
+        ]);
+
+        return $fileManager;
     }
 
     public function setUp()
@@ -100,7 +142,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
     {
         $event = new DocumentEvent($this->request);
 
-        $document = new Document($this->getContainer());
+        $document = new Document($this->getFileManager());
 
         $document->processDocument($event);
      }
@@ -115,7 +157,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      {
          $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          $event->setCacheFilepath("blablabla.txt");
          $event->setCacheSubdirectory("tests");
@@ -133,7 +175,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      {
          $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          $event->setCacheFilepath("blablabla.pdf");
          $event->setCacheSubdirectory("../../../");
@@ -151,7 +193,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $event->setSourceFilepath(__DIR__."/assets/documents/sources/test-document-1.txt");
          $event->setCacheSubdirectory("tests");
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          // mock cache configuration.
          $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
@@ -180,7 +222,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $event->setSourceFilepath(__DIR__."/assets/documents/sources/test-document-2.txt");
          $event->setCacheSubdirectory("tests");
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          // mock cache configuration.
          $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
@@ -205,7 +247,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $event->setCacheSubdirectory('tests');
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          $document->clearCache($event);
      }
@@ -214,7 +256,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
      {
          $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          $document->clearCache($event);
      }
@@ -230,7 +272,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $event->setCacheSubdirectory('../../../..');
 
-         $document = new Document($this->getContainer());
+         $document = new Document($this->getFileManager());
 
          $document->clearCache($event);
      }

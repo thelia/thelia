@@ -38,6 +38,8 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCouponQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildCouponQuery orderByVersion($order = Criteria::ASC) Order by the version column
+ * @method     ChildCouponQuery orderByVersionCreatedAt($order = Criteria::ASC) Order by the version_created_at column
+ * @method     ChildCouponQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method     ChildCouponQuery groupById() Group by the id column
  * @method     ChildCouponQuery groupByCode() Group by the code column
@@ -55,6 +57,8 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCouponQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCouponQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildCouponQuery groupByVersion() Group by the version column
+ * @method     ChildCouponQuery groupByVersionCreatedAt() Group by the version_created_at column
+ * @method     ChildCouponQuery groupByVersionCreatedBy() Group by the version_created_by column
  *
  * @method     ChildCouponQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildCouponQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -99,6 +103,8 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     ChildCoupon findOneByCreatedAt(string $created_at) Return the first ChildCoupon filtered by the created_at column
  * @method     ChildCoupon findOneByUpdatedAt(string $updated_at) Return the first ChildCoupon filtered by the updated_at column
  * @method     ChildCoupon findOneByVersion(int $version) Return the first ChildCoupon filtered by the version column
+ * @method     ChildCoupon findOneByVersionCreatedAt(string $version_created_at) Return the first ChildCoupon filtered by the version_created_at column
+ * @method     ChildCoupon findOneByVersionCreatedBy(string $version_created_by) Return the first ChildCoupon filtered by the version_created_by column
  *
  * @method     array findById(int $id) Return ChildCoupon objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCoupon objects filtered by the code column
@@ -116,6 +122,8 @@ use Thelia\Model\Map\CouponTableMap;
  * @method     array findByCreatedAt(string $created_at) Return ChildCoupon objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCoupon objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildCoupon objects filtered by the version column
+ * @method     array findByVersionCreatedAt(string $version_created_at) Return ChildCoupon objects filtered by the version_created_at column
+ * @method     array findByVersionCreatedBy(string $version_created_by) Return ChildCoupon objects filtered by the version_created_by column
  *
  */
 abstract class CouponQuery extends ModelCriteria
@@ -211,7 +219,7 @@ abstract class CouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION` FROM `coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `SERIALIZED_EFFECTS`, `IS_ENABLED`, `EXPIRATION_DATE`, `MAX_USAGE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `IS_USED`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -828,6 +836,78 @@ abstract class CouponQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CouponTableMap::VERSION, $version, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedAt('2011-03-14'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt('now'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $versionCreatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedAt($versionCreatedAt = null, $comparison = null)
+    {
+        if (is_array($versionCreatedAt)) {
+            $useMinMax = false;
+            if (isset($versionCreatedAt['min'])) {
+                $this->addUsingAlias(CouponTableMap::VERSION_CREATED_AT, $versionCreatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($versionCreatedAt['max'])) {
+                $this->addUsingAlias(CouponTableMap::VERSION_CREATED_AT, $versionCreatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CouponTableMap::VERSION_CREATED_AT, $versionCreatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_by column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedBy('fooValue');   // WHERE version_created_by = 'fooValue'
+     * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $versionCreatedBy The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCouponQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedBy($versionCreatedBy = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($versionCreatedBy)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $versionCreatedBy)) {
+                $versionCreatedBy = str_replace('*', '%', $versionCreatedBy);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CouponTableMap::VERSION_CREATED_BY, $versionCreatedBy, $comparison);
     }
 
     /**

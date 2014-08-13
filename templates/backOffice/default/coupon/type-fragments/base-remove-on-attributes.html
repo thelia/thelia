@@ -1,0 +1,67 @@
+{default_translation_domain domain='bo.default'}
+
+{block name="discount-field"}{/block}
+
+<div class="form-group input-coupon-attribute-id">
+
+    <label for="coupon-category-id">{intl l="Select attribute :"}</label>
+
+    <select required class="form-control" id="coupon-attribute-id" name="{$attribute_field_name}">
+        <option value="0">{intl l="Please select..."}</option>
+        {loop type="attribute" name="list-of-attributes" order="alpha" backend_context="1"}
+            <option value="{$ID}" {if $ID == $attribute_value}selected="selected"{/if}>{$TITLE}</option>
+        {/loop}
+    </select>
+</div>
+
+<div class="loading" id="input-coupon-attributeAvs-id-loading" style="display: none"></div>
+
+<div class="form-group" id="input-coupon-attributeAvs-id" {if $attribute_value == 0}style="display: none"{/if}>
+
+    <label for="coupon-products-id">{intl l="Applies to attribute values :"}</label>
+
+    <select required multiple size="10" class="form-control" id="coupon-attributeAvs-id" name="{$attribute_av_field_name}[]">
+        {loop type="attribute_availability" attribute=$attribute_value|default:0 name="list-of-attribute_avs" backend_context="1"}
+            <option value="{$ID}" {if in_array($ID, $attribute_av_values)}selected="selected"{/if}>{$TITLE}</option>
+        {/loop}
+    </select>
+
+    <span class="label-help-block">{intl l='Use Ctrl+click to select (or deselect) more that one attribute value'}</span>
+</div>
+
+<script>
+    function couponInputFormSetup() {
+
+        var $catSelect = $('#coupon-attribute-id');
+
+        $catSelect.change(function(ev) {
+
+            var $attribute_id = $(this).val();
+
+            $('#input-coupon-attributeAvs-id').hide();
+            $('#coupon-attributeAvs-id').html('');
+
+            if ($attribute_id != 0) {
+
+                $('#input-coupon-attributeAvs-id-loading').show();
+
+                $.ajax({
+                    url: "{url path='/admin/coupon/type-fragments/ajax-attribute-avs-list'}",
+                    type: 'POST',
+                    data: {
+                        attribute_id: $attribute_id
+                    },
+                    success: function(options) {
+                        $('#coupon-attributeAvs-id').html(options);
+                        $('#input-coupon-attributeAvs-id').show();
+                    },
+                    complete: function() {
+                        $('#input-coupon-attributeAvs-id-loading').hide();
+                    }
+                });
+            }
+        });
+
+        {block name="javascript-init"}{/block}
+    }
+</script>

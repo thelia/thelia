@@ -17,6 +17,9 @@ use Thelia\Model\Map\LangTableMap;
 class Lang extends BaseLang
 {
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
+
+    protected static $defaultLanguage;
+
     /**
      * Return the default language object, using a local variable to cache it.
      *
@@ -24,10 +27,15 @@ class Lang extends BaseLang
      */
     public static function getDefaultLanguage()
     {
-        $default_lang = LangQuery::create()->findOneByByDefault(1);
+        if (null === self::$defaultLanguage) {
+            self::$defaultLanguage = LangQuery::create()->findOneByByDefault(1);
 
-        if ($default_lang == null) throw new \RuntimeException("No default language is defined. Please define one.");
-        return $default_lang;
+            if (null === self::$defaultLanguage) {
+                throw new \RuntimeException("No default language is defined. Please define one.");
+            }
+        }
+
+        return self::$defaultLanguage;
     }
 
     public function toggleDefault()

@@ -23,7 +23,6 @@ use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Tools\URL;
-use Thelia\Tools\Redirect;
 use Thelia\Model\AdminLog;
 
 use Thelia\Model\LangQuery;
@@ -330,12 +329,12 @@ class BaseAdminController extends BaseController
      * Return the current list order identifier for a given object name,
      * updating in using the current request.
      *
-     * @param unknown $objectName           the object name (e.g. 'attribute', 'message')
-     * @param unknown $requestParameterName the name of the request parameter that defines the list order
-     * @param unknown $defaultListOrder     the default order to use, if none is defined
-     * @param string  $updateSession        if true, the session will be updated with the current order.
+     * @param string $objectName           the object name (e.g. 'attribute', 'message')
+     * @param string $requestParameterName the name of the request parameter that defines the list order
+     * @param string $defaultListOrder     the default order to use, if none is defined
+     * @param bool   $updateSession        if true, the session will be updated with the current order.
      *
-     * @return String the current liste order.
+     * @return String the current list order.
      */
     protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
     {

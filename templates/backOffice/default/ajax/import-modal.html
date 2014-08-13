@@ -1,0 +1,58 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
+{form name="thelia.import"}
+<form action="{$URL}" method="post" {form_enctype form=$form}>
+    {form_hidden_fields form=$form}
+    <div class="modal fade" id="real-import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="import-modal-label">Import: {$TITLE}</h4>
+                </div>
+                <div class="modal-body">
+                    {if $DESCRIPTION}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    {$DESCRIPTION nofilter}
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {form_field form=$form field="language"}
+                                <label for="{$label_attr.for}">
+                                    {$label}
+                                </label>
+                                <select id="{$label_attr.for}" name="{$name}" required>
+                                    {loop name="import-lang" type="lang"}
+                                        <option value="{$ID}" {if $ID == $CURRENT_LANG_ID}selected{/if}>{$TITLE}</option>
+                                    {/loop}
+                                </select>
+                            {/form_field}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {form_field form=$form field="file_upload"}
+                                <label form="{$label_attr.for}">
+                                    {$label}
+                                </label>
+
+                                <input type="file" required aria-required="true" name="{$name}" id="{$label_attr.for}" accept="{$ALLOWED_MIME_TYPES}"/>
+                                <div class="small">Accepted formats: {$ALLOWED_EXTENSIONS}</div>
+                            {/form_field}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" title="{intl l="Import this file"}">{intl l="Import this file"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{/form}

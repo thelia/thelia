@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="no-return-functions"}
+    {$admin_current_location = 'configuration'}
+{/block}
+
 {block name="page-title"}{intl l='Thelia Languages'}{/block}
 
 {block name="check-resource"}admin.configuration.language{/block}
@@ -44,6 +48,7 @@
                             </caption>
                             <thead>
                                 <tr>
+                                    <th>{intl l="ID"}</th>
                                     <th colspan="2">{intl l="Language name"}</th>
                                     <th>{intl l="ISO 639 Code"}</th>
                                     <th>{intl l="Locale"}</th>
@@ -54,6 +59,7 @@
                             <tbody>
                                 {loop type="lang" name="lang.list" backend_context="1"}
                                 <tr>
+                                    <td>{$ID}</td>
                                     <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>

@@ -33,6 +33,8 @@ use Thelia\Module\BaseModule;
  */
 class CouponCreationForm extends BaseForm
 {
+    const COUPON_CREATION_FORM_NAME = 'thelia_coupon_creation';
+
     /**
      * Build Coupon form
      *
@@ -109,14 +111,6 @@ class CouponCreationForm extends BaseForm
                         )
                     )
                 )
-            )
-            ->add(
-                'amount',
-                'money',
-                array(
-                    'constraints' => array(
-                    new NotBlank()
-                ))
             )
             ->add(
                 'isEnabled',
@@ -198,7 +192,12 @@ class CouponCreationForm extends BaseForm
                         new NotBlank()
                     )
                 )
-            );
+            )
+            ->add('coupon_specific', 'collection', array(
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+            ))
+        ;
     }
 
     /**
@@ -226,6 +225,6 @@ class CouponCreationForm extends BaseForm
      */
     public function getName()
     {
-        return 'thelia_coupon_creation';
+        return self::COUPON_CREATION_FORM_NAME;
     }
 }

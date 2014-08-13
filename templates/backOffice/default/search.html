@@ -170,6 +170,44 @@
                 </div>
                 {* end order search *}
 
+                {* category search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Category'}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="ID"}</th>
+                                <th></th>
+                                <th>{intl l="Category title"}</th>
+
+                                <th class="actions">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {loop type="category" name="category-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+                            <tr>
+                                <td>{$ID}</td>
+                                <td></td>
+                                <td class="object-title"><a href="{url path="/admin/categories/update" category_id={$ID}}">{$TITLE}</a></td>
+                                <td class="actions">
+                                    <div class="btn-group">
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
+                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path="/admin/categories/update" category_id={$ID}}"><i class="glyphicon glyphicon-edit"></i></a>
+                                        {/loop}
+                                    </div>
+                                </td>
+                            </tr>
+                            {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {* end category search *}
+
                 {* product search *}
                 <div class="general-block-decorator">
                     <div class="table-responsive">
@@ -190,13 +228,13 @@
 
                             <tbody>
                             {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="ref,title"}
-
+                                {$id_product=$ID}
                                 <tr>
                                     <td>{$ID}</td>
 
                                     <td>
                                         {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">
+                                            <a href="{url path='/admin/products/update' product_id=$id_product}" title="{intl l='Edit this product'}">
                                                 <img src="{$IMAGE_URL}" alt="{$TITLE}" />
                                             </a>
                                         {/loop}
@@ -221,6 +259,92 @@
                     </div>
                 </div>
                 {* end product search *}
+
+                {* folder search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Folder'}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="ID"}</th>
+                                <th></th>
+                                <th>{intl l="Folder title"}</th>
+
+                                <th class="actions">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {loop type="folder" name="folder-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+
+                                <tr>
+                                    <td>{$ID}</td>
+                                    <td></td>
+
+                                    <td class="object-title"><a href="{url path="/admin/folders/update/{$ID}"}">{$TITLE}</a></td>
+
+
+                                    <td class="actions">
+                                        <div class="btn-group">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {* end folder search *}
+
+                {* content search *}
+                <div class="general-block-decorator">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-condensed table-left-aligned">
+                            <caption class="clearfix">
+                                {intl l='Content'}
+                            </caption>
+                            <thead>
+                            <tr>
+                                <th>{intl l="ID"}</th>
+                                <th></th>
+                                <th>{intl l="Content title"}</th>
+
+                                <th class="actions">{intl l="Actions"}</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            {loop type="content" name="content-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="title"}
+
+                                <tr>
+                                    <td>{$ID}</td>
+                                    <td></td>
+
+                                    <td class="object-title"><a href="{url path="/admin/content/update/{$ID}"}">{$TITLE}</a></td>
+
+
+                                    <td class="actions">
+                                        <div class="btn-group">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="/admin/content/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                            {/loop}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {* end content search *}
 
             </div>
         </div>

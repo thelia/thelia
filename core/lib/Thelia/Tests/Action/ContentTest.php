@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Collection\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Content;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
@@ -21,10 +22,13 @@ use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
@@ -34,10 +38,14 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {
+    use I18nTestTrait;
+
     /**
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
+
+    protected static $folderForPositionTest = null;
 
     public function setUp()
     {
@@ -167,6 +175,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionUp()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest(), Criteria::EQUAL)
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -190,6 +199,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionDown()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1)
             ->findOne();
 
@@ -213,6 +223,7 @@ class ContentTest extends TestCaseWithURLToolSetup
     public function testUpdatePositionWithSpecificPosition()
     {
         $content = ContentQuery::create()
+            ->filterByFolder($this->getFolderForPositionTest())
             ->filterByPosition(1, Criteria::GREATER_THAN)
             ->findOne();
 
@@ -280,6 +291,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $this->assertNull($testAssociation);
     }
+
     /**
      * @return \Thelia\Model\Content
      */
@@ -294,6 +306,51 @@ class ContentTest extends TestCaseWithURLToolSetup
         }
 
         return $content;
+    }
+
+    /**
+     * generates a folder and its contents to be used in Position tests
+     *
+     * @return Folder the parent folder
+     */
+    protected function getFolderForPositionTest()
+    {
+
+        if (null === self::$folderForPositionTest) {
+
+            $folder = new Folder();
+
+            $folder->setParent(0);
+            $folder->setVisible(1);
+            $folder->setPosition(1);
+
+            $this->setI18n($folder);
+
+            $folder->save();
+
+            for ($i = 0; $i < 4; $i++) {
+
+                $content = new \Thelia\Model\Content();
+
+                $content->addFolder($folder);
+                $content->setVisible(1);
+                $content->setPosition($i + 1);
+
+                $this->setI18n($content);
+
+                $contentFolders = $content->getContentFolders();
+                $collection     = new Collection();
+                $collection->prepend($contentFolders[0]->setDefaultFolder(1));
+                $content->setContentFolders($collection);
+
+                $content->save();
+
+            }
+
+            self::$folderForPositionTest = $folder;
+        }
+
+        return self::$folderForPositionTest;
     }
 
     /**

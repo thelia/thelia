@@ -17,6 +17,8 @@ class Order extends BaseOrder
     protected $choosenDeliveryAddress = null;
     protected $choosenInvoiceAddress = null;
 
+    protected $disableVersioning = false;
+
     /**
      * @param null $choosenDeliveryAddress
      */
@@ -25,6 +27,30 @@ class Order extends BaseOrder
         $this->choosenDeliveryAddress = $choosenDeliveryAddress;
 
         return $this;
+    }
+
+    /**
+     * @param boolean $disableVersionning
+     */
+    public function setDisableVersioning($disableVersioning)
+    {
+        $this->disableVersioning = (bool) $disableVersioning;
+
+        return $this;
+    }
+
+    public function isVersioningDisable()
+    {
+        return $this->disableVersioning;
+    }
+
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->isVersioningDisable()) {
+            return false;
+        } else {
+            return parent::isVersioningNecessary($con);
+        }
     }
 
     /**
@@ -53,6 +79,16 @@ class Order extends BaseOrder
         return $this->choosenInvoiceAddress;
     }
 
+    public function preSave(ConnectionInterface $con = null)
+    {
+        if ($this->isPaid() && null === $this->getInvoiceDate()) {
+            $this
+                ->setInvoiceDate(time());
+        }
+
+        return parent::preSave($con);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -69,22 +105,14 @@ class Order extends BaseOrder
     public function postInsert(ConnectionInterface $con = null)
     {
         $this->setRef($this->generateRef())
+            ->setDisableVersioning(true)
             ->save($con);
         $this->dispatchEvent(TheliaEvents::ORDER_AFTER_CREATE, new OrderEvent($this));
     }
 
-    public function postSave(ConnectionInterface $con = null)
-    {
-        if ($this->isPaid() && null === $this->getInvoiceDate()) {
-            $this
-                ->setInvoiceDate(time())
-                ->save($con);
-        }
-    }
-
     public function generateRef()
     {
-       return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
+        return sprintf('ORD%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
     }
 
     /**

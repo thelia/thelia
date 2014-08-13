@@ -40,9 +40,16 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class CouponController extends BaseFrontController
 {
+    /**
+     * Clear all coupons.
+     */
+    public function clearAllCouponsAction() {
+        // Dispatch Event to the Action
+        $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
+    }
 
     /**
-     * Test Coupon consuming
+     * Coupon consuming
      */
     public function consumeAction()
     {

@@ -30,12 +30,47 @@
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
-<!--
+
         <service id="thelia.coupon.type.remove_amount_on_categories" class="Thelia\Coupon\Type\RemoveAmountOnCategories">
             <argument type="service" id="thelia.facade" />
             <tag name="thelia.coupon.addCoupon"/>
         </service>
--->
+
+        <service id="thelia.coupon.type.remove_percentage_on_categories" class="Thelia\Coupon\Type\RemovePercentageOnCategories">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_amount_on_products" class="Thelia\Coupon\Type\RemoveAmountOnProducts">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_percentage_on_products" class="Thelia\Coupon\Type\RemovePercentageOnProducts">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_percentage_on_products" class="Thelia\Coupon\Type\RemovePercentageOnProducts">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_amount_on_attribute_av" class="Thelia\Coupon\Type\RemoveAmountOnAttributeValues">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.remove_percentage_on_attribute_av" class="Thelia\Coupon\Type\RemovePercentageOnAttributeValues">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
+        <service id="thelia.coupon.type.free_product" class="Thelia\Coupon\Type\FreeProduct">
+            <argument type="service" id="thelia.facade" />
+            <tag name="thelia.coupon.addCoupon"/>
+        </service>
+
         <!-- Condition module -->
 
         <service id="thelia.condition.factory" class="Thelia\Condition\ConditionFactory">

@@ -52,13 +52,12 @@
                         <article itemscope itemtype="http://schema.org/Product">
                             <!-- Use the meta tag to specify content that is not visible on the page in any way -->
                             {$product_id=$ID}
-                            {loop name="brand.feature" type="feature" product="{$ID}" title="brand"}
-                                {loop name="brand.value" type="feature_value" feature="{$ID}" product="$product_id"}
-                                    <meta itemprop="brand" content="{$TITLE}">
-                                {/loop}
+                            {loop name="brand.feature" type="brand" product="{$ID}"}
+                                <meta itemprop="brand" content="{$TITLE}">
                             {/loop}
-                            {loop name="brand.feature" type="feature" product=$ID title="isbn"}
-                                {loop name="brand.value" type="feature_value" feature=$ID product=$product_id}
+
+                            {loop name="isbn.feature" type="feature" product=$ID title="isbn"}
+                                {loop name="isbn.value" type="feature_value" feature=$ID product=$product_id}
                                     <meta itemprop="productID" content="isbn:{$TITLE}">
                                 {/loop}
                             {/loop}

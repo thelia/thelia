@@ -29,6 +29,13 @@ class ConfigStoreForm extends BaseForm
                         "for" => "store_name"
                 )
             ))
+            ->add("store_description", "text", array(
+                    "label" => Translator::getInstance()->trans('Store description'),
+                    "label_attr" => array(
+                        "for" => "store_description"
+                    ),
+                    "required" => false
+                ))
             ->add("store_email", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),

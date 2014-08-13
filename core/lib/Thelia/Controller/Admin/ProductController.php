@@ -158,12 +158,14 @@ class ProductController extends AbstractSeoCrudController
 
         $changeEvent
             ->setLocale($formData['locale'])
+            ->setRef($formData['ref'])
             ->setTitle($formData['title'])
             ->setChapo($formData['chapo'])
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setDefaultCategory($formData['default_category'])
+            ->setBrandId($formData['brand_id'])
         ;
 
         // Create and dispatch the change event
@@ -213,6 +215,10 @@ class ProductController extends AbstractSeoCrudController
         $array[$key][] = $value;
     }
 
+    /**
+     * @param  Product                 $object
+     * @return ProductModificationForm
+     */
     protected function hydrateObjectForm($object)
     {
         // Find product's sale elements
@@ -320,7 +326,8 @@ class ProductController extends AbstractSeoCrudController
             'description'      => $object->getDescription(),
             'postscriptum'     => $object->getPostscriptum(),
             'visible'          => $object->getVisible(),
-            'default_category' => $object->getDefaultCategoryId()
+            'default_category' => $object->getDefaultCategoryId(),
+            'brand_id'         => $object->getBrandId()
         );
 
         // Setup the object form
@@ -361,7 +368,8 @@ class ProductController extends AbstractSeoCrudController
                 'product_id'            => $this->getRequest()->get('product_id', 0),
                 'folder_id'             => $this->getRequest()->get('folder_id', 0),
                 'accessory_category_id' => $this->getRequest()->get('accessory_category_id', 0),
-                'current_tab'           => $this->getRequest()->get('current_tab', 'general')
+                'current_tab'           => $this->getRequest()->get('current_tab', 'general'),
+                'page'                  => $this->getRequest()->get('page', 1)
         );
     }
 
@@ -386,7 +394,8 @@ class ProductController extends AbstractSeoCrudController
         return $this->render('categories',
                 array(
                     'product_order' => $currentOrder,
-                    'category_id' => $this->getCategoryId()
+                    'category_id' => $this->getCategoryId(),
+                    'page' => $this->getRequest()->get('page', 1)
         ));
     }
 
@@ -394,7 +403,10 @@ class ProductController extends AbstractSeoCrudController
     {
         $this->redirectToRoute(
                 'admin.products.default',
-                array('category_id' => $this->getCategoryId())
+                array(
+                    'category_id' => $this->getCategoryId(),
+                    'page' => $this->getRequest()->get('page', 1)
+                )
         );
     }
 
@@ -436,18 +448,6 @@ class ProductController extends AbstractSeoCrudController
                 'admin.products.default',
                 array('category_id' => $this->getCategoryId())
         );
-    }
-
-    protected function performAdditionalUpdateAction($updateEvent)
-    {
-        if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            // Redirect to parent product list
-            $this->redirectToRoute(
-                    'admin.categories.default',
-                    array('category_id' => $this->getCategoryId())
-            );
-        }
     }
 
     protected function performAdditionalUpdatePositionAction($positionEvent)

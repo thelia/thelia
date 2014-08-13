@@ -82,9 +82,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
-
+        $locale = $this->request->getSession()->getLang()->getLocale();
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
-            $product = $cartItem->getProduct();
+            $product = $cartItem->getProduct(null, $locale);
             $productSaleElement = $cartItem->getProductSaleElements();
 
             $loopResultRow = new LoopResultRow();
