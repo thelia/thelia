@@ -423,6 +423,7 @@ return array(
     'Warnings' => 'Warnings',
     'Weight' => 'Weight',
     'Wrong form method, %s expected.' => 'Wrong form method, %s expected.',
+    'Wrong email or password. Please try again' => 'Wrong email or password. Please try again',
     'Yes, I have a password :' => 'Yes, I have a password :',
     'You are already registered!' => 'You are already registered!',
     'You don\'t need to use commas or other punctuations.' => 'You don\'t need to use commas or other punctuations.',

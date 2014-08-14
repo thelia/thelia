@@ -428,6 +428,7 @@ return array(
     'Warnings' => 'Avertissements',
     'Weight' => 'Poids',
     'Wrong form method, %s expected.' => 'Méthode HTTP invalide : %s attendu.',
+    'Wrong email or password. Please try again' => 'Mauvais email ou mot de passe. Veuillez retenter',
     'Yes, I have a password :' => 'Oui, j\'ai un mot de passe :',
     'You are already registered!' => 'Vous êtes déjà enregistré !',
     'You don\'t need to use commas or other punctuations.' => 'Vous n\'avez pas besoin d\'utiliser de virgules ou d\'autres signes de ponctuation',

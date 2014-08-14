@@ -201,7 +201,9 @@ abstract class BaseController extends ContainerAware
             $form->bind($aBaseForm->getRequest());
 
             if ($form->isValid()) {
-                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk()) {
+                $env = $this->container->getParameter("kernel.environment");
+
+                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($env)) {
                     throw new FormValidationException(
                         $this->getTranslator()->trans(
                             "You've submitted this form too many times. Further submissions will be ignored during %time",
