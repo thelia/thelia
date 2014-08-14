@@ -134,7 +134,21 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 1, 'Tinymce\\Tinymce', NOW(), NOW());
+(5, 'Tinymce', 1, 0, 1, 'Tinymce\\Tinymce', NOW(), NOW()),
+(6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', NOW(), NOW()),
+(7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', NOW(), NOW()),
+(8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', NOW(), NOW()),
+(9, 'HookSearch', 1, 1, 5, 'HookSearch\\HookSearch', NOW(), NOW()),
+(10, 'HookCustomer', 1, 1, 6, 'HookCustomer\\HookCustomer', NOW(), NOW()),
+(11, 'HookCart', 1, 1, 7, 'HookCart\\HookCart', NOW(), NOW()),
+(12, 'HookAnalytics', 1, 1, 8, 'HookAnalytics\\HookAnalytics', NOW(), NOW()),
+(13, 'HookContact', 1, 1, 9, 'HookContact\\HookContact', NOW(), NOW()),
+(14, 'HookLinks', 1, 1, 10, 'HookLinks\\HookLinks', NOW(), NOW()),
+(15, 'HookNewsletter', 1, 1, 12, 'HookNewsletter\\HookNewsletter', NOW(), NOW()),
+(16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', NOW(), NOW()),
+(17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
+(18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW())
+;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
@@ -144,7 +158,35 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('4',  'en_US',  'Front office integration', NULL,  NULL,  NULL),
 ('4',  'fr_FR',  'Module Front office', NULL,  NULL,  NULL),
 ('5',  'en_US',  'tinymce wysiwyg editor', NULL,  NULL,  NULL),
-('5',  'fr_FR',  'éditeur wysiwyg tinymce', NULL,  NULL,  NULL);
+('5',  'fr_FR',  'éditeur wysiwyg tinymce', NULL,  NULL,  NULL),
+('6', 'en_US',  'Navigation block', NULL,  NULL,  NULL),
+('6', 'fr_FR',  'Bloc menu', NULL,  NULL,  NULL),
+('7',  'en_US',  'Currency block', NULL,  NULL,  NULL),
+('7',  'fr_FR',  'Bloc des devises', NULL,  NULL,  NULL),
+('8',  'en_US',  'Languages block', NULL,  NULL,  NULL),
+('8',  'fr_FR',  'Bloc des langues', NULL,  NULL,  NULL),
+('9',  'en_US',  'Search block', NULL,  NULL,  NULL),
+('9',  'fr_FR',  'Bloc de recherche', NULL,  NULL,  NULL),
+('10',  'en_US',  'Customer account block', NULL,  NULL,  NULL),
+('10',  'fr_FR',  'Bloc compte client', NULL,  NULL,  NULL),
+('11', 'en_US',  'Cart block', NULL,  NULL,  NULL),
+('11', 'fr_FR',  'Bloc panier', NULL,  NULL,  NULL),
+('12', 'en_US',  'Google Analytics block', NULL,  NULL,  NULL),
+('12', 'fr_FR',  'Bloc Google Analytics', NULL,  NULL,  NULL),
+('13', 'en_US',  'Contact block', NULL,  NULL,  NULL),
+('13', 'fr_FR',  'Bloc contact', NULL,  NULL,  NULL),
+('14', 'en_US',  'Links block', NULL,  NULL,  NULL),
+('14', 'fr_FR',  'Bloc liens', NULL,  NULL,  NULL),
+('15', 'en_US',  'Newsletter block', NULL,  NULL,  NULL),
+('15', 'fr_FR',  'Bloc newsletter', NULL,  NULL,  NULL),
+('16', 'en_US',  'Social Networks block', NULL,  NULL,  NULL),
+('16', 'fr_FR',  'Bloc réseaux sociaux', NULL,  NULL,  NULL),
+('17', 'en_US',  'New Products block', NULL,  NULL,  NULL),
+('17', 'fr_FR',  'Bloc nouveaux produits', NULL,  NULL,  NULL),
+('18', 'en_US',  'Products offer block', NULL,  NULL,  NULL),
+('18', 'fr_FR',  'Bloc promotions', NULL,  NULL,  NULL)
+;
+
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
 (1, 'order-invoice.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
