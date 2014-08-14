@@ -417,11 +417,15 @@ $(function() {
     $(".pse-assoc-image-document").click(function() {
         var $this = $(this);
         var type = "none";
+        var toggle_event = "";
+
 
         if ($this.hasClass("pse-assoc-image")) {
             type = "image";
+            toggle_event = "click";
         } else if ($this.hasClass("pse-assoc-document")) {
             type = "document";
+            toggle_event = "switch-change";
         }
 
         var $modal_container = $("#pse-modal-container");
@@ -434,19 +438,24 @@ $(function() {
 
             $("#pse-image-document-assoc-modal").modal();
 
-            $(".img-do-associate").click(function() {
+            $(".do-associate").on(toggle_event, function(e, data) {
                 var $file = $(this);
-                var image_id = $file.data("id");
+                var type_id = $file.data("id");
 
                 $.ajax(
-                    "{url path='/admin/product_sale_elements'}/"+pse_id+"/image/"+image_id
+                    "{url path='/admin/product_sale_elements'}/"+pse_id+"/"+type+"/"+type_id
                 ).done(function() {
-                    if ($file.hasClass("is-associated")) {
-                        $file.removeClass("is-associated");
-                        $(".product-pse-image-join-glyphicon", $file.parent()).remove();
-                    } else {
-                        $file.addClass("is-associated");
-                        $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                    /**
+                     * If the modal is for images, add some graphics
+                     */
+                    if (type == "image") {
+                        if ($file.hasClass("is-associated")) {
+                            $file.removeClass("is-associated");
+                            $(".product-pse-image-join-glyphicon", $file.parent()).remove();
+                        } else {
+                            $file.addClass("is-associated");
+                            $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                        }
                     }
                 }).fail(function(data) {
                     $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");

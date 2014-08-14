@@ -1527,7 +1527,8 @@ class ProductController extends AbstractSeoCrudController
                 "id" => $image->get("ID"),
                 "url" => $image->get("IMAGE_URL"),
                 "title" => $image->get("TITLE"),
-                "is_associated" => $isAssociated
+                "is_associated" => $isAssociated,
+                "filename" => $image->model->getFile(),
             ];
         }
 
@@ -1571,7 +1572,8 @@ class ProductController extends AbstractSeoCrudController
                 "id" => $document->get("ID"),
                 "url" => $document->get("DOCUMENT_URL"),
                 "title" => $document->get("TITLE"),
-                "is-associated" => $isAssociated
+                "is_associated" => $isAssociated,
+                "filename" => $document->model->getFile(),
             ];
         }
 
