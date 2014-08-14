@@ -1475,6 +1475,10 @@ class ProductController extends AbstractSeoCrudController
                 $data = [];
         }
 
+        if (empty($data) && null === $errorMessage) {
+            $errorMessage = $this->getTranslator()->trans("There are no files to associate");
+        }
+
         $this->getParserContext()
             ->set("items", $data)
             ->set("type", $type)
@@ -1503,11 +1507,7 @@ class ProductController extends AbstractSeoCrudController
         ;
 
         $imageAssoc = ProductSaleElementsProductImageQuery::create()
-            ->useProductSaleElementsQuery()
-                ->useProductQuery()
-                    ->filterById($pse->getProductId())
-                ->endUse()
-            ->endUse()
+            ->filterByProductSaleElementsId($pse->getId())
             ->find()
             ->toArray()
         ;
@@ -1527,7 +1527,7 @@ class ProductController extends AbstractSeoCrudController
                 "id" => $image->get("ID"),
                 "url" => $image->get("IMAGE_URL"),
                 "title" => $image->get("TITLE"),
-                "is-associated" => $isAssociated
+                "is_associated" => $isAssociated
             ];
         }
 
@@ -1550,9 +1550,7 @@ class ProductController extends AbstractSeoCrudController
 
         $documentAssoc = ProductSaleElementsProductDocumentQuery::create()
             ->useProductSaleElementsQuery()
-                ->useProductQuery()
-                    ->filterById($pse->getProductId())
-                ->endUse()
+                ->filterById($pse->getId())
             ->endUse()
             ->find()
             ->toArray()

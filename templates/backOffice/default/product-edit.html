@@ -415,29 +415,38 @@ $(function() {
     });
 
     $(".pse-assoc-image-document").click(function() {
+        var $this = $(this);
+        var type = "none";
+
+        if ($this.hasClass("pse-assoc-image")) {
+            type = "image";
+        } else if ($this.hasClass("pse-assoc-document")) {
+            type = "document";
+        }
+
         var $modal_container = $("#pse-modal-container");
         var pse_id = $(this).data("id");
 
         $.ajax(
-            "{url path="/admin/product_sale_elements/ajax/image"}/" + pse_id
+            "{url path="/admin/product_sale_elements/ajax/"}"+ type + "/" + pse_id
         ).done(function(data) {
             $modal_container.html(data);
 
             $("#pse-image-document-assoc-modal").modal();
 
             $(".img-do-associate").click(function() {
-                var $image = $(this);
-                var image_id = $image.data("id");
+                var $file = $(this);
+                var image_id = $file.data("id");
 
                 $.ajax(
                     "{url path='/admin/product_sale_elements'}/"+pse_id+"/image/"+image_id
                 ).done(function() {
-                    if ($image.hasClass("is-associated")) {
-                        $image.removeClass("is-associated");
-                        $(".product-pse-image-join-glyphicon", $image.parent()).remove();
+                    if ($file.hasClass("is-associated")) {
+                        $file.removeClass("is-associated");
+                        $(".product-pse-image-join-glyphicon", $file.parent()).remove();
                     } else {
-                        $image.addClass("is-associated");
-                        $image.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                        $file.addClass("is-associated");
+                        $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
                     }
                 }).fail(function(data) {
                     $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");
@@ -446,7 +455,19 @@ $(function() {
                 });
             });
         }).fail(function(data) {
-            $body.html(data["error"]);
+            var $modal_title = $("#associate_images_documents_label");
+            var $body = $(".modal-body", $modal_container);
+
+            $modal_title.html("{intl l='Error'}");
+
+            var error_message = data["error"];
+            if (!error_message || error_message.length === 0) {
+                error_message = "{intl l='An unknown error occured, please try again.'}";
+            }
+
+            $body.html("<p>"+error_message+"</p>");
+
+            $("#pse-assoc-image-document-modal").modal();
         });
     });
 
