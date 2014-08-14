@@ -243,7 +243,7 @@ return array(
     'deliveries' => 'Livraisons',
     'for' => 'pour',
     'instead of' => 'au lieu de',
-    'missing or invalid data' => 'Information érronée ou incomplète',
+    'missing or invalid data' => 'Information erronée ou incomplète',
     'per page' => 'par page',
     'update' => 'mettre à jour',
     'with:' => 'avec :',
