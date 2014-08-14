@@ -316,11 +316,11 @@ class CustomerController extends BaseFrontController
                         return RedirectResponse::create($successUrl);
 
                     } catch (UsernameNotFoundException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
                     } catch (WrongPasswordException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
                     } catch (AuthenticationException $e) {
-                        $message = "Wrong email or password. Please try again";
+                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
                     }
 
                 }

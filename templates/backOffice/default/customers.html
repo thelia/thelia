@@ -297,7 +297,7 @@
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <select name="{$name}" id="{$label_attr.for}" class="form-control">
                         {loop type="country" name="country1"}
-                            <option value="{$ID}">{$TITLE}</option>
+                            <option value="{$ID}" {if $IS_DEFAULT}selected{/if}>{$TITLE}</option>
                         {/loop}
                     </select>
                 </div>
