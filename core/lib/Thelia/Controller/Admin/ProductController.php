@@ -49,7 +49,6 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -1299,9 +1298,9 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param int $pseId
-     * @param string $type
-     * @param int $typeId
+     * @param  int                                        $pseId
+     * @param  string                                     $type
+     * @param  int                                        $typeId
      * @return mixed|\Thelia\Core\HttpFoundation\Response
      */
     public function productSaleElementsProductImageDocumentAssociation($pseId, $type, $typeId)
@@ -1322,18 +1321,77 @@ class ProductController extends AbstractSeoCrudController
         $responseData = [];
 
         try {
-            if (null !== $msg = $this->checkFileType($type)) {
-                throw new \Exception($msg);
-            }
+            $responseData = $this->getAssociationResponseData($pseId, $type, $typeId);
+        } catch (\Exception $e) {
+            $responseData["error"] = $e->getMessage();
+        }
 
-            $responseData["product_sale_elements_id"] = $pseId;
+        return JsonResponse::create($responseData, isset($responseData["error"]) ? 500 : 200);
+    }
 
-            $pse = ProductSaleElementsQuery::create()->findPk($pseId);
+    public function getAssociationResponseData($pseId, $type, $typeId)
+    {
+        $responseData = [];
 
-            if (null === $pse) {
+        if (null !== $msg = $this->checkFileType($type)) {
+            throw new \Exception($msg);
+        }
+
+        $responseData["product_sale_elements_id"] = $pseId;
+
+        $pse = ProductSaleElementsQuery::create()->findPk($pseId);
+
+        if (null === $pse) {
+            throw new \Exception(
+                $this->getTranslator()->trans(
+                    "The product sale elements id %id doesn't exists",
+                    [
+                        "%id" => $pseId,
+                    ]
+                )
+            );
+        }
+
+        if ($type === "image") {
+            $image = ProductImageQuery::create()->findPk($typeId);
+
+            if (null === $image) {
                 throw new \Exception(
                     $this->getTranslator()->trans(
-                        "The product sale elements id %id doesn't exists",
+                        "The product image id %id doesn't exists",
+                        [
+                            "%id" => $typeId,
+                        ]
+                    )
+                );
+            }
+
+            $assoc = ProductSaleElementsProductImageQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductImageId($typeId)
+            ;
+
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductImage();
+
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductImageId($typeId)
+                    ->save()
+                ;
+            } else {
+                $assoc->delete();
+            }
+
+            $responseData["product_image_id"] = $typeId;
+
+        } elseif ($type === "document") {
+            $image = ProductDocumentQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "The product document id %id doesn't exists",
                         [
                             "%id" => $pseId,
                         ]
@@ -1341,81 +1399,29 @@ class ProductController extends AbstractSeoCrudController
                 );
             }
 
-            if ($type === "image") {
-                $image = ProductImageQuery::create()->findPk($typeId);
+            $assoc = ProductSaleElementsProductDocumentQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductDocumentId($typeId)
+            ;
 
-                if (null === $image) {
-                    throw new \Exception(
-                        $this->getTranslator()->trans(
-                            "The product image id %id doesn't exists",
-                            [
-                                "%id" => $typeId,
-                            ]
-                        )
-                    );
-                }
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductDocument();
 
-                $assoc = ProductSaleElementsProductImageQuery::create()
-                    ->filterByProductSaleElementsId($pseId)
-                    ->findOneByProductImageId($typeId)
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductDocumentId($typeId)
+                    ->save()
                 ;
-
-                if (null === $assoc) {
-                    $assoc = new ProductSaleElementsProductImage();
-
-                    $assoc
-                        ->setProductSaleElementsId($pseId)
-                        ->setProductImageId($typeId)
-                        ->save()
-                    ;
-                } else {
-                    $assoc->delete();
-                }
-
-                $responseData["product_image_id"] = $typeId;
-
-            } elseif ($type === "document") {
-                $image = ProductDocumentQuery::create()->findPk($typeId);
-
-                if (null === $image) {
-                    throw new \Exception(
-                        $this->getTranslator()->trans(
-                            "The product document id %id doesn't exists",
-                            [
-                                "%id" => $pseId,
-                            ]
-                        )
-                    );
-                }
-
-                $assoc = ProductSaleElementsProductDocumentQuery::create()
-                    ->filterByProductSaleElementsId($pseId)
-                    ->findOneByProductDocumentId($typeId)
-                ;
-
-                if (null === $assoc) {
-                    $assoc = new ProductSaleElementsProductDocument();
-
-                    $assoc
-                        ->setProductSaleElementsId($pseId)
-                        ->setProductDocumentId($typeId)
-                        ->save()
-                    ;
-                } else {
-                    $assoc->delete();
-                }
-
-                $responseData["product_document_id"] = $typeId;
+            } else {
+                $assoc->delete();
             }
 
-            $responseData["is-associated"] = (int) (!$assoc->isDeleted());
-        } catch (\Exception $e) {
-            $responseData["error"] = $e->getMessage();
+            $responseData["product_document_id"] = $typeId;
         }
 
+        $responseData["is-associated"] = (int) (!$assoc->isDeleted());
 
-
-        return JsonResponse::create($responseData, isset($responseData["error"]) ? 500 : 200);
+        return $responseData;
     }
 
     public function checkFileType($type)
@@ -1580,10 +1586,10 @@ class ProductController extends AbstractSeoCrudController
         return $data;
     }
 
-    protected function arrayHasEntries(array $data, array $entries) {
+    protected function arrayHasEntries(array $data, array $entries)
+    {
         $status = false;
         $countEntries = count($entries);
-
 
         foreach ($data as &$line) {
             $localMatch = 0;

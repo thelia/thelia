@@ -64,4 +64,4 @@ class JsonResponse extends BaseJsonResponse
 
         return static::createError($errorMessage, 404);
     }
-} 
+}

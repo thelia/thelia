@@ -1254,7 +1254,7 @@
         <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
         <requirement key="id">\d+</requirement>
     </route>
-    
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
