@@ -134,7 +134,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 1, 'Tinymce\\Tinymce', NOW(), NOW());
+(5, 'Tinymce', 1, 0, 3, 'Tinymce\\Tinymce', NOW(), NOW());
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 ('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
