@@ -12,10 +12,10 @@
 {block name='breadcrumb'}{/block}
 
 {block name="main-content"}
-    {ifHook rel="home.body"}
+    {ifhook rel="home.body"}
        {hook name="home.body"}
-    {/ifHook}
-    {elseHook rel="home.body"}
+    {/ifhook}
+    {elsehook rel="home.body"}
     <section class="carousel-container">
         <div id="carousel" class="carousel slide">
             <div class="carousel-wrapper">
@@ -124,7 +124,7 @@
         </section><!-- #products-offer -->
         {/ifloop}
     {/if}
-    {/elseHook}
+    {/elsehook}
 
 {/block}
 

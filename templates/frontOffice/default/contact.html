@@ -10,15 +10,15 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
         <h1 id="main-label" class="page-header">{intl l="Contact Us"}</h1>
 
-        {ifHook rel="contact.top"}
+        {ifhook rel="contact.top"}
            {hook name="contact.top"}
-        {/ifHook}
-        {elseHook rel="contact.top"}
+        {/ifhook}
+        {elsehook rel="contact.top"}
         <div id="google-map">
             {assign var="address" value="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}"}
             <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&source=s_q&geocode=&q={$address|escape:'url'}&output=embed"></iframe>
         </div><!-- / #google-map-->
-        {/elseHook}
+        {/elsehook}
 
         {block name="contact-form"}
             {form name="thelia.front.contact"}

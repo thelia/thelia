@@ -16,7 +16,7 @@
 
     {include file="includes/folder-breadcrumb.html" folder_id=$parent }
 
-    {module_include location='folders_top'}
+    {hook name="folders.top" location="folders_top" }
 
     <div class="row">
         <div class="col-md-12">
@@ -33,7 +33,7 @@
                                 {intl l="Top level folders"}
                             {/elseloop}
 
-                            {module_include location='folder_list_caption'}
+                            {hook name="folders.caption" location="folder_list_caption" }
 
                             {loop type="auth" name="can_create" role="ADMIN" resource="admin.folder" access="CREATE"}
                                 <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new folder'}" href="#folder_creation_dialog" data-toggle="modal">
@@ -69,7 +69,7 @@
                                     }
                                 </th>
 
-                                {module_include location='folder_list_header'}
+                                {hook name="folders.header" location="folder_list_header" }
 
                                 <th>
                                     {admin_sortable_header
@@ -114,7 +114,7 @@
                                         </a>
                                     </td>
 
-                                    {module_include location='folder_list_row'}
+                                    {hook name="folders.row" location="folder_list_row" }
 
                                     <td>
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
@@ -202,7 +202,7 @@
                             {intl l="Top level Contents"}
                             {/elseloop}
 
-                            {module_include location='content_list_caption'}
+                            {hook name="contents.caption" location="content_list_caption" }
 
                             <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new content'}" href="#content_creation_dialog" data-toggle="modal">
                                 <span class="glyphicon glyphicon-plus-sign"></span>
@@ -232,7 +232,7 @@
                                     label="{intl l='Content title'}"
                                     }
 
-                                    {module_include location='content_list_header'}
+                                    {hook name="contents.header" location="content_list_header" }
 
                                 <th>
                                     {admin_sortable_header
@@ -272,7 +272,7 @@
 
                                     <td class="object-title"><a href="{url path="/admin/content/update/$ID"}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
 
-                                    {module_include location='content_list_row'}
+                                    {hook name="contents.row" location="content_list_row" }
 
                                     <td>
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
@@ -333,7 +333,7 @@
         <div class="alert alert-info">{intl l="To create a new content, select an existing folder, or create a new one."}</div>
     {/if}
 
-    {module_include location='folders_bottom'}
+    {hook name="folders.bottom" location="folders_bottom" }
 
     </div>
 
@@ -390,7 +390,7 @@
             </div>
         {/form_field}
 
-        {module_include location='folder_create_form'}
+        {hook name="folder.create-form" location="folder_create_form" }
 
     {/capture}
 
@@ -462,7 +462,7 @@
             </div>
         {/form_field}
 
-        {module_include location='content_create_form'}
+        {hook name="content.create-form" location="content_create_form" }
 
     {/capture}
 
@@ -486,7 +486,7 @@
 {capture "folder_delete_dialog"}
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
 
-    {module_include location='folder_delete_form'}
+    {hook name="folder.delete-form" location="folder_delete_form" }
 
 {/capture}
 
@@ -507,7 +507,7 @@
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
     <input type="hidden" name="folder_id" value="{$parent}" />
 
-    {module_include location='content_delete_form'}
+    {hook name="content.delete-form" location="content_delete_form" }
 
 {/capture}
 
@@ -639,5 +639,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='folders-js'}
+    {hook name="folders.js" location="folders-js" }
 {/block}

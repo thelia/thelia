@@ -26,10 +26,10 @@
             {include file="misc/checkout-progress.tpl"  step="last"}
 
             {loop type="order" name="placed-order" id=$order_id}
-            {ifHook rel="order-payment-gateway.body"}
+            {ifhook rel="order-payment-gateway.body"}
                 {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
-            {/ifHook}
-            {elseHook rel="order-payment-gateway.body"}
+            {/ifhook}
+            {elsehook rel="order-payment-gateway.body"}
                 <div id="payment-success" class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
@@ -55,7 +55,7 @@
                         {/if}
                     </div>
                 </div>
-            {/elseHook}
+            {/elsehook}
             {/loop}
 
         </article>
@@ -64,10 +64,10 @@
 {/block}
 
 {block name="javascript-initialization"}
-{ifHook rel="order-payment-gateway.javascript"}
+{ifhook rel="order-payment-gateway.javascript"}
    {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
-{/ifHook}
-{elseHook rel="order-payment-gateway.javascript"}
+{/ifhook}
+{elsehook rel="order-payment-gateway.javascript"}
     <script type="text/javascript">
         jQuery(function($) {
             $('#payement_gateway_form').submit();
@@ -79,7 +79,7 @@
             });
         });
      </script>
-{/elseHook}
+{/elsehook}
 {hook name="order-payment-gateway.after-javascript-initialization"}
 {/block}
 

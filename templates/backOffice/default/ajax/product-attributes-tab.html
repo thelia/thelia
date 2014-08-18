@@ -91,7 +91,7 @@
 	                                            <th>{intl l='ID'}</th>
 	                                            <th>{intl l='Attribute Name'}</th>
 
-	                                            {module_include location='product_attributes_table_header'}
+	                                            {hook name="product.attributes-table-header" location="product_attributes_table_header" }
 	                                        </tr>
 	                                    </thead>
 
@@ -102,7 +102,7 @@
 
 	                                            <td>{$TITLE}</td>
 
-	                                            {module_include location='product_features_table_row'}
+	                                            {hook name="product.attributes-table-row" location="product_attributes_table_row" }
 	                                        </tr>
 	                                         {/loop}
 
@@ -153,7 +153,7 @@
 	                                            <th>{intl l='Feature Name'}</th>
 						                        <th>{intl l='Feature value for this product'}</th>
 
-						                        {module_include location='product_features_table_header'}
+						                        {hook name="product.features-table-header" location="product_features_table_header" }
 
 						                    </tr>
 						                </thead>
@@ -211,7 +211,7 @@
 								                     {/elseloop}
 							                    </td>
 
-										        {module_include location='product_features_table_row'}
+										        {hook name="product.features-table-row" location="product_features_table_row" }
 
 										    </tr>
 										     {/loop}

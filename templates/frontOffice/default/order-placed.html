@@ -27,10 +27,10 @@
 
             {loop type="order" name="placed-order" id=$placed_order_id}
 
-            {ifHook rel="order-placed.body"}
+            {ifhook rel="order-placed.body"}
                 {hook name="order-placed.body" module="$PAYMENT_MODULE"}
-            {/ifHook}
-            {elseHook rel="order-placed.body"}
+            {/ifhook}
+            {elsehook rel="order-placed.body"}
                 <div id="payment-success" class="panel">
                     <div class="panel-heading">
                         <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
@@ -50,7 +50,7 @@
                         </dl>
                     </div>
                 </div>
-            {/elseHook}
+            {/elsehook}
             {/loop}
 
             <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>

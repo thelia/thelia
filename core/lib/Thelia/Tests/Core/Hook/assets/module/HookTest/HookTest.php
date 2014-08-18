@@ -10,25 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Hook;
+namespace HookTest;
 
-use Thelia\Core\Template\Smarty\SmartyParser;
-use Thelia\Module\BaseModuleInterface;
+use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Module\BaseModule;
 
-interface BaseHookInterface
+class HookTest extends BaseModule
 {
-    /*
-    public function setModule(BaseModuleInterface $module);
-
-    public function getModule();
-
-    public function setParser(SmartyParser $parser);
-
-    public function getParser();
-    */
-
-    public function render($templateName);
-
-    public function assign($name, $value);
 
 }

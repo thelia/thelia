@@ -17,7 +17,7 @@
             </ul>
         </div>
 
-        {module_include location='modules_top'}
+        {hook name="search.top" location="search_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -43,7 +43,7 @@
                                     {intl l="firstname & lastname"}
                                 </th>
 
-                                {module_include location='customer_list_header'}
+                                {hook name="customers.header" location="customer_list_header" }
 
                                 <th>
                                     {intl l="last order"}
@@ -80,7 +80,7 @@
                                         {$FIRSTNAME} {$LASTNAME}
                                     </td>
 
-                                    {module_include location='customer_list_row'}
+                                    {hook name="customers.row" location="customer_list_row" }
 
                                     <td>
                                         {$lastOrderDate}
@@ -349,7 +349,7 @@
             </div>
         </div>
 
-        {module_include location='modules_bottom'}
+        {hook name="search.bottom" location="search_bottom" }
 
     </div>
 </div>
@@ -364,5 +364,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='search-js'}
+    {hook name="search.js" location="search-js" }
 {/block}

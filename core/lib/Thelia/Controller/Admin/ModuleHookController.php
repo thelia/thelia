@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
@@ -28,7 +29,7 @@ use Thelia\Model\ModuleHookQuery;
 /**
  * Class HookController
  * @package Thelia\Controller\Admin
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class ModuleHookController extends AbstractCrudController
 {
@@ -51,13 +52,19 @@ class ModuleHookController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
         return $this->renderList();
     }
 
     public function toggleActivationAction($module_hook_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $message = null;
 
         $event = new ModuleHookToggleActivationEvent($this->getExistingObject());
@@ -116,11 +123,11 @@ class ModuleHookController extends AbstractCrudController
     protected function hydrateObjectForm($object)
     {
         $data = array(
-            'id' => $object->getId(),
-            'hook_id' => $object->getHookId(),
+            'id'        => $object->getId(),
+            'hook_id'   => $object->getHookId(),
             'classname' => $object->getClassname(),
-            'method' => $object->getMethod(),
-            'active' => $object->getActive(),
+            'method'    => $object->getMethod(),
+            'active'    => $object->getActive(),
         );
 
         return new ModuleHookModificationForm($this->getRequest(), 'form', $data);
@@ -150,21 +157,19 @@ class ModuleHookController extends AbstractCrudController
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update=false)
+    protected function hydrateEvent($event, $formData, $update = false)
     {
         if (!$update) {
             $event
                 ->setModuleId($formData['module_id'])
                 ->setHookId($formData['hook_id']);
         } else {
-            // todo
             $event
                 ->setModuleHookId($formData['id'])
                 ->setHookId($formData['hook_id'])
                 ->setClassname($formData['classname'])
                 ->setMethod($formData['method'])
-                ->setActive($formData['active'])
-            ;
+                ->setActive($formData['active']);
         }
 
         return $event;
@@ -253,7 +258,7 @@ class ModuleHookController extends AbstractCrudController
     protected function getEditionArgument()
     {
         return array(
-            'module_hook_id'  => $this->getRequest()->get('module_hook_id', 0)
+            'module_hook_id' => $this->getRequest()->get('module_hook_id', 0)
         );
     }
 

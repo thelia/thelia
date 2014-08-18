@@ -47,7 +47,7 @@
 
     {* Modules css are included here *}
 
-    {module_include location='head_css'}
+    {hook name="main.head-css" location="head_css" }
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
@@ -65,7 +65,7 @@
 
 	    {* -- Brand bar section ------------------------------------------------- *}
 
-		{module_include location='before_topbar'}
+		{hook name="main.before-topbar" location="before_topbar" }
 
 		<div class="topbar">
 			<div class="container">
@@ -76,6 +76,8 @@
 
                         <div class="clearfix pull-right hidden-xs">
                             <div class="button-toolbar pull-righ" role="toolbar">
+
+                                {hook name="main.topbar-top" }
 
                                 <div class="btn-group">
                                     <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
@@ -105,23 +107,26 @@
                                         {/loop}
                                      </ul>
                                 </div>
+
+                                {hook name="main.topbar-bottom" }
+
                             </div>
                         </div>
 
 		            </div>
 
-		    		{module_include location='inside_topbar'}
+		    		{hook name="main.inside-topbar" location="inside_topbar" }
 
 		        </div>
 
 		    </div>
 		</div>
 
-		{module_include location='after_topbar'}
+		{hook name="main.after-topbar" location="after_topbar" }
 
 	    {* -- Top menu section -------------------------------------------------- *}
 
-		{module_include location='before_top_menu'}
+		{hook name="main.before-top-menu" location="before_top_menu" }
 
 		<nav class="navbar navbar-default" role="navigation">
 
@@ -138,22 +143,42 @@
         			</div>
 
         			<div class="collapse navbar-collapse navbar-collapse">
-        				<ul class="nav navbar-nav">
+        				<ul class="nav navbar-nav navbar-top-menu">
 
                             <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
                                 <a href="{url path='/admin/home'}">{intl l="Home"}</a>
                             </li>
 
                             {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
-                            <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
-                                <a href="{url path='/admin/customers'}">{intl l="Customers"}</a>
-                            </li>
+                            {ifhook rel="main.top-menu-customer"}
+                                {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+
+                                    <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Customers"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-customer"}
+                                        <li role="menuitem">
+                                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                {$title}
+                                            </a>
+                                        </li>
+                                        {/forhook}
+                                    </ul>
+                                </li>
+                                {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-customer"}
+                                <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+                                    <a href="{url path='/admin/customers'}" >{intl l="Customers"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
                                 <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"}</a>
 
                                     <ul class="dropdown-menu" role="menu">
 
@@ -173,43 +198,148 @@
                                                 </a>
                                             </li>
                                         {/loop}
+                                        {hookblock name="main.top-menu-order" fields="id,class,url,title"}
+                                        {forhook rel="main.top-menu-order"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                        {/hookblock}
                                     </ul>
                                 </li>
                             {/loop}
 
                             {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
-                            <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
-                                <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
-                            </li>
+                            {ifhook rel="main.top-menu-catalog"}
+                            {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+
+                                    <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Catalog"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-catalog"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                    </ul>
+                                </li>
+                            {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-catalog"}
+                                <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+                                    <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-content" type="auth" role="ADMIN" resource="admin.folder"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'folder'}active{/if}" id="folders_menu">
-                                <a href="{url path='/admin/folders'}">{intl l="Folders"}</a>
-                            </li>
+                            {ifhook rel="main.top-menu-content"}
+                            {hookblock name="main.top-menu-content" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'content'}active{/if}" id="contents_menu">
+
+                                    <a href="{url path='/admin/contents'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Folders"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-content"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                    </ul>
+                                </li>
+                            {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-content"}
+                                <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
+                                    <a href="{url path='/admin/contents'}" >{intl l="Folders"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                                <a href="{url path='/admin/tools'}">{intl l="Tools"}</a>
-                            </li>
+                            {ifhook rel="main.top-menu-tools"}
+                            {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+                                    <a href="{url path='/admin/tools'}" data-target="{url path='/admin/tools'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-tools"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                    </ul>
+                                </li>
+                            {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-tools"}
+                                <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+                                    <a href="{url path='/admin/tools'}" >{intl l="Tools"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
-                                <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                                    <a href="{url path='/admin/modules'}">{intl l="Modules"}</a>
+                            {ifhook rel="main.top-menu-modules"}
+                            {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                                    <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Modules"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-modules"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                    </ul>
                                 </li>
+                            {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-modules"}
+                                <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                                    <a href="{url path='/admin/modules'}" >{intl l="Modules"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration"  access="VIEW"}
-                            <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                                <a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a>
-                            </li>
+                            {ifhook rel="main.top-menu-configuration"}
+                            {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
+                                <li class="dropdown {if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                                    <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Configuration"}</a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {forhook rel="main.top-menu-configuration"}
+                                            <li role="menuitem">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    {$title}
+                                                </a>
+                                            </li>
+                                        {/forhook}
+                                    </ul>
+                                </li>
+                            {/hookblock}
+                            {/ifhook}
+                            {elsehook rel="main.top-menu-configuration"}
+                                <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                                    <a href="{url path='/admin/configuration'}" >{intl l="Configuration"}</a>
+                                </li>
+                            {/elsehook}
                             {/loop}
 
 
-                            {module_include location='in_top_menu_items'}
-
+                            {hook name="main.in-top-menu-items" location="in_top_menu_items" }
 
                         </ul>
 
@@ -227,7 +357,7 @@
             </div>
 		</nav>
 
-		{module_include location='after_top_menu'}
+		{hook name="main.after-top-menu" location="after_top_menu" }
 
 	{/loop}
 
@@ -245,7 +375,7 @@
 
     {* -- Footer section ---------------------------------------------------- *}
 
-    {module_include location='before_footer'}
+    {hook name="main.before-footer" location="before_footer" }
 
     <hr />
     <footer class="footer">
@@ -256,12 +386,12 @@
             - <a href="#" target="_blank">{intl l='Thelia contributions'}</a>
             </p>
 
-            {module_include location='in_footer'}
+            {hook name="main.in-footer" location="in_footer" }
 
         </div>
     </footer>
 
-    {module_include location='after_footer'}
+    {hook name="main.after-footer" location="after_footer" }
 
 
 	{* -- Javascript section ------------------------------------------------ *}
@@ -296,7 +426,9 @@
     </script>
 
 	{* Modules scripts are included now *}
-	{module_include location='footer_js'}
+	{hook name='main.footer-js' location="footer_js"}
+
     {block name="javascript-last-call"}{/block}
 </body>
 </html>
+

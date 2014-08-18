@@ -15,7 +15,7 @@ namespace Thelia\Core\Hook;
 /**
  * Class Fragment
  * @package Thelia\Core\Hook
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class Fragment
 {
@@ -23,7 +23,7 @@ class Fragment
 
     public function __construct($data = array())
     {
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             throw new \InvalidArgumentException("'data' argument must be an array");
         }
         $this->data = $data;

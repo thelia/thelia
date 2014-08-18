@@ -27,7 +27,9 @@ use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\HookQuery;
+use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\ModuleHook as ModuleHookModel;
@@ -36,18 +38,18 @@ use Thelia\Module\BaseModule;
 /**
  * Class ModuleHook
  * @package Thelia\Action
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHook extends BaseAction  implements EventSubscriberInterface
+class ModuleHook extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var ContainerInterface
+     * @var string
      */
-    protected $container;
+    protected $cacheDir;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct($cacheDir)
     {
-        $this->container = $container;
+        $this->cacheDir = $cacheDir;
     }
 
     public function toggleModuleActivation(ModuleToggleActivationEvent $event)
@@ -150,10 +152,10 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     {
         if (null !== $moduleHook = $event->getModuleHook()) {
             if ($moduleHook->getModuleActive()) {
-                $moduleHook->setActive(! $moduleHook->getActive());
+                $moduleHook->setActive(!$moduleHook->getActive());
                 $moduleHook->save();
             } else {
-                throw new \LogicException($this->getTranslator()->trans("The module has to be activated."));
+                throw new \LogicException(Translator::getInstance()->trans("The module has to be activated."));
             }
         }
         $this->cacheClear($event->getDispatcher());
@@ -165,6 +167,7 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
      * Changes position, selecting absolute ou relative change.
      *
      * @param  UpdatePositionEvent $event
+     *
      * @return UpdatePositionEvent $event
      */
     public function updateModuleHookPosition(UpdatePositionEvent $event)
@@ -199,9 +202,7 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
-        $cacheEvent = new CacheEvent(
-            $this->container->getParameter('kernel.cache_dir')
-        );
+        $cacheEvent = new CacheEvent($this->cacheDir);
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
@@ -229,17 +230,17 @@ class ModuleHook extends BaseAction  implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::MODULE_HOOK_CREATE => array('createModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE => array('updateModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_DELETE => array('deleteModuleHook', 128),
-            TheliaEvents::MODULE_HOOK_UPDATE_POSITION => array('updateModuleHookPosition', 128),
+            TheliaEvents::MODULE_HOOK_CREATE            => array('createModuleHook', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE            => array('updateModuleHook', 128),
+            TheliaEvents::MODULE_HOOK_DELETE            => array('deleteModuleHook', 128),
+            TheliaEvents::MODULE_HOOK_UPDATE_POSITION   => array('updateModuleHookPosition', 128),
             TheliaEvents::MODULE_HOOK_TOGGLE_ACTIVATION => array('toggleModuleHookActivation', 128),
 
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleModuleActivation', 64),
-            TheliaEvents::MODULE_DELETE => array('deleteModule', 64),
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION      => array('toggleModuleActivation', 64),
+            TheliaEvents::MODULE_DELETE                 => array('deleteModule', 64),
 
-            TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleHookActivation', 64),
-            TheliaEvents::HOOK_UPDATE => array('updateHook', 64),
+            TheliaEvents::HOOK_TOGGLE_ACTIVATION        => array('toggleHookActivation', 64),
+            TheliaEvents::HOOK_UPDATE                   => array('updateHook', 64),
 
         );
     }

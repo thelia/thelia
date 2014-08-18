@@ -12,59 +12,18 @@
 
 namespace Thelia\Core\Hook;
 
+
+
 /**
- * Interface FragmentBagInterface
+ * Class HookDefinition
  * @package Thelia\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-interface FragmentBagInterface
-{
-    /**
-     * Clears all parameters.
-     *
-     * @api
-     */
-    public function clear();
+class HookDefinition {
 
-    /**
-     * Gets the all fragments.
-     *
-     * @return array An array of parameters
-     *
-     * @api
-     */
-    public function all();
+    const BASE_CLASS = 'Thelia\Core\Hook\BaseHook';
 
-    /**
-     * Adds a new fragment.
-     *
-     * @param $content The new fragment content
-     * @param $key    The name/key of the fragment
-     *
-     * @api
-     */
-    public function add($key, $content);
+    const RENDER_BLOCK_EVENT = 'Thelia\Core\Event\Hook\HookRenderBlockEvent';
+    const RENDER_FUNCTION_EVENT = 'Thelia\Core\Event\Hook\HookRenderEvent';
 
-    /**
-     * Gets an array of fragments corresponding.
-     *
-     * @param string $key The parameter name
-     *
-     * @return array of fragment or an empty array
-     *
-     * @api
-     */
-    public function get($key);
-
-    /**
-     * Returns true if al less one fragment with this name is defined.
-     *
-     * @param string $key The fragment name
-     *
-     * @return Boolean true if a fragment is defined, false otherwise
-     *
-     * @api
-     */
-    public function has($key);
-
-}
+} 

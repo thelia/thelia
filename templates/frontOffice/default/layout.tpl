@@ -107,7 +107,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
             <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
                 {hook name="main.navbar-secondary"}
-                {elseHook rel="main.navbar-secondary"}
+                {elsehook rel="main.navbar-secondary"}
                 {if {count type="currency" exclude={currency attr="id"}} != 0 }
                 <ul class="nav navbar-nav navbar-currency navbar-left">
                     <li class="dropdown">
@@ -187,7 +187,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </li>
                     {/elseloop}
                 </ul>
-                {/elseHook}
+                {/elsehook}
             </nav>
         </div>
     </div>
@@ -201,7 +201,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </a>
             </h1>
             {hook name="main.navbar-primary"}
-            {elseHook rel="main.navbar-primary"}
+            {elsehook rel="main.navbar-primary"}
             <nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
                 <div class="container-fluid">
                     <div class="navbar-header">
@@ -223,7 +223,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     </div>
                 </div>
             </nav>
-            {/elseHook}
+            {/elsehook}
         </div>
     </header><!-- /.header -->
 
@@ -241,7 +241,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
-    {ifHook rel="main.footer-top"}
+    {ifhook rel="main.footer-top"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-3">
@@ -249,8 +249,8 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section>
-    {/ifHook}
-    {elseHook rel="main.footer-top"}
+    {/ifhook}
+    {elsehook rel="main.footer-top"}
     <section class="footer-banner">
         <div class="container">
             <div class="banner banner-col-3">
@@ -269,14 +269,14 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-banner -->
-    {/elseHook}
+    {/elsehook}
 
-    {ifHook rel="main.footer-body"}
+    {ifhook rel="main.footer-body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
-                {hookBlock name="main.footer-body"}
-                    {forHook rel="main.footer-body"}
+                {hookblock name="main.footer-body"}
+                    {forhook rel="main.footer-body"}
                     <div class="col">
                         <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
                             <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
@@ -285,13 +285,13 @@ GNU General Public License : http://www.gnu.org/licenses/
                             </div>
                         </section>
                     </div>
-                    {/forHook}
-                {/hookBlock}
+                    {/forhook}
+                {/hookblock}
             </div>
         </div>
     </section>
-    {/ifHook}
-    {elseHook rel="main.footer-body"}
+    {/ifhook}
+    {elsehook rel="main.footer-body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
@@ -460,9 +460,9 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-block -->
-    {/elseHook}
+    {/elsehook}
 
-    {ifHook rel="main.footer-bottom"}
+    {ifhook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
@@ -471,8 +471,8 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </footer>
-    {/ifHook}
-    {elseHook rel="main.footer-bottom"}
+    {/ifhook}
+    {elsehook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
@@ -491,7 +491,7 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </footer><!-- /.footer-info -->
-    {/elseHook}
+    {/elsehook}
 
 </section><!-- /.footer-container -->
 

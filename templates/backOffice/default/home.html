@@ -10,7 +10,7 @@
 	<div class="homepage">
 	      <div id="wrapper" class="container">
 
-		    {module_include location='home_top'}
+		    {hook name="home.top" location="home_top" }
 
             {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
 			<div class="col-md-12 general-block-decorator dashboard">
@@ -43,7 +43,7 @@
  			</div>
             {/loop}
 
-	 		<div class="row">
+	 		<div class="grid-container">
 
                 {* Do not display shop information block if user none of the required authorizations *}
 
@@ -98,7 +98,7 @@
                 {/capture}
 
                 {if trim($smarty.capture.shop_information_block_content) ne ""}
-                    <div class="col-md-4">
+                    <div class="grid-box">
                         <div class="general-block-decorator">
                             <div class="title title-without-tabs">{intl l="Shop Informations"}</div>
                             <div class="table-responsive">
@@ -113,7 +113,7 @@
                 {/if}
 
                 {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
-				<div class="col-md-4">
+				<div class="grid-box">
 					<div class="general-block-decorator">
 						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
 
@@ -273,9 +273,21 @@
 					</div>
 				</div>
 
-			</div>
+                {hookblock name="home.block" fields="id,title,content"}
+                    {forhook rel="home.block"}
+                        <div class="grid-box">
+                            <div {if $id}id="{$id}"{/if} class="general-block-decorator">
+                                {if $title}<div class="title title-without-tabs">{$title}</div>{/if}
+                                {$content}
+                            </div>
+                        </div>
+                    {/forhook}
+                {/hookblock}
 
-			{module_include location='home_bottom'}
+
+            </div>
+
+			{hook name="home.bottom" location="home_bottom" }
 		</div>
 	</div>
 {/block}
@@ -292,6 +304,9 @@
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
     {javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
+        <script type="text/javascript" src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/blocksit.min.js'}
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
 
@@ -431,11 +446,42 @@ jQuery(function($){
             $('#latest-thelia-version').text("Unavailable");
     });
 
+    // Grid setup
+    var currentGridNbCol = 0;
+
+    function refreshGrid() {
+        var winWidth = $(window).width();
+        var gridNbCol = 0;
+
+        if(winWidth < 480) {
+            gridNbCol = 1
+        } else if(winWidth < 768) {
+            gridNbCol = 2
+        } else {
+            gridNbCol = 3;
+        }
+
+        currentGridNbCol = gridNbCol;
+
+        $('.grid-container').BlocksIt({
+            numOfCol: gridNbCol,
+            offsetX: 5,
+            offsetY: 5,
+            blockElement: '.grid-box'
+        });
+
+    }
+
+    $(window).resize(function() {
+        refreshGrid();
+    });
+    refreshGrid();
+
 });
 
 </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='home-js'}
+    {hook name="home.js" location="home-js" }
 {/block}

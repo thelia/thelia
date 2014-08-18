@@ -12,12 +12,12 @@
         </service>
 
         <service id="thelia.action.hook" class="Thelia\Action\Hook">
-            <argument type="service" id="service_container"/>
+            <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.moduleHook" class="Thelia\Action\ModuleHook">
-            <argument type="service" id="service_container"/>
+            <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber"/>
         </service>
 

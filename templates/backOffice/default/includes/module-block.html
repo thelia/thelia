@@ -71,7 +71,7 @@
                 }
                 </th>
 
-                {module_include location='modules_table_header'}
+                {hook name="modules.table-header" location="modules_table_header" }
 
                 <th class="actions">{intl l="Actions"}</th>
             </tr>
@@ -117,7 +117,7 @@
                         </td>
                     {/if}
 
-                    {module_include location='modules_table_row'}
+                    {hook name="modules.table-row" location="modules_table_row" }
 
                     <td class="text-right">
                         <div class="btn-group">

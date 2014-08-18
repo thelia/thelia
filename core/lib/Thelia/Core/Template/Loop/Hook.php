@@ -86,15 +86,6 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($id, Criteria::IN);
         }
 
-        /*
-        $profile = $this->getProfile();
-        if (null !== $profile) {
-            $search->leftJoinProfileModule('profile_module')
-                ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
-                ->withColumn('profile_module.access', 'access');
-        }
-        */
-
         $code = $this->getCode();
         if (null !== $code) {
             $search->filterByCode($code, Criteria::IN);

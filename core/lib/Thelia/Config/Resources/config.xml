@@ -86,6 +86,10 @@
 			<argument type="service" id="service_container"/>
 		</service>
 
+        <!--  Hook Helper -->
+
+        <service id="thelia.hookHelper" class="Thelia\Core\Hook\HookHelper" />
+
 		<!-- Security context for front and back office -->
 
 		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">

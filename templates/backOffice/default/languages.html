@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/languages'}">{intl l="Languages"}</a></li>
         </ul>
 
-        {module_include location='languages_top'}
+        {hook name="languages.top" location="languages_top" }
 
         {if $error_message}
             <div class="row">
@@ -167,7 +167,7 @@
             </div>
         </div>
 
-        {module_include location='languages_bottom'}
+        {hook name="languages.bottom" location="languages_bottom" }
 
     </div>
 </div>
@@ -234,7 +234,7 @@
             </div>
         {/form_field}
 
-        {module_include location='language_create_form'}
+        {hook name="language.create-form" location="language_create_form" }
 
     {/capture}
 
@@ -258,7 +258,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="language_id" id="language_delete_id" value="" />
 
-    {module_include location='languages_delete_form'}
+    {hook name="languages.delete-form" location="languages_delete_form" }
 
 {/capture}
 
@@ -344,5 +344,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='languages-js'}
+    {hook name="languages.js" location="languages-js" }
 {/block}

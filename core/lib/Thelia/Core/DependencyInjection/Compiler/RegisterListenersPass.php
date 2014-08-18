@@ -18,6 +18,7 @@ use ReflectionMethod;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Model\HookQuery;
@@ -85,7 +86,7 @@ class RegisterListenersPass implements CompilerPassInterface
             $class = $container->getDefinition($id)->getClass();
 
             // the class must extends BaseHook
-            $implementClass = 'Thelia\Core\Hook\BaseHook';
+            $implementClass = HookDefinition::BASE_CLASS;
             if (! is_subclass_of($class, $implementClass)) {
                 throw new \InvalidArgumentException(sprintf('Hook class "%s" must extends class "%s".', $class, $implementClass));
             }
@@ -101,63 +102,9 @@ class RegisterListenersPass implements CompilerPassInterface
             }
 
             foreach ($events as $event) {
-
-                $active = isset($event['active']) ? intval($event['active']) : 1;
-                $active = (1 === $active);
-
-                if (!isset($event['event'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
-                }
-
-                $type = (isset($event['type'])) ? $this->getHookType($event['type']) : TemplateDefinition::FRONT_OFFICE;
-
-                $hook = HookQuery::create()
-                    ->filterByCode($event['event'])
-                    ->filterByType($type)
-                    ->findOne();
-                if (null === $hook) {
-                    Tlog::getInstance()->addAlert(sprintf("Hook %s is unknown.", $event['event']));
-                    continue;
-                }
-                if (! $hook->getActivate()) {
-                    Tlog::getInstance()->addAlert(sprintf("Hook %s is not activated.", $event['event']));
-                    continue;
-                }
-
-                if (!isset($event['method'])) {
-                    $event['method'] = 'on'.preg_replace(array(
-                            '/(?<=\b)[a-z]/ie',
-                            '/[^a-z0-9]/i'
-                        ), array('strtoupper("\\0")', ''), $event['event']);
-                }
-
-                // test if method exists
-                if (! $this->isValidHookMethod($class, $event['method'], $hook->getBlock())) {
-                    continue;
-                }
-
-                // test if hook is already registered in ModuleHook
-                $moduleHook = ModuleHookQuery::create()
-                    ->filterByModuleId($module)
-                    ->filterByHook($hook)
-                    ->filterByMethod($event['method'])
-                    ->findOne();
-
-                if (null === $moduleHook) {
-                    // hook for module doesn't exist, we add it with default registered values
-                    $moduleHook = new ModuleHook();
-                    //$moduleHook->setModuleId();
-                    $moduleHook->setHook($hook)
-                        ->setModuleId($module)
-                        ->setClassname($id)
-                        ->setMethod($event['method'])
-                        ->setActive($active)
-                        ->setHookActive(true)
-                        ->setModuleActive(true)
-                        ->setPosition(ModuleHook::MAX_POSITION)
-                        ->save();
-                }
+                $this->registerHook($class, $module, $id, $event);
             }
+
         }
 
         // now we can add listeners for active hooks and active module
@@ -165,6 +112,146 @@ class RegisterListenersPass implements CompilerPassInterface
 
     }
 
+
+    /**
+     * Create a new hook if the hook definition is valid.
+     *
+     * @param string               $class  the namespace of the class
+     * @param \Thelia\Model\Module $module the module
+     * @param string               $id     the service (hook) id
+     * @param array                $event  the event attributes
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function registerHook($class, $module, $id, $event)
+    {
+
+        $active = isset($event['active']) ? intval($event['active']) : 1;
+        $active = (1 === $active);
+
+        if (!isset($event['event'])) {
+            throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "hook.event_listener" tags.', $id));
+        }
+
+        $type = (isset($event['type'])) ? $this->getHookType($event['type']) : TemplateDefinition::FRONT_OFFICE;
+
+        $hook = HookQuery::create()
+            ->filterByCode($event['event'])
+            ->filterByType($type)
+            ->findOne();
+
+        if (null === $hook) {
+            Tlog::getInstance()->addAlert(sprintf("Hook %s is unknown.", $event['event']));
+            return;
+        }
+
+        if (! $hook->getActivate()) {
+            Tlog::getInstance()->addAlert(sprintf("Hook %s is not activated.", $event['event']));
+            return;
+        }
+
+        if (!isset($event['method'])) {
+            $event['method'] = 'on'.preg_replace(array(
+                    '/(?<=\b)[a-z]/ie',
+                    '/[^a-z0-9]/i'
+                ), array('strtoupper("\\0")', ''), $event['event']);
+        }
+
+        // test if method exists
+        if (! $this->isValidHookMethod($class, $event['method'], $hook->getBlock())) {
+            return;
+        }
+
+        // test if hook is already registered in ModuleHook
+        $moduleHook = ModuleHookQuery::create()
+            ->filterByModuleId($module)
+            ->filterByHook($hook)
+            ->filterByMethod($event['method'])
+            ->findOne();
+
+        if (null === $moduleHook) {
+            // hook for module doesn't exist, we add it with default registered values
+            $moduleHook = new ModuleHook();
+            //$moduleHook->setModuleId();
+            $moduleHook->setHook($hook)
+                ->setModuleId($module)
+                ->setClassname($id)
+                ->setMethod($event['method'])
+                ->setActive($active)
+                ->setHookActive(true)
+                ->setModuleActive(true)
+                ->setPosition(ModuleHook::MAX_POSITION)
+                ->save();
+        }
+
+    }
+
+
+    /**
+     * First the new hooks are positioning next to the last module hook.
+     * Next, if the module, hook and module hook is active, a new listener is
+     * added to the service definition.
+     *
+     * @param Definition $definition The service definition
+     */
+    protected function addHooksMethodCall(Definition $definition)
+    {
+        $moduleHooks = ModuleHookQuery::create()
+            ->orderByHookId()
+            ->orderByPosition()
+            ->orderById()
+            ->find();
+
+        $modulePosition = 0;
+        $hookId = 0;
+        /** @var ModuleHook $moduleHook */
+        foreach ($moduleHooks as $moduleHook) {
+
+            // manage module hook position for new hook
+            if ($hookId !== $moduleHook->getHookId()) {
+                $hookId = $moduleHook->getHookId();
+                $modulePosition = 1;
+            } else {
+                $modulePosition++;
+            }
+
+            if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION) {
+                // new module hook, we set it at the end of the queue for this event
+                $moduleHook->setPosition($modulePosition)->save();
+            } else {
+                $modulePosition = $moduleHook->getPosition($modulePosition);
+            }
+
+            // Add the the new listener for active hooks, we have to reverse the priority and the position
+            if ($moduleHook->getActive() && $moduleHook->getModuleActive() && $moduleHook->getHookActive()) {
+
+                $hook = $moduleHook->getHook();
+                $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
+
+                // we a register an event which is relative to a specific module
+                if ($hook->getByModule()) {
+                    $eventName .= '.' . $moduleHook->getModuleId();
+                }
+
+                $definition->addMethodCall('addListenerService',
+                    array(
+                        $eventName,
+                        array($moduleHook->getClassname(), $moduleHook->getMethod()),
+                        ModuleHook::MAX_POSITION - $moduleHook->getPosition()
+                    )
+                );
+            }
+        }
+    }
+
+
+    /**
+     * get the hook type according to the type attribute of the hook tag
+     *
+     * @param string $name
+     *
+     * @return int the hook type
+     */
     protected function getHookType($name)
     {
         $type = TemplateDefinition::FRONT_OFFICE;
@@ -184,6 +271,15 @@ class RegisterListenersPass implements CompilerPassInterface
     }
 
 
+    /**
+     * Test if the method that will handled the hook is valid
+     *
+     * @param string $className  the namespace of the class
+     * @param string $methodName the method name
+     * @param bool   $block      tell if the hook is a block or a function
+     *
+     * @return bool
+     */
     protected function isValidHookMethod($className, $methodName, $block)
     {
         try {
@@ -191,74 +287,28 @@ class RegisterListenersPass implements CompilerPassInterface
 
             $parameters = $method->getParameters();
             if (count($parameters) !== 1) {
-                Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
+                Tlog::getInstance()->addAlert(sprintf("Method %s in %s does not have the right signature.", $methodName, $className));
 
                 return false;
             }
 
             $eventType = ($block) ?
-                'Thelia\Core\Event\Hook\HookRenderBlockEvent' :
-                'Thelia\Core\Event\Hook\HookRenderEvent';
-            if ($parameters[0]->getClass()->getName() !== $eventType) {
-                Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s", $methodName, $eventType));
+                HookDefinition::RENDER_BLOCK_EVENT :
+                HookDefinition::RENDER_FUNCTION_EVENT;
 
-                return false;;
+            //if ( ! ($parameters[0]->getClass()->getName() instanceof $eventType) ) {
+            if ( ! ($parameters[0]->getClass()->getName() == $eventType
+                    || is_subclass_of($parameters[0]->getClass()->getName(), $eventType) ) ) {
+                Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));
+                return false;
             }
         } catch (ReflectionException $ex) {
-            Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s", $methodName, $className));
+            Tlog::getInstance()->addAlert(sprintf("Method %s does not exist in %s : %s", $methodName, $className, $ex));
 
-            return false;;
+            return false;
         }
 
         return true;
     }
 
-    protected function addHooksMethodCall(Definition $definition)
-    {
-        $moduleHooks = ModuleHookQuery::create()
-            //->filterByActive(true)
-            //->filterByModuleActive(true)
-            ->orderByHookId()
-            ->orderByPosition()
-            ->orderById()
-            ->find();
-
-        $modulePosition = 0;
-        $hookId = 0;
-        /** @var ModuleHook $moduleHook */
-        foreach ($moduleHooks as $moduleHook) {
-            // manage module hook position for new hook
-            if ($hookId !== $moduleHook->getHookId()) {
-                $hookId = $moduleHook->getHookId();
-                $modulePosition = 1;
-            } else {
-                $modulePosition++;
-            }
-            if ($moduleHook->getPosition() === ModuleHook::MAX_POSITION) {
-                // new module hook, we set it at the end of the queue for this event
-                $moduleHook->setPosition($modulePosition)->save();
-            } else {
-                $modulePosition = $moduleHook->getPosition($modulePosition);
-            }
-            // Add the the new listener for active hooks, we have to reverse the priority and the position
-            if ($moduleHook->getActive() && $moduleHook->getModuleActive()) {
-                $hook = $moduleHook->getHook();
-                $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
-
-                // we a register an event which is relative to a specific module
-                if ($hook->getByModule()) {
-                    $eventName .= '.' . $moduleHook->getModuleId();
-                }
-
-                $definition->addMethodCall('addListenerService',
-                    array(
-                        $eventName,
-                        array($moduleHook->getClassname(), $moduleHook->getMethod()),
-                        ModuleHook::MAX_POSITION - $moduleHook->getPosition()
-                    )
-                );
-            }
-        }
-
-    }
 }

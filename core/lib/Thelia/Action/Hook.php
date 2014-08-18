@@ -16,7 +16,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
+use Thelia\Core\Event\Hook\HookDeactivationEvent;
 use Thelia\Core\Event\Hook\HookDeleteEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookToggleNativeEvent;
@@ -28,19 +30,19 @@ use Thelia\Model\HookQuery;
 /**
  * Class HookAction
  * @package Thelia\Action
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Hook extends BaseAction  implements EventSubscriberInterface
+class Hook extends BaseAction implements EventSubscriberInterface
 {
 
     /**
-     * @var ContainerInterface
+     * @var string
      */
-    protected $container;
+    protected $cacheDir;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct($cacheDir)
     {
-        $this->container = $container;
+        $this->cacheDir = $cacheDir;
     }
 
     public function create(HookCreateEvent $event)
@@ -93,11 +95,42 @@ class Hook extends BaseAction  implements EventSubscriberInterface
         }
     }
 
+    public function createAll(HookCreateAllEvent $event)
+    {
+        $hook = new HookModel();
+
+        $hook
+            ->setLocale($event->getLocale())
+            ->setCode($event->getCode())
+            ->setType($event->getType())
+            ->setNative($event->getNative())
+            ->setActivate($event->getActive())
+            ->setBlock($event->getBlock())
+            ->setByModule($event->getByModule())
+            ->setTitle($event->getTitle())
+            ->setChapo($event->getChapo())
+            ->setDescription($event->getDescription())
+            ->save();
+
+        $event->setHook($hook);
+
+    }
+
+    public function deactivation(HookDeactivationEvent $event)
+    {
+        if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
+            $hook
+                ->setActivate(false)
+                ->save();
+            $event->setHook($hook);
+        }
+    }
+
     public function toggleNative(HookToggleNativeEvent $event)
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
-                ->setNative( ! $hook->getNative())
+                ->setNative(!$hook->getNative())
                 ->save();
             $event->setHook($hook);
         }
@@ -107,7 +140,7 @@ class Hook extends BaseAction  implements EventSubscriberInterface
     {
         if (null !== $hook = HookQuery::create()->findPk($event->getHookId())) {
             $hook
-                ->setActivate( ! $hook->getActivate())
+                ->setActivate(!$hook->getActivate())
                 ->save();
             $event->setHook($hook);
 
@@ -117,9 +150,7 @@ class Hook extends BaseAction  implements EventSubscriberInterface
 
     protected function cacheClear(EventDispatcherInterface $dispatcher)
     {
-        $cacheEvent = new CacheEvent(
-            $this->container->getParameter('kernel.cache_dir')
-        );
+        $cacheEvent = new CacheEvent($this->cacheDir);
 
         $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
@@ -151,7 +182,10 @@ class Hook extends BaseAction  implements EventSubscriberInterface
             TheliaEvents::HOOK_UPDATE            => array('update', 128),
             TheliaEvents::HOOK_DELETE            => array('delete', 128),
             TheliaEvents::HOOK_TOGGLE_ACTIVATION => array('toggleActivation', 128),
-            TheliaEvents::HOOK_TOGGLE_NATIVE     => array('toggleNative', 128)
+            TheliaEvents::HOOK_TOGGLE_NATIVE     => array('toggleNative', 128),
+            TheliaEvents::HOOK_CREATE_ALL        => array('createAll', 128),
+            TheliaEvents::HOOK_DEACTIVATION      => array('deactivation', 128),
+
         );
 
     }

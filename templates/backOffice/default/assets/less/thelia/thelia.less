@@ -16,6 +16,7 @@
 @import "jqplot.less";
 @import "dropzone.less";
 @import "logger.less";
+@import "labels.less";
 
 // -- Base styling ------------------------------------------------------------
 
@@ -54,6 +55,13 @@
     .form-search, .btn-group{
         margin-top: 10px;
     }
+}
+
+// -- Top bar -----------------------------------------------------------------
+
+// display sub menu on hover
+ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
+  display: block;
 }
 
 // -- Brandbar ----------------------------------------------------------------

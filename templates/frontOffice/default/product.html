@@ -58,10 +58,10 @@
 
             {hook name="product.top" product="{$ID}"}
 
-            {ifHook rel="product.gallery"}
+            {ifhook rel="product.gallery"}
                {hook name="product.gallery" product="{$ID}"}
-            {/ifHook}
-            {elseHook rel="product.gallery"}
+            {/ifhook}
+            {elsehook rel="product.gallery"}
             <section id="product-gallery">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
@@ -110,7 +110,7 @@
                 </div>
                 {/ifloop}
             </section>
-            {/elseHook}
+            {/elsehook}
 
             <section id="product-details">
                 {hook name="product.details-top" product="{$ID}"}
@@ -272,14 +272,14 @@
             {/strip}
 
             <section id="product-tabs">
-                {hookBlock name="product.additional" product="{product attr="id"}"}
+                {hookblock name="product.additional" product="{product attr="id"}"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
                     {if $smarty.capture.brand_info ne ""}<li role="presentation"><a id="tab3" href="#brand_info" data-toggle="tab" role="tab">{intl l="Brand information"}</a></li>{/if}
-                    {forHook rel="product.additional"}
+                    {forhook rel="product.additional"}
                         <li role="presentation"><a id="tab{$id}" href="#{$id}" data-toggle="tab" role="tab">{$title}</a></li>
-                    {/forHook}
+                    {/forhook}
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
@@ -295,13 +295,13 @@
                             {$smarty.capture.brand_info nofilter}
                         </div>
                     {/if}
-                    {forHook rel="product.additional"}
+                    {forhook rel="product.additional"}
                     <div class="tab-pane" id="{$id}" role="tabpanel" aria-labelledby="tab{$id}">
                         {$content nofilter}
                     </div>
-                    {/forHook}
+                    {/forhook}
                 </div>
-                {/hookBlock}
+                {/hookblock}
             </section>
             {hook name="product.bottom" product="{$ID}"}
 

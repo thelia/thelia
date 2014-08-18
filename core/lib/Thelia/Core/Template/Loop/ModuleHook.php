@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 //use Thelia\Module\BaseModule;
+use Thelia\Log\Tlog;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -143,7 +144,6 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
 
                 $loopResultRow
                     ->set("ID"           , $moduleHook->getId())
-                    //->set("IS_TRANSLATED", $moduleHook->getVirtualColumn('IS_TRANSLATED'))
                     ->set("HOOK_ID"      , $moduleHook->getHookId())
                     ->set("MODULE_ID"    , $moduleHook->getModuleId())
                     ->set("MODULE_TITLE" , $moduleHook->getModule()->getTitle())

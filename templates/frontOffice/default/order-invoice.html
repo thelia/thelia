@@ -215,11 +215,11 @@
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                 <div id="cart-address">
-                    {ifHook rel="order-invoice.delivery-address"}
+                    {ifhook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
                         {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
-                    {/ifHook}
-                    {elseHook rel="order-invoice.delivery-address"}
+                    {/ifhook}
+                    {elsehook rel="order-invoice.delivery-address"}
                     <div class="panel">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
                         <div class="panel-heading">{intl l="Delivery address"}</div>
@@ -240,7 +240,7 @@
                         </div>
                         {/loop}
                     </div>
-                    {/elseHook}
+                    {/elsehook}
 
                     {form_field form=$form field='invoice-address'}
                     <div class="panel">

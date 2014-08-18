@@ -11,12 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Hook;
+
 use Iterator;
 
 /**
  * Class FragmentBag
  * @package Thelia\Core\Hook
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FragmentBag implements Iterator
 {
@@ -28,7 +29,7 @@ class FragmentBag implements Iterator
 
     public function __construct()
     {
-        $this->position = 0;
+        $this->position  = 0;
         $this->fragments = array();
     }
 
@@ -95,7 +96,7 @@ class FragmentBag implements Iterator
      */
     public function clear()
     {
-        $this->position = 0;
+        $this->position  = 0;
         $this->fragments = array();
     }
 

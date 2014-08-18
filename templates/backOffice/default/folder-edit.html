@@ -156,7 +156,7 @@
                                     }
                                 </div>
 
-                                {include file="includes/module-tab-content.html" location="folder-edit"}
+                                {include file="includes/module-tab-content.html" hook="folder.tab-content" location="folder-edit"}
 		                    </div>
 		                 </div>
                     </div>
@@ -240,5 +240,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='folder-edit-js'}
+    {hook name="folder.edit-js" location="folder-edit-js" }
 {/block}

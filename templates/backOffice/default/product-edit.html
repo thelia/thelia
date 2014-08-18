@@ -123,7 +123,7 @@
                                         }
                                     </div>
 
-                                    {include file="includes/module-tab-content.html" location="product-edit"}
+                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit"}
                                 </div>
 
                              </div>
@@ -420,5 +420,5 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='product-edit-js'}
+    {hook name="product.edit-js" location="product-edit-js" }
 {/block}

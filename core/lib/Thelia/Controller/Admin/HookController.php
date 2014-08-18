@@ -12,23 +12,31 @@
 
 namespace Thelia\Controller\Admin;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Thelia\Core\Event\Hook\HookCreateAllEvent;
 use Thelia\Core\Event\Hook\HookCreateEvent;
+use Thelia\Core\Event\Hook\HookDeactivationEvent;
 use Thelia\Core\Event\Hook\HookDeleteEvent;
 use Thelia\Core\Event\Hook\HookToggleActivationEvent;
 use Thelia\Core\Event\Hook\HookToggleNativeEvent;
 use Thelia\Core\Event\Hook\HookUpdateEvent;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\HookCreationForm;
 use Thelia\Form\HookModificationForm;
 use Thelia\Log\Tlog;
+use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
+use Thelia\Model\Lang;
 
 /**
  * Class HookController
  * @package Thelia\Controller\Admin
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class HookController extends AbstractCrudController
 {
@@ -50,8 +58,170 @@ class HookController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
         return $this->renderList();
+    }
+
+    public function discoverAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $templateType = intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
+
+        $json_data = array();
+        try {
+            // parse the current template
+            $hookHelper = $this->container->get("thelia.hookHelper");
+            $hooks      = $hookHelper->parseActiveTemplate($templateType);
+
+            // official hook
+            $allHooks = $this->getAllHooks($templateType);
+
+            // diff
+            $newHooks      = array();
+            $existingHooks = array();
+            foreach ($hooks as $hook) {
+                if (array_key_exists($hook["code"], $allHooks)) {
+                    $existingHooks[] = $hook["code"];
+                } else {
+                    $newHooks[] = $hook;
+                }
+            }
+
+            foreach ($existingHooks as $code) {
+                unset($allHooks[$code]);
+            }
+
+            $json_data = array(
+                "success" => true,
+                "new"     => $newHooks,
+                "missing" => $allHooks
+            );
+
+            $response = JsonResponse::create($json_data);
+
+        } catch (\Exception $e) {
+            $response  = JsonResponse::create(array("error" => $e->getMessage()), 500);
+        }
+
+        return $response;
+
+    }
+
+    public function discoverSaveAction()
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $errors = array();
+
+        $templateType = $this->getRequest()->request->get("templateType");
+
+        // new hooks in the template
+        if (null !== $newHooks = $this->getRequest()->request->get("new", null)) {
+            foreach ($newHooks as $hook) {
+
+                $event = $this->getDiscoverCreationEvent($hook, $templateType);
+
+                $this->dispatch(TheliaEvents::HOOK_CREATE_ALL, $event);
+
+                if (!$event->hasHook()) {
+                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to create new hook %s"), $hook["code"]);
+                }
+            }
+        }
+
+        // missing official hooks
+        if (null !== $missingHooks = $this->getRequest()->request->get("missing")) {
+            foreach ($missingHooks as $hookId) {
+
+                $event = new HookDeactivationEvent($hookId);
+
+                $this->dispatch(TheliaEvents::HOOK_DEACTIVATION, $event);
+
+                if (!$event->hasHook()) {
+                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to deactivate hook with id %s"), $hookId);
+                }
+            }
+        }
+
+        $json_data = array(
+            "success" => true
+        );
+
+        if (count($errors)) {
+            $response  = JsonResponse::create(array("error" => $errors), 500);
+        } else {
+            $response = JsonResponse::create($json_data);
+        }
+
+        return $response;
+    }
+
+    protected function getDiscoverCreationEvent($data, $type)
+    {
+        $event = new HookCreateAllEvent();
+
+        $event
+            ->setLocale(Lang::getDefaultLanguage()->getLocale())
+            ->setType($type)
+            ->setCode($data['code'])
+            ->setNative(false)
+            ->setActive(true)
+            ->setTitle(($data['title'] != "") ? $data['title'] : $data['code'])
+            ->setByModule($data['module'])
+            ->setBlock($data['block'])
+            ->setChapo("")
+            ->setDescription("");
+
+        return $event;
+    }
+
+    protected function getDeactivationEvent($code, $type)
+    {
+        $event = null;
+
+        $hook_id = HookQuery::create()
+            ->filterByActivate(true, Criteria::EQUAL)
+            ->filterByType($type, Criteria::EQUAL)
+            ->filterByCode($code, Criteria::EQUAL)
+            ->select("Id")
+            ->findOne();
+
+        if (null !== $hook_id) {
+            $event = new HookDeactivationEvent($hook_id);
+        }
+
+        return $event;
+    }
+
+    protected function getAllHooks($templateType)
+    {
+        // get the all hooks
+        $hooks = HookQuery::create()
+            ->filterByType($templateType, Criteria::EQUAL)
+            ->find();
+
+        $ret = array();
+        /** @var Hook $hook */
+        foreach ($hooks as $hook) {
+            $ret[$hook->getCode()] = array(
+                "id"       => $hook->getId(),
+                "code"     => $hook->getCode(),
+                "native"   => $hook->getNative(),
+                "activate" => $hook->getActivate(),
+                "title"    => $hook->getTitle()
+            );
+        }
+
+        return $ret;
+
     }
 
     /**
@@ -74,20 +244,22 @@ class HookController extends AbstractCrudController
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param \Thelia\Model\Hook $object
+     *
+     * @return \Thelia\Form\HookModificationForm
      */
     protected function hydrateObjectForm($object)
     {
         $data = array(
-            'id' => $object->getId(),
-            'code' => $object->getCode(),
-            'type' => $object->getType(),
-            'native' => $object->getNative(),
-            'by_module' => $object->getByModule(),
-            'block' => $object->getBlock(),
-            'active' => $object->getActivate(),
-            'locale' => $object->getLocale(),
-            'title' => $object->getTitle(),
-            'chapo' => $object->getChapo(),
+            'id'          => $object->getId(),
+            'code'        => $object->getCode(),
+            'type'        => $object->getType(),
+            'native'      => $object->getNative(),
+            'by_module'   => $object->getByModule(),
+            'block'       => $object->getBlock(),
+            'active'      => $object->getActivate(),
+            'locale'      => $object->getLocale(),
+            'title'       => $object->getTitle(),
+            'chapo'       => $object->getChapo(),
             'description' => $object->getDescription(),
         );
 
@@ -118,7 +290,7 @@ class HookController extends AbstractCrudController
         return $this->hydrateEvent($event, $formData, true);
     }
 
-    protected function hydrateEvent($event, $formData, $update=false)
+    protected function hydrateEvent($event, $formData, $update = false)
     {
         $event
             ->setLocale($formData['locale'])
@@ -159,7 +331,10 @@ class HookController extends AbstractCrudController
     /**
      * Get the created object from an event.
      *
-     * @param unknown $createEvent
+     * @param unknown $event
+     *
+     * @return
+     * @internal param \Thelia\Controller\Admin\unknown $createEvent
      */
     protected function getObjectFromEvent($event)
     {
@@ -185,6 +360,8 @@ class HookController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.)
      *
      * @param \Thelia\Model\Hook $object
+     *
+     * @return string
      */
     protected function getObjectLabel($object)
     {
@@ -195,6 +372,8 @@ class HookController extends AbstractCrudController
      * Returns the object ID from the object
      *
      * @param \Thelia\Model\Hook $object
+     *
+     * @return int
      */
     protected function getObjectId($object)
     {
@@ -204,7 +383,7 @@ class HookController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
+     * @param unknown $currentOrder , if any, null otherwise.
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -222,7 +401,7 @@ class HookController extends AbstractCrudController
     protected function getEditionArgument()
     {
         return array(
-            'hook_id'  => $this->getRequest()->get('hook_id', 0)
+            'hook_id' => $this->getRequest()->get('hook_id', 0)
         );
     }
 
@@ -247,7 +426,10 @@ class HookController extends AbstractCrudController
 
     public function toggleNativeAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $content = null;
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleNativeEvent($hook_id);
@@ -268,7 +450,10 @@ class HookController extends AbstractCrudController
 
     public function toggleActivationAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
         $content = null;
         if (null !== $hook_id = $this->getRequest()->get('hook_id')) {
             $toggleDefaultEvent = new HookToggleActivationEvent($hook_id);
