@@ -423,7 +423,20 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
 
+    <!-- Associate a product_sale_elements with a product document / image -->
 
+    <route id="admin.product_sale_elements.document_image_assoc" path="/admin/product_sale_elements/{pseId}/{type}/{typeId}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::productSaleElementsProductImageDocumentAssociation</default>
+        <requirement key="pseId">\d+</requirement>
+        <requirement key="type">.+</requirement>
+        <requirement key="typeId">\d+</requirement>
+    </route>
+
+    <route id="admin.product_sale_elements.document_image_assoc.get_assoc" path="/admin/product_sale_elements/ajax/{type}/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAjaxProductSaleElementsImagesDocuments</default>
+        <requirement key="id">\d+</requirement>
+        <requirement key="type">.+</requirement>
+    </route>
 
 
     <!--  Folder routes management -->

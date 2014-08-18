@@ -17,4 +17,4 @@ var thelia2_content_image_list_url = thelia2_base_url + 'admin/content/update/1'
 
 casper.test.comment('Variables are set');
 
-casper.test.done(0);
+casper.test.done();
