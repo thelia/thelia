@@ -249,29 +249,29 @@
 				</div>
                 {/loop}
 
-				<div class="col-md-4">
-					<div class="general-block-decorator">
-						<div class="title title-without-tabs">{intl l="Thelia informations"}</div>
-						<div class="table-responsive">
-							<table class="table table-striped">
-								<tbody>
-									<tr>
-										<th>{intl l="Current version"}</th>
-										<td>{$THELIA_VERSION}</td>
-									</tr>
-									<tr>
-										<th>{intl l="Latest version available"}</th>
-										<td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."}</a></td>
-									</tr>
-									<tr>
-										<th>{intl l="News"}</th>
-										<td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here"}</a></td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</div>
+                <div class="grid-box">
+                    <div class="general-block-decorator">
+                        <div class="title title-without-tabs">{intl l="Thelia informations"}</div>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <th>{intl l="Current version"}</th>
+                                        <td>{$THELIA_VERSION}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{intl l="Latest version available"}</th>
+                                        <td><a href="http://thelia.net/#download" id="latest-thelia-version">{intl l="Loading..."}</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th>{intl l="News"}</th>
+                                        <td><a href="http://thelia.net/blog" target="_blank">{intl l="Click here"}</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
                 {hookblock name="home.block" fields="id,title,content"}
                     {forhook rel="home.block"}
@@ -285,7 +285,7 @@
                 {/hookblock}
 
 
-            </div>
+           </div>
 
 			{hook name="home.bottom" location="home_bottom" }
 		</div>
