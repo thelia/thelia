@@ -255,7 +255,9 @@
                         {loop type="address" name="invoice-address"}
                             {assign var="isInvoiceAddressChecked" value="0"}
                             {if $isPost}
-                                {if $value == $ID}
+                                {if $value == $ID && $value != ""}
+                                    {assign var="isInvoiceAddressChecked" value="1"}
+                                {elseif $DEFAULT}
                                     {assign var="isInvoiceAddressChecked" value="1"}
                                 {/if}
                             {elseif $DEFAULT}

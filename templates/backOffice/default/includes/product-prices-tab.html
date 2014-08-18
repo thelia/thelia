@@ -375,13 +375,21 @@
 
 			                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
 			                        <input type="hidden" name="{$name}" value="{$value}" />
-
                                     {$current_pse_id = $value}
 
 	                                {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
 	                                    {if $LOOP_COUNT > 1} - {/if}{$ATTRIBUTE_TITLE}
 	                                {/loop}
                                 {/form_field}
+
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-xs pse-assoc-image pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate images"}">
+                                            <span class="glyphicon glyphicon-picture"></span>
+                                        </a>
+                                        <a class="btn btn-default btn-xs pse-assoc-document pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate documents"}">
+                                            <span class="glyphicon glyphicon-file"></span>
+                                        </a>
+                                    </div>
                                 </td>
 
                                 <td colspan="2" class="text-right">ID: {$current_pse_id}</td>
@@ -493,6 +501,7 @@
     {/if}
 
     {hook name="product.after-combinations" location="product_after_combinations" }
+
 </div>
 
 {* PSE / Image-Document combination modal *}

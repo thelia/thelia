@@ -14,6 +14,8 @@ namespace Thelia\Tests;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
@@ -45,7 +47,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
         $container->set("event_dispatcher", $dispatcher);
 
         $request = new Request();
-        $request->setSession($this->session);
+        $request->setSession($this->getSession());
 
         $container->set("request", $request);
 
@@ -58,7 +60,7 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
     public function getSession()
     {
-        return new Session();
+        return new Session(new MockArraySessionStorage());
     }
 
     public function setUp()

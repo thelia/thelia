@@ -136,4 +136,5 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
     {
         return ProductImageQuery::create();
     }
+
 }

@@ -134,7 +134,7 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
-(5, 'Tinymce', 1, 0, 1, 'Tinymce\\Tinymce', NOW(), NOW()),
+(5, 'Tinymce', 1, 0, 16, 'Tinymce\\Tinymce', NOW(), NOW()),
 (6, 'HookNavigation', 1, 1, 11, 'HookNavigation\\HookNavigation', NOW(), NOW()),
 (7, 'HookCurrency', 1, 1, 3, 'HookCurrency\\HookCurrency', NOW(), NOW()),
 (8, 'HookLang', 1, 1, 4, 'HookLang\\HookLang', NOW(), NOW()),
