@@ -20,7 +20,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Currency;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Tools\ProductPriceTools;
 
@@ -154,7 +153,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @param \Thelia\Model\Cart     $cart
      * @param \Thelia\Model\Currency $currency
      */
-    public function updateCartPrices(\Thelia\Model\Cart $cart, Currency $currency)
+    public function updateCartPrices(\Thelia\Model\Cart $cart, \Thelia\Model\Currency $currency)
     {
 
         $customer = $cart->getCustomer();

@@ -112,7 +112,6 @@ class RegisterListenersPass implements CompilerPassInterface
 
     }
 
-
     /**
      * Create a new hook if the hook definition is valid.
      *
@@ -142,11 +141,13 @@ class RegisterListenersPass implements CompilerPassInterface
 
         if (null === $hook) {
             Tlog::getInstance()->addAlert(sprintf("Hook %s is unknown.", $event['event']));
+
             return;
         }
 
         if (! $hook->getActivate()) {
             Tlog::getInstance()->addAlert(sprintf("Hook %s is not activated.", $event['event']));
+
             return;
         }
 
@@ -270,7 +271,6 @@ class RegisterListenersPass implements CompilerPassInterface
         return $type;
     }
 
-
     /**
      * Test if the method that will handled the hook is valid
      *
@@ -300,6 +300,7 @@ class RegisterListenersPass implements CompilerPassInterface
             if ( ! ($parameters[0]->getClass()->getName() == $eventType
                     || is_subclass_of($parameters[0]->getClass()->getName(), $eventType) ) ) {
                 Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));
+
                 return false;
             }
         } catch (ReflectionException $ex) {

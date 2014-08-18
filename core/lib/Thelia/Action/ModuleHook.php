@@ -12,7 +12,6 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -32,7 +31,6 @@ use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Module\BaseModule;
 
 /**
@@ -166,7 +164,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param  UpdatePositionEvent $event
+     * @param UpdatePositionEvent $event
      *
      * @return UpdatePositionEvent $event
      */

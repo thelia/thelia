@@ -12,18 +12,16 @@
 
 namespace Thelia\Core\Hook;
 
-
-
 /**
  * Class HookDefinition
  * @package Thelia\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookDefinition {
-
+class HookDefinition
+{
     const BASE_CLASS = 'Thelia\Core\Hook\BaseHook';
 
     const RENDER_BLOCK_EVENT = 'Thelia\Core\Event\Hook\HookRenderBlockEvent';
     const RENDER_FUNCTION_EVENT = 'Thelia\Core\Event\Hook\HookRenderEvent';
 
-} 
+}

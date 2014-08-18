@@ -920,6 +920,10 @@
         <default key="_controller">Thelia\Controller\Admin\MailingSystemController::updateAction</default>
     </route>
 
+    <route id="admin.configuration.mailing-system.test" path="/admin/configuration/mailingSystem/test">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::testAction</default>
+    </route>
+
     <!-- end mailing-system management -->
 
     <!-- admin logs display -->
@@ -1051,6 +1055,14 @@
 
     <route id="admin.hook" path="/admin/hooks">
         <default key="_controller">Thelia\Controller\Admin\HookController::indexAction</default>
+    </route>
+
+    <route id="admin.hook.discover" path="/admin/hooks/discover">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverAction</default>
+    </route>
+
+    <route id="admin.hook.discover.save" path="/admin/hooks/discover/save">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverSaveAction</default>
     </route>
 
     <route id="admin.hook.create" path="/admin/hooks/create">

@@ -27,10 +27,10 @@ class SmartyHelper
      *
      *
      *
-     * @param  string $content   the template content
-     * @param  array  $functions the only functions we want to parse
+     * @param string $content   the template content
+     * @param array  $functions the only functions we want to parse
      *
-     * @return array  array of functions with 2 index name and attributes an array of name, value
+     * @return array array of functions with 2 index name and attributes an array of name, value
      */
     public static function getFunctionsDefinition($content, array $functions = array())
     {
