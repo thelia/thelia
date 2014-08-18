@@ -85,6 +85,8 @@ class CustomerController extends BaseFrontController
                     ->addForm($passwordLost)
                     ->setGeneralError($message)
                 ;
+            } else {
+                $this->getParserContext()->set('sent',true);
             }
         }
     }
