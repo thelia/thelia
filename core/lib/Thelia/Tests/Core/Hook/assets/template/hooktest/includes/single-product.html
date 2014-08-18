@@ -1,0 +1,110 @@
+<li class="item">
+    {if $PSE_COUNT > 1}
+        {assign var="hasSubmit" value = false}
+    {else}
+        {assign var="hasSubmit" value = true}
+    {/if}
+    {assign var="productTitle" value="{$TITLE}"}
+	{if not $product_id}
+	   {assign var="product_id" value=$ID}
+	{/if}
+    <article itemscope itemtype="http://schema.org/Product">
+		
+		{hook name="singleproduct.top" product="{$product_id}"}
+
+        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
+            {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
+                <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
+            {/loop}
+            {elseloop rel="product_thumbnail"}
+                {images file='../assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
+            {/elseloop}
+            <span class="mask"></span>
+        </a>
+
+        <div class="product-info">
+            <h2 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h2>
+            {if $hasDescription}
+            <div class="description" itemprop="description">
+                <p>{$DESCRIPTION nofilter}</p>
+            </div>
+            {/if}
+        </div>
+
+        {* Stock *}
+        {assign var="current_stock_content" value = "in_stock"}
+        {assign var="current_stock_href" value = "http://schema.org/InStock"}
+        {if {config key="check-available-stock"} != 0}
+            {if $QUANTITY == 0}
+                {assign var="current_stock_content" value = "out_stock"}
+                {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
+            {/if}
+        {/if}
+
+        <div class="product-price">
+            <div class="price-container" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                <meta itemprop="category" content="{category attr="title"}">
+                {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}
+                <meta itemprop="itemCondition" itemscope itemtype="http://schema.org/NewCondition">
+                {* List of currency : The currency used to describe the product price, in three-letter ISO format. *}
+                <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
+                <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
+                {if $IS_PROMO }
+                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
+                {else}
+                    <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
+                {/if}
+            </div>
+
+            {if $hasBtn == true}
+                {if $hasSubmit == true}
+                    {form name="thelia.cart.add" }
+                    <form id="form-product-details{$product_id}" action="{url path="/cart/add" }" method="post" class="form-product">
+                        {form_hidden_fields form=$form}
+                        <input type="hidden" name="view" value="product">
+                        <input type="hidden" name="product_id" value="{$product_id}">
+
+                        {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
+
+                        {form_field form=$form field='product_sale_elements_id'}
+                            <input type="hidden" name="{$name}" value="{$PRODUCT_SALE_ELEMENT}" {$attr}>
+                        {/form_field}
+                        {form_field form=$form field="product"}
+                            <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$product_id}" {$attr} >
+                        {/form_field}
+
+                        <fieldset class="product-cart form-inline">
+                            {form_field form=$form field='quantity'}
+                                <div class="form-group group-qty hide {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
+                                    <label for="{$label_attr.for}">{$label}</label>
+                                    <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="0" required>
+                                    {if $error }
+                                        <span class="help-block"><i class="icon-remove"></i> {$message}</span>
+                                    {elseif $value != "" && !$error}
+                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                    {/if}
+                                </div>
+                            {/form_field}
+                            <div>
+                                <div class="product-btn">
+                                    <button type="submit" class="btn btn-cart">{intl l="Add to cart"}</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                    {/form}
+                {else}
+                    <div>
+                        <div class="product-btn">
+                            <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
+                        </div>
+                    </div>
+                {/if}
+            {/if}
+        </div>
+
+        {hook name="singleproduct.bottom" product="{$product_id}"}
+
+    </article><!-- /product -->
+</li>

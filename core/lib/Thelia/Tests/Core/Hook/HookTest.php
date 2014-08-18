@@ -108,8 +108,8 @@ class HookTest extends WebTestCase {
         $this->assertStringContains($content, "::main.navbar-secondary ifhook::");
         $this->assertStringNotContains($content, "::main.navbar-secondary elsehook::");
 
-        $this->assertStringNotContains($content, "::main.navbar-primary ifhook::");
-        $this->assertStringContains($content, "::main.navbar-primary elsehook::");
+        $this->assertStringContains($content, "::main.navbar-primary ifhook::");
+        $this->assertStringNotContains($content, "::main.navbar-primary elsehook::");
 
         // block
         $this->assertStringNotContains($content, "::product.additional ifhook::");
@@ -140,7 +140,7 @@ class HookTest extends WebTestCase {
         $this->assertStringContains($content, ":: main.content-top ::");
         $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
         $this->assertRegExp('/:: session : [a-f0-9]{40} ::/', $content);
-        $this->assertStringContains($content, ":: cart : null ::");
+        $this->assertStringContains($content, ":: cart : not null ::");
         $this->assertStringContains($content, ":: order : not null ::");
         $this->assertStringContains($content, ":: currency : 1 ::");
         $this->assertStringContains($content, ":: customer :  ::");
