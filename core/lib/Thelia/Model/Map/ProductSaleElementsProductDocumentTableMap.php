@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductDocument;
+use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 
 
 /**
- * This class defines the structure of the 'product_document' table.
+ * This class defines the structure of the 'product_sale_elements_product_document' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ProductDocumentQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ProductDocumentTableMap extends TableMap
+class ProductSaleElementsProductDocumentTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ProductDocumentTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProductSaleElementsProductDocumentTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class ProductDocumentTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'product_document';
+    const TABLE_NAME = 'product_sale_elements_product_document';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ProductDocument';
+    const OM_CLASS = '\\Thelia\\Model\\ProductSaleElementsProductDocument';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ProductDocument';
+    const CLASS_DEFAULT = 'Thelia.Model.ProductSaleElementsProductDocument';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -68,51 +68,27 @@ class ProductDocumentTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'product_document.ID';
+    const ID = 'product_sale_elements_product_document.ID';
 
     /**
-     * the column name for the PRODUCT_ID field
+     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
      */
-    const PRODUCT_ID = 'product_document.PRODUCT_ID';
+    const PRODUCT_SALE_ELEMENTS_ID = 'product_sale_elements_product_document.PRODUCT_SALE_ELEMENTS_ID';
 
     /**
-     * the column name for the FILE field
+     * the column name for the PRODUCT_DOCUMENT_ID field
      */
-    const FILE = 'product_document.FILE';
-
-    /**
-     * the column name for the POSITION field
-     */
-    const POSITION = 'product_document.POSITION';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'product_document.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'product_document.UPDATED_AT';
+    const PRODUCT_DOCUMENT_ID = 'product_sale_elements_product_document.PRODUCT_DOCUMENT_ID';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -121,12 +97,12 @@ class ProductDocumentTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'File', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'file', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductDocumentTableMap::ID, ProductDocumentTableMap::PRODUCT_ID, ProductDocumentTableMap::FILE, ProductDocumentTableMap::POSITION, ProductDocumentTableMap::CREATED_AT, ProductDocumentTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FILE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_id', 'file', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductSaleElementsId', 'ProductDocumentId', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productSaleElementsId', 'productDocumentId', ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsProductDocumentTableMap::ID, ProductSaleElementsProductDocumentTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductSaleElementsProductDocumentTableMap::PRODUCT_DOCUMENT_ID, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_SALE_ELEMENTS_ID', 'PRODUCT_DOCUMENT_ID', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_sale_elements_id', 'product_document_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -136,12 +112,12 @@ class ProductDocumentTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'File' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'file' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProductDocumentTableMap::ID => 0, ProductDocumentTableMap::PRODUCT_ID => 1, ProductDocumentTableMap::FILE => 2, ProductDocumentTableMap::POSITION => 3, ProductDocumentTableMap::CREATED_AT => 4, ProductDocumentTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FILE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'file' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductSaleElementsId' => 1, 'ProductDocumentId' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productSaleElementsId' => 1, 'productDocumentId' => 2, ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsProductDocumentTableMap::ID => 0, ProductSaleElementsProductDocumentTableMap::PRODUCT_SALE_ELEMENTS_ID => 1, ProductSaleElementsProductDocumentTableMap::PRODUCT_DOCUMENT_ID => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_SALE_ELEMENTS_ID' => 1, 'PRODUCT_DOCUMENT_ID' => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_sale_elements_id' => 1, 'product_document_id' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -154,18 +130,16 @@ class ProductDocumentTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('product_document');
-        $this->setPhpName('ProductDocument');
-        $this->setClassName('\\Thelia\\Model\\ProductDocument');
+        $this->setName('product_sale_elements_product_document');
+        $this->setPhpName('ProductSaleElementsProductDocument');
+        $this->setClassName('\\Thelia\\Model\\ProductSaleElementsProductDocument');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
-        $this->addColumn('FILE', 'File', 'VARCHAR', true, 255, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
+        $this->addForeignKey('PRODUCT_DOCUMENT_ID', 'ProductDocumentId', 'INTEGER', 'product_document', 'ID', true, null, null);
     } // initialize()
 
     /**
@@ -173,34 +147,9 @@ class ProductDocumentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProductSaleElementsProductDocument', '\\Thelia\\Model\\ProductSaleElementsProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_document_id', ), null, null, 'ProductSaleElementsProductDocuments');
-        $this->addRelation('ProductDocumentI18n', '\\Thelia\\Model\\ProductDocumentI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductDocumentI18ns');
-        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_MANY, array(), null, null, 'ProductSaleElementss');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
+        $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::MANY_TO_ONE, array('product_document_id' => 'id', ), null, null);
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-        );
-    } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to product_document     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProductDocumentI18nTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -258,7 +207,7 @@ class ProductDocumentTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProductDocumentTableMap::CLASS_DEFAULT : ProductDocumentTableMap::OM_CLASS;
+        return $withPrefix ? ProductSaleElementsProductDocumentTableMap::CLASS_DEFAULT : ProductSaleElementsProductDocumentTableMap::OM_CLASS;
     }
 
     /**
@@ -272,21 +221,21 @@ class ProductDocumentTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ProductDocument object, last column rank)
+     * @return array (ProductSaleElementsProductDocument object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProductDocumentTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProductDocumentTableMap::getInstanceFromPool($key))) {
+        $key = ProductSaleElementsProductDocumentTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProductSaleElementsProductDocumentTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProductDocumentTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProductSaleElementsProductDocumentTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductDocumentTableMap::OM_CLASS;
+            $cls = ProductSaleElementsProductDocumentTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProductDocumentTableMap::addInstanceToPool($obj, $key);
+            ProductSaleElementsProductDocumentTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -309,8 +258,8 @@ class ProductDocumentTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProductDocumentTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProductDocumentTableMap::getInstanceFromPool($key))) {
+            $key = ProductSaleElementsProductDocumentTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProductSaleElementsProductDocumentTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -319,7 +268,7 @@ class ProductDocumentTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductDocumentTableMap::addInstanceToPool($obj, $key);
+                ProductSaleElementsProductDocumentTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -340,19 +289,13 @@ class ProductDocumentTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductDocumentTableMap::ID);
-            $criteria->addSelectColumn(ProductDocumentTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(ProductDocumentTableMap::FILE);
-            $criteria->addSelectColumn(ProductDocumentTableMap::POSITION);
-            $criteria->addSelectColumn(ProductDocumentTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ProductDocumentTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProductSaleElementsProductDocumentTableMap::ID);
+            $criteria->addSelectColumn(ProductSaleElementsProductDocumentTableMap::PRODUCT_SALE_ELEMENTS_ID);
+            $criteria->addSelectColumn(ProductSaleElementsProductDocumentTableMap::PRODUCT_DOCUMENT_ID);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.FILE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
+            $criteria->addSelectColumn($alias . '.PRODUCT_DOCUMENT_ID');
         }
     }
 
@@ -365,7 +308,7 @@ class ProductDocumentTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProductDocumentTableMap::DATABASE_NAME)->getTable(ProductDocumentTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsProductDocumentTableMap::DATABASE_NAME)->getTable(ProductSaleElementsProductDocumentTableMap::TABLE_NAME);
     }
 
     /**
@@ -373,16 +316,16 @@ class ProductDocumentTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductDocumentTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ProductDocumentTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProductDocumentTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsProductDocumentTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProductSaleElementsProductDocumentTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductSaleElementsProductDocumentTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ProductDocument or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductSaleElementsProductDocument or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ProductDocument object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProductSaleElementsProductDocument object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -393,25 +336,25 @@ class ProductDocumentTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductDocumentTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsProductDocumentTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ProductDocument) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProductSaleElementsProductDocument) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductDocumentTableMap::DATABASE_NAME);
-            $criteria->add(ProductDocumentTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ProductSaleElementsProductDocumentTableMap::DATABASE_NAME);
+            $criteria->add(ProductSaleElementsProductDocumentTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ProductDocumentQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsProductDocumentQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ProductDocumentTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProductSaleElementsProductDocumentTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ProductDocumentTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProductSaleElementsProductDocumentTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -419,20 +362,20 @@ class ProductDocumentTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the product_document table.
+     * Deletes all rows from the product_sale_elements_product_document table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProductDocumentQuery::create()->doDeleteAll($con);
+        return ProductSaleElementsProductDocumentQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ProductDocument or Criteria object.
+     * Performs an INSERT on the database, given a ProductSaleElementsProductDocument or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ProductDocument object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProductSaleElementsProductDocument object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -441,22 +384,22 @@ class ProductDocumentTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductDocumentTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsProductDocumentTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ProductDocument object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProductSaleElementsProductDocument object
         }
 
-        if ($criteria->containsKey(ProductDocumentTableMap::ID) && $criteria->keyContainsValue(ProductDocumentTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductDocumentTableMap::ID.')');
+        if ($criteria->containsKey(ProductSaleElementsProductDocumentTableMap::ID) && $criteria->keyContainsValue(ProductSaleElementsProductDocumentTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductSaleElementsProductDocumentTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ProductDocumentQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsProductDocumentQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -472,7 +415,7 @@ class ProductDocumentTableMap extends TableMap
         return $pk;
     }
 
-} // ProductDocumentTableMap
+} // ProductSaleElementsProductDocumentTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProductDocumentTableMap::buildTableMap();
+ProductSaleElementsProductDocumentTableMap::buildTableMap();

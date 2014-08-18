@@ -12,7 +12,6 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Propel\Runtime\ActiveQuery\Criteria;
 
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
@@ -35,9 +34,12 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 
+use Thelia\Core\Template\Loop\Document;
+use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\CategoryQuery;
@@ -47,9 +49,16 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
+use Thelia\Model\ProductSaleElements as ProductSaleElementsModel;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElementsProductDocument;
+use Thelia\Model\ProductSaleElementsProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductImage;
+use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\Currency;
@@ -1286,5 +1295,318 @@ class ProductController extends AbstractSeoCrudController
 
         // Format the number using '.', to perform further calculation
         return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+    }
+
+    /**
+     * @param  int                                        $pseId
+     * @param  string                                     $type
+     * @param  int                                        $typeId
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function productSaleElementsProductImageDocumentAssociation($pseId, $type, $typeId)
+    {
+        /**
+         * Check user's auth
+         */
+        if (null !== $response = $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $this->checkXmlHttpRequest();
+
+        /**
+         * Check given type
+         */
+
+        $responseData = [];
+
+        try {
+            $responseData = $this->getAssociationResponseData($pseId, $type, $typeId);
+        } catch (\Exception $e) {
+            $responseData["error"] = $e->getMessage();
+        }
+
+        return JsonResponse::create($responseData, isset($responseData["error"]) ? 500 : 200);
+    }
+
+    public function getAssociationResponseData($pseId, $type, $typeId)
+    {
+        $responseData = [];
+
+        if (null !== $msg = $this->checkFileType($type)) {
+            throw new \Exception($msg);
+        }
+
+        $responseData["product_sale_elements_id"] = $pseId;
+
+        $pse = ProductSaleElementsQuery::create()->findPk($pseId);
+
+        if (null === $pse) {
+            throw new \Exception(
+                $this->getTranslator()->trans(
+                    "The product sale elements id %id doesn't exists",
+                    [
+                        "%id" => $pseId,
+                    ]
+                )
+            );
+        }
+
+        if ($type === "image") {
+            $image = ProductImageQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "The product image id %id doesn't exists",
+                        [
+                            "%id" => $typeId,
+                        ]
+                    )
+                );
+            }
+
+            $assoc = ProductSaleElementsProductImageQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductImageId($typeId)
+            ;
+
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductImage();
+
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductImageId($typeId)
+                    ->save()
+                ;
+            } else {
+                $assoc->delete();
+            }
+
+            $responseData["product_image_id"] = $typeId;
+
+        } elseif ($type === "document") {
+            $image = ProductDocumentQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "The product document id %id doesn't exists",
+                        [
+                            "%id" => $pseId,
+                        ]
+                    )
+                );
+            }
+
+            $assoc = ProductSaleElementsProductDocumentQuery::create()
+                ->filterByProductSaleElementsId($pseId)
+                ->findOneByProductDocumentId($typeId)
+            ;
+
+            if (null === $assoc) {
+                $assoc = new ProductSaleElementsProductDocument();
+
+                $assoc
+                    ->setProductSaleElementsId($pseId)
+                    ->setProductDocumentId($typeId)
+                    ->save()
+                ;
+            } else {
+                $assoc->delete();
+            }
+
+            $responseData["product_document_id"] = $typeId;
+        }
+
+        $responseData["is-associated"] = (int) (!$assoc->isDeleted());
+
+        return $responseData;
+    }
+
+    public function checkFileType($type)
+    {
+        $types = ["image", "document"];
+
+        if (!in_array($type, $types)) {
+            return $this->getTranslator()->trans(
+                "The type %type is not valid",
+                [
+                    "%type" => $type,
+                ]
+            );
+        }
+
+        return null;
+    }
+
+    public function getAjaxProductSaleElementsImagesDocuments($id, $type)
+    {
+        if (null !== $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW)) {
+            return JsonResponse::createAuthError(AccessManager::VIEW);
+        }
+
+        $this->checkXmlHttpRequest();
+
+        $pse = ProductSaleElementsQuery::create()
+            ->findPk($id);
+
+        $errorMessage = $this->checkFileType($type);
+
+        if (null === $pse && null === $errorMessage) {
+            $type = null;
+
+            $errorMessage = $this->getTranslator()->trans(
+                "The product sale elements id %id doesn't exist",
+                [
+                    "%id" => $pse->getId(),
+                ]
+            );
+        }
+
+        switch ($type) {
+            case "image":
+                $modalTitle = $this->getTranslator()->trans("Associate images");
+                $data = $this->getPSEImages($pse);
+                break;
+
+            case "document":
+                $modalTitle = $this->getTranslator()->trans("Associate documents");
+                $data = $this->getPSEDocuments($pse);
+                break;
+
+            case null:
+            default:
+                $modalTitle = $this->getTranslator()->trans("Error");
+                $data = [];
+        }
+
+        if (empty($data) && null === $errorMessage) {
+            $errorMessage = $this->getTranslator()->trans("There are no files to associate");
+        }
+
+        $this->getParserContext()
+            ->set("items", $data)
+            ->set("type", $type)
+            ->set("error_message", $errorMessage)
+            ->set("modal_title", $modalTitle)
+        ;
+
+        return $this->render("ajax/pse-image-document-assoc-modal");
+    }
+
+    protected function getPSEImages(ProductSaleElementsModel $pse)
+    {
+        /**
+         * Compute images with the associated loop
+         */
+        $imageLoop = new Image($this->container);
+        $imageLoop->initializeArgs([
+            "product" => $pse->getProductId(),
+            "width" => 100,
+            "height"=> 75,
+            "resize_mode" => "borders",
+        ]);
+
+        $images = $imageLoop
+            ->exec($imagePagination)
+        ;
+
+        $imageAssoc = ProductSaleElementsProductImageQuery::create()
+            ->filterByProductSaleElementsId($pse->getId())
+            ->find()
+            ->toArray()
+        ;
+
+        $data = [];
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $image */
+        for ($images->rewind(); $images->valid(); $images->next()) {
+            $image = $images->current();
+
+            $isAssociated = $this->arrayHasEntries($imageAssoc, [
+                "ProductImageId" => $image->get("ID"),
+                "ProductSaleElementsId" => $pse->getId(),
+            ]);
+
+            $data[] = [
+                "id" => $image->get("ID"),
+                "url" => $image->get("IMAGE_URL"),
+                "title" => $image->get("TITLE"),
+                "is_associated" => $isAssociated,
+                "filename" => $image->model->getFile(),
+            ];
+        }
+
+        return $data;
+    }
+
+    protected function getPSEDocuments(ProductSaleElementsModel $pse)
+    {
+        /**
+         * Compute documents with the associated loop
+         */
+        $documentLoop = new Document($this->container);
+        $documentLoop->initializeArgs([
+            "product" => $pse->getProductId(),
+        ]);
+
+        $documents = $documentLoop
+            ->exec($documentPagination)
+        ;
+
+        $documentAssoc = ProductSaleElementsProductDocumentQuery::create()
+            ->useProductSaleElementsQuery()
+                ->filterById($pse->getId())
+            ->endUse()
+            ->find()
+            ->toArray()
+        ;
+
+        $data = [];
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $document */
+        for ($documents->rewind(); $documents->valid(); $documents->next()) {
+            $document = $documents->current();
+
+            $isAssociated = $this->arrayHasEntries($documentAssoc, [
+                "ProductDocumentId" => $document->get("ID"),
+                "ProductSaleElementsId" => $pse->getId(),
+            ]);
+
+            $data[] = [
+                "id" => $document->get("ID"),
+                "url" => $document->get("DOCUMENT_URL"),
+                "title" => $document->get("TITLE"),
+                "is_associated" => $isAssociated,
+                "filename" => $document->model->getFile(),
+            ];
+        }
+
+        return $data;
+    }
+
+    protected function arrayHasEntries(array $data, array $entries)
+    {
+        $status = false;
+        $countEntries = count($entries);
+
+        foreach ($data as &$line) {
+            $localMatch = 0;
+
+            foreach ($entries as $key => $entry) {
+                if (isset($line[$key]) && $line[$key] === $entry) {
+                    $localMatch++;
+                }
+            }
+
+            if ($localMatch === $countEntries) {
+                $status = true;
+                unset ($line);
+                break;
+            }
+        }
+
+        return $status;
     }
 }

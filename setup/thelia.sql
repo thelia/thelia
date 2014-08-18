@@ -1958,6 +1958,50 @@ CREATE TABLE `import`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- product_sale_elements_product_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_product_image`;
+
+CREATE TABLE `product_sale_elements_product_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_image_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_pse_product_image_product_image_id_idx` (`product_image_id`),
+    INDEX `fk_pse_product_image_product_sale_element_idx` (`product_sale_elements_id`),
+    CONSTRAINT `fk_pse_product_image_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`),
+    CONSTRAINT `fk_pse_product_image_product_image_id`
+        FOREIGN KEY (`product_image_id`)
+        REFERENCES `product_image` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- product_sale_elements_product_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_sale_elements_product_document`;
+
+CREATE TABLE `product_sale_elements_product_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_sale_elements_id` INTEGER NOT NULL,
+    `product_document_id` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `fk_pse_product_document_product_document__idx` (`product_document_id`),
+    INDEX `fk_pse_product_document_product_sale_elem_idx` (`product_sale_elements_id`),
+    CONSTRAINT `fk_pse_product_document_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`),
+    CONSTRAINT `fk_pse_product_document_product_document_id`
+        FOREIGN KEY (`product_document_id`)
+        REFERENCES `product_document` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 

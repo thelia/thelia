@@ -14,7 +14,10 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductImage;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
@@ -388,6 +391,24 @@ class Product extends BaseAction implements EventSubscriberInterface
         ;
     }
 
+    public function deleteImagePSEAssociations(FileDeleteEvent $event)
+    {
+        $model = $event->getFileToDelete();
+
+        if ($model instanceof ProductImage) {
+            $model->getProductSaleElementsProductImages()->delete();
+        }
+    }
+
+    public function deleteDocumentPSEAssociations(FileDeleteEvent $event)
+    {
+        $model = $event->getFileToDelete();
+
+        if ($model instanceof ProductDocument) {
+            $model->getProductSaleElementsProductDocuments()->delete();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -417,6 +438,10 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
+
+            // Those two has to be executed before
+            TheliaEvents::IMAGE_DELETE                      => array("deleteImagePSEAssociations", 192),
+            TheliaEvents::DOCUMENT_DELETE                      => array("deleteDocumentPSEAssociations", 192),
         );
     }
 }
