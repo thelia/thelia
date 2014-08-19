@@ -49,8 +49,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
+            Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('currency'),
-            Argument::createIntTypeArgument('product', null, true),
+            Argument::createIntTypeArgument('product'),
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
@@ -71,9 +72,22 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
     {
         $search = ProductSaleElementsQuery::create();
 
-        $product = $this->getProduct();
 
-        $search->filterByProductId($product, Criteria::EQUAL);
+        $id = $this->getId();
+
+        if (! is_null($id)) {
+            $search->filterById($id, Criteria::IN);
+        }
+        else {
+            $product = $this->getProduct();
+
+            if (! is_null($product)) {
+                $search->filterByProductId($product, Criteria::EQUAL);
+            }
+            else {
+                throw new \InvalidArgumentException("Either 'id' or 'product' argument should be present");
+            }
+        }
 
         $orders  = $this->getOrder();
 
@@ -149,6 +163,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             $discount = $securityContext->getCustomerUser()->getDiscount();
         }
 
+        /** @var \Thelia\Model\ProductSaleElements $PSEValue */
         foreach ($loopResult->getResultDataCollection() as $PSEValue) {
             $loopResultRow = new LoopResultRow($PSEValue);
 
@@ -194,6 +209,5 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }
