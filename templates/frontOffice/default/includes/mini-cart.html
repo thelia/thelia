@@ -32,7 +32,7 @@
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
                             {/if}
-                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{$real_price} {currency attr="symbol"}</span>
+                            <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{format_money number=$real_price symbol={currency attr="symbol"}}</span>
                             {assign "total_price" $total_price + ($QUANTITY * $real_price)}
                         </td>
                     </tr>
@@ -47,7 +47,7 @@
                         </td>
                         <td class="total">
                             <div class="total-price">
-                                <span class="price">{$total_price} {currency attr="symbol"}</span>
+                                <span class="price">{format_money number=$total_price symbol={currency attr="symbol"}}</span>
                             </div>
                         </td>
                     </tr>
