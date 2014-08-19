@@ -55,6 +55,12 @@ if (empty($base_url)) {
 // path from base_url to base of upload folder (with start and final /)
 $upload_dir = '/media/upload/';
 
+// path from base_url to base of upload folder (with start and final /)
+$thumbs_dir = '/media/thumbs/';
+
+// path from base_url to filemanager folder (with start and final /)
+$filemanager_dir = '/tinymce/filemanager/';
+
 // path to file manager folder to upload folder (with final /)
 $current_path = THELIA_WEB_DIR . DS . 'media'. DS .'upload'. DS;
 
