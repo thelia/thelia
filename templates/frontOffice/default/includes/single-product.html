@@ -50,10 +50,10 @@
                 <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
                 <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
                 {if $IS_PROMO }
-                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
-                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
                 {else}
-                    <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="regular-price"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
                 {/if}
             </div>
 

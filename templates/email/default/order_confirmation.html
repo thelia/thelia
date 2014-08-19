@@ -53,7 +53,7 @@
         <br />
 
         <p>
-            {intl l="Order Total:"} {$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
+            {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
             {intl l="Order Number:"} {$REF}<br />
             {intl l="Paid With:"} {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
             {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="date"}<br />
@@ -85,21 +85,21 @@
                         {/ifloop}
                     </td>
                     <td align="right" style="border-bottom:1px solid #000">
-                        {$QUANTITY} x {$realTaxedPrice} {$orderCurrencySymbol}
+                        {$QUANTITY} x {format_money number=$realTaxedPrice symbol=$orderCurrencySymbol}
                     </td>
                 </tr>
             {/loop}
             <tr>
                 <td align="right" style="text-align:right">{intl l="Total"}</td>
-                <td align="right" style="text-align:right">{$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrencySymbol}</td>
+                <td align="right" style="text-align:right">{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrencySymbol} </td>
             </tr>
             <tr>
                 <td align="right" style="text-align:right">{intl l="Shipping:"}</td>
-                <td align="right" style="text-align:right">{$POSTAGE} {$orderCurrencySymbol}</td>
+                <td align="right" style="text-align:right">{format_money number=$POSTAGE symbol=$orderCurrencySymbol}</td>
             </tr>
             <tr>
                 <td align="right" style="text-align:right"><strong>{intl l="Order Total"}</strong></td>
-                <td align="right" style="text-align:right"><strong>{$TOTAL_TAXED_AMOUNT} {$orderCurrencySymbol}</strong></td>
+                <td align="right" style="text-align:right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}</strong></td>
             </tr>
         </table>
     {/loop}
