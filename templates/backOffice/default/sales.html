@@ -31,11 +31,12 @@
                                <caption class="clearfix">
                                    {intl l='Sales management'}
                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.sales" access="CREATE"}
-                                       <span class="pull-right">
-                                        <a class="btn btn-default btn-primary" title="{intl l='Add a new sale'}" href="#creation_dialog" data-toggle="modal">
+                                        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new sale'}" href="#creation_dialog" data-toggle="modal">
                                             <span class="glyphicon glyphicon-plus-sign"></span>
-                                        </a>
-                                        </span>
+                                       </a>
+                                       <a class="btn btn-default btn-primary action-btn" href="#confirm_sale_status_reset" data-toggle="modal">
+                                           {intl l='Reset sale status for all products'}
+                                       </a>
                                    {/loop}
                                 </caption>
 
@@ -204,7 +205,7 @@
                 {* Switch edition to the current locale *}
                 <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-            {render_form_field form=$form field="locale" value=$LOCALE}
+                {render_form_field form=$form field="locale" value=$LOCALE}
 
                 <div class="input-group">
                     <input type="text" {form_field_attributes form=$form field="title"}>
@@ -260,6 +261,21 @@
         form_action         = {url path='/admin/sale/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
+
+    {* Delete confirmation dialog *}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "confirm_sale_status_reset"
+    dialog_title    = {intl l="Reset sale status for all products"}
+    dialog_message  = {intl l="This will reset the sale status of all products, and disable all active sales. Dou you really want to continue ?"}
+
+    form_action         = {url path='/admin/sale/reset'}
+    form_content        = ''
+}
+
+
 {/block}
 
 {block name="javascript-initialization"}

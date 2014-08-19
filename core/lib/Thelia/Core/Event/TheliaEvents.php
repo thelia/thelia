@@ -789,6 +789,8 @@ final class TheliaEvents
 
     const SALE_TOGGLE_ACTIVITY = "action.toggleSaleActivity";
 
+    const SALE_CLEAR_SALE_STATUS = "action.clearSaleStatus";
+
     const BEFORE_CREATESALE = "action.before_createSale";
     const AFTER_CREATESALE	= "action.after_createSale";
 

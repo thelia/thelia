@@ -102,10 +102,10 @@ abstract class SaleProductQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56), $con);
+     * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param array[$sales_id, $product_id, $attribute_av_id] $key Primary key to use for the query
+     * @param array[$sales_id, $product_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildSaleProduct|array|mixed the result, formatted by the current formatter
@@ -115,7 +115,7 @@ abstract class SaleProductQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = SaleProductTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
+        if ((null !== ($obj = SaleProductTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -143,12 +143,11 @@ abstract class SaleProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `SALES_ID`, `PRODUCT_ID`, `ATTRIBUTE_AV_ID` FROM `sale_product` WHERE `SALES_ID` = :p0 AND `PRODUCT_ID` = :p1 AND `ATTRIBUTE_AV_ID` = :p2';
+        $sql = 'SELECT `SALES_ID`, `PRODUCT_ID`, `ATTRIBUTE_AV_ID` FROM `sale_product` WHERE `SALES_ID` = :p0 AND `PRODUCT_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
             $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
-            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -158,7 +157,7 @@ abstract class SaleProductQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildSaleProduct();
             $obj->hydrate($row);
-            SaleProductTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
+            SaleProductTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -219,7 +218,6 @@ abstract class SaleProductQuery extends ModelCriteria
     {
         $this->addUsingAlias(SaleProductTableMap::SALES_ID, $key[0], Criteria::EQUAL);
         $this->addUsingAlias(SaleProductTableMap::PRODUCT_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(SaleProductTableMap::ATTRIBUTE_AV_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -240,8 +238,6 @@ abstract class SaleProductQuery extends ModelCriteria
             $cton0 = $this->getNewCriterion(SaleProductTableMap::SALES_ID, $key[0], Criteria::EQUAL);
             $cton1 = $this->getNewCriterion(SaleProductTableMap::PRODUCT_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(SaleProductTableMap::ATTRIBUTE_AV_ID, $key[2], Criteria::EQUAL);
-            $cton0->addAnd($cton2);
             $this->addOr($cton0);
         }
 
@@ -560,7 +556,7 @@ abstract class SaleProductQuery extends ModelCriteria
      *
      * @return ChildSaleProductQuery The current query, for fluid interface
      */
-    public function joinAttributeAv($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAttributeAv($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('AttributeAv');
@@ -595,7 +591,7 @@ abstract class SaleProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AttributeAvQuery A secondary query class using the current class as primary query
      */
-    public function useAttributeAvQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAttributeAvQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinAttributeAv($relationAlias, $joinType)
@@ -614,8 +610,7 @@ abstract class SaleProductQuery extends ModelCriteria
         if ($saleProduct) {
             $this->addCond('pruneCond0', $this->getAliasedColName(SaleProductTableMap::SALES_ID), $saleProduct->getSalesId(), Criteria::NOT_EQUAL);
             $this->addCond('pruneCond1', $this->getAliasedColName(SaleProductTableMap::PRODUCT_ID), $saleProduct->getProductId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(SaleProductTableMap::ATTRIBUTE_AV_ID), $saleProduct->getAttributeAvId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
+            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
         return $this;

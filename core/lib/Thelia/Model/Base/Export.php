@@ -72,16 +72,16 @@ abstract class Export implements ActiveRecordInterface
     protected $ref;
 
     /**
-     * The value for the export_category_id field.
-     * @var        int
-     */
-    protected $export_category_id;
-
-    /**
      * The value for the position field.
      * @var        int
      */
     protected $position;
+
+    /**
+     * The value for the export_category_id field.
+     * @var        int
+     */
+    protected $export_category_id;
 
     /**
      * The value for the handle_class field.
@@ -421,17 +421,6 @@ abstract class Export implements ActiveRecordInterface
     }
 
     /**
-     * Get the [export_category_id] column value.
-     *
-     * @return   int
-     */
-    public function getExportCategoryId()
-    {
-
-        return $this->export_category_id;
-    }
-
-    /**
      * Get the [position] column value.
      *
      * @return   int
@@ -440,6 +429,17 @@ abstract class Export implements ActiveRecordInterface
     {
 
         return $this->position;
+    }
+
+    /**
+     * Get the [export_category_id] column value.
+     *
+     * @return   int
+     */
+    public function getExportCategoryId()
+    {
+
+        return $this->export_category_id;
     }
 
     /**
@@ -536,6 +536,27 @@ abstract class Export implements ActiveRecordInterface
     } // setRef()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Export The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[ExportTableMap::POSITION] = true;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Set the value of [export_category_id] column.
      *
      * @param      int $v new value
@@ -559,27 +580,6 @@ abstract class Export implements ActiveRecordInterface
 
         return $this;
     } // setExportCategoryId()
-
-    /**
-     * Set the value of [position] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Export The current object (for fluent API support)
-     */
-    public function setPosition($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->position !== $v) {
-            $this->position = $v;
-            $this->modifiedColumns[ExportTableMap::POSITION] = true;
-        }
-
-
-        return $this;
-    } // setPosition()
 
     /**
      * Set the value of [handle_class] column.
@@ -687,11 +687,11 @@ abstract class Export implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ExportTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ExportTableMap::translateFieldName('ExportCategoryId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->export_category_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ExportTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ExportTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ExportTableMap::translateFieldName('ExportCategoryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->export_category_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ExportTableMap::translateFieldName('HandleClass', TableMap::TYPE_PHPNAME, $indexType)];
             $this->handle_class = (null !== $col) ? (string) $col : null;
@@ -976,11 +976,11 @@ abstract class Export implements ActiveRecordInterface
         if ($this->isColumnModified(ExportTableMap::REF)) {
             $modifiedColumns[':p' . $index++]  = '`REF`';
         }
-        if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`EXPORT_CATEGORY_ID`';
-        }
         if ($this->isColumnModified(ExportTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
+        }
+        if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`EXPORT_CATEGORY_ID`';
         }
         if ($this->isColumnModified(ExportTableMap::HANDLE_CLASS)) {
             $modifiedColumns[':p' . $index++]  = '`HANDLE_CLASS`';
@@ -1008,11 +1008,11 @@ abstract class Export implements ActiveRecordInterface
                     case '`REF`':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`EXPORT_CATEGORY_ID`':
-                        $stmt->bindValue($identifier, $this->export_category_id, PDO::PARAM_INT);
-                        break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
+                        break;
+                    case '`EXPORT_CATEGORY_ID`':
+                        $stmt->bindValue($identifier, $this->export_category_id, PDO::PARAM_INT);
                         break;
                     case '`HANDLE_CLASS`':
                         $stmt->bindValue($identifier, $this->handle_class, PDO::PARAM_STR);
@@ -1092,10 +1092,10 @@ abstract class Export implements ActiveRecordInterface
                 return $this->getRef();
                 break;
             case 2:
-                return $this->getExportCategoryId();
+                return $this->getPosition();
                 break;
             case 3:
-                return $this->getPosition();
+                return $this->getExportCategoryId();
                 break;
             case 4:
                 return $this->getHandleClass();
@@ -1137,8 +1137,8 @@ abstract class Export implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRef(),
-            $keys[2] => $this->getExportCategoryId(),
-            $keys[3] => $this->getPosition(),
+            $keys[2] => $this->getPosition(),
+            $keys[3] => $this->getExportCategoryId(),
             $keys[4] => $this->getHandleClass(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
@@ -1196,10 +1196,10 @@ abstract class Export implements ActiveRecordInterface
                 $this->setRef($value);
                 break;
             case 2:
-                $this->setExportCategoryId($value);
+                $this->setPosition($value);
                 break;
             case 3:
-                $this->setPosition($value);
+                $this->setExportCategoryId($value);
                 break;
             case 4:
                 $this->setHandleClass($value);
@@ -1236,8 +1236,8 @@ abstract class Export implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setExportCategoryId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setExportCategoryId($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setHandleClass($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
@@ -1254,8 +1254,8 @@ abstract class Export implements ActiveRecordInterface
 
         if ($this->isColumnModified(ExportTableMap::ID)) $criteria->add(ExportTableMap::ID, $this->id);
         if ($this->isColumnModified(ExportTableMap::REF)) $criteria->add(ExportTableMap::REF, $this->ref);
-        if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) $criteria->add(ExportTableMap::EXPORT_CATEGORY_ID, $this->export_category_id);
         if ($this->isColumnModified(ExportTableMap::POSITION)) $criteria->add(ExportTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(ExportTableMap::EXPORT_CATEGORY_ID)) $criteria->add(ExportTableMap::EXPORT_CATEGORY_ID, $this->export_category_id);
         if ($this->isColumnModified(ExportTableMap::HANDLE_CLASS)) $criteria->add(ExportTableMap::HANDLE_CLASS, $this->handle_class);
         if ($this->isColumnModified(ExportTableMap::CREATED_AT)) $criteria->add(ExportTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ExportTableMap::UPDATED_AT)) $criteria->add(ExportTableMap::UPDATED_AT, $this->updated_at);
@@ -1323,8 +1323,8 @@ abstract class Export implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setRef($this->getRef());
-        $copyObj->setExportCategoryId($this->getExportCategoryId());
         $copyObj->setPosition($this->getPosition());
+        $copyObj->setExportCategoryId($this->getExportCategoryId());
         $copyObj->setHandleClass($this->getHandleClass());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1669,8 +1669,8 @@ abstract class Export implements ActiveRecordInterface
     {
         $this->id = null;
         $this->ref = null;
-        $this->export_category_id = null;
         $this->position = null;
+        $this->export_category_id = null;
         $this->handle_class = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -1716,6 +1716,20 @@ abstract class Export implements ActiveRecordInterface
     public function __toString()
     {
         return (string) $this->exportTo(ExportTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildExport The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[ExportTableMap::UPDATED_AT] = true;
+
+        return $this;
     }
 
     // i18n behavior
@@ -1861,20 +1875,6 @@ abstract class Export implements ActiveRecordInterface
          */
         public function setDescription($v)
         {    $this->getCurrentTranslation()->setDescription($v);
-
-        return $this;
-    }
-
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     ChildExport The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[ExportTableMap::UPDATED_AT] = true;
 
         return $this;
     }

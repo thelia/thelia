@@ -1002,7 +1002,6 @@ abstract class SaleProduct implements ActiveRecordInterface
         $criteria = new Criteria(SaleProductTableMap::DATABASE_NAME);
         $criteria->add(SaleProductTableMap::SALES_ID, $this->sales_id);
         $criteria->add(SaleProductTableMap::PRODUCT_ID, $this->product_id);
-        $criteria->add(SaleProductTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
 
         return $criteria;
     }
@@ -1017,7 +1016,6 @@ abstract class SaleProduct implements ActiveRecordInterface
         $pks = array();
         $pks[0] = $this->getSalesId();
         $pks[1] = $this->getProductId();
-        $pks[2] = $this->getAttributeAvId();
 
         return $pks;
     }
@@ -1032,7 +1030,6 @@ abstract class SaleProduct implements ActiveRecordInterface
     {
         $this->setSalesId($keys[0]);
         $this->setProductId($keys[1]);
-        $this->setAttributeAvId($keys[2]);
     }
 
     /**
@@ -1042,7 +1039,7 @@ abstract class SaleProduct implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getSalesId()) && (null === $this->getProductId()) && (null === $this->getAttributeAvId());
+        return (null === $this->getSalesId()) && (null === $this->getProductId());
     }
 
     /**

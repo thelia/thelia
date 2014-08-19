@@ -20,6 +20,65 @@ class Sale extends BaseSale
 
 
     /**
+     * Get the price offsets for each of the currencies.
+     *
+     * @return array an array of (currency ID => offset value)
+     */
+    public function getPriceOffsets()
+    {
+        $currencyOffsets = SaleOffsetCurrencyQuery::create()->filterBySalesId($this->getId())->find();
+
+        $offsetList = [];
+
+        /** @var SaleOffsetCurrency $currencyOffset */
+        foreach($currencyOffsets as $currencyOffset) {
+            $offsetList[$currencyOffset->getCurrencyId()] = $currencyOffset->getPriceOffsetValue();
+        }
+
+        return $offsetList;
+    }
+
+    /**
+     * Return the products included in this sale.
+     *
+     * @return array an array of Products
+     */
+    public function getSaleProductList()
+    {
+        $saleProducts = SaleProductQuery::create()->filterBySalesId($this->getId())->groupByProductId()->find();
+
+        return $saleProducts;
+    }
+
+    /**
+     * Return the product attributes for each of the selected products.
+     *
+     * @return array an array of (product ID => array of attribute availability ID)
+     */
+    public function getSaleProductsAttributeList()
+    {
+        $saleProducts = SaleProductQuery::create()->filterBySalesId($this->getId())->orderByProductId()->find();
+
+
+        $productSaleElements = [];
+
+        $currentProduct = false;
+
+        /** @var SaleProduct $saleProduct */
+        foreach($saleProducts as $saleProduct) {
+            if ($currentProduct != $saleProduct->getProductId()) {
+                $currentProduct = $saleProduct->getProductId();
+
+                $productSaleElements[$currentProduct] = [];
+            }
+
+            $productSaleElements[$currentProduct][] = $saleProduct->getAttributeAvId();
+        }
+
+        return $saleProducts;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function preInsert(ConnectionInterface $con = null)

@@ -635,7 +635,7 @@ abstract class AttributeAvQuery extends ModelCriteria
      *
      * @return ChildAttributeAvQuery The current query, for fluid interface
      */
-    public function joinSaleProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinSaleProduct($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('SaleProduct');
@@ -670,7 +670,7 @@ abstract class AttributeAvQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\SaleProductQuery A secondary query class using the current class as primary query
      */
-    public function useSaleProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useSaleProductQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinSaleProduct($relationAlias, $joinType)

@@ -138,7 +138,7 @@ class SaleProductTableMap extends TableMap
         // columns
         $this->addForeignPrimaryKey('SALES_ID', 'SalesId', 'INTEGER' , 'sale', 'ID', true, null, null);
         $this->addForeignPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER' , 'product', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'ID', true, null, null);
+        $this->addForeignKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER', 'attribute_av', 'ID', false, null, null);
     } // initialize()
 
     /**
@@ -166,7 +166,7 @@ class SaleProductTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getSalesId(), (string) $obj->getProductId(), (string) $obj->getAttributeAvId()));
+                $key = serialize(array((string) $obj->getSalesId(), (string) $obj->getProductId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -186,11 +186,11 @@ class SaleProductTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \Thelia\Model\SaleProduct) {
-                $key = serialize(array((string) $value->getSalesId(), (string) $value->getProductId(), (string) $value->getAttributeAvId()));
+                $key = serialize(array((string) $value->getSalesId(), (string) $value->getProductId()));
 
-            } elseif (is_array($value) && count($value) === 3) {
+            } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
+                $key = serialize(array((string) $value[0], (string) $value[1]));
             } elseif ($value instanceof Criteria) {
                 self::$instances = [];
 
@@ -218,11 +218,11 @@ class SaleProductTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -405,7 +405,6 @@ class SaleProductTableMap extends TableMap
             foreach ($values as $value) {
                 $criterion = $criteria->getNewCriterion(SaleProductTableMap::SALES_ID, $value[0]);
                 $criterion->addAnd($criteria->getNewCriterion(SaleProductTableMap::PRODUCT_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(SaleProductTableMap::ATTRIBUTE_AV_ID, $value[2]));
                 $criteria->addOr($criterion);
             }
         }

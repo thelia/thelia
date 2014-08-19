@@ -379,7 +379,7 @@
                                     {$current_pse_id = $value}
 
 	                                {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
-	                                    {if $LOOP_COUNT > 1} - {/if}{$ATTRIBUTE_TITLE}
+	                                    {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
 	                                {/loop}
                                 {/form_field}
                                 </td>

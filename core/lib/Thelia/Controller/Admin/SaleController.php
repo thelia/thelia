@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleEvent;
@@ -21,7 +22,12 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Sale\SaleCreationForm;
 use Thelia\Form\Sale\SaleModificationForm;
+use Thelia\Model\AttributeCombination;
+use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale;
+use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleQuery;
 
 /**
@@ -66,25 +72,42 @@ class SaleController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param  Sale                 $object
-     * @return SaleModificationForm $object
+     * @param  Sale                 $sale
+     * @return SaleModificationForm
      */
-    protected function hydrateObjectForm($object)
+    protected function hydrateObjectForm($sale)
     {
+        // Find all categories of the selected products
+        $saleProducts = $sale->getSaleProductList();
+
+        $categories = $products = [ ];
+
+        /** @var SaleProduct $saleProduct */
+        foreach($saleProducts as $saleProduct) {
+            $categories[] = $saleProduct->getProduct()->getDefaultCategoryId();
+            $products[] = $saleProduct->getProduct()->getId();
+        }
+
+        $dateFormat = SaleModificationForm::PHP_DATE_FORMAT;
+
         // Prepare the data that will hydrate the form
         $data = [
-            'id'            => $object->getId(),
-            'locale'        => $object->getLocale(),
-            'title'         => $object->getTitle(),
-            'label'         => $object->getSaleLabel(),
-            'chapo'         => $object->getChapo(),
-            'description'   => $object->getDescription(),
-            'postscriptum'  => $object->getPostscriptum(),
-            'active'        => $object->getActive(),
-            'display_initial_price' => $object->getActive(),
-            'start_date'            => $object->getStartDate(),
-            'end_date'              => $object->getEndDate(),
-            'price_offset_type'     => $object->getPriceOffsetType(),
+            'id'            => $sale->getId(),
+            'locale'        => $sale->getLocale(),
+            'title'         => $sale->getTitle(),
+            'label'         => $sale->getSaleLabel(),
+            'chapo'         => $sale->getChapo(),
+            'description'   => $sale->getDescription(),
+            'postscriptum'  => $sale->getPostscriptum(),
+            'active'        => $sale->getActive(),
+            'display_initial_price' => $sale->getActive(),
+            'start_date'            => $sale->getStartDate($dateFormat),
+            'end_date'              => $sale->getEndDate($dateFormat),
+            'price_offset_type'     => $sale->getPriceOffsetType(),
+            'price_offset'          => $sale->getPriceOffsets(),
+            'categories'            => $categories,
+            'products'              => $products,
+            'product_attributes'    => array() // $sale->getSaleProductsAttributeList()
         ];
 
         // Setup the object form
@@ -118,6 +141,18 @@ class SaleController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
+        // Build the products array
+        $products = [];
+
+        foreach($formData['products'] as $productId) {
+            $products[$productId] = [];
+            /*
+            if (isset($formData['product_attributes'])) {
+                $products[]
+            }
+            */
+        }
+
         $saleUpdateEvent = new SaleUpdateEvent($formData['id']);
 
         $saleUpdateEvent
@@ -125,6 +160,8 @@ class SaleController extends AbstractCrudController
             ->setEndDate($formData['end_date'])
             ->setActive($formData['active'])
             ->setPriceOffsetType($formData['price_offset_type'])
+            ->setPriceOffsets($formData['price_offset'])
+            ->setProducts($products)
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setSaleLabel($formData['label'])
@@ -262,8 +299,8 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function toggleActivity() {
-
+    protected function toggleActivity()
+    {
         try {
             $this->dispatch(
                 TheliaEvents::SALE_TOGGLE_ACTIVITY,
@@ -277,5 +314,77 @@ class SaleController extends AbstractCrudController
         }
 
         return $this->nullResponse();
+    }
+
+    public function updateProductList()
+    {
+        // Build the list of categories
+        $categories = '';
+
+        foreach($this->getRequest()->get('categories', []) as $category_id) {
+            $categories .=  $category_id . ',';
+        }
+
+        return $this->render('ajax/sale-edit-products',[
+                'sale_id'       => $this->getRequest()->get('sale_id'),
+                'category_list' => rtrim($categories, ','),
+                'product_list'  => $this->getRequest()->get('products', [])
+            ]);
+    }
+
+    public function updateProductAttributes()
+    {
+        $attributesInfo = [];
+
+        $productId = $this->getRequest()->get('product_id');
+
+        // Get PSE for this product
+        if (null !== $pseList = ProductSaleElementsQuery::create()->filterByProductId($productId)->find()) {
+
+            /** @var ProductSaleElements $pse */
+            foreach($pseList as $pse) {
+
+                // Find all combinations
+                if (null !== $combinations = AttributeCombinationQuery::create()->filterByProductSaleElementsId($pse->getId())) {
+
+                    /** @var AttributeCombination $combination */
+                    foreach($combinations as $combination) {
+
+                        $attrId = $combination->getAttributeId();
+                        $attrAvId = $combination->getAttributeAvId();
+
+                        // Store each AttributeAv
+                        if (! isset($attributesInfo[$attrId])) {
+
+                            $attributesInfo[$attrId] = [];
+                        }
+
+                        if (! in_array($attrAvId, $attributesInfo[$attrId])) {
+                            $attributesInfo[$attrId][] = $attrAvId;
+                        }
+                    }
+                };
+            }
+        }
+
+        return $this->render('ajax/sale-edit-product-attributes',[
+            'product_id'       => $productId,
+            'attributes_info'   => $attributesInfo
+        ]);
+    }
+
+    public function resetSaleStatus()
+    {
+        try {
+            $this->dispatch(
+                TheliaEvents::SALE_CLEAR_SALE_STATUS,
+                new SaleClearStatusEvent()
+            );
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToListTemplate();
     }
 }

@@ -281,7 +281,6 @@ abstract class AbstractCrudController extends BaseAdminController
         $creationForm = $this->getCreationForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($creationForm, "POST");
 
@@ -380,7 +379,6 @@ abstract class AbstractCrudController extends BaseAdminController
         $changeForm = $this->getUpdateForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($changeForm, "POST");
 
@@ -543,7 +541,7 @@ abstract class AbstractCrudController extends BaseAdminController
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::DELETE))
             return $response;
 
-        // Get the currency id, and dispatch the delet request
+        // Get the currency id, and dispatch the delete request
         $deleteEvent = $this->getDeleteEvent();
 
         $this->dispatch($this->deleteEventIdentifier, $deleteEvent);

@@ -1262,9 +1262,28 @@
         <requirement key="sale_id">\d+</requirement>
     </route>
 
+    <route id="admin.sale.delete" path="/admin/sale/delete">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::deleteAction</default>
+    </route>
+
+    <route id="admin.sale.update.product.list" path="/admin/sale/update-product-list/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductList</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.update.product.attribute.list" path="/admin/sale/update-product-attribute-list/{sale_id}/{product_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductAttributes</default>
+        <requirement key="sale_id">\d+</requirement>
+        <requirement key="product_id">\d+</requirement>
+    </route>
+
     <route id="admin.sale.toggleActivity" path="/admin/sale/toggle-activity/{sale_id}">
         <default key="_controller">Thelia\Controller\Admin\SaleController::toggleActivity</default>
         <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.reset" path="/admin/sale/reset">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::resetSaleStatus</default>
     </route>
 
     <!-- The default route, to display a template -->

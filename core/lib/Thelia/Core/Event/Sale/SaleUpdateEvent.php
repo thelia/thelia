@@ -29,6 +29,8 @@ class SaleUpdateEvent extends SaleCreateEvent
     protected $endDate;
     protected $priceOffsetType;
     protected $displayInitialPrice;
+    protected $priceOffsets;
+    protected $products;
 
     /**
      * @param int $saleId
@@ -205,5 +207,41 @@ class SaleUpdateEvent extends SaleCreateEvent
     public function getDisplayInitialPrice()
     {
         return $this->displayInitialPrice;
+    }
+
+    /**
+     * @param array $priceOffsets an array of (currency_id => price offset) couples.
+     * @return $this
+     */
+    public function setPriceOffsets($priceOffsets)
+    {
+        $this->priceOffsets = $priceOffsets;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPriceOffsets()
+    {
+        return $this->priceOffsets;
+    }
+
+    /**
+     * @param array $products an array of (product ID => attribute IDs ids[])
+     * @return $this
+     */
+    public function setProducts($products)
+    {
+        $this->products = $products;
+        return $this;
+    }
+
+    /**
+     * @return array $products an array of (product ID => attribute IDs ids[])
+     */
+    public function getProducts()
+    {
+        return $this->products;
     }
 }

@@ -167,7 +167,7 @@ class ExportCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Export', '\\Thelia\\Model\\Export', RelationMap::ONE_TO_MANY, array('id' => 'export_category_id', ), 'CASCADE', 'RESTRICT', 'Exports');
+        $this->addRelation('Export', '\\Thelia\\Model\\Export', RelationMap::ONE_TO_MANY, array('id' => 'export_category_id', ), null, null, 'Exports');
         $this->addRelation('ExportCategoryI18n', '\\Thelia\\Model\\ExportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportCategoryI18ns');
     } // buildRelations()
 
@@ -191,7 +191,6 @@ class ExportCategoryTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ExportTableMap::clearInstancePool();
                 ExportCategoryI18nTableMap::clearInstancePool();
             }
 

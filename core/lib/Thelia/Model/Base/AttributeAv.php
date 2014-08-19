@@ -1802,10 +1802,7 @@ abstract class AttributeAv implements ActiveRecordInterface
         $saleProductsToDelete = $this->getSaleProducts(new Criteria(), $con)->diff($saleProducts);
 
 
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->saleProductsScheduledForDeletion = clone $saleProductsToDelete;
+        $this->saleProductsScheduledForDeletion = $saleProductsToDelete;
 
         foreach ($saleProductsToDelete as $saleProductRemoved) {
             $saleProductRemoved->setAttributeAv(null);
@@ -1898,7 +1895,7 @@ abstract class AttributeAv implements ActiveRecordInterface
                 $this->saleProductsScheduledForDeletion = clone $this->collSaleProducts;
                 $this->saleProductsScheduledForDeletion->clear();
             }
-            $this->saleProductsScheduledForDeletion[]= clone $saleProduct;
+            $this->saleProductsScheduledForDeletion[]= $saleProduct;
             $saleProduct->setAttributeAv(null);
         }
 

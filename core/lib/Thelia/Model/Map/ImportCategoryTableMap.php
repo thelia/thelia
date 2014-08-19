@@ -167,7 +167,7 @@ class ImportCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Import', '\\Thelia\\Model\\Import', RelationMap::ONE_TO_MANY, array('id' => 'import_category_id', ), 'CASCADE', 'RESTRICT', 'Imports');
+        $this->addRelation('Import', '\\Thelia\\Model\\Import', RelationMap::ONE_TO_MANY, array('id' => 'import_category_id', ), null, null, 'Imports');
         $this->addRelation('ImportCategoryI18n', '\\Thelia\\Model\\ImportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ImportCategoryI18ns');
     } // buildRelations()
 
@@ -180,8 +180,8 @@ class ImportCategoryTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
     /**
@@ -191,7 +191,6 @@ class ImportCategoryTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ImportTableMap::clearInstancePool();
                 ImportCategoryI18nTableMap::clearInstancePool();
             }
 
