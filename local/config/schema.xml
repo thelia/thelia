@@ -762,6 +762,50 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
+  <table name="hook" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="code" required="true" size="255" type="VARCHAR" />
+    <column name="type" required="true" type="TINYINT" />
+    <column name="by_module" type="BOOLEAN" />
+    <column name="native" type="BOOLEAN" />
+    <column name="activate" type="BOOLEAN" />
+    <column name="block" type="BOOLEAN" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <index name="idx_module_activate">
+      <index-column name="activate" />
+    </index>
+    <unique name="code_UNIQUE">
+      <unique-column name="code" />
+      <unique-column name="type" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo" />
+    </behavior>
+  </table>
+  <table name="module_hook" namespace="Thelia\Model">
+    <column name="id" autoIncrement="true" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="hook_id" required="true" type="INTEGER" />
+    <column name="classname" size="255" type="VARCHAR" />
+    <column name="method" size="255" type="VARCHAR" />
+    <column name="active" required="true" type="BOOLEAN" />
+    <column name="hook_active" required="true" type="BOOLEAN" />
+    <column name="module_active" required="true" type="BOOLEAN" />
+    <column name="position" required="true" type="INTEGER" />
+    <index name="idx_module_hook_active">
+      <index-column name="active" />
+    </index>
+    <foreign-key foreignTable="module" name="fk_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="hook" name="fk_module_hook_hook_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="hook_id" />
+    </foreign-key>
+  </table>
   <table isCrossRef="true" name="accessory" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />

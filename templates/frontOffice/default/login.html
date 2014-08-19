@@ -12,7 +12,9 @@
 
 
 {block name="main-content"}
+    {hook name="login.top"}
     <div class="main">
+        {hook name="login.main-top"}
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.front.customer.login"}
@@ -26,6 +28,7 @@
                     <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
                 {form_hidden_fields form=$form}
+                {hook name="login.form-top"}
                 <fieldset>
                     {form_field form=$form field="email"}
                         <div class="form-group group-email{if $error} has-error{/if}">
@@ -66,7 +69,7 @@
                         {/form_field}
                     </fieldset>
                 </fieldset>
-
+                {hook name="login.form-bottom"}
                 <div class="group-btn">
                     <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
                     <button type="submit" class="btn btn-login">{intl l="Next"}</button>
@@ -74,5 +77,19 @@
             </form>
             {/form}
         </article>
+        {hook name="login.main-bottom"}
     </div>
+    {hook name="login.bottom"}
+{/block}
+
+{block name="stylesheet"}
+{hook name="login.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="login.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="login.after-javascript-initialization"}
 {/block}

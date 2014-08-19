@@ -27,6 +27,8 @@
 
             {include file="misc/checkout-progress.tpl"  step="invoice"}
 
+            {hook name="order-invoice.top"}
+
             {form name="thelia.order.coupon"}
 
             <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
@@ -211,7 +213,13 @@
                 {form_hidden_fields form=$form}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
                 <div id="cart-address">
+                    {ifhook rel="order-invoice.delivery-address"}
+                        {* delivery module can customize the delivery address *}
+                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
+                    {/ifhook}
+                    {elsehook rel="order-invoice.delivery-address"}
                     <div class="panel">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
                         <div class="panel-heading">{intl l="Delivery address"}</div>
@@ -232,6 +240,7 @@
                         </div>
                         {/loop}
                     </div>
+                    {/elsehook}
 
                     {form_field form=$form field='invoice-address'}
                     <div class="panel">
@@ -299,13 +308,12 @@
                                 <li class="list-group-item text-left">
                                     <label for="payment_{$paymentModuleId}">
                                         <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
-
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                             <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}
-
                                         {$TITLE}
                                     </label>
+                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
                                 </li>
                             {/loop}
                         </ul>
@@ -341,6 +349,7 @@
                 <button type="submit" class="btn btn-checkout-next"><span>{intl l="Order Payment"}</span></button>
             </form>
             {/form}
+            {hook name="order-invoice.bottom"}
         </article>
     </div>
 {/block}
@@ -384,4 +393,14 @@ jQuery(function($) {
 
 });
 </script>
+{hook name="order-invoice.after-javascript-initialization"}
 {/block}
+
+{block name="stylesheet"}
+{hook name="order-invoice.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-invoice.after-javascript-include"}
+{/block}
+

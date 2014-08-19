@@ -72,7 +72,7 @@ casper.test.begin('Register', 15, function suite(test) {
 
     });
 
-    casper.wait(4000, function(){
+    casper.wait(thelia_default_timeout, function(){
 
         test.assertSelectorHasText('.group-email .help-block', 'This email already exists.');
 
@@ -86,7 +86,7 @@ casper.test.begin('Register', 15, function suite(test) {
 
     });
 
-    casper.wait(4000, function() {
+    casper.wait(thelia_default_timeout, function() {
 
         this.capture(screenshot_dir + 'front/20_register-ok.png');
         test.assertSelectorHasText('h1#main-label', 'My Account');
@@ -97,7 +97,7 @@ casper.test.begin('Register', 15, function suite(test) {
         this.click('a.logout');
     });
 
-    casper.wait(4000, function() {
+    casper.wait(thelia_default_timeout, function() {
 
         test.assertExists('a.login', 'Login button exists');
 

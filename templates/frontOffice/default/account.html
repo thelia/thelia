@@ -21,6 +21,7 @@
 
             <h1 id="main-label" class="page-header">{intl l="My Account"}</h1>
 
+            {hook name="account.top"}
             <div id="account" class="panel-group">
                 <div class="panel account-info">
                     <div class="panel-heading">
@@ -180,10 +181,21 @@
                         </div>
                     </div>
                 </div>
+                {hook name="account.bottom"}
             </div>
         </article>
 
     </div><!-- /.layout -->
 {/block}
 
-{block name="after-javascript-include"}{/block}
+{block name="stylesheet"}
+{hook name="account.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="account.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="account.after-javascript-initialization"}
+{/block}

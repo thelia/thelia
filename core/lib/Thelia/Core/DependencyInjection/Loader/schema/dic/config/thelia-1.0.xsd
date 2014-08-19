@@ -17,6 +17,7 @@
             <xsd:element name="commands" type="commands"/>
             <xsd:element name="forms" type="forms" />
             <xsd:element name="routing" type="routing" />
+            <xsd:element name="hooks" type="hooks" />
             <xsd:element name="export_categories" type="export_categories" />
             <xsd:element name="exports" type="exports" />
             <xsd:element name="import_categories" type="import_categories" />
@@ -134,7 +135,40 @@
         </xsd:choice>
     </xsd:complexType>
 
+    <xsd:complexType name="hooks">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[
+        Enclosing element for the definition of all hooks
+      ]]></xsd:documentation>
+        </xsd:annotation>
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="hook" type="hook" />
+        </xsd:choice>
+    </xsd:complexType>
+
     <xsd:complexType name="service">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="configurator" type="configurator" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="call" type="call" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="tag" type="tag" minOccurs="0" maxOccurs="unbounded" />
+            <xsd:element name="property" type="property" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:choice>
+        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="class" type="xsd:string" />
+        <xsd:attribute name="scope" type="xsd:string" />
+        <xsd:attribute name="public" type="boolean" />
+        <xsd:attribute name="synthetic" type="boolean" />
+        <xsd:attribute name="abstract" type="boolean" />
+        <xsd:attribute name="factory-class" type="xsd:string" />
+        <xsd:attribute name="factory-method" type="xsd:string" />
+        <xsd:attribute name="factory-service" type="xsd:string" />
+        <xsd:attribute name="alias" type="xsd:string" />
+        <xsd:attribute name="parent" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="hook">
         <xsd:choice maxOccurs="unbounded">
             <xsd:element name="file" type="xsd:string" minOccurs="0" maxOccurs="1" />
             <xsd:element name="argument" type="argument" minOccurs="0" maxOccurs="unbounded" />

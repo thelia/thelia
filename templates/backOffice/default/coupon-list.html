@@ -22,7 +22,7 @@
             </ul>
         </nav>
 
-        {module_include location='coupon_top'}
+        {hook name="coupon.top" location="coupon_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -33,7 +33,7 @@
                             <caption>
                                 {intl l='Coupons'}
 
-                                {module_include location='coupon_list_caption'}
+                                {hook name="coupon.list-caption" location="coupon_list_caption" }
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
                                     <a class="btn btn-default btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
@@ -104,7 +104,7 @@
                                     }
                                     </th>
 
-                                    {module_include location='coupon_table_header'}
+                                    {hook name="coupon.table-header" location="coupon_table_header" }
 
                                     <th>&nbsp;</th>
                                 </tr>
@@ -151,7 +151,7 @@
                                             {/if}
                                         </td>
 
-                                        {module_include location='coupon_table_row'}
+                                        {hook name="coupon.table-row" location="coupon_table_row" }
 
                                         <td class="text-center">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
@@ -165,7 +165,7 @@
                     </div>
                 </div>
 
-                {module_include location='coupon_bottom'}
+                {hook name="coupon.bottom" location="coupon_bottom" }
 
             </div>
         </div>
@@ -205,5 +205,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='coupon-list-js'}
+    {hook name="coupon.list-js" location="coupon-list-js" }
 {/block}

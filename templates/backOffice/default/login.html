@@ -16,7 +16,7 @@
 					<h1 class="title title-without-tabs">{intl l='Thelia Back Office'}</h1>
 
 				   	<div class="col-md-6">
-				   		{module_include location='index_top'}
+				   		{hook name="index.top" location="index_top" }
 				        
 						{form name="thelia.admin.login"}
 						<form action="{url path='/admin/checklogin'}" method="post" {form_enctype form=$form}>
@@ -64,7 +64,7 @@
 						</form>
 						{/form}
 
-						{module_include location='index_middle'}
+						{hook name="index.middle" location="index_middle" }
 					</div>
 
 					<div class="col-md-6">
@@ -78,7 +78,7 @@
 			</div>
 		</div>
 
-		{module_include location='index_bottom'}
+		{hook name="index.bottom" location="index_bottom" }
 
 	</div>
 </div>

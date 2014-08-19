@@ -1,0 +1,336 @@
+{extends file="admin-layout.tpl"}
+
+{block name="page-title"}{intl l='Hooks position'}{/block}
+
+{block name="check-resource"}admin.module-hook{/block}
+{block name="check-access"}view{/block}
+
+{block name="main-content"}
+<div class="hooks">
+
+    <div id="wrapper" class="container">
+
+        <div class="clearfix">
+            <ul class="breadcrumb pull-left">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+                <li>{intl l="Hooks position"}</li>
+            </ul>
+        </div>
+
+        <div class="general-block-decorator ">
+            <div class="clearfix">
+                {loop type="auth" name="can_create" role="ADMIN" resource="admin.module-hook" access="CREATE"}
+                <div class="pull-right">
+                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                    </a>
+                </div>
+                {/loop}
+                <p class="title title-without-tabs">{intl l="Hooks position"}</p>
+            </div>
+            <div class="hooks-filter row">
+                <div class="col-md-3 col-sm-12">
+                    <label for="hooks-filter-status">{intl l="By status"}</label><br />
+                    <select id="hooks-filter-status">
+                        <option value="">{intl l="All"}</option>
+                        <option value="1">{intl l="Active"}</option>
+                        <option value="0">{intl l="Inactive"}</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <label for="hooks-filter-module">{intl l="By module"}</label><br />
+                    <select id="hooks-filter-module">
+                        <option value="">{intl l="All"}</option>
+                        {loop type="module" name="module" order=$module_order backend_context=1}
+                        <option value="{$ID}">{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <label for="hooks-filter-type">{intl l="By type"}</label><br />
+                    <select id="hooks-filter-type">
+                        <option value="">{intl l="All"}</option>
+                        <option value="1">{intl l="Front Office"}</option>
+                        <option value="2">{intl l="Back Office"}</option>
+                        <option value="3">{intl l="pdf"}</option>
+                        <option value="4">{intl l="email"}</option>
+                    </select>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <label for="hooks-filter-status">
+                        <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" /> {intl l="Hide empty hook"}
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+                {loop type="hook" name="hook" order=$hook_order backend_context=1}
+                <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}" data-id="{$ID}" data-type="{$TYPE}" data-block="{$BLOCK}">
+                    <p class="title title-without-tabs">
+                        <a class="btn btn-default btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                        </a>
+                        {$ID}. {$TITLE}
+                    </p>
+                    <div class="row hidden" id="hook-info-{$ID}">
+                        <div class="hook-description col-md-8">
+                            {if $DESCRIPTION}
+                                {$DESCRIPTION}
+                            {else}
+                                <em>{intl l="No description for this hook"}</em>
+                            {/if}
+                        </div>
+                        <div class="hook-ref col-md-4">
+                            {intl l="Code:"} <strong>{$CODE}</strong><br />
+                            {intl l="Type:"} <strong>
+                                {if $TYPE == 1}{intl l="Front Office"}{/if}
+                                {if $TYPE == 2}{intl l="Back Office"}{/if}
+                                {if $TYPE == 3}{intl l="pdf"}{/if}
+                                {if $TYPE == 4}{intl l="email"}{/if}
+                            </strong><br />
+                            {intl l="By module:"} <strong>{if $BY_MODULE}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                            {intl l="Block :"} <strong>{if $BLOCK}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                        </div>
+                    </div>
+                    {include file="includes/module-hook-block.html" hook_id="{$ID}" by_module="{$BY_MODULE}"}
+                </div>
+                {/loop}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+{* Adding a new Module Hook *}
+
+{form name="thelia.admin.module-hook.creation"}
+
+{* Capture the dialog body, to pass it to the generic dialog *}
+{capture "module_hook_creation_dialog"}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field='success_url'}
+    {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+    <input type="hidden" name="{$name}" value="{url path='/admin/module-hook/update/_ID_'}" />
+    {/form_field}
+
+    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+    {form_field form=$form field='module_id'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+        <select name="{$name}" id="{$label_attr.for}" class="form-control">
+            {foreach $choices as $choice}
+            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+            {/foreach}
+        </select>
+    </div>
+    {/form_field}
+
+    {form_field form=$form field='hook_id'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+        <select name="{$name}" id="{$label_attr.for}" class="form-control">
+            {foreach $choices as $choice}
+            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
+            {/foreach}
+        </select>
+    </div>
+    {/form_field}
+
+    {hook name="module-hook.create-form" location="module_hook_create_form" }
+
+{/capture}
+
+{include
+file = "includes/generic-create-dialog.html"
+
+dialog_id    = "add_module_hook_dialog"
+dialog_title = {intl l="Add a module to a hook"}
+dialog_body  = {$smarty.capture.module_hook_creation_dialog nofilter}
+
+dialog_ok_label     = {intl l="Graft this module"}
+dialog_cancel_label = {intl l="Cancel"}
+
+form_action        = {url path='/admin/module-hooks/create'}
+form_enctype       = {form_enctype form=$form}
+form_error_message = $form_error_message
+}
+{/form}
+
+
+{* Delete module confirmation dialog *}
+
+{capture "delete_module_dialog"}
+    <input type="hidden" name="module_hook_id" id="delete_module_hook_id" value="" />
+    {hook name="module-hook.delete-form" location="module_hook_delete_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_module_dialog"
+    dialog_title    = {intl l="Remove a module from a hook"}
+    dialog_message  = {intl l="Do you really want to remove this module ?"}
+
+    form_action         = {url path='/admin/module-hooks/delete'}
+    form_content        = {$smarty.capture.delete_module_dialog nofilter}
+}
+
+<div class="modal fade" id="module-hook-failed" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="An error occured"}</h3>
+            </div>
+            <div class="modal-body" id="module-failed-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="javascript-initialization"}
+
+    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script>
+        $(document).ready(function() {
+           var url_management = "{url path="/admin/module-hooks/toggle-activation/"}";
+           $(".module-hook-activation").on("switch-change", function(e, data){
+
+               var checkbox = $(this);
+        	   var module_hook_id = checkbox.data('id');
+        	   var is_checked = data.value;
+
+               $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+               $.ajax({
+                    url: url_management+$(this).data('id')
+               }).done(function(){
+                   $("#loading-event").remove();
+               })
+               .success(function() {
+
+               })
+               .fail(function(jqXHR, textStatus, errorThrown){
+                    checkbox.bootstrapSwitch('toggleState', true);
+                    $("#loading-event").remove();
+                    $('#hook-failed-body').html(jqXHR.responseJSON.error);
+                    $("#hook-failed").modal("show");
+               });
+
+           });
+
+           $(".module-hook-delete").click(function(){
+                $("#delete_module_hook_id").val($(this).data("id"));
+           });
+
+           $(".action-info-btn").click(function(e){
+               e.preventDefault();
+               $($(this).data("target")).toggleClass("hidden");
+           });
+
+           {* Inline editing of object position using bootstrap-editable *}
+
+           $('.modulePositionChange').editable({
+               type        : 'text',
+               title       : "{intl l="Enter new module position"}",
+               mode        : 'popup',
+               inputclass  : 'input-mini',
+               placement   : 'left',
+               success     : function(response, newValue) {
+                   // The URL template
+                   var url = "{url noamp='1' path='/admin/module-hooks/update-position' module_hook_id='__ID__' position='__POS__'}";
+
+                   // Perform subtitutions
+                   url = url.replace('__ID__', $(this).data('id'))
+                   .replace('__POS__', newValue);
+
+                   // Reload the page
+                   location.href = url;
+               }
+           });
+
+            var isFilterProcessing = false,
+                $fStatus = $('#hooks-filter-status'),
+                $fModule = $('#hooks-filter-module'),
+                $fType   = $('#hooks-filter-type');
+                $fEmpty  = $('#hooks-filter-empty');
+
+            var filterProcess = function filterProcess(){
+                console.log(this, isFilterProcessing);
+                if (! isFilterProcessing) {
+                    isFilterProcessing = true;
+
+                    var formData = {
+                        status: $fStatus.val(),
+                        module: $fModule.val(),
+                        type: $fType.val(),
+                        empty: $fEmpty.is(":checked")
+                    };
+                    console.log("filtering", formData);
+
+                    // filters hook type first
+                    $(".hooks .hook").each(function(){
+                        var $hook = $(this),
+                                empty = true,
+                                $lines;
+
+                        if (formData.type == "" || formData.type == $hook.data("type")){
+                            $hook.removeClass("hidden");
+                            // test each line
+                            $lines = $hook.find("tr.hook-module");
+                            $lines.each(function(){
+                                var $line = $(this),
+                                        visible;
+                                visible = (formData.status == "" || formData.status == $line.data("visible"))
+                                        && (formData.module == "" || formData.module == $line.data("module-id"));
+                                if (visible) {
+                                    empty = false;
+                                    $line.removeClass("hidden");
+                                } else {
+                                    $line.addClass("hidden");
+                                }
+                            });
+                            if (empty && formData.empty) {
+                                $hook.addClass("hidden");
+                            } else {
+                                $hook.removeClass("hidden");
+                            }
+                        } else {
+                            $hook.addClass("hidden");
+                        }
+                    });
+                    isFilterProcessing = false;
+                }
+            };
+
+            /* filters */
+            $('.hooks-filter select, .hooks-filter input').on('change', filterProcess);
+            filterProcess();
+        });
+    </script>
+
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="module-hook.js" location="module-hook-js" }
+{/block}

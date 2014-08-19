@@ -18,7 +18,7 @@
                 <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
             </ul>
 
-            {module_include location='customer_top'}
+            {hook name="customer.top" location="customer_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -34,7 +34,7 @@
                                 <caption>
                                     {intl l="Customers list"}
 
-                                    {module_include location='customer_list_caption'}
+                                    {hook name="customers.caption" location="customer_list_caption" }
 
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.customer" access="CREATE"}
                                         <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
@@ -79,7 +79,7 @@
                                             }
                                         </th>
 
-                                        {module_include location='customer_list_header'}
+                                        {hook name="customers.header" location="customer_list_header" }
 
                                         <th class="object-title">
                                             {admin_sortable_header
@@ -148,7 +148,7 @@
                                             </td>
 
 
-                                            {module_include location='customer_list_row'}
+                                            {hook name="customers.row" location="customer_list_row" }
 
                                             <td>
                                                 {format_date date=$CREATE_DATE}
@@ -201,7 +201,7 @@
             </div>
 
 
-    {module_include location='customer_bottom'}
+    {hook name="customer.bottom" location="customer_bottom" }
 
     {* Adding a new Category *}
 
@@ -310,7 +310,7 @@
                 </div>
             {/form_field}
 
-            {module_include location='customer_create_form'}
+            {hook name="customer.create-form" location="customer_create_form" }
 
         {/capture}
 
@@ -336,7 +336,7 @@
         <input type="hidden" name="page" value="{$page}">
         <input type="hidden" name="customer_id" id="delete_customer_id">
 
-        {module_include location='customer_delete_form'}
+        {hook name="customer.delete-form" location="customer_delete_form" }
     {/capture}
 
     {include
@@ -364,5 +364,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='customers-js'}
+    {hook name="customers.js" location="customers-js" }
 {/block}

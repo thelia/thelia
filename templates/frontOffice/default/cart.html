@@ -20,6 +20,8 @@
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
 
+            {hook name="cart.top"}
+
             <table class="table table-cart">
                 <colgroup>
                     <col width="150">
@@ -181,6 +183,8 @@
                 </div>
             {/elseloop}
 
+            {hook name="cart.bottom"}
+
         </article>
 
         {ifloop rel="product_upsell"}
@@ -218,5 +222,13 @@
         })
     });
 </script>
+{hook name="cart.after-javascript-include"}
 {/block}
 
+{block name="stylesheet"}
+{hook name="cart.stylesheet"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="cart.javascript-initialization"}
+{/block}

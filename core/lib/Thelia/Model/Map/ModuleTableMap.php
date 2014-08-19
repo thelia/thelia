@@ -187,6 +187,7 @@ class ModuleTableMap extends TableMap
     {
         $this->addRelation('OrderRelatedByPaymentModuleId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'payment_module_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByPaymentModuleId');
         $this->addRelation('OrderRelatedByDeliveryModuleId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryModuleId');
+        $this->addRelation('ModuleHook', '\\Thelia\\Model\\ModuleHook', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleHooks');
         $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'delivery_module_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
         $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ProfileModules');
         $this->addRelation('ModuleImage', '\\Thelia\\Model\\ModuleImage', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleImages');
@@ -217,6 +218,7 @@ class ModuleTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                ModuleHookTableMap::clearInstancePool();
                 AreaDeliveryModuleTableMap::clearInstancePool();
                 ProfileModuleTableMap::clearInstancePool();
                 ModuleImageTableMap::clearInstancePool();

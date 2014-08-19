@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a></li>
         </ul>
 
-        {module_include location='variables_top'}
+        {hook name="variables.top" location="variables_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -73,7 +73,7 @@
                                  }
                                  </th>
 
-                                 {module_include location='variables_table_header'}
+                                 {hook name="variables.table-header" location="variables_table_header" }
 
                                  <th>{intl l='Action'}</th>
   	                        </tr>
@@ -105,7 +105,7 @@
   	                                    {/if}
   	                                </td>
 
-  	                                {module_include location='variables_table_row'}
+  	                                {hook name="variables.table-row" location="variables_table_row" }
 
   	                                <td class="actions">
   	                                    {if ! $SECURED}
@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        {module_include location='variables_bottom'}
+        {hook name="variables.bottom" location="variables_bottom" }
 
     </div>
 </div>
@@ -203,7 +203,7 @@
 		    {/form_field}
 
 
-            {module_include location='variable_create_form'}
+            {hook name="variable.create-form" location="variable_create_form" }
         {/capture}
 
 	    {include
@@ -226,7 +226,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="variable_id" id="variable_delete_id" value="" />
 
-        {module_include location='variable_delete_form'}
+        {hook name="variable.delete-form" location="variable_delete_form" }
 
     {/capture}
 
@@ -286,5 +286,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='variables-js'}
+    {hook name="variables.js" location="variables-js" }
 {/block}

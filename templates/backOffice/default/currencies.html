@@ -20,7 +20,7 @@
                 <li><a href="{url path='/admin/configuration/currencies'}">{intl l="Currencies"}</a></li>
             </ul>
 
-            {module_include location='currencies_top'}
+            {hook name="currencies.top" location="currencies_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -114,7 +114,7 @@
                                                 }
                                             </th>
 
-                                            {module_include location='currencies_table_header'}
+                                            {hook name="currencies.table-header" location="currencies_table_header" }
 
                                             <th class="actions">{intl l='Actions'}</th>
                                         </tr>
@@ -158,7 +158,7 @@
                                                     </div>
                                                 </td>
 
-                                                {module_include location='currencies_table_row'}
+                                                {hook name="currencies.table-row" location="currencies_table_row" }
 
                                                 <td class="actions">
                                                     <div class="btn-group">
@@ -197,7 +197,7 @@
 
             </div>
 
-            {module_include location='currencies_bottom'}
+            {hook name="currencies.bottom" location="currencies_bottom" }
 
         </div>
     </div>
@@ -261,7 +261,7 @@
 			    </div>
 			{/form_field}
 
-            {module_include location='currency_create_form'}
+            {hook name="currency.create-form" location="currency_create_form" }
 
         {/capture}
 
@@ -286,7 +286,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="currency_id" id="currency_delete_id" value="" />
 
-        {module_include location='currency_delete_form'}
+        {hook name="currency.delete-form" location="currency_delete_form" }
 
     {/capture}
 
@@ -368,5 +368,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='currencies-js'}
+    {hook name="currencies.js" location="currencies-js" }
 {/block}

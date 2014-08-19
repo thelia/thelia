@@ -54,7 +54,7 @@
 
                             <th>{intl l='Folder title'}</th>
 
-                            {module_include location='product_folders_table_header'}
+                            {hook name="product.folders-table-header" location="product_folders_table_header" }
 
                             <th class="actions">{intl l="Actions"}</th>
                         </tr>
@@ -69,7 +69,7 @@
                                     {$TITLE}
                                 </td>
 
-                                {module_include location='product_folders_table_row'}
+                                {hook name="product.folders-table-row" location="product_folders_table_row" }
 
                                 <td class="actions">
                                     <div class="btn-group">

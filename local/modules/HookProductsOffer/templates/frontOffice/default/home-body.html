@@ -1,0 +1,15 @@
+{ifloop rel="product_promo"}
+<section id="products-offer">
+    <div class="products-heading">
+        <h2>{intl l="Offers" d="hookproductsoffer.fo.default"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All" d="hookproductsoffer.fo.default"}</a></h2>
+    </div>
+
+    <div class="products-content">
+        <ul class="products-grid product-col-5 hover-effect">
+            {loop name="product_promo" type="product" limit="5" promo="yes"}
+            {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
+            {/loop}
+        </ul>
+    </div>
+</section><!-- #products-offer -->
+{/ifloop}

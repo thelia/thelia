@@ -25,6 +25,7 @@ use Thelia\Core\Translation\Translator;
 
 class TheliaLoop extends AbstractSmartyPlugin
 {
+
     /** @var PropelModelPager[] */
     protected static $pagination = null;
 

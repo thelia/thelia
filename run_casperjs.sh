@@ -40,4 +40,4 @@ php Thelia module:activate Colissimo
 echo -e "\n\033[01;34m[INFO] Activating Payment Module(s)\033[00m\n"
 php Thelia module:activate Cheque
 
-casperjs test ./tests/functionnal/casperjs/exe --pre=./tests/functionnal/casperjs/conf/local.js --direct
+casperjs test ./tests/functionnal/casperjs/exe/front --pre=./tests/functionnal/casperjs/conf/local.js --verbose

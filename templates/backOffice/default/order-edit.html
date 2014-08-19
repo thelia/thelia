@@ -116,7 +116,7 @@
                                                                 {/loop}
                                                             </dl>
                                                             {/ifloop}
-                                                            {module_include location='order-product-list'}
+                                                            {hook name="order.product-list" location="order-product-list" }
                                                         </td>
                                                         <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
@@ -391,7 +391,7 @@
 
                                     <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
 
-                                        {include file="includes/module-tab-content.html" location="order-edit"}
+                                        {include file="includes/module-tab-content.html" hook="order.tab-content" location="order-edit"}
                                     </div>
                                 </div>
                             {/loop}
@@ -572,5 +572,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='order-edit-js'}
+    {hook name="order.edit-js" location="order-edit-js" }
 {/block}

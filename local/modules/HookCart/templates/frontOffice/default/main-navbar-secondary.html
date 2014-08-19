@@ -1,0 +1,71 @@
+<ul class="nav navbar-nav navbar-cart navbar-right">
+    {ifloop rel="cartloop"}
+    <li class="dropdown pull-right cart-not-empty cart-container">
+        <a href="{url path="/cart"}" rel="nofollow" class="cart">
+        {intl l="Cart" d="hookcart.fo.default"} <span class="badge">{cart attr="count_item"}</span>
+        </a>
+        <div class="dropdown-menu cart-content">
+            <form id="form-cart-mini" action="{url path="/order/delivery"}" method="post">
+            <table class="table table-cart-mini">
+                <colgroup>
+                    <col width="70">
+                    <col>
+                    <col width="100">
+                </colgroup>
+                <tbody>
+                {assign "total_price" 0}
+                {loop type="cart" name="cartloop"}
+                <tr>
+                    <td class="image">
+                        {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
+                        <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                        {/loop}
+                    </td>
+                    <td class="product">
+                        <h3 class="name" style="margin:0">
+                            {$TITLE}
+                        </h3>
+                        <a href="{url path="/cart/delete/{$ITEM_ID}"}" class="btn btn-remove" data-tip="tooltip" data-title="Delete" data-original-title=""><i class="icon-trash"></i> <span>{intl l="Remove" d="hookcart.fo.default"}</span></a>
+                    </td>
+                    <td class="unitprice text-center">
+                        {if $IS_PROMO == 1}
+                        {assign "real_price" $PROMO_TAXED_PRICE}
+                        {else}
+                        {assign "real_price" $TAXED_PRICE}
+                        {/if}
+                        <span class="qty">{$QUANTITY}</span> X <span class="price" style="font-size:1em;">{$real_price} {currency attr="symbol"}</span></div>
+        {assign "total_price" $total_price + ($QUANTITY * $real_price)}
+        </td>
+        </tr>
+        {/loop}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td colspan="2" class="empty">
+                <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><span>{intl l="View Cart" d="hookcart.fo.default"}</span></a>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-warning btn-sm"><span>{intl l="Checkout" d="hookcart.fo.default"}</span></a>
+                {*<button type="submit" name="checkout" class="btn btn-warning btn-sm"><span>{intl l="Checkout" d="hookcart.fo.default"}</span></button>*}
+            </td>
+            <td class="total">
+                <div class="total-price">
+                    <span class="price">{$total_price} {currency attr="symbol"}</span>
+                </div>
+            </td>
+        </tr>
+        </tfoot>
+        </table>
+        </form>
+        </div>
+    </li>
+    {/ifloop}
+    {elseloop rel="cartloop"}
+    <li class="dropdown pull-right  cart-container">
+        <a href="{url path="/cart"}" rel="nofollow" class="cart">
+        {intl l="Cart" d="hookcart.fo.default"} <span class="badge">0</span>
+        </a>
+        <div class="dropdown-menu cart-content">
+            <p>{intl l="You have no items in your shopping cart." d="hookcart.fo.default"}</p>
+        </div>
+    </li>
+    {/elseloop}
+</ul>

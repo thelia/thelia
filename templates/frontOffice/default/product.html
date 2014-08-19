@@ -56,6 +56,12 @@
             {/loop}
             *}
 
+            {hook name="product.top" product="{$ID}"}
+
+            {ifhook rel="product.gallery"}
+               {hook name="product.gallery" product="{$ID}"}
+            {/ifhook}
+            {elsehook rel="product.gallery"}
             <section id="product-gallery">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
@@ -104,8 +110,11 @@
                 </div>
                 {/ifloop}
             </section>
+            {/elsehook}
 
             <section id="product-details">
+                {hook name="product.details-top" product="{$ID}"}
+
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: <span id="pse-ref">{$REF}</span></span>{/if}
@@ -211,6 +220,7 @@
 
                 </form>
                 {/form}
+                {hook name="product.details-bottom" product="{$ID}"}
             </section>
 
             {strip}
@@ -262,11 +272,14 @@
             {/strip}
 
             <section id="product-tabs">
+                {hookblock name="product.additional" product="{product attr="id"}"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
                     {if $smarty.capture.brand_info ne ""}<li role="presentation"><a id="tab3" href="#brand_info" data-toggle="tab" role="tab">{intl l="Brand information"}</a></li>{/if}
-
+                    {forhook rel="product.additional"}
+                        <li role="presentation"><a id="tab{$id}" href="#{$id}" data-toggle="tab" role="tab">{$title}</a></li>
+                    {/forhook}
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active in" id="description" itemprop="description" role="tabpanel" aria-labelledby="tab1">
@@ -282,8 +295,16 @@
                             {$smarty.capture.brand_info nofilter}
                         </div>
                     {/if}
+                    {forhook rel="product.additional"}
+                    <div class="tab-pane" id="{$id}" role="tabpanel" aria-labelledby="tab{$id}">
+                        {$content nofilter}
+                    </div>
+                    {/forhook}
                 </div>
+                {/hookblock}
             </section>
+            {hook name="product.bottom" product="{$ID}"}
+
 {* javascript confiuguration to display pse *}
 {$pse=[]}
 {$combination_label=[]}
@@ -333,7 +354,7 @@
                 {/loop}
             {/if}
         </ul>
-       {/loop}
+        {/loop}
 
     </div><!-- /.main -->
     {else}
@@ -345,3 +366,14 @@
     {/if}
 {/block}
 
+{block name="stylesheet"}
+{hook name="product.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="product.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="product.after-javascript-initialization"}
+{/block}

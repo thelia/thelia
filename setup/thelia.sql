@@ -894,6 +894,62 @@ CREATE TABLE `module`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook`;
+
+CREATE TABLE `hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(255) NOT NULL,
+    `type` TINYINT NOT NULL,
+    `by_module` TINYINT(1),
+    `native` TINYINT(1),
+    `activate` TINYINT(1),
+    `block` TINYINT(1),
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
+    INDEX `idx_module_activate` (`activate`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_hook`;
+
+CREATE TABLE `module_hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `classname` VARCHAR(255),
+    `method` VARCHAR(255),
+    `active` TINYINT(1) NOT NULL,
+    `hook_active` TINYINT(1) NOT NULL,
+    `module_active` TINYINT(1) NOT NULL,
+    `position` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_hook_active` (`active`),
+    INDEX `FI_module_hook_module_id` (`module_id`),
+    INDEX `FI_module_hook_hook_id` (`hook_id`),
+    CONSTRAINT `fk_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- accessory
 -- ---------------------------------------------------------------------
 
@@ -2379,6 +2435,26 @@ CREATE TABLE `module_i18n`
     CONSTRAINT `module_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `module` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- hook_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook_i18n`;
+
+CREATE TABLE `hook_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `hook_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `hook` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

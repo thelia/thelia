@@ -10,12 +10,23 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
         <h1 id="main-label" class="page-header">{intl l="Contact Us"}</h1>
 
-        <div id="google-map"><!-- Google Map --></div>
+        {ifhook rel="contact.top"}
+           {hook name="contact.top"}
+        {/ifhook}
+        {elsehook rel="contact.top"}
+        <div id="google-map">
+            {assign var="address" value="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}"}
+            <iframe class="map" width="100%" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?f=q&source=s_q&geocode=&q={$address|escape:'url'}&output=embed"></iframe>
+        </div><!-- / #google-map-->
+        {/elsehook}
 
         {block name="contact-form"}
             {form name="thelia.front.contact"}
             <form id="form-contact" action="{url path="/contact"}" method="post">
                 {form_hidden_fields form=$form}
+
+                {hook name="contact.form-top"}
+
                 <fieldset id="contact-info" class="panel">
                     <div class="panel-heading">
                         {intl l="Send us a message"}
@@ -73,63 +84,35 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-
-                        <div class="form-group group-btn">
-                            <div class="control-btn">
-                                <button type="submit" class="btn btn-contact">{intl l="Send"}</button>
-                            </div>
-                        </div><!--/.form-group-->
                     </div>
                 </fieldset>
+
+                {hook name="contact.form-bottom"}
+
+                <div class="form-group group-btn">
+                    <div class="control-btn">
+                        <button type="submit" class="btn btn-contact">{intl l="Send"}</button>
+                    </div>
+                </div><!--/.form-group-->
+
             </form>
             {/form}
         {/block}
+
+        {hook name="contact.bottom"}
+
         </article>
     </div>
 {/block}
 
-{block name="javascript-initialization"}
-<script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&language={lang attr="code"}"></script>
-<script>
-var address = '{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}, {config key="store_city"}, {config key="store_country"}';
-var icon_thelia = '{images file="assets/img/googlemap-icon.png"}{$asset_url}{/images}';
-{literal}
-$(function(){
-    $('#google-map').each(function() {
-        var map,
-            $this = $(this),
-            geocoder = new google.maps.Geocoder(),
-            marker,
-            latlng = new google.maps.LatLng(45.79, 3.09),
-            myOptions = {
-                zoom: 9,
-                center:  latlng,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
- 
-        map = new google.maps.Map(document.getElementById($this.attr("id")), myOptions);
+{block name="stylesheet"}
+{hook name="contact.stylesheet"}
+{/block}
 
-        // locate store address
-        geocoder.geocode( { 'address': address}, function(results, status) {
-            if (status == google.maps.GeocoderStatus.OK) {
-                map.setCenter(results[0].geometry.location);
-                latlng = new google.maps.LatLng(results[0].geometry.location.Qa, results[0].geometry.location.Ra),
-                marker = new google.maps.Marker({
-                    map: map,
-                    position: results[0].geometry.location
-                });
-            } else {
-                console.log('Error: The Geolocation service failed.')
-                // Show Thelia address
-                marker = new google.maps.Marker({
-                    map: map,
-                    position: latlng,
-                    icon: icon_thelia
-                });
-            }
-        });
-    });
-});
-{/literal}
-</script>
+{block name="after-javascript-include"}
+{hook name="contact.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="contact.after-javascript-initialization"}
 {/block}
