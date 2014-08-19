@@ -192,7 +192,7 @@ abstract class BaseCachedFile extends BaseAction
     public function saveFile(FileCreateOrUpdateEvent $event)
     {
         $model = $event->getModel();
-
+        $model->setFile(sprintf("tmp/%s", $event->getUploadedFile()->getFilename()));
         $nbModifiedLines = $model->save();
         $event->setModel($model);
 
