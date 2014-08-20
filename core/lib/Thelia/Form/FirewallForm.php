@@ -34,7 +34,7 @@ abstract class FirewallForm extends BaseForm
 
     public function isFirewallOk($env)
     {
-        if ($env === "prod") {
+        if ($env === "prod" && $this->isFirewallActive()) {
             /**
              * Empty the firewall
              */
@@ -52,7 +52,7 @@ abstract class FirewallForm extends BaseForm
                 ->findOne()
             ;
 
-            if ($this->isFirewallActive() && null !== $firewallInstance) {
+            if (null !== $firewallInstance) {
                 if ($firewallInstance->getAttempts() < $this->getConfigAttempts()) {
                     $firewallInstance->incrementAttempts();
                 } else {
@@ -96,7 +96,7 @@ abstract class FirewallForm extends BaseForm
 
     public function isFirewallActive()
     {
-        return ConfigQuery::read("form_firewall_active", true);
+        return (bool)((int)ConfigQuery::read("form_firewall_active", true));
     }
 
     public function getWaitingTime()
