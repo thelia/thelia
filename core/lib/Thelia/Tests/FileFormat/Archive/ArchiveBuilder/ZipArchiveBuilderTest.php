@@ -40,7 +40,7 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->zip = new ZipArchiveBuilder();
 
-        $this->zip->setEnvironment("dev");
+        $this->zip->setEnvironment("test");
 
         $this->loadedZip = $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/well_formatted.zip"

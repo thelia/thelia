@@ -33,7 +33,7 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         Tlog::getNewInstance();
 
         $this->tar = new TarArchiveBuilder();
-        $this->tar->setEnvironment("dev");
+        $this->tar->setEnvironment("test");
     }
 
     public function testAddFileAndDirectory()
