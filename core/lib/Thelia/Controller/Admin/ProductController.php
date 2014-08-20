@@ -1285,6 +1285,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Format the number using '.', to perform further calculation
-        return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+        //return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+        return $return_price;
     }
 }

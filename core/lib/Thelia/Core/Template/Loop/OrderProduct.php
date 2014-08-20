@@ -75,9 +75,9 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($orderProduct);
 
             $price = $orderProduct->getPrice();
-            $taxedPrice = $price + round($orderProduct->getVirtualColumn('TOTAL_TAX'), 2);
+            $taxedPrice = $price + $orderProduct->getVirtualColumn('TOTAL_TAX');
             $promoPrice = $orderProduct->getPromoPrice();
-            $taxedPromoPrice = $promoPrice + round($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'), 2);
+            $taxedPromoPrice = $promoPrice + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
             $loopResultRow->set("ID", $orderProduct->getId())
                 ->set("REF", $orderProduct->getProductRef())
