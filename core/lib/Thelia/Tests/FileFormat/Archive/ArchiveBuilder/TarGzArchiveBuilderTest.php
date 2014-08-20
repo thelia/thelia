@@ -25,7 +25,7 @@ class TarGzArchiveBuilderTest extends TarArchiveBuilderTest
         parent::setUp();
 
         $this->tar = new TarGzArchiveBuilder();
-        $this->tar->setEnvironment("dev");
+        $this->tar->setEnvironment("test");
     }
 
     public function testCompression()
