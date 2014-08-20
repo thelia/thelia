@@ -358,7 +358,7 @@ class SaleController extends AbstractCrudController
 
                             $attributesInfo[$attrId] = [];
                         }
-
+echo "PSE=".$pse->getId().", attr=$attrId: c=".$combination->getAttributeAvId()."<br />";
                         if (! in_array($attrAvId, $attributesInfo[$attrId])) {
                             $attributesInfo[$attrId][] = $attrAvId;
                         }

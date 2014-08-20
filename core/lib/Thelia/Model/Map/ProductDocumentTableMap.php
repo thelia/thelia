@@ -174,7 +174,9 @@ class ProductDocumentTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductSaleElementsProductDocument', '\\Thelia\\Model\\ProductSaleElementsProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_document_id', ), null, null, 'ProductSaleElementsProductDocuments');
         $this->addRelation('ProductDocumentI18n', '\\Thelia\\Model\\ProductDocumentI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductDocumentI18ns');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_MANY, array(), null, null, 'ProductSaleElementss');
     } // buildRelations()
 
     /**

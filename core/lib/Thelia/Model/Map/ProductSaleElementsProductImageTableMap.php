@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Export;
-use Thelia\Model\ExportQuery;
+use Thelia\Model\ProductSaleElementsProductImage;
+use Thelia\Model\ProductSaleElementsProductImageQuery;
 
 
 /**
- * This class defines the structure of the 'export' table.
+ * This class defines the structure of the 'product_sale_elements_product_image' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ExportQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ExportTableMap extends TableMap
+class ProductSaleElementsProductImageTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ExportTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProductSaleElementsProductImageTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class ExportTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'export';
+    const TABLE_NAME = 'product_sale_elements_product_image';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Export';
+    const OM_CLASS = '\\Thelia\\Model\\ProductSaleElementsProductImage';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Export';
+    const CLASS_DEFAULT = 'Thelia.Model.ProductSaleElementsProductImage';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -68,56 +68,27 @@ class ExportTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'export.ID';
+    const ID = 'product_sale_elements_product_image.ID';
 
     /**
-     * the column name for the REF field
+     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
      */
-    const REF = 'export.REF';
+    const PRODUCT_SALE_ELEMENTS_ID = 'product_sale_elements_product_image.PRODUCT_SALE_ELEMENTS_ID';
 
     /**
-     * the column name for the POSITION field
+     * the column name for the PRODUCT_IMAGE_ID field
      */
-    const POSITION = 'export.POSITION';
-
-    /**
-     * the column name for the EXPORT_CATEGORY_ID field
-     */
-    const EXPORT_CATEGORY_ID = 'export.EXPORT_CATEGORY_ID';
-
-    /**
-     * the column name for the HANDLE_CLASS field
-     */
-    const HANDLE_CLASS = 'export.HANDLE_CLASS';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'export.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'export.UPDATED_AT';
+    const PRODUCT_IMAGE_ID = 'product_sale_elements_product_image.PRODUCT_IMAGE_ID';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -126,12 +97,12 @@ class ExportTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'Position', 'ExportCategoryId', 'HandleClass', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'position', 'exportCategoryId', 'handleClass', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ExportTableMap::ID, ExportTableMap::REF, ExportTableMap::POSITION, ExportTableMap::EXPORT_CATEGORY_ID, ExportTableMap::HANDLE_CLASS, ExportTableMap::CREATED_AT, ExportTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'POSITION', 'EXPORT_CATEGORY_ID', 'HANDLE_CLASS', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'position', 'export_category_id', 'handle_class', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductSaleElementsId', 'ProductImageId', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productSaleElementsId', 'productImageId', ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsProductImageTableMap::ID, ProductSaleElementsProductImageTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductSaleElementsProductImageTableMap::PRODUCT_IMAGE_ID, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_SALE_ELEMENTS_ID', 'PRODUCT_IMAGE_ID', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_sale_elements_id', 'product_image_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -141,12 +112,12 @@ class ExportTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'Position' => 2, 'ExportCategoryId' => 3, 'HandleClass' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'position' => 2, 'exportCategoryId' => 3, 'handleClass' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ExportTableMap::ID => 0, ExportTableMap::REF => 1, ExportTableMap::POSITION => 2, ExportTableMap::EXPORT_CATEGORY_ID => 3, ExportTableMap::HANDLE_CLASS => 4, ExportTableMap::CREATED_AT => 5, ExportTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'POSITION' => 2, 'EXPORT_CATEGORY_ID' => 3, 'HANDLE_CLASS' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'position' => 2, 'export_category_id' => 3, 'handle_class' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductSaleElementsId' => 1, 'ProductImageId' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productSaleElementsId' => 1, 'productImageId' => 2, ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsProductImageTableMap::ID => 0, ProductSaleElementsProductImageTableMap::PRODUCT_SALE_ELEMENTS_ID => 1, ProductSaleElementsProductImageTableMap::PRODUCT_IMAGE_ID => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_SALE_ELEMENTS_ID' => 1, 'PRODUCT_IMAGE_ID' => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_sale_elements_id' => 1, 'product_image_id' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -159,19 +130,16 @@ class ExportTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('export');
-        $this->setPhpName('Export');
-        $this->setClassName('\\Thelia\\Model\\Export');
+        $this->setName('product_sale_elements_product_image');
+        $this->setPhpName('ProductSaleElementsProductImage');
+        $this->setClassName('\\Thelia\\Model\\ProductSaleElementsProductImage');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addForeignKey('EXPORT_CATEGORY_ID', 'ExportCategoryId', 'INTEGER', 'export_category', 'ID', true, null, null);
-        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'CLOB', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
+        $this->addForeignKey('PRODUCT_IMAGE_ID', 'ProductImageId', 'INTEGER', 'product_image', 'ID', true, null, null);
     } // initialize()
 
     /**
@@ -179,32 +147,9 @@ class ExportTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ExportCategory', '\\Thelia\\Model\\ExportCategory', RelationMap::MANY_TO_ONE, array('export_category_id' => 'id', ), 'RESTRICT', 'CASCADE');
-        $this->addRelation('ExportI18n', '\\Thelia\\Model\\ExportI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportI18ns');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
+        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::MANY_TO_ONE, array('product_image_id' => 'id', ), null, null);
     } // buildRelations()
-
-    /**
-     *
-     * Gets the list of behaviors registered for this table
-     *
-     * @return array Associative array (name => parameters) of behaviors
-     */
-    public function getBehaviors()
-    {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title,description', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-        );
-    } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to export     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ExportI18nTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -262,7 +207,7 @@ class ExportTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ExportTableMap::CLASS_DEFAULT : ExportTableMap::OM_CLASS;
+        return $withPrefix ? ProductSaleElementsProductImageTableMap::CLASS_DEFAULT : ProductSaleElementsProductImageTableMap::OM_CLASS;
     }
 
     /**
@@ -276,21 +221,21 @@ class ExportTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Export object, last column rank)
+     * @return array (ProductSaleElementsProductImage object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ExportTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ExportTableMap::getInstanceFromPool($key))) {
+        $key = ProductSaleElementsProductImageTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProductSaleElementsProductImageTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ExportTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProductSaleElementsProductImageTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ExportTableMap::OM_CLASS;
+            $cls = ProductSaleElementsProductImageTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ExportTableMap::addInstanceToPool($obj, $key);
+            ProductSaleElementsProductImageTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -313,8 +258,8 @@ class ExportTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ExportTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ExportTableMap::getInstanceFromPool($key))) {
+            $key = ProductSaleElementsProductImageTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProductSaleElementsProductImageTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -323,7 +268,7 @@ class ExportTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ExportTableMap::addInstanceToPool($obj, $key);
+                ProductSaleElementsProductImageTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -344,21 +289,13 @@ class ExportTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ExportTableMap::ID);
-            $criteria->addSelectColumn(ExportTableMap::REF);
-            $criteria->addSelectColumn(ExportTableMap::POSITION);
-            $criteria->addSelectColumn(ExportTableMap::EXPORT_CATEGORY_ID);
-            $criteria->addSelectColumn(ExportTableMap::HANDLE_CLASS);
-            $criteria->addSelectColumn(ExportTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ExportTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProductSaleElementsProductImageTableMap::ID);
+            $criteria->addSelectColumn(ProductSaleElementsProductImageTableMap::PRODUCT_SALE_ELEMENTS_ID);
+            $criteria->addSelectColumn(ProductSaleElementsProductImageTableMap::PRODUCT_IMAGE_ID);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.EXPORT_CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.HANDLE_CLASS');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
+            $criteria->addSelectColumn($alias . '.PRODUCT_IMAGE_ID');
         }
     }
 
@@ -371,7 +308,7 @@ class ExportTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ExportTableMap::DATABASE_NAME)->getTable(ExportTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsProductImageTableMap::DATABASE_NAME)->getTable(ProductSaleElementsProductImageTableMap::TABLE_NAME);
     }
 
     /**
@@ -379,16 +316,16 @@ class ExportTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ExportTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ExportTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ExportTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsProductImageTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProductSaleElementsProductImageTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductSaleElementsProductImageTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Export or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductSaleElementsProductImage or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Export object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProductSaleElementsProductImage object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -399,25 +336,25 @@ class ExportTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ExportTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsProductImageTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Export) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProductSaleElementsProductImage) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ExportTableMap::DATABASE_NAME);
-            $criteria->add(ExportTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ProductSaleElementsProductImageTableMap::DATABASE_NAME);
+            $criteria->add(ProductSaleElementsProductImageTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ExportQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsProductImageQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ExportTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProductSaleElementsProductImageTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ExportTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProductSaleElementsProductImageTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -425,20 +362,20 @@ class ExportTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the export table.
+     * Deletes all rows from the product_sale_elements_product_image table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ExportQuery::create()->doDeleteAll($con);
+        return ProductSaleElementsProductImageQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Export or Criteria object.
+     * Performs an INSERT on the database, given a ProductSaleElementsProductImage or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Export object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProductSaleElementsProductImage object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -447,22 +384,22 @@ class ExportTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ExportTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsProductImageTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Export object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProductSaleElementsProductImage object
         }
 
-        if ($criteria->containsKey(ExportTableMap::ID) && $criteria->keyContainsValue(ExportTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ExportTableMap::ID.')');
+        if ($criteria->containsKey(ProductSaleElementsProductImageTableMap::ID) && $criteria->keyContainsValue(ProductSaleElementsProductImageTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductSaleElementsProductImageTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ExportQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsProductImageQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -478,7 +415,7 @@ class ExportTableMap extends TableMap
         return $pk;
     }
 
-} // ExportTableMap
+} // ProductSaleElementsProductImageTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ExportTableMap::buildTableMap();
+ProductSaleElementsProductImageTableMap::buildTableMap();

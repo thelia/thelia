@@ -31,6 +31,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     protected $displayInitialPrice;
     protected $priceOffsets;
     protected $products;
+    protected $productAttributes;
 
     /**
      * @param int $saleId
@@ -228,7 +229,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param array $products an array of (product ID => attribute IDs ids[])
+     * @param array $products an array of (product_id => product_sale_elements ids[])
      * @return $this
      */
     public function setProducts($products)
@@ -238,10 +239,30 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @return array $products an array of (product ID => attribute IDs ids[])
+     * @return array
      */
     public function getProducts()
     {
         return $this->products;
     }
+
+    /**
+     * @param array $productAttributes an array of (product_id => array of attribute IDs)
+     * @return $this
+     */
+    public function setProductAttributes($productAttributes)
+    {
+        $this->productAttributes = $productAttributes;
+        return $this;
+    }
+
+    /**
+     * @return array $productAttributes an array of (product_id => array of attribute IDs)
+     */
+    public function getProductAttributes()
+    {
+        return $this->productAttributes;
+    }
+
+
 }

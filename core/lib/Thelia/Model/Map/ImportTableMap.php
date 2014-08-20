@@ -169,7 +169,7 @@ class ImportTableMap extends TableMap
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addForeignKey('IMPORT_CATEGORY_ID', 'ImportCategoryId', 'INTEGER', 'import_category', 'ID', true, null, null);
-        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('HANDLE_CLASS', 'HandleClass', 'CLOB', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -179,7 +179,7 @@ class ImportTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ImportCategory', '\\Thelia\\Model\\ImportCategory', RelationMap::MANY_TO_ONE, array('import_category_id' => 'id', ), null, null);
+        $this->addRelation('ImportCategory', '\\Thelia\\Model\\ImportCategory', RelationMap::MANY_TO_ONE, array('import_category_id' => 'id', ), 'RESTRICT', 'CASCADE');
         $this->addRelation('ImportI18n', '\\Thelia\\Model\\ImportI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ImportI18ns');
     } // buildRelations()
 

@@ -167,7 +167,7 @@ class ExportCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Export', '\\Thelia\\Model\\Export', RelationMap::ONE_TO_MANY, array('id' => 'export_category_id', ), null, null, 'Exports');
+        $this->addRelation('Export', '\\Thelia\\Model\\Export', RelationMap::ONE_TO_MANY, array('id' => 'export_category_id', ), 'RESTRICT', 'CASCADE', 'Exports');
         $this->addRelation('ExportCategoryI18n', '\\Thelia\\Model\\ExportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ExportCategoryI18ns');
     } // buildRelations()
 

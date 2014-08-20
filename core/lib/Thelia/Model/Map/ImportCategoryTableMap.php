@@ -167,7 +167,7 @@ class ImportCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Import', '\\Thelia\\Model\\Import', RelationMap::ONE_TO_MANY, array('id' => 'import_category_id', ), null, null, 'Imports');
+        $this->addRelation('Import', '\\Thelia\\Model\\Import', RelationMap::ONE_TO_MANY, array('id' => 'import_category_id', ), 'RESTRICT', 'CASCADE', 'Imports');
         $this->addRelation('ImportCategoryI18n', '\\Thelia\\Model\\ImportCategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ImportCategoryI18ns');
     } // buildRelations()
 

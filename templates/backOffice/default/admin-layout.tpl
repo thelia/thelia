@@ -214,6 +214,7 @@
                                     {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
                                         <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
                                     {/loop}
+
                                 </ul>
                             </li>
                             {/loop}

@@ -1277,6 +1277,7 @@
         <requirement key="product_id">\d+</requirement>
     </route>
 
+
     <route id="admin.sale.toggleActivity" path="/admin/sale/toggle-activity/{sale_id}">
         <default key="_controller">Thelia\Controller\Admin\SaleController::toggleActivity</default>
         <requirement key="sale_id">\d+</requirement>
