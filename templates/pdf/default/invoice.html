@@ -256,7 +256,7 @@
                 <td><p class="align-right">{format_money number=$realTax symbol=$orderCurrency}</p></td>
                 <td><p class="align-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
                 <td><p class="align-center">{$QUANTITY}</p></td>
-                <td><p class="align-right">{format_money number="$realTaxedPrice * $QUANTITY" symbol=$orderCurrency}</p></td>
+                <td><p class="align-right">{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
             </tr>
         {/loop}
     </table>
