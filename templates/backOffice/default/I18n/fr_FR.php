@@ -849,7 +849,7 @@ return array(
     'Tax rule taxes will be update for the following countries :' => 'Les règles de taxe seront modifiées pour les pays suivants :',
     'Tax rules' => 'Règles de taxes',
     'Tax rules are combination of different taxes.' => 'Les règles de taxe sont une combinaison de différentes taxes.',
-    'Taxed total' => 'Montant total des taxes',
+    'Taxed total' => 'Total TTC',
     'Taxes' => 'Taxes',
     'Taxes define the amount of money which is added to a bought product.' => 'Les taxes correspondent au montant ajouté au prix HT d\'un produit acheté',
     'Taxes rules' => 'Règles de taxes',
