@@ -1,3 +1,8 @@
+#2.0.3
+- Fix js syntax in order-delivery template
+- price are now save without any round.
+ /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
+
 #2.0.3-beta2
 - fix update process
 - fix coupons trait
