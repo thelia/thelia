@@ -35,7 +35,12 @@ trait ImportExportControllerTrait
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-        $archiveBuilderManager = (new ArchiveBuilderManager("dev"))
+        $cacheDir = THELIA_CACHE_DIR . "test";
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir);
+        }
+
+        $archiveBuilderManager = (new ArchiveBuilderManager("test"))
             ->add(new ZipArchiveBuilder())
             ->add(new TarArchiveBuilder())
             ->add(new TarBz2ArchiveBuilder())
