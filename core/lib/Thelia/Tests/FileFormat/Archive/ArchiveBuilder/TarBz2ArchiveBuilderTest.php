@@ -25,7 +25,7 @@ class TarBz2ArchiveBuilderTest extends TarArchiveBuilderTest
         parent::setUp();
 
         $this->tar = new TarBz2ArchiveBuilder();
-        $this->tar->setEnvironment("dev");
+        $this->tar->setEnvironment("test");
     }
 
     public function testCompression()

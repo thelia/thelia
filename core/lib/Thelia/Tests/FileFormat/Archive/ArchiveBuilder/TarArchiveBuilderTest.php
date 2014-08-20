@@ -32,8 +32,13 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         Tlog::getNewInstance();
 
+        $cacheDir = THELIA_CACHE_DIR . "test";
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir);
+        }
+
         $this->tar = new TarArchiveBuilder();
-        $this->tar->setEnvironment("dev");
+        $this->tar->setEnvironment("test");
     }
 
     public function testAddFileAndDirectory()
