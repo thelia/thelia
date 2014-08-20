@@ -80,8 +80,19 @@ For tar.bz2 archives, you need tar's dependencies and the extension "bzip2". See
 
 For tar.gz archives, you need tar's dependencies and the extension "zlib". See [PHP Doc](http://fr2.php.net/manual/fr/book.zlib.php)
 
-## Download Thelia 2
+## Download Thelia 2 and install its dependencies
 
+You can get the sources from git and then let composer install dependencies, or use composer to install the whole thelia project into a specific directory
+
+### Using git for download and composer for dependencies
+``` bash
+$ git clone https://github.com/thelia/thelia thelia
+$ cd thelia
+$ git checkout 2.0.3-beta2
+$ php composer.phar install
+```
+
+### Using composer for download and dependencies
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar create-project thelia/thelia path/ 2.0.3-beta2
