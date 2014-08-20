@@ -30,9 +30,9 @@
                 <p class="title title-without-tabs">{intl l="Hooks position"}</p>
             </div>
             <div class="hooks-filter row">
-                <div class="col-md-3 col-sm-12">
+                <div class="col-md-3">
                     <label for="hooks-filter-status">{intl l="By status"}</label><br />
-                    <select id="hooks-filter-status">
+                    <select id="hooks-filter-status" class="form-control">
                         <option value="">{intl l="All"}</option>
                         <option value="1">{intl l="Active"}</option>
                         <option value="0">{intl l="Inactive"}</option>
@@ -40,7 +40,7 @@
                 </div>
                 <div class="col-md-3 col-sm-12">
                     <label for="hooks-filter-module">{intl l="By module"}</label><br />
-                    <select id="hooks-filter-module">
+                    <select id="hooks-filter-module" class="form-control">
                         <option value="">{intl l="All"}</option>
                         {loop type="module" name="module" order=$module_order backend_context=1}
                         <option value="{$ID}">{$TITLE}</option>
@@ -49,7 +49,7 @@
                 </div>
                 <div class="col-md-3 col-sm-12">
                     <label for="hooks-filter-type">{intl l="By type"}</label><br />
-                    <select id="hooks-filter-type">
+                    <select id="hooks-filter-type" class="form-control">
                         <option value="">{intl l="All"}</option>
                         <option value="1">{intl l="Front Office"}</option>
                         <option value="2">{intl l="Back Office"}</option>

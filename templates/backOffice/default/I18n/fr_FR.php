@@ -136,7 +136,7 @@ return array(
     'Change this template' => 'Modifier ce gabarit',
     'Change this variable' => 'Modifier cette variable',
     'Chapo' => 'Chapeau',
-    'Check the support of hooks.' => 'Vérifiez le des hooks',
+    'Check the support of hooks.' => 'Vérifier le support des hooks',
     'Check this box if you want to add this attributes to all product templates' => 'Cochez cette case si vous voulez ajouter cette déclinaison à tous les gabarits de produits',
     'Check this box if you want to add this features to all product templates' => 'Cochez cette case si voulez ajouter cette caractéristique à tous les gabarits de produit.',
     'Choose a country' => 'Choisissez un pays',
