@@ -103,7 +103,7 @@
 		                          }
 		                         </td>
 
-		                        {module_include location='product_contents_table_row'}
+                                {hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
 
 		                        <td class="actions">
 		                            <div class="btn-group">
@@ -197,7 +197,7 @@
 
 		                        <th class="text-center">{intl l='Position'}</th>
 
-		                        {module_include location='product_accessories_table_header'}
+                                {hook name="product.accessories-table-header" location="product_accessories_table_header-bottom" }
 
 		                        <th class="actions">{intl l="Actions"}</th>
 		                    </tr>
@@ -224,7 +224,7 @@
 		                          }
 		                         </td>
 
-		                        {module_include location='product_accessories_table_row'}
+                                {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
 
 		                        <td class="actions">
 		                            <div class="btn-group">

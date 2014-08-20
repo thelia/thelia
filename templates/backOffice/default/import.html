@@ -31,7 +31,7 @@
                 </ul>
             </nav>
 
-            {module_include location='tools_top'}
+            {hook name="imports.top" location="imports-top" }
 
             {loop name="import-category" type="import-category" order=$category_order}
             {ifloop rel="import-categ-list"}
@@ -104,6 +104,7 @@
                                                 </td>
                                             </tr>
                                         {/loop}
+                                        {hook name="imports.row" category=$ID }
                                         </tbody>
                                     </table>
                                 </div>
@@ -120,7 +121,8 @@
                 </div>
             {/elseloop}
 
-            {module_include location='configuration_bottom'}
+            {hook name="imports.bottom" location="imports-bottom" }
+
         </div>
     </div>
 {/block}
@@ -195,5 +197,5 @@
             });
         });
     </script>
-    {module_include location='configuration-js'}
+    {hook name="imports.js" location="imports-js" }
 {/block}
