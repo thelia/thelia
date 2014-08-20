@@ -13,34 +13,6 @@
     <commands>
     </commands>
 
-    <!--
-    hook list:
-
-    main.head-top
-    main.stylesheet
-    main.head-bottom
-    main.body-top
-    main.header-top
-    main.navbar-secondary
-    main.navbar-primary
-    main.header-bottom
-    main.content-top
-    main.content-bottom
-    main.footer-top
-    main.footer-body (block)
-    main.footer-bottom
-    main.after-javascript-include
-    main.javascript-initialization
-    main.body-bottom
-
-    home.body
-    home.stylesheet
-    home.after-javascript-include
-    home.after-javascript-initialization
-
-    order-delivery.extra (module)
-    -->
-
     <hooks>
         <hook id="hooktest.hook.front" class="HookTest\Hook\FrontHook" scope="request">
             <!-- test: hook tag -->
