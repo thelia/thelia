@@ -35,7 +35,7 @@ trait ImportExportControllerTrait
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-        $archiveBuilderManager = (new ArchiveBuilderManager("dev"))
+        $archiveBuilderManager = (new ArchiveBuilderManager("test"))
             ->add(new ZipArchiveBuilder())
             ->add(new TarArchiveBuilder())
             ->add(new TarBz2ArchiveBuilder())
