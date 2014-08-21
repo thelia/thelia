@@ -17,10 +17,17 @@ use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Event\Hook\HookCreateAllEvent;
+use Thelia\Core\Event\Hook\HookUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Exception\ModuleException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
+use Thelia\Model\HookQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
@@ -66,6 +73,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $con->rollBack();
                 throw $e;
             }
+
+            $this->registerHooks();
         }
     }
 
@@ -450,5 +459,267 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
         // Override this method to do something useful.
+    }
+
+    /**
+     * @return array
+     *
+     * This method must be used when your module defines hooks.
+     * Override this and return an array of your hooks names to register them
+     *
+     * This returned value must be like the example, only type and code are mandatory
+     *
+     * Example:
+     *
+     * return array(
+     *
+     *      // Only register the title in the default language
+     *      array(
+     *          "type" => TemplateDefinition::BACK_OFFICE,
+     *          "code" => "my_super_hook_name",
+     *          "title" => "My hook",
+     *          "description" => "My hook is really, really great",
+     *      ),
+     *
+     *      // Manage i18n
+     *      array(
+     *          "type" => TemplateDefinition::FRONT_OFFICE,
+     *          "code" => "my_hook_name",
+     *          "title" => array(
+     *              "fr_FR" => "Mon Hook",
+     *              "en_US" => "My hook",
+     *          ),
+     *          "description" => array(
+     *              "fr_FR" => "Mon hook est vraiment super",
+     *              "en_US" => "My hook is really, really great",
+     *          ),
+     *          "chapo" => array(
+     *              "fr_FR" => "Mon hook est vraiment super",
+     *              "en_US" => "My hook is really, really great",
+     *          ),
+     *          "block" => true,
+     *          "active" => true
+     *      )
+     * );
+     */
+    public function getHooks()
+    {
+        return array();
+    }
+
+    public function registerHooks()
+    {
+        $moduleHooks = $this->getHooks();
+
+        if (is_array($moduleHooks) && !empty($moduleHooks)) {
+            $allowedTypes = (array) TemplateDefinition::getStandardTemplatesSubdirsIterator();
+            $defaultLang = Lang::getDefaultLanguage();
+            $defaultLocale = $defaultLang->getLocale();
+
+            $dispatcher = $this->container->get("event_dispatcher");
+
+            foreach ($moduleHooks as $hook) {
+                $isValid = is_array($hook) &&
+                    isset($hook["type"]) &&
+                    array_key_exists($hook["type"], $allowedTypes) &&
+                    isset($hook["code"]) &&
+                    is_string($hook["code"]) &&
+                    !empty($hook["code"])
+                ;
+
+                if (!$isValid) {
+                    Tlog::getInstance()->notice("The module ".$this->getCode()." tried to register an invalid hook");
+
+                    continue;
+                }
+
+                /**
+                 * Create or update hook db entry.
+                 */
+                list($hookModel, $updateData) = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
+
+                /**
+                 * Update translations
+                 */
+                $event = new HookUpdateEvent($hookModel->getId());
+
+                foreach ($updateData as $locale => $data) {
+
+                    $event
+                        ->setCode($hookModel->getCode())
+                        ->setNative($hookModel->getNative())
+                        ->setByModule($hookModel->getByModule())
+                        ->setActive($hookModel->getActivate())
+                        ->setBlock($hookModel->getBlock())
+                        ->setNative($hookModel->getNative())
+                        ->setType($hookModel->getType())
+                        ->setLocale($locale)
+                        ->setChapo($data["chapo"])
+                        ->setTitle($data["title"])
+                        ->setDescription($data["description"])
+                    ;
+
+                    $dispatcher->dispatch(TheliaEvents::HOOK_UPDATE, $event);
+                }
+            }
+        }
+    }
+
+    protected function createOrUpdateHook(array $hook, EventDispatcherInterface $dispatcher, $defaultLocale)
+    {
+        $hookModel = HookQuery::create()->filterByCode($hook["code"])->findOne();
+
+        if ($hookModel === null) {
+            $event = new HookCreateAllEvent();
+        } else {
+            $event = new HookUpdateEvent($hookModel->getId());
+        }
+
+        /**
+         * Get used I18n variables
+         */
+        $locale = $defaultLocale;
+
+        list($titles, $descriptions, $chapos) = $this->getHookI18nInfo($hook, $defaultLocale);
+
+        /**
+         * If the default locale exists
+         * extract it to save it in create action
+         *
+         * otherwise take the first
+         */
+        if (isset($titles[$defaultLocale])) {
+            $title = $titles[$defaultLocale];
+
+            unset($titles[$defaultLocale]);
+        } else {
+            reset($titles);
+
+            $locale = key($titles);
+            $title = array_shift($titles);
+        }
+
+        $description = $this->array_key_pop($locale, $descriptions);
+        $chapo = $this->array_key_pop($locale, $chapos);
+
+        /**
+         * Set data
+         */
+        $event
+            ->setBlock(isset($hook["block"]) && (bool) $hook["block"])
+            ->setLocale($locale)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setChapo($chapo)
+            ->setType($hook["type"])
+            ->setCode($hook["code"])
+            ->setNative(false)
+            ->setByModule(true)
+        ;
+
+        if ($hookModel === null) {
+            $event->setActive(isset($hook["active"]) && (bool) $hook["active"]);
+        }
+        /**
+         * Dispatch the event
+         */
+        $dispatcher->dispatch(
+            (
+            $hookModel === null ?
+                TheliaEvents::HOOK_CREATE_ALL :
+                TheliaEvents::HOOK_UPDATE
+            ),
+            $event
+        );
+
+        return [
+            $event->getHook(),
+            $this->formatHookDataForI18n($titles, $descriptions, $chapos)
+        ];
+    }
+
+    protected function formatHookDataForI18n(array $titles, array $descriptions, array $chapos)
+    {
+        $locales = array_merge(
+            array_keys($titles),
+            array_keys($descriptions),
+            array_keys($chapos)
+        );
+
+        $locales = array_unique($locales);
+
+        $data = array();
+
+        foreach ($locales as $locale) {
+            $row = array();
+
+            $row["title"] = !isset($titles[$locale]) ?: $titles[$locale];
+            $row["description"] = !isset($descriptions[$locale]) ?: $descriptions[$locale];
+            $row["chapo"] = !isset($chapos[$locale]) ?: $chapos[$locale];
+        }
+
+        return $data;
+    }
+
+    protected function getHookI18nInfo(array $hook, $defaultLocale)
+    {
+        $titles = array();
+        $descriptions = array();
+        $chapos = array();
+
+        /**
+         * Get the defined titles
+         */
+        if (isset($hook["title"])) {
+            $titles = $this->extractI18nValues($hook["title"], $defaultLocale);
+        }
+
+        /**
+         * Then the defined descriptions
+         */
+        if (isset($hook["description"])) {
+            $descriptions = $this->extractI18nValues($hook["description"], $defaultLocale);
+        }
+
+        /**
+         * Then the short descriptions
+         */
+        if (isset($hook["chapo"])) {
+            $chapos = $this->extractI18nValues($hook["chapo"], $defaultLocale);
+        }
+
+        return [$titles, $descriptions, $chapos];
+    }
+
+    protected function extractI18nValues($data, $defaultLocale)
+    {
+        $returnData = array();
+
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if (!is_string($key)) {
+                    continue;
+                }
+
+                $returnData[$key] = $value;
+            }
+        } elseif (is_scalar($data)) {
+            $returnData[$defaultLocale] = $data;
+        }
+
+        return $returnData;
+    }
+
+    protected function array_key_pop($key, array &$array)
+    {
+        $value = null;
+
+        if (array_key_exists($key, $array)) {
+            $value = $array[$key];
+
+            unset($array[$key]);
+        }
+
+        return $value;
     }
 }
