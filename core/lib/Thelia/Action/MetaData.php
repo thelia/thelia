@@ -14,7 +14,9 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
+
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
+use Thelia\Core\Event\MetaData\MetaDataEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 use Thelia\Model\MetaData as MetaDataModel;
