@@ -1761,4 +1761,17 @@
       <index-column name="hook_id" />
     </index>
   </table>
+  <table name="meta_data" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="meta_key" required="true" size="100" type="VARCHAR" />
+    <column name="element_key" required="true" size="100" type="VARCHAR" />
+    <column name="element_id" required="true" type="INTEGER" />
+    <column name="is_serialized" required="true" type="BOOLEAN" />
+    <column name="value" required="true" type="CLOB" />
+    <index name="meta_data_key_element_idx">
+      <index-column name="meta_key" />
+      <index-column name="element_key" />
+      <index-column name="element_id" />
+    </index>
+  </table>
 </database>

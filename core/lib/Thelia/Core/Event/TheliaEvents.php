@@ -831,4 +831,11 @@ final class TheliaEvents
 
     const BEFORE_UPDATESALE = "action.before_updateSale";
     const AFTER_UPDATESALE  = "action.after_updateSale";
+
+    // -- Meta Data ---------------------------------------------
+
+    const META_DATA_CREATE = "thelia.metadata.create";
+    const META_DATA_UPDATE = "thelia.metadata.update";
+    const META_DATA_DELETE = "thelia.metadata.delete";
+
 }
