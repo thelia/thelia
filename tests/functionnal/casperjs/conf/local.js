@@ -26,7 +26,7 @@ casper.test.comment('Screenshots will be saved under : '+ screenshot_dir);
 
 // Default Viewport size
 casper.options.viewportSize = {width: 1024, height: 768};
-casper.test.comment('Viewport size: '+ casper.options.viewportSize);
+casper.test.comment('Viewport size: '+ casper.options.viewportSize.width + 'x' + casper.options.viewportSize.height);
 
 // Default time to wait in ms
 var thelia_default_timeout = 6000;
