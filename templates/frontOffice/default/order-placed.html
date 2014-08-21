@@ -26,7 +26,9 @@
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
-
+                {loop type="currency" name="order-currency" id=$CURRENCY}
+                    {$orderCurrency=$SYMBOL}
+                {/loop}
             <div id="payment-success" class="panel">
                 <div class="panel-heading">
                     <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
@@ -42,7 +44,7 @@
                         <dt>{intl l="Date"} : </dt>
                         <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                         <dt>{intl l="Total"} : </dt>
-                        <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
+                        <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
                     </dl>
                 </div>
             </div>
