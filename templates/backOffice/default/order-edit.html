@@ -390,7 +390,7 @@
                                     </div> <!-- #bill -->
 
                                     <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
-
+                                        {* ugly fix : {hook name="order.tab-content"} *}
                                         {include file="includes/module-tab-content.html" hook="order.tab-content" location="order-edit"}
                                     </div>
                                 </div>

@@ -6,6 +6,9 @@ set -e
 echo "phpunit"
 phpunit
 
+echo "Clearing cache"
+php Thelia cache:clear --env=prod
+
 echo "CasperJS"
 cd ../casperjs
 export DISPLAY=:99.0
