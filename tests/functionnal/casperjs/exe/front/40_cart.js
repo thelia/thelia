@@ -1,6 +1,6 @@
 casper.test.comment('== Cart ==');
 
-casper.test.begin('Cart', 5, function suite(test) {
+casper.test.begin('Cart', 4, function suite(test) {
 
     var productUrl = '';
 
