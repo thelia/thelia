@@ -17,19 +17,17 @@ casper.test.begin('Cart', 4, function suite(test) {
     });
 
     casper.wait(thelia_default_timeout, function(){
-        test.assertExists("#pse-submit", "Submit button exists");
+        test.assertExists("#pse-submit", "Add to cart button exists");
         this.capture(screenshot_dir + 'front/40_product.png');
         this.echo("Submit add to cart");
         this.click("#pse-submit");
     });
 
-    /*
     casper.wait(thelia_default_timeout, function() {
         this.echo(this.getHTML());
+        test.assertSelectorHasText('.bootbox h3', 'The product has been added to your cart (popup)');
         this.captureSelector(screenshot_dir + 'front/40_added-to-cart.png', '.bootbox');
-        test.assertSelectorHasText('.bootbox h3', 'The product has been added to your cart');
     });
-    */
 
     casper.wait(thelia_default_timeout, function() {
 
