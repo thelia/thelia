@@ -1,6 +1,6 @@
 casper.test.comment('== Cart ==');
 
-casper.test.begin('Cart', 4, function suite(test) {
+casper.test.begin('Cart', 5, function suite(test) {
 
     var productUrl = '';
 
@@ -17,17 +17,20 @@ casper.test.begin('Cart', 4, function suite(test) {
     });
 
     casper.wait(thelia_default_timeout, function(){
+        test.assertExists("#pse-submit", "Submit button exists");
         this.capture(screenshot_dir + 'front/40_product.png');
+        this.echo("Submit add to cart");
         this.click("#pse-submit");
     });
 
     casper.wait(thelia_default_timeout, function() {
         this.captureSelector(screenshot_dir + 'front/40_added-to-cart.png', '.bootbox');
+        this.echo(this.getHTML());
         test.assertSelectorHasText('.bootbox h3', 'The product has been added to your cart');
     });
 
 
-    casper.then(function(){
+    casper.wait(thelia_default_timeout, function() {
 
         this.thenOpen(thelia2_base_url + "cart", function() {
             this.echo(this.getTitle());
