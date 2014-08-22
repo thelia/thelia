@@ -14,17 +14,11 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Model\MetaDataQuery;
 
-use Product;
-use Thelia\Action\Message;
+use Thelia\Model\Product;
 use Thelia\Action\MetaData;
-use Thelia\Core\Event\Message\MessageDeleteEvent;
-use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataEvent;
-use Thelia\Model\Base\ProductQuery;
-use Thelia\Model\Message as MessageModel;
-use Thelia\Core\Event\Message\MessageCreateEvent;
-use Thelia\Model\MessageQuery;
+use Thelia\Model\ProductQuery;
 
 
 /**
@@ -44,7 +38,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
     public static function setUpBeforeClass()
     {
         $boom = MetaDataQuery::create()
-            ->delete();
+            ->deleteAll();
     }
 
 
@@ -57,7 +51,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         $event = new MetaDataCreateOrUpdateEvent();
         $event
             ->setMetaKey('test')
-            ->setElementId(get_class($product))
+            ->setElementKey(get_class($product))
             ->setElementId($product->getId())
             ->setValue('test')
             ->setDispatcher($this->dispatcher);
@@ -81,7 +75,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         $event = new MetaDataCreateOrUpdateEvent();
         $event
             ->setMetaKey('test2')
-            ->setElementId(get_class($product))
+            ->setElementKey(get_class($product))
             ->setElementId($product->getId())
             ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
             ->setDispatcher($this->dispatcher);
@@ -102,5 +96,116 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         return $product;
     }
+
+
+    /**
+     * @params Product $product
+     *
+     * @depends testCreate
+     */
+    public function testRead(Product $product)
+    {
+        $metaDatas = MetaDataQuery::create()
+            ->filterByElementKey(get_class($product))
+            ->filterByElementId($product->getId())
+            ->find();
+
+        $this->assertEquals($metaDatas->count(), 2);
+
+        $metaData = MetaDataQuery::create()
+            ->filterByMetaKey('test')
+            ->filterByElementKey(get_class($product))
+            ->filterByElementId($product->getId())
+            ->findOne();
+
+        $this->assertNotNull($metaData);
+        $this->assertEquals('test', $metaData->getMetaKey());
+        $this->assertEquals(get_class($product), $metaData->getElementKey());
+        $this->assertEquals($product->getId(), $metaData->getElementId());
+        $this->assertEquals('test', $metaData->getValue());
+
+        $this->assertEquals(false, $metaData->getIsSerialized());
+
+        $datas = MetaDataQuery::getAllValues(get_class($product), $product->getId());
+        $this->assertEquals(count($datas), 2);
+        $this->assertEquals($datas['test'], 'test');
+        $this->assertEquals($datas['test2'], array("fr_FR" => "bonjour", "en_US" => "Hello"));
+
+        return $product;
+    }
+
+
+    /**
+     * @params Product $product
+     *
+     * @depends testRead
+     */
+    public function testUpdate(Product $product)
+    {
+        $metaData = MetaDataQuery::create()
+            ->filterByMetaKey('test')
+            ->filterByElementKey(get_class($product))
+            ->filterByElementId($product->getId())
+            ->findOne();
+
+        $this->assertNotNull($metaData);
+
+        $event = new MetaDataCreateOrUpdateEvent();
+        $event
+            ->setMetaKey($metaData->getMetaKey())
+            ->setElementKey($metaData->getElementKey())
+            ->setElementId($metaData->getElementId())
+            ->setValue(array("fr_FR" => "bonjour", "en_US" => "Hello"))
+            ->setDispatcher($this->dispatcher);
+
+        $action = new MetaData();
+        $action->createOrUpdate($event);
+
+        $updated = $event->getMetaData();
+
+        $this->assertInstanceOf('Thelia\Model\MetaData', $updated);
+
+        $this->assertFalse($updated->isNew());
+
+        $this->assertEquals('test', $updated->getMetaKey());
+        $this->assertEquals(get_class($product), $updated->getElementKey());
+        $this->assertEquals($product->getId(), $updated->getElementId());
+        $this->assertEquals(array("fr_FR" => "bonjour", "en_US" => "Hello"), $updated->getValue());
+        $this->assertEquals(true, $updated->getIsSerialized());
+
+        return $product;
+    }
+
+
+    /**
+     * @params Product $product
+     *
+     * @depends testUpdate
+     */
+    public function testDelete(Product $product)
+    {
+        $metaData = MetaDataQuery::create()
+            ->filterByMetaKey('test')
+            ->filterByElementKey(get_class($product))
+            ->filterByElementId($product->getId())
+            ->findOne();
+
+        $this->assertNotNull($metaData);
+
+        $event = new MetaDataEvent();
+        $event
+            ->setMetaData($metaData)
+            ->setDispatcher($this->dispatcher);
+
+        $action = new MetaData();
+        $action->delete($event);
+
+        $deleted = $event->getMetaData();
+
+        $this->assertInstanceOf('Thelia\Model\MetaData', $deleted);
+        $this->assertTrue($deleted->isDeleted());
+
+    }
+
 
 }
