@@ -382,11 +382,12 @@
         <div class="alert alert-info">{intl l="To create a new product, select an existing category, or create a new one."}</div>
         {/if}
 
-        {module_include location='categories_bottom'}
+        {hook name="categories.bottom" location="categories_bottom" }
 
     </div>
 
-    {module_include location='catalog_bottom'}
+    {hook name="categories.catalog-bottom" location="catalog_bottom" }
+
 </div>
 
 
@@ -440,7 +441,7 @@
             </div>
         {/form_field}
 
-        {module_include location='category_create_form'}
+        {hook name="category.create-form" location="category_create_form" }
 
     {/capture}
 

@@ -119,16 +119,18 @@ class SmartyAssetsManager
 
         $paths = $this->getFallbackSources($templateDirectories, $templateDefinition->getName(), $assetOrigin);
 
-        foreach ($paths as $path) {
-            if ($this->filesExist($path, $file)) {
-                $assetSource = $path;
-                break;
-            }
-        }
-
+        // Normalize path separator if required
         if (DS != '/') {
             // Just to be sure to generate a clean pathname
             $file = str_replace('/', DS, $file);
+        }
+
+        foreach ($paths as $path) {
+            if ($this->filesExist($path, $file)) {
+
+                $assetSource = $path;
+                break;
+            }
         }
 
         $url = "";
@@ -199,18 +201,23 @@ class SmartyAssetsManager
     {
         if (!file_exists($dir)) return false;
 
-        $finder = new Finder();
-        $files = $finder->files()->in($dir);
+        $full_path = rtrim($dir, DS) . DS . ltrim($file, DS);
 
-        $pos = strrpos($file, DS);
-        if ($pos !== false) {
-            $files = $files->path(substr($file, 0, $pos))
-                ->name(substr($file, $pos + 1));
-        } else {
-           $files = $files->name($file);
+        $path = dirname($full_path);
+        $name = basename($full_path);
+
+        try {
+            $finder = new Finder();
+
+            $files_found = $finder->files()->in($path)->name($name)->count() > 0;
+        }
+        catch (\Exception $ex) {
+            Tlog::getInstance()->addError($ex->getMessage());
+
+            $files_found = false;
         }
 
-        return ($files->count() != 0);
+        return $files_found;
     }
 
     public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)

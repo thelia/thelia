@@ -57,12 +57,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return new ArgumentCollection(
             Argument::createBooleanTypeArgument('complex', false),
             Argument::createIntListTypeArgument('id'),
-            new Argument(
-                'ref',
-                new TypeCollection(
-                    new Type\AlphaNumStringListType()
-                )
-            ),
+            Argument::createAnyTypeArgument('ref'),
             Argument::createIntListTypeArgument('category'),
             Argument::createIntListTypeArgument('brand'),
             Argument::createIntListTypeArgument('category_default'),

@@ -14,8 +14,8 @@
     </commands>
 
     <hooks>
-        <hook id="hooklang.hook.front" class="HookLang\Hook\FrontHook" scope="request">
-            <tag name="hook.event_listener" event="main.navbar-secondary" />
+        <hook id="hooklang.hook.front" class="HookLang\Hook\FrontHook" scope="request" >
+            <tag name="hook.event_listener" event="main.navbar-secondary"  />
         </hook>
     </hooks>
 

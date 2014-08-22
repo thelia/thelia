@@ -104,9 +104,9 @@
 		                        </tr>
 	                        </thead>
 
-	                        <tbody>
+                            <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit={#max_displayed_orders#} status=$status_filter|default:'*'}
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' }
 
                                     {loop type="currency" name="order-currency" id=$CURRENCY}
                                         {$orderCurrency=$SYMBOL}
@@ -132,10 +132,10 @@
 		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
 		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
 		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
-
+                                        {* *}
 		                                {hook name="orders.table-row" location="orders_table_row" }
 
-		                                <td>
+                                        <td>
 		                                    <div class="btn-group">
 
 				                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}

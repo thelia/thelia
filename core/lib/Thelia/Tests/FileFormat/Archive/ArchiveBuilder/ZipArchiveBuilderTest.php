@@ -38,9 +38,14 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         Tlog::getNewInstance();
 
+        $cacheDir = THELIA_CACHE_DIR . "test";
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir);
+        }
+
         $this->zip = new ZipArchiveBuilder();
 
-        $this->zip->setEnvironment("dev");
+        $this->zip->setEnvironment("test");
 
         $this->loadedZip = $this->zip->loadArchive(
             __DIR__ . DS . "TestResources/well_formatted.zip"

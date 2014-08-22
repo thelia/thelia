@@ -26,7 +26,9 @@
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
-
+                {loop type="currency" name="order-currency" id=$CURRENCY}
+                    {$orderCurrency=$SYMBOL}
+                {/loop}
             {ifhook rel="order-placed.body"}
                 {hook name="order-placed.body" module="$PAYMENT_MODULE"}
             {/ifhook}
@@ -39,14 +41,13 @@
                         <h3>{intl l="Thank you for the trust you place in us."}</h3>
                         <p>{intl l="A summary of your order email has been sent to the following address"} : {customer attr="email"}</p>
                         <p>{intl l="Your order will be confirmed by us upon receipt of your payment."}</p>
-
                         <dl class="dl-horizontal">
                             <dt>{intl l="Order number"} : </dt>
                             <dd>{$REF}</dd>
                             <dt>{intl l="Date"} : </dt>
                             <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                             <dt>{intl l="Total"} : </dt>
-                            <dd>{$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order-currency" id=$CURRENCY}{$SYMBOL}{/loop}</dd>
+                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
                         </dl>
                     </div>
                 </div>
@@ -70,5 +71,5 @@
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="order-placed.after-javascript-initialization"}
+{hook name="order-placed.javascript-initialization"}
 {/block}

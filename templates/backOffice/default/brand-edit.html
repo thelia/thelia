@@ -142,8 +142,8 @@
                                             current_tab = "modules"
                                         }
                                     </div>
-
-                                    {include file="includes/module-tab-content.html" location="brand-edit"}
+                                    {* bad fix : {hook name="brand.tab-content"} *}
+                                    {include file="includes/module-tab-content.html" hook="brand.tab-content" location="brand-edit"}
                                 </div>
                             </div>
                         </div>

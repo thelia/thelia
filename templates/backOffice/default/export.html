@@ -31,7 +31,7 @@
                 </ul>
             </nav>
 
-            {module_include location='tools_top'}
+            {hook name="exports.top" location="exports_top" }
 
             {loop name="export-category" type="export-category" order=$category_order}
                 {ifloop rel="export-categ-list"}
@@ -125,6 +125,7 @@
                                                     </td>
                                                 </tr>
                                             {/loop}
+                                            {hook name="exports.row" category=$ID }
                                         </tbody>
                                     </table>
                                 </div>
@@ -141,7 +142,8 @@
                 </div>
             {/elseloop}
 
-            {module_include location='configuration_bottom'}
+
+            {hook name="exports.bottom" location="exports_bottom" }
         </div>
     </div>
 {/block}
@@ -241,5 +243,5 @@
             });
         });
     </script>
-    {module_include location='configuration-js'}
+    {hook name="exports.js" location="exports-js" }
 {/block}
