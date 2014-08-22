@@ -257,8 +257,8 @@
                             {/hookblock}
                             {/ifhook}
                             {elsehook rel="main.top-menu-content"}
-                                <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
-                                    <a href="{url path='/admin/contents'}" >{intl l="Folders"}</a>
+                                <li class="{if $admin_current_location == 'folder'}active{/if}" id="contents_menu">
+                                    <a href="{url path='/admin/folders'}" >{intl l="Folders"}</a>
                                 </li>
                             {/elsehook}
                             {/loop}
