@@ -19,6 +19,7 @@ class ProductCreateEvent extends ProductEvent
     protected $locale;
     protected $default_category;
     protected $visible;
+    protected $virtual;
 
     protected $basePrice;
     protected $baseWeight;
@@ -84,6 +85,19 @@ class ProductCreateEvent extends ProductEvent
 
         return $this;
     }
+
+    public function setVirtual($virtual)
+    {
+        $this->virtual = $virtual;
+
+        return $this;
+    }
+
+    public function getVirtual()
+    {
+        return $this->virtual;
+    }
+
 
     public function getBasePrice()
     {

@@ -36,6 +36,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="tax_rule_id" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column defaultValue="0" name="visible" required="true" type="TINYINT" />
     <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />

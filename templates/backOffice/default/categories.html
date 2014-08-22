@@ -593,6 +593,17 @@
             </div>
         {/form_field}
 
+        {form_field form=$form field='virtual'}
+        <div class="form-group {if $error}has-error{/if}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1">
+                    {$label}
+                </label>
+            </div>
+        </div>
+        {/form_field}
+
         {form_field form=$form field='visible'}
             <div class="form-group {if $error}has-error{/if}">
                 <div class="checkbox">

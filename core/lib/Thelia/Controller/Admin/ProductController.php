@@ -156,6 +156,7 @@ class ProductController extends AbstractSeoCrudController
             ->setLocale($formData['locale'])
             ->setDefaultCategory($formData['default_category'])
             ->setVisible($formData['visible'])
+            ->setVirtual($formData['virtual'])
             ->setBasePrice($formData['price'])
             ->setBaseWeight($formData['weight'])
             ->setCurrencyId($formData['currency'])
@@ -178,6 +179,7 @@ class ProductController extends AbstractSeoCrudController
             ->setDescription($formData['description'])
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
+            ->setVirtual($formData['virtual'])
             ->setDefaultCategory($formData['default_category'])
             ->setBrandId($formData['brand_id'])
         ;
@@ -349,6 +351,7 @@ class ProductController extends AbstractSeoCrudController
             'description'      => $object->getDescription(),
             'postscriptum'     => $object->getPostscriptum(),
             'visible'          => $object->getVisible(),
+            'virtual'          => $object->getVirtual(),
             'default_category' => $object->getDefaultCategoryId(),
             'brand_id'         => $object->getBrandId()
         );

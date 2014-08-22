@@ -51,6 +51,10 @@ class ProductCreationForm extends BaseForm
                 "label"      => Translator::getInstance()->trans("This product is online"),
                 "label_attr" => array("for" => "visible_field")
             ))
+            ->add("virtual", "integer", array(
+                "label"      => Translator::getInstance()->trans("This product does not have a physical presence"),
+                "label_attr" => array("for" => "virtual_field")
+            ))
             ;
 
        if (! $change_mode) {
