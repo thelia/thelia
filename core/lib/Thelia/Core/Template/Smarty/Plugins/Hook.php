@@ -83,7 +83,7 @@ class Hook extends AbstractSmartyPlugin
     {
         $hookName   = $this->getParam($params, 'name');
         $module     = intval($this->getParam($params, 'module', 0));
-        $moduleCode = intval($this->getParam($params, 'modulecode', 0));
+        $moduleCode = $this->getParam($params, 'modulecode', "");
 
         $type = $smarty->getTemplateDefinition()->getType();
 
