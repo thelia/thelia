@@ -17,36 +17,80 @@ namespace Thelia\Core\Event\MetaData;
  * @package Thelia\Core\Event\MetaData
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class MetaDataCreateOrUpdateEvent extends MetaDataDeleteEvent
+class MetaDataDeleteEvent extends MetaDataEvent
 {
 
-    protected $value = null;
+    protected $metaKey = null;
+    protected $elementKey = null;
+    protected $elementId = null;
 
-    public function __construct($metaKey = null, $elementKey = null, $elementId = null, $value = null)
+    public function __construct($metaKey = null, $elementKey = null, $elementId = null)
     {
-        parent::__construct($metaKey, $elementKey, $elementId);
+        parent::__construct();
 
-        $this->value      = $value;
+        $this->metaKey    = $metaKey;
+        $this->elementKey = $elementKey;
+        $this->elementId  = $elementId;
     }
 
     /**
-     * @param mixed $value
+     * @param string $metaKey
      *
      * @return $this
      */
-    public function setValue($value)
+    public function setMetaKey($metaKey)
     {
-        $this->value = $value;
+        $this->metaKey = $metaKey;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getValue()
+    public function getMetaKey()
     {
-        return $this->value;
+        return $this->metaKey;
+    }
+
+    /**
+     * @param $elementKey
+     *
+     * @return $this
+     */
+    public function setElementKey($elementKey)
+    {
+        $this->elementKey = $elementKey;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getElementKey()
+    {
+        return $this->elementKey;
+    }
+
+    /**
+     * @param int $elementId
+     *
+     * @return $this
+     */
+    public function setElementId($elementId)
+    {
+        $this->elementId = $elementId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getElementId()
+    {
+        return $this->elementId;
     }
 
 }

@@ -126,7 +126,7 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(false, $metaData->getIsSerialized());
 
-        $datas = MetaDataQuery::getAllValues(get_class($product), $product->getId());
+        $datas = MetaDataQuery::getAllVal(get_class($product), $product->getId());
         $this->assertEquals(count($datas), 2);
         $this->assertEquals($datas['test'], 'test');
         $this->assertEquals($datas['test2'], array("fr_FR" => "bonjour", "en_US" => "Hello"));

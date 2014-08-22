@@ -24,7 +24,31 @@ class MetaDataQuery extends BaseMetaDataQuery
      *
      * @return array all meta data affected to this element
      */
-    public static function getAllValues($elementKey, $elementId)
+    public static function getVal($metaKey, $elementKey, $elementId)
+    {
+        $out = null;
+
+        $data = self::create()
+            ->filterByMetaKey($metaKey)
+            ->filterByElementKey($elementKey)
+            ->filterByElementId($elementId)
+            ->findOne();
+        if (null !== $data) {
+            /** @var MetaData $data */
+            $out = $data->getValue();
+        }
+
+        return $out;
+    }
+
+    /**
+     *
+     * @param string $elementKey the element Key : product, category, ...
+     * @param int    $elementId  the element id
+     *
+     * @return array all meta data affected to this element
+     */
+    public static function getAllVal($elementKey, $elementId)
     {
 
         $out = array();

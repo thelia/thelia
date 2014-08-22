@@ -17,6 +17,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductEvent;
+use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
+use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
@@ -44,6 +46,7 @@ use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
+use Thelia\Model\Base\MetaData;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\Feature;
@@ -53,6 +56,7 @@ use Thelia\Model\FolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -1412,6 +1416,7 @@ class ProductController extends AbstractSeoCrudController
             }
 
             $responseData["product_image_id"] = $typeId;
+            $responseData["is-associated"] = (int) (!$assoc->isDeleted());
 
         } elseif ($type === "document") {
             $image = ProductDocumentQuery::create()->findPk($typeId);
@@ -1445,16 +1450,44 @@ class ProductController extends AbstractSeoCrudController
             }
 
             $responseData["product_document_id"] = $typeId;
-        }
+            $responseData["is-associated"] = (int) (!$assoc->isDeleted());
 
-        $responseData["is-associated"] = $assoc !== null && !$assoc->isDeleted() ? 1 : 0;
+        } elseif ($type === "virtual") {
+            $image = ProductDocumentQuery::create()->findPk($typeId);
+
+            if (null === $image) {
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "The product document id %id doesn't exists",
+                        [
+                            "%id" => $pseId,
+                        ]
+                    )
+                );
+            }
+
+            $documentId = intval(MetaDataQuery::getVal('virtual', 'pse', $pseId));
+
+            if ($documentId === intval($typeId)) {
+                $assocEvent = new MetaDataDeleteEvent('virtual', 'pse', $pseId);
+                $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
+                $responseData["is-associated"] = 0;
+            } else {
+                $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', 'pse', $pseId, $typeId);
+                $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
+                $responseData["is-associated"] = 1;
+            }
+
+            $responseData["product_document_id"] = $typeId;
+
+        }
 
         return $responseData;
     }
 
     public function checkFileType($type)
     {
-        $types = ["image", "document"];
+        $types = ["image", "document", "virtual"];
 
         if (!in_array($type, $types)) {
             return $this->getTranslator()->trans(
@@ -1503,9 +1536,14 @@ class ProductController extends AbstractSeoCrudController
                 $data = $this->getPSEDocuments($pse);
                 break;
 
+            case "virtual":
+                $modalTitle = $this->getTranslator()->trans("Select the virtual document");
+                $data = $this->getPSEVirtualDocument($pse);
+                break;
+
             case null:
             default:
-                $modalTitle = $this->getTranslator()->trans("Error");
+                $modalTitle = $this->getTranslator()->trans("");
                 $data = [];
         }
 
@@ -1607,6 +1645,40 @@ class ProductController extends AbstractSeoCrudController
                 "url" => $document->get("DOCUMENT_URL"),
                 "title" => $document->get("TITLE"),
                 "is_associated" => $isAssociated,
+                "filename" => $document->model->getFile(),
+            ];
+        }
+
+        return $data;
+    }
+
+    protected function getPSEVirtualDocument(ProductSaleElementsModel $pse)
+    {
+        /**
+         * Compute documents with the associated loop
+         */
+        $documentLoop = new Document($this->container);
+        $documentLoop->initializeArgs([
+            "product" => $pse->getProductId(),
+        ]);
+
+        $documents = $documentLoop
+            ->exec($documentPagination)
+        ;
+
+        $documentId = intval(MetaDataQuery::getVal("virtual", "pse", $pse->getId()));
+
+        $data = [];
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $document */
+        for ($documents->rewind(); $documents->valid(); $documents->next()) {
+            $document = $documents->current();
+
+            $data[] = [
+                "id" => $document->get("ID"),
+                "url" => $document->get("DOCUMENT_URL"),
+                "title" => $document->get("TITLE"),
+                "is_associated" => ($documentId === $document->get("ID")),
                 "filename" => $document->model->getFile(),
             ];
         }

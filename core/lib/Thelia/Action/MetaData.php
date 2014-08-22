@@ -14,7 +14,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
-use Thelia\Core\Event\MetaData\MetaDataEvent;
+use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 
 use Thelia\Model\MetaData as MetaDataModel;
@@ -46,13 +46,21 @@ class MetaData extends BaseAction implements EventSubscriberInterface
         $metaData->
             setValue($event->getValue());
         $metaData->save();
+
         $event->setMetaData($metaData);
     }
 
-    public function delete(MetaDataEvent $event)
+    public function delete(MetaDataDeleteEvent $event)
     {
-        $metaData = $event->getMetaData();
-        $metaData->delete();
+        $metaData = MetaDataQuery::create()
+            ->filterByMetaKey($event->getMetaKey())
+            ->filterByElementKey($event->getElementKey())
+            ->filterByElementId($event->getElementId())
+            ->findOne();
+        $event->setMetaData($metaData);
+        if (null !== $metaData) {
+            $metaData->delete();
+        }
     }
 
     /**

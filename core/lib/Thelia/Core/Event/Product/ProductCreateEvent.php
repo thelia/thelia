@@ -98,7 +98,6 @@ class ProductCreateEvent extends ProductEvent
         return $this->virtual;
     }
 
-
     public function getBasePrice()
     {
         return $this->basePrice;
