@@ -214,7 +214,7 @@
 
                                                         <th>{intl l='Content title'}</th>
 
-                                                        {module_include location='category_contents_table_header'}
+                                                        {hook name="category.contents-table-header" location="category_contents_table_header" }
 
                                                         <th class="actions">{intl l="Actions"}</th>
                                                     </tr>
@@ -227,7 +227,7 @@
 
                                                         <td><a href="{url path="/admin/content/update/{$CONTENT_ID}"}">{$TITLE}</a></td>
 
-                                                        {module_include location='category_contents_table_row'}
+                                                        {hook name="category.contents-table-row" location="category_contents_table_row" }
 
                                                         <td class="actions">
                                                             <div class="btn-group">
@@ -275,7 +275,7 @@
                                         }
                                     </div>
 
-                                    {include file="includes/module-tab-content.html" location="category-edit"}
+                                    {include file="includes/module-tab-content.html" hook="category.tab-content" location="category-edit"}
 
                                 </div>
                              </div>
@@ -394,5 +394,5 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='category-edit-js'}
+    {hook name="category.edit-js" location="category-edit-js" }
 {/block}

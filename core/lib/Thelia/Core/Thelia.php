@@ -47,7 +47,7 @@ use Thelia\Model\ModuleQuery;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.3-beta';
+    const THELIA_VERSION = '2.0.3-beta2';
 
     public function init()
     {
@@ -74,7 +74,6 @@ class Thelia extends Kernel
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
-
     }
 
     /**
@@ -87,7 +86,6 @@ class Thelia extends Kernel
         if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
-
     }
 
     /**
@@ -117,7 +115,6 @@ class Thelia extends Kernel
     {
         // Get template path
         $templateDirectory = $module->getAbsoluteTemplateDirectoryPath($templateSubdirName);
-
         try {
             $templateDirBrowser = new \DirectoryIterator($templateDirectory);
 
@@ -197,7 +194,7 @@ class Thelia extends Kernel
                     }
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load("config.xml");
+                    $loader->load("config.xml", "module.".$module->getCode());
 
                     // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {

@@ -35,6 +35,7 @@ local/modules/*
 !local/modules/TheliaDebugBar/
 !local/modules/Tinymce/
 !local/modules/Colissimo/
+!local/modules/Hook*/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
@@ -47,3 +48,7 @@ templates/*
 codekit-config.json
 config.codekit
 .codekit-cache
+
+# Ignore casperjs screenshots
+tests/functionnal/casperjs/screenshot/
+

@@ -1,3 +1,9 @@
+#2.0.3-beta2
+- fix update process
+- fix coupons trait
+- update schema adding new constraints on foreign keys
+- previous url is now saved in session. use ```{navigate to="previous"}``` in your template
+
 #2.0.3-beta
 - New coupon type: Free product if selected products are in the cart.
 - New feature: Product Brands / Suppliers management

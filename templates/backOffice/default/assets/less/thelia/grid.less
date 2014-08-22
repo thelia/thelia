@@ -9,3 +9,35 @@
 	}
 
 }
+
+// -- BlocksIt : Dynamic grid layout --------------------------------
+
+.grid-container {
+  position:relative;
+  width: 100%;
+  margin:0 auto 25px;
+  padding-bottom: 10px;
+}
+.grid-box {
+  width: 33.333333%;
+  min-height:100px;
+  float:left;
+  -webkit-transition: top 1s ease, left 1s ease;
+  -moz-transition: top 1s ease, left 1s ease;
+  -o-transition: top 1s ease, left 1s ease;
+  -ms-transition: top 1s ease, left 1s ease;
+}
+
+@media screen and (max-width : @screen-tablet) {
+  .grid-box {
+    width: 50%;
+    min-height:100px;
+  }
+}
+
+@media screen and (max-width : @screen-phone) {
+  .grid-box {
+    width: 100%;
+    min-height:100px;
+  }
+}

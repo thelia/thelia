@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        {module_include location='administrators_top'}
+        {hook name="administrators.top" location="administrators_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -108,7 +108,7 @@
             </div>
         </div>
 
-        {module_include location='administrators_bottom'}
+        {hook name="administrators.bottom" location="administrators_bottom" }
 
     </div>
 </div>
@@ -197,7 +197,7 @@
 
         </div>
     {/form_field}
-    {module_include location='administrator_create_form'}
+    {hook name="administrator.create-form" location="administrator_create_form" }
 {/capture}
 
     {include
@@ -301,7 +301,7 @@
 
         </div>
     {/form_field}
-    {module_include location='administrator_update_form'}
+    {hook name="administrator.update-form" location="administrator_update_form" }
 {/capture}
 
     {include
@@ -326,7 +326,7 @@
 {capture "administrator_delete_dialog"}
     <input type="hidden" name="administrator_id" id="administrator_delete_id" value="" />
 
-    {module_include location='administrator_delete_form'}
+    {hook name="administrator.delete-form" location="administrator_delete_form" }
 
 {/capture}
 
@@ -401,5 +401,5 @@ jQuery(function($) {
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='administrators-js'}
+    {hook name="administrators.js" location="administrators-js" }
 {/block}

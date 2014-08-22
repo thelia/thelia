@@ -120,7 +120,7 @@
     				                                        }
     				                                    </th>
 
-    				                                    {module_include location='attributes_value_table_header'}
+    				                                    {hook name="attributes-value.table-header" location="attributes_value_table_header" }
 
     				                                    <th class="actions">{intl l="Actions"}</th>
     				                                </tr>
@@ -148,7 +148,7 @@
     				                                        }
     				                                    </td>
 
-    				                                    {module_include location='attributes_value_table_row'}
+    				                                    {hook name="attributes-value.table-row" location="attributes_value_table_row" }
 
     				                                    <td class="actions">
     				                                        <div class="btn-group">
@@ -239,7 +239,7 @@
             </div>
         {/form_field}
 
-        {module_include location='attribute_value_create_form'}
+        {hook name="attribute-value.create-form" location="attribute_value_create_form" }
 
     {/capture}
 
@@ -264,7 +264,7 @@
     <input type="hidden" name="attribute_id" value="{$attribute_id}" />
     <input type="hidden" name="attributeav_id" id="value_delete_id" value="" />
 
-    {module_include location='attribute_id_delete_form'}
+    {hook name="attribute.id-delete-form" location="attribute_id_delete_form" }
 {/capture}
 
 {include
@@ -326,5 +326,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='attribute-edit-js'}
+    {hook name="attribute.edit-js" location="attribute-edit-js" }
 {/block}

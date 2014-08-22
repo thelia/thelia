@@ -21,7 +21,7 @@
             </ul>
         </div>
 
-        {module_include location='module_configuration' module=$module_code}
+        {hook name="module.configuration" location="module_configuration"  modulecode="$module_code"}
 
     </div>
 </div>
@@ -29,5 +29,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='module-config-js'}
+    {hook name="module.config-js" location="module-config-js" }
 {/block}

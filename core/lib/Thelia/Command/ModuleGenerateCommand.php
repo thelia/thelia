@@ -79,8 +79,15 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
 
             // config.xml file
-            $fs->copy($skeletonDir . "config.xml", $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml");
+            $configContent = file_get_contents($skeletonDir . "config.xml");
 
+            $configContent = str_replace("%%CLASSNAME%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE_LOWER%%", strtolower($this->module), $configContent);
+
+            file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml", $configContent);
+
+            // module.xml file
             $moduleContent = file_get_contents($skeletonDir . "module.xml");
 
             $moduleContent = str_replace("%%CLASSNAME%%", $this->module, $moduleContent);

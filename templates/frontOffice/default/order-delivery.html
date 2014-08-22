@@ -27,6 +27,8 @@
 
             {include file="misc/checkout-progress.tpl" step="delivery"}
 
+            {hook name="order-delivery.top"}
+
             {form name="thelia.order.delivery"}
             {assign var="isPost" value="{$smarty.post|count}"}
             <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype form=$form}>
@@ -34,6 +36,8 @@
                 {form_hidden_fields form=$form}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                {hook name="order-delivery.form-top"}
 
                 {form_field form=$form field='delivery-address'}
 
@@ -126,11 +130,15 @@
 
                 {/form_field}
 
+                {hook name="order-delivery.form-bottom"}
+
                 <a href="{url path="/cart"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
                 <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
 
             </form>
             {/form}
+
+            {hook name="order-delivery.bottom"}
 
         </article>
     </div>
@@ -145,14 +153,24 @@
             $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
 
             $('.js-change-delivery-address').change(function(e) {
-                $('#delivery-module-list-block').load(
-                    '{url path="/order/deliveryModuleList"}',
-{literal}
-                    {country_id: $(this).data('country')}
-{/literal}
-                );
+                if (this.checked) {
+                    $('#delivery-module-list-block').load(
+                        '{url path="/order/deliveryModuleList"}',
+    {literal}
+                        {country_id: $(this).data('country')}
+    {/literal}
+                    );
+                }
             });
         });
     </script>
+    {hook name="order-delivery.after-javascript-initialization"}
+{/block}
 
+{block name="stylesheet"}
+{hook name="order-delivery.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="order-delivery.after-javascript-include"}
 {/block}

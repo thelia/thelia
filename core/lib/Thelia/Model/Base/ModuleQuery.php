@@ -72,6 +72,10 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery rightJoinOrderCouponModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderCouponModule relation
  * @method     ChildModuleQuery innerJoinOrderCouponModule($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderCouponModule relation
  *
+ * @method     ChildModuleQuery leftJoinModuleHook($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleHook relation
+ * @method     ChildModuleQuery rightJoinModuleHook($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleHook relation
+ * @method     ChildModuleQuery innerJoinModuleHook($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleHook relation
+ *
  * @method     ChildModuleQuery leftJoinModuleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery rightJoinModuleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleI18n relation
  * @method     ChildModuleQuery innerJoinModuleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleI18n relation
@@ -1090,6 +1094,79 @@ abstract class ModuleQuery extends ModelCriteria
         return $this
             ->joinOrderCouponModule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'OrderCouponModule', '\Thelia\Model\OrderCouponModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ModuleHook object
+     *
+     * @param \Thelia\Model\ModuleHook|ObjectCollection $moduleHook  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByModuleHook($moduleHook, $comparison = null)
+    {
+        if ($moduleHook instanceof \Thelia\Model\ModuleHook) {
+            return $this
+                ->addUsingAlias(ModuleTableMap::ID, $moduleHook->getModuleId(), $comparison);
+        } elseif ($moduleHook instanceof ObjectCollection) {
+            return $this
+                ->useModuleHookQuery()
+                ->filterByPrimaryKeys($moduleHook->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByModuleHook() only accepts arguments of type \Thelia\Model\ModuleHook or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ModuleHook relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function joinModuleHook($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ModuleHook');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ModuleHook');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ModuleHook relation ModuleHook object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ModuleHookQuery A secondary query class using the current class as primary query
+     */
+    public function useModuleHookQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinModuleHook($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleHook', '\Thelia\Model\ModuleHookQuery');
     }
 
     /**

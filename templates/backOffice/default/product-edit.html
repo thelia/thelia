@@ -123,7 +123,7 @@
                                         }
                                     </div>
 
-                                    {include file="includes/module-tab-content.html" location="product-edit"}
+                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit"}
                                 </div>
 
                              </div>
@@ -413,12 +413,80 @@ $(function() {
 
     	$('#number_of_generated_combinations').text(total);
     });
+
+    $(".pse-assoc-image-document").click(function() {
+        var $this = $(this);
+        var type = "none";
+        var toggle_event = "";
+
+
+        if ($this.hasClass("pse-assoc-image")) {
+            type = "image";
+            toggle_event = "click";
+        } else if ($this.hasClass("pse-assoc-document")) {
+            type = "document";
+            toggle_event = "switch-change";
+        }
+
+        var $modal_container = $("#pse-modal-container");
+        var pse_id = $(this).data("id");
+
+        $.ajax(
+            "{url path="/admin/product_sale_elements/ajax/"}"+ type + "/" + pse_id
+        ).done(function(data) {
+            $modal_container.html(data);
+
+            $("#pse-image-document-assoc-modal").modal();
+
+            $(".do-associate").on(toggle_event, function(e, data) {
+                var $file = $(this);
+                var type_id = $file.data("id");
+
+                $.ajax(
+                    "{url path='/admin/product_sale_elements'}/"+pse_id+"/"+type+"/"+type_id
+                ).done(function() {
+                    /**
+                     * If the modal is for images, add some graphics
+                     */
+                    if (type == "image") {
+                        if ($file.hasClass("is-associated")) {
+                            $file.removeClass("is-associated");
+                            $(".product-pse-image-join-glyphicon", $file.parent()).remove();
+                        } else {
+                            $file.addClass("is-associated");
+                            $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
+                        }
+                    }
+                }).fail(function(data) {
+                    $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");
+
+                    $body.html($errorMessage + $body.html());
+                });
+            });
+        }).fail(function(data) {
+            var $modal_title = $("#associate_images_documents_label");
+            var $body = $(".modal-body", $modal_container);
+
+            $modal_title.html("{intl l='Error'}");
+
+            var error_message = data["error"];
+            if (!error_message || error_message.length === 0) {
+                error_message = "{intl l='An unknown error occured, please try again.'}";
+            }
+
+            $body.html("<p>"+error_message+"</p>");
+
+            $("#pse-assoc-image-document-modal").modal();
+        });
+    });
+
 });
+
 </script>
 
 
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='product-edit-js'}
+    {hook name="product.edit-js" location="product-edit-js" }
 {/block}

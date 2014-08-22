@@ -32,41 +32,43 @@ abstract class FirewallForm extends BaseForm
     const DEFAULT_TIME_TO_WAIT = 60; // 1 hour
     const DEFAULT_ATTEMPTS = 6;
 
-    public function isFirewallOk()
+    public function isFirewallOk($env)
     {
-        /**
-         * Empty the firewall
-         */
-        $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60 );
-        $collection = FormFirewallQuery::create()
-            ->filterByFormName($this->getName())
-            ->filterByUpdatedAt($deleteTime, Criteria::LESS_THAN)
-            ->find();
+        if ($env === "prod") {
+            /**
+             * Empty the firewall
+             */
+            $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60 );
+            $collection = FormFirewallQuery::create()
+                ->filterByFormName($this->getName())
+                ->filterByUpdatedAt($deleteTime, Criteria::LESS_THAN)
+                ->find();
 
-        $collection->delete();
+            $collection->delete();
 
-        $firewallInstance = FormFirewallQuery::create()
-            ->filterByFormName($this->getName())
-            ->filterByIpAddress($this->request->getClientIp())
-            ->findOne()
-        ;
+            $firewallInstance = FormFirewallQuery::create()
+                ->filterByFormName($this->getName())
+                ->filterByIpAddress($this->request->getClientIp())
+                ->findOne()
+            ;
 
-        if ($this->isFirewallActive() && null !== $firewallInstance) {
-            if ($firewallInstance->getAttempts() < $this->getConfigAttempts()) {
-                $firewallInstance->incrementAttempts();
+            if ($this->isFirewallActive() && null !== $firewallInstance) {
+                if ($firewallInstance->getAttempts() < $this->getConfigAttempts()) {
+                    $firewallInstance->incrementAttempts();
+                } else {
+                    /** Set updated_at at NOW() */
+                    $firewallInstance->save();
+
+                    return false;
+                }
             } else {
-                /** Set updated_at at NOW() */
+                $firewallInstance = (new FormFirewall())
+                    ->setIpAddress($this->request->getClientIp())
+                    ->setFormName($this->getName())
+                ;
                 $firewallInstance->save();
 
-                return false;
             }
-        } else {
-            $firewallInstance = (new FormFirewall())
-                ->setIpAddress($this->request->getClientIp())
-                ->setFormName($this->getName())
-            ;
-            $firewallInstance->save();
-
         }
 
         return true;

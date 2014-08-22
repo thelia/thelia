@@ -322,7 +322,7 @@
                     </div>
                 </div>
 
-            {module_include location='customer-edit'}
+            {hook name="customer.edit" location="customer-edit" }
 
     		{/loop}
 
@@ -348,7 +348,7 @@
 
         {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
 
-        {module_include location='customer_address_create_form'}
+        {hook name="customer.address-create-form" location="customer_address_create_form" }
 
     {/capture}
 
@@ -380,7 +380,7 @@
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
 	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
-            {module_include location='customer_address_update_form'}
+            {hook name="customer.address-update-form" location="customer_address_update_form" }
 	    {/capture}
 
 	    {include
@@ -429,7 +429,7 @@
     <input type="hidden" name="customer_id" value="{$customer_id}">
     <input type="hidden" name="page" value="{$page}">
 
-    {module_include location='customer_address_delete_form'}
+    {hook name="customer.address-delete-form" location="customer_address_delete_form" }
 {/capture}
 
 {include
@@ -490,5 +490,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='customer-edit-js'}
+    {hook name="customer.edit-js" location="customer-edit-js" }
 {/block}

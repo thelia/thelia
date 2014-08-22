@@ -101,6 +101,16 @@ class SmartyParser extends Smarty implements ParserInterface
     }
 
     /**
+     * Return the current request or null if no request exists
+     *
+     * @return Request|null
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
      * Trim whitespaces from the HTML output, preserving required ones in pre, textarea, javascript.
      * This methois uses 3 levels of trimming :
      *

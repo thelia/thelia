@@ -11,10 +11,13 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\EventListener;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
 
 /**
  * Class RequestListener
@@ -54,6 +57,43 @@ class RequestListener implements EventSubscriberInterface
     }
 
     /**
+     * Save the previous URL in session which is based on the referer header of the request
+     *
+     * @param GetResponseEvent $event
+     */
+    public function registerPreviousUrl(GetResponseEvent $event)
+    {
+
+        $request = $event->getRequest();
+
+        // set previous URL
+        if (null !== $referer = $request->headers->get('referer')) {
+
+            $session = $request->getSession();
+
+            if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+
+                $components = parse_url($referer);
+                $lang = LangQuery::create()
+                    ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
+                    ->findOne();
+
+                if (null !== $lang) {
+                    $session->setReturnToUrl($referer);
+                }
+
+            } else {
+
+                if ( false !== strpos($referer, $request->getSchemeAndHttpHost())) {
+                    $session->setReturnToUrl($referer);
+                }
+
+            }
+        }
+
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -76,7 +116,10 @@ class RequestListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array("registerValidatorTranslator", 128)
+            KernelEvents::REQUEST => array(
+                array("registerValidatorTranslator", 128),
+                array("registerPreviousUrl", 128)
+            )
         );
     }
 }

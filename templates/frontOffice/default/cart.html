@@ -20,6 +20,8 @@
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
 
+            {hook name="cart.top"}
+
             <table class="table table-cart">
                 <colgroup>
                     <col width="150">
@@ -85,11 +87,11 @@
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{$PROMO_TAXED_PRICE} {currency attr="symbol"}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></small>
+                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{$TAXED_PRICE} {currency attr="symbol"}</span></div>
+                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
@@ -112,7 +114,7 @@
                             </div>
                         </td>
                         <td class="subprice">
-                            <span class="price">{$real_price * $QUANTITY} {currency attr="symbol"}</span>
+                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
                         </td>
                     </tr>
                     {/loop}
@@ -151,9 +153,9 @@
                                 {/if}
                             </form>
                         </td>
-                        <td class="unitprice">{$postage} {currency attr="symbol"}</td>
+                        <td class="unitprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
                         <td class="qty">-</td>
-                        <td class="subprice">{$postage} {currency attr="symbol"}</td>
+                        <td class="subprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
                     </tr>
                     {/postage}
                 </tbody>
@@ -164,7 +166,7 @@
                     <td class="total">
                         <div class="total-price">
                             {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
-                            <span class="price">{$totalAmount} {currency attr="symbol"}</span>
+                            <span class="price">{format_money number=$totalAmount symbol={currency attr="symbol"}}</span>
                         </div>
                     </td>
                 </tr>
@@ -180,6 +182,8 @@
                     <strong>{intl l="Warning"}!</strong> {intl l="You have no items in your shopping cart."}
                 </div>
             {/elseloop}
+
+            {hook name="cart.bottom"}
 
         </article>
 
@@ -218,5 +222,13 @@
         })
     });
 </script>
+{hook name="cart.after-javascript-include"}
 {/block}
 
+{block name="stylesheet"}
+{hook name="cart.stylesheet"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="cart.javascript-initialization"}
+{/block}

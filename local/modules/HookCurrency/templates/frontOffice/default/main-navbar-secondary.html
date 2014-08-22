@@ -1,0 +1,10 @@
+<ul class="nav navbar-nav navbar-currency navbar-left">
+    <li class="dropdown">
+        <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown">{currency attr="code"}</a>
+        <ul class="dropdown-menu">
+            {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
+            <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+            {/loop}
+        </ul>
+    </li>
+</ul>

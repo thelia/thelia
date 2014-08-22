@@ -120,45 +120,52 @@
     .clear-none {
         padding: 0.5%;
     }
+	
+	{hook name="invoice.css"}
 
 </style>
 {/literal}
 <page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
     <page_header>
+		{hook name="invoice.header" order="{$order_id}"}
     </page_header>
 
     <page_footer>
+		{hook name="invoice.footer-top" order="{$order_id}"}
         <table>
             <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
             <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
             <tbody>
             <tr>
                 <td>
-                    <!-- Imprint -->
-                    {config key="store_name"}
-                    {$addresses="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}"}
-                    {$city="{config key="store_zipcode"} {config key="store_city"}"}
-                    {if $addresses != "  "}- {$addresses}{/if}
-                    {if $city != " " }- {$city}{/if}
-                    {if {config key="store_country"} }
-                        {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
-                    {/if}
-                    {if {config key="store_business_id"} }
-                        - {config key="store_business_id"}
-                    {/if}
-                    <br>
-                    {if {config key="store_phone"} }
-                        {intl l="Phone: "}{config key="store_phone"}
-                    {/if}
-                    {if {config key="store_email"} }
-                        {intl l="Email: "}{config key="store_email"}
-                    {/if}
-
+					{hook name="invoice.imprint" order="{$order_id}"}
+					{elsehook rel="invoice.imprint"}
+						<!-- Imprint -->
+		                {config key="store_name"}
+		                {$addresses="{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}"}
+		                {$city="{config key="store_zipcode"} {config key="store_city"}"}
+		                {if $addresses != "  "}- {$addresses}{/if}
+		                {if $city != " " }- {$city}{/if}
+		                {if {config key="store_country"} }
+		                    {loop type="country" name="address.country.title" id={config key="store_country"}} - {$TITLE}{/loop}
+		                {/if}
+		                {if {config key="store_business_id"} }
+		                    - {config key="store_business_id"}
+		                {/if}
+		                <br>
+		                {if {config key="store_phone"} }
+		                    {intl l="Phone: "}{config key="store_phone"}
+		                {/if}
+		                {if {config key="store_email"} }
+		                    {intl l="Email: "}{config key="store_email"}
+		                {/if}
+					{/elsehook}
                 </td>
                 <td>{intl l="page"} [[page_cu]]/[[page_nb]]</td>
             </tr>
             </tbody>
         </table>
+		{hook name="invoice.footer-bottom" order="{$order_id}"}
     </page_footer>
 
     {$taxes = []}
@@ -183,7 +190,16 @@
         <tr>
             <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
         </tr>
+		{hookblock name="invoice.information" order="{$order_id}"}
+        {forhook rel="invoice.information"}
+        <tr>
+            <td><h3>{$title} : <span>{$value}</span></h3></td>
+        </tr>
+        {/forhook}
+        {/hookblock}
     </table>
+	
+	{hook name="invoice.after-information" order="{$order_id}"}
 
     <table class="table-address">
         <col style="width: 50%; padding: 3mm;" />
@@ -191,7 +207,12 @@
         <tr>
             <td style="border-left: solid 1mm #f6993c;" >
                 <h3>{intl l="Delivery address"}</h3>
-                <p>
+				{ifhook rel="invoice.delivery-address"}
+                    {* delivery module can customize the delivery address *}
+                    {hook name="invoice.delivery-address" module="{order attr="delivery_module"}" order="{$order_id}"}
+                {/ifhook}
+                {elsehook rel="invoice.delivery-address"}                
+				<p>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
@@ -199,6 +220,7 @@
                     {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
                     {/loop}
                 </p>
+               	{/elsehook}
             </td>
             <td style="border-left: solid 1mm #f6993c;">
                 <h3>{intl l="Invoice address"}</h3>
@@ -213,6 +235,8 @@
             </td>
         </tr>
     </table>
+
+    {hook name="invoice.after-addresses" order="{$order_id}"}
 
     <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
         <col style="width: 40%; padding: 1mm;" />
@@ -256,11 +280,12 @@
                 <td><p class="align-right">{format_money number=$realTax symbol=$orderCurrency}</p></td>
                 <td><p class="align-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
                 <td><p class="align-center">{$QUANTITY}</p></td>
-                <td><p class="align-right">{format_money number="$realTaxedPrice * $QUANTITY" symbol=$orderCurrency}</p></td>
+                <td><p class="align-right">{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
             </tr>
         {/loop}
     </table>
 
+{hook name="invoice.after-products" order="{$order_id}"}
 
     <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
         <col style="width: 60%; padding: 1mm;" />
@@ -332,6 +357,8 @@
             </td>
         </tr>
     </table>
+
+{hook name="invoice.after-summary" order="{$order_id}"}
 
 {/loop}
 </page>

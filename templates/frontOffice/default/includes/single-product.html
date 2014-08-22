@@ -9,6 +9,8 @@
 	   {assign var="product_id" value=$ID}
 	{/if}
     <article itemscope itemtype="http://schema.org/Product">
+		
+		{hook name="singleproduct.top" product="{$product_id}"}
 
         <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
@@ -48,10 +50,10 @@
                 <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
                 <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
                 {if $IS_PROMO }
-                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_number number=$TAXED_PROMO_PRICE} {currency attr="symbol"}</span></span>
-                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_number number=$TAXED_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
+                    <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
                 {else}
-                    <span class="regular-price"><span itemprop="price" class="price">{format_number number=$BEST_TAXED_PRICE} {currency attr="symbol"}</span></span>
+                    <span class="regular-price"><span itemprop="price" class="price">{format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
                 {/if}
             </div>
 
@@ -101,5 +103,8 @@
                 {/if}
             {/if}
         </div>
+
+        {hook name="singleproduct.bottom" product="{$product_id}"}
+
     </article><!-- /product -->
 </li>

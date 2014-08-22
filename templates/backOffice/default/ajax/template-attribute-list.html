@@ -38,7 +38,7 @@
 
             <th class="text-center">{intl l='Position'}</th>
 
-            {module_include location='template_attributes_table_header'}
+            {hook name="template.attributes-table-header" location="template_attributes_table_header" }
 
             <th class="actions">{intl l="Actions"}</th>
         </tr>
@@ -63,7 +63,7 @@
              }
             </td>
 
-            {module_include location='template_attributes_table_row'}
+            {hook name="template.attributes-table-row" location="template_attributes_table_row" }
 
             <td class="actions">
                 <div class="btn-group">

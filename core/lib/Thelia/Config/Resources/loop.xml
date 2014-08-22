@@ -26,6 +26,8 @@
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
         <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path"/>
         <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
+        <loop class="Thelia\Core\Template\Loop\Hook" name="hook"/>
+        <loop class="Thelia\Core\Template\Loop\ModuleHook" name="module_hook"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
         <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>

@@ -79,6 +79,8 @@ class XmlFileLoader extends FileLoader
 
         $this->parseDefinitions($xml, $path);
 
+        $this->parseHooks($xml, $path, $type);
+
         $this->propelOnlyRun(
             [$this, "parseExportCategories"],
             $xml,
@@ -255,14 +257,55 @@ class XmlFileLoader extends FileLoader
         }
     }
 
+    protected function parseDefinition($id, $service, $file)
+    {
+        $definition = $this->parseService($id, $service, $file);
+        if (null !== $definition) {
+            $this->container->setDefinition($id, $definition);
+        }
+    }
+
+    /**
+     * Parses multiple definitions
+     *
+     * @param SimpleXMLElement $xml
+     * @param string           $file
+     * @param string           $type
+     */
+    protected function parseHooks(SimpleXMLElement $xml, $file, $type)
+    {
+        if (false === $hooks = $xml->xpath('//config:hooks/config:hook')) {
+            return;
+        }
+        foreach ($hooks as $hook) {
+            $this->parseHook((string) $hook['id'], $hook, $file, $type);
+        }
+    }
+
+    protected function parseHook($id, $hook, $file, $type)
+    {
+        $definition = $this->parseService($id, $hook, $file);
+        if (null !== $definition) {
+            if (null !== $type) {
+                // inject the BaseModule
+                $definition->setProperty('module', new Reference($type));
+            }
+            $definition->setProperty('parser', new Reference('thelia.parser'));
+            $definition->setProperty('translator', new Reference('thelia.translator'));
+            $definition->setProperty('assetsManager', new Reference('assetic.asset.manager'));
+            $this->container->setDefinition($id, $definition);
+        }
+    }
+
     /**
      * Parses an individual Definition
      *
-     * @param string           $id
-     * @param SimpleXMLElement $service
-     * @param string           $file
+     * @param  string           $id
+     * @param  SimpleXMLElement $service
+     * @param  string           $file
+     * @return Definition
      */
-    protected function parseDefinition($id, $service, $file)
+    protected function parseService($id, $service, $file)
     {
 
         if ((string) $service['alias']) {
@@ -326,7 +369,7 @@ class XmlFileLoader extends FileLoader
             $definition->addTag((string) $tag['name'], $parameters);
         }
 
-        $this->container->setDefinition($id, $definition);
+        return $definition;
     }
 
     protected function parseExportCategories(SimpleXMLElement $xml)

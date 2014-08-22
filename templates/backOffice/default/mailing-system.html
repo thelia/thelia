@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/mailingSystem'}">{intl l="Mailing system"}</a></li>
         </ul>
 
-        {module_include location='mailing_system_top'}
+        {hook name="mailing-system.top" location="mailing_system_top" }
 
         <div class="row">
             <div class="col-md-12">
@@ -124,7 +124,25 @@
             </div>
         </div>
 
-        {module_include location='mailing_system_bottom'}
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <div class="title title-without-tabs">{intl l="Test your configuration"}</div>
+
+                    <form id="test-configuration" class="form-inline" onsubmit="return false;" role="form">
+                        <div class="form-group">
+                            <label class="sr-only" for="test-email">{intl l="Your email"}</label>
+                            <input type="text" class="form-control" id="test-email" name="test-email" value="{config key="store_email"}">
+                        </div>
+                        <button type="button" id="test-send" class="btn btn-default btn-primary">{intl l="Send"}</button>
+                        <div>&nbsp;</div>
+                        <div id="test-result"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {hook name="mailing-system.bottom" location="mailing_system_bottom" }
 
     </div>
 </div>
@@ -141,11 +159,41 @@ jQuery(function($) {
     $('#enable-smtp').on('switch-change', function (e, data) {
         $('#smtp_enabled').val(data.value ? 1 : 0);
     });
+
+    $('#test-send').on("click", function(e){
+        e.preventDefault();
+
+        $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+        $.ajax({
+            url: '{url path="/admin/configuration/mailingSystem/test"}',
+            data: {
+                email: $('#test-email').val()
+            },
+            type: "GET",
+            dataType: "json"
+        }).done(function(data){
+            var messages = '',
+                    i = 0
+            $("#loading-event").remove();
+            if (data.success){
+                $("#test-result").removeClass("alert alert-danger").html(data.message);
+            } else {
+                $("#test-result").addClass("alert alert-danger").html(data.message);
+            }
+        })
+        .fail(function(jqXHR, textStatus, errorThrown){
+            $("#loading-event").remove();
+            $("#test-result").html(textStatus).addClass("alert alert-danger");
+        });
+
+    });
+
 });
 
 </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='mainling-system-js'}
+    {hook name="mailing-system.js" location="mainling-system-js" }
 {/block}

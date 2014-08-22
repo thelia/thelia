@@ -173,7 +173,7 @@
                                             }
                                         </div>
 
-                                        {include file="includes/module-tab-content.html" location="content-edit"}
+                                        {include file="includes/module-tab-content.html" hook="content.tab-content" location="content-edit"}
                                     </div>
                                 </div>
                             </div>
@@ -282,5 +282,5 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='content-edit-js'}
+    {hook name="content.edit-js" location="content-edit-js" }
 {/block}

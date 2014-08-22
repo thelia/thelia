@@ -101,7 +101,7 @@
                                             </td>
                                         {/elseloop}
                                     </tbody>
-                                    {module_include location='shipping-configuration-edit'}
+                                    {hook name="shipping-configuration.edit" location="shipping-configuration-edit" }
                                 </table>
                             </div>
                         </div>
@@ -128,7 +128,7 @@
         <input type="hidden" name="area_id" value="{$area_id}">
         <input type="hidden" name="country_id" id="delete-country-id" value="">
 
-        {module_include location='shipping_configuration_delete_form'}
+        {hook name="shipping-configuration.country-delete-form" location="shipping_configuration_country_delete_form" }
     {/capture}
 
     {include
@@ -161,5 +161,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='shipping-configuration-edit-js'}
+    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" }
 {/block}

@@ -423,7 +423,20 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductDefaultSaleElementAction</default>
     </route>
 
+    <!-- Associate a product_sale_elements with a product document / image -->
 
+    <route id="admin.product_sale_elements.document_image_assoc" path="/admin/product_sale_elements/{pseId}/{type}/{typeId}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::productSaleElementsProductImageDocumentAssociation</default>
+        <requirement key="pseId">\d+</requirement>
+        <requirement key="type">.+</requirement>
+        <requirement key="typeId">\d+</requirement>
+    </route>
+
+    <route id="admin.product_sale_elements.document_image_assoc.get_assoc" path="/admin/product_sale_elements/ajax/{type}/{id}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getAjaxProductSaleElementsImagesDocuments</default>
+        <requirement key="id">\d+</requirement>
+        <requirement key="type">.+</requirement>
+    </route>
 
 
     <!--  Folder routes management -->
@@ -920,6 +933,10 @@
         <default key="_controller">Thelia\Controller\Admin\MailingSystemController::updateAction</default>
     </route>
 
+    <route id="admin.configuration.mailing-system.test" path="/admin/configuration/mailingSystem/test">
+        <default key="_controller">Thelia\Controller\Admin\MailingSystemController::testAction</default>
+    </route>
+
     <!-- end mailing-system management -->
 
     <!-- admin logs display -->
@@ -1027,7 +1044,7 @@
 
     <route id="admin.module.toggle-activation" path="/admin/module/toggle-activation/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
-        <requirement key="module_id">\d+</requirement>
+        <requirement key="module_hook_id">\d+</requirement>
     </route>
 
     <route id="admin.module.delete" path="/admin/module/delete">
@@ -1037,7 +1054,6 @@
     <route id="admin.module.update-position" path="/admin/module/update-position">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
     </route>
-
     <!--
         Generic module route.
         Will be use if module route is not define in module own config file.
@@ -1047,6 +1063,79 @@
     </route>
 
     <!-- end Modules rule management -->
+
+    <!-- Hooks rule management -->
+
+    <route id="admin.hook" path="/admin/hooks">
+        <default key="_controller">Thelia\Controller\Admin\HookController::indexAction</default>
+    </route>
+
+    <route id="admin.hook.discover" path="/admin/hooks/discover">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverAction</default>
+    </route>
+
+    <route id="admin.hook.discover.save" path="/admin/hooks/discover/save">
+        <default key="_controller">Thelia\Controller\Admin\HookController::discoverSaveAction</default>
+    </route>
+
+    <route id="admin.hook.create" path="/admin/hooks/create">
+        <default key="_controller">Thelia\Controller\Admin\HookController::createAction</default>
+    </route>
+
+    <route id="admin.hook.update" path="/admin/hook/update/{hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\HookController::updateAction</default>
+        <requirement key="hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.hook.save" path="/admin/hook/save/{hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\HookController::processUpdateAction</default>
+        <requirement key="hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.hook.delete" path="/admin/hooks/delete">
+        <default key="_controller">Thelia\Controller\Admin\HookController::deleteAction</default>
+    </route>
+
+    <route id="admin.hook.toggle-activation" path="/admin/hook/toggle-activation">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleActivationAction</default>
+    </route>
+
+    <route id="admin.hook.toggle-native" path="/admin/hook/toggle-native">
+        <default key="_controller">Thelia\Controller\Admin\HookController::toggleNativeAction</default>
+    </route>
+
+    <route id="admin.module-hook" path="/admin/module-hooks">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::indexAction</default>
+    </route>
+
+    <route id="admin.module-hook.create" path="/admin/module-hooks/create">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::createAction</default>
+    </route>
+
+    <route id="admin.module-hook.update" path="/admin/module-hook/update/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updateAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.save" path="/admin/module-hook/save/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::processUpdateAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.delete" path="/admin/module-hooks/delete">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::deleteAction</default>
+    </route>
+
+    <route id="admin.module-hook.toggle-activation" path="/admin/module-hooks/toggle-activation/{module_hook_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::toggleActivationAction</default>
+        <requirement key="module_hook_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module-hook.update-position" path="/admin/module-hooks/update-position">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updatePositionAction</default>
+    </route>
+
+    <!-- end Hooks rule management -->
 
     <!-- tax management -->
 

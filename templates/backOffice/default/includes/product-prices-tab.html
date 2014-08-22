@@ -144,7 +144,7 @@
 			                  </div>
                           {/form_field}
 
-			              {module_include location='product_details_pricing_form'}
+			              {hook name="product.details-pricing-form" location="product_details_pricing_form" }
 			          </div>
 		        </div>
 
@@ -186,7 +186,7 @@
                             </div>
                          {/form_field}
 
-                         {module_include location='product_details_details_form'}
+                         {hook name="product.details-details-form" location="product_details_details_form" }
                     </div>
                 </div>
 
@@ -240,7 +240,7 @@
 			            </div>
 			            {/form_field}
 
-			            {module_include location='product_details_promotion_form'}
+			            {hook name="product.details-promotion-form" location="product_details_promotion_form" }
 			        </div>
                 </div>
 	        </div>
@@ -327,13 +327,13 @@
 					    </div>
 					</div>
 
-	                {module_include location='product_before_combinations'}
+	                {hook name="product.before-combinations" location="product_before_combinations" }
 
 					<table class="table table-striped table-condensed" id="category_list">
 					    <caption>
 					        {intl l='Attribute Combinations'}
 
-					        {module_include location='product_combinations_list_caption'}
+					        {hook name="product.combinations-list-caption" location="product_combinations_list_caption" }
 
 					        {loop type="auth" name="can_create" role="ADMIN" resource="admin.product" access="UPDATE"}
                             <a class="btn btn-default btn-primary action-btn" id="open_combination_builder" title="{intl l='Quickly create combinations using the combination builder'}" href="#combination_builder_dialog" data-toggle="modal">
@@ -375,13 +375,21 @@
 
 			                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
 			                        <input type="hidden" name="{$name}" value="{$value}" />
-
                                     {$current_pse_id = $value}
 
 	                                {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
 	                                    {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
 	                                {/loop}
                                 {/form_field}
+
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-xs pse-assoc-image pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate images"}">
+                                            <span class="glyphicon glyphicon-picture"></span>
+                                        </a>
+                                        <a class="btn btn-default btn-xs pse-assoc-document pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate documents"}">
+                                            <span class="glyphicon glyphicon-file"></span>
+                                        </a>
+                                    </div>
                                 </td>
 
                                 <td colspan="2" class="text-right">ID: {$current_pse_id}</td>
@@ -453,7 +461,7 @@
 					    </tbody>
 					</table>
 
-	                {module_include location='product_after_combinations'}
+	                {hook name="product.after-combinations" location="product_after_combinations" }
 
 
                     {include
@@ -492,8 +500,27 @@
 		</div>
     {/if}
 
-{module_include location='product_after_combinations'}
-	</div>
+    {hook name="product.after-combinations" location="product_after_combinations" }
+
+</div>
+
+{* PSE / Image-Document combination modal *}
+<div id="pse-modal-container">
+    <div class="modal fade" id="pse-assoc-image-document-modal" tabindex="-1" role="dialog" aria-labelledby="associate_images_documents_label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="associate_images_documents_label"></h4>
+                </div>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {* -- Adding a new combination ------------------------------------------------- *}
 
@@ -583,7 +610,7 @@
 
     <input type="hidden" name="product_sale_element_id" id="combination_delete_id" value="" />
 
-    {module_include location='category_delete_form'}
+    {hook name="product.combination-delete-form" location="product_combination_delete_form" }
 
 {/capture}
 

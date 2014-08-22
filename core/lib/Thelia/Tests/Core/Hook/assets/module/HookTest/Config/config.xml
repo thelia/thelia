@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+    </loops>
+
+    <forms>
+    </forms>
+
+    <commands>
+    </commands>
+
+    <!--
+    hook list:
+
+    main.head-top
+    main.stylesheet
+    main.head-bottom
+    main.body-top
+    main.header-top
+    main.navbar-secondary
+    main.navbar-primary
+    main.header-bottom
+    main.content-top
+    main.content-bottom
+    main.footer-top
+    main.footer-body (block)
+    main.footer-bottom
+    main.after-javascript-include
+    main.javascript-initialization
+    main.body-bottom
+
+    home.body
+    home.stylesheet
+    home.after-javascript-include
+    home.after-javascript-initialization
+
+    order-delivery.extra (module)
+    -->
+
+    <hooks>
+        <hook id="hooktest.hook.front" class="HookTest\Hook\FrontHook" scope="request">
+            <!-- test: hook tag -->
+            <tag name="hook.event_listener" event="main.head-top" />
+            <tag name="hook.event_listener" event="main.head-top" method="onMainHeadTopTest1" />
+            <tag name="hook.event_listener" event="main.head-top" method="onMainHeadTopTest2" type="front" />
+            <tag name="hook.event_listener" event="main.head-top" method="onMainHeadTopTest3" type="front" active="0" />
+
+            <!-- test: hook function -->
+            <tag name="hook.event_listener" event="main.body-top" />
+            <tag name="hook.event_listener" event="main.body-top" method="onMainBodyTop2" />
+
+            <!-- test: if hook -->
+            <tag name="hook.event_listener" event="main.navbar-secondary" />
+            <tag name="hook.event_listener" event="main.navbar-primary" />
+
+            <!-- test: hookblock / forhook -->
+            <tag name="hook.event_listener" event="main.footer-body" />
+
+            <!-- test: functionality -->
+            <tag name="hook.event_listener" event="main.content-top" />
+            <!-- render function-->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopRender" />
+            <!-- dump function-->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopDump" />
+            <!-- addCSS function-->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopAddCSS" />
+            <!-- addJS function-->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopAddJS" />
+            <!-- trans function-->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopTrans" />
+
+            <!-- overriding -->
+            <tag name="hook.event_listener" event="main.content-top" method="onMainContentTopOverriding" />
+
+
+        </hook>
+    </hooks>
+
+</config>

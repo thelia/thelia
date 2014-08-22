@@ -22,7 +22,7 @@
                 </ul>
             </div>
 
-            {module_include location='taxes_rules_top'}
+            {hook name="taxes-rules.top" location="taxes_rules_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -146,7 +146,7 @@
                 </div>
             </div>
 
-            {module_include location='taxes_rules_bottom'}
+            {hook name="taxes-rules.bottom" location="taxes_rules_bottom" }
 
         </div>
     </div>
@@ -225,7 +225,7 @@
             </div>
         {/form_tagged_fields}
 
-        {module_include location='tax_create_form'}
+        {hook name="tax.create-form" location="tax_create_form" }
 
     {/capture}
 
@@ -251,7 +251,7 @@
     {capture "tax_delete_dialog"}
         <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
 
-        {module_include location='tax_delete_form'}
+        {hook name="tax.delete-form" location="tax_delete_form" }
 
     {/capture}
 
@@ -303,7 +303,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
                 <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{/if}</textarea>
             </div>
         {/form_field}
-        {module_include location='tax_rule_create_form'}
+        {hook name="tax-rule.create-form" location="tax_rule_create_form" }
     {/capture}
 
         {include
@@ -328,7 +328,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     {capture "tax_rule_delete_dialog"}
         <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
 
-        {module_include location='tax_rule_delete_form'}
+        {hook name="tax-rule.delete-form" location="tax_rule_delete_form" }
 
     {/capture}
 
@@ -387,5 +387,5 @@ form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {module_include location='taxes-rules-js'}
+    {hook name="taxes-rules.js" location="taxes-rules-js" }
 {/block}

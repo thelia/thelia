@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
@@ -98,6 +99,8 @@ class SmartyAssetsManager
         $debug            = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $webAssetTemplate = isset($params['template']) ? $params['template'] : false;
 
+        $assetSource = "";
+
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
         while (substr($file, 0, 3) == '../') {
@@ -113,29 +116,15 @@ class SmartyAssetsManager
         // if it's not a custom template and looking for a different origin (e.g. module)
         // we first check if the asset is present in the default "source" (template)
         // if not we take the default asset from the assetOrigin (module)
-        if (! $webAssetTemplate && $assetOrigin !== "0") {
-            if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
-                if (file_exists($templateDirectories[$templateDefinition->getName()]["0"] . DS . $file)) {
-                    // the file exists, we take the default origin
-                    $assetOrigin = "0";
-                }
+
+        $paths = $this->getFallbackSources($templateDirectories, $templateDefinition->getName(), $assetOrigin);
+
+        foreach ($paths as $path) {
+            if ($this->filesExist($path, $file)) {
+                $assetSource = $path;
+                break;
             }
         }
-
-        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-            // we try with the default origin
-            if (! $webAssetTemplate && $assetOrigin !== "0") {
-                $assetOrigin = "0";
-            } else {
-                throw new \Exception("Failed to get real path of '/".dirname($file)."'");
-            }
-        }
-
-        if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-            throw new \Exception("Failed to get real path of '/".dirname($file)."'");
-        }
-
-        $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
 
         if (DS != '/') {
             // Just to be sure to generate a clean pathname
@@ -145,12 +134,8 @@ class SmartyAssetsManager
         $url = "";
 
         // test if file exists before running the process
-        $finder = new Finder();
 
-        $files = $finder->files()->in($assetSource)->name($file);
-
-        if (! empty($files)) {
-
+        if ("" !== $assetSource) {
             $url = $this->assetsManager->processAsset(
                 $assetSource . DS . $file,
                 $assetSource . DS . self::$assetsDirectory,
@@ -163,10 +148,69 @@ class SmartyAssetsManager
                 $debug
             );
         } else {
-            Tlog::getInstance()->addError("Asset $assetSource".DS."$file was not found.");
+            Tlog::getInstance()->addError("Asset $file was not found.");
         }
 
         return $url;
+    }
+
+    /**
+     * Get all possible directories from which the asset can be found.
+     * It returns an array of directories ordered by priority.
+     *
+     * @param  array  $directories all directories source available for the template type
+     * @param  string $template    the name of the template
+     * @param  string $source      the module code or "0"
+     * @return array  possible directories
+     */
+    protected function getFallbackSources($directories, $template, $source)
+    {
+        $paths = [];
+
+        if ("0" !== $source) {
+
+            if (isset($directories[$template]["0"])) {
+                $paths[] = $directories[$template]["0"] . DS
+                    . TemplateDefinition::HOOK_OVERRIDE_SUBDIR . DS
+                    .$source;
+            }
+
+            if (isset($directories[$template][$source])) $paths[] = $directories[$template][$source];
+
+            if (isset($directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source])) $paths[] = $directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source];
+
+        } else {
+
+            $paths[] = $directories[$template]["0"];
+
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Check if a file(s) exists in a directory
+     *
+     * @param  string $dir  the directory path
+     * @param  string $file the file path. It can contain wildcard. eg: /path/*.css
+     * @return bool   true if file(s)
+     */
+    protected function filesExist($dir, $file)
+    {
+        if (!file_exists($dir)) return false;
+
+        $finder = new Finder();
+        $files = $finder->files()->in($dir);
+
+        $pos = strrpos($file, DS);
+        if ($pos !== false) {
+            $files = $files->path(substr($file, 0, $pos))
+                ->name(substr($file, $pos + 1));
+        } else {
+           $files = $files->name($file);
+        }
+
+        return ($files->count() != 0);
     }
 
     public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)

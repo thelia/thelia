@@ -716,6 +716,27 @@ final class TheliaEvents
     const MODULE_PAY = 'thelia.module.pay';
 
     /**
+     * Hook
+     */
+    const BEFORE_HOOK_RENDER    = 'thelia.hook.beforeRender';
+    const HOOK_PROCESS_RENDER   = 'thelia.hook.processRender';
+    const AFTER_HOOK_RENDER     = 'thelia.hook.afterRender';
+
+    const HOOK_CREATE                = 'thelia.hook.action.create';
+    const HOOK_UPDATE                = 'thelia.hook.action.update';
+    const HOOK_DELETE                = 'thelia.hook.action.delete';
+    const HOOK_TOGGLE_NATIVE         = 'thelia.hook.action.toggleNative';
+    const HOOK_TOGGLE_ACTIVATION     = 'thelia.hook.action.toggleActivation';
+    const HOOK_CREATE_ALL            = 'thelia.hook.action.createAll';
+    const HOOK_DEACTIVATION          = 'thelia.hook.action.deactivation';
+
+    const MODULE_HOOK_CREATE            = 'thelia.moduleHook.action.create';
+    const MODULE_HOOK_UPDATE            = 'thelia.moduleHook.action.update';
+    const MODULE_HOOK_DELETE            = 'thelia.moduleHook.action.delete';
+    const MODULE_HOOK_UPDATE_POSITION   = 'thelia.moduleHook.action.updatePosition';
+    const MODULE_HOOK_TOGGLE_ACTIVATION = 'thelia.moduleHook.action.toggleActivation';
+
+    /**
      * sent for clearing cache
      */
     const CACHE_CLEAR = 'thelia.cache.clear';

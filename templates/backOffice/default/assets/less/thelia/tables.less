@@ -25,6 +25,12 @@
         border-bottom: 1px solid @table-border-color;
       }
     }
+    tr.inactive {
+      td {
+        color: @gray-light;
+        font-style: italic;
+      }
+    }
   }
   
 }
@@ -66,6 +72,13 @@ tfoot{
 			margin-left: 10px;
 			text-transform: none;
 		}
+
+        .action-select {
+            display: inline-block;
+            float: right;
+            margin-left: 10px;
+            width: auto;
+        }
 	}
 
 	td.object-title, th.object-title {

@@ -46,12 +46,16 @@
 {* Content *}
 {block name="main-content"}
 
+{$limit={$smarty.get.limit|default:8}}
+{$product_page={$smarty.get.page|default:1}}
+{$product_order={$smarty.get.order|default:'alpha'}}
 
-    {$limit={$smarty.get.limit|default:8}}
-    {$product_page={$smarty.get.page|default:1}}
-    {$product_order={$smarty.get.order|default:'alpha'}}
+{hook name="category.top" category="$category_id"}
 
     <div class="main layout-col-2-left">
+
+        {hook name="category.main-top" category="$category_id"}
+
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
 
             {if #category_display_detail# && $category_id}
@@ -131,17 +135,16 @@
 
                 </div><!-- /.sorter -->
             </div>
-                <div id="category-products">
-                    <div class="products-content">
-                        <ul class="product-col-4">
-                            {loop type="product" name="product_list" category=$category_id limit=$limit page=$product_page order=$product_order}
-                                {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
-                            {/loop}
-                        </ul>
-                    </div>
-                </div><!-- /#category-products -->
+            <div id="category-products">
+                <div class="products-content">
+                    <ul class="product-col-4">
+                        {loop type="product" name="product_list" category=$category_id limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
+                        {/loop}
+                    </ul>
+                </div>
+            </div><!-- /#category-products -->
             <div class="toolbar toolbar-bottom" role="toolbar">
-
                 {if $amount > $limit}
                     <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
                         <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
@@ -163,6 +166,7 @@
                     {intl l="No products available in this category"}
                 </div>
             {/elseloop}
+            {hook name="category.main-bottom" category="$category_id"}
         </article>
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
@@ -170,4 +174,18 @@
         </aside>
 
     </div>
+    {hook name="category.bottom" category="$category_id"}
+{/block}
+
+
+{block name="stylesheet"}
+{hook name="category.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="category.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="category.after-javascript-initialization"}
 {/block}

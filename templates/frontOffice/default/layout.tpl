@@ -37,7 +37,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
 <head>
-
+    {hook name="main.head-top"}
     {* Test if javascript is enabled *}
     <script>(function(H) { H.className=H.className.replace(/\bno-js\b/,'js') } )(document.documentElement);</script>
 
@@ -60,6 +60,8 @@ GNU General Public License : http://www.gnu.org/licenses/
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
+    {hook name="main.stylesheet"}
+
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
@@ -77,23 +79,23 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
     <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
+    {hook name="main.head-bottom"}
 </head>
-
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
-
+{hook name="main.body-top"}
 <!-- Accessibility -->
 <a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
 <div class="page" role="document">
 
 <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
-
-    <div class="navbar" itemscope itemtype="http://schema.org/SiteNavigationElement">
+    {hook name="main.header-top"}
+    <div class="navbar navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">
         <div class="container">
 
             <div class="navbar-header">
                 <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-main">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-secondary">
                     <span class="sr-only">{intl l="Toggle navigation"}</span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -103,9 +105,48 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
 
             <!-- Place everything within .nav-collapse to hide it until above 768px -->
-            <nav class="navbar-collapse collapse nav-main" role="navigation" aria-label="{intl l="Main Navigation"}">
-                {nocache}
+            <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
+                {hook name="main.navbar-secondary"}
+                {elsehook rel="main.navbar-secondary"}
+                {if {count type="currency" exclude={currency attr="id"}} != 0 }
+                <ul class="nav navbar-nav navbar-currency navbar-left">
+                    <li class="dropdown">
+                        <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
+                        <ul class="dropdown-menu">
+                            {loop type="currency" name="currency_available" exclude={currency attr="id"} }
+                                <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+                            {/loop}
+                        </ul>
+                    </li>
+                </ul>
+                {/if}
+                {if {count type="lang" exclude={lang attr='id'}} != 0 }
+                <ul class="nav navbar-nav navbar-lang navbar-left">
+                    <li class="dropdown">
+                        <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
+                        <ul class="dropdown-menu">
+                            {loop type="lang" name="lang_available" exclude={lang attr="id"}}
+                                <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
+                            {/loop}
+                        </ul>
+                    </li>
+                </ul>
+                {/if}
+                <div class="search-container navbar-form navbar-left">
+                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
+                        <label id="search-label" for="q">{intl l="Search a product"}</label>
+                        <div class="input-group">
+                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <ul class="nav navbar-nav navbar-cart navbar-right">
+                    {include file="includes/mini-cart.html" nocache}
+                </ul>
+                <ul class="nav navbar-nav navbar-customer navbar-right">
                     {loop type="auth" name="customer_info_block" role="CUSTOMER"}
                         <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
                         <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
@@ -113,7 +154,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {elseloop rel="customer_info_block"}
                     <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
                     <li class="dropdown">
-                        <a href="{url path="/login"}" class="login">{intl l="Log In!"}</a>
+                        <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!"}</a>
                         <div class="dropdown-menu">
                             {form name="thelia.front.customer.login"}
                             <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
@@ -145,15 +186,8 @@ GNU General Public License : http://www.gnu.org/licenses/
                         </div>
                     </li>
                     {/elseloop}
-                    {include file="includes/mini-cart.html" nocache}
                 </ul>
-                {/nocache}
-                <ul class="nav navbar-nav navbar-categories">
-                    <li><a href="{navigate to="index"}" class="home">{intl l="Home"}</a></li>
-                    {loop type="category" name="category.navigation" parent="0"}
-                        <li><a href="{$URL}">{$TITLE}</a></li>
-                    {/loop}
-                </ul>
+                {/elsehook}
             </nav>
         </div>
     </div>
@@ -166,60 +200,57 @@ GNU General Public License : http://www.gnu.org/licenses/
                     {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$store_name}">{/images}
                 </a>
             </h1>
-
-            <div class="language-container">
-
-                <div class="search-container">
-                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
-                        <label id="search-label" for="q">{intl l="Search a product"}</label>
-                        <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
-                            </div>
-                        </div>
-                    </form>
+            {hook name="main.navbar-primary"}
+            {elsehook rel="main.navbar-primary"}
+            <nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-primary">
+                            <span class="sr-only">{intl l="Toggle navigation" d="hooknavigation.fo.default"}</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand" href="{navigate to="index"}">{intl l="Categories" d="hooknavigation.fo.default"}</a>
+                    </div>
+                    <div class="collapse navbar-collapse" id="navbar-primary">
+                        <ul class="nav navbar-nav navbar-categories">
+                            <li><a href="{navigate to="index"}" class="home">{intl l="Home" d="hooknavigation.fo.default"}</a></li>
+                            {loop type="category" name="category.navigation" parent="0"}
+                                <li><a href="{$URL}">{$TITLE}</a></li>
+                            {/loop}
+                        </ul>
+                    </div>
                 </div>
-
-                {if {count type="lang" exclude="{lang attr='id'}"} != 0 }
-                <div class="language-switch" aria-labelledby="language-label" role="form">
-                    <span id="language-label" class="dropdown-label">{intl l="Language:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/language"}">{lang attr="title"}</a>
-                    <ul class="select dropdown-menu">
-                        {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
-                        {/loop}
-                    </ul>
-                </div>
-                {/if}
-
-                {if {count type="currency" exclude="{currency attr='id'}"} != 0 }
-                <div class="currency-switch" aria-labelledby="currency-label" role="form">
-                    <span id="currency-label" class="dropdown-label">{intl l="Currency:"}</span>
-                    <a class="current dropdown-toggle" data-toggle="dropdown" href="{url path="/currency"}">{currency attr="code"}</a>
-                    <ul class="select dropdown-menu">
-                        {loop type="currency" name="currency_available" exclude="{currency attr="id"}" }
-                            <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
-                        {/loop}
-                    </ul>
-                </div>
-                {/if}
-            </div>
+            </nav>
+            {/elsehook}
         </div>
-
     </header><!-- /.header -->
 
+    {hook name="main.header-bottom"}
 </div><!-- /.header-container -->
 
 <main class="main-container" role="main">
     <div class="container">
+        {hook name="main.content-top"}
         {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
         <div id="content">{block name="main-content"}{/block}</div>
+        {hook name="main.content-bottom"}
     </div><!-- /.container -->
 </main><!-- /.main-container -->
 
 <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
+    {ifhook rel="main.footer-top"}
+    <section class="footer-block">
+        <div class="container">
+            <div class="blocks block-col-3">
+                {hook name="main.footer-top"}
+            </div>
+        </div>
+    </section>
+    {/ifhook}
+    {elsehook rel="main.footer-top"}
     <section class="footer-banner">
         <div class="container">
             <div class="banner banner-col-3">
@@ -238,7 +269,29 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-banner -->
+    {/elsehook}
 
+    {ifhook rel="main.footer-body"}
+    <section class="footer-block">
+        <div class="container">
+            <div class="blocks block-col-4">
+                {hookblock name="main.footer-body"}
+                    {forhook rel="main.footer-body"}
+                    <div class="col">
+                        <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
+                            <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
+                            <div class="block-content">
+                                {$content nofilter}
+                            </div>
+                        </section>
+                    </div>
+                    {/forhook}
+                {/hookblock}
+            </div>
+        </div>
+    </section>
+    {/ifhook}
+    {elsehook rel="main.footer-body"}
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
@@ -407,8 +460,19 @@ GNU General Public License : http://www.gnu.org/licenses/
             </div>
         </div>
     </section><!-- /.footer-block -->
+    {/elsehook}
 
-
+    {ifhook rel="main.footer-bottom"}
+    <footer class="footer-info" role="contentinfo">
+        <div class="container">
+            <div class="info">
+                {hook name="main.footer-bottom"}
+                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
+            </div>
+        </div>
+    </footer>
+    {/ifhook}
+    {elsehook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">
         <div class="container">
             <div class="info">
@@ -423,11 +487,11 @@ GNU General Public License : http://www.gnu.org/licenses/
                         <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
                     </ul>
                 </nav>
-
                 <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
             </div>
         </div>
     </footer><!-- /.footer-info -->
+    {/elsehook}
 
 </section><!-- /.footer-container -->
 
@@ -456,7 +520,11 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="{$asset_url}"></script>
 {/javascripts}
 
+{hook name="main.after-javascript-include"}
+
 {block name="after-javascript-include"}{/block}
+
+{hook name="main.javascript-initialization"}
 
 {block name="javascript-initialization"}{/block}
 
@@ -464,5 +532,6 @@ GNU General Public License : http://www.gnu.org/licenses/
 {javascripts file='assets/js/script.js'}
     <script src="{$asset_url}"></script>
 {/javascripts}
+{hook name="main.body-bottom"}
 </body>
 </html>
