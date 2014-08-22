@@ -81,6 +81,17 @@
                 </div>
                 {/form_field}
 
+                {if $PSE_COUNT > 1 && $VIRTUAL}
+                    {custom_render_form_field form=$form field='virtual_document_id'}
+                    <select {form_field_attributes form=$form field='virtual_document_id' extra_class='duocument-selector'} >
+                        <option value="">{intl l="No document"}</option>
+                        {loop name="virtual-documents" type="document" product=$ID }
+                        <option value="{$ID}" data-img-src="{$IMAGE_URL}" {if $virtual_document_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                    {/custom_render_form_field}
+                {/if}
+
                 {custom_render_form_field form=$form field='brand_id'}
                     <select {form_field_attributes form=$form field='brand_id'}>
                         <option value="0">{intl l="No brand"}</option>
