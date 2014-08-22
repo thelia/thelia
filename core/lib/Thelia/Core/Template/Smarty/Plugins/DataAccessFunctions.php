@@ -177,10 +177,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $cart = $this->getCart($this->getDispatcher(), $this->request);
         $result = "";
         switch ($params["attr"]) {
-            case "count_item":
+            case "count_product":
                 $result = $cart->getCartItems()->count();
                 break;
-            case "count_all_item":
+            case "count_item":
                 $count_allitem = 0;
                 foreach ($cart->getCartItems() as $cartItem) {
                     $count_allitem += $cartItem->getQuantity();
