@@ -329,7 +329,7 @@
 
 	                {hook name="product.before-combinations" location="product_before_combinations" }
 
-					<table class="table table-striped table-condensed" id="category_list">
+					<table class="table table-striped table-condensed table-responsive" id="combinations_list">
 					    <caption>
 					        {intl l='Attribute Combinations'}
 
@@ -347,24 +347,22 @@
 
 					    <thead>
 					        <tr>
-                                <th class="text-center">{intl l='Reference'}</th>
-                                <th class="text-center">{intl l='EAN Code'}</th>
-                                <th class="text-center">{intl l='Stock'}</th>
-								<th class="text-center">{intl l='Price<br />w/o taxes (%currency)' currency={$currency_symbol}}</th>
-								<th class="text-center">{intl l='Price<br />w/ taxes (%currency)' currency={$currency_symbol}}</th>
-								<th class="text-center">{intl l='Weight<br />(Kg)'}</th>
-                                <th class="text-center">{intl l='Default'}</th>
-                                <th class="text-center">{intl l='Sale'}</th>
-                                <th class="text-center">{intl l='New'}</th>
-								<th class="text-center">{intl l='Sale price<br />w/o taxes (%currency)' currency={$currency_symbol}}</th>
-								<th class="text-center">{intl l='Sale price<br />w/ taxes (%currency)' currency={$currency_symbol}}</th>
-								<th class="actions">&nbsp;</th>
+                                <th class="col-sm-2 text-center">{intl l='Reference'}</th>
+                                <th class="col-sm-2 text-center">{intl l='EAN Code'}</th>
+                                <th class="col-sm-1 text-center">{intl l='Stock'}</th>
+								<th class="col-sm-1 text-center"><small>{intl l='Price (%currency)<br />w/o taxes' currency={$currency_symbol}}</small></th>
+								<th class="col-sm-1 text-center"><small>{intl l='Price (%currency)<br />w/ taxes' currency={$currency_symbol}}</small></th>
+								<th class="col-sm-1 text-center"><small>{intl l='Weight<br />(Kg)'}</small></th>
+                                <th class="text-center"><small>{intl l='Default'}</small></th>
+                                <th class="text-center"><small>{intl l='Sale'}</small></th>
+                                <th class="text-center"><small>{intl l='New'}</small></th>
+								<th class="col-sm-1 text-center"><small>{intl l='Sale price (%currency)<br />w/o taxes' currency={$currency_symbol}}</small></th>
+								<th class="col-sm-1 text-center"><small>{intl l='Sale price (%currency)<br />w/ taxes' currency={$currency_symbol}}</small></th>
 					        </tr>
 					    </thead>
 
 					    <tbody>
 	                        {* Get number of PSE defined, assumin the form have the same number of values for each fields *}
-
 	                        {form_field form=$form field='product_sale_element_id' value_key=0}
 	                           {$pse_count = $total_value_count}
 	                        {/form_field}
@@ -372,16 +370,6 @@
 	                        {for $idx = 0 to $total_value_count-1}
 	                        <tr>
                                 <td colspan="10">
-
-			                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
-			                        <input type="hidden" name="{$name}" value="{$value}" />
-                                    {$current_pse_id = $value}
-
-	                                {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
-	                                    {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
-	                                {/loop}
-                                {/form_field}
-
                                     <div class="btn-group">
                                         <a class="btn btn-default btn-xs pse-assoc-image pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate images"}">
                                             <span class="glyphicon glyphicon-picture"></span>
@@ -390,72 +378,79 @@
                                             <span class="glyphicon glyphicon-file"></span>
                                         </a>
                                     </div>
+
+                                    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+
+                                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
+                                            <input type="hidden" name="{$name}" value="{$value}" />
+                                        {$current_pse_id = $value}
+
+                                        {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
+                                            {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
+                                        {/loop}
+                                    {/form_field}
                                 </td>
 
-                                <td colspan="2" class="text-right">ID: {$current_pse_id}</td>
-	                        </tr>
+                                <td class="text-right">ID: {$current_pse_id}</td>
+                            </tr>
 
                             <tr>
                                 {form_field form=$form field='reference' value_key=$idx}
-                                <td {if $error}class="has-error"{/if}><input class="form-control" type="text" name="{$name}" value="{$value}" /></td>
+                                <td {if $error}class="has-error"{/if}><input class="form-control input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
                                 {form_field form=$form field='ean_code' value_key=$idx}
-                                <td {if $error}class="has-error"{/if}><input class="form-control" type="text" name="{$name}" value="{$value}" /></td>
+                                <td {if $error}class="has-error"{/if}><input class="form-control input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
                                 {form_field form=$form field='quantity' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
-                                    <input class="form-control text-right" required type="text" name="{$name}" value="{$value}" />
+                                    <input class="form-control input-sm text-right" required type="text" name="{$name}" value="{$value}" />
                                 </td>
                                 {/form_field}
 
                                 {form_field form=$form field='price' value_key=$idx}
-                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} required data-price-type="price-without-tax" data-rel-price="price_with_tax_{$idx}" id="price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right" required type="text" name="{$name}" value="{$value}" /></td>
+                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} required data-price-type="price-without-tax" data-rel-price="price_with_tax_{$idx}" id="price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" required type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
                                 {form_field form=$form field='price_with_tax' value_key=$idx}
-                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} data-price-type="price-with-tax" data-rel-price="price_without_tax_{$idx}" id="price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}" /></td>
+                                <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} data-price-type="price-with-tax" data-rel-price="price_without_tax_{$idx}" id="price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
                                 {form_field form=$form field='weight' value_key=$idx}
-                                <td {if $error}class="has-error"{/if}><input required class="form-control text-right" type="text" name="{$name}" value="{$value}" /></td>
+                                <td {if $error}class="has-error"{/if}><input required class="form-control text-right input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
 
                                 {form_field form=$form field='default_pse'}
                                 <td class="{if $error}has-error {/if}text-center">
-                                    <input class="form-control" type="radio" name="{$name}" value="{$current_pse_id}" {if $value == $current_pse_id}checked="checked"{/if}/>
+                                    <input class="input-sm" type="radio" name="{$name}" value="{$current_pse_id}" {if $value == $current_pse_id}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
                                 {form_field form=$form field='onsale' value_key=$idx}
                                 <td class="{if $error}has-error {/if}text-center">
-                                    <input class="form-control" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
+                                    <input class="input-sm" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
                                 {form_field form=$form field='isnew' value_key=$idx}
                                 <td class="{if $error}has-error {/if}text-center">
-                                     <input class="form-control" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
+                                     <input class="input-sm" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
                                 {form_field form=$form field='sale_price' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
-                                    <input {if !$show_pricing_fields}readonly{/if} required data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax_{$idx}" id="sale_price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}"  />
+                                    <input {if !$show_pricing_fields}readonly{/if} required data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax_{$idx}" id="sale_price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}"  />
                                 </td>
                                 {/form_field}
 
                                 {form_field form=$form field='sale_price_with_tax' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
-                                    <input {if !$show_pricing_fields}readonly{/if} data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax_{$idx}" id="sale_price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right" type="text" name="{$name}" value="{$value}"  />
+                                    <input {if !$show_pricing_fields}readonly{/if} data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax_{$idx}" id="sale_price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}"  />
                                 </td>
                                 {/form_field}
-
-                                <td class="actions">
-                                    <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
-                                </td>
                             </tr>
 	                        {/for}
 					    </tbody>
