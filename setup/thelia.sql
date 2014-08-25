@@ -1902,13 +1902,13 @@ DROP TABLE IF EXISTS `sale_offset_currency`;
 
 CREATE TABLE `sale_offset_currency`
 (
-    `sales_id` INTEGER NOT NULL,
+    `sale_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
     `price_offset_value` FLOAT DEFAULT 0,
-    PRIMARY KEY (`sales_id`,`currency_id`),
+    PRIMARY KEY (`sale_id`,`currency_id`),
     INDEX `fk_sale_offset_currency_currency1_idx` (`currency_id`),
     CONSTRAINT `fk_sale_offset_currency_sales_id`
-        FOREIGN KEY (`sales_id`)
+        FOREIGN KEY (`sale_id`)
         REFERENCES `sale` (`id`)
         ON DELETE CASCADE,
     CONSTRAINT `fk_sale_offset_currency_currency_id`
@@ -1926,15 +1926,15 @@ DROP TABLE IF EXISTS `sale_product`;
 
 CREATE TABLE `sale_product`
 (
-    `sales_id` INTEGER NOT NULL,
+    `sale_id` INTEGER NOT NULL,
     `product_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER,
-    PRIMARY KEY (`sales_id`,`product_id`),
+    PRIMARY KEY (`sale_id`,`product_id`),
     INDEX `fk_sale_product_product1_idx` (`product_id`),
     INDEX `fk_sale_product_attribute_av1_idx` (`attribute_av_id`),
-    INDEX `idx_sale_product_sales_id_product_id` (`sales_id`, `product_id`),
+    INDEX `idx_sale_product_sales_id_product_id` (`sale_id`, `product_id`),
     CONSTRAINT `fk_sale_product_sales_id`
-        FOREIGN KEY (`sales_id`)
+        FOREIGN KEY (`sale_id`)
         REFERENCES `sale` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,

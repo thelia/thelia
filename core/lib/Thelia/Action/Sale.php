@@ -137,21 +137,21 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 $event->setSale($sale);
 
                 // Update price offsets
-                SaleOffsetCurrencyQuery::create()->filterBySalesId($sale->getId())->delete($con);
+                SaleOffsetCurrencyQuery::create()->filterBySaleId($sale->getId())->delete($con);
 
                 foreach($event->getPriceOffsets() as $currencyId => $priceOffset) {
                     $saleOffset = new SaleOffsetCurrency();
 
                     $saleOffset
                         ->setCurrencyId($currencyId)
-                        ->setSalesId($sale->getId())
+                        ->setSaleId($sale->getId())
                         ->setPriceOffsetValue($priceOffset)
                         ->save($con)
                     ;
                 }
 
                 // Update products
-                SaleProductQuery::create()->filterBySalesId($sale->getId())->delete($con);
+                SaleProductQuery::create()->filterBySaleId($sale->getId())->delete($con);
 
                 foreach($event->getProducts() as $productId => $attributeIdArray) {
 
@@ -159,7 +159,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                         $saleProduct = new SaleProduct();
 
                         $saleProduct
-                            ->setSalesId($sale->getId())
+                            ->setSaleId($sale->getId())
                             ->setProductId($productId)
                             ->setAttributeAvId(null)
                             ->save($con)
@@ -170,7 +170,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                             $saleProduct = new SaleProduct();
 
                             $saleProduct
-                                ->setSalesId($sale->getId())
+                                ->setSaleId($sale->getId())
                                 ->setProductId($productId)
                                 ->setAttributeAvId($attributeId)
                                 ->save($con)
