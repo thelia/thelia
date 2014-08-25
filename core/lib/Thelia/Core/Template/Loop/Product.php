@@ -153,10 +153,15 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $complex = $this->getComplex();
 
         if (true === $complex) {
-
-            return $this->parseComplex($loopResult);
+            return $this->parseComplexResults($loopResult);
         }
+        else {
+            return $this->parseSimpleResults($loopResult);
+        }
+    }
 
+    public function parseSimpleResults(LoopResult $loopResult)
+    {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
         $securityContext = $this->container->get('thelia.securityContext');
@@ -222,10 +227,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         return $loopResult;
     }
 
-    public function parseComplex(LoopResult $results)
+    public function parseComplexResults(LoopResult $loopResult)
     {
-        $loopResult = new LoopResult($results);
-
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
 
         /** @var \Thelia\Core\Security\SecurityContext $securityContext */
