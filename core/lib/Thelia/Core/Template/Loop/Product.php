@@ -29,6 +29,8 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Map\SaleProductTableMap;
+use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Type;
@@ -217,6 +219,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
                 ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
                 ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
+                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
                 ->set("PSE_COUNT"               , $product->getVirtualColumn('pse_count'))
             ;
 
@@ -261,8 +264,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("BEST_PRICE"       , $price)
                 ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
                 ->set("BEST_TAXED_PRICE" , $taxedPrice)
-                ->set("IS_PROMO"         , $product->getVirtualColumn('is_promo'))
-                ->set("IS_NEW"           , $product->getVirtualColumn('is_new'))
+                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
             ;
 
             $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
@@ -292,7 +295,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
             ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
             ->set("META_KEYWORDS"           , $product->getVirtualColumn('i18n_META_KEYWORDS'))
-            ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
             ->set("POSITION"                , $product->getPosition())
             ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
             ->set("TEMPLATE"                , $product->getTemplateId())
@@ -301,7 +303,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("BRAND_ID"                , $product->getBrandId() ?: 0)
             ->set("SHOW_ORIGINAL_PRICE"     , $product->getVirtualColumn('display_initial_price') == 1 ? 1 : 0)
         ;
-
 
         if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
             // Find previous and next category
@@ -414,9 +415,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $search = ProductQuery::create();
 
         $complex = $this->getComplex();
-
-        // FIXME très fort !
-        // if ($complex) return $this->buildComplex();
 
         if (! $complex) {
 
@@ -532,7 +530,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if ($sale_id !== null) {
             $search->useSaleProductQuery("SaleProductSelect")
-                ->filterBySalesId($sale_id)
+                ->filterBySaleId($sale_id)
                 ->groupByProductId()
                 ->endUse()
             ;
@@ -566,7 +564,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $visible = $this->getVisible();
 
-        if ($visible !== Type\BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== Type\BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $exclude = $this->getExclude();
 
@@ -592,6 +592,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $max_price  = $this->getMax_price();
 
         if ($complex) {
+
             if ($new === true) {
                 $isPSELeftJoinList[] = 'is_new';
                 $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
@@ -848,15 +849,26 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
 
-        // Check if we have to display the initial price, as defined in a sale operation
+        // Check if we have to display the initial price, as defined in an active sale operation
+
+        // First join sale_product table...
         $search
-            ->useSaleProductQuery('SaleProductPriceDisplay')
-                ->useSaleQuery('SalePriceDisplay')
-                    ->filterByActive(true)
-                ->endUse()
-            ->endUse()
+            ->leftJoinSaleProduct('SaleProductPriceDisplay')
         ;
 
+        // ... then the sale table...
+        $salesJoin = new Join();
+        $salesJoin->addExplicitCondition(
+            'SaleProductPriceDisplay', 'SALE_ID',
+            null,
+            SaleTableMap::TABLE_NAME, 'ID',
+            'SalePriceDisplay'
+        );
+        $salesJoin->setJoinType(Criteria::LEFT_JOIN);
+
+        $search->addJoinObject($salesJoin, 'SalePriceDisplay');
+
+        // ... to get the DISPLAY_INITIAL_PRICE column !
         $search->withColumn('`SalePriceDisplay`.DISPLAY_INITIAL_PRICE', 'display_initial_price');
 
         $feature_availability = $this->getFeature_availability();

@@ -43,7 +43,9 @@ class ProductTest extends BaseLoopTestor
     public function testSearchById()
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
+
         if (null === $product) {
+
             $product = new \Thelia\Model\Product();
             $product->setDefaultCategory(0);
             $product->setVisible(1);
@@ -53,6 +55,27 @@ class ProductTest extends BaseLoopTestor
 
         $otherParameters = array(
             "visible" => "*",
+        );
+
+        $this->baseTestSearchById($product->getId(), $otherParameters);
+    }
+
+    public function testSearchByIdComplex()
+    {
+        $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
+
+        if (null === $product) {
+
+            $product = new \Thelia\Model\Product();
+            $product->setDefaultCategory(0);
+            $product->setVisible(1);
+            $product->setTitle('foo');
+            $product->save();
+        }
+
+        $otherParameters = array(
+            "visible" => "*",
+            "complex" => 1
         );
 
         $this->baseTestSearchById($product->getId(), $otherParameters);
