@@ -2,11 +2,10 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Security\User\UserInterface;
-use Thelia\Model\Base\AdminLog as BaseAdminLog;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Log\Tlog;
-use Thelia\Model\Base\Admin as BaseAdminUser;
+use Thelia\Model\Base\AdminLog as BaseAdminLog;
 
 class AdminLog extends BaseAdminLog
 {
@@ -25,9 +24,9 @@ class AdminLog extends BaseAdminLog
         $log = new AdminLog();
 
         $log
-            ->setAdminLogin($adminUser !== null ? $adminUser->getLogin() : '<no login>')
-            ->setAdminFirstname($adminUser !== null ? $adminUser->getFirstname() : '<no first name>')
-            ->setAdminLastname($adminUser !== null ? $adminUser->getLastname() : '<no last name>')
+            ->setAdminLogin($adminUser !== null ? $adminUser->getUsername() : '<no login>')
+            ->setAdminFirstname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getFirstname() : '<no first name>')
+            ->setAdminLastname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getLastname() : '<no last name>')
             ->setResource($resource)
             ->setAction($action)
             ->setMessage($message)
