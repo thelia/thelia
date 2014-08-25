@@ -5,7 +5,7 @@
     <parameter name="Charset" value="utf8"/>
   </vendor>
   <table name="category" namespace="Thelia\Model">
-	<column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
     <column name="visible" required="true" type="TINYINT" />
     <column name="position" required="true" type="INTEGER" />
@@ -1546,11 +1546,11 @@
     <behavior name="timestampable" />
   </table>
   <table name="sale_offset_currency" namespace="Thelia\Model">
-    <column name="sales_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="price_offset_value" type="FLOAT" />
     <foreign-key foreignTable="sale" name="fk_sale_offset_currency_sales_id" onDelete="CASCADE">
-      <reference foreign="id" local="sales_id" />
+      <reference foreign="id" local="sale_id" />
     </foreign-key>
     <foreign-key foreignTable="currency" name="fk_sale_offset_currency_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="currency_id" />
@@ -1560,11 +1560,11 @@
     </index>
   </table>
   <table name="sale_product" namespace="Thelia\Model">
-    <column name="sales_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="NULL" name="attribute_av_id" type="INTEGER" />
     <foreign-key foreignTable="sale" name="fk_sale_product_sales_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="sales_id" />
+      <reference foreign="id" local="sale_id" />
     </foreign-key>
     <foreign-key foreignTable="product" name="fk_sale_product_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
@@ -1579,7 +1579,7 @@
       <index-column name="attribute_av_id" />
     </index>
     <index name="idx_sale_product_sales_id_product_id">
-      <index-column name="sales_id" />
+      <index-column name="sale_id" />
       <index-column name="product_id" />
     </index>
   </table>
@@ -1708,7 +1708,7 @@
     </unique>
     <behavior name="timestampable" />
     <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo" />
+      <parameter name="i18n_columns" value="title,description,chapo" />
     </behavior>
   </table>
   <table name="module_hook" namespace="Thelia\Model">
