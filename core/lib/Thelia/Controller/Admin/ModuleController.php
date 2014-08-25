@@ -250,7 +250,11 @@ class ModuleController extends AbstractCrudController
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) return $response;
 
         $message = null;
+
         try {
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get("_token")
+            );
 
             $module_id = $this->getRequest()->get('module_id');
 

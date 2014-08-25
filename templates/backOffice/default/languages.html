@@ -269,7 +269,7 @@
     dialog_title    = {intl l="Delete language"}
     dialog_message  = {intl l="Do you really want to delete this language ?"}
 
-    form_action         = {url path='/admin/configuration/languages/delete'}
+    form_action         = {token_url path='/admin/configuration/languages/delete'}
     form_content        = {$smarty.capture.delete_dialog nofilter}
     form_error_message  = $error_delete_message
 }

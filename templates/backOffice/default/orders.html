@@ -194,7 +194,7 @@
     dialog_title    = {intl l="Delete an order"}
     dialog_message  = {intl l="Do you really want to cancel this order ?"}
 
-    form_action         = {url path='/admin/order/update/status'}
+    form_action         = {token_url path='/admin/order/update/status'}
     form_content        = {$smarty.capture.cancel_order_dialog nofilter}
     form_id             = "cancel-order-form"
 }

@@ -346,7 +346,7 @@
         dialog_title    = {intl l="Delete customer"}
         dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
-        form_action         = {url path='/admin/customer/delete'}
+        form_action         = {token_url path='/admin/customer/delete'}
         form_content        = {$smarty.capture.delete_customer_dialog nofilter}
         form_id             = "form_delete_customer"
     }

@@ -439,7 +439,7 @@
     dialog_title    = {intl l="Delete address"}
     dialog_message  = {intl l="Do you really want to delete this address ?"}
 
-    form_action         = {url path='/admin/address/delete'}
+    form_action         = {token_url path='/admin/address/delete'}
     form_content        = {$smarty.capture.delete_address_dialog nofilter}
 }
 {/block}

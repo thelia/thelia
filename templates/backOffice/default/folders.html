@@ -497,7 +497,7 @@
                             dialog_title    = {intl l="Delete folder"}
                             dialog_message  = {intl l="Do you really want to delete this folder and all its content ?"}
 
-                            form_action         = {url path='/admin/folders/delete'}
+                            form_action         = {token_url path='/admin/folders/delete'}
                             form_content        = {$smarty.capture.folder_delete_dialog nofilter}
                             }
 
@@ -518,7 +518,7 @@
                             dialog_title    = {intl l="Delete content"}
                             dialog_message  = {intl l="Do you really want to delete this content ?"}
 
-                            form_action         = {url path='/admin/content/delete'}
+                            form_action         = {token_url path='/admin/content/delete'}
                             form_content        = {$smarty.capture.content_delete_dialog nofilter}
                             }
 {/block}

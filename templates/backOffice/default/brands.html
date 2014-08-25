@@ -247,7 +247,7 @@
         dialog_title    = {intl l="Delete brand"}
         dialog_message  = {intl l="Do you really want to delete this brand ?"}
 
-        form_action         = {url path='/admin/brand/delete'}
+        form_action         = {token_url path='/admin/brand/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}

@@ -147,7 +147,7 @@
         dialog_title    = {intl l="Delete shipping zone"}
         dialog_message  = {intl l="Do you really want to delete this shipping zone ?"}
 
-        form_action         = {url path='/admin/configuration/shipping_configuration/delete'}
+        form_action         = {token_url path='/admin/configuration/shipping_configuration/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}
