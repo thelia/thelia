@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Model\Base\AdminLog as BaseAdminLog;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Log\Tlog;
@@ -16,10 +17,10 @@ class AdminLog extends BaseAdminLog
      * @param $action
      * @param $message
      * @param Request    $request
-     * @param Base\Admin $adminUser
+     * @param UserInterface $adminUser
      * @param bool       $withRequestContent
      */
-    public static function append($resource, $action, $message, Request $request, BaseAdminUser $adminUser = null, $withRequestContent = true)
+    public static function append($resource, $action, $message, Request $request, UserInterface $adminUser = null, $withRequestContent = true)
     {
         $log = new AdminLog();
 
