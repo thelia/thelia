@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
@@ -19,6 +20,7 @@ use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Sale\SaleCreationForm;
 use Thelia\Form\Sale\SaleModificationForm;
@@ -100,7 +102,7 @@ class SaleController extends AbstractCrudController
             'description'   => $sale->getDescription(),
             'postscriptum'  => $sale->getPostscriptum(),
             'active'        => $sale->getActive(),
-            'display_initial_price' => $sale->getActive(),
+            'display_initial_price' => $sale->getDisplayInitialPrice(),
             'start_date'            => $sale->getStartDate($dateFormat),
             'end_date'              => $sale->getEndDate($dateFormat),
             'price_offset_type'     => $sale->getPriceOffsetType(),
@@ -159,6 +161,7 @@ class SaleController extends AbstractCrudController
             ->setStartDate($formData['start_date'])
             ->setEndDate($formData['end_date'])
             ->setActive($formData['active'])
+            ->setDisplayInitialPrice($formData['display_initial_price'])
             ->setPriceOffsetType($formData['price_offset_type'])
             ->setPriceOffsets($formData['price_offset'])
             ->setProducts($products)
@@ -301,6 +304,9 @@ class SaleController extends AbstractCrudController
      */
     protected function toggleActivity()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+            return $response;
+
         try {
             $this->dispatch(
                 TheliaEvents::SALE_TOGGLE_ACTIVITY,
@@ -318,6 +324,9 @@ class SaleController extends AbstractCrudController
 
     public function updateProductList()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+            return $response;
+
         // Build the list of categories
         $categories = '';
 
@@ -334,6 +343,9 @@ class SaleController extends AbstractCrudController
 
     public function updateProductAttributes()
     {
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+            return $response;
+
         $attributesInfo = [];
 
         $productId = $this->getRequest()->get('product_id');
@@ -375,10 +387,30 @@ echo "PSE=".$pse->getId().", attr=$attrId: c=".$combination->getAttributeAvId().
 
     public function resetSaleStatus()
     {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+            return $response;
+
         try {
             $this->dispatch(
                 TheliaEvents::SALE_CLEAR_SALE_STATUS,
                 new SaleClearStatusEvent()
+            );
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        $this->redirectToListTemplate();
+    }
+
+    public function checkSalesActivationStatus()
+    {
+        // We do not check auth, as the related route may be invoked from a cron
+        try {
+            $this->dispatch(
+                TheliaEvents::CHECK_SALE_ACTIVATION_EVENT,
+                new SaleActiveStatusCheckEvent()
             );
         } catch (\Exception $ex) {
             // Any error

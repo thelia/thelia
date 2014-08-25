@@ -12,9 +12,12 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Sale\ProductSaleStatusUpdateEvent;
+use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
@@ -39,7 +42,42 @@ use Thelia\Model\SaleQuery;
  */
 class Sale extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * Update the promo status of the sale's selected products and combinations
+     *
+     * @param ProductSaleStatusUpdateEvent $event
+     * @throws \RuntimeException
+     */
+    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event) {
 
+        $sale = $event->getSale();
+
+        // Get all selected product sale elements for this sale
+        if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)) {
+
+            /** @var SaleProduct $saleProduct */
+            foreach($saleProducts as $saleProduct) {
+
+                // If no attribute AV id is defined, consider ALL product combinations
+                if (is_null($saleProduct->getAttributeAvId())) {
+                    ProductSaleElementsQuery::create()
+                        ->filterByProductId($saleProduct->getProductId())
+                        ->update([ 'Promo' => $sale->getActive()])
+                    ;
+                }
+                else {
+                    // Consider only combinations which contains the selected AttributeAv ID
+                    throw new \RuntimeException("Not yet implemented !");
+                }
+            }
+        }
+    }
+
+    /**
+     * Create a new Sale
+     *
+     * @param SaleCreateEvent $event
+     */
     public function create(SaleCreateEvent $event)
     {
         $sale = new SaleModel();
@@ -55,7 +93,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * process update sale
+     * Process update sale
      *
      * @param SaleUpdateEvent $event
      * @throws PropelException
@@ -63,14 +101,24 @@ class Sale extends BaseAction implements EventSubscriberInterface
     public function update(SaleUpdateEvent $event)
     {
         if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
+
             $sale->setDispatcher($event->getDispatcher());
 
-            // TODO : update product status on activity change
-
             $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+
             $con->beginTransaction();
 
             try {
+
+                // Disable all promo flag on sale's current selected products,
+                // to get a correct selection, even if a product has been de-selected.
+                $sale->setActive(false);
+
+                $event->getDispatcher()->dispatch(
+                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                    new ProductSaleStatusUpdateEvent($sale)
+                );
+
                 $sale
                     ->setActive($event->getActive())
                     ->setStartDate($event->getStartDate())
@@ -131,6 +179,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     }
                 }
 
+                // Update related products sale status
+                $event->getDispatcher()->dispatch(
+                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                    new ProductSaleStatusUpdateEvent($sale)
+                );
+
                 $con->commit();
 
             } catch (PropelException $e) {
@@ -154,9 +208,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
             ->setActive(!$sale->getActive())
             ->save();
 
-        $event->setSale($sale);
+        // Update related products sale status
+        $event->getDispatcher()->dispatch(
+            TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+            new ProductSaleStatusUpdateEvent($sale)
+        );
 
-        // TODO : update products status
+        $event->setSale($sale);
     }
 
     /**
@@ -173,7 +231,16 @@ class Sale extends BaseAction implements EventSubscriberInterface
             $event->setSale($sale);
         }
 
-        // TODO : update products status
+        // Update related products sale status, if required
+        if ($sale->getActive()) {
+            $sale->setActive(false);
+
+            // Update related products sale status
+            $event->getDispatcher()->dispatch(
+                TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                new ProductSaleStatusUpdateEvent($sale)
+            );
+        }
     }
 
     /**
@@ -209,6 +276,66 @@ class Sale extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * This method check the activation and deactivation dates of sales, and perform
+     * the required action depending on the current date.
+     *
+     * @param SaleActiveStatusCheckEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function checkSaleActivation(SaleActiveStatusCheckEvent $event) {
+
+        $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+
+            $now = time();
+
+            // Disable expired sales
+            if (null !== $salesToDisable = SaleQuery::create()
+                    ->filterByActive(true)
+                    ->filterByEndDate($now, Criteria::GREATER_THAN)) {
+
+                /** @var \Thelia\Model\Sale $sale */
+                foreach($salesToDisable as $sale) {
+                    $sale->setActive(false)->save();
+
+                    // Update related products sale status
+                    $event->getDispatcher()->dispatch(
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                        new ProductSaleStatusUpdateEvent($sale)
+                    );
+                }
+            }
+
+            // Enable sales that should be enabled.
+            if (null !== $salesToDisable = SaleQuery::create()
+                    ->filterByActive(false)
+                    ->filterByStartDate($now, Criteria::GREATER_THAN)
+                    ->filterByEndDate($now, Criteria::LESS_THAN))
+                {
+                /** @var \Thelia\Model\Sale $sale */
+                foreach($salesToDisable as $sale) {
+
+                    $sale->setActive(true)->save();
+
+                    // Update related products sale status
+                    $event->getDispatcher()->dispatch(
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                        new ProductSaleStatusUpdateEvent($sale)
+                    );
+                }
+            }
+
+            $con->commit();
+
+        } catch (PropelException $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * @inheritdoc
      */
     public static function getSubscribedEvents()
@@ -221,6 +348,10 @@ class Sale extends BaseAction implements EventSubscriberInterface
             TheliaEvents::SALE_TOGGLE_ACTIVITY => array('toggleActivity', 128),
 
             TheliaEvents::SALE_CLEAR_SALE_STATUS => array('clearStatus', 128),
+
+            TheliaEvents::UPDATE_PRODUCT_SALE_STATUS => array('updateProductsSaleStatus', 128),
+
+            TheliaEvents::CHECK_SALE_ACTIVATION_EVENT => array('checkSaleActivation', 128),
         );
     }
 }
