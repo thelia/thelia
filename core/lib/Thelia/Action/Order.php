@@ -237,8 +237,9 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $newStock = 0;
             }
             $pse->setQuantity(
-                    $newStock
+                $newStock
             );
+
             $pse->save($con);
 
             /* get tax */
