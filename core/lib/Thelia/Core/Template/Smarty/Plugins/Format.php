@@ -78,7 +78,11 @@ class Format extends AbstractSmartyPlugin
         }
 
         if (!($date instanceof \DateTime)) {
-            return "";
+            try {
+                $date = new \DateTime($date);
+            } catch (\Exception $e) {
+                return "";
+            }
         }
 
         $format = $this->getParam($params, "format", false);
