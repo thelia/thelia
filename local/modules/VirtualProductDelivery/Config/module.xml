@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <fullnamespace>VirtualProductDelivery\VirtualProductDelivery</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Virtual Products Delivery</title>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Livraison Produits Virtuels</title>
+    </descriptive>
+    <version>1.0</version>
+    <author>
+        <name>Julien Chanséaume</name>
+        <email>jchanseaume@openstudio.fr</email>
+    </author>
+    <type>delivery</type>
+    <thelia>2.0.0</thelia>
+    <stability>alpha</stability>
+</module>

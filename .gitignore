@@ -36,6 +36,7 @@ local/modules/*
 !local/modules/Tinymce/
 !local/modules/Colissimo/
 !local/modules/Hook*/
+!local/modules/VirtualProductDelivery/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
