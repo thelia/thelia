@@ -131,7 +131,9 @@ class CartAdd extends BaseForm
                 ->filterByProductId($data["product"])
                 ->findOne();
 
-            if ($productSaleElements->getQuantity() < $value && ConfigQuery::checkAvailableStock()) {
+            $product = $productSaleElements->getProduct();
+
+            if ($productSaleElements->getQuantity() < $value && $product->getVirtual() === 0 && ConfigQuery::checkAvailableStock()) {
                 $context->addViolation(Translator::getInstance()->trans("quantity value is not valid"));
             }
         }

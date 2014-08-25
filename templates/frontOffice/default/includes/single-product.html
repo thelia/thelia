@@ -35,7 +35,7 @@
         {assign var="current_stock_content" value = "in_stock"}
         {assign var="current_stock_href" value = "http://schema.org/InStock"}
         {if {config key="check-available-stock"} != 0}
-            {if $QUANTITY <= 0}
+            {if $VIRTUAL == 0 && $QUANTITY <= 0}
                 {assign var="current_stock_content" value = "out_stock"}
                 {assign var="current_stock_href" value = "http://schema.org/OutOfStock"}
             {/if}

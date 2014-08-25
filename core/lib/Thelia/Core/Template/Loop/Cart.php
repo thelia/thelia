@@ -19,6 +19,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
+use Thelia\Model\Base\Config;
+use Thelia\Model\ConfigQuery;
 use Thelia\Type;
 
 class Cart extends BaseLoop implements ArraySearchLoopInterface
@@ -83,6 +85,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
     {
         $taxCountry = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         $locale = $this->request->getSession()->getLang()->getLocale();
+        $checkAvailability = ConfigQuery::checkAvailableStock();
+        $defaultAvailability = intval(ConfigQuery::read('default-available-stock', 100));
+
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct(null, $locale);
             $productSaleElement = $cartItem->getProductSaleElements();
@@ -94,9 +99,13 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set("REF", $product->getRef());
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
-            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()))
-                ->set("STOCK", $productSaleElement->getQuantity())
-                ->set("PRICE", $cartItem->getPrice())
+            $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()));
+            if (!$checkAvailability || $product->getVirtual() === 1){
+                $loopResultRow->set("STOCK", $defaultAvailability);
+            } else {
+                $loopResultRow->set("STOCK", $productSaleElement->getQuantity());
+            }
+            $loopResultRow->set("PRICE", $cartItem->getPrice())
                 ->set("PROMO_PRICE", $cartItem->getPromoPrice())
                 ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
                 ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
