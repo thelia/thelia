@@ -148,7 +148,7 @@
     </route>
 
     <route id="order.delivery" path="/order/delivery">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_controller">Front\Controller\OrderController::deliverView</default>
         <default key="_view">order-delivery</default>
     </route>
 

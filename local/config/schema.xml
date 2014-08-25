@@ -703,6 +703,8 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
+    <column name="virtual" required="true" type="TINYINT" defaultValue="0" />
+    <column name="virtual_document" type="VARCHAR" size="255" />
     <column name="quantity" required="true" type="FLOAT" />
     <column name="price" required="true" type="FLOAT" />
     <column name="promo_price" size="45" type="VARCHAR" />

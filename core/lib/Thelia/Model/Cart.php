@@ -158,4 +158,22 @@ class Cart extends BaseCart
 
         return $weight;
     }
+
+    /**
+     * Tell if the cart contains only virtual products
+     *
+     * @return bool
+     */
+    public function isVirtual()
+    {
+        foreach ($this->getCartItems() as $cartItem) {
+            $product = $cartItem->getProductSaleElements()->getProduct();
+            if (!$product->getVirtual()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

@@ -818,6 +818,8 @@ CREATE TABLE `order_product`
     `chapo` TEXT,
     `description` LONGTEXT,
     `postscriptum` TEXT,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
+    `virtual_document` VARCHAR(255),
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` VARCHAR(45),

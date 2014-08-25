@@ -25,12 +25,15 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\ProductDocumentQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
+use Thelia\Model\MessageQuery;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
@@ -219,13 +222,19 @@ class Order extends BaseAction implements EventSubscriberInterface
             $pse = $cartItem->getProductSaleElements();
 
             /* check still in stock */
-            if ($cartItem->getQuantity() > $pse->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+            if ($cartItem->getQuantity() > $pse->getQuantity()
+                    && true === ConfigQuery::checkAvailableStock()
+                    && 0 === $product->getVirtual()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
             /* decrease stock */
+            $allowNegativeStock = intval(ConfigQuery::read('allow-negative-stock', 0));
             $newStock = $pse->getQuantity() - $cartItem->getQuantity();
-            if($newStock < 0) $newStock = 0; //Forbid negative stock
+            //Forbid negative stock
+            if ($newStock < 0 && 0 === $allowNegativeStock) {
+                $newStock = 0;
+            }
             $pse->setQuantity(
                     $newStock
             );
@@ -242,6 +251,19 @@ class Order extends BaseAction implements EventSubscriberInterface
                     $lang->getLocale()
             );
 
+            // get the virtual document path
+            $virtualDocumentPath = null;
+            if ($product->getVirtual() === 1){
+                // try to find the associated document
+                if (null !== $documentId = MetaDataQuery::getVal('virtual', 'pse', $pse->getId())) {
+                    $productDocument = ProductDocumentQuery::create()->findPk($documentId);
+                    if (null !== $productDocument){
+                        $virtualDocumentPath = $productDocument->getUploadDir() . $productDocument->getFile();
+                    }
+
+                }
+            }
+
             $orderProduct = new OrderProduct();
             $orderProduct
                 ->setOrderId($placedOrder->getId())
@@ -252,6 +274,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setChapo($productI18n->getChapo())
                 ->setDescription($productI18n->getDescription())
                 ->setPostscriptum($productI18n->getPostscriptum())
+                ->setVirtual($product->getVirtual())
+                ->setVirtualDocument($virtualDocumentPath)
                 ->setQuantity($cartItem->getQuantity())
                 ->setPrice($cartItem->getPrice())
                 ->setPromoPrice($cartItem->getPromoPrice())

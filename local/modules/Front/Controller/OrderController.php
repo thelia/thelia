@@ -23,6 +23,7 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
@@ -53,6 +54,55 @@ use Thelia\Tools\URL;
 class OrderController extends BaseFrontController
 {
     use CartTrait;
+
+
+    /**
+     * Check if the cart contains only virtual products.
+     */
+    public function deliverView()
+    {
+        $this->checkAuth();
+        $this->checkCartNotEmpty();
+
+        // check if the cart contains only virtual products
+        $cart = $this->getSession()->getCart();
+
+        if ( $cart->isVirtual()){
+            // get the virtual product module
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            $deliveryAddress = AddressQuery::create()
+                ->filterByCustomerId($customer->getId())
+                ->orderByIsDefault(Criteria::DESC)
+                ->findOne();
+
+            if (null !== $deliveryAddress) {
+
+                $deliveryModule = ModuleQuery::create()
+                    ->findOneByCode('VirtualProductDelivery');
+
+                if (null !== $deliveryModule) {
+                    /* get postage amount */
+                    $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+
+                    $orderEvent = $this->getOrderEvent();
+                    $orderEvent->setDeliveryAddress($deliveryAddress->getId());
+                    $orderEvent->setDeliveryModule($deliveryModule->getId());
+                    $orderEvent->setPostage($postage);
+
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+
+                    $this->redirectToRoute("order.invoice");
+                }
+            }
+        }
+
+        return $this->render('order-delivery');
+    }
+
     /**
      * set delivery address
      * set delivery module
