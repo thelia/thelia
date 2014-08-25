@@ -44,6 +44,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\Base\MetaData;
@@ -186,6 +187,7 @@ class ProductController extends AbstractSeoCrudController
             ->setVirtual($formData['virtual'])
             ->setDefaultCategory($formData['default_category'])
             ->setBrandId($formData['brand_id'])
+            ->setVirtualDocumentId($formData['virtual_document_id'])
         ;
 
         // Create and dispatch the change event
@@ -360,6 +362,14 @@ class ProductController extends AbstractSeoCrudController
             'brand_id'         => $object->getBrandId()
         );
 
+        // Virtual document
+        if (array_key_exists("product_sale_element_id", $defaultPseData)) {
+            $virtualDocumentId = intval(MetaDataQuery::getVal('virtual', 'pse', $defaultPseData['product_sale_element_id']));
+            if ($virtualDocumentId) {
+                $data["virtual_document_id"] = $virtualDocumentId;
+            }
+        }
+
         // Setup the object form
         return new ProductModificationForm($this->getRequest(), "form", $data);
     }
@@ -497,6 +507,33 @@ class ProductController extends AbstractSeoCrudController
             'admin.categories.default',
             ['category_id' => $this->getCategoryId()]
         );
+    }
+
+
+    protected function performAdditionalUpdateAction($updateEvent)
+    {
+        // Associate the file if it's a virtual product
+        // and with only 1 PSE
+        $virtualDocumentId = intval($updateEvent->getVirtualDocumentId());
+
+        Tlog::getInstance()->debug(sprintf(" GUGU %s", "ICI"));
+
+        if ($virtualDocumentId >= 0) {
+            $defaultPSE = ProductSaleElementsQuery::create()
+                ->filterByProductId($updateEvent->getProductId())
+                ->filterByIsDefault(true)
+                ->findOne();
+
+            if (null !== $defaultPSE) {
+                if ($virtualDocumentId !== 0) {
+                    $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', 'pse', $defaultPSE->getId(), $virtualDocumentId);
+                    $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
+                } else {
+                    $assocEvent = new MetaDataDeleteEvent('virtual', 'pse', $defaultPSE->getId());
+                    $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
+                }
+            }
+        }
     }
 
     // -- Related content management -------------------------------------------
@@ -1127,7 +1164,6 @@ class ProductController extends AbstractSeoCrudController
 
                 if (! isset($attributes_av_list[$attribute_id]))
                     $attributes_av_list[$attribute_id] = array();
-
 
                 $attributes_av_list[$attribute_id][] = $attribute_av_id;
             }

@@ -20,6 +20,7 @@ class ProductUpdateEvent extends ProductCreateEvent
     protected $description;
     protected $postscriptum;
     protected $brand_id;
+    protected $virtual_document_id;
 
     public function __construct($product_id)
     {
@@ -92,4 +93,25 @@ class ProductUpdateEvent extends ProductCreateEvent
     {
         return $this->brand_id;
     }
+
+    /**
+     * @param mixed $virtual_document_id
+     *
+     * @return $this
+     */
+    public function setVirtualDocumentId($virtual_document_id)
+    {
+        $this->virtual_document_id = $virtual_document_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVirtualDocumentId()
+    {
+        return $this->virtual_document_id;
+    }
+
 }

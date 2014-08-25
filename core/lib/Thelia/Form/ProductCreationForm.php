@@ -55,10 +55,6 @@ class ProductCreationForm extends BaseForm
                 "label"      => Translator::getInstance()->trans("This product does not have a physical presence"),
                 "label_attr" => array("for" => "virtual_field")
             ))
-            ->add("virtual_document_id", "integer", array(
-                "label"      => Translator::getInstance()->trans("Virtual document"),
-                "label_attr" => array("for" => "virtual_document_id_field")
-            ))
             ;
 
        if (! $change_mode) {
