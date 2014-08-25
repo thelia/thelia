@@ -1,4 +1,3 @@
-
 <?php
 namespace Thelia\Model;
 use Thelia\Model\Base\ProductSaleElementsProductDocumentQuery as BaseProductSaleElementsProductDocumentQuery;
