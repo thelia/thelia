@@ -26,7 +26,7 @@ class Sale extends BaseSale
      */
     public function getPriceOffsets()
     {
-        $currencyOffsets = SaleOffsetCurrencyQuery::create()->filterBySalesId($this->getId())->find();
+        $currencyOffsets = SaleOffsetCurrencyQuery::create()->filterBySaleId($this->getId())->find();
 
         $offsetList = [];
 
@@ -45,7 +45,7 @@ class Sale extends BaseSale
      */
     public function getSaleProductList()
     {
-        $saleProducts = SaleProductQuery::create()->filterBySalesId($this->getId())->groupByProductId()->find();
+        $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->groupByProductId()->find();
 
         return $saleProducts;
     }
@@ -57,7 +57,7 @@ class Sale extends BaseSale
      */
     public function getSaleProductsAttributeList()
     {
-        $saleProducts = SaleProductQuery::create()->filterBySalesId($this->getId())->orderByProductId()->find();
+        $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->orderByProductId()->find();
 
 
         $productSaleElements = [];

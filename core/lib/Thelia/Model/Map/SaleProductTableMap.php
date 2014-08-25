@@ -71,9 +71,9 @@ class SaleProductTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 3;
 
     /**
-     * the column name for the SALES_ID field
+     * the column name for the SALE_ID field
      */
-    const SALES_ID = 'sale_product.SALES_ID';
+    const SALE_ID = 'sale_product.SALE_ID';
 
     /**
      * the column name for the PRODUCT_ID field
@@ -97,11 +97,11 @@ class SaleProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('SalesId', 'ProductId', 'AttributeAvId', ),
-        self::TYPE_STUDLYPHPNAME => array('salesId', 'productId', 'attributeAvId', ),
-        self::TYPE_COLNAME       => array(SaleProductTableMap::SALES_ID, SaleProductTableMap::PRODUCT_ID, SaleProductTableMap::ATTRIBUTE_AV_ID, ),
-        self::TYPE_RAW_COLNAME   => array('SALES_ID', 'PRODUCT_ID', 'ATTRIBUTE_AV_ID', ),
-        self::TYPE_FIELDNAME     => array('sales_id', 'product_id', 'attribute_av_id', ),
+        self::TYPE_PHPNAME       => array('SaleId', 'ProductId', 'AttributeAvId', ),
+        self::TYPE_STUDLYPHPNAME => array('saleId', 'productId', 'attributeAvId', ),
+        self::TYPE_COLNAME       => array(SaleProductTableMap::SALE_ID, SaleProductTableMap::PRODUCT_ID, SaleProductTableMap::ATTRIBUTE_AV_ID, ),
+        self::TYPE_RAW_COLNAME   => array('SALE_ID', 'PRODUCT_ID', 'ATTRIBUTE_AV_ID', ),
+        self::TYPE_FIELDNAME     => array('sale_id', 'product_id', 'attribute_av_id', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,11 +112,11 @@ class SaleProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('SalesId' => 0, 'ProductId' => 1, 'AttributeAvId' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('salesId' => 0, 'productId' => 1, 'attributeAvId' => 2, ),
-        self::TYPE_COLNAME       => array(SaleProductTableMap::SALES_ID => 0, SaleProductTableMap::PRODUCT_ID => 1, SaleProductTableMap::ATTRIBUTE_AV_ID => 2, ),
-        self::TYPE_RAW_COLNAME   => array('SALES_ID' => 0, 'PRODUCT_ID' => 1, 'ATTRIBUTE_AV_ID' => 2, ),
-        self::TYPE_FIELDNAME     => array('sales_id' => 0, 'product_id' => 1, 'attribute_av_id' => 2, ),
+        self::TYPE_PHPNAME       => array('SaleId' => 0, 'ProductId' => 1, 'AttributeAvId' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'productId' => 1, 'attributeAvId' => 2, ),
+        self::TYPE_COLNAME       => array(SaleProductTableMap::SALE_ID => 0, SaleProductTableMap::PRODUCT_ID => 1, SaleProductTableMap::ATTRIBUTE_AV_ID => 2, ),
+        self::TYPE_RAW_COLNAME   => array('SALE_ID' => 0, 'PRODUCT_ID' => 1, 'ATTRIBUTE_AV_ID' => 2, ),
+        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'product_id' => 1, 'attribute_av_id' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -136,7 +136,7 @@ class SaleProductTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('SALES_ID', 'SalesId', 'INTEGER' , 'sale', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('SALE_ID', 'SaleId', 'INTEGER' , 'sale', 'ID', true, null, null);
         $this->addForeignPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER' , 'product', 'ID', true, null, null);
         $this->addForeignKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER', 'attribute_av', 'ID', false, null, null);
     } // initialize()
@@ -146,7 +146,7 @@ class SaleProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Sale', '\\Thelia\\Model\\Sale', RelationMap::MANY_TO_ONE, array('sales_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Sale', '\\Thelia\\Model\\Sale', RelationMap::MANY_TO_ONE, array('sale_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('AttributeAv', '\\Thelia\\Model\\AttributeAv', RelationMap::MANY_TO_ONE, array('attribute_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
@@ -166,7 +166,7 @@ class SaleProductTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getSalesId(), (string) $obj->getProductId()));
+                $key = serialize(array((string) $obj->getSaleId(), (string) $obj->getProductId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -186,7 +186,7 @@ class SaleProductTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \Thelia\Model\SaleProduct) {
-                $key = serialize(array((string) $value->getSalesId(), (string) $value->getProductId()));
+                $key = serialize(array((string) $value->getSaleId(), (string) $value->getProductId()));
 
             } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
@@ -218,11 +218,11 @@ class SaleProductTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -338,11 +338,11 @@ class SaleProductTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(SaleProductTableMap::SALES_ID);
+            $criteria->addSelectColumn(SaleProductTableMap::SALE_ID);
             $criteria->addSelectColumn(SaleProductTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(SaleProductTableMap::ATTRIBUTE_AV_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.SALES_ID');
+            $criteria->addSelectColumn($alias . '.SALE_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_ID');
         }
@@ -403,7 +403,7 @@ class SaleProductTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(SaleProductTableMap::SALES_ID, $value[0]);
+                $criterion = $criteria->getNewCriterion(SaleProductTableMap::SALE_ID, $value[0]);
                 $criterion->addAnd($criteria->getNewCriterion(SaleProductTableMap::PRODUCT_ID, $value[1]));
                 $criteria->addOr($criterion);
             }

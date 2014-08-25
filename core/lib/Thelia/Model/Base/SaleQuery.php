@@ -573,7 +573,7 @@ abstract class SaleQuery extends ModelCriteria
     {
         if ($saleOffsetCurrency instanceof \Thelia\Model\SaleOffsetCurrency) {
             return $this
-                ->addUsingAlias(SaleTableMap::ID, $saleOffsetCurrency->getSalesId(), $comparison);
+                ->addUsingAlias(SaleTableMap::ID, $saleOffsetCurrency->getSaleId(), $comparison);
         } elseif ($saleOffsetCurrency instanceof ObjectCollection) {
             return $this
                 ->useSaleOffsetCurrencyQuery()
@@ -646,7 +646,7 @@ abstract class SaleQuery extends ModelCriteria
     {
         if ($saleProduct instanceof \Thelia\Model\SaleProduct) {
             return $this
-                ->addUsingAlias(SaleTableMap::ID, $saleProduct->getSalesId(), $comparison);
+                ->addUsingAlias(SaleTableMap::ID, $saleProduct->getSaleId(), $comparison);
         } elseif ($saleProduct instanceof ObjectCollection) {
             return $this
                 ->useSaleProductQuery()

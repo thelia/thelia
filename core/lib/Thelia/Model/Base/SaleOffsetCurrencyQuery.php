@@ -21,11 +21,11 @@ use Thelia\Model\Map\SaleOffsetCurrencyTableMap;
  *
  *
  *
- * @method     ChildSaleOffsetCurrencyQuery orderBySalesId($order = Criteria::ASC) Order by the sales_id column
+ * @method     ChildSaleOffsetCurrencyQuery orderBySaleId($order = Criteria::ASC) Order by the sale_id column
  * @method     ChildSaleOffsetCurrencyQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
  * @method     ChildSaleOffsetCurrencyQuery orderByPriceOffsetValue($order = Criteria::ASC) Order by the price_offset_value column
  *
- * @method     ChildSaleOffsetCurrencyQuery groupBySalesId() Group by the sales_id column
+ * @method     ChildSaleOffsetCurrencyQuery groupBySaleId() Group by the sale_id column
  * @method     ChildSaleOffsetCurrencyQuery groupByCurrencyId() Group by the currency_id column
  * @method     ChildSaleOffsetCurrencyQuery groupByPriceOffsetValue() Group by the price_offset_value column
  *
@@ -44,11 +44,11 @@ use Thelia\Model\Map\SaleOffsetCurrencyTableMap;
  * @method     ChildSaleOffsetCurrency findOne(ConnectionInterface $con = null) Return the first ChildSaleOffsetCurrency matching the query
  * @method     ChildSaleOffsetCurrency findOneOrCreate(ConnectionInterface $con = null) Return the first ChildSaleOffsetCurrency matching the query, or a new ChildSaleOffsetCurrency object populated from the query conditions when no match is found
  *
- * @method     ChildSaleOffsetCurrency findOneBySalesId(int $sales_id) Return the first ChildSaleOffsetCurrency filtered by the sales_id column
+ * @method     ChildSaleOffsetCurrency findOneBySaleId(int $sale_id) Return the first ChildSaleOffsetCurrency filtered by the sale_id column
  * @method     ChildSaleOffsetCurrency findOneByCurrencyId(int $currency_id) Return the first ChildSaleOffsetCurrency filtered by the currency_id column
  * @method     ChildSaleOffsetCurrency findOneByPriceOffsetValue(double $price_offset_value) Return the first ChildSaleOffsetCurrency filtered by the price_offset_value column
  *
- * @method     array findBySalesId(int $sales_id) Return ChildSaleOffsetCurrency objects filtered by the sales_id column
+ * @method     array findBySaleId(int $sale_id) Return ChildSaleOffsetCurrency objects filtered by the sale_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildSaleOffsetCurrency objects filtered by the currency_id column
  * @method     array findByPriceOffsetValue(double $price_offset_value) Return ChildSaleOffsetCurrency objects filtered by the price_offset_value column
  *
@@ -101,7 +101,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
      * $obj = $c->findPk(array(12, 34), $con);
      * </code>
      *
-     * @param array[$sales_id, $currency_id] $key Primary key to use for the query
+     * @param array[$sale_id, $currency_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildSaleOffsetCurrency|array|mixed the result, formatted by the current formatter
@@ -139,7 +139,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `SALES_ID`, `CURRENCY_ID`, `PRICE_OFFSET_VALUE` FROM `sale_offset_currency` WHERE `SALES_ID` = :p0 AND `CURRENCY_ID` = :p1';
+        $sql = 'SELECT `SALE_ID`, `CURRENCY_ID`, `PRICE_OFFSET_VALUE` FROM `sale_offset_currency` WHERE `SALE_ID` = :p0 AND `CURRENCY_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -212,7 +212,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $key[0], Criteria::EQUAL);
         $this->addUsingAlias(SaleOffsetCurrencyTableMap::CURRENCY_ID, $key[1], Criteria::EQUAL);
 
         return $this;
@@ -231,7 +231,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(SaleOffsetCurrencyTableMap::SALES_ID, $key[0], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(SaleOffsetCurrencyTableMap::SALE_ID, $key[0], Criteria::EQUAL);
             $cton1 = $this->getNewCriterion(SaleOffsetCurrencyTableMap::CURRENCY_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
             $this->addOr($cton0);
@@ -241,18 +241,18 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the sales_id column
+     * Filter the query on the sale_id column
      *
      * Example usage:
      * <code>
-     * $query->filterBySalesId(1234); // WHERE sales_id = 1234
-     * $query->filterBySalesId(array(12, 34)); // WHERE sales_id IN (12, 34)
-     * $query->filterBySalesId(array('min' => 12)); // WHERE sales_id > 12
+     * $query->filterBySaleId(1234); // WHERE sale_id = 1234
+     * $query->filterBySaleId(array(12, 34)); // WHERE sale_id IN (12, 34)
+     * $query->filterBySaleId(array('min' => 12)); // WHERE sale_id > 12
      * </code>
      *
      * @see       filterBySale()
      *
-     * @param     mixed $salesId The value to use as filter.
+     * @param     mixed $saleId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -260,16 +260,16 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
      *
      * @return ChildSaleOffsetCurrencyQuery The current query, for fluid interface
      */
-    public function filterBySalesId($salesId = null, $comparison = null)
+    public function filterBySaleId($saleId = null, $comparison = null)
     {
-        if (is_array($salesId)) {
+        if (is_array($saleId)) {
             $useMinMax = false;
-            if (isset($salesId['min'])) {
-                $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $salesId['min'], Criteria::GREATER_EQUAL);
+            if (isset($saleId['min'])) {
+                $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $saleId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($salesId['max'])) {
-                $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $salesId['max'], Criteria::LESS_EQUAL);
+            if (isset($saleId['max'])) {
+                $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $saleId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -280,7 +280,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $salesId, $comparison);
+        return $this->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $saleId, $comparison);
     }
 
     /**
@@ -379,14 +379,14 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
     {
         if ($sale instanceof \Thelia\Model\Sale) {
             return $this
-                ->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $sale->getId(), $comparison);
+                ->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $sale->getId(), $comparison);
         } elseif ($sale instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(SaleOffsetCurrencyTableMap::SALES_ID, $sale->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(SaleOffsetCurrencyTableMap::SALE_ID, $sale->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterBySale() only accepts arguments of type \Thelia\Model\Sale or Collection');
         }
@@ -527,7 +527,7 @@ abstract class SaleOffsetCurrencyQuery extends ModelCriteria
     public function prune($saleOffsetCurrency = null)
     {
         if ($saleOffsetCurrency) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(SaleOffsetCurrencyTableMap::SALES_ID), $saleOffsetCurrency->getSalesId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(SaleOffsetCurrencyTableMap::SALE_ID), $saleOffsetCurrency->getSaleId(), Criteria::NOT_EQUAL);
             $this->addCond('pruneCond1', $this->getAliasedColName(SaleOffsetCurrencyTableMap::CURRENCY_ID), $saleOffsetCurrency->getCurrencyId(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }

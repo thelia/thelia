@@ -185,8 +185,8 @@ class SaleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('SaleOffsetCurrency', '\\Thelia\\Model\\SaleOffsetCurrency', RelationMap::ONE_TO_MANY, array('id' => 'sales_id', ), 'CASCADE', null, 'SaleOffsetCurrencies');
-        $this->addRelation('SaleProduct', '\\Thelia\\Model\\SaleProduct', RelationMap::ONE_TO_MANY, array('id' => 'sales_id', ), 'CASCADE', 'RESTRICT', 'SaleProducts');
+        $this->addRelation('SaleOffsetCurrency', '\\Thelia\\Model\\SaleOffsetCurrency', RelationMap::ONE_TO_MANY, array('id' => 'sale_id', ), 'CASCADE', null, 'SaleOffsetCurrencies');
+        $this->addRelation('SaleProduct', '\\Thelia\\Model\\SaleProduct', RelationMap::ONE_TO_MANY, array('id' => 'sale_id', ), 'CASCADE', 'RESTRICT', 'SaleProducts');
         $this->addRelation('SaleI18n', '\\Thelia\\Model\\SaleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'SaleI18ns');
     } // buildRelations()
 

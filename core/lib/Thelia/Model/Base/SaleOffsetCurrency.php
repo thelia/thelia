@@ -56,10 +56,10 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the sales_id field.
+     * The value for the sale_id field.
      * @var        int
      */
-    protected $sales_id;
+    protected $sale_id;
 
     /**
      * The value for the currency_id field.
@@ -364,14 +364,14 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     }
 
     /**
-     * Get the [sales_id] column value.
+     * Get the [sale_id] column value.
      *
      * @return   int
      */
-    public function getSalesId()
+    public function getSaleId()
     {
 
-        return $this->sales_id;
+        return $this->sale_id;
     }
 
     /**
@@ -397,20 +397,20 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [sales_id] column.
+     * Set the value of [sale_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\SaleOffsetCurrency The current object (for fluent API support)
      */
-    public function setSalesId($v)
+    public function setSaleId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->sales_id !== $v) {
-            $this->sales_id = $v;
-            $this->modifiedColumns[SaleOffsetCurrencyTableMap::SALES_ID] = true;
+        if ($this->sale_id !== $v) {
+            $this->sale_id = $v;
+            $this->modifiedColumns[SaleOffsetCurrencyTableMap::SALE_ID] = true;
         }
 
         if ($this->aSale !== null && $this->aSale->getId() !== $v) {
@@ -419,7 +419,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
 
 
         return $this;
-    } // setSalesId()
+    } // setSaleId()
 
     /**
      * Set the value of [currency_id] column.
@@ -508,8 +508,8 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleOffsetCurrencyTableMap::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->sales_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleOffsetCurrencyTableMap::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sale_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleOffsetCurrencyTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->currency_id = (null !== $col) ? (int) $col : null;
@@ -546,7 +546,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aSale !== null && $this->sales_id !== $this->aSale->getId()) {
+        if ($this->aSale !== null && $this->sale_id !== $this->aSale->getId()) {
             $this->aSale = null;
         }
         if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
@@ -756,8 +756,8 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(SaleOffsetCurrencyTableMap::SALES_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`SALES_ID`';
+        if ($this->isColumnModified(SaleOffsetCurrencyTableMap::SALE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`SALE_ID`';
         }
         if ($this->isColumnModified(SaleOffsetCurrencyTableMap::CURRENCY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`CURRENCY_ID`';
@@ -776,8 +776,8 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`SALES_ID`':
-                        $stmt->bindValue($identifier, $this->sales_id, PDO::PARAM_INT);
+                    case '`SALE_ID`':
+                        $stmt->bindValue($identifier, $this->sale_id, PDO::PARAM_INT);
                         break;
                     case '`CURRENCY_ID`':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
@@ -841,7 +841,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getSalesId();
+                return $this->getSaleId();
                 break;
             case 1:
                 return $this->getCurrencyId();
@@ -878,7 +878,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
         $alreadyDumpedObjects['SaleOffsetCurrency'][serialize($this->getPrimaryKey())] = true;
         $keys = SaleOffsetCurrencyTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getSalesId(),
+            $keys[0] => $this->getSaleId(),
             $keys[1] => $this->getCurrencyId(),
             $keys[2] => $this->getPriceOffsetValue(),
         );
@@ -929,7 +929,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setSalesId($value);
+                $this->setSaleId($value);
                 break;
             case 1:
                 $this->setCurrencyId($value);
@@ -961,7 +961,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     {
         $keys = SaleOffsetCurrencyTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setSalesId($arr[$keys[0]]);
+        if (array_key_exists($keys[0], $arr)) $this->setSaleId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCurrencyId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setPriceOffsetValue($arr[$keys[2]]);
     }
@@ -975,7 +975,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     {
         $criteria = new Criteria(SaleOffsetCurrencyTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(SaleOffsetCurrencyTableMap::SALES_ID)) $criteria->add(SaleOffsetCurrencyTableMap::SALES_ID, $this->sales_id);
+        if ($this->isColumnModified(SaleOffsetCurrencyTableMap::SALE_ID)) $criteria->add(SaleOffsetCurrencyTableMap::SALE_ID, $this->sale_id);
         if ($this->isColumnModified(SaleOffsetCurrencyTableMap::CURRENCY_ID)) $criteria->add(SaleOffsetCurrencyTableMap::CURRENCY_ID, $this->currency_id);
         if ($this->isColumnModified(SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE)) $criteria->add(SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE, $this->price_offset_value);
 
@@ -993,7 +993,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(SaleOffsetCurrencyTableMap::DATABASE_NAME);
-        $criteria->add(SaleOffsetCurrencyTableMap::SALES_ID, $this->sales_id);
+        $criteria->add(SaleOffsetCurrencyTableMap::SALE_ID, $this->sale_id);
         $criteria->add(SaleOffsetCurrencyTableMap::CURRENCY_ID, $this->currency_id);
 
         return $criteria;
@@ -1007,7 +1007,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getSalesId();
+        $pks[0] = $this->getSaleId();
         $pks[1] = $this->getCurrencyId();
 
         return $pks;
@@ -1021,7 +1021,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
      */
     public function setPrimaryKey($keys)
     {
-        $this->setSalesId($keys[0]);
+        $this->setSaleId($keys[0]);
         $this->setCurrencyId($keys[1]);
     }
 
@@ -1032,7 +1032,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getSalesId()) && (null === $this->getCurrencyId());
+        return (null === $this->getSaleId()) && (null === $this->getCurrencyId());
     }
 
     /**
@@ -1048,7 +1048,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setSalesId($this->getSalesId());
+        $copyObj->setSaleId($this->getSaleId());
         $copyObj->setCurrencyId($this->getCurrencyId());
         $copyObj->setPriceOffsetValue($this->getPriceOffsetValue());
         if ($makeNew) {
@@ -1088,9 +1088,9 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
     public function setSale(ChildSale $v = null)
     {
         if ($v === null) {
-            $this->setSalesId(NULL);
+            $this->setSaleId(NULL);
         } else {
-            $this->setSalesId($v->getId());
+            $this->setSaleId($v->getId());
         }
 
         $this->aSale = $v;
@@ -1115,8 +1115,8 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
      */
     public function getSale(ConnectionInterface $con = null)
     {
-        if ($this->aSale === null && ($this->sales_id !== null)) {
-            $this->aSale = ChildSaleQuery::create()->findPk($this->sales_id, $con);
+        if ($this->aSale === null && ($this->sale_id !== null)) {
+            $this->aSale = ChildSaleQuery::create()->findPk($this->sale_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
@@ -1185,7 +1185,7 @@ abstract class SaleOffsetCurrency implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->sales_id = null;
+        $this->sale_id = null;
         $this->currency_id = null;
         $this->price_offset_value = null;
         $this->alreadyInSave = false;

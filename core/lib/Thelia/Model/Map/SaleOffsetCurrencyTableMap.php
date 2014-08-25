@@ -71,9 +71,9 @@ class SaleOffsetCurrencyTableMap extends TableMap
     const NUM_HYDRATE_COLUMNS = 3;
 
     /**
-     * the column name for the SALES_ID field
+     * the column name for the SALE_ID field
      */
-    const SALES_ID = 'sale_offset_currency.SALES_ID';
+    const SALE_ID = 'sale_offset_currency.SALE_ID';
 
     /**
      * the column name for the CURRENCY_ID field
@@ -97,11 +97,11 @@ class SaleOffsetCurrencyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('SalesId', 'CurrencyId', 'PriceOffsetValue', ),
-        self::TYPE_STUDLYPHPNAME => array('salesId', 'currencyId', 'priceOffsetValue', ),
-        self::TYPE_COLNAME       => array(SaleOffsetCurrencyTableMap::SALES_ID, SaleOffsetCurrencyTableMap::CURRENCY_ID, SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE, ),
-        self::TYPE_RAW_COLNAME   => array('SALES_ID', 'CURRENCY_ID', 'PRICE_OFFSET_VALUE', ),
-        self::TYPE_FIELDNAME     => array('sales_id', 'currency_id', 'price_offset_value', ),
+        self::TYPE_PHPNAME       => array('SaleId', 'CurrencyId', 'PriceOffsetValue', ),
+        self::TYPE_STUDLYPHPNAME => array('saleId', 'currencyId', 'priceOffsetValue', ),
+        self::TYPE_COLNAME       => array(SaleOffsetCurrencyTableMap::SALE_ID, SaleOffsetCurrencyTableMap::CURRENCY_ID, SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE, ),
+        self::TYPE_RAW_COLNAME   => array('SALE_ID', 'CURRENCY_ID', 'PRICE_OFFSET_VALUE', ),
+        self::TYPE_FIELDNAME     => array('sale_id', 'currency_id', 'price_offset_value', ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -112,11 +112,11 @@ class SaleOffsetCurrencyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('SalesId' => 0, 'CurrencyId' => 1, 'PriceOffsetValue' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('salesId' => 0, 'currencyId' => 1, 'priceOffsetValue' => 2, ),
-        self::TYPE_COLNAME       => array(SaleOffsetCurrencyTableMap::SALES_ID => 0, SaleOffsetCurrencyTableMap::CURRENCY_ID => 1, SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE => 2, ),
-        self::TYPE_RAW_COLNAME   => array('SALES_ID' => 0, 'CURRENCY_ID' => 1, 'PRICE_OFFSET_VALUE' => 2, ),
-        self::TYPE_FIELDNAME     => array('sales_id' => 0, 'currency_id' => 1, 'price_offset_value' => 2, ),
+        self::TYPE_PHPNAME       => array('SaleId' => 0, 'CurrencyId' => 1, 'PriceOffsetValue' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'currencyId' => 1, 'priceOffsetValue' => 2, ),
+        self::TYPE_COLNAME       => array(SaleOffsetCurrencyTableMap::SALE_ID => 0, SaleOffsetCurrencyTableMap::CURRENCY_ID => 1, SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE => 2, ),
+        self::TYPE_RAW_COLNAME   => array('SALE_ID' => 0, 'CURRENCY_ID' => 1, 'PRICE_OFFSET_VALUE' => 2, ),
+        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'currency_id' => 1, 'price_offset_value' => 2, ),
         self::TYPE_NUM           => array(0, 1, 2, )
     );
 
@@ -136,7 +136,7 @@ class SaleOffsetCurrencyTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('SALES_ID', 'SalesId', 'INTEGER' , 'sale', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('SALE_ID', 'SaleId', 'INTEGER' , 'sale', 'ID', true, null, null);
         $this->addForeignPrimaryKey('CURRENCY_ID', 'CurrencyId', 'INTEGER' , 'currency', 'ID', true, null, null);
         $this->addColumn('PRICE_OFFSET_VALUE', 'PriceOffsetValue', 'FLOAT', false, null, 0);
     } // initialize()
@@ -146,7 +146,7 @@ class SaleOffsetCurrencyTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Sale', '\\Thelia\\Model\\Sale', RelationMap::MANY_TO_ONE, array('sales_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Sale', '\\Thelia\\Model\\Sale', RelationMap::MANY_TO_ONE, array('sale_id' => 'id', ), 'CASCADE', null);
         $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
@@ -165,7 +165,7 @@ class SaleOffsetCurrencyTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getSalesId(), (string) $obj->getCurrencyId()));
+                $key = serialize(array((string) $obj->getSaleId(), (string) $obj->getCurrencyId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -185,7 +185,7 @@ class SaleOffsetCurrencyTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \Thelia\Model\SaleOffsetCurrency) {
-                $key = serialize(array((string) $value->getSalesId(), (string) $value->getCurrencyId()));
+                $key = serialize(array((string) $value->getSaleId(), (string) $value->getCurrencyId()));
 
             } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
@@ -217,11 +217,11 @@ class SaleOffsetCurrencyTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SalesId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -337,11 +337,11 @@ class SaleOffsetCurrencyTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(SaleOffsetCurrencyTableMap::SALES_ID);
+            $criteria->addSelectColumn(SaleOffsetCurrencyTableMap::SALE_ID);
             $criteria->addSelectColumn(SaleOffsetCurrencyTableMap::CURRENCY_ID);
             $criteria->addSelectColumn(SaleOffsetCurrencyTableMap::PRICE_OFFSET_VALUE);
         } else {
-            $criteria->addSelectColumn($alias . '.SALES_ID');
+            $criteria->addSelectColumn($alias . '.SALE_ID');
             $criteria->addSelectColumn($alias . '.CURRENCY_ID');
             $criteria->addSelectColumn($alias . '.PRICE_OFFSET_VALUE');
         }
@@ -402,7 +402,7 @@ class SaleOffsetCurrencyTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(SaleOffsetCurrencyTableMap::SALES_ID, $value[0]);
+                $criterion = $criteria->getNewCriterion(SaleOffsetCurrencyTableMap::SALE_ID, $value[0]);
                 $criterion->addAnd($criteria->getNewCriterion(SaleOffsetCurrencyTableMap::CURRENCY_ID, $value[1]));
                 $criteria->addOr($criterion);
             }
