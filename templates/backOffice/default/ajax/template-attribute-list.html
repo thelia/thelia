@@ -103,7 +103,7 @@
     dialog_title    = {intl l="Remove attribute"}
     dialog_message  = {intl l="Do you really want to remove this attribute from the template ?"}
 
-    form_action     = {url path='/admin/configuration/templates/attributes/delete'}
+    form_action     = {token_url path='/admin/configuration/templates/attributes/delete'}
     form_content    = {$smarty.capture.delete_attribute_dialog nofilter}
 }
 

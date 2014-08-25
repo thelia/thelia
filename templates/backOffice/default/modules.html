@@ -71,7 +71,7 @@
     dialog_title    = {intl l="Delete a module"}
     dialog_message  = {intl l="Do you really want to delete this module ?"}
 
-    form_action         = {url path='/admin/module/delete'}
+    form_action         = {token_url path='/admin/module/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 

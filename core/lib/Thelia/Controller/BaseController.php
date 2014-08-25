@@ -49,6 +49,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 abstract class BaseController extends ContainerAware
 {
+    protected $tokenProvider;
 
     /**
      * Return an empty response (after an ajax request, for example)
@@ -155,6 +156,18 @@ abstract class BaseController extends ContainerAware
         $request = $this->getRequest();
 
         return $request->getSession();
+    }
+
+    /**
+     * @return \Thelia\Tools\TokenProvider
+     */
+    protected function getTokenProvider()
+    {
+        if (null === $this->tokenProvider) {
+            $this->tokenProvider = $this->container->get("thelia.token_provider");
+        }
+
+        return $this->tokenProvider;
     }
 
     /**

@@ -297,7 +297,7 @@
         dialog_title    = {intl l="Delete currency"}
         dialog_message  = {intl l="Do you really want to delete this currency ?"}
 
-        form_action         = {url path='/admin/configuration/currencies/delete'}
+        form_action         = {token_url path='/admin/configuration/currencies/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}

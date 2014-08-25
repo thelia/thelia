@@ -205,7 +205,7 @@
     dialog_title    = {intl l="Delete profile"}
     dialog_message  = {intl l="Do you really want to delete this profile ?"}
 
-    form_action         = {url path='/admin/configuration/profiles/delete'}
+    form_action         = {token_url path='/admin/configuration/profiles/delete'}
     form_content        = {$smarty.capture.profile_delete_dialog nofilter}
 }
 

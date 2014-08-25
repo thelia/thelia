@@ -14,6 +14,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Tools\TokenProvider;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
@@ -22,9 +23,12 @@ class UrlGenerator extends AbstractSmartyPlugin
 {
     protected $request;
 
-    public function __construct(Request $request)
+    protected $tokenProvider;
+
+    public function __construct(Request $request, TokenProvider $tokenProvider)
     {
         $this->request = $request;
+        $this->tokenProvider = $tokenProvider;
     }
 
     /**
@@ -131,6 +135,30 @@ class UrlGenerator extends AbstractSmartyPlugin
            return $pairs;
      }
 
+    public function generateUrlWithToken($params, &$smarty)
+    {
+        /**
+         * Compute the url
+         */
+        $url = $this->generateUrlFunction($params, $smarty);
+
+        $urlTokenParam = $this->getParam($params, "url_param", "_token");
+
+        /**
+         * Add the token
+         */
+        $token = $this->tokenProvider->assignToken();
+
+        $newUrl = URL::getInstance()->absoluteUrl(
+            $url,
+            [
+                $urlTokenParam => $token
+            ]
+        );
+
+        return $newUrl;
+    }
+
     /**
      * Define the various smarty plugins handled by this class
      *
@@ -140,6 +168,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     {
         return array(
             new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
+            new SmartyPluginDescriptor('function', 'token_url', $this, 'generateUrlWithToken'),
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),

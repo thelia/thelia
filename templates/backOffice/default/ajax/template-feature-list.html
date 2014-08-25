@@ -106,7 +106,7 @@
     dialog_title    = {intl l="Remove feature"}
     dialog_message  = {intl l="Do you really want to remove this feature from the template ?"}
 
-    form_action     = {url path='/admin/configuration/templates/features/delete'}
+    form_action     = {token_url path='/admin/configuration/templates/features/delete'}
     form_content    = {$smarty.capture.delete_feature_dialog nofilter}
 }
 

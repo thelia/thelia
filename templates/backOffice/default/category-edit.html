@@ -305,7 +305,7 @@
         dialog_title    = {intl l="Remove related content"}
         dialog_message  = {intl l="Do you really want to remove this related content ?"}
 
-        form_action     = {url path='/admin/categories/related-content/delete'}
+        form_action     = {token_url path='/admin/categories/related-content/delete'}
         form_content    = {$smarty.capture.delete_content_dialog nofilter}
     }
 {/block}
