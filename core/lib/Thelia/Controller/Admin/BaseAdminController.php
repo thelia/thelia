@@ -19,6 +19,8 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -71,7 +73,7 @@ class BaseAdminController extends BaseController
     /**
      * This method process the rendering of view called from an admin page
      *
-     * @param  unknown  $template
+     * @param  string  $template the template name
      * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
@@ -103,7 +105,8 @@ class BaseAdminController extends BaseController
     /**
      * Return a general error page
      *
-     * @param mixed $message a message string, or an exception instance
+     * @param string $message a message string, or an exception instance
+     * @param int $status the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -166,7 +169,7 @@ class BaseAdminController extends BaseController
      * @param string    $action        the action that caused the error (category modification, variable creation, currency update, etc.)
      * @param BaseForm  $form          the form where the error occured, or null if no form was involved
      * @param string    $error_message the error message
-     * @param Exception $exception     the exception or null if no exception
+     * @param \Exception $exception     the exception or null if no exception
      */
     protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null)
     {
@@ -198,7 +201,9 @@ class BaseAdminController extends BaseController
     }
 
     /**
-     * @return a ParserInterface instance parser
+     * @param TemplateDefinition $template the template to process
+     *
+     * @return ParserInterface instance parser
      */
     protected function getParser($template = null)
     {
@@ -309,13 +314,16 @@ class BaseAdminController extends BaseController
 
     /**
      * A simple helper to get the URL based on the language.
+     *
+     * @param string $locale the locale, or null to get the current one
+     * @return null|string the URL for the current language, or null if the "One domain for each lang" feature is disabled.
      */
     protected function getUrlLanguage($locale = null)
     {
         // Check if the functionality is activated
         if(!ConfigQuery::read("one_domain_foreach_lang", false))
 
-            return;
+            return null;
 
         // If we don't have a locale value, use the locale value in the session
         if(!$locale)
@@ -338,8 +346,6 @@ class BaseAdminController extends BaseController
      */
     protected function getListOrderFromSession($objectName, $requestParameterName, $defaultListOrder, $updateSession = true)
     {
-        $order = $defaultListOrder;
-
         $orderSessionIdentifier = sprintf("admin.%s.currentListOrder", $objectName);
 
         // Find the current order
@@ -414,7 +420,7 @@ class BaseAdminController extends BaseController
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
+     * @param string $templateName the complete template name, with extension
      * @param array $args        the template arguments
      * @param null  $templateDir
      *
