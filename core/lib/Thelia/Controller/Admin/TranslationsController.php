@@ -123,9 +123,9 @@ class TranslationsController extends BaseAdminController
                         $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
                     }
 
-                    // If the module is not active, load the translation file,
-                    // as it is not already loaded in Thelia.php
-                    if (! empty ($domain) && ! $module->getActivate()) {
+                    // Modules translations files are in the cache, and are not always
+                    // updated. Force a reload of the files to get last changes.
+                    if (! empty ($domain)) {
                         $this->loadTranslation($i18n_directory, $domain);
                     }
 
