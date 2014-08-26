@@ -45,6 +45,8 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanOrBothTypeArgument('active', 1),
+            Argument::createIntListTypeArgument('product'),
+            Argument::createIntTypeArgument('currency', $this->request->getSession()->getCurrency()->getId()),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -116,6 +118,23 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
+        $productIdList = $this->getProduct();
+
+        if (! is_null($productIdList)) {
+            $search
+                ->useSaleProductQuery()
+                    ->filterByProductId($productIdList, Criteria::IN)
+                ->endUse()
+            ;
+        }
+
+        $search
+            ->joinSaleOffsetCurrency('SaleOffsetCurrency')
+            ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, \PDO::PARAM_INT)
+        ;
+
+        $search->withColumn('`SaleOffsetCurrency`.PRICE_OFFSET_VALUE', 'price_offset_value');
+
         $orders  = $this->getOrder();
 
         foreach ($orders as $order) {
@@ -180,6 +199,21 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         foreach ($loopResult->getResultDataCollection() as $sale) {
             $loopResultRow = new LoopResultRow($sale);
 
+            switch ($sale->getPriceOffsetType()) {
+                case \Thelia\Model\Sale::OFFSET_TYPE_AMOUNT:
+                    $priceOffsetType = 'A';
+                    $priceOffsetSymbol = $this->request->getSession()->getCurrency()->getSymbol();
+                break;
+
+                case \Thelia\Model\Sale::OFFSET_TYPE_PERCENTAGE:
+                    $priceOffsetType = 'P';
+                    $priceOffsetSymbol = '%';
+                break;
+
+                default:
+                    $priceOffsetType = $priceOffsetSymbol = '?';
+            }
+
             $loopResultRow->set("ID"            , $sale->getId())
                 ->set("IS_TRANSLATED"           , $sale->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE"                  , $this->locale)
@@ -191,8 +225,12 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 ->set("ACTIVE"                  , $sale->getActive())
                 ->set("DISPLAY_INITIAL_PRICE"   , $sale->getDisplayInitialPrice())
                 ->set("START_DATE"              , $sale->getStartDate())
+                ->set("HAS_START_DATE"          , $sale->hasStartDate() ? 0 : 1)
                 ->set("END_DATE"                , $sale->getEndDate())
-                ->set("PRICE_OFFSET_TYPE"       , $sale->getPriceOffsetType())
+                ->set("HAS_END_DATE"            , $sale->hasEndDate() ? 0 : 1)
+                ->set("PRICE_OFFSET_TYPE"       , $priceOffsetType)
+                ->set("PRICE_OFFSET_SYMBOL"     , $priceOffsetSymbol)
+                ->set("PRICE_OFFSET_VALUE"      , $sale->getVirtualColumn('price_offset_value'))
             ;
 
             $loopResult->addRow($loopResultRow);
