@@ -225,6 +225,11 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     if ($routing && strpos($routing, '/admin/module/') !== false) {
                         $hasConfigurationInterface = true;
                     }
+                    else {
+                        if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                            $hasConfigurationInterface = true;
+                        }
+                    }
                 }
 
                 $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
