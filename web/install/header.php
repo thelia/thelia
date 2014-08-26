@@ -20,6 +20,8 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+set_time_limit(0);
+
 session_start();
 include 'bootstrap.php';
 
@@ -55,7 +57,9 @@ $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php',
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <div class="version-info"><?php echo $trans->trans('Version undefined'); ?></div>
+                <div class="version-info">
+                    <?php echo $trans->trans('Version') . " " . \Thelia\Core\Thelia::THELIA_VERSION ; ?>
+                </div>
             </div>
         </div>
     </div>
