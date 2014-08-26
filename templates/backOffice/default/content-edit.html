@@ -198,7 +198,7 @@
     dialog_title    = {intl l="Remove associated folder"}
     dialog_message  = {intl l="Do you really want to remove the content from this folder ?"}
 
-form_action     = {url path='/admin/content/folder/delete'}
+form_action     = {token_url path='/admin/content/folder/delete'}
 form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 }
 {/block}

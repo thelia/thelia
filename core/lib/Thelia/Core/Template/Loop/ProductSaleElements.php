@@ -72,19 +72,16 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
     {
         $search = ProductSaleElementsQuery::create();
 
-
         $id = $this->getId();
 
         if (! is_null($id)) {
             $search->filterById($id, Criteria::IN);
-        }
-        else {
+        } else {
             $product = $this->getProduct();
 
             if (! is_null($product)) {
                 $search->filterByProductId($product, Criteria::EQUAL);
-            }
-            else {
+            } else {
                 throw new \InvalidArgumentException("Either 'id' or 'product' argument should be present");
             }
         }

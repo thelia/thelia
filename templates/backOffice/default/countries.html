@@ -215,7 +215,7 @@
         dialog_title    = {intl l="Delete country"}
         dialog_message  = {intl l="Do you really want to delete this country ?"}
 
-        form_action         = {url path='/admin/configuration/countries/delete'}
+        form_action         = {token_url path='/admin/configuration/countries/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 

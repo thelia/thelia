@@ -232,7 +232,7 @@
     dialog_title    = {intl l="Delete feature"}
     dialog_message  = {intl l="Do you really want to delete this feature ? It will be removed from all product templates."}
 
-    form_action     = {url path='/admin/configuration/features/delete'}
+    form_action     = {token_url path='/admin/configuration/features/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 
@@ -253,7 +253,7 @@
     dialog_title    = {intl l="Add to all product templates"}
     dialog_message  = {intl l="Do you really want to add this feature to all product templates ?"}
 
-    form_action         = {url path='/admin/configuration/features/add-to-all-templates'}
+    form_action         = {token_url path='/admin/configuration/features/add-to-all-templates'}
     form_content        = {$smarty.capture.add_to_all_dialog nofilter}
 }
 
@@ -273,7 +273,7 @@
     dialog_title    = {intl l="Remove from all product templates"}
     dialog_message  = {intl l="Do you really want to remove this feature from all product templates ? You'll loose all product related data for this feature."}
 
-    form_action         = {url path='/admin/configuration/features/remove-from-all-templates'}
+    form_action         = {token_url path='/admin/configuration/features/remove-from-all-templates'}
     form_content        = {$smarty.capture.remove_from_all_dialog nofilter}
 }
 

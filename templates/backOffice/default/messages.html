@@ -195,7 +195,7 @@
         dialog_title    = {intl l="Delete mailing template"}
         dialog_message  = {intl l="Do you really want to delete this mailing template ?"}
 
-        form_action         = {url path='/admin/configuration/messages/delete'}
+        form_action         = {token_url path='/admin/configuration/messages/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}

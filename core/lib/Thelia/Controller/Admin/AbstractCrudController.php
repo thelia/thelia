@@ -535,13 +535,18 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Delete an object
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function deleteAction()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::DELETE))
             return $response;
+
+        // Check token
+        $this->getTokenProvider()->checkToken(
+            $this->getRequest()->query->get("_token")
+        );
 
         // Get the currency id, and dispatch the delet request
         $deleteEvent = $this->getDeleteEvent();

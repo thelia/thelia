@@ -73,6 +73,7 @@
         <service id="smarty.url.module" class="Thelia\Core\Template\Smarty\Plugins\UrlGenerator" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request"/>
+            <argument type="service" id="thelia.token_provider"/>
         </service>
 
         <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" scope="request">
