@@ -282,6 +282,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     private function associateValues($loopResultRow, $product, $default_category_id)
     {
+
+        $display_initial_price = $product->getVirtualColumn('display_initial_price');
+
+        if (is_null($display_initial_price))
+            $display_initial_price = 1;
+
         $loopResultRow
             ->set("ID"                      , $product->getId())
             ->set("REF"                     , $product->getRef())
@@ -301,7 +307,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("DEFAULT_CATEGORY"        , $default_category_id)
             ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
             ->set("BRAND_ID"                , $product->getBrandId() ?: 0)
-            ->set("SHOW_ORIGINAL_PRICE"     , $product->getVirtualColumn('display_initial_price') == 1 ? 1 : 0)
+            ->set("SHOW_ORIGINAL_PRICE"     , $display_initial_price)
         ;
 
         if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
