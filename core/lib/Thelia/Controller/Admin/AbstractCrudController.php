@@ -533,7 +533,7 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Delete an object
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function deleteAction()
     {
@@ -541,7 +541,12 @@ abstract class AbstractCrudController extends BaseAdminController
         if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::DELETE))
             return $response;
 
-        // Get the currency id, and dispatch the delete request
+        // Check token
+        $this->getTokenProvider()->checkToken(
+            $this->getRequest()->query->get("_token")
+        );
+
+        // Get the currency id, and dispatch the delet request
         $deleteEvent = $this->getDeleteEvent();
 
         $this->dispatch($this->deleteEventIdentifier, $deleteEvent);

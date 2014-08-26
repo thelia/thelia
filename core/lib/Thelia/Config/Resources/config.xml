@@ -36,6 +36,8 @@
 
         <parameter key="import.base_url">/admin/import</parameter>
         <parameter key="export.base_url">/admin/export</parameter>
+
+        <parameter key="thelia.token_id">thelia.token_provider</parameter>
     </parameters>
 
 
@@ -182,6 +184,13 @@
 
         <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
             <tag name="thelia.formatter" />
+        </service>
+
+        <!-- Thelia simple token provider -->
+        <service id="thelia.token_provider" class="Thelia\Tools\TokenProvider" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="thelia.translator" />
+            <argument>%thelia.token_id%</argument>
         </service>
     </services>
 </config>

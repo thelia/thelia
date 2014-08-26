@@ -130,7 +130,7 @@
                                                     <a class="btn btn-default btn-xs" title="{intl l='Set as default tax rule'}" href="{url path="/admin/configuration/taxes_rules/update/set_default/$ID"}" {if $IS_DEFAULT == 1}disabled{/if}><span class="glyphicon glyphicon-star"></span></a>
                                                 {/loop}
 
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.tax" access="DELETE"}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.tax" access="DELETE"}
                                                     <a class="btn btn-default btn-xs js-delete-tax-rule" title="{intl l='Delete this tax rule'}" href="#tax_rule_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}
                                             </div>
@@ -262,7 +262,7 @@
     dialog_title    = {intl l="Delete tax"}
     dialog_message  = {intl l="Do you really want to delete this tax ?"}
 
-form_action         = {url path='/admin/configuration/taxes/delete'}
+form_action         = {token_url path='/admin/configuration/taxes/delete'}
 form_content        = {$smarty.capture.tax_delete_dialog nofilter}
 }
 
@@ -339,7 +339,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     dialog_title    = {intl l="Delete tax rule"}
     dialog_message  = {intl l="Do you really want to delete this tax rule ?"}
 
-form_action         = {url path='/admin/configuration/taxes_rules/delete'}
+form_action         = {token_url path='/admin/configuration/taxes_rules/delete'}
 form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
 

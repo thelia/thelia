@@ -216,11 +216,11 @@ var pseManager = (function($){
             if (parseInt($pse.quantity.val()) > pse.quantity){
                 $pse.quantity.val(pse.quantity);
             }
-
             if (PSE_CHECK_AVAILABILITY) {
                 $pse.quantity.attr("max", pse.quantity);
             } else {
                 $pse.quantity.attr("max", PSE_DEFAULT_AVAILABLE_STOCK);
+                $pse.quantity.val("1");
             }
             $pse.submit.prop("disabled", false);
 

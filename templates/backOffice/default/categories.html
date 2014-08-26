@@ -639,7 +639,7 @@
     dialog_title    = {intl l="Delete category"}
     dialog_message  = {intl l="Do you really want to delete this category and all its content ?"}
 
-    form_action         = {url path='/admin/categories/delete'}
+    form_action         = {token_url path='/admin/categories/delete'}
     form_content        = {$smarty.capture.category_delete_dialog nofilter}
 }
 
@@ -661,7 +661,7 @@
     dialog_title    = {intl l="Delete product"}
     dialog_message  = {intl l="Do you really want to delete this product ?"}
 
-    form_action         = {url path='/admin/products/delete'}
+    form_action         = {token_url path='/admin/products/delete'}
     form_content        = {$smarty.capture.product_delete_dialog nofilter}
 }
 {/block}

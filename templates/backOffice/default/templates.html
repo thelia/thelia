@@ -192,7 +192,7 @@
     dialog_title    = {intl l="Delete template"}
     dialog_message  = {intl l="Do you really want to delete this template ? It will be removed from all products."}
 
-    form_action     = {url path='/admin/configuration/templates/delete'}
+    form_action     = {token_url path='/admin/configuration/templates/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 {/block}

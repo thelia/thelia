@@ -237,7 +237,7 @@
         dialog_title    = {intl l="Delete a variable"}
         dialog_message  = {intl l="Do you really want to delete this variable ?"}
 
-        form_action         = {url path='/admin/configuration/variables/delete'}
+        form_action         = {token_url path='/admin/configuration/variables/delete'}
         form_content        = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}

@@ -213,6 +213,9 @@ class LangController extends BaseAdminController
         $error_msg = false;
 
         try {
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get("_token")
+            );
 
             $deleteEvent = new LangDeleteEvent($this->getRequest()->get('language_id', 0));
 

@@ -380,7 +380,7 @@
     dialog_title    = {intl l="Remove related content"}
     dialog_message  = {intl l="Do you really want to remove this related content from the product ?"}
 
-    form_action     = {url path='/admin/products/content/delete'}
+    form_action     = {token_url path='/admin/products/content/delete'}
     form_content    = {$smarty.capture.delete_content_dialog nofilter}
 }
 
@@ -401,7 +401,7 @@
     dialog_title    = {intl l="Remove an accessory"}
     dialog_message  = {intl l="Do you really want to remove this accessory from the product ?"}
 
-    form_action     = {url path='/admin/products/accessory/delete'}
+    form_action     = {token_url path='/admin/products/accessory/delete'}
     form_content    = {$smarty.capture.delete_accessory_dialog nofilter}
 }
 
@@ -421,7 +421,7 @@
     dialog_title    = {intl l="Remove from category"}
     dialog_message  = {intl l="Do you really want to remove the product from this category ?"}
 
-    form_action     = {url path='/admin/products/category/delete'}
+    form_action     = {token_url path='/admin/products/category/delete'}
     form_content    = {$smarty.capture.delete_category_dialog nofilter}
 }
 

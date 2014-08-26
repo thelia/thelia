@@ -272,7 +272,7 @@
     dialog_title    = {intl l="Delete feature value"}
     dialog_message  = {intl l="Do you really want to delete this feature value ?"}
 
-    form_action     = {url path='/admin/configuration/features-av/delete'}
+    form_action     = {token_url path='/admin/configuration/features-av/delete'}
     form_content    = {$smarty.capture.delete_dialog nofilter}
 }
 
