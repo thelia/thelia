@@ -259,7 +259,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 // try to find the associated document
                 if (null !== $documentId = MetaDataQuery::getVal('virtual', MetaDataModel::PSE_KEY, $pse->getId())) {
                     $productDocument = ProductDocumentQuery::create()->findPk($documentId);
-                    if (null !== $productDocument) {
+                    if (null !== $productDocument){
                         $virtualDocumentPath = $productDocument->getFile();
                     }
                 }
