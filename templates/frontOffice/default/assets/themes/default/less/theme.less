@@ -638,6 +638,31 @@ td.product,
         background-color: #f5f5f5!important;
         margin-bottom: @line-height-computed; padding: 10px!important;
     }
+
+    .product-promo {
+        background-color: #f5f5f5;
+        margin-bottom: 15px;
+        padding: 10px;
+
+        .sale-label {
+            font-weight: 300;
+            line-height: 1.4;
+            font-size: 21px;
+        }
+
+        .sale-saving {
+            color: @brand-primary;
+
+            &:before {
+                .icon(@star);
+            }
+        }
+
+        .sale-period {
+            font-style: italic;
+            font-size: 90%;
+        }
+    }
 }
 
 #product-thumbnails {
