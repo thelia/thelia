@@ -1,3 +1,6 @@
+#2.1
+- Added sale management function
+
 #2.0.3
 - Fix js syntax in order-delivery template
 - price are now save without any round.
@@ -5,7 +8,6 @@
 - change Argument type for ref parameter in Product loop
 - Fix export template
 - [Tinymce]fix invisible thumb in file manager
-
 
 #2.0.3-beta2
 - fix update process
