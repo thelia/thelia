@@ -72,8 +72,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                     )
                 ),
                 'start-date'
-            ),
-            Argument::createIntListTypeArgument('exclude')
+            )
         );
     }
 
