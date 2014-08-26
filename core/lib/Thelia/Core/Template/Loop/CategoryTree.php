@@ -20,6 +20,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Core\Template\Element\BaseI18nLoop;
@@ -42,10 +43,19 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection(Argument::createIntTypeArgument('category', null, true),
-                Argument::createIntTypeArgument('depth', PHP_INT_MAX),
-                Argument::createBooleanOrBothTypeArgument('visible', true, false),
-                Argument::createIntListTypeArgument('exclude', array()));
+        return new ArgumentCollection(
+            Argument::createIntTypeArgument('category', null, true),
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
+            Argument::createIntListTypeArgument('exclude', array()),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('position','position_reverse','id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                ),
+                'position'
+            )
+        );
     }
 
     // changement de rubrique
@@ -65,7 +75,30 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
 
-        $search->orderByPosition(Criteria::ASC);
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "position":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "position_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+            }
+        }
 
         $results = $search->find();
 
