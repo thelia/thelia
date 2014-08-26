@@ -41,9 +41,6 @@
     <div class="main">
         {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1"}
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
-            virtual : {$product_virtual}<br>
-            stock : {$check_availability}<br>
-
 
             {$pse_count=$PSE_COUNT}
 

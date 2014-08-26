@@ -170,7 +170,7 @@ class Order extends BaseOrder
     /**
      * Check if the current order contains at less 1 virtual product with a file to download
      *
-     * @return bool true if this order have at less 1 file to download, false otherwise.
+     * @return bool   true if this order have at less 1 file to download, false otherwise.
      */
     public function hasVirtualProduct()
     {
@@ -295,5 +295,6 @@ class Order extends BaseOrder
     {
         return $this->getOrderStatus()->getCode() == $statusCode;
     }
+
 
 }
