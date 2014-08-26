@@ -237,6 +237,8 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         foreach ($loopResult->getResultDataCollection() as $order) {
             $tax = 0;
             $amount = $order->getTotalAmount($tax);
+            $hasVirtualDownload = $order->hasVirtualProduct();
+
             $loopResultRow = new LoopResultRow($order);
             $loopResultRow
                 ->set('ID', $order->getId())
@@ -250,6 +252,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('TRANSACTION_REF', $order->getTransactionRef())
                 ->set('DELIVERY_REF', $order->getDeliveryRef())
                 ->set('INVOICE_REF', $order->getInvoiceRef())
+                ->set('VIRTUAL', $hasVirtualDownload)
                 ->set('POSTAGE', $order->getPostage())
                 ->set('PAYMENT_MODULE', $order->getPaymentModuleId())
                 ->set('DELIVERY_MODULE', $order->getDeliveryModuleId())

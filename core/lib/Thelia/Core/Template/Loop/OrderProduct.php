@@ -71,6 +71,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
@@ -89,6 +90,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set("CHAPO", $orderProduct->getChapo())
                 ->set("DESCRIPTION", $orderProduct->getDescription())
                 ->set("POSTSCRIPTUM", $orderProduct->getPostscriptum())
+                ->set("VIRTUAL", $orderProduct->getVirtual())
+                ->set("VIRTUAL_DOCUMENT", $orderProduct->getVirtualDocument())
                 ->set("QUANTITY", $orderProduct->getQuantity())
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $taxedPrice - $price)

@@ -25,9 +25,11 @@ namespace Front\Controller;
 use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -39,6 +41,7 @@ use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
@@ -345,6 +348,53 @@ class OrderController extends BaseFrontController
         $this->checkOrderCustomer($order_id);
 
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+
+    public function downloadVirtualProduct($order_product_id)
+    {
+
+        if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)){
+
+            $order = $orderProduct->getOrder();
+
+            if ($order->isPaid()){
+
+                // check customer
+                $this->checkOrderCustomer($order->getId());
+
+                if ($orderProduct->getVirtualDocument()) {
+
+                    // try to get the file
+                    $path = THELIA_ROOT
+                        . ConfigQuery::read('documents_library_path', 'local/media/documents')
+                        . DS . "product" . DS
+                        . $orderProduct->getVirtualDocument();
+
+                    if (!is_file($path) || !is_readable($path)) {
+                        throw new \ErrorException(
+                            Translator::getInstance()->trans(
+                                "The file [%file] does not exist",
+                                [
+                                    "%file" => $order_product_id
+                                ]
+                            )
+                        );
+                    }
+
+                    $data = file_get_contents($path);
+
+                    $mime = MimeTypeGuesser::getInstance()
+                        ->guess($path)
+                    ;
+
+                    return new Response($data, 200, ["Content-Type" => $mime]);
+                }
+            }
+        }
+
+        throw new AccessDeniedHttpException();
+
     }
 
     private function checkOrderCustomer($order_id)

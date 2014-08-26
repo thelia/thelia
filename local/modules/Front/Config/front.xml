@@ -79,6 +79,11 @@
         <default key="_controller">Front\Controller\OrderController::generateInvoicePdf</default>
         <requirement key="order_id">\d+</requirement>
     </route>
+
+    <route id="customer.order.product.download" path="/account/download/{order_product_id}">
+        <default key="_controller">Front\Controller\OrderController::downloadVirtualProduct</default>
+        <requirement key="order_product_id">\d+</requirement>
+    </route>
     <!-- end customer routes -->
 
     <!-- customer address routes -->

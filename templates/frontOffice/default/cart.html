@@ -118,6 +118,7 @@
                         </td>
                     </tr>
                     {/loop}
+                    {if {cart attr="is_virtual"} != 1}
                     {postage}
                     {assign var="postageAmount" value=$postage }
                     <tr>
@@ -158,6 +159,9 @@
                         <td class="subprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
                     </tr>
                     {/postage}
+                    {else}
+                    {assign var="postageAmount" value=0 }
+                    {/if}
                 </tbody>
                 <tfoot>
                 <tr>

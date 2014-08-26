@@ -165,11 +165,35 @@
                                     <td>
                                     {if $STATUS >=2}
                                         <a href="{url path="/account/order/pdf/invoice/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a>
+                                        {if $VIRTUAL}
+                                        <a href="#" class="btn btn-virtual-details btn-order-details" data-order="{$ID}" title="{intl l="View order virtual downloads"}"><span class="glyphicon glyphicon-download"></span> {intl l="Download files"}</a>
+                                        {/if}
                                     {/if}
                                     </td>
                                 </tr>
+                                    {if $STATUS >=2 && $VIRTUAL}
+                                    <tr id="virtual-product-{$ID}" class="hide">
+                                        <td colspan="5">
+                                            <table class="table table-condensed table-order-products" summary="{intl l="List of files"}">
+                                                <thead>
+                                                    <tr>
+                                                        <th>{intl l="File"}</th>
+                                                        <th>{intl l="Download"}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {loop name="virtual.order.products" type="order_product" virtual="1" order="$ID"}
+                                                        <tr>
+                                                            <td>{$TITLE}</td>
+                                                            <td><a href="{url path="/account/download/$ID"}" class="btn"><span class="glyphicon glyphicon-download"></span> {intl l="Download"}</a></td>
+                                                        </tr>
+                                                    {/loop}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    {/if}
                                 {/loop}
-
                                 </tbody>
                             </table>
                             {/ifloop}
@@ -197,5 +221,20 @@
 {/block}
 
 {block name="javascript-initialization"}
+<script type="text/javascript">
+(function ($) {
+
+    $(document).ready(function () {
+
+        $('.btn-virtual-details').on('click', function(ev){
+            ev.preventDefault();
+            var $tr = $('#virtual-product-' + $(this).data('order'));
+            $tr.toggleClass('hide');
+        })
+
+    });
+
+})(jQuery);
+</script>
 {hook name="account.javascript-initialization"}
 {/block}

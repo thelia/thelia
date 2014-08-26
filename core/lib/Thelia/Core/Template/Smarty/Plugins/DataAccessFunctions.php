@@ -211,6 +211,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case "total_taxed_price_without_discount":
                 $result = $cart->getTaxedAmount($taxCountry, false);
                 break;
+            case "is_virtual":
+                $result = $cart->isVirtual();
+                break;
         }
 
         return $result;
@@ -233,6 +236,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return $order->getDeliveryModuleId();
             case 'payment_module':
                 return $order->getPaymentModuleId();
+            case 'has_virtual_product':
+                return $order->hasVirtualProduct();
+
         }
 
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
