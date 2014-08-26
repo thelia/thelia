@@ -24,8 +24,10 @@ use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\Map\ProductSaleElementsTableMap;
+use Thelia\Model\Base\ProductPriceQuery;
+use Thelia\Model\Country as CountryModel;
 use Thelia\Model\Map\SaleTableMap;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale as SaleModel;
 use Thelia\Model\SaleOffsetCurrency;
@@ -33,6 +35,7 @@ use Thelia\Model\SaleOffsetCurrencyQuery;
 use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleProductQuery;
 use Thelia\Model\SaleQuery;
+use Thelia\TaxEngine\Calculator;
 
 /**
  * Class Sale
@@ -42,6 +45,7 @@ use Thelia\Model\SaleQuery;
  */
 class Sale extends BaseAction implements EventSubscriberInterface
 {
+
     /**
      * Update the promo status of the sale's selected products and combinations
      *
@@ -50,25 +54,94 @@ class Sale extends BaseAction implements EventSubscriberInterface
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event) {
 
+        $taxCalculator = new Calculator();
+
         $sale = $event->getSale();
 
         // Get all selected product sale elements for this sale
         if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)) {
 
-            /** @var SaleProduct $saleProduct */
-            foreach($saleProducts as $saleProduct) {
+            $saleOffsetByCurrency = $sale->getPriceOffsets();
 
-                // If no attribute AV id is defined, consider ALL product combinations
-                if (is_null($saleProduct->getAttributeAvId())) {
-                    ProductSaleElementsQuery::create()
-                        ->filterByProductId($saleProduct->getProductId())
-                        ->update([ 'Promo' => $sale->getActive()])
-                    ;
+            $offsetType = $sale->getPriceOffsetType();
+
+            $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+
+            $con->beginTransaction();
+
+            try {
+
+                /** @var SaleProduct $saleProduct */
+                foreach($saleProducts as $saleProduct) {
+
+                    $taxCalculator->load(
+                        $saleProduct->getProduct($con),
+                        CountryModel::getShopLocation()
+                    );
+
+                    // If no attribute AV id is defined, consider ALL product combinations
+                    if (is_null($saleProduct->getAttributeAvId())) {
+                        ProductSaleElementsQuery::create()
+                            ->filterByProductId($saleProduct->getProductId())
+                            ->update([ 'Promo' => $sale->getActive()], $con)
+                        ;
+
+                        $pseList = ProductSaleElementsQuery::create()
+                            ->filterByProductId($saleProduct->getProductId());
+
+                        /** @var ProductSaleElements $pse */
+                        foreach($pseList as $pse) {
+
+                            /** @var SaleOffsetCurrency $offsetByCurrency */
+                            foreach ($saleOffsetByCurrency as $currencyId => $offset) {
+
+                                $productPrice = ProductPriceQuery::create()
+                                    ->filterByProductSaleElementsId($pse->getId())
+                                    ->filterByCurrencyId($currencyId)
+                                    ->findOne($con);
+
+                                if (null !== $productPrice) {
+
+                                    // Get the taxed price
+                                    $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
+
+                                    // Remove the price offset to get the taxed promo price
+                                    switch ($offsetType) {
+                                        case SaleModel::OFFSET_TYPE_AMOUNT :
+                                            $promoPrice = max(0, $priceWithTax - $offset);
+                                            break;
+
+                                        case SaleModel::OFFSET_TYPE_PERCENTAGE :
+                                            $promoPrice = $priceWithTax * (1 - $offset / 100);
+                                            break;
+
+                                        default:
+                                            $promoPrice = $priceWithTax;
+                                    }
+
+                                    // and then get the untaxed promo price.
+                                    $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);
+
+                                    $productPrice
+                                        ->setPromoPrice($promoPrice)
+                                        ->save($con)
+                                    ;
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // Consider only combinations which contains the selected AttributeAv ID
+                        // TODO not yet coded.
+                        throw new \RuntimeException("Not yet implemented !");
+                    }
                 }
-                else {
-                    // Consider only combinations which contains the selected AttributeAv ID
-                    throw new \RuntimeException("Not yet implemented !");
-                }
+
+                $con->commit();
+
+            } catch (PropelException $e) {
+                $con->rollback();
+                throw $e;
             }
         }
     }
@@ -296,7 +369,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->filterByActive(true)
                     ->filterByEndDate($now, Criteria::GREATER_THAN)) {
 
-                /** @var \Thelia\Model\Sale $sale */
+                /** @var SaleModel $sale */
                 foreach($salesToDisable as $sale) {
                     $sale->setActive(false)->save();
 
@@ -314,7 +387,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->filterByStartDate($now, Criteria::GREATER_THAN)
                     ->filterByEndDate($now, Criteria::LESS_THAN))
                 {
-                /** @var \Thelia\Model\Sale $sale */
+                /** @var SaleModel $sale */
                 foreach($salesToDisable as $sale) {
 
                     $sale->setActive(true)->save();
