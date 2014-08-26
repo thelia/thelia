@@ -128,6 +128,16 @@
                     </div>{/if}
                 </div>
 
+                {loop type="sale" name="product-sale-info" product="{$ID}" active="1"}
+                    <div class="product-promo">
+                        <p class="sale-label">{$SALE_LABEL}</p>
+                        <p class="sale-saving"> {intl l="Save %amount%sign on this product" amount=$PRICE_OFFSET_VALUE sign=$PRICE_OFFSET_SYMBOL}</p>
+                        {if $HAS_END_DATE}
+                            <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
+                        {/if}
+                    </div>
+                 {/loop}
+
                 <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                     <div class="availability">
                         <span class="availibity-label">{intl l="Availability"}: </span>
@@ -148,7 +158,9 @@
 
                         <span id="pse-promo">
                             <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
-                            <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                            {if $SHOW_ORIGINAL_PRICE}
+                                <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                            {/if}
                         </span>
                     </div>
 
