@@ -866,7 +866,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         );
         $salesJoin->setJoinType(Criteria::LEFT_JOIN);
 
-        $search->addJoinObject($salesJoin, 'SalePriceDisplay');
+        $search
+            ->addJoinObject($salesJoin, 'SalePriceDisplay')
+            ->addJoinCondition('SalePriceDisplay', '`SalePriceDisplay`.`active` = 1');
+
 
         // ... to get the DISPLAY_INITIAL_PRICE column !
         $search->withColumn('`SalePriceDisplay`.DISPLAY_INITIAL_PRICE', 'display_initial_price');
