@@ -20,6 +20,20 @@ class Sale extends BaseSale
 
 
     /**
+     * @return bool true if the sale has an end date, false otherwise
+     */
+    public function hasStartDate() {
+        return ! is_null($this->getEndDate());
+    }
+
+    /**
+     * @return bool true if the sale has a begin date, false otherwise
+     */
+    public function hasEndDate() {
+        return ! is_null($this->getEndDate());
+    }
+
+    /**
      * Get the price offsets for each of the currencies.
      *
      * @return array an array of (currency ID => offset value)
