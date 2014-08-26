@@ -12,8 +12,12 @@
 
 namespace VirtualProductDelivery;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Country;
+use Thelia\Model\LangQuery;
+use Thelia\Model\Message;
+use Thelia\Model\MessageQuery;
 use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\Exception\DeliveryException;
 
@@ -47,6 +51,31 @@ class VirtualProductDelivery extends AbstractDeliveryModule
         }
 
         return 0.0;
+    }
+
+
+    public function postActivation(ConnectionInterface $con = null)
+    {
+        // delete existing message
+        $message = MessageQuery::create()
+            ->filterByName('mail_virtualproduct')
+            ->findOne($con);
+
+        if (null !== $message) {
+            $message->delete($con);
+        }
+
+        // create new message
+        $message = new Message();
+        $message
+            ->setName('mail_virtualproduct');
+
+        $languages = LangQuery::create()
+            ->find();
+        foreach ($languages as $language){
+            // todo: implement
+        }
+
     }
 
 }

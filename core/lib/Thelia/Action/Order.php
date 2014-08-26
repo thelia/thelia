@@ -258,9 +258,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 if (null !== $documentId = MetaDataQuery::getVal('virtual', 'pse', $pse->getId())) {
                     $productDocument = ProductDocumentQuery::create()->findPk($documentId);
                     if (null !== $productDocument){
-                        $virtualDocumentPath = $productDocument->getUploadDir() . $productDocument->getFile();
+                        $virtualDocumentPath = $productDocument->getFile();
                     }
-
                 }
             }
 
