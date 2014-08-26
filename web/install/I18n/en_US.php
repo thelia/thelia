@@ -25,7 +25,7 @@ return array(
 'Thelia installation wizard' => 'Thelia installation wizard',
 'The SQL server contains multiple databases.' => 'The SQL server contains multiple databases.',
 'Username :' => 'Username :',
-'Version undefined' => 'Version undefined',
+'Version' => 'Version',
 'website url :' => 'website url :',
 'Welcome' => 'Welcome',
 'Welcome in the Thelia installation wizard.' => 'Welcome in the Thelia installation wizard.',
