@@ -169,6 +169,69 @@ class SmartyAssetsManager
         return $url;
     }
 
+    /**
+     * Get all possible directories from which the asset can be found.
+     * It returns an array of directories ordered by priority.
+     *
+     * @param  array  $directories all directories source available for the template type
+     * @param  string $template    the name of the template
+     * @param  string $source      the module code or "0"
+     * @return array  possible directories
+     */
+    protected function getFallbackSources($directories, $template, $source)
+    {
+        $paths = [];
+
+        if ("0" !== $source) {
+
+            if (isset($directories[$template]["0"])) {
+                $paths[] = $directories[$template]["0"] . DS
+                    . TemplateDefinition::HOOK_OVERRIDE_SUBDIR . DS
+                    .$source;
+            }
+
+            if (isset($directories[$template][$source])) $paths[] = $directories[$template][$source];
+
+            if (isset($directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source])) $paths[] = $directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source];
+
+        } else {
+
+            $paths[] = $directories[$template]["0"];
+
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Check if a file(s) exists in a directory
+     *
+     * @param  string $dir  the directory path
+     * @param  string $file the file path. It can contain wildcard. eg: /path/*.css
+     * @return bool   true if file(s)
+     */
+    protected function filesExist($dir, $file)
+    {
+        if (!file_exists($dir)) return false;
+
+        $full_path = rtrim($dir, DS) . DS . ltrim($file, DS);
+
+        $path = dirname($full_path);
+        $name = basename($full_path);
+
+        try {
+            $finder = new Finder();
+
+            $files_found = $finder->files()->in($path)->name($name)->count() > 0;
+        } catch (\Exception $ex) {
+            Tlog::getInstance()->addError($ex->getMessage());
+
+            $files_found = false;
+        }
+
+        return $files_found;
+    }
+
     public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         // Opening tag (first call only)
