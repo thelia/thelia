@@ -36,13 +36,6 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
      */
     protected $zip;
 
-    public function __construct()
-    {
-        parent::__construct();
-
-        $this->zip = new \ZipArchive();
-    }
-
     /**
      * On the destruction of the class,
      * remove the temporary file.
@@ -416,6 +409,8 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
     public function setEnvironment($environment)
     {
         parent::setEnvironment($environment);
+
+        $this->zip = new \ZipArchive();
 
         $cacheFile = $this->generateCacheFile($environment);
 

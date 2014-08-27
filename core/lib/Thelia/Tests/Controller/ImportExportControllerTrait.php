@@ -40,12 +40,30 @@ trait ImportExportControllerTrait
             mkdir($cacheDir);
         }
 
-        $archiveBuilderManager = (new ArchiveBuilderManager("test"))
-            ->add(new ZipArchiveBuilder())
-            ->add(new TarArchiveBuilder())
-            ->add(new TarBz2ArchiveBuilder())
-            ->add(new TarGzArchiveBuilder())
-        ;
+        $archiveBuilders = [
+            new ZipArchiveBuilder(),
+            new TarArchiveBuilder(),
+            new TarBz2ArchiveBuilder(),
+            new TarGzArchiveBuilder(),
+        ];
+
+        $archiveBuilderManager = new ArchiveBuilderManager("test");
+
+        /**
+         * @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder
+         */
+        foreach ($archiveBuilders as $key => $archiveBuilder) {
+            if (!$archiveBuilder->isAvailable()) {
+                unset($archiveBuilders[$key]);
+            } else {
+                $archiveBuilderManager->add($archiveBuilder);
+            }
+        }
+
+        if (empty($archiveBuilders)) {
+            $this->markTestSkipped("You don't have any archive builder, you can't run this test");
+        }
+
         $container->set("thelia.manager.archive_builder_manager", $archiveBuilderManager);
 
         $formatterManager = (new FormatterManager())
