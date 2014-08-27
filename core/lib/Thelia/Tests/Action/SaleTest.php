@@ -94,11 +94,13 @@ class SaleTest extends TestCaseWithURLToolSetup
     {
         $sale = $this->getRandomSale();
 
+        $date = new \DateTime();
+
         $event = new SaleUpdateEvent($sale->getId());
         $event->setDispatcher($this->dispatcher);
         $event
-            ->setStartDate(\DateTime::createFromFormat("Y-m-d", date('Y-m-d', time() - 84600)))
-            ->setEndDate(\DateTime::createFromFormat("Y-m-d", date('Y-m-d', time() + 86400)))
+            ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
+            ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
             ->setActive(1)
             ->setDisplayInitialPrice(1)
             ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_AMOUNT)
