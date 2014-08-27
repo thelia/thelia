@@ -58,6 +58,6 @@ class FileDownloaderTest extends \PHPUnit_Framework_TestCase
 
     public function testFileDownloadSuccess()
     {
-        $this->downloader->download("https://github.com/thelia/thelia", "php://temp");
+        $this->downloader->download("http://www.w3.org/", "php://temp");
     }
 }
