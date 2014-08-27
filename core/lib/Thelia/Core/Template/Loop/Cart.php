@@ -99,7 +99,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
             $loopResultRow->set("PRODUCT_ID", $product->getId());
             $loopResultRow->set("PRODUCT_URL", $product->getUrl($this->request->getSession()->getLang()->getLocale()));
-            if (!$checkAvailability || $product->getVirtual() === 1){
+            if (!$checkAvailability || $product->getVirtual() === 1) {
                 $loopResultRow->set("STOCK", $defaultAvailability);
             } else {
                 $loopResultRow->set("STOCK", $productSaleElement->getQuantity());

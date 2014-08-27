@@ -12,7 +12,6 @@
 
 namespace VirtualProductDelivery\EventListeners;
 
-use Colissimo\Colissimo;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
