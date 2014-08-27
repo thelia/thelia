@@ -387,7 +387,7 @@ class FileController extends BaseAdminController
      *
      * @return FileModelInterface
      */
-    public function updateFileAction($fileId, $parentType, $objectType, $eventName)
+    protected function updateFileAction($fileId, $parentType, $objectType, $eventName)
     {
         $message = false;
 
@@ -456,9 +456,11 @@ class FileController extends BaseAdminController
                 else
                     $tab = 'images';
 
-                $this->redirect(URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab]));
+                return $this->generateRedirect(
+                    URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
+                );
             } else {
-                $this->redirectSuccess($fileUpdateForm);
+                return $this->generateSuccessRedirect($fileUpdateForm);
             }
 
         } catch (FormValidationException $e) {
@@ -498,12 +500,16 @@ class FileController extends BaseAdminController
 
         $imageInstance = $this->updateFileAction($imageId, $parentType, 'image', TheliaEvents::IMAGE_UPDATE);
 
-        return $this->render('image-edit', array(
-            'imageId' => $imageId,
-            'imageType' => $parentType,
-            'redirectUrl' => $imageInstance,
-            'formId' => $imageInstance->getUpdateFormId()
-        ));
+        if ($imageInstance instanceof \Symfony\Component\HttpFoundation\Response) {
+            return $imageInstance;
+        } else {
+            return $this->render('image-edit', array(
+                'imageId' => $imageId,
+                'imageType' => $parentType,
+                'redirectUrl' => $imageInstance->getRedirectionUrl(),
+                'formId' => $imageInstance->getUpdateFormId()
+            ));
+        }
     }
 
     /**
@@ -522,12 +528,17 @@ class FileController extends BaseAdminController
 
         $documentInstance = $this->updateFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_UPDATE);
 
-        return $this->render('document-edit', array(
+        if ($documentInstance instanceof \Symfony\Component\HttpFoundation\Response) {
+            return $documentInstance;
+        } else {
+            return $this->render('document-edit', array(
                 'documentId' => $documentId,
                 'documentType' => $parentType,
                 'redirectUrl' => $documentInstance->getRedirectionUrl(),
                 'formId' => $documentInstance->getUpdateFormId()
             ));
+        }
+
     }
 
     /**
