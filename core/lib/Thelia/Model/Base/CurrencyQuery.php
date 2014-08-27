@@ -56,6 +56,10 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
  * @method     ChildCurrencyQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
  *
+ * @method     ChildCurrencyQuery leftJoinSaleOffsetCurrency($relationAlias = null) Adds a LEFT JOIN clause to the query using the SaleOffsetCurrency relation
+ * @method     ChildCurrencyQuery rightJoinSaleOffsetCurrency($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleOffsetCurrency relation
+ * @method     ChildCurrencyQuery innerJoinSaleOffsetCurrency($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleOffsetCurrency relation
+ *
  * @method     ChildCurrencyQuery leftJoinCurrencyI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CurrencyI18n relation
  * @method     ChildCurrencyQuery rightJoinCurrencyI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CurrencyI18n relation
  * @method     ChildCurrencyQuery innerJoinCurrencyI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CurrencyI18n relation
@@ -782,6 +786,79 @@ abstract class CurrencyQuery extends ModelCriteria
         return $this
             ->joinProductPrice($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ProductPrice', '\Thelia\Model\ProductPriceQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\SaleOffsetCurrency object
+     *
+     * @param \Thelia\Model\SaleOffsetCurrency|ObjectCollection $saleOffsetCurrency  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterBySaleOffsetCurrency($saleOffsetCurrency, $comparison = null)
+    {
+        if ($saleOffsetCurrency instanceof \Thelia\Model\SaleOffsetCurrency) {
+            return $this
+                ->addUsingAlias(CurrencyTableMap::ID, $saleOffsetCurrency->getCurrencyId(), $comparison);
+        } elseif ($saleOffsetCurrency instanceof ObjectCollection) {
+            return $this
+                ->useSaleOffsetCurrencyQuery()
+                ->filterByPrimaryKeys($saleOffsetCurrency->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySaleOffsetCurrency() only accepts arguments of type \Thelia\Model\SaleOffsetCurrency or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SaleOffsetCurrency relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinSaleOffsetCurrency($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SaleOffsetCurrency');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SaleOffsetCurrency');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SaleOffsetCurrency relation SaleOffsetCurrency object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\SaleOffsetCurrencyQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleOffsetCurrencyQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinSaleOffsetCurrency($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SaleOffsetCurrency', '\Thelia\Model\SaleOffsetCurrencyQuery');
     }
 
     /**

@@ -100,7 +100,7 @@ class ModelCriteriaTools
             $aliasPrefix = $foreignTable . '_';
         }
 
-        $requestedLocaleI18nAlias = 'requested_locale_i18n';
+        $requestedLocaleI18nAlias = $aliasPrefix . 'requested_locale_i18n';
 
         $requestedLocaleJoin = new Join();
         $requestedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $requestedLocaleI18nAlias);

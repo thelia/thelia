@@ -16,18 +16,15 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-
-use Thelia\Type\TypeCollection;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -195,6 +192,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
                 ->set("WEIGHT"            , $PSEValue->getWeight())
                 ->set("REF"               , $PSEValue->getRef())
                 ->set("EAN_CODE"          , $PSEValue->getEanCode())
+                ->set("PRODUCT_ID"        , $PSEValue->getProductId())
                 ->set("PRICE"             , $price)
                 ->set("PRICE_TAX"         , $taxedPrice - $price)
                 ->set("TAXED_PRICE"       , $taxedPrice)

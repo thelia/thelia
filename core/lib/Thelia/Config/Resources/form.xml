@@ -52,7 +52,6 @@
         <form name="thelia.admin.content.image.modification" class="Thelia\Form\ContentImageModification"/>
         <form name="thelia.admin.content.document.modification" class="Thelia\Form\ContentDocumentModification"/>
 
-
         <form name="thelia.admin.brand.creation" class="Thelia\Form\Brand\BrandCreationForm"/>
         <form name="thelia.admin.brand.modification" class="Thelia\Form\Brand\BrandModificationForm"/>
         <form name="thelia.admin.brand.image.modification" class="Thelia\Form\Brand\BrandImageModification"/>
@@ -141,6 +140,9 @@
 
         <form name="thelia.export" class="Thelia\Form\ExportForm" />
         <form name="thelia.import" class="Thelia\Form\ImportForm" />
+
+        <form name="thelia.admin.sale.creation" class="Thelia\Form\Sale\SaleCreationForm"/>
+        <form name="thelia.admin.sale.modification" class="Thelia\Form\Sale\SaleModificationForm"/>
 
     </forms>
 

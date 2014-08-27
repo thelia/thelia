@@ -49,6 +49,8 @@
                             <dt>{intl l="Total"} : </dt>
                             <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
                         </dl>
+
+                        {block name='additional-payment-info'}{/block}
                     </div>
                 </div>
             {/elsehook}

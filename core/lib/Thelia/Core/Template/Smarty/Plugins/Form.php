@@ -253,6 +253,14 @@ class Form extends AbstractSmartyPlugin
 
             $val = $value[$key];
 
+            // For collection types, the type of field is defined in the 'type' option.
+            // We will use this instead of the 'collection' type
+            $formFieldType = $formFieldConfig->getType()->getInnerType();
+
+            if ($formFieldType instanceof CollectionType) {
+                $formFieldType = $formFieldConfig->getOption('type');
+            }
+
             $this->assignFieldValues(
                 $template,
                 $name,
@@ -312,6 +320,8 @@ class Form extends AbstractSmartyPlugin
             $field_name        = $this->getParam($params, 'field', false);
             $field_extra_class = $this->getParam($params, 'extra_class', '');
             $field_value       = $this->getParam($params, 'value', '');
+            $show_label        = $this->getParam($params, 'show_label', true);
+            $value_key         = $this->getParam($params, 'value_key', false);
 
             $template->assign([
                     'content'           => trim($content),
@@ -319,8 +329,10 @@ class Form extends AbstractSmartyPlugin
                     'field_name'        => $field_name,
                     'field_extra_class' => $field_extra_class,
                     'field_value'       => $field_value,
-                    'field_template'    => $templateStyle
-                ]);
+                    'field_template'    => $templateStyle,
+                    'value_key'         => $value_key,
+                    'show_label'        => $show_label,
+               ]);
 
             $data = $template->fetch(sprintf('string:%s', $snippet_content));
         }

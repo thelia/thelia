@@ -297,6 +297,12 @@ header .header .logo{
             }
         }
     }
+
+    .short-description {
+        background-color: #f5f5f5;
+        margin-bottom: 10px;
+        padding: 10px;
+    }
 }
 
 .product-options {
@@ -637,6 +643,31 @@ td.product,
     .product-cart {
         background-color: #f5f5f5!important;
         margin-bottom: @line-height-computed; padding: 10px!important;
+    }
+
+    .product-promo {
+        background-color: #f5f5f5;
+        margin-bottom: 15px;
+        padding: 10px;
+
+        .sale-label {
+            font-weight: 300;
+            line-height: 1.4;
+            font-size: 21px;
+        }
+
+        .sale-saving {
+            color: @brand-primary;
+
+            &:before {
+                .icon(@star);
+            }
+        }
+
+        .sale-period {
+            font-style: italic;
+            font-size: 90%;
+        }
     }
 }
 
@@ -1271,4 +1302,36 @@ td.product,
   -ms-filter: @filter-map;
   -o-filter: @filter-map;
   filter: @filter-map;
+}
+
+// Sale details
+#sale-details {
+
+    .sale-discount-information {
+        background-color: #f5f5f5;
+        margin-bottom: 10px;
+        padding: 10px;
+
+        .sale-saving {
+            font-size: 120%;
+            color: @brand-primary;
+
+            &:before {
+                .icon(@star);
+            }
+        }
+
+        .sale-period {
+            font-style: italic;
+            font-size: 90%;
+        }
+    }
+
+    .sale-information {
+        margin-bottom: 30px;
+
+        .chapo, .description {
+            margin-bottom: 10px;
+        }
+    }
 }

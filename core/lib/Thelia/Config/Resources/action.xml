@@ -183,6 +183,11 @@
             <argument>%kernel.cache_dir%</argument>
             <tag name="kernel.event_subscriber" />
         </service>
+
+        <service id="thelia.action.sale" class="Thelia\Action\Sale">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>

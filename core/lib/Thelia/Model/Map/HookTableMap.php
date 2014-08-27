@@ -182,7 +182,7 @@ class HookTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 255, null);
-        $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
+        $this->addColumn('TYPE', 'Type', 'TINYINT', false, null, null);
         $this->addColumn('BY_MODULE', 'ByModule', 'BOOLEAN', false, 1, null);
         $this->addColumn('NATIVE', 'Native', 'BOOLEAN', false, 1, null);
         $this->addColumn('ACTIVATE', 'Activate', 'BOOLEAN', false, 1, null);
@@ -211,7 +211,7 @@ class HookTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title,description,chapo', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
     /**

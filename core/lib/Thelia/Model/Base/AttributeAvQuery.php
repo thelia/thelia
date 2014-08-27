@@ -46,6 +46,10 @@ use Thelia\Model\Map\AttributeAvTableMap;
  * @method     ChildAttributeAvQuery rightJoinAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCombination relation
  * @method     ChildAttributeAvQuery innerJoinAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCombination relation
  *
+ * @method     ChildAttributeAvQuery leftJoinSaleProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the SaleProduct relation
+ * @method     ChildAttributeAvQuery rightJoinSaleProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the SaleProduct relation
+ * @method     ChildAttributeAvQuery innerJoinSaleProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the SaleProduct relation
+ *
  * @method     ChildAttributeAvQuery leftJoinAttributeAvI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeAvI18n relation
  * @method     ChildAttributeAvQuery rightJoinAttributeAvI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeAvI18n relation
  * @method     ChildAttributeAvQuery innerJoinAttributeAvI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeAvI18n relation
@@ -598,6 +602,79 @@ abstract class AttributeAvQuery extends ModelCriteria
         return $this
             ->joinAttributeCombination($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'AttributeCombination', '\Thelia\Model\AttributeCombinationQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\SaleProduct object
+     *
+     * @param \Thelia\Model\SaleProduct|ObjectCollection $saleProduct  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAttributeAvQuery The current query, for fluid interface
+     */
+    public function filterBySaleProduct($saleProduct, $comparison = null)
+    {
+        if ($saleProduct instanceof \Thelia\Model\SaleProduct) {
+            return $this
+                ->addUsingAlias(AttributeAvTableMap::ID, $saleProduct->getAttributeAvId(), $comparison);
+        } elseif ($saleProduct instanceof ObjectCollection) {
+            return $this
+                ->useSaleProductQuery()
+                ->filterByPrimaryKeys($saleProduct->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterBySaleProduct() only accepts arguments of type \Thelia\Model\SaleProduct or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the SaleProduct relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildAttributeAvQuery The current query, for fluid interface
+     */
+    public function joinSaleProduct($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('SaleProduct');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'SaleProduct');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the SaleProduct relation SaleProduct object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\SaleProductQuery A secondary query class using the current class as primary query
+     */
+    public function useSaleProductQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinSaleProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'SaleProduct', '\Thelia\Model\SaleProductQuery');
     }
 
     /**

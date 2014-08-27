@@ -1331,6 +1331,54 @@
         <requirement key="id">\d+</requirement>
     </route>
 
+    <!-- Routes to the sales & promotions management -->
+
+    <route id="admin.sale.default" path="/admin/sales">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::defaultAction</default>
+    </route>
+
+    <route id="admin.sale.reset" path="/admin/sales/reset">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::resetSaleStatus</default>
+    </route>
+
+    <route id="admin.sale.reset" path="/admin/sales/check-activation">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::checkSalesActivationStatus</default>
+    </route>
+
+    <route id="admin.sale.create" path="/admin/sale/create">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::createAction</default>
+    </route>
+
+    <route id="admin.sale.update" path="/admin/sale/update/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateAction</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.save" path="/admin/sale/save/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::processUpdateAction</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.delete" path="/admin/sale/delete">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::deleteAction</default>
+    </route>
+
+    <route id="admin.sale.update.product.list" path="/admin/sale/update-product-list/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductList</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.update.product.attribute.list" path="/admin/sale/update-product-attribute-list/{sale_id}/{product_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::updateProductAttributes</default>
+        <requirement key="sale_id">\d+</requirement>
+        <requirement key="product_id">\d+</requirement>
+    </route>
+
+    <route id="admin.sale.toggleActivity" path="/admin/sale/toggle-activity/{sale_id}">
+        <default key="_controller">Thelia\Controller\Admin\SaleController::toggleActivity</default>
+        <requirement key="sale_id">\d+</requirement>
+    </route>
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">

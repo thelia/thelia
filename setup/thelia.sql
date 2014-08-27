@@ -894,62 +894,6 @@ CREATE TABLE `module`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
--- hook
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `hook`;
-
-CREATE TABLE `hook`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `code` VARCHAR(255) NOT NULL,
-    `type` TINYINT NOT NULL,
-    `by_module` TINYINT(1),
-    `native` TINYINT(1),
-    `activate` TINYINT(1),
-    `block` TINYINT(1),
-    `position` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
-    INDEX `idx_module_activate` (`activate`)
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
--- module_hook
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `module_hook`;
-
-CREATE TABLE `module_hook`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `module_id` INTEGER NOT NULL,
-    `hook_id` INTEGER NOT NULL,
-    `classname` VARCHAR(255),
-    `method` VARCHAR(255),
-    `active` TINYINT(1) NOT NULL,
-    `hook_active` TINYINT(1) NOT NULL,
-    `module_active` TINYINT(1) NOT NULL,
-    `position` INTEGER NOT NULL,
-    PRIMARY KEY (`id`),
-    INDEX `idx_module_hook_active` (`active`),
-    INDEX `FI_module_hook_module_id` (`module_id`),
-    INDEX `FI_module_hook_hook_id` (`hook_id`),
-    CONSTRAINT `fk_module_hook_module_id`
-        FOREIGN KEY (`module_id`)
-        REFERENCES `module` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_module_hook_hook_id`
-        FOREIGN KEY (`hook_id`)
-        REFERENCES `hook` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
 -- accessory
 -- ---------------------------------------------------------------------
 
@@ -1930,6 +1874,83 @@ CREATE TABLE `form_firewall`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- sale
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale`;
+
+CREATE TABLE `sale`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `active` TINYINT(1) DEFAULT 0 NOT NULL,
+    `display_initial_price` TINYINT(1) DEFAULT 1 NOT NULL,
+    `start_date` DATETIME,
+    `end_date` DATETIME,
+    `price_offset_type` TINYINT,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_sales_active_start_end_date` (`active`, `start_date`, `end_date`),
+    INDEX `idx_sales_active` (`active`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale_offset_currency
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_offset_currency`;
+
+CREATE TABLE `sale_offset_currency`
+(
+    `sale_id` INTEGER NOT NULL,
+    `currency_id` INTEGER NOT NULL,
+    `price_offset_value` FLOAT DEFAULT 0,
+    PRIMARY KEY (`sale_id`,`currency_id`),
+    INDEX `fk_sale_offset_currency_currency1_idx` (`currency_id`),
+    CONSTRAINT `fk_sale_offset_currency_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_offset_currency_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- sale_product
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_product`;
+
+CREATE TABLE `sale_product`
+(
+    `sale_id` INTEGER NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    `attribute_av_id` INTEGER,
+    PRIMARY KEY (`sale_id`,`product_id`),
+    INDEX `fk_sale_product_product1_idx` (`product_id`),
+    INDEX `fk_sale_product_attribute_av1_idx` (`attribute_av_id`),
+    INDEX `idx_sale_product_sales_id_product_id` (`sale_id`, `product_id`),
+    CONSTRAINT `fk_sale_product_sales_id`
+        FOREIGN KEY (`sale_id`)
+        REFERENCES `sale` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_sale_product_attribute_av_id`
+        FOREIGN KEY (`attribute_av_id`)
+        REFERENCES `attribute_av` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- export_category
 -- ---------------------------------------------------------------------
 
@@ -2055,6 +2076,62 @@ CREATE TABLE `product_sale_elements_product_document`
     CONSTRAINT `fk_pse_product_document_product_document_id`
         FOREIGN KEY (`product_document_id`)
         REFERENCES `product_document` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook`;
+
+CREATE TABLE `hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(255) NOT NULL,
+    `type` TINYINT,
+    `by_module` TINYINT(1),
+    `native` TINYINT(1),
+    `activate` TINYINT(1),
+    `block` TINYINT(1),
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `code_UNIQUE` (`code`, `type`),
+    INDEX `idx_module_activate` (`activate`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_hook`;
+
+CREATE TABLE `module_hook`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `classname` VARCHAR(255),
+    `method` VARCHAR(255),
+    `active` TINYINT(1) NOT NULL,
+    `hook_active` TINYINT(1) NOT NULL,
+    `module_active` TINYINT(1) NOT NULL,
+    `position` INTEGER NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_hook_active` (`active`),
+    INDEX `fk_module_hook_module_id_idx` (`module_id`),
+    INDEX `fk_module_hook_hook_id_idx` (`hook_id`),
+    CONSTRAINT `fk_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -2439,26 +2516,6 @@ CREATE TABLE `module_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
--- hook_i18n
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `hook_i18n`;
-
-CREATE TABLE `hook_i18n`
-(
-    `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
-    `title` VARCHAR(255),
-    `description` LONGTEXT,
-    `chapo` TEXT,
-    PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `hook_i18n_FK_1`
-        FOREIGN KEY (`id`)
-        REFERENCES `hook` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
 -- profile_i18n
 -- ---------------------------------------------------------------------
 
@@ -2773,6 +2830,28 @@ CREATE TABLE `brand_image_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- sale_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `sale_i18n`;
+
+CREATE TABLE `sale_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    `sale_label` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `sale_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `sale` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- export_category_i18n
 -- ---------------------------------------------------------------------
 
@@ -2843,6 +2922,26 @@ CREATE TABLE `import_i18n`
     CONSTRAINT `import_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `import` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- hook_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook_i18n`;
+
+CREATE TABLE `hook_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `hook_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `hook` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

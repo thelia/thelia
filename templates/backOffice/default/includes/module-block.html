@@ -120,8 +120,27 @@
                     {hook name="modules.table-row" location="modules_table_row" }
 
                     <td class="text-right">
+                        {if $module_type == 2}
+                            {ifloop rel="area-attached"}
+                                {$zones=""}
+                                {loop name="area-attached" type="area" module_id=$ID}
+                                    {$zones="{$zones}, {$NAME}"}
+                                {/loop}
+                                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count=$LOOP_TOTAL  zones={$zones|ltrim:', '}}}
+                                {$btnstyle="btn-info"}
+                                {$icon=''}
+                            {/ifloop}
+                            {elseloop rel="area-attached"}
+                                {$title={intl l='No shipping zone attached to this module, click here to attach one'}}
+                                {$icon='<span class="glyphicon glyphicon glyphicon-exclamation-sign"></span> '}
+                                {$btnstyle="btn-danger"}
+                            {/elseloop}
+
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs" id="config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                        {/if}
                         <div class="btn-group">
                             {if $EXISTS}
+
                                 {if $CONFIGURABLE == 1}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
                                         <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>

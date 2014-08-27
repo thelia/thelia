@@ -1,3 +1,9 @@
+#2.1
+- Added sale management function
+- - Added `module_id` parameter to Area loop
+- Added "Shipping configuration" button to the delivery module list, with a warning if no shipping zone is assigned to the module.
+- Added the `show_label` parameter to the `render_form_field Smarty` function.
+
 #2.0.3
 - Fix js syntax in order-delivery template
 - price are now save without any round.
@@ -5,7 +11,6 @@
 - change Argument type for ref parameter in Product loop
 - Fix export template
 - [Tinymce]fix invisible thumb in file manager
-
 
 #2.0.3-beta2
 - fix update process

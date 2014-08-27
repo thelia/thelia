@@ -188,6 +188,7 @@ class CurrencyTableMap extends TableMap
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'RESTRICT', 'RESTRICT', 'Orders');
         $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'CASCADE', 'RESTRICT', 'Carts');
         $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'CASCADE', null, 'ProductPrices');
+        $this->addRelation('SaleOffsetCurrency', '\\Thelia\\Model\\SaleOffsetCurrency', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'CASCADE', 'RESTRICT', 'SaleOffsetCurrencies');
         $this->addRelation('CurrencyI18n', '\\Thelia\\Model\\CurrencyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CurrencyI18ns');
     } // buildRelations()
 
@@ -213,6 +214,7 @@ class CurrencyTableMap extends TableMap
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 CartTableMap::clearInstancePool();
                 ProductPriceTableMap::clearInstancePool();
+                SaleOffsetCurrencyTableMap::clearInstancePool();
                 CurrencyI18nTableMap::clearInstancePool();
             }
 

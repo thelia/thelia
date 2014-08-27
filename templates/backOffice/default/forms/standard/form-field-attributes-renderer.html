@@ -18,6 +18,10 @@ In addition to the standard form_field block output, this fragment uses the foll
     {$label_attr.for = "{$form->getName()}-id-{$field_name}"}
 {/if}
 
+{* If we have a value key, generates a unique ID based on the value key. *}
+{if ! empty($value_key)}
+    {$label_attr.for = "{$label_attr.for}_{$value_key}"}
+{/if}
 {if $disabled}
     {$sDisabled = 'disabled'}
 {/if}
@@ -39,13 +43,13 @@ In addition to the standard form_field block output, this fragment uses the foll
 {/if}
 
 {if $type == 'hidden'}
-   id="{$label_attr.for}" name="{$name}" value="{$value}"
+   id="{$label_attr.for}" name="{$name}" value="{$value}" {$attr}
 {elseif $type == 'checkbox' || $type == 'radio'}
-    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}
+    id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'choice'}
-    id="{$label_attr.for}" name="{$name} "class="form-control class="{$field_extra_class}" {if $multiple}multiple{/if} {if $lattr_list.size}size="{$lattr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
-    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}
+    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {/if}

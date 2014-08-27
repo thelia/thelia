@@ -10,9 +10,10 @@ Parameters:
    - show_currencies: true/false. If true, show the currency selection bar
    - page_url: the current page URL. Default is $current_url. Used to switchedition anguage.
    - close_url: no default. URL displayed when close button is clicked. If empty, the close button is not displayed.
+   -page_bottom: true/false. If true, the toolbar will have a style suitable for page bottom
 *}
 
-<div class="row inner-toolbar">
+<div class="row inner-toolbar{if $page_bottom} inner-toolbar-bottom{/if}">
     <div class="col-md-3 inner-actions">
     {if $hide_flags != true}
 		<ul class="nav nav-pills">
@@ -48,7 +49,7 @@ Parameters:
     {/if}
     </div>
 
-    <div class="col-md-6 inner-actions">
+    <div class="col-md-6 inner-actions text-right">
          {if $hide_submit_buttons != true}
             {if $hide_save_buttons != true}
                 <button type="submit" name="save_mode" value="stay" class="form-submit-button btn btn-sm btn-default btn-success" title="{intl l='Save'}">{intl l='Save'} <span class="glyphicon glyphicon-ok"></span></button>

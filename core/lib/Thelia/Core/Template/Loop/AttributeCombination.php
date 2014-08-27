@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
@@ -99,21 +100,25 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\AttributeCombination $attributeCombination */
         foreach ($loopResult->getResultDataCollection() as $attributeCombination) {
+
             $loopResultRow = new LoopResultRow($attributeCombination);
 
             $loopResultRow
-                ->set("ATTRIBUTE_ID", $attributeCombination->getAttributeId())
-                ->set("ATTRIBUTE_AVAILABILITY_ID", $attributeCombination->getAttributeAvId())
-                ->set("LOCALE",$this->locale)
-                ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("ATTRIBUTE_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
+                ->set("LOCALE"                              , $this->locale)
+
+                ->set("ATTRIBUTE_ID"                        , $attributeCombination->getAttributeId())
+                ->set("ATTRIBUTE_TITLE"                     , $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("ATTRIBUTE_CHAPO"                     , $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("ATTRIBUTE_DESCRIPTION"               , $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("ATTRIBUTE_POSTSCRIPTUM"              , $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+
+                ->set("ATTRIBUTE_AVAILABILITY_ID"           , $attributeCombination->getAttributeAvId())
+                ->set("ATTRIBUTE_AVAILABILITY_TITLE"        , $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("ATTRIBUTE_AVAILABILITY_CHAPO"        , $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION"  , $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM" , $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

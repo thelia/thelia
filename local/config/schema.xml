@@ -762,50 +762,6 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="hook" namespace="Thelia\Model">
-    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="code" required="true" size="255" type="VARCHAR" />
-    <column name="type" required="true" type="TINYINT" />
-    <column name="by_module" type="BOOLEAN" />
-    <column name="native" type="BOOLEAN" />
-    <column name="activate" type="BOOLEAN" />
-    <column name="block" type="BOOLEAN" />
-    <column name="position" type="INTEGER" />
-    <column name="title" size="255" type="VARCHAR" />
-    <column name="description" type="CLOB" />
-    <column name="chapo" type="LONGVARCHAR" />
-    <index name="idx_module_activate">
-      <index-column name="activate" />
-    </index>
-    <unique name="code_UNIQUE">
-      <unique-column name="code" />
-      <unique-column name="type" />
-    </unique>
-    <behavior name="timestampable" />
-    <behavior name="i18n">
-      <parameter name="i18n_columns" value="title, description, chapo" />
-    </behavior>
-  </table>
-  <table name="module_hook" namespace="Thelia\Model">
-    <column name="id" autoIncrement="true" primaryKey="true" required="true" type="INTEGER" />
-    <column name="module_id" required="true" type="INTEGER" />
-    <column name="hook_id" required="true" type="INTEGER" />
-    <column name="classname" size="255" type="VARCHAR" />
-    <column name="method" size="255" type="VARCHAR" />
-    <column name="active" required="true" type="BOOLEAN" />
-    <column name="hook_active" required="true" type="BOOLEAN" />
-    <column name="module_active" required="true" type="BOOLEAN" />
-    <column name="position" required="true" type="INTEGER" />
-    <index name="idx_module_hook_active">
-      <index-column name="active" />
-    </index>
-    <foreign-key foreignTable="module" name="fk_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="module_id" />
-    </foreign-key>
-    <foreign-key foreignTable="hook" name="fk_module_hook_hook_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="hook_id" />
-    </foreign-key>
-  </table>
   <table isCrossRef="true" name="accessory" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
@@ -1564,6 +1520,69 @@
     </index>
     <behavior name="timestampable" />
   </table>
+  <table name="sale" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="sale_label" size="255" type="VARCHAR" />
+    <column defaultValue="NULL" name="description" type="CLOB" />
+    <column defaultValue="NULL" name="chapo" type="LONGVARCHAR" />
+    <column defaultValue="NULL" name="postscriptum" type="LONGVARCHAR" />
+    <column defaultValue="0" name="active" required="true" type="BOOLEAN" />
+    <column defaultValue="1" name="display_initial_price" required="true" type="BOOLEAN" />
+    <column defaultValue="NULL" name="start_date" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="end_date" type="TIMESTAMP" />
+    <column defaultValue="NULL" name="price_offset_type" type="TINYINT" />
+    <index name="idx_sales_active_start_end_date">
+      <index-column name="active" />
+      <index-column name="start_date" />
+      <index-column name="end_date" />
+    </index>
+    <index name="idx_sales_active">
+      <index-column name="active" />
+    </index>
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum,sale_label" />
+    </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="sale_offset_currency" namespace="Thelia\Model">
+    <column name="sale_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="currency_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="0" name="price_offset_value" type="FLOAT" />
+    <foreign-key foreignTable="sale" name="fk_sale_offset_currency_sales_id" onDelete="CASCADE">
+      <reference foreign="id" local="sale_id" />
+    </foreign-key>
+    <foreign-key foreignTable="currency" name="fk_sale_offset_currency_currency_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="currency_id" />
+    </foreign-key>
+    <index name="fk_sale_offset_currency_currency1_idx">
+      <index-column name="currency_id" />
+    </index>
+  </table>
+  <table name="sale_product" namespace="Thelia\Model">
+    <column name="sale_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
+    <column defaultValue="NULL" name="attribute_av_id" type="INTEGER" />
+    <foreign-key foreignTable="sale" name="fk_sale_product_sales_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="sale_id" />
+    </foreign-key>
+    <foreign-key foreignTable="product" name="fk_sale_product_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="product_id" />
+    </foreign-key>
+    <foreign-key foreignTable="attribute_av" name="fk_sale_product_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="attribute_av_id" />
+    </foreign-key>
+    <index name="fk_sale_product_product1_idx">
+      <index-column name="product_id" />
+    </index>
+    <index name="fk_sale_product_attribute_av1_idx">
+      <index-column name="attribute_av_id" />
+    </index>
+    <index name="idx_sale_product_sales_id_product_id">
+      <index-column name="sale_id" />
+      <index-column name="product_id" />
+    </index>
+  </table>
   <table name="export_category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
@@ -1666,6 +1685,56 @@
     </index>
     <index name="fk_pse_product_document_product_sale_elem_idx">
       <index-column name="product_sale_elements_id" />
+    </index>
+  </table>
+  <table name="hook" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="code" required="true" size="255" type="VARCHAR" />
+    <column name="type" type="TINYINT" />
+    <column name="by_module" type="BOOLEAN" />
+    <column name="native" type="BOOLEAN" />
+    <column name="activate" type="BOOLEAN" />
+    <column name="block" type="BOOLEAN" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <index name="idx_module_activate">
+      <index-column name="activate" />
+    </index>
+    <unique name="code_UNIQUE">
+      <unique-column name="code" />
+      <unique-column name="type" />
+    </unique>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title,description,chapo" />
+    </behavior>
+  </table>
+  <table name="module_hook" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="hook_id" required="true" type="INTEGER" />
+    <column name="classname" size="255" type="VARCHAR" />
+    <column name="method" size="255" type="VARCHAR" />
+    <column name="active" required="true" type="BOOLEAN" />
+    <column name="hook_active" required="true" type="BOOLEAN" />
+    <column name="module_active" required="true" type="BOOLEAN" />
+    <column name="position" required="true" type="INTEGER" />
+    <foreign-key foreignTable="module" name="fk_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="hook" name="fk_module_hook_hook_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="hook_id" />
+    </foreign-key>
+    <index name="idx_module_hook_active">
+      <index-column name="active" />
+    </index>
+    <index name="fk_module_hook_module_id_idx">
+      <index-column name="module_id" />
+    </index>
+    <index name="fk_module_hook_hook_id_idx">
+      <index-column name="hook_id" />
     </index>
   </table>
 </database>

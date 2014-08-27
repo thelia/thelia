@@ -801,4 +801,27 @@ final class TheliaEvents
 
     const IMPORT_CATEGORY_CHANGE_POSITION = "Thelia.import.change_category_position";
     const IMPORT_CHANGE_POSITION = "Thelia.import.change_position";
+
+    // -- Sales management -----------------------------------------------
+
+    const SALE_CREATE = "action.createSale";
+    const SALE_UPDATE = "action.updateSale";
+    const SALE_DELETE = "action.deleteSale";
+
+    const SALE_TOGGLE_ACTIVITY = "action.toggleSaleActivity";
+
+    const SALE_CLEAR_SALE_STATUS = "action.clearSaleStatus";
+
+    const UPDATE_PRODUCT_SALE_STATUS = "action.updateProductSaleStatus";
+
+    const CHECK_SALE_ACTIVATION_EVENT = "action.checkSaleActivationEvent";
+
+    const BEFORE_CREATESALE = "action.before_createSale";
+    const AFTER_CREATESALE	= "action.after_createSale";
+
+    const BEFORE_DELETESALE = "action.before_deleteSale";
+    const AFTER_DELETESALE  = "action.after_deleteSale";
+
+    const BEFORE_UPDATESALE = "action.before_updateSale";
+    const AFTER_UPDATESALE  = "action.after_updateSale";
 }

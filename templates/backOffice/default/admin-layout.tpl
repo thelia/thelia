@@ -264,6 +264,7 @@
                             {/loop}
 
                             {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
+
                             {ifhook rel="main.top-menu-tools"}
                             {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
@@ -282,8 +283,32 @@
                             {/hookblock}
                             {/ifhook}
                             {elsehook rel="main.top-menu-tools"}
-                                <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                                    <a href="{url path='/admin/tools'}" >{intl l="Tools"}</a>
+                                <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+                                    {* <a href="{url path='/admin/tools'}">{intl l="Tools"}</a> *}
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"} <span class="caret"></span></a>
+
+                                    <ul class="dropdown-menu" role="menu">
+                                        {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
+                                            <li role="menuitem"><a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a></li>
+                                        {/loop}
+
+                                        {loop name="auth-sales" type="auth" role="ADMIN" resource="admin.sales"  access="VIEW"}
+                                            <li role="menuitem"><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
+                                        {/loop}
+
+
+                                        {loop name="auth-brand" type="auth" role="ADMIN" resource="admin.brand"  access="VIEW"}
+                                            <li role="menuitem"><a href="{url path='/admin/brand'}">{intl l="Brands"}</a></li>
+                                        {/loop}
+
+                                        {loop name="auth-export" type="auth" role="ADMIN" resource="admin.export"  access="VIEW"}
+                                            <li role="menuitem"><a href="{url path='/admin/export'}">{intl l="Export"}</a></li>
+                                        {/loop}
+                                        {loop name="auth-import" type="auth" role="ADMIN" resource="admin.import" access="VIEW"}
+                                            <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
+                                        {/loop}
+
+                                    </ul>
                                 </li>
                             {/elsehook}
                             {/loop}

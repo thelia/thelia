@@ -257,7 +257,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function defaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW))
             return $response;
 
         return $this->renderList();
@@ -271,7 +271,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::CREATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::CREATE))
             return $response;
 
         // Error (Default: false)
@@ -281,7 +281,6 @@ abstract class AbstractCrudController extends BaseAdminController
         $creationForm = $this->getCreationForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($creationForm, "POST");
 
@@ -297,7 +296,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Check if object exist
             if (! $this->eventContainsObject($createEvent))
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was created.", array('%obj', $this->objectName)));
+                    $this->getTranslator()->trans("No %obj was created.", ['%obj' => $this->objectName]));
 
             // Log object creation
             if (null !== $createdObject = $this->getObjectFromEvent($createEvent)) {
@@ -326,7 +325,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => $this->objectName)),
+                $this->getTranslator()->trans("%obj creation", ['%obj' => $this->objectName]),
                 $error_msg,
                 $creationForm,
                 $ex
@@ -345,7 +344,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
             return $response;
 
         // Load object if exist
@@ -370,7 +369,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function processUpdateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
             return $response;
 
         // Error (Default: false)
@@ -380,7 +379,6 @@ abstract class AbstractCrudController extends BaseAdminController
         $changeForm = $this->getUpdateForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($changeForm, "POST");
 
@@ -396,7 +394,7 @@ abstract class AbstractCrudController extends BaseAdminController
             // Check if object exist
             if (! $this->eventContainsObject($changeEvent))
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+                    $this->getTranslator()->trans("No %obj was updated.", ['%obj' => $this->objectName]));
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
@@ -429,7 +427,7 @@ abstract class AbstractCrudController extends BaseAdminController
         if (false !== $error_msg) {
             // At this point, the form has errors, and should be redisplayed.
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj modification", array('%obj' => $this->objectName)),
+                $this->getTranslator()->trans("%obj modification",['%obj' => $this->objectName]),
                 $error_msg,
                 $changeForm,
                 $ex
@@ -446,7 +444,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updatePositionAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
             return $response;
 
         try {
@@ -482,7 +480,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
             return $response;
 
         if ($object != null) {
@@ -517,7 +515,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
             return $response;
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
@@ -540,7 +538,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function deleteAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::DELETE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::DELETE))
             return $response;
 
         // Check token
