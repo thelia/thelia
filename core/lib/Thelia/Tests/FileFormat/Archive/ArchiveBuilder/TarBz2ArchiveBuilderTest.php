@@ -20,13 +20,11 @@ use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder;
  */
 class TarBz2ArchiveBuilderTest extends TarArchiveBuilderTest
 {
-    public function setUp()
+    protected function getArchiveBuilder()
     {
-        parent::setUp();
-
-        $this->tar = new TarBz2ArchiveBuilder();
-        $this->tar->setEnvironment("test");
+        return new TarBz2ArchiveBuilder();
     }
+
 
     public function testCompression()
     {

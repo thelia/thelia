@@ -25,7 +25,7 @@ return array(
 'Thelia installation wizard' => 'Gestionnaire d\'installation de Thélia',
 'The SQL server contains multiple databases.' => 'Le serveur SQL contient plusieurs databases.',
 'Username :' => 'Utilisateur :',
-'Version undefined' => 'Version non définie',
+'Version' => 'Version',
 'website url :' => 'Url du site :',
 'Welcome' => 'Bienvenue',
 'Welcome in the Thelia installation wizard.' => 'Bienvenue dans le gestionnaire d\'installation de Thélia.',

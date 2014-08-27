@@ -26,6 +26,11 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     /** @var  TarArchiveBuilder */
     protected $tar;
 
+    protected function getArchiveBuilder()
+    {
+        return new TarArchiveBuilder();
+    }
+
     public function setUp()
     {
         new Translator(new Container());
@@ -37,7 +42,14 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             mkdir($cacheDir);
         }
 
-        $this->tar = new TarArchiveBuilder();
+        $this->tar = $this->getArchiveBuilder();
+
+        if (! $this->tar->isAvailable()) {
+            $this->markTestSkipped(
+                "The ".$this->tar->getExtension()." archiver can't be tested as its dependencies are not installed/configured in this context"
+            );
+        }
+
         $this->tar->setEnvironment("test");
     }
 
