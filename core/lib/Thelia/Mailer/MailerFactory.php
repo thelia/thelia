@@ -61,16 +61,26 @@ class MailerFactory
 
     private function configureSmtp()
     {
-        $smtpTransporter = new \Swift_SmtpTransport();
-        $smtpTransporter->setHost(Configquery::getSmtpHost())
-            ->setPort(ConfigQuery::getSmtpPort())
-            ->setEncryption(ConfigQuery::getSmtpEncryption())
-            ->setUsername(ConfigQuery::getSmtpUsername())
-            ->setPassword(ConfigQuery::getSmtpPassword())
-            ->setAuthMode(ConfigQuery::getSmtpAuthMode())
-            ->setTimeout(ConfigQuery::getSmtpTimeout())
-            ->setSourceIp(ConfigQuery::getSmtpSourceIp())
-        ;
+        $smtpTransporter = \Swift_SmtpTransport::newInstance(Configquery::getSmtpHost(), ConfigQuery::getSmtpPort());
+
+        if (ConfigQuery::getSmtpEncryption()){
+            $smtpTransporter->setEncryption(ConfigQuery::getSmtpEncryption());
+        }
+        if (ConfigQuery::getSmtpUsername()){
+            $smtpTransporter->setUsername(ConfigQuery::getSmtpUsername());
+        }
+        if (ConfigQuery::getSmtpPassword()){
+            $smtpTransporter->setPassword(ConfigQuery::getSmtpPassword());
+        }
+        if (ConfigQuery::getSmtpAuthMode()){
+            $smtpTransporter->setAuthMode(ConfigQuery::getSmtpAuthMode());
+        }
+        if (ConfigQuery::getSmtpTimeout()){
+            $smtpTransporter->setTimeout(ConfigQuery::getSmtpTimeout());
+        }
+        if (ConfigQuery::getSmtpSourceIp()){
+            $smtpTransporter->setSourceIp(ConfigQuery::getSmtpSourceIp());
+        }
 
         return $smtpTransporter;
     }
