@@ -45,6 +45,12 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->zip = new ZipArchiveBuilder();
 
+        if (! $this->zip->isAvailable()) {
+            $this->markTestSkipped(
+                "The ".$this->zip->getExtension()." archiver can't be tested as its dependencies are not installed/configured in this context"
+            );
+        }
+
         $this->zip->setEnvironment("test");
 
         $this->loadedZip = $this->zip->loadArchive(
