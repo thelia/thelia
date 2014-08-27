@@ -18,7 +18,7 @@ if (php_sapi_name() != 'cli') {
 
 require __DIR__ . '/../core/bootstrap.php';
 
-$thelia = new Thelia\Core\Thelia("prod", false);
+$thelia = new Thelia\Core\Thelia("dev", false);
 $thelia->boot();
 
 // The default faker is en_US
@@ -43,7 +43,10 @@ $url = new Thelia\Tools\URL();
 
 $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
 
+//\Thelia\Log\Tlog::getInstance()->setLevel(\Thelia\Log\Tlog::ERROR);
+
 try {
+
     $stmt = $con->prepare("SET foreign_key_checks = 0");
     $stmt->execute();
 
@@ -171,6 +174,8 @@ try {
 
     \Thelia\Model\CouponQuery::create()->find()->delete();
     \Thelia\Model\OrderQuery::create()->find()->delete();
+
+    \Thelia\Model\SaleQuery::create()->find()->delete();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
@@ -472,7 +477,6 @@ try {
             $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
             do {
                 $pick = array_rand($contentIdList, 1);
-                \Thelia\Log\Tlog::getInstance()->debug("pick : $pick");
             } while (in_array($pick, $alreadyPicked));
 
             $alreadyPicked[] = $pick;
@@ -647,6 +651,61 @@ try {
     echo "Generating coupons fixtures\n";
 
     generateCouponFixtures($thelia);
+
+    echo "Generating sales\n";
+
+    for($idx = 1; $idx <= 5; $idx++) {
+
+        $sale = new \Thelia\Model\Sale();
+
+        $start = new \DateTime();
+        $end = new \DateTime();
+
+        $sale
+            ->setActive(0)
+            ->setStartDate($start->setTimestamp(strtotime("today - 1 month")))
+            ->setEndDate($end->setTimestamp(strtotime("today + 1 month")))
+            ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_PERCENTAGE)
+            ->setDisplayInitialPrice(true)
+        ;
+
+        setI18n($sale, [
+                'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
+        ]);
+
+        $sale->save();
+
+        $currencies = \Thelia\Model\CurrencyQuery::create()->find();
+
+        foreach($currencies as $currency) {
+            $saleOffset = new \Thelia\Model\SaleOffsetCurrency();
+
+            $saleOffset
+                ->setCurrencyId($currency->getId())
+                ->setSaleId($sale->getId())
+                ->setPriceOffsetValue($faker->numberBetween(10, 70))
+                ->save()
+            ;
+        }
+
+        $products = \Thelia\Model\ProductQuery::create()->addAscendingOrderByColumn('RAND()')->find();
+
+        $count = $faker->numberBetween(5, 20);
+
+        foreach ($products as $product) {
+
+            if ( --$count < 0) break;
+
+            $saleProduct = new \Thelia\Model\SaleProduct();
+
+            $saleProduct
+                ->setSaleId($sale->getId())
+                ->setProductId($product->getId())
+                ->setAttributeAvId(null)
+                ->save();
+            ;
+         }
+    }
 
     $con->commit();
 
