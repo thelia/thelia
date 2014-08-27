@@ -1,4 +1,7 @@
 <?php
+
 return array(
-    // 'an english string' => 'The displayed english string',
+    'Order {$order_ref} validated. Download your files.' => 'Order {$order_ref} validated. Download your files.',
+    'This module cannot be used on the current cart.' => 'This module cannot be used on the current cart.',
+    'Virtual product download message' => 'Virtual product download message',
 );

@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\OrderProductQuery;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -42,7 +43,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order', null, true),
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createBooleanOrBothTypeArgument('virtual')
         );
     }
 
@@ -58,6 +60,18 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         $order = $this->getOrder();
 
         $search->filterByOrderId($order, Criteria::EQUAL);
+
+        $virtual = $this->getVirtual();
+        if ($virtual !== BooleanOrBothType::ANY) {
+            if ($virtual) {
+                $search
+                    ->filterByVirtual(1, Criteria::EQUAL)
+                    ->filterByVirtualDocument(null, Criteria::NOT_EQUAL);
+            } else {
+                $search
+                    ->filterByVirtual(0);
+            }
+        }
 
         if (null !== $this->getId()) {
             $search->filterById($this->getId(), Criteria::IN);

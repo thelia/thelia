@@ -27,8 +27,8 @@ use Thelia\Module\PaymentModuleInterface;
 
 /**
  * Class SendMail
- * @package Colissimo\Listener
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @package VirtualProductDelivery\EventListeners
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class SendMail implements EventSubscriberInterface
 {
@@ -45,7 +45,51 @@ class SendMail implements EventSubscriberInterface
 
     public function updateStatus(OrderEvent $event)
     {
-        // todo: implement
+        $order = $event->getOrder();
+
+        if ($order->hasVirtualProduct() && $event->getStatus() == OrderStatus::CODE_PAID) {
+
+            $contact_email = ConfigQuery::read('store_email');
+
+            if ($contact_email) {
+
+                $message = MessageQuery::create()
+                    ->filterByName('mail_virtualproduct')
+                    ->findOne();
+
+                if (false === $message) {
+                    throw new \Exception("Failed to load message 'mail_virtualproduct'.");
+                }
+
+                $order = $event->getOrder();
+                $customer = $order->getCustomer();
+
+                $this->parser->assign('customer_id', $customer->getId());
+                $this->parser->assign('order_ref', $order->getRef());
+                $this->parser->assign('order_date', $order->getCreatedAt());
+                $this->parser->assign('update_date', $order->getUpdatedAt());
+
+                $message
+                    ->setLocale($order->getLang()->getLocale());
+
+                $instance = \Swift_Message::newInstance()
+                    ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
+                    ->addFrom($contact_email, ConfigQuery::read('store_name'))
+                ;
+
+                // Build subject and body
+
+                $message->buildMessage($this->parser, $instance);
+
+                $this->mailer->send($instance);
+
+                Tlog::getInstance()->debug("Virtual product download message sent to customer ".$customer->getEmail());
+            }
+            else {
+                $customer = $order->getCustomer();
+                Tlog::getInstance()->debug("Virtual product download message no contact email customer_id", $customer->getId());
+            }
+        }
     }
 
     /**

@@ -253,11 +253,11 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             // get the virtual document path
             $virtualDocumentPath = null;
-            if ($product->getVirtual() === 1){
+            if ($product->getVirtual() === 1) {
                 // try to find the associated document
                 if (null !== $documentId = MetaDataQuery::getVal('virtual', 'pse', $pse->getId())) {
                     $productDocument = ProductDocumentQuery::create()->findPk($documentId);
-                    if (null !== $productDocument){
+                    if (null !== $productDocument) {
                         $virtualDocumentPath = $productDocument->getFile();
                     }
                 }

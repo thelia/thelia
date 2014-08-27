@@ -253,7 +253,7 @@ abstract class BaseController extends ContainerAware
         $order = OrderQuery::create()->findPk($order_id);
 
         // check if the order has the paid status
-        if (!$order->isPaid()){
+        if (!$order->isPaid()) {
             throw new NotFoundHttpException();
         }
 
