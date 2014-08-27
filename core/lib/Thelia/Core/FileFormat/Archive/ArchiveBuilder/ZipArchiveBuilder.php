@@ -46,7 +46,7 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
             @$this->zip->close();
 
             if (file_exists($this->cacheFile)) {
-                unlink($this->cacheFile);
+                @unlink($this->cacheFile);
             }
         }
     }
