@@ -13,7 +13,6 @@
 namespace Thelia\Controller\Admin;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductEvent;
@@ -47,7 +46,6 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
-use Thelia\Model\Base\MetaData;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\Feature;
@@ -58,6 +56,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\MetaDataQuery;
+use Thelia\Model\MetaData;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -364,7 +363,7 @@ class ProductController extends AbstractSeoCrudController
 
         // Virtual document
         if (array_key_exists("product_sale_element_id", $defaultPseData)) {
-            $virtualDocumentId = intval(MetaDataQuery::getVal('virtual', 'pse', $defaultPseData['product_sale_element_id']));
+            $virtualDocumentId = intval(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $defaultPseData['product_sale_element_id']));
             if ($virtualDocumentId) {
                 $data["virtual_document_id"] = $virtualDocumentId;
             }
@@ -526,10 +525,10 @@ class ProductController extends AbstractSeoCrudController
 
             if (null !== $defaultPSE) {
                 if ($virtualDocumentId !== 0) {
-                    $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', 'pse', $defaultPSE->getId(), $virtualDocumentId);
+                    $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $defaultPSE->getId(), $virtualDocumentId);
                     $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
                 } else {
-                    $assocEvent = new MetaDataDeleteEvent('virtual', 'pse', $defaultPSE->getId());
+                    $assocEvent = new MetaDataDeleteEvent('virtual', MetaData::PSE_KEY, $defaultPSE->getId());
                     $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
                 }
             }
@@ -1502,14 +1501,14 @@ class ProductController extends AbstractSeoCrudController
                 );
             }
 
-            $documentId = intval(MetaDataQuery::getVal('virtual', 'pse', $pseId));
+            $documentId = intval(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $pseId));
 
             if ($documentId === intval($typeId)) {
-                $assocEvent = new MetaDataDeleteEvent('virtual', 'pse', $pseId);
+                $assocEvent = new MetaDataDeleteEvent('virtual', MetaData::PSE_KEY, $pseId);
                 $this->dispatch(TheliaEvents::META_DATA_DELETE, $assocEvent);
                 $responseData["is-associated"] = 0;
             } else {
-                $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', 'pse', $pseId, $typeId);
+                $assocEvent = new MetaDataCreateOrUpdateEvent('virtual', MetaData::PSE_KEY, $pseId, $typeId);
                 $this->dispatch(TheliaEvents::META_DATA_UPDATE, $assocEvent);
                 $responseData["is-associated"] = 1;
             }

@@ -72,7 +72,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
-            Argument::createBooleanOrBothTypeArgument('virtual', 1),
+            Argument::createBooleanOrBothTypeArgument('virtual', Type\BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
             Argument::createAnyTypeArgument('title'),
