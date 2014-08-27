@@ -121,12 +121,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param bool $active
+     * @param  bool            $active
      * @return SaleUpdateEvent $this
      */
     public function setActive($active)
     {
         $this->active = $active;
+
         return $this;
     }
 
@@ -139,12 +140,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param \DateTime $endDate
+     * @param  \DateTime       $endDate
      * @return SaleUpdateEvent $this
      */
     public function setEndDate($endDate)
     {
         $this->endDate = $endDate;
+
         return $this;
     }
 
@@ -157,12 +159,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param int $priceOffsetType
+     * @param  int             $priceOffsetType
      * @return SaleUpdateEvent $this
      */
     public function setPriceOffsetType($priceOffsetType)
     {
         $this->priceOffsetType = $priceOffsetType;
+
         return $this;
     }
 
@@ -175,12 +178,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param \DateTime $startDate
+     * @param  \DateTime       $startDate
      * @return SaleUpdateEvent $this
      */
     public function setStartDate($startDate)
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
@@ -193,12 +197,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param bool $displayInitialPrice
+     * @param  bool  $displayInitialPrice
      * @return $this
      */
     public function setDisplayInitialPrice($displayInitialPrice)
     {
         $this->displayInitialPrice = $displayInitialPrice;
+
         return $this;
     }
 
@@ -211,12 +216,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param array $priceOffsets an array of (currency_id => price offset) couples.
+     * @param  array $priceOffsets an array of (currency_id => price offset) couples.
      * @return $this
      */
     public function setPriceOffsets($priceOffsets)
     {
         $this->priceOffsets = $priceOffsets;
+
         return $this;
     }
 
@@ -229,12 +235,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param array $products an array of (product_id => product_sale_elements ids[])
+     * @param  array $products an array of (product_id => product_sale_elements ids[])
      * @return $this
      */
     public function setProducts($products)
     {
         $this->products = $products;
+
         return $this;
     }
 
@@ -247,12 +254,13 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param array $productAttributes an array of (product_id => array of attribute IDs)
+     * @param  array $productAttributes an array of (product_id => array of attribute IDs)
      * @return $this
      */
     public function setProductAttributes($productAttributes)
     {
         $this->productAttributes = $productAttributes;
+
         return $this;
     }
 
@@ -263,6 +271,5 @@ class SaleUpdateEvent extends SaleCreateEvent
     {
         return $this->productAttributes;
     }
-
 
 }

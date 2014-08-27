@@ -18,18 +18,19 @@ class Sale extends BaseSale
     const OFFSET_TYPE_PERCENTAGE = 10;
     const OFFSET_TYPE_AMOUNT = 20;
 
-
     /**
      * @return bool true if the sale has an end date, false otherwise
      */
-    public function hasStartDate() {
+    public function hasStartDate()
+    {
         return ! is_null($this->getEndDate());
     }
 
     /**
      * @return bool true if the sale has a begin date, false otherwise
      */
-    public function hasEndDate() {
+    public function hasEndDate()
+    {
         return ! is_null($this->getEndDate());
     }
 
@@ -45,7 +46,7 @@ class Sale extends BaseSale
         $offsetList = [];
 
         /** @var SaleOffsetCurrency $currencyOffset */
-        foreach($currencyOffsets as $currencyOffset) {
+        foreach ($currencyOffsets as $currencyOffset) {
             $offsetList[$currencyOffset->getCurrencyId()] = $currencyOffset->getPriceOffsetValue();
         }
 
@@ -73,13 +74,12 @@ class Sale extends BaseSale
     {
         $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->orderByProductId()->find();
 
-
         $productSaleElements = [];
 
         $currentProduct = false;
 
         /** @var SaleProduct $saleProduct */
-        foreach($saleProducts as $saleProduct) {
+        foreach ($saleProducts as $saleProduct) {
             if ($currentProduct != $saleProduct->getProductId()) {
                 $currentProduct = $saleProduct->getProductId();
 

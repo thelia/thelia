@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\SaleQuery as BaseSaleQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'sale' table.
  *

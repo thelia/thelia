@@ -15,9 +15,9 @@ class AdminLog extends BaseAdminLog
      * @param $resource
      * @param $action
      * @param $message
-     * @param Request    $request
+     * @param Request       $request
      * @param UserInterface $adminUser
-     * @param bool       $withRequestContent
+     * @param bool          $withRequestContent
      */
     public static function append($resource, $action, $message, Request $request, UserInterface $adminUser = null, $withRequestContent = true)
     {

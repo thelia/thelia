@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\SaleOffsetCurrencyQuery as BaseSaleOffsetCurrencyQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'sale_offset_currency' table.
  *

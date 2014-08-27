@@ -29,7 +29,6 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
-use Thelia\Model\Map\SaleProductTableMap;
 use Thelia\Model\Map\SaleTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -156,8 +155,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if (true === $complex) {
             return $this->parseComplexResults($loopResult);
-        }
-        else {
+        } else {
             return $this->parseSimpleResults($loopResult);
         }
     }
@@ -275,7 +273,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     }
 
     /**
-     * @param LoopResultRow $loopResultRow the current result row
+     * @param  LoopResultRow         $loopResultRow the current result row
      * @param  \Thelia\Model\Product $product
      * @param $default_category_id
      * @return mixed
@@ -810,8 +808,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             $search->withColumn('ROUND(MAX(' . $priceToCompareAsSQL . '), 2)', 'real_highest_price');
             $search->withColumn('ROUND(MIN(' . $priceToCompareAsSQL . '), 2)', 'real_lowest_price');
-        }
-        else {
+        } else {
 
             if ($new === true) {
                 $search->where('`pse`.NEWNESS' . Criteria::EQUAL . '1');

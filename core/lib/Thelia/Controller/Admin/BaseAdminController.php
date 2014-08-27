@@ -73,7 +73,7 @@ class BaseAdminController extends BaseController
     /**
      * This method process the rendering of view called from an admin page
      *
-     * @param  string  $template the template name
+     * @param  string   $template the template name
      * @return Response the response which contains the rendered view
      */
     public function processTemplateAction($template)
@@ -106,7 +106,7 @@ class BaseAdminController extends BaseController
      * Return a general error page
      *
      * @param string $message a message string, or an exception instance
-     * @param int $status the HTTP status (default is 500)
+     * @param int    $status  the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -166,9 +166,9 @@ class BaseAdminController extends BaseController
     /**
      * Setup the error context when an error occurs in a action method.
      *
-     * @param string    $action        the action that caused the error (category modification, variable creation, currency update, etc.)
-     * @param BaseForm  $form          the form where the error occured, or null if no form was involved
-     * @param string    $error_message the error message
+     * @param string     $action        the action that caused the error (category modification, variable creation, currency update, etc.)
+     * @param BaseForm   $form          the form where the error occured, or null if no form was involved
+     * @param string     $error_message the error message
      * @param \Exception $exception     the exception or null if no exception
      */
     protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null)
@@ -315,7 +315,7 @@ class BaseAdminController extends BaseController
     /**
      * A simple helper to get the URL based on the language.
      *
-     * @param string $locale the locale, or null to get the current one
+     * @param  string      $locale the locale, or null to get the current one
      * @return null|string the URL for the current language, or null if the "One domain for each lang" feature is disabled.
      */
     protected function getUrlLanguage($locale = null)
@@ -421,8 +421,8 @@ class BaseAdminController extends BaseController
      * Render the given template, and returns the result as a string.
      *
      * @param string $templateName the complete template name, with extension
-     * @param array $args        the template arguments
-     * @param null  $templateDir
+     * @param array  $args         the template arguments
+     * @param null   $templateDir
      *
      * @return string|\Symfony\Component\HttpFoundation\RedirectResponse
      */

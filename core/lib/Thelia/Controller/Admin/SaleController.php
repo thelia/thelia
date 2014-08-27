@@ -85,7 +85,7 @@ class SaleController extends AbstractCrudController
         $categories = $products = [ ];
 
         /** @var SaleProduct $saleProduct */
-        foreach($saleProducts as $saleProduct) {
+        foreach ($saleProducts as $saleProduct) {
             $categories[] = $saleProduct->getProduct()->getDefaultCategoryId();
             $products[] = $saleProduct->getProduct()->getId();
         }
@@ -119,7 +119,7 @@ class SaleController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param  array            $formData
+     * @param  array           $formData
      * @return SaleCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -138,7 +138,7 @@ class SaleController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param  array            $formData
+     * @param  array           $formData
      * @return SaleUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -146,7 +146,7 @@ class SaleController extends AbstractCrudController
         // Build the products array
         $products = [];
 
-        foreach($formData['products'] as $productId) {
+        foreach ($formData['products'] as $productId) {
             $products[$productId] = [];
             /*
             if (isset($formData['product_attributes'])) {
@@ -330,7 +330,7 @@ class SaleController extends AbstractCrudController
         // Build the list of categories
         $categories = '';
 
-        foreach($this->getRequest()->get('categories', []) as $category_id) {
+        foreach ($this->getRequest()->get('categories', []) as $category_id) {
             $categories .=  $category_id . ',';
         }
 
@@ -354,13 +354,13 @@ class SaleController extends AbstractCrudController
         if (null !== $pseList = ProductSaleElementsQuery::create()->filterByProductId($productId)->find()) {
 
             /** @var ProductSaleElements $pse */
-            foreach($pseList as $pse) {
+            foreach ($pseList as $pse) {
 
                 // Find all combinations
                 if (null !== $combinations = AttributeCombinationQuery::create()->filterByProductSaleElementsId($pse->getId())) {
 
                     /** @var AttributeCombination $combination */
-                    foreach($combinations as $combination) {
+                    foreach ($combinations as $combination) {
 
                         $attrId = $combination->getAttributeId();
                         $attrAvId = $combination->getAttributeAvId();

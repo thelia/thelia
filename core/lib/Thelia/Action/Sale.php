@@ -49,11 +49,11 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations
      *
-     * @param ProductSaleStatusUpdateEvent $event
+     * @param  ProductSaleStatusUpdateEvent $event
      * @throws \RuntimeException
      */
-    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event) {
-
+    public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event)
+    {
         $taxCalculator = new Calculator();
 
         $sale = $event->getSale();
@@ -72,7 +72,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
             try {
 
                 /** @var SaleProduct $saleProduct */
-                foreach($saleProducts as $saleProduct) {
+                foreach ($saleProducts as $saleProduct) {
 
                     $taxCalculator->load(
                         $saleProduct->getProduct($con),
@@ -90,7 +90,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                             ->filterByProductId($saleProduct->getProductId());
 
                         /** @var ProductSaleElements $pse */
-                        foreach($pseList as $pse) {
+                        foreach ($pseList as $pse) {
 
                             /** @var SaleOffsetCurrency $offsetByCurrency */
                             foreach ($saleOffsetByCurrency as $currencyId => $offset) {
@@ -129,8 +129,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         // Consider only combinations which contains the selected AttributeAv ID
                         // TODO not yet coded.
                         throw new \RuntimeException("Not yet implemented !");
@@ -168,7 +167,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Process update sale
      *
-     * @param SaleUpdateEvent $event
+     * @param  SaleUpdateEvent $event
      * @throws PropelException
      */
     public function update(SaleUpdateEvent $event)
@@ -212,7 +211,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 // Update price offsets
                 SaleOffsetCurrencyQuery::create()->filterBySaleId($sale->getId())->delete($con);
 
-                foreach($event->getPriceOffsets() as $currencyId => $priceOffset) {
+                foreach ($event->getPriceOffsets() as $currencyId => $priceOffset) {
                     $saleOffset = new SaleOffsetCurrency();
 
                     $saleOffset
@@ -226,7 +225,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 // Update products
                 SaleProductQuery::create()->filterBySaleId($sale->getId())->delete($con);
 
-                foreach($event->getProducts() as $productId => $attributeIdArray) {
+                foreach ($event->getProducts() as $productId => $attributeIdArray) {
 
                     if (empty($attributeIdArray)) {
                         $saleProduct = new SaleProduct();
@@ -237,9 +236,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
                             ->setAttributeAvId(null)
                             ->save($con)
                         ;
-                    }
-                    else {
-                        foreach($attributeIdArray as $attributeId) {
+                    } else {
+                        foreach ($attributeIdArray as $attributeId) {
                             $saleProduct = new SaleProduct();
 
                             $saleProduct
@@ -319,7 +317,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Clear all sales
      *
-     * @param SaleClearStatusEvent $event
+     * @param  SaleClearStatusEvent                      $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function clearStatus(SaleClearStatusEvent $event)
@@ -352,11 +350,11 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * This method check the activation and deactivation dates of sales, and perform
      * the required action depending on the current date.
      *
-     * @param SaleActiveStatusCheckEvent $event
+     * @param  SaleActiveStatusCheckEvent                $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function checkSaleActivation(SaleActiveStatusCheckEvent $event) {
-
+    public function checkSaleActivation(SaleActiveStatusCheckEvent $event)
+    {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();
 
@@ -370,7 +368,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->filterByEndDate($now, Criteria::GREATER_THAN)) {
 
                 /** @var SaleModel $sale */
-                foreach($salesToDisable as $sale) {
+                foreach ($salesToDisable as $sale) {
                     $sale->setActive(false)->save();
 
                     // Update related products sale status
@@ -388,7 +386,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     ->filterByEndDate($now, Criteria::LESS_THAN))
                 {
                 /** @var SaleModel $sale */
-                foreach($salesToDisable as $sale) {
+                foreach ($salesToDisable as $sale) {
 
                     $sale->setActive(true)->save();
 

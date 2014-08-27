@@ -64,12 +64,13 @@ class SaleCreateEvent extends SaleEvent
     }
 
     /**
-     * @param string $saleLabel
+     * @param  string $saleLabel
      * @return $this
      */
     public function setSaleLabel($saleLabel)
     {
         $this->saleLabel = $saleLabel;
+
         return $this;
     }
 

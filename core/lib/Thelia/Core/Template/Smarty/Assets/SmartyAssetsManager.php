@@ -210,8 +210,7 @@ class SmartyAssetsManager
             $finder = new Finder();
 
             $files_found = $finder->files()->in($path)->name($name)->count() > 0;
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             Tlog::getInstance()->addError($ex->getMessage());
 
             $files_found = false;
