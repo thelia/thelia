@@ -20,7 +20,7 @@
                 <li><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
             </ul>
 
-            {module_include location='sales_top'}
+            {hook name="sales.top" location="sales_top" }
 
             <div class="row">
                 <div class="col-md-12">
@@ -92,7 +92,7 @@
                                             }
                                         </th>
 
-                                        {module_include location='sales_table_header'}
+                                        {hook name="sales.table-header" location="sales_table_header" }
 
                                         <th class="actions">{intl l='Actions'}</th>
                                     </tr>
@@ -142,7 +142,7 @@
                                                 {/if}
                                             </td>
 
-                                            {module_include location='sales_table_row'}
+                                            {hook name="sales.table-row" location="sales_table_row" }
 
                                             <td class="actions">
                                                 <div class="btn-group">
@@ -177,7 +177,7 @@
                 </div>
             </div>
 
-            {module_include location='sales_bottom'}
+            {hook name="sales.bottom" location="sales_bottom" }
 
         </div>
     </div>
@@ -223,7 +223,7 @@
                 {/loop}
             {/custom_render_form_field}
 
-            {module_include location='sale_create_form'}
+            {hook name="sale.create-form" location="sale_create_form" }
 
         {/capture}
 
@@ -248,7 +248,8 @@
     {capture "delete_dialog"}
         <input type="hidden" name="sale_id" id="sale_delete_id" value="" />
 
-        {module_include location='sale_delete_form'}
+        {hook name="sale.delete-form" location="sale_delete_form" }
+
     {/capture}
 
     {include
@@ -339,6 +340,7 @@
     </script>
 {/block}
 
+
 {block name="javascript-last-call"}
-    {module_include location='sales-js'}
+    {hook name="sales.js" location="sales-js" }
 {/block}
