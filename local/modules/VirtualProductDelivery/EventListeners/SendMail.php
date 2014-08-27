@@ -22,6 +22,7 @@ use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderStatus;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\PaymentModuleInterface;
 
 
@@ -47,7 +48,12 @@ class SendMail implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        if ($order->hasVirtualProduct() && $event->getStatus() == OrderStatus::CODE_PAID) {
+        $paidStatusId = OrderStatusQuery::create()
+            ->filterByCode(OrderStatus::CODE_PAID)
+            ->select('Id')
+            ->findOne();
+
+        if ($order->hasVirtualProduct() && $event->getStatus() == $paidStatusId) {
 
             $contact_email = ConfigQuery::read('store_email');
 

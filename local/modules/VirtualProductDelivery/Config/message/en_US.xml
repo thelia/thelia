@@ -2,20 +2,22 @@
 <message>
     <title>Virtual product download message</title>
     <subject>Order {$order_ref} validated. Download your files.</subject>
-    <text><![CDATA[{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1"}
+    <text><![CDATA[
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1"}
 
-    Your order {$REF} has been validated. You can download your files.
+Your order {$REF} has been validated. You can download your files.
 
-    Products:
+Products:
 
-    {loop type="order_product" name="order-products" order=$ID virtual="1"}
-        $TITLE : {url path="/account/download/$ID"}
-        {ifloop rel="combinations"}
-            {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
-                {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
-            {/loop}
-        {/ifloop}
-    {/loop}
+{loop type="order_product" name="order-products" order=$ID virtual="1"}
+{$TITLE} : {url path="/account/download/$ID"}
+{ifloop rel="combinations"}
+{loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+{$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+{/loop}
+{/ifloop}
+
+{/loop}
 {/loop}
 
 You have to be logged in to your account to download this files.
