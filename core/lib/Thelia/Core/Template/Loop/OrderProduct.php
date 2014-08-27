@@ -44,7 +44,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order', null, true),
             Argument::createIntListTypeArgument('id'),
-            Argument::createBooleanOrBothTypeArgument('virtual')
+            Argument::createBooleanOrBothTypeArgument('virtual', BooleanOrBothType::ANY)
         );
     }
 
