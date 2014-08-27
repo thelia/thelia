@@ -38,6 +38,12 @@
     </route>
 
     <!-- Account -->
+
+    <route id="customer.home" path="/account" methods="get">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_view">account</default>
+    </route>
+
     <route id="customer.update.view" path="/account/update" methods="get">
         <default key="_controller">Front\Controller\CustomerController::viewAction</default>
         <default key="_view">account-update</default>

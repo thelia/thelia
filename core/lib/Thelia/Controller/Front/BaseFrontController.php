@@ -24,42 +24,8 @@ use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string $routeId a route ID, as defines in Config/Resources/routing/front.xml
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
+    private $currentRouter = "router.admin";
 
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string $routeId       the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $parameters    the Route parameters, as a var/value pair array
-     * @param bool   $referenceType Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     *
-     * @return string the route path
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_PATH)
-    {
-        return $this->getRouteFromRouter('router.front', $routeId, $parameters, $referenceType);
-    }
-
-    /**
-     * Redirect to a specific route.
-     *
-     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $urlParameters   the URL parameters, as a var/value pair array
-     * @param array  $routeParameters the Route parameters, as a var/value pair array
-     * @param bool   $referenceType   Router::ABSOLUTE_PATH or Router::ABSOLUTE_URL
-     */
-    public function redirectToRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
-    {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters));
-    }
 
     public function checkAuth()
     {

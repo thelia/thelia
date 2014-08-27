@@ -62,7 +62,10 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+
+            if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
+                return $response;
+            }
 
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
@@ -90,11 +93,17 @@ class CartController extends BaseFrontController
         $cartEvent->setQuantity($this->getRequest()->get("quantity"));
 
         try {
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get('_token')
+            );
+
             $this->dispatch(TheliaEvents::CART_UPDATEITEM, $cartEvent);
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+            if (null !== $response = $this->generateSuccessRedirect()) {
+                return $response;
+            }
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
@@ -107,11 +116,18 @@ class CartController extends BaseFrontController
         $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
 
         try {
+
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get('_token')
+            );
+
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
 
             $this->afterModifyCart();
 
-            $this->redirectSuccess();
+            if (null !== $response = $this->generateSuccessRedirect()) {
+                return $response;
+            }
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
             $this->getParserContext()->setGeneralError($e->getMessage());

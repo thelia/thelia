@@ -16,10 +16,18 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Log\Tlog;
 
+/**
+ * Class Redirect
+ * @package Thelia\Tools
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ *
+ * @deprecated deprecated since version 2.1 and will be removed in 2.3. A response can not be send before the end of the script. Please use RedirectResponse directly
+ */
 class Redirect
 {
     public static function exec($url, $status = 302, $cookies = array())
     {
+        trigger_error('deprecated since version 2.1 and will be removed in 2.3. A response can not be send before the end of the script. Please use RedirectResponse directly', E_USER_DEPRECATED);
         if (false == Tlog::getInstance()->showRedirect($url)) {
             $response = new RedirectResponse($url, $status);
             foreach ($cookies as $cookie) {
