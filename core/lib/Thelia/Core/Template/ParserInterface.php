@@ -22,8 +22,6 @@ interface ParserInterface
 {
     public function render($realTemplateName, array $parameters = array());
 
-    public function setContent($content);
-
     public function getStatus();
 
     public function setStatus($status);
