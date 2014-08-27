@@ -77,7 +77,7 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             if ($dirName == ".") {
                 $dirName = "";
             }
-            $directoryInArchive .= DS . $dirName;
+            $directoryInArchive .= '/' . $dirName;
         }
 
         if (empty($name) || !is_scalar($name)) {
