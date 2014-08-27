@@ -36,50 +36,18 @@ class SaleTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array();
+        return ["active" => "*"];
     }
 
     public function testSearchById()
     {
-        $newsale = false;
-
         $sale = SaleQuery::create()->findOne();
 
-        if (null === $sale) {
-            $sale = new \Thelia\Model\Sale();
-            $sale->setActive(1);
-            $sale->setTitle('foo');
-            $sale->save();
-
-            $newsale = $sale;
-        }
-
-        $otherParameters = array(
-            "active" => "*",
-        );
-
-        $this->baseTestSearchById($sale->getId(), $otherParameters);
-
-        if ($newsale) $newsale->delete();
+        $this->baseTestSearchById($sale->getId());
     }
 
     public function testSearchLimit()
     {
-        $newsale = false;
-
-        $count = SaleQuery::create()->count();
-
-        if ($count < 1) {
-            $sale = new \Thelia\Model\Sale();
-            $sale->setActive(1);
-            $sale->setTitle('foo');
-            $sale->save();
-
-            $newsale = $sale;
-        }
-
-        $this->baseTestSearchWithLimit(1);
-
-        if ($newsale) $newsale->delete();
+        $this->baseTestSearchWithLimit(3);
     }
 }
