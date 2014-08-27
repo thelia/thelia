@@ -13,6 +13,9 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 use Symfony\Component\Finder\Finder;
+
+use Thelia\Core\Template\Smarty\SmartyParser;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
 use Thelia\Core\Template\Assets\AssetManagerInterface;
@@ -47,6 +50,7 @@ class SmartyAssetsManager
     {
         self::$assetsDirectory = $assets_directory;
 
+        /** @var SmartyParser $smartyParser */
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
 
@@ -98,14 +102,21 @@ class SmartyAssetsManager
         $debug            = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $webAssetTemplate = isset($params['template']) ? $params['template'] : false;
 
+        Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $webAssetTemplate");
+
+        $assetSource = "";
+
+
         /* we trick here relative thinking for file attribute */
         $file = ltrim($file, '/');
         while (substr($file, 0, 3) == '../') {
             $file = substr($file, 3);
         }
 
+        /** @var SmartyParser $smartyParser */
         $smartyParser = $template->smarty;
-        /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
+
+        /** @var TemplateDefinition $templateDefinition */
         $templateDefinition = $smartyParser->getTemplateDefinition($webAssetTemplate);
 
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
@@ -132,9 +143,9 @@ class SmartyAssetsManager
         }
 
         if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
-            throw new \Exception("Failed to get real path of '/".dirname($file)."'");
+            throw new \Exception("Failed to get real path of '/" . dirname($file) . "'");
         }
-
+        
         $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
 
         if (DS != '/') {
@@ -243,6 +254,7 @@ class SmartyAssetsManager
                 Tlog::getInstance()->addWarning("Failed to get real path of " . $params['file']);
             }
             $template->assign('asset_url', $url);
+
         } elseif (isset($content)) {
             return $content;
         }
