@@ -21,6 +21,7 @@ use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\SaleOffsetCurrency;
 use Thelia\Model\SaleQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
@@ -165,11 +166,17 @@ class SaleTest extends TestCaseWithURLToolSetup
 
     public function testClearAllSales()
     {
+        // Store current promo statuses
+        $promoList = ProductSaleElementsQuery::create()->filterByPromo(true)->select('Id')->find()->toArray();
+
         $event = new SaleClearStatusEvent();
         $event->setDispatcher($this->dispatcher);
 
         $saleAction = new Sale($this->getContainer());
         $saleAction->clearStatus($event);
+
+        // Restore promo status
+        ProductSaleElementsQuery::create()->filterById($promoList)->update(['Promo' => true]);
     }
 
     public function testCheckSaleActivation()
