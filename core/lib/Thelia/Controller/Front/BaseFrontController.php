@@ -15,6 +15,7 @@ namespace Thelia\Controller\Front;
 use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
@@ -30,7 +31,7 @@ class BaseFrontController extends BaseController
     public function checkAuth()
     {
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
-            $this->redirectToRoute('customer.login.process');
+            throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
         }
     }
 
@@ -38,7 +39,7 @@ class BaseFrontController extends BaseController
     {
         $cart = $this->getSession()->getCart();
         if ($cart===null || $cart->countCartItems() == 0) {
-            $this->redirectToRoute('cart.view');
+            throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }
     }
 
@@ -54,7 +55,7 @@ class BaseFrontController extends BaseController
             null === AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())
             ||
             null === ModuleQuery::create()->findPk($order->getDeliveryModuleId())) {
-            $this->redirectToRoute("order.delivery");
+            throw new RedirectException($this->retrieveUrlFromRouteId('order.delivery'));
         }
     }
 
@@ -70,7 +71,7 @@ class BaseFrontController extends BaseController
             null === AddressQuery::create()->findPk($order->getChoosenInvoiceAddress())
             ||
             null === ModuleQuery::create()->findPk($order->getPaymentModuleId())) {
-            $this->redirectToRoute("order.invoice");
+            throw new RedirectException($this->retrieveUrlFromRouteId('order.invoice'));
         }
     }
 
