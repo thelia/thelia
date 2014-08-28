@@ -12,9 +12,6 @@
 
 namespace Thelia\Files;
 
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
-use Thelia\Form\BaseForm;
-
 interface FileModelParentInterface
 {
     public function getTitle();

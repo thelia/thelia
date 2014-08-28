@@ -12,9 +12,6 @@
 
 namespace Thelia\Core\Event\Hook;
 
-use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\Hook\Fragment;
-
 /**
  * HookRenderEvent is used by the hook smarty plugin function.
  *

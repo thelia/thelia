@@ -35,7 +35,6 @@ class ProductTaxedPricesExport extends ProductPricesExport
         /** @var \Thelia\Model\AttributeCombinationQuery $query */
         $query = parent::buildDataSet($lang);
 
-
         $pseJoin = new Join(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductSaleElementsTableMap::ID);
         $pseJoin->setRightTableAlias("pse_tax_join");
 
@@ -95,4 +94,4 @@ class ProductTaxedPricesExport extends ProductPricesExport
 
         return $dataSet;
     }
-} 
+}

@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CartItem;
 
 /**
  * A trait to manage a coupon which removes a percentage of cart items from the order total.
@@ -21,8 +22,8 @@ use Thelia\Core\Translation\Translator;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @package Thelia\Coupon\Type
  */
-Trait PercentageCouponTrait {
-
+trait PercentageCouponTrait
+{
     public $percentage = 0;
 
     /**
@@ -43,7 +44,7 @@ Trait PercentageCouponTrait {
     /**
      * @inheritdoc
      */
-    public function getCartItemDiscount($cartItem)
+    public function getCartItemDiscount(CartItem $cartItem)
     {
         return $cartItem->getQuantity() * $cartItem->getPrice() * ($this->percentage / 100);
     }

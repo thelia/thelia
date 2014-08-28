@@ -21,7 +21,6 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-//use Thelia\Module\BaseModule;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;

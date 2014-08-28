@@ -255,14 +255,12 @@ class TranslationsController extends BaseAdminController
     public function defaultAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, array(), AccessManager::VIEW)) return $response;
-
         return $this->renderTemplate();
     }
 
     public function updateAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
-
         return $this->renderTemplate();
     }
 

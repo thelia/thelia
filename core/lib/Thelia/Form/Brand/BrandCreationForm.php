@@ -13,7 +13,6 @@
 namespace Thelia\Form\Brand;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\True;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\Lang;
@@ -56,7 +55,6 @@ class BrandCreationForm extends BaseForm
             'visible',
             'checkbox',
             [
-                'constraints' => [ ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('This brand is online'),
                 'label_attr' => [

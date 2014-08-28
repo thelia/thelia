@@ -24,7 +24,6 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\HookQuery;
 
-//use Thelia\Module\BaseModule;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 

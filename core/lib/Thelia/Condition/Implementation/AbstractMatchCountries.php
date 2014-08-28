@@ -28,7 +28,7 @@ use Thelia\Model\CountryQuery;
 abstract class AbstractMatchCountries extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    CONST COUNTRIES_LIST = 'countries';
+    const COUNTRIES_LIST = 'countries';
 
     /**
      * @inheritdoc

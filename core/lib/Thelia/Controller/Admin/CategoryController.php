@@ -251,6 +251,7 @@ class CategoryController extends AbstractSeoCrudController
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
+
         return $this->redirectToListTemplateWithId($category_id);
     }
 

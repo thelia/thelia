@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\HttpKernel\Exception;
 
-
 /**
  * Class RedirectException
  * @package Thelia\Core\HttpKernel\Exception
@@ -45,5 +44,4 @@ class RedirectException extends \RuntimeException
         return $this->statusCode;
     }
 
-
-} 
+}

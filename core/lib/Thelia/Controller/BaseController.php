@@ -275,11 +275,10 @@ abstract class BaseController extends ContainerAware
 
     }
 
-
     /**
      * Search success url in a form if present, in the query string otherwise
      *
-     * @param BaseForm $form
+     * @param  BaseForm          $form
      * @return mixed|null|string
      */
     protected function retrieveSuccessUrl(BaseForm $form = null)
@@ -304,7 +303,7 @@ abstract class BaseController extends ContainerAware
      * create an instance of RedirectResponse
      *
      * @param $url
-     * @param int $status
+     * @param  int                                        $status
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function generateRedirect($url, $status = 302)
@@ -315,7 +314,7 @@ abstract class BaseController extends ContainerAware
     /**
      * create an instance of RedirectReponse if a success url is present, return null otherwise
      *
-     * @param BaseForm $form
+     * @param  BaseForm                                        $form
      * @return null|\Symfony\Component\HttpFoundation\Response
      */
     protected function generateSuccessRedirect(BaseForm $form = null)
@@ -333,9 +332,9 @@ abstract class BaseController extends ContainerAware
      * create an instance of RedriectResponse for a given route id.
      *
      * @param $routeId
-     * @param array $urlParameters
-     * @param array $routeParameters
-     * @param bool $referenceType
+     * @param  array                                      $urlParameters
+     * @param  array                                      $routeParameters
+     * @param  bool                                       $referenceType
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function generateRedirectFromRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
@@ -344,7 +343,6 @@ abstract class BaseController extends ContainerAware
             $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
         );
     }
-
 
     /**
      * Return the route path defined for the givent route ID
@@ -371,8 +369,6 @@ abstract class BaseController extends ContainerAware
             $referenceType
         );
     }
-
-
 
     /**
      * Get a route path from the route id.
@@ -494,7 +490,6 @@ abstract class BaseController extends ContainerAware
      * @return string
      */
     abstract protected function renderRaw($templateName, $args = array(), $templateDir = null);
-
 
     /****************** DEPRECATED METHODS ******************/
 

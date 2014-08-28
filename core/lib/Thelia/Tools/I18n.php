@@ -94,8 +94,8 @@ class I18n
             static::$defaultLocale = Lang::getDefaultLanguage()->getLocale();
         }
 
-        $locale = static::real_escape($locale);
-        $defaultLocale = static::real_escape(static::$defaultLocale);
+        $locale = static::realEscape($locale);
+        $defaultLocale = static::realEscape(static::$defaultLocale);
 
         $query
             ->_and()
@@ -118,7 +118,7 @@ class I18n
      *
      * Really escapes a string for SQL query.
      */
-    public static function real_escape($str)
+    public static function realEscape($str)
     {
         $str = trim($str, "\"'");
 

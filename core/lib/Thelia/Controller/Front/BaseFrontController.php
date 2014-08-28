@@ -21,12 +21,10 @@ use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\ModuleQuery;
-use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {
     protected $currentRouter = "router.front";
-
 
     public function checkAuth()
     {

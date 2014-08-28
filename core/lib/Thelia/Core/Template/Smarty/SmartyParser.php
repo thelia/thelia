@@ -349,9 +349,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template file
      *
-     * @param  string $realTemplateName the template name (from the template directory)
-     * @param  array  $parameters       an associative array of names / value pairs
-     * @return string the rendered template text
+     * @param  string                    $realTemplateName the template name (from the template directory)
+     * @param  array                     $parameters       an associative array of names / value pairs
+     * @return string                    the rendered template text
      * @throws ResourceNotFoundException if the template cannot be found
      */
     public function render($realTemplateName, array $parameters = array())

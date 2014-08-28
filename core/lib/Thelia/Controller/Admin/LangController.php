@@ -120,6 +120,7 @@ class LangController extends BaseAdminController
         if (false !== $error_msg) {
             $response = $this->renderDefault(array('error_message' => $error_msg));
         }
+
         return $response;
     }
 

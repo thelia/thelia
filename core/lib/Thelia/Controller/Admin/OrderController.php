@@ -22,7 +22,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Tools\URL;
 
 /**
  * Class OrderController
@@ -209,7 +208,6 @@ class OrderController extends BaseAdminController
     private function generateBackOfficeOrderPdf($order_id, $fileName)
     {
         if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
-
             return $this->generateRedirectFromRoute("admin.order.update.view",
                 [
                     'order_id' => $order_id
