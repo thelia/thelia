@@ -773,7 +773,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
   (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 
-  (2022, 'order-placed.body', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+  (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
