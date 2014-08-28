@@ -391,9 +391,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         if ($key !== null && $id !== null) {
             if ($meta === null) {
-                $out = MetaDataQuery::getAllVal($key, (int)$id);
+                $out = MetaDataQuery::getAllVal($key, (int) $id);
             } else {
-                $out = MetaDataQuery::getVal($meta, $key, (int)$id);
+                $out = MetaDataQuery::getVal($meta, $key, (int) $id);
             }
         } else {
             throw new \InvalidArgumentException("key and id attributes are required in meta access function");
@@ -403,7 +403,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
         return $out;
     }
-
 
     /**
      * @param               $objectLabel

@@ -33,7 +33,7 @@ use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MessageQuery;
-use Thelia\Model\MetaData;
+use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
@@ -256,7 +256,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $virtualDocumentPath = null;
             if ($product->getVirtual() === 1) {
                 // try to find the associated document
-                if (null !== $documentId = MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $pse->getId())) {
+                if (null !== $documentId = MetaDataQuery::getVal('virtual', MetaDataModel::PSE_KEY, $pse->getId())) {
                     $productDocument = ProductDocumentQuery::create()->findPk($documentId);
                     if (null !== $productDocument) {
                         $virtualDocumentPath = $productDocument->getFile();

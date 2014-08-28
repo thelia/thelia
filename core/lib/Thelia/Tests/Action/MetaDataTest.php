@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Model\MetaDataQuery;
 
 use Thelia\Model\Product;
@@ -192,9 +193,8 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($metaData);
 
-        $event = new MetaDataEvent();
+        $event = new MetaDataDeleteEvent('test', get_class($product), $product->getId());
         $event
-            ->setMetaData($metaData)
             ->setDispatcher($this->dispatcher);
 
         $action = new MetaData();

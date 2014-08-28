@@ -515,8 +515,6 @@ class ProductController extends AbstractSeoCrudController
         // and with only 1 PSE
         $virtualDocumentId = intval($updateEvent->getVirtualDocumentId());
 
-        Tlog::getInstance()->debug(sprintf(" GUGU %s", "ICI"));
-
         if ($virtualDocumentId >= 0) {
             $defaultPSE = ProductSaleElementsQuery::create()
                 ->filterByProductId($updateEvent->getProductId())

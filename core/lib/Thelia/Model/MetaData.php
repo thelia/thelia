@@ -30,7 +30,6 @@ class MetaData extends BaseMetaData
     const COUNTRY_KEY  = 'country';
     const LANG_KEY     = 'lang';
 
-
     public function getValue()
     {
         $data = parent::getValue();

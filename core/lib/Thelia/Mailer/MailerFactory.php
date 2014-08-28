@@ -63,22 +63,22 @@ class MailerFactory
     {
         $smtpTransporter = \Swift_SmtpTransport::newInstance(Configquery::getSmtpHost(), ConfigQuery::getSmtpPort());
 
-        if (ConfigQuery::getSmtpEncryption()){
+        if (ConfigQuery::getSmtpEncryption()) {
             $smtpTransporter->setEncryption(ConfigQuery::getSmtpEncryption());
         }
-        if (ConfigQuery::getSmtpUsername()){
+        if (ConfigQuery::getSmtpUsername()) {
             $smtpTransporter->setUsername(ConfigQuery::getSmtpUsername());
         }
-        if (ConfigQuery::getSmtpPassword()){
+        if (ConfigQuery::getSmtpPassword()) {
             $smtpTransporter->setPassword(ConfigQuery::getSmtpPassword());
         }
-        if (ConfigQuery::getSmtpAuthMode()){
+        if (ConfigQuery::getSmtpAuthMode()) {
             $smtpTransporter->setAuthMode(ConfigQuery::getSmtpAuthMode());
         }
-        if (ConfigQuery::getSmtpTimeout()){
+        if (ConfigQuery::getSmtpTimeout()) {
             $smtpTransporter->setTimeout(ConfigQuery::getSmtpTimeout());
         }
-        if (ConfigQuery::getSmtpSourceIp()){
+        if (ConfigQuery::getSmtpSourceIp()) {
             $smtpTransporter->setSourceIp(ConfigQuery::getSmtpSourceIp());
         }
 

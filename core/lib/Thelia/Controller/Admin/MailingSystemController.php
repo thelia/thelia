@@ -105,7 +105,6 @@ class MailingSystemController extends BaseAdminController
         return $response;
     }
 
-
     public function testAction()
     {
 
