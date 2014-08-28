@@ -355,11 +355,20 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 $orderProduct->getOrderProductAttributeCombinations()->count()
             );
 
-            /* check stock decrease */
-            $this->assertEquals(
-                $itemsStock[$index] - $orderProduct->getQuantity(),
-                $cartItem->getProductSaleElements()->getQuantity()
-            );
+
+            if ($orderProduct->getVirtual()){
+                /* check same stock*/
+                $this->assertEquals(
+                    $itemsStock[$index],
+                    $cartItem->getProductSaleElements()->getQuantity()
+                );
+            } else {
+                /* check stock decrease */
+                $this->assertEquals(
+                    $itemsStock[$index] - $orderProduct->getQuantity(),
+                    $cartItem->getProductSaleElements()->getQuantity()
+                );
+            }
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();

@@ -6,7 +6,7 @@
 {loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
 
 Your order {$REF} has been validated. You can download your files.
-    
+
 ----------------------------------------------------------------------
 Products:
 ----------------------------------------------------------------------
