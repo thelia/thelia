@@ -61,7 +61,7 @@ class MailerFactory
 
     private function configureSmtp()
     {
-        $smtpTransporter = \Swift_SmtpTransport::newInstance(Configquery::getSmtpHost(), ConfigQuery::getSmtpPort());
+        $smtpTransporter = \Swift_SmtpTransport::newInstance(ConfigQuery::getSmtpHost(), ConfigQuery::getSmtpPort());
 
         if (ConfigQuery::getSmtpEncryption()) {
             $smtpTransporter->setEncryption(ConfigQuery::getSmtpEncryption());

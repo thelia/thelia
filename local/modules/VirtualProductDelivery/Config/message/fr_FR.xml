@@ -3,21 +3,21 @@
     <title>Message pour le téléchargement des produits virtuels</title>
     <subject>Commande {$order_ref} validée. Téléchargez vos fichiers.</subject>
     <text><![CDATA[
-{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1"}
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
 
 Votre commande {$REF} a été validé. Vous pouvez désormais télécharger vos fichiers.
 
+----------------------------------------------------------------------
 {intl l="Articles à télécharger:"}
-
-{loop type="order_product" name="order-products" order=$ID virtual="1"}
+----------------------------------------------------------------------
+{loop type="order_product" name="order-products" order=$ID virtual="1" backend_context="1"}
 {$TITLE} : {url path="/account/download/$ID"}
 {ifloop rel="combinations"}
 {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
 {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
 {/loop}
 {/ifloop}
-
-
+----------------------------------------------------------------------
 {/loop}
 {/loop}
 
@@ -27,15 +27,16 @@ N'hésitez pas à nous contacter pour toute information complémentaire.
 
 Cordialement
 ]]></text>
-    <html><![CDATA[{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1"}
+    <html><![CDATA[
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
 <p>
 Votre commande {$REF} a été validé. Vous pouvez désormais télécharger vos fichiers.</p>
 <p>{intl l="Articles à télécharger:"}</p>
 
 <ul>
-{loop type="order_product" name="order-products" order=$ID virtual="1"}
+{loop type="order_product" name="order-products" order=$ID virtual="1" backend_context="1"}
 <li>
-    $TITLE : <a href="{url path="/account/download/$ID"}">{url path="/account/download/$ID"}</a>
+    {$TITLE} : <a href="{url path="/account/download/$ID"}">{url path="/account/download/$ID"}</a>
     {ifloop rel="combinations"}
     <br><em>
     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
