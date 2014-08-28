@@ -165,7 +165,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $response = $paymentModuleInstance->pay($order);
 
-        if (null !== $response && $response instanceof \Thelia\Core\HttpFoundation\Response) {
+        if (null !== $response && $response instanceof \Symfony\Component\HttpFoundation\Response) {
             $event->setResponse($response);
         }
     }
