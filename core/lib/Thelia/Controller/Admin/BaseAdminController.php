@@ -46,7 +46,7 @@ class BaseAdminController extends BaseController
      * setCurrentRouter() method to pass their own router, and use the route related
      * methods of this class.
      */
-    private $currentRouter = "router.admin";
+    protected $currentRouter = "router.admin";
 
     /**
      * Helper to append a message to the admin log.

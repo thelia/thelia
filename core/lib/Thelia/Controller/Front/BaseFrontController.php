@@ -24,7 +24,7 @@ use Thelia\Tools\URL;
 
 class BaseFrontController extends BaseController
 {
-    private $currentRouter = "router.admin";
+    protected $currentRouter = "router.admin";
 
 
     public function checkAuth()

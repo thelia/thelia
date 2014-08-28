@@ -53,7 +53,7 @@ abstract class BaseController extends ContainerAware
 {
     protected $tokenProvider;
 
-    private $currentRouter;
+    protected $currentRouter;
 
     /**
      * Return an empty response (after an ajax request, for example)
