@@ -692,7 +692,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2018, 'delivery.after-information', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2019, 'delivery.delivery-address', 3, 1, 0, 1, 1, 1, NOW(), NOW()),
 (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+
+(2022, 'order-placed.body', 1, 1, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -1699,7 +1701,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (2020, 'fr_FR', 'Bon de livraison - après la zone d\'adresses', '', ''),
 (2020, 'en_US', 'Delivery - after addresse area', '', ''),
 (2021, 'fr_FR', 'Bon de livraison - après le résumé de la commande', '', ''),
-(2021, 'en_US', 'Delivery - after the order summary', '', '')
+(2021, 'en_US', 'Delivery - after the order summary', '', ''),
+
+(2022, 'fr_FR', 'Confirmation de commande - après les récapitulatif de commande', '', ''),
+(2022, 'en_US', 'Order confirmation - after the order summary', '', '')
 ;
 
 
@@ -2896,7 +2901,9 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (34, 'admin.tools', NOW(), NOW()),
 (35, 'admin.brand', NOW(), NOW()),
 (36, 'admin.hook', NOW(), NOW()),
-(37, 'admin.module-hook', NOW(), NOW());
+(37, 'admin.module-hook', NOW(), NOW()),
+(38, 'admin.sales', NOW(), NOW())
+;
 
 
 /**
@@ -2971,10 +2978,14 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (33, 'fr_FR', 'gestion des exports'),
 (34, 'en_US', 'Tools panel'),
 (34, 'fr_FR', 'Outils'),
-(35, 'en_US', 'Hooks'),
-(35, 'fr_FR', 'Hooks'),
-(36, 'en_US', 'Hook positions'),
-(36, 'fr_FR', 'Position des hooks')
+(35, 'en_US', 'Brands management'),
+(35, 'fr_FR', 'Gestion des marques')
+(36, 'en_US', 'Hooks'),
+(36, 'fr_FR', 'Hooks'),
+(37, 'en_US', 'Hook positions'),
+(37, 'fr_FR', 'Position des hooks'),
+(38, 'en_US', 'Sales management'),
+(38, 'fr_FR', 'Gestion des promotions')
 ;
 
 
