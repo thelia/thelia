@@ -302,7 +302,10 @@
                              {/loop}
                              </td>
 
-                             <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a></td>
+                             <td class="object-title">
+                                 <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
+                                 {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                             </td>
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
