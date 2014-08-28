@@ -84,7 +84,7 @@ class ModuleHookController extends AbstractCrudController
                 $response = $this->nullResponse();
             }
         } else {
-            $this->redirectToRoute('admin.module-hook');
+            $response = $this->generateRedirectFromRoute('admin.module-hook');
         }
 
         return $response;

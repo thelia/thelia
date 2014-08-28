@@ -176,7 +176,7 @@ class TaxController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTax()->getId())

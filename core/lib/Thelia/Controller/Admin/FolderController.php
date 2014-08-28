@@ -263,12 +263,12 @@ class FolderController extends AbstractSeoCrudController
     protected function performAdditionalUpdateAction($updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $updateEvent->getFolder()->getParent())
+                ['parent' => $updateEvent->getFolder()->getParent()]
             );
+        } else {
+            return null;
         }
     }
 
@@ -280,10 +280,9 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Redirect to parent category list
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            array('parent' => $deleteEvent->getFolder()->getParent())
+            ['parent' => $deleteEvent->getFolder()->getParent()]
         );
     }
 
@@ -297,14 +296,13 @@ class FolderController extends AbstractSeoCrudController
         $folder = FolderQuery::create()->findPk($event->getObjectId());
 
         if ($folder != null) {
-            // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $folder->getParent())
+                ['parent' => $folder->getParent()]
             );
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**

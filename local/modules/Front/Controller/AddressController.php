@@ -104,7 +104,7 @@ class AddressController extends BaseFrontController
         $address = AddressQuery::create()->findPk($address_id);
 
         if (!$address || $customer->getId() != $address->getCustomerId()) {
-            $this->redirectToRoute('default');
+            return $this->generateRedirectFromRoute('default');
         }
 
         $this->getParserContext()->set("address_id", $address_id);
@@ -125,11 +125,11 @@ class AddressController extends BaseFrontController
             $address = AddressQuery::create()->findPk($address_id);
 
             if (null === $address) {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
 
             if ($address->getCustomer()->getId() != $customer->getId()) {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
 
             $event = $this->createAddressEvent($form);
@@ -172,7 +172,7 @@ class AddressController extends BaseFrontController
                                 "message" => "Error during address deletion process"
                             )));
             } else {
-                $this->redirectToRoute('default');
+                return $this->generateRedirectFromRoute('default');
             }
         }
 
@@ -201,7 +201,7 @@ class AddressController extends BaseFrontController
             return $response;
 
         } else {
-            $this->redirectToRoute('default', array('view'=>'account'));
+            return $this->generateRedirectFromRoute('default', array('view'=>'account'));
         }
     }
 

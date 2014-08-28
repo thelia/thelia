@@ -110,13 +110,17 @@ class LangController extends BaseAdminController
 
             $changedObject = $event->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
-            $this->redirectToRoute('admin.configuration.languages');
+
+            $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
             $error_msg = $this->getTranslator()->trans("Failed to update language definition: %ex", array("%ex" => $ex->getMessage()));
             Tlog::getInstance()->addError("Failed to update language definition", $ex->getMessage());
         }
 
-        return $this->renderDefault(array('error_message' => $error_msg));
+        if (false !== $error_msg) {
+            $response = $this->renderDefault(array('error_message' => $error_msg));
+        }
+        return $response;
     }
 
     protected function hydrateEvent($event,Form $form)
@@ -188,7 +192,7 @@ class LangController extends BaseAdminController
             $createdObject = $createEvent->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::CREATE, sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
 
-            $this->redirectToRoute('admin.configuration.languages');
+            $response = $this->generateRedirectFromRoute('admin.configuration.languages');
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -198,12 +202,15 @@ class LangController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $createForm, $ex);
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $createForm, $ex);
 
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderDefault();
+            // At this point, the form has error, and should be redisplayed.
+            $response = $this->renderDefault();
+        }
 
+        return $response;
     }
 
     public function deleteAction()
@@ -221,16 +228,19 @@ class LangController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::LANG_DELETE, $deleteEvent);
 
-            $this->redirectToRoute('admin.configuration.languages');
+            $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
             Tlog::getInstance()->error(sprintf("error during language removal with message : %s", $ex->getMessage()));
             $error_msg = $ex->getMessage();
         }
 
-        return $this->renderDefault(array(
-           'error_message' => $error_msg
-        ));
+        if (false !== $error_msg) {
+            $response = $this->renderDefault(array(
+                'error_message' => $error_msg
+            ));
+        }
 
+        return $response;
     }
 
     public function defaultBehaviorAction()
@@ -248,7 +258,7 @@ class LangController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::LANG_DEFAULTBEHAVIOR, $event);
 
-            $this->redirectToRoute('admin.configuration.languages');
+            $response = $this->generateRedirectFromRoute('admin.configuration.languages');
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -258,11 +268,15 @@ class LangController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $behaviorForm, $ex);
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $behaviorForm, $ex);
 
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderDefault();
+            // At this point, the form has error, and should be redisplayed.
+            $response = $this->renderDefault();
+        }
+
+        return $response;
     }
 
     public function domainAction()
@@ -285,7 +299,7 @@ class LangController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::LANG_URL, $event);
 
-            $this->redirectToRoute('admin.configuration.languages');
+            $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -294,21 +308,25 @@ class LangController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $langUrlForm, $ex);
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $langUrlForm, $ex);
 
-        // At this point, the form has error, and should be redisplayed.
-        return $this->renderDefault();
+            // At this point, the form has error, and should be redisplayed.
+            $response = $this->renderDefault();
+        }
+
+        return $response;
     }
 
     public function activateDomainAction()
     {
-        $this->domainActivation(1);
+        return $this->domainActivation(1);
     }
 
     public function deactivateDomainAction()
     {
-        $this->domainActivation(0);
+        return $this->domainActivation(0);
     }
 
     private function domainActivation($activate)
@@ -319,6 +337,6 @@ class LangController extends BaseAdminController
             ->filterByName('one_domain_foreach_lang')
             ->update(array('Value' => $activate));
 
-        $this->redirectToRoute('admin.configuration.languages');
+        return $this->generateRedirectFromRoute('admin.configuration.languages');
     }
 }

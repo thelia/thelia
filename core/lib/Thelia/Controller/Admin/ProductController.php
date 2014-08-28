@@ -452,19 +452,17 @@ class ProductController extends AbstractSeoCrudController
 
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Redirect to parent product list
-        $this->redirectToRoute(
-                'admin.products.default',
-                array('category_id' => $this->getCategoryId())
+        return $this->generateRedirectFromRoute(
+            'admin.products.default',
+            ['category_id' => $this->getCategoryId()]
         );
     }
 
     protected function performAdditionalUpdatePositionAction($positionEvent)
     {
-        // Redirect to parent product list
-        $this->redirectToRoute(
-                'admin.categories.default',
-                array('category_id' => $this->getCategoryId())
+        return $this->generateRedirectFromRoute(
+            'admin.categories.default',
+            ['category_id' => $this->getCategoryId()]
         );
     }
 

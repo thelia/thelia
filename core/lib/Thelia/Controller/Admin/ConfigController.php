@@ -192,6 +192,6 @@ class ConfigController extends AbstractCrudController
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
         }
 
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 }

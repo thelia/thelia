@@ -68,7 +68,7 @@ class ContactController extends BaseFrontController
                 ->setGeneralError($error_message)
             ;
         } else {
-            $this->redirectToRoute('contact.success');
+            return $this->generateRedirectFromRoute('contact.success');
         }
     }
 }

@@ -85,7 +85,7 @@ class SessionController extends BaseAdminController
         $this->clearRememberMeCookie();
 
         // Go back to login page.
-        $this->redirectToRoute('admin.login');
+        return $this->generateRedirectFromRoute('admin.login');
     }
 
     public function checkLoginAction()

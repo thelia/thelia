@@ -138,19 +138,23 @@ class SystemLogController extends BaseAdminController
 
             $this->adminLogAppend(AdminResources::SYSTEM_LOG, AccessManager::UPDATE, "System log configuration changed");
 
-            $this->redirectToRoute('admin.configuration.system-logs.default');
+            $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
 
         } catch (\Exception $ex) {
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
                 $this->getTranslator()->trans("System log configuration failed."),
                 $error_msg,
                 $systemLogForm,
                 $ex
-        );
+            );
 
-        return $this->renderTemplate();
+            $response = $this->renderTemplate();
+        }
+
+        return $response;
     }
 }

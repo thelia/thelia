@@ -88,12 +88,14 @@ class OrderController extends BaseAdminController
 
         if ($browsedPage) {
             $params["order_page"] = $browsedPage;
-            $this->redirectToRoute("admin.order.list", $params);
+            $response = $this->generateRedirectFromRoute("admin.order.list", $params);
         } else {
             $params["order_id"] = $order_id;
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
-            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params);
         }
+
+        return $response;
     }
 
     public function updateDeliveryRef($order_id)

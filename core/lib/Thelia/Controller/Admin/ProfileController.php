@@ -200,7 +200,7 @@ class ProfileController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getProfile()->getId())

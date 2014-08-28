@@ -236,7 +236,7 @@ class ModuleController extends AbstractCrudController
             }
 
         } else {
-            $this->redirectToRoute('admin.module');
+            $response = $this->generateRedirectFromRoute('admin.module');
         }
 
         return $response;
@@ -246,7 +246,7 @@ class ModuleController extends AbstractCrudController
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) return $response;
 
-        $message = null;
+        $message = false;
 
         try {
             $this->getTokenProvider()->checkToken(
@@ -272,12 +272,14 @@ class ModuleController extends AbstractCrudController
             Tlog::getInstance()->addError("Error during module removal", $e);
         }
 
-        if ($message) {
-            return $this->render("modules", array(
+        if (false !== $message) {
+            $response = $this->render("modules", array(
                 "error_message" => $message
             ));
         } else {
-            $this->redirectToRoute('admin.module');
+            $response = $this->generateRedirectFromRoute('admin.module');
         }
+
+        return $response;
     }
 }
