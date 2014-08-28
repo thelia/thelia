@@ -1006,7 +1006,7 @@ class ProductController extends AbstractSeoCrudController
             }
 
            // Redirect to the success URL
-           $this->redirect($changeForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($changeForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -1128,7 +1128,7 @@ class ProductController extends AbstractSeoCrudController
             $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
 
            // Redirect to the success URL
-           $this->redirect($changeForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($changeForm);
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated

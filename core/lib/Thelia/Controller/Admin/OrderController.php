@@ -130,7 +130,9 @@ class OrderController extends BaseAdminController
         $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+        return $this->generateRedirectFromRoute(
+            "admin.order.update.view", $params
+        );
     }
 
     public function updateAddress($order_id)
@@ -186,7 +188,10 @@ class OrderController extends BaseAdminController
         $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+        return $this->generateRedirectFromRoute(
+            "admin.order.update.view", $params
+        );
+
     }
 
     public function generateInvoicePdf($order_id)
@@ -204,9 +209,12 @@ class OrderController extends BaseAdminController
     private function generateBackOfficeOrderPdf($order_id, $fileName)
     {
         if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
-            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
-                'order_id' => $order_id
-            ))));
+
+            return $this->generateRedirectFromRoute("admin.order.update.view",
+                [
+                    'order_id' => $order_id
+                ]
+            );
         }
 
         return $response;

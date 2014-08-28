@@ -122,7 +122,7 @@ class SessionController extends BaseAdminController
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);
 
             // Redirect to the success URL, passing the cookie if one exists.
-            $this->redirect($adminLoginForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($adminLoginForm);
 
          } catch (FormValidationException $ex) {
 

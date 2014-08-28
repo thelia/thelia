@@ -145,7 +145,10 @@ class CartController extends BaseFrontController
 
         $cookie = new Cookie($cookieName, $deliveryId, time() + $cookieExpires, '/');
 
-        $this->redirect($redirectUrl, 302, array($cookie));
+        $response = $this->generateRedirect($redirectUrl);
+        $response->headers->setCookie($cookie);
+
+        return $response;
     }
 
     /**
