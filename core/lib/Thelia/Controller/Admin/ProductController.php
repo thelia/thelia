@@ -410,12 +410,12 @@ class ProductController extends AbstractSeoCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                'admin.products.default',
-                array(
-                    'category_id' => $this->getCategoryId(),
-                    'page' => $this->getRequest()->get('page', 1)
-                )
+        return $this->generateRedirectFromRoute(
+            'admin.products.default',
+            [
+                'category_id' => $this->getCategoryId(),
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 
@@ -749,7 +749,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Redirect to the category/product list
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     public function addAdditionalCategoryAction()

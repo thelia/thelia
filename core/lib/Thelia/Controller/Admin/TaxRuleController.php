@@ -223,9 +223,7 @@ class TaxRuleController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
     }
 
     public function updateAction()
@@ -260,7 +258,7 @@ class TaxRuleController extends AbstractCrudController
 
         $this->dispatch(TheliaEvents::TAX_RULE_SET_DEFAULT, $setDefaultEvent);
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     public function processUpdateTaxesAction()

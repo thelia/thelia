@@ -259,7 +259,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.brand.default');
+        return $this->generateRedirectFromRoute('admin.brand.default');
     }
 
     /**

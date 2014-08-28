@@ -178,9 +178,7 @@ class ModuleController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.module"
-        );
+        return $this->generateRedirectFromRoute("admin.module");
     }
 
     public function indexAction()

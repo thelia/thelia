@@ -180,9 +180,9 @@ class FeatureAvController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            $this->getViewArguments()
         );
      }
 }

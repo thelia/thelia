@@ -172,7 +172,7 @@ class CurrencyController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.currencies.default');
+        return $this->generateRedirectFromRoute('admin.configuration.currencies.default');
     }
 
     /**
@@ -190,7 +190,7 @@ class CurrencyController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**
@@ -213,7 +213,7 @@ class CurrencyController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
 }

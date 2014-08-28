@@ -209,9 +209,7 @@ class ProfileController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.profiles.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.profiles.list");
     }
 
     public function updateAction()

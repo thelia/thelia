@@ -179,9 +179,9 @@ class AttributeAvController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.attributes.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.attributes.update",
+            $this->getViewArguments()
         );
      }
 }

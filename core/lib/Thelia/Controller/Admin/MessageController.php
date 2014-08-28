@@ -194,6 +194,6 @@ class MessageController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.messages.default');
+        return $this->generateRedirectFromRoute('admin.configuration.messages.default');
     }
 }

@@ -279,9 +279,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.module-hook"
-        );
+        return $this->generateRedirectFromRoute("admin.module-hook");
     }
 
     protected function getViewArguments()

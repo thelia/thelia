@@ -165,7 +165,7 @@ class TemplateController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.templates.default');
+        return $this->generateRedirectFromRoute('admin.configuration.templates.default');
     }
 
     // Process delete failure, which may occurs if template is in use.

@@ -214,7 +214,7 @@ class AreaController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.shipping-configuration.default');
+        return $this->generateRedirectFromRoute('admin.configuration.shipping-configuration.default');
     }
 
     /**

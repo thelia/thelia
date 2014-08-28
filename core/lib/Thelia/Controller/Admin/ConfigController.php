@@ -169,7 +169,7 @@ class ConfigController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 
     /**

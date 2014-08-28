@@ -180,8 +180,11 @@ class CustomerController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.customers', array(
-                'page' => $this->getRequest()->get('page', 1))
+        return $this->generateRedirectFromRoute(
+            'admin.customers',
+            [
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 

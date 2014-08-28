@@ -324,9 +324,9 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.content.default',
-            array('parent' => $this->getFolderId())
+            ['parent' => $this->getFolderId()]
         );
     }
 

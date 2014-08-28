@@ -486,7 +486,7 @@ abstract class AbstractCrudController extends BaseAdminController
         $response = $this->performAdditionalUpdatePositionAction($event);
 
         if ($response == null) {
-            $this->redirectToListTemplate();
+            return $this->redirectToListTemplate();
         } else {
             return $response;
         }
@@ -576,9 +576,10 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $response = $this->performAdditionalDeleteAction($deleteEvent);
 
-        if ($response == null)
-            $this->redirectToListTemplate();
-        else
+        if ($response == null) {
+            return $this->redirectToListTemplate();
+        } else {
             return $response;
+        }
     }
 }

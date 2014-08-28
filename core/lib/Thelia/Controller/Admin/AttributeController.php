@@ -205,7 +205,7 @@ class AttributeController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.attributes.default');
+        return $this->generateRedirectFromRoute('admin.configuration.attributes.default');
     }
 
     /**
@@ -242,7 +242,7 @@ class AttributeController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**

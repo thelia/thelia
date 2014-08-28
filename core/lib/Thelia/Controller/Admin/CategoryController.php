@@ -190,24 +190,27 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.categories', array(
+        return $this->generateRedirectFromRoute(
+            'admin.categories',
+            [
                 'category_id' => $this->getRequest()->get('category_id', 0),
-                'page' => $this->getRequest()->get('page', 1))
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 
     protected function redirectToListTemplateWithId($category_id)
     {
+        $response = null;
         if ($category_id > 0) {
-            $this->redirectToRoute(
-                'admin.categories.default',
-                array('category_id' => $category_id)
+            $response = $this->generateRedirectFromRoute('admin.categories.default',
+                ['category_id' => $category_id]
             );
         } else {
-            $this->redirectToRoute(
-                'admin.catalog'
-            );
+            $response = $this->generateRedirectFromRoute('admin.catalog');
         }
+
+        return $response;
     }
 
     protected function renderEditionTemplate()
@@ -248,30 +251,33 @@ class CategoryController extends AbstractSeoCrudController
     {
         // Redirect to parent category list
         $category_id = $deleteEvent->getCategory()->getParent();
-        $this->redirectToListTemplateWithId($category_id);
+        return $this->redirectToListTemplateWithId($category_id);
     }
 
     protected function performAdditionalUpdateAction($updateEvent)
     {
+        $response = null;
         if ($this->getRequest()->get('save_mode') != 'stay') {
             // Redirect to parent category list
             $category_id = $updateEvent->getCategory()->getParent();
-            $this->redirectToListTemplateWithId($category_id);
+            $response = $this->redirectToListTemplateWithId($category_id);
         }
+
+        return $response;
     }
 
     protected function performAdditionalUpdatePositionAction($event)
     {
 
         $category = CategoryQuery::create()->findPk($event->getObjectId());
-
+        $response = null;
         if ($category != null) {
             // Redirect to parent category list
             $category_id = $category->getParent();
-            $this->redirectToListTemplateWithId($category_id);
+            $response = $this->redirectToListTemplateWithId($category_id);
         }
 
-        return null;
+        return $response;
     }
 
     public function getAvailableRelatedContentAction($categoryId, $folderId)

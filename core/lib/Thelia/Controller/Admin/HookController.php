@@ -424,7 +424,7 @@ class HookController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.hook');
+        return $this->generateRedirectFromRoute('admin.hook');
     }
 
     public function toggleNativeAction()

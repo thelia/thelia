@@ -320,9 +320,9 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            array('parent' => $this->getRequest()->get('parent', 0))
+            ['parent' => $this->getRequest()->get('parent', 0)]
         );
     }
 }

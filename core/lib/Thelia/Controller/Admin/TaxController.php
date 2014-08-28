@@ -185,9 +185,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
     }
 
     protected function getRequirements($type, $formData)

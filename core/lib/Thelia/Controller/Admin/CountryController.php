@@ -226,7 +226,7 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.countries.default');
+        return $this->generateRedirectFromRoute('admin.configuration.countries.default');
     }
 
     public function toggleDefaultAction()

@@ -205,7 +205,7 @@ class FeatureController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.features.default');
+        return $this->generateRedirectFromRoute('admin.configuration.features.default');
     }
 
     /**
@@ -242,7 +242,7 @@ class FeatureController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**
