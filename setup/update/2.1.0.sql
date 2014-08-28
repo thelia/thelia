@@ -165,7 +165,7 @@ CREATE TABLE `product_sale_elements_product_document`
 SELECT @max_pos := MAX(`position`) FROM `module`;
 SELECT @max_id := MAX(`id`) FROM `module`;
 
-INSERT INTO `module` (`code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
   (@max_id+1, 'HookNavigation', 1, 1, @max_pos+1, 'HookNavigation\\HookNavigation', NOW(), NOW()),
   (@max_id+2, 'HookCurrency', 1, 1, @max_pos+2, 'HookCurrency\\HookCurrency', NOW(), NOW()),
   (@max_id+3, 'HookLang', 1, 1, @max_pos+3, 'HookLang\\HookLang', NOW(), NOW()),

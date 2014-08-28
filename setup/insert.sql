@@ -694,7 +694,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 
-(2022, 'order-placed.body', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+(2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -2979,7 +2979,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (34, 'en_US', 'Tools panel'),
 (34, 'fr_FR', 'Outils'),
 (35, 'en_US', 'Brands management'),
-(35, 'fr_FR', 'Gestion des marques')
+(35, 'fr_FR', 'Gestion des marques'),
 (36, 'en_US', 'Hooks'),
 (36, 'fr_FR', 'Hooks'),
 (37, 'en_US', 'Hook positions'),
