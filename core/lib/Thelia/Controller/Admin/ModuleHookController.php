@@ -267,8 +267,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the module edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.module-hook.update",
             $this->getViewArguments(),
             $this->getRouteArguments()

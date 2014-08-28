@@ -161,8 +161,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()

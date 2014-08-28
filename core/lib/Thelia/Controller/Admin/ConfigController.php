@@ -161,9 +161,9 @@ class ConfigController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.variables.update",
-                array('variable_id' => $this->getRequest()->get('variable_id'))
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.variables.update",
+            array('variable_id' => $this->getRequest()->get('variable_id'))
         );
     }
 

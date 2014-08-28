@@ -162,9 +162,11 @@ class CurrencyController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.currencies.update",
-                array('currency_id' => $this->getRequest()->get('currency_id'))
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.currencies.update",
+            [
+                'currency_id' => $this->getRequest()->get('currency_id'),
+            ]
         );
     }
 

@@ -192,7 +192,10 @@ class CustomerController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.customer.update.view", $this->getEditionArguments());
+        return $this->generateRedirectFromRoute(
+            "admin.customer.update.view",
+            $this->getEditionArguments()
+        );
     }
 
     public function deleteAction()

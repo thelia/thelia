@@ -184,9 +184,12 @@ class MessageController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.configuration.messages.update", array(
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.messages.update",
+            [
                 'message_id' => $this->getRequest()->get('message_id')
-        ));
+            ]
+        );
     }
 
     protected function redirectToListTemplate()

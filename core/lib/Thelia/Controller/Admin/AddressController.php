@@ -65,7 +65,7 @@ class AddressController extends AbstractCrudController
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address setting as default with message %s", $e->getMessage()));
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -257,10 +257,14 @@ class AddressController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         // We display here the custromer edition template
-        $this->redirectToRoute('admin.customer.update.view', array(
-            "page"        => $this->getRequest()->get('page'),
-            "customer_id" => $this->getCustomerId()
-        ));
+        return $this->generateRedirectFromRoute(
+            'admin.customer.update.view',
+            [
+                "page"        => $this->getRequest()->get('page'),
+                "customer_id" => $this->getCustomerId()
+            ]
+        );
+
     }
 
     /**
@@ -279,7 +283,7 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -290,12 +294,12 @@ class AddressController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     protected function performAdditionalUpdateAction($event)
     {
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     protected function getCustomerId()

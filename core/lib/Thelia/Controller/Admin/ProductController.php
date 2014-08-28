@@ -426,7 +426,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.products.update", $this->getEditionArguments());
+        return $this->generateRedirectFromRoute("admin.products.update", $this->getEditionArguments());
     }
 
     /**
@@ -518,7 +518,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteRelatedContentAction()
@@ -544,7 +544,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     // -- Accessories management ----------------------------------------------
@@ -596,7 +596,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteAccessoryAction()
@@ -621,7 +621,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -672,7 +672,7 @@ class ProductController extends AbstractSeoCrudController
             );
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -745,7 +745,7 @@ class ProductController extends AbstractSeoCrudController
         // If we have to stay on the same page, do not redirect to the succesUrl,
         // just redirect to the edit page again.
         if ($this->getRequest()->get('save_mode') == 'stay') {
-            $this->redirectToEditionTemplate($this->getRequest());
+            return $this->redirectToEditionTemplate($this->getRequest());
         }
 
         // Redirect to the category/product list
@@ -774,7 +774,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteAdditionalCategoryAction()
@@ -799,7 +799,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     // -- Product combination management ---------------------------------------
@@ -892,7 +892,7 @@ class ProductController extends AbstractSeoCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -915,7 +915,7 @@ class ProductController extends AbstractSeoCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -1004,7 +1004,7 @@ class ProductController extends AbstractSeoCrudController
 
             // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
+                return $this->redirectToEditionTemplate($this->getRequest());
             }
 
            // Redirect to the success URL

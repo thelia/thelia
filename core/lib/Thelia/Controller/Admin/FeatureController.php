@@ -194,12 +194,12 @@ class FeatureController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                array(
-                        'feature_id' => $this->getRequest()->get('feature_id'),
-                        'featureav_order' => $this->getFeatureAvListOrder()
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            [
+                'feature_id' => $this->getRequest()->get('feature_id'),
+                'featureav_order' => $this->getFeatureAvListOrder()
+            ]
         );
     }
 

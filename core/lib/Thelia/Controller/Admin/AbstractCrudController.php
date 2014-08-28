@@ -168,12 +168,14 @@ abstract class AbstractCrudController extends BaseAdminController
     abstract protected function renderEditionTemplate();
 
     /**
-     * Redirect to the edition template
+     * Must return a RedirectResponse instance
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     abstract protected function redirectToEditionTemplate();
 
     /**
-     * Redirect to the list template
+     * Must return a RedirectResponse instance
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     abstract protected function redirectToListTemplate();
 
@@ -324,7 +326,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
                 // Redirect to the success URL
-                $this->redirect($successUrl);
+                return $this->generateRedirect($successUrl);
             } else {
                 return $response;
             }
@@ -421,11 +423,11 @@ abstract class AbstractCrudController extends BaseAdminController
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($this->getRequest()->get('save_mode') == 'stay') {
-                    $this->redirectToEditionTemplate($this->getRequest());
+                    return $this->redirectToEditionTemplate($this->getRequest());
                 }
 
                 // Redirect to the success URL
-                $this->redirect($changeForm->getSuccessUrl());
+                return $this->generateSuccessRedirect($changeForm);
             } else {
                 return $response;
             }
@@ -519,7 +521,9 @@ abstract class AbstractCrudController extends BaseAdminController
             }
         }
 
-        if ($doFinalRedirect) $this->redirectToEditionTemplate();
+        if ($doFinalRedirect) {
+            return $this->redirectToEditionTemplate();
+        }
     }
 
     /**

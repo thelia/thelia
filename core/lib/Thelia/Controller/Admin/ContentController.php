@@ -76,7 +76,7 @@ class ContentController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -104,7 +104,7 @@ class ContentController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -313,7 +313,10 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirect($this->getRoute('admin.content.update', $this->getEditionArguments()));
+        return $this->generateRedirectFromRoute(
+            'admin.content.update',
+            $this->getEditionArguments()
+        );
     }
 
     /**

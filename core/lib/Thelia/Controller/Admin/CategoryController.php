@@ -217,7 +217,10 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.categories.update", $this->getEditionArguments());
+        return $this->generateRedirectFromRoute(
+            "admin.categories.update",
+            $this->getEditionArguments()
+        );
     }
 
     /**
@@ -318,7 +321,7 @@ class CategoryController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -333,7 +336,7 @@ class CategoryController extends AbstractSeoCrudController
             return $response;
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteRelatedContentAction()
@@ -358,7 +361,7 @@ class CategoryController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
 }

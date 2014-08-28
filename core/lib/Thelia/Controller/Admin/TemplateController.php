@@ -155,11 +155,11 @@ class TemplateController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.templates.update",
-                array(
-                        'template_id' => $this->getRequest()->get('template_id'),
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.templates.update",
+            [
+                'template_id' => $this->getRequest()->get('template_id'),
+            ]
         );
     }
 
@@ -223,7 +223,7 @@ class TemplateController extends AbstractCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteAttributeAction()
@@ -243,7 +243,7 @@ class TemplateController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function updateAttributePositionAction()
@@ -282,7 +282,7 @@ class TemplateController extends AbstractCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteFeatureAction()
@@ -302,7 +302,7 @@ class TemplateController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function updateFeaturePositionAction()

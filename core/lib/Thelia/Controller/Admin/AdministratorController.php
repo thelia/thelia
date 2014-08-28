@@ -145,7 +145,7 @@ class AdministratorController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         // We always return to the feature edition form
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     protected function performAdditionalCreateAction($updateEvent)

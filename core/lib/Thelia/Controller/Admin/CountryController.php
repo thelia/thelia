@@ -212,9 +212,12 @@ class CountryController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute('admin.configuration.countries.update', array(), array(
+        return $this->generateRedirectFromRoute(
+            'admin.configuration.countries.update',
+            [],
+            [
                 "country_id" => $this->getRequest()->get('country_id', 0)
-            )
+            ]
         );
     }
 
