@@ -4,6 +4,17 @@
 - Added "Shipping configuration" button to the delivery module list, with a warning if no shipping zone is assigned to the module.
 - Added the `show_label` parameter to the `render_form_field Smarty` function.
 
+##DEPRECATED
+Redirect methods are deprecated. You have now two way for redirecting a user :
+- Throwing a Thelia\Core\HttpKernel\Exception\RedirectException with a given URL
+- If you are in a controller, returning an instance of \Symfony\Component\HttpFoundation\RedirectResponse
+- Never ever send a response. Only the HttpKernel class is allow to do that.
+
+### methods deprecated :
+- Thelia\Controller\BaseController::redirect
+- Thelia\Controller\BaseController::redirectSuccess
+- Thelia\Controller\BaseController::redirectToRoute
+
 #2.0.3
 - Fix js syntax in order-delivery template
 - price are now save without any round.
