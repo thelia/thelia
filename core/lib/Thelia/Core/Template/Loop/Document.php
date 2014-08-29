@@ -201,12 +201,12 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
-        if (!is_null($exclude)){
+        if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY){
+        if ($visible !== BooleanOrBothType::ANY) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 

@@ -706,7 +706,6 @@ class FileController extends BaseAdminController
         return $this->updateFilePositionAction($parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
 
-
     public function toggleVisibilityFileAction($documentId, $parentType, $objectType, $eventName)
     {
         $message = null;

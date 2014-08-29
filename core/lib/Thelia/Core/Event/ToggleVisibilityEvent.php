@@ -55,5 +55,4 @@ class ToggleVisibilityEvent  extends ActionEvent
         return $this->object;
     }
 
-
 }

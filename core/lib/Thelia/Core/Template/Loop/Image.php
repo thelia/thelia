@@ -222,7 +222,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $visible = $this->getVisible();
-        if ($visible !== BooleanOrBothType::ANY){
+        if ($visible !== BooleanOrBothType::ANY) {
             $search->filterByVisible($visible ? 1 : 0);
         }
 

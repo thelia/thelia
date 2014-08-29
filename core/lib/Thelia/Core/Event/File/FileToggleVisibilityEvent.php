@@ -14,14 +14,13 @@ namespace Thelia\Core\Event\File;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Event\ToggleVisibilityEvent;
 
-
 /**
  * Class FileToggleVisibilityEvent
  * @package Thelia\Core\Event\File
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FileToggleVisibilityEvent extends ToggleVisibilityEvent {
-
+class FileToggleVisibilityEvent extends ToggleVisibilityEvent
+{
     protected $query;
 
     /**
@@ -51,4 +50,4 @@ class FileToggleVisibilityEvent extends ToggleVisibilityEvent {
         return $this->query;
     }
 
-} 
+}

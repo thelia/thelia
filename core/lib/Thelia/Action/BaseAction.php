@@ -84,7 +84,6 @@ class BaseAction
         return $object;
     }
 
-
     /**
      * Toggle visibility for an object
      *

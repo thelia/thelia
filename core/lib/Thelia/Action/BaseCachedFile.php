@@ -15,7 +15,6 @@ use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\File\FileToggleVisibilityEvent;
-use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
@@ -258,7 +257,5 @@ abstract class BaseCachedFile extends BaseAction
     {
         $this->genericToggleVisibility($event->getQuery(), $event);
     }
-
-
 
 }
