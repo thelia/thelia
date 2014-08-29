@@ -57,7 +57,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $deleteEventIdentifier,
         $visibilityToggleEventIdentifier = null,
         $changePositionEventIdentifier = null,
-        $updateSeoEventIdentifier = null
+        $updateSeoEventIdentifier = null,
+        $moduleCode = null
     )
     {
         parent::__construct(
@@ -69,7 +70,8 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             $updateEventIdentifier,
             $deleteEventIdentifier,
             $visibilityToggleEventIdentifier,
-            $changePositionEventIdentifier
+            $changePositionEventIdentifier,
+            $moduleCode
         );
 
         $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
@@ -151,7 +153,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     public function processUpdateSeoAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE)) {
             return $response;
         }
 
