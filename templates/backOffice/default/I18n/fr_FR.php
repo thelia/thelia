@@ -1015,6 +1015,7 @@ return array(
     'This folder doesn\'t contains any contents. To add a new content, <strong>click the + button</strong> above.' => 'Ce dossier n\'a aucun contenu. Pour ajouter un nouveau contenu, <strong>cliquez sur le bouton + ci-dessus</strong>.',
     'This folder has no sub-folders.' => 'Ce dossier n\'a pas de sous-dossiers.',
     'This folder has no sub-folders. To create a new one, click the + button above.' => 'Ce dossier n\'a pas de sous-dossiers. Afin de créer un nouveau, cliquez sur le bouton + ci-dessus.',
+    'This function is not yet implemented.' => 'La fonction n\'est pas encore implémentée.',
     'This hook is specific to a module (delivery/payment modules).' => 'Ce hook est spécifique à un module (généralement pour les modules de livraison et paiements).',
     'This is the code entered by your customers to use this coupon' => 'Il s\'agit du code qui sera saisi par vos clients',
     'This is the message purpose, such as \'Order confirmation\'.' => 'Titre du message (ex : confirmation de commande)',
