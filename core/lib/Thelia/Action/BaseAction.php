@@ -13,6 +13,7 @@ namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 
+use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 
@@ -82,4 +83,33 @@ class BaseAction
 
         return $object;
     }
+
+
+    /**
+     * Toggle visibility for an object
+     *
+     * @param ModelCriteria               $query
+     * @param UpdateToggleVisibilityEvent $event
+     *
+     * @return mixed
+     */
+    public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event)
+    {
+        if (null !== $object = $query->findPk($event->getObjectId())) {
+
+            $newVisibility = ($object->getVisible() === 1) ? 0 : 1;
+            $object
+                ->setDispatcher($event->getDispatcher())
+
+                ->setVisible($newVisibility)
+
+                ->save()
+            ;
+
+            $event->setObject($object);
+        }
+
+        return $object;
+    }
+
 }

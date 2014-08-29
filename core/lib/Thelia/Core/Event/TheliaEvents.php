@@ -415,6 +415,7 @@ final class TheliaEvents
      */
     const DOCUMENT_UPDATE = "action.updateDocument";
     const DOCUMENT_UPDATE_POSITION = "action.updateDocumentPosition";
+    const DOCUMENT_TOGGLE_VISIBILITY = "action.toggleDocumentVisibility";
 
     /**
      * Delete given document
@@ -436,6 +437,7 @@ final class TheliaEvents
      */
     const IMAGE_UPDATE = "action.updateImages";
     const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
+    const IMAGE_TOGGLE_VISIBILITY = "action.toggleImageVisibility";
 
     /**
      * Delete given image

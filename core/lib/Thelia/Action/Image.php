@@ -364,6 +364,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             TheliaEvents::IMAGE_SAVE => array("saveFile", 128),
             TheliaEvents::IMAGE_UPDATE => array("updateFile", 128),
             TheliaEvents::IMAGE_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::IMAGE_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
         );
     }
 }
