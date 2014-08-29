@@ -58,7 +58,7 @@ class ProductImageTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ProductImageTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,11 @@ class ProductImageTableMap extends TableMap
      * the column name for the FILE field
      */
     const FILE = 'product_image.FILE';
+
+    /**
+     * the column name for the VISIBLE field
+     */
+    const VISIBLE = 'product_image.VISIBLE';
 
     /**
      * the column name for the POSITION field
@@ -121,12 +126,12 @@ class ProductImageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'File', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'file', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductImageTableMap::ID, ProductImageTableMap::PRODUCT_ID, ProductImageTableMap::FILE, ProductImageTableMap::POSITION, ProductImageTableMap::CREATED_AT, ProductImageTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FILE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_id', 'file', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'File', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'file', 'visible', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductImageTableMap::ID, ProductImageTableMap::PRODUCT_ID, ProductImageTableMap::FILE, ProductImageTableMap::VISIBLE, ProductImageTableMap::POSITION, ProductImageTableMap::CREATED_AT, ProductImageTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FILE', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_id', 'file', 'visible', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -136,12 +141,12 @@ class ProductImageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'File' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'file' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProductImageTableMap::ID => 0, ProductImageTableMap::PRODUCT_ID => 1, ProductImageTableMap::FILE => 2, ProductImageTableMap::POSITION => 3, ProductImageTableMap::CREATED_AT => 4, ProductImageTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FILE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'file' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'File' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ProductImageTableMap::ID => 0, ProductImageTableMap::PRODUCT_ID => 1, ProductImageTableMap::FILE => 2, ProductImageTableMap::VISIBLE => 3, ProductImageTableMap::POSITION => 4, ProductImageTableMap::CREATED_AT => 5, ProductImageTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FILE' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -163,6 +168,7 @@ class ProductImageTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('FILE', 'File', 'VARCHAR', true, 255, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 1);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -343,6 +349,7 @@ class ProductImageTableMap extends TableMap
             $criteria->addSelectColumn(ProductImageTableMap::ID);
             $criteria->addSelectColumn(ProductImageTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(ProductImageTableMap::FILE);
+            $criteria->addSelectColumn(ProductImageTableMap::VISIBLE);
             $criteria->addSelectColumn(ProductImageTableMap::POSITION);
             $criteria->addSelectColumn(ProductImageTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductImageTableMap::UPDATED_AT);
@@ -350,6 +357,7 @@ class ProductImageTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.FILE');
+            $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

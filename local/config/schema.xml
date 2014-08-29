@@ -518,6 +518,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -542,6 +543,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1105,6 +1107,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1129,6 +1132,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1153,6 +1157,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="content_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1177,6 +1182,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1197,6 +1203,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="content_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1217,6 +1224,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1313,6 +1321,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="module_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1478,6 +1487,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="brand_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column defaultValue="NULL" name="position" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
     <column defaultValue="NULL" name="description" type="CLOB" />
@@ -1498,6 +1508,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="brand_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
     <column defaultValue="NULL" name="description" type="CLOB" />
