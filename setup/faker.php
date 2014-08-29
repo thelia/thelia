@@ -590,6 +590,12 @@ try {
         ->save($con)
         ;
 
+        /**
+         * Create a cart for the order
+         */
+        $cart = new \Thelia\Model\Cart();
+        $cart->save();
+
         $placedOrder
             ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
             ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
@@ -613,6 +619,7 @@ try {
                     ->findOne()
             )
             ->setPostage(mt_rand(1, 50))
+            ->setCart($cart)
         ;
 
         $placedOrder->save($con);

@@ -61,6 +61,10 @@ use Thelia\Model\Map\CartTableMap;
  * @method     ChildCartQuery rightJoinCurrency($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Currency relation
  * @method     ChildCartQuery innerJoinCurrency($relationAlias = null) Adds a INNER JOIN clause to the query using the Currency relation
  *
+ * @method     ChildCartQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
+ * @method     ChildCartQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
+ * @method     ChildCartQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
+ *
  * @method     ChildCartQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
  * @method     ChildCartQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
  * @method     ChildCartQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
@@ -931,6 +935,79 @@ abstract class CartQuery extends ModelCriteria
         return $this
             ->joinCurrency($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Currency', '\Thelia\Model\CurrencyQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Order object
+     *
+     * @param \Thelia\Model\Order|ObjectCollection $order  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCartQuery The current query, for fluid interface
+     */
+    public function filterByOrder($order, $comparison = null)
+    {
+        if ($order instanceof \Thelia\Model\Order) {
+            return $this
+                ->addUsingAlias(CartTableMap::ID, $order->getCartId(), $comparison);
+        } elseif ($order instanceof ObjectCollection) {
+            return $this
+                ->useOrderQuery()
+                ->filterByPrimaryKeys($order->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrder() only accepts arguments of type \Thelia\Model\Order or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Order relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCartQuery The current query, for fluid interface
+     */
+    public function joinOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Order');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Order');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Order relation Order object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
     }
 
     /**

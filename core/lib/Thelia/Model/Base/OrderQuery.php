@@ -38,6 +38,7 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery orderByDeliveryModuleId($order = Criteria::ASC) Order by the delivery_module_id column
  * @method     ChildOrderQuery orderByStatusId($order = Criteria::ASC) Order by the status_id column
  * @method     ChildOrderQuery orderByLangId($order = Criteria::ASC) Order by the lang_id column
+ * @method     ChildOrderQuery orderByCartId($order = Criteria::ASC) Order by the cart_id column
  * @method     ChildOrderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  * @method     ChildOrderQuery orderByVersion($order = Criteria::ASC) Order by the version column
@@ -61,6 +62,7 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery groupByDeliveryModuleId() Group by the delivery_module_id column
  * @method     ChildOrderQuery groupByStatusId() Group by the status_id column
  * @method     ChildOrderQuery groupByLangId() Group by the lang_id column
+ * @method     ChildOrderQuery groupByCartId() Group by the cart_id column
  * @method     ChildOrderQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderQuery groupByUpdatedAt() Group by the updated_at column
  * @method     ChildOrderQuery groupByVersion() Group by the version column
@@ -103,6 +105,10 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery rightJoinLang($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Lang relation
  * @method     ChildOrderQuery innerJoinLang($relationAlias = null) Adds a INNER JOIN clause to the query using the Lang relation
  *
+ * @method     ChildOrderQuery leftJoinCart($relationAlias = null) Adds a LEFT JOIN clause to the query using the Cart relation
+ * @method     ChildOrderQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
+ * @method     ChildOrderQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
+ *
  * @method     ChildOrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
  * @method     ChildOrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
@@ -135,6 +141,7 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
  * @method     ChildOrder findOneByStatusId(int $status_id) Return the first ChildOrder filtered by the status_id column
  * @method     ChildOrder findOneByLangId(int $lang_id) Return the first ChildOrder filtered by the lang_id column
+ * @method     ChildOrder findOneByCartId(int $cart_id) Return the first ChildOrder filtered by the cart_id column
  * @method     ChildOrder findOneByCreatedAt(string $created_at) Return the first ChildOrder filtered by the created_at column
  * @method     ChildOrder findOneByUpdatedAt(string $updated_at) Return the first ChildOrder filtered by the updated_at column
  * @method     ChildOrder findOneByVersion(int $version) Return the first ChildOrder filtered by the version column
@@ -158,6 +165,7 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
  * @method     array findByStatusId(int $status_id) Return ChildOrder objects filtered by the status_id column
  * @method     array findByLangId(int $lang_id) Return ChildOrder objects filtered by the lang_id column
+ * @method     array findByCartId(int $cart_id) Return ChildOrder objects filtered by the cart_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrder objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrder objects filtered by the updated_at column
  * @method     array findByVersion(int $version) Return ChildOrder objects filtered by the version column
@@ -258,7 +266,7 @@ abstract class OrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -1012,6 +1020,49 @@ abstract class OrderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderTableMap::LANG_ID, $langId, $comparison);
+    }
+
+    /**
+     * Filter the query on the cart_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCartId(1234); // WHERE cart_id = 1234
+     * $query->filterByCartId(array(12, 34)); // WHERE cart_id IN (12, 34)
+     * $query->filterByCartId(array('min' => 12)); // WHERE cart_id > 12
+     * </code>
+     *
+     * @see       filterByCart()
+     *
+     * @param     mixed $cartId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByCartId($cartId = null, $comparison = null)
+    {
+        if (is_array($cartId)) {
+            $useMinMax = false;
+            if (isset($cartId['min'])) {
+                $this->addUsingAlias(OrderTableMap::CART_ID, $cartId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($cartId['max'])) {
+                $this->addUsingAlias(OrderTableMap::CART_ID, $cartId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::CART_ID, $cartId, $comparison);
     }
 
     /**
@@ -1811,6 +1862,81 @@ abstract class OrderQuery extends ModelCriteria
         return $this
             ->joinLang($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Lang', '\Thelia\Model\LangQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Cart object
+     *
+     * @param \Thelia\Model\Cart|ObjectCollection $cart The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByCart($cart, $comparison = null)
+    {
+        if ($cart instanceof \Thelia\Model\Cart) {
+            return $this
+                ->addUsingAlias(OrderTableMap::CART_ID, $cart->getId(), $comparison);
+        } elseif ($cart instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(OrderTableMap::CART_ID, $cart->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCart() only accepts arguments of type \Thelia\Model\Cart or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Cart relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function joinCart($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Cart');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Cart');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Cart relation Cart object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     */
+    public function useCartQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCart($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
     }
 
     /**
