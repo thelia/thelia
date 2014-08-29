@@ -599,8 +599,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $title = array_shift($titles);
         }
 
-        $description = $this->array_key_pop($locale, $descriptions);
-        $chapo = $this->array_key_pop($locale, $chapos);
+        $description = $this->arrayKeyPop($locale, $descriptions);
+        $chapo = $this->arrayKeyPop($locale, $chapos);
 
         /**
          * Set data
@@ -708,7 +708,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $returnData;
     }
 
-    protected function array_key_pop($key, array &$array)
+    protected function arrayKeyPop($key, array &$array)
     {
         $value = null;
 
