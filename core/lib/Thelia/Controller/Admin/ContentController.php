@@ -76,7 +76,7 @@ class ContentController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -104,7 +104,7 @@ class ContentController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -313,7 +313,10 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirect($this->getRoute('admin.content.update', $this->getEditionArguments()));
+        return $this->generateRedirectFromRoute(
+            'admin.content.update',
+            $this->getEditionArguments()
+        );
     }
 
     /**
@@ -321,9 +324,9 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.content.default',
-            array('parent' => $this->getFolderId())
+            ['parent' => $this->getFolderId()]
         );
     }
 
@@ -334,12 +337,12 @@ class ContentController extends AbstractSeoCrudController
     protected function performAdditionalUpdateAction($updateEvent)
     {
         if ($this->getRequest()->get('save_mode') != 'stay') {
-
-            // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $this->getFolderId())
+                ['parent' => $this->getFolderId()]
             );
+        } else {
+            return null;
         }
     }
 
@@ -351,10 +354,9 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Redirect to parent category list
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             'admin.folders.default',
-            array('parent' => $deleteEvent->getDefaultFolderId())
+            ['parent' => $deleteEvent->getDefaultFolderId()]
         );
     }
 
@@ -367,13 +369,13 @@ class ContentController extends AbstractSeoCrudController
 
         if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
             // Redirect to parent category list
-            $this->redirectToRoute(
+            return $this->generateRedirectFromRoute(
                 'admin.folders.default',
-                array('parent' => $content->getDefaultFolderId())
+                ['parent' => $content->getDefaultFolderId()]
             );
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     /**

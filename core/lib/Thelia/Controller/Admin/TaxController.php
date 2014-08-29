@@ -161,8 +161,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
@@ -177,7 +176,7 @@ class TaxController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTax()->getId())
@@ -186,9 +185,7 @@ class TaxController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
     }
 
     protected function getRequirements($type, $formData)

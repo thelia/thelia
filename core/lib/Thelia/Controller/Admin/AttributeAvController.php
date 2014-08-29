@@ -171,18 +171,17 @@ class AttributeAvController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        // We always return to the attribute edition form
-        $this->redirectToRoute(
-                "admin.configuration.attributes.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.attributes.update",
+            $this->getViewArguments()
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.attributes.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.attributes.update",
+            $this->getViewArguments()
         );
      }
 }

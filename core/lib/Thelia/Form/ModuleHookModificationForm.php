@@ -13,8 +13,6 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use ReflectionClass;
-use ReflectionException;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -88,28 +86,17 @@ class ModuleHookModificationForm extends BaseForm
         return $choices;
     }
 
+    /**
+     *
+     * Verify if method has a valid signature. See RegisterListenersPass::isValidHookMethod for implementing this verification
+     *
+     * @param $value
+     * @param  ExecutionContextInterface $context
+     * @return bool
+     */
     public function verifyMethod($value, ExecutionContextInterface $context)
     {
         return true;
-
-        // TODO: implement
-        /*
-        $data = $context->getRoot()->getData();
-        $valid = true;
-        try {
-            $class = new ReflectionClass($data["classname"]);
-            $valid = $class->hasMethod($data["method"]);
-        } catch (ReflectionException $ex) {
-            $valid = false;
-        }
-
-        if (!$valid) {
-            $context->addViolation(Translator::getInstance()->trans(
-                'The method "%method" has not been found in "%classname"',
-                array("%method" => $data["method"], "%classname" => $data["classname"])
-            ));
-        }
-        */
     }
 
 public function getName()

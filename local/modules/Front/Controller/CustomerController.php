@@ -130,10 +130,13 @@ class CustomerController extends BaseFrontController
 
                 $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
                 if ($cart->getCartItems()->count() > 0) {
-                    $this->redirectToRoute('cart.view');
+                    $response = $this->generateRedirectFromRoute('cart.view');
                 } else {
-                    $this->redirectSuccess($customerCreation);
+                    $response = $this->generateSuccessRedirect($customerCreation);
                 }
+
+                return $response;
+
             } catch (FormValidationException $e) {
                 $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
@@ -193,7 +196,7 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
-                $this->redirectSuccess($customerPasswordUpdateForm);
+                return $this->generateSuccessRedirect($customerPasswordUpdateForm);
 
             } catch (FormValidationException $e) {
                 $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
@@ -256,7 +259,7 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($updatedCustomer);
 
-                $this->redirectSuccess($customerProfileUpdateForm);
+                return $this->generateSuccessRedirect($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
                 $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
@@ -298,7 +301,7 @@ class CustomerController extends BaseFrontController
 
                 // If User is a new customer
                 if ($form->get('account')->getData() == 0 && !$form->get("email")->getErrors()) {
-                    $this->redirectToRoute("customer.create.process", array("email" => $form->get("email")->getData()));
+                    return $this->generateRedirectFromRoute("customer.create.process", array("email" => $form->get("email")->getData()));
                 } else {
 
                     try {
@@ -309,9 +312,7 @@ class CustomerController extends BaseFrontController
 
                         $this->processLogin($customer);
 
-                        $successUrl = $customerLoginForm->getSuccessUrl();
-
-                        return RedirectResponse::create($successUrl);
+                        return $this->generateSuccessRedirect($customerLoginForm);
 
                     } catch (UsernameNotFoundException $e) {
                         $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
@@ -349,7 +350,7 @@ class CustomerController extends BaseFrontController
         }
 
         // Redirect to home page
-        return RedirectResponse::create(URL::getInstance()->getIndexPage());
+        return $this->generateRedirect(URL::getInstance()->getIndexPage());
     }
 
     /**

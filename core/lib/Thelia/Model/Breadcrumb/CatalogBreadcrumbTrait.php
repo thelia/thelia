@@ -12,13 +12,10 @@
 
 namespace Thelia\Model\Breadcrumb;
 
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\CategoryPath;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Category;
-use Thelia\Model\Product;
 
 trait CatalogBreadcrumbTrait
 {
@@ -49,7 +46,7 @@ trait CatalogBreadcrumbTrait
 
     public function getProductBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        /** @var Product $product */
+        /** @var \Thelia\Model\Product $product */
         $product = $this->getProduct();
 
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $product->getDefaultCategoryId(), $locale);
@@ -67,7 +64,7 @@ trait CatalogBreadcrumbTrait
 
     public function getCategoryBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        /** @var Category $category */
+        /** @var \Thelia\Model\Category $category */
         $category = $this->getCategory();
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
 

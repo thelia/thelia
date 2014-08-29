@@ -161,15 +161,15 @@ class ConfigController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.variables.update",
-                array('variable_id' => $this->getRequest()->get('variable_id'))
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.variables.update",
+            array('variable_id' => $this->getRequest()->get('variable_id'))
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 
     /**
@@ -192,6 +192,6 @@ class ConfigController extends AbstractCrudController
             $this->dispatch(TheliaEvents::CONFIG_SETVALUE, $event);
         }
 
-        $this->redirectToRoute('admin.configuration.variables.default');
+        return $this->generateRedirectFromRoute('admin.configuration.variables.default');
     }
 }

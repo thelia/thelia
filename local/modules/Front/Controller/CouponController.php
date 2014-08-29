@@ -104,7 +104,7 @@ class CouponController extends BaseFrontController
                 }
             }
 
-            $this->redirect($couponCodeForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($couponCodeForm);
 
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your coupon code: %s', $e->getMessage());

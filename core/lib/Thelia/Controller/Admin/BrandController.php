@@ -247,7 +247,11 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirect($this->getRoute('admin.brand.update', $this->getEditionArguments()));
+        return $this->generateRedirectFromRoute(
+            'admin.brand.update',
+            [],
+            $this->getEditionArguments()
+        );
     }
 
     /**
@@ -255,7 +259,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.brand.default');
+        return $this->generateRedirectFromRoute('admin.brand.default');
     }
 
     /**

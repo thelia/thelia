@@ -185,7 +185,7 @@ class ProfileController extends AbstractCrudController
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
         // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
@@ -200,7 +200,7 @@ class ProfileController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.profiles.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getProfile()->getId())
@@ -209,9 +209,7 @@ class ProfileController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.profiles.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.profiles.list");
     }
 
     public function updateAction()
@@ -329,7 +327,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
             } else {
                 return $response;
             }
@@ -378,7 +376,7 @@ class ProfileController extends AbstractCrudController
             }
 
             if ($response == null) {
-                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
             } else {
                 return $response;
             }

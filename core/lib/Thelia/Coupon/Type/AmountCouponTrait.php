@@ -13,6 +13,7 @@
 namespace Thelia\Coupon\Type;
 
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CartItem;
 
 /**
  * A trait to manage a coupon which removes a constant amount from the order total.
@@ -22,8 +23,8 @@ use Thelia\Core\Translation\Translator;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @package Thelia\Coupon\Type
  */
-Trait AmountCouponTrait {
-
+trait AmountCouponTrait
+{
     // The amount is already defined in CouponAbstract, and should not be redefined here.
     // protected $amount = 0;
 
@@ -45,7 +46,7 @@ Trait AmountCouponTrait {
     /**
      * @inheritdoc
      */
-    public function getCartItemDiscount($cartItem)
+    public function getCartItemDiscount(CartItem $cartItem)
     {
         return $cartItem->getQuantity() * $this->amount;
     }

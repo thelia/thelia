@@ -180,8 +180,11 @@ class CustomerController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.customers', array(
-                'page' => $this->getRequest()->get('page', 1))
+        return $this->generateRedirectFromRoute(
+            'admin.customers',
+            [
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 
@@ -192,7 +195,10 @@ class CustomerController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.customer.update.view", $this->getEditionArguments());
+        return $this->generateRedirectFromRoute(
+            "admin.customer.update.view",
+            $this->getEditionArguments()
+        );
     }
 
     public function deleteAction()

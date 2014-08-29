@@ -43,7 +43,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
      * @param  CartItem $cartItem the cart item
      * @return float    the discount value
      */
-    abstract public function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
      * @inheritdoc

@@ -410,9 +410,12 @@ class HookController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute('admin.hook.update', array(), array(
-                "hook_id" => $this->getRequest()->get('hook_id', 0)
-            )
+        return $this->generateRedirectFromRoute(
+            'admin.hook.update',
+            [],
+            [
+                "hook_id" => $this->getRequest()->get('hook_id', 0),
+            ]
         );
     }
 
@@ -421,7 +424,7 @@ class HookController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.hook');
+        return $this->generateRedirectFromRoute('admin.hook');
     }
 
     public function toggleNativeAction()

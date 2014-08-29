@@ -85,7 +85,7 @@ class SessionController extends BaseAdminController
         $this->clearRememberMeCookie();
 
         // Go back to login page.
-        $this->redirectToRoute('admin.login');
+        return $this->generateRedirectFromRoute('admin.login');
     }
 
     public function checkLoginAction()
@@ -122,7 +122,7 @@ class SessionController extends BaseAdminController
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);
 
             // Redirect to the success URL, passing the cookie if one exists.
-            $this->redirect($adminLoginForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($adminLoginForm);
 
          } catch (FormValidationException $ex) {
 

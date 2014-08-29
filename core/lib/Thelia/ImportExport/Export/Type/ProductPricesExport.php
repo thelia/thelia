@@ -13,7 +13,6 @@
 namespace Thelia\ImportExport\Export\Type;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\Base\AttributeCombinationQuery;
@@ -57,7 +56,7 @@ class ProductPricesExport extends ExportHandler
     }
 
     /**
-     * @param Lang $lang
+     * @param  Lang                                                                                   $lang
      * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria|\Thelia\Core\Template\Element\BaseLoop
      */
     public function buildDataSet(Lang $lang)

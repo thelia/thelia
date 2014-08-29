@@ -13,7 +13,6 @@
 namespace Thelia\Files;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
 
@@ -91,7 +90,6 @@ interface FileModelInterface
      */
     public function save();
 
-
     /**
      * Delete the model object.
      *
@@ -99,14 +97,12 @@ interface FileModelInterface
      */
     public function delete();
 
-
     /**
      * Get the model object ID
      *
      * @return int
      */
     public function getId();
-
 
     /**
      * Set the current title
@@ -118,7 +114,7 @@ interface FileModelInterface
     /**
      * Get the current title
      *
-     * @param string $title the title in the current locale
+     * @param  string             $title the title in the current locale
      * @return FileModelInterface
      */
     public function getTitle();
@@ -126,7 +122,7 @@ interface FileModelInterface
     /**
      * Set the chapo
      *
-     * @param string $chapo the chapo in the current locale
+     * @param  string             $chapo the chapo in the current locale
      * @return FileModelInterface
      */
     public function setChapo($chapo);
@@ -134,7 +130,7 @@ interface FileModelInterface
     /**
      * Set the description
      *
-     * @param string $description the description in the current locale
+     * @param  string             $description the description in the current locale
      * @return FileModelInterface
      */
     public function setDescription($description);
@@ -142,7 +138,7 @@ interface FileModelInterface
     /**
      * Set the postscriptum
      *
-     * @param string $postscriptum the postscriptum in the current locale
+     * @param  string             $postscriptum the postscriptum in the current locale
      * @return FileModelInterface
      */
     public function setPostscriptum($postscriptum);
@@ -150,7 +146,7 @@ interface FileModelInterface
     /**
      * Set the current locale
      *
-     * @param string $locale the locale string
+     * @param  string             $locale the locale string
      * @return FileModelInterface
      */
     public function setLocale($locale);

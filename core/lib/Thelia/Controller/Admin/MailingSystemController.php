@@ -80,7 +80,7 @@ class MailingSystemController extends BaseAdminController
             $this->dispatch(TheliaEvents::MAILING_SYSTEM_UPDATE, $event);
 
             // Redirect to the success URL
-            $this->redirectToRoute("admin.configuration.mailing-system.view");
+            $response = $this->generateRedirectFromRoute("admin.configuration.mailing-system.view");
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -89,14 +89,18 @@ class MailingSystemController extends BaseAdminController
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
-            $this->getTranslator()->trans("mailing system modification", array()),
-            $error_msg,
-            $form,
-            $ex
-        );
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("mailing system modification", array()),
+                $error_msg,
+                $form,
+                $ex
+            );
 
-        // At this point, the form has errors, and should be redisplayed.
-        return $this->render('mailing-system');
+            // At this point, the form has errors, and should be redisplayed.
+            $response = $this->render('mailing-system');
+        }
+
+        return $response;
     }
 }

@@ -172,17 +172,17 @@ class FeatureAvController extends AbstractCrudController
     protected function redirectToEditionTemplate()
     {
         // We always return to the feature edition form
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            $this->getViewArguments()
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                $this->getViewArguments()
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            $this->getViewArguments()
         );
      }
 }

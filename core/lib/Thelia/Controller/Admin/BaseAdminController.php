@@ -13,9 +13,6 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthorizationException;
@@ -46,17 +43,7 @@ class BaseAdminController extends BaseController
      * setCurrentRouter() method to pass their own router, and use the route related
      * methods of this class.
      */
-    private $currentRouter = "router.admin";
-
-    protected function getCurrentRouter()
-    {
-        return $this->currentRouter;
-    }
-
-    protected function setCurrentRouter($routerId)
-    {
-        $this->currentRouter = $routerId;
-    }
+    protected $currentRouter = "router.admin";
 
     /**
      * Helper to append a message to the admin log.
@@ -230,44 +217,6 @@ class BaseAdminController extends BaseController
         $subRequest = $this->container->get('request')->duplicate($query, null, $path);
 
         return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-    }
-
-    /**
-     * Return the route path defined for the givent route ID
-     *
-     * @param string         $routeId       a route ID, as defines in Config/Resources/routing/admin.xml
-     * @param mixed          $parameters    An array of parameters
-     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
-     *
-     * @throws RouteNotFoundException              If the named route doesn't exist
-     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
-     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
-     *                                             it does not match the requirement
-     * @throws \InvalidArgumentException           When the router doesn't exist
-     * @return string                              The generated URL
-     *
-     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
-     */
-    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
-    {
-        return $this->getRouteFromRouter(
-            $this->currentRouter,
-            $routeId,
-            $parameters,
-            $referenceType
-        );
-    }
-
-    /**
-     * Redirect to à route ID related URL
-     *
-     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
-     * @param array  $urlParameters   the URL parameters, as a var/value pair array
-     * @param array  $routeParameters
-     */
-    public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
-    {
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
     }
 
     /**

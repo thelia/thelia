@@ -182,7 +182,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                         case 'vertical_flip':
                         case 'vflip':
-                            $image-> flipVertically();
+                            $image->flipVertically();
                             break;
 
                         case 'gamma':

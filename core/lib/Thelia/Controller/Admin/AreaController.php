@@ -200,9 +200,12 @@ class AreaController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute('admin.configuration.shipping-configuration.update.view', array(), array(
+        return $this->generateRedirectFromRoute(
+            'admin.configuration.shipping-configuration.update.view',
+            [],
+            [
                 "area_id" => $this->getAreaId()
-            )
+            ]
         );
     }
 
@@ -211,7 +214,7 @@ class AreaController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.shipping-configuration.default');
+        return $this->generateRedirectFromRoute('admin.configuration.shipping-configuration.default');
     }
 
     /**
@@ -242,7 +245,7 @@ class AreaController extends AbstractCrudController
             }
 
             // Redirect to the success URL
-            $this->redirect($areaCountryForm->getSuccessUrl());
+            $this->generateSuccessRedirect($areaCountryForm);
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated
@@ -268,7 +271,7 @@ class AreaController extends AbstractCrudController
 
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function updatePostageAction()
@@ -296,7 +299,7 @@ class AreaController extends AbstractCrudController
             }
 
             // Redirect to the success URL
-            $this->redirect($areaUpdateForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($areaUpdateForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);

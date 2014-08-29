@@ -10,9 +10,38 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Files;
+namespace Thelia\Core\HttpKernel\Exception;
 
-interface FileModelParentInterface
+/**
+ * Class RedirectException
+ * @package Thelia\Core\HttpKernel\Exception
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ */
+class RedirectException extends \RuntimeException
 {
-    public function getTitle();
+
+    private $url;
+    private $statusCode;
+
+    public function __construct($url, $statusCode = 302, $message = "", $code = 0, \Exception $previous = null)
+    {
+        $this->url = $url;
+        $this->statusCode = $statusCode;
+
+        parent::__construct($message, $code, $previous);
+    }
+
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
 }
