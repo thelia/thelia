@@ -12,8 +12,8 @@
 
 namespace Thelia\Core\Event\Order;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\Order;
 
 /**
@@ -47,7 +47,9 @@ class OrderPaymentEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Core\HttpFoundation\Response $response
+     * @param Response $response
+     *
+     * @return $this
      */
     public function setResponse(Response $response)
     {
