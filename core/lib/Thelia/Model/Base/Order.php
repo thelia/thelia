@@ -17,6 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Cart as ChildCart;
+use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
@@ -177,6 +179,12 @@ abstract class Order implements ActiveRecordInterface
     protected $lang_id;
 
     /**
+     * The value for the cart_id field.
+     * @var        int
+     */
+    protected $cart_id;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -246,6 +254,11 @@ abstract class Order implements ActiveRecordInterface
      * @var        Lang
      */
     protected $aLang;
+
+    /**
+     * @var        Cart
+     */
+    protected $aCart;
 
     /**
      * @var        ObjectCollection|ChildOrderProduct[] Collection to store aggregation of ChildOrderProduct objects.
@@ -767,6 +780,17 @@ abstract class Order implements ActiveRecordInterface
     }
 
     /**
+     * Get the [cart_id] column value.
+     *
+     * @return   int
+     */
+    public function getCartId()
+    {
+
+        return $this->cart_id;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -1238,6 +1262,31 @@ abstract class Order implements ActiveRecordInterface
     } // setLangId()
 
     /**
+     * Set the value of [cart_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setCartId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->cart_id !== $v) {
+            $this->cart_id = $v;
+            $this->modifiedColumns[OrderTableMap::CART_ID] = true;
+        }
+
+        if ($this->aCart !== null && $this->aCart->getId() !== $v) {
+            $this->aCart = null;
+        }
+
+
+        return $this;
+    } // setCartId()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -1437,28 +1486,31 @@ abstract class Order implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lang_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->cart_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -1468,7 +1520,7 @@ abstract class Order implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 22; // 22 = OrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 23; // 23 = OrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Order object", 0, $e);
@@ -1513,6 +1565,9 @@ abstract class Order implements ActiveRecordInterface
         }
         if ($this->aLang !== null && $this->lang_id !== $this->aLang->getId()) {
             $this->aLang = null;
+        }
+        if ($this->aCart !== null && $this->cart_id !== $this->aCart->getId()) {
+            $this->aCart = null;
         }
     } // ensureConsistency
 
@@ -1561,6 +1616,7 @@ abstract class Order implements ActiveRecordInterface
             $this->aModuleRelatedByPaymentModuleId = null;
             $this->aModuleRelatedByDeliveryModuleId = null;
             $this->aLang = null;
+            $this->aCart = null;
             $this->collOrderProducts = null;
 
             $this->collOrderCoupons = null;
@@ -1762,6 +1818,13 @@ abstract class Order implements ActiveRecordInterface
                 $this->setLang($this->aLang);
             }
 
+            if ($this->aCart !== null) {
+                if ($this->aCart->isModified() || $this->aCart->isNew()) {
+                    $affectedRows += $this->aCart->save($con);
+                }
+                $this->setCart($this->aCart);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1901,6 +1964,9 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) {
             $modifiedColumns[':p' . $index++]  = '`LANG_ID`';
         }
+        if ($this->isColumnModified(OrderTableMap::CART_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`CART_ID`';
+        }
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -1977,6 +2043,9 @@ abstract class Order implements ActiveRecordInterface
                         break;
                     case '`LANG_ID`':
                         $stmt->bindValue($identifier, $this->lang_id, PDO::PARAM_INT);
+                        break;
+                    case '`CART_ID`':
+                        $stmt->bindValue($identifier, $this->cart_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -2107,18 +2176,21 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getLangId();
                 break;
             case 17:
-                return $this->getCreatedAt();
+                return $this->getCartId();
                 break;
             case 18:
-                return $this->getUpdatedAt();
+                return $this->getCreatedAt();
                 break;
             case 19:
-                return $this->getVersion();
+                return $this->getUpdatedAt();
                 break;
             case 20:
-                return $this->getVersionCreatedAt();
+                return $this->getVersion();
                 break;
             case 21:
+                return $this->getVersionCreatedAt();
+                break;
+            case 22:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -2167,11 +2239,12 @@ abstract class Order implements ActiveRecordInterface
             $keys[14] => $this->getDeliveryModuleId(),
             $keys[15] => $this->getStatusId(),
             $keys[16] => $this->getLangId(),
-            $keys[17] => $this->getCreatedAt(),
-            $keys[18] => $this->getUpdatedAt(),
-            $keys[19] => $this->getVersion(),
-            $keys[20] => $this->getVersionCreatedAt(),
-            $keys[21] => $this->getVersionCreatedBy(),
+            $keys[17] => $this->getCartId(),
+            $keys[18] => $this->getCreatedAt(),
+            $keys[19] => $this->getUpdatedAt(),
+            $keys[20] => $this->getVersion(),
+            $keys[21] => $this->getVersionCreatedAt(),
+            $keys[22] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -2202,6 +2275,9 @@ abstract class Order implements ActiveRecordInterface
             }
             if (null !== $this->aLang) {
                 $result['Lang'] = $this->aLang->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCart) {
+                $result['Cart'] = $this->aCart->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collOrderProducts) {
                 $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2298,18 +2374,21 @@ abstract class Order implements ActiveRecordInterface
                 $this->setLangId($value);
                 break;
             case 17:
-                $this->setCreatedAt($value);
+                $this->setCartId($value);
                 break;
             case 18:
-                $this->setUpdatedAt($value);
+                $this->setCreatedAt($value);
                 break;
             case 19:
-                $this->setVersion($value);
+                $this->setUpdatedAt($value);
                 break;
             case 20:
-                $this->setVersionCreatedAt($value);
+                $this->setVersion($value);
                 break;
             case 21:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 22:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -2353,11 +2432,12 @@ abstract class Order implements ActiveRecordInterface
         if (array_key_exists($keys[14], $arr)) $this->setDeliveryModuleId($arr[$keys[14]]);
         if (array_key_exists($keys[15], $arr)) $this->setStatusId($arr[$keys[15]]);
         if (array_key_exists($keys[16], $arr)) $this->setLangId($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setCreatedAt($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setUpdatedAt($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setVersion($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setVersionCreatedAt($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedBy($arr[$keys[21]]);
+        if (array_key_exists($keys[17], $arr)) $this->setCartId($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setCreatedAt($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setUpdatedAt($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedAt($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setVersionCreatedBy($arr[$keys[22]]);
     }
 
     /**
@@ -2386,6 +2466,7 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) $criteria->add(OrderTableMap::STATUS_ID, $this->status_id);
         if ($this->isColumnModified(OrderTableMap::LANG_ID)) $criteria->add(OrderTableMap::LANG_ID, $this->lang_id);
+        if ($this->isColumnModified(OrderTableMap::CART_ID)) $criteria->add(OrderTableMap::CART_ID, $this->cart_id);
         if ($this->isColumnModified(OrderTableMap::CREATED_AT)) $criteria->add(OrderTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderTableMap::UPDATED_AT)) $criteria->add(OrderTableMap::UPDATED_AT, $this->updated_at);
         if ($this->isColumnModified(OrderTableMap::VERSION)) $criteria->add(OrderTableMap::VERSION, $this->version);
@@ -2470,6 +2551,7 @@ abstract class Order implements ActiveRecordInterface
         $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
         $copyObj->setStatusId($this->getStatusId());
         $copyObj->setLangId($this->getLangId());
+        $copyObj->setCartId($this->getCartId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
@@ -2935,6 +3017,57 @@ abstract class Order implements ActiveRecordInterface
         }
 
         return $this->aLang;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCart object.
+     *
+     * @param                  ChildCart $v
+     * @return                 \Thelia\Model\Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCart(ChildCart $v = null)
+    {
+        if ($v === null) {
+            $this->setCartId(NULL);
+        } else {
+            $this->setCartId($v->getId());
+        }
+
+        $this->aCart = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCart object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrder($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCart object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCart The associated ChildCart object.
+     * @throws PropelException
+     */
+    public function getCart(ConnectionInterface $con = null)
+    {
+        if ($this->aCart === null && ($this->cart_id !== null)) {
+            $this->aCart = ChildCartQuery::create()->findPk($this->cart_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCart->addOrders($this);
+             */
+        }
+
+        return $this->aCart;
     }
 
 
@@ -3638,6 +3771,7 @@ abstract class Order implements ActiveRecordInterface
         $this->delivery_module_id = null;
         $this->status_id = null;
         $this->lang_id = null;
+        $this->cart_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
@@ -3691,6 +3825,7 @@ abstract class Order implements ActiveRecordInterface
         $this->aModuleRelatedByPaymentModuleId = null;
         $this->aModuleRelatedByDeliveryModuleId = null;
         $this->aLang = null;
+        $this->aCart = null;
     }
 
     /**
@@ -3782,6 +3917,7 @@ abstract class Order implements ActiveRecordInterface
         $version->setDeliveryModuleId($this->getDeliveryModuleId());
         $version->setStatusId($this->getStatusId());
         $version->setLangId($this->getLangId());
+        $version->setCartId($this->getCartId());
         $version->setCreatedAt($this->getCreatedAt());
         $version->setUpdatedAt($this->getUpdatedAt());
         $version->setVersion($this->getVersion());
@@ -3841,6 +3977,7 @@ abstract class Order implements ActiveRecordInterface
         $this->setDeliveryModuleId($version->getDeliveryModuleId());
         $this->setStatusId($version->getStatusId());
         $this->setLangId($version->getLangId());
+        $this->setCartId($version->getCartId());
         $this->setCreatedAt($version->getCreatedAt());
         $this->setUpdatedAt($version->getUpdatedAt());
         $this->setVersion($version->getVersion());
