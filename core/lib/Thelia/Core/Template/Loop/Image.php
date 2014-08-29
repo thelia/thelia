@@ -17,6 +17,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
 use Propel\Runtime\ActiveQuery\Criteria;
@@ -52,6 +53,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 Argument::createIntListTypeArgument('id'),
                 Argument::createIntListTypeArgument('exclude'),
+                Argument::createBooleanOrBothTypeArgument('visible', 1),
                 new Argument(
                         'order',
                         new TypeCollection(
@@ -59,8 +61,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                         ),
                         'manual'
                 ),
-                Argument::createIntTypeArgument('lang'),
-
                 Argument::createIntTypeArgument('width'),
                 Argument::createIntTypeArgument('height'),
                 Argument::createIntTypeArgument('rotation', 0),
@@ -217,8 +217,14 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         $exclude = $this->getExclude();
-        if (!is_null($exclude))
+        if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $visible = $this->getVisible();
+        if ($visible !== BooleanOrBothType::ANY){
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         return $search;
 
@@ -295,6 +301,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("CHAPO"               , $result->getVirtualColumn('i18n_CHAPO'))
                     ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
                     ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("VISIBLE"             , $result->getVisible())
                     ->set("POSITION"            , $result->getPosition())
                     ->set("OBJECT_TYPE"         , $this->objectType)
                     ->set("OBJECT_ID"           , $this->objectId)
