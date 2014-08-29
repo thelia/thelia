@@ -2176,6 +2176,31 @@ abstract class Module implements ActiveRecordInterface
         return $this->getOrdersRelatedByPaymentModuleId($query, $con);
     }
 
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByPaymentModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByPaymentModuleIdJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Cart', $joinBehavior);
+
+        return $this->getOrdersRelatedByPaymentModuleId($query, $con);
+    }
+
     /**
      * Clears out the collOrdersRelatedByDeliveryModuleId collection
      *
@@ -2540,6 +2565,31 @@ abstract class Module implements ActiveRecordInterface
     {
         $query = ChildOrderQuery::create(null, $criteria);
         $query->joinWith('Lang', $joinBehavior);
+
+        return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related OrdersRelatedByDeliveryModuleId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersRelatedByDeliveryModuleIdJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Cart', $joinBehavior);
 
         return $this->getOrdersRelatedByDeliveryModuleId($query, $con);
     }

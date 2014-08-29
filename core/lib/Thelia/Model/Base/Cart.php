@@ -27,6 +27,8 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\Order as ChildOrder;
+use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\Map\CartTableMap;
 
 abstract class Cart implements ActiveRecordInterface
@@ -139,6 +141,12 @@ abstract class Cart implements ActiveRecordInterface
     protected $aCurrency;
 
     /**
+     * @var        ObjectCollection|ChildOrder[] Collection to store aggregation of ChildOrder objects.
+     */
+    protected $collOrders;
+    protected $collOrdersPartial;
+
+    /**
      * @var        ObjectCollection|ChildCartItem[] Collection to store aggregation of ChildCartItem objects.
      */
     protected $collCartItems;
@@ -151,6 +159,12 @@ abstract class Cart implements ActiveRecordInterface
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $ordersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -909,6 +923,8 @@ abstract class Cart implements ActiveRecordInterface
             $this->aAddressRelatedByAddressDeliveryId = null;
             $this->aAddressRelatedByAddressInvoiceId = null;
             $this->aCurrency = null;
+            $this->collOrders = null;
+
             $this->collCartItems = null;
 
         } // if (deep)
@@ -1075,6 +1091,23 @@ abstract class Cart implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->ordersScheduledForDeletion !== null) {
+                if (!$this->ordersScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\OrderQuery::create()
+                        ->filterByPrimaryKeys($this->ordersScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->ordersScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collOrders !== null) {
+            foreach ($this->collOrders as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->cartItemsScheduledForDeletion !== null) {
@@ -1331,6 +1364,9 @@ abstract class Cart implements ActiveRecordInterface
             if (null !== $this->aCurrency) {
                 $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collOrders) {
+                $result['Orders'] = $this->collOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCartItems) {
                 $result['CartItems'] = $this->collCartItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1524,6 +1560,12 @@ abstract class Cart implements ActiveRecordInterface
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
+
+            foreach ($this->getOrders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrder($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getCartItems() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1776,9 +1818,430 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('Order' == $relationName) {
+            return $this->initOrders();
+        }
         if ('CartItem' == $relationName) {
             return $this->initCartItems();
         }
+    }
+
+    /**
+     * Clears out the collOrders collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrders()
+     */
+    public function clearOrders()
+    {
+        $this->collOrders = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collOrders collection loaded partially.
+     */
+    public function resetPartialOrders($v = true)
+    {
+        $this->collOrdersPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrders collection.
+     *
+     * By default this just sets the collOrders collection to an empty array (like clearcollOrders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrders($overrideExisting = true)
+    {
+        if (null !== $this->collOrders && !$overrideExisting) {
+            return;
+        }
+        $this->collOrders = new ObjectCollection();
+        $this->collOrders->setModel('\Thelia\Model\Order');
+    }
+
+    /**
+     * Gets an array of ChildOrder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCart is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     * @throws PropelException
+     */
+    public function getOrders($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                // return empty collection
+                $this->initOrders();
+            } else {
+                $collOrders = ChildOrderQuery::create(null, $criteria)
+                    ->filterByCart($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collOrdersPartial && count($collOrders)) {
+                        $this->initOrders(false);
+
+                        foreach ($collOrders as $obj) {
+                            if (false == $this->collOrders->contains($obj)) {
+                                $this->collOrders->append($obj);
+                            }
+                        }
+
+                        $this->collOrdersPartial = true;
+                    }
+
+                    reset($collOrders);
+
+                    return $collOrders;
+                }
+
+                if ($partial && $this->collOrders) {
+                    foreach ($this->collOrders as $obj) {
+                        if ($obj->isNew()) {
+                            $collOrders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrders = $collOrders;
+                $this->collOrdersPartial = false;
+            }
+        }
+
+        return $this->collOrders;
+    }
+
+    /**
+     * Sets a collection of Order objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $orders A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCart The current object (for fluent API support)
+     */
+    public function setOrders(Collection $orders, ConnectionInterface $con = null)
+    {
+        $ordersToDelete = $this->getOrders(new Criteria(), $con)->diff($orders);
+
+
+        $this->ordersScheduledForDeletion = $ordersToDelete;
+
+        foreach ($ordersToDelete as $orderRemoved) {
+            $orderRemoved->setCart(null);
+        }
+
+        $this->collOrders = null;
+        foreach ($orders as $order) {
+            $this->addOrder($order);
+        }
+
+        $this->collOrders = $orders;
+        $this->collOrdersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Order objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Order objects.
+     * @throws PropelException
+     */
+    public function countOrders(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getOrders());
+            }
+
+            $query = ChildOrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCart($this)
+                ->count($con);
+        }
+
+        return count($this->collOrders);
+    }
+
+    /**
+     * Method called to associate a ChildOrder object to this object
+     * through the ChildOrder foreign key attribute.
+     *
+     * @param    ChildOrder $l ChildOrder
+     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     */
+    public function addOrder(ChildOrder $l)
+    {
+        if ($this->collOrders === null) {
+            $this->initOrders();
+            $this->collOrdersPartial = true;
+        }
+
+        if (!in_array($l, $this->collOrders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddOrder($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Order $order The order object to add.
+     */
+    protected function doAddOrder($order)
+    {
+        $this->collOrders[]= $order;
+        $order->setCart($this);
+    }
+
+    /**
+     * @param  Order $order The order object to remove.
+     * @return ChildCart The current object (for fluent API support)
+     */
+    public function removeOrder($order)
+    {
+        if ($this->getOrders()->contains($order)) {
+            $this->collOrders->remove($this->collOrders->search($order));
+            if (null === $this->ordersScheduledForDeletion) {
+                $this->ordersScheduledForDeletion = clone $this->collOrders;
+                $this->ordersScheduledForDeletion->clear();
+            }
+            $this->ordersScheduledForDeletion[]= clone $order;
+            $order->setCart(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByInvoiceOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByInvoiceOrderAddressId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByDeliveryOrderAddressId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByDeliveryOrderAddressId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinOrderStatus($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('OrderStatus', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByPaymentModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByPaymentModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinModuleRelatedByDeliveryModuleId($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('ModuleRelatedByDeliveryModuleId', $joinBehavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Cart is new, it will return
+     * an empty collection; or if this Cart has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Cart.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrder[] List of ChildOrder objects
+     */
+    public function getOrdersJoinLang($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderQuery::create(null, $criteria);
+        $query->joinWith('Lang', $joinBehavior);
+
+        return $this->getOrders($query, $con);
     }
 
     /**
@@ -2083,6 +2546,11 @@ abstract class Cart implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collOrders) {
+                foreach ($this->collOrders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCartItems) {
                 foreach ($this->collCartItems as $o) {
                     $o->clearAllReferences($deep);
@@ -2090,6 +2558,7 @@ abstract class Cart implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collOrders = null;
         $this->collCartItems = null;
         $this->aCustomer = null;
         $this->aAddressRelatedByAddressDeliveryId = null;

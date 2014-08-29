@@ -675,6 +675,7 @@ CREATE TABLE `order`
     `delivery_module_id` INTEGER NOT NULL,
     `status_id` INTEGER NOT NULL,
     `lang_id` INTEGER NOT NULL,
+    `cart_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -690,6 +691,7 @@ CREATE TABLE `order`
     INDEX `fk_order_payment_module_id_idx` (`payment_module_id`),
     INDEX `fk_order_delivery_module_id_idx` (`delivery_module_id`),
     INDEX `fk_order_lang_id_idx` (`lang_id`),
+    INDEX `idx_order_cart_fk` (`cart_id`),
     CONSTRAINT `fk_order_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
@@ -729,7 +731,10 @@ CREATE TABLE `order`
         FOREIGN KEY (`lang_id`)
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_cart_id`
+        FOREIGN KEY (`cart_id`)
+        REFERENCES `cart` (`id`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -2849,6 +2854,7 @@ CREATE TABLE `order_version`
     `delivery_module_id` INTEGER NOT NULL,
     `status_id` INTEGER NOT NULL,
     `lang_id` INTEGER NOT NULL,
+    `cart_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,
