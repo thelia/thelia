@@ -413,11 +413,15 @@ class Form extends AbstractSmartyPlugin
 
         $return = "";
 
+        $exclude = explode(',', $this->getParam($params, 'exclude', ''));
+
         /** @var FormView $row */
         foreach ($formView->getIterator() as $row) {
 
             // We have to exclude the fields for which value is defined in the template.
-            if ($baseFormInstance->isTemplateDefinedHiddenField($row)) continue;
+            if ($baseFormInstance->isTemplateDefinedHiddenField($row)
+                ||
+                in_array($row->vars['name'], $exclude)) continue;
 
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $attributeList = array();

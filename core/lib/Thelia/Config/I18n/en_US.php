@@ -394,6 +394,7 @@ return array(
     'Select the brand logo' => 'Select the brand logo',
     'Select the brand logo amongst the brand images' => 'Select the brand logo amongst the brand images',
     'Select the categories of the products covered by this operation' => 'Select the categories of the products covered by this operation',
+    'Select the countries to include in this shipping zone' => 'Select the countries to include in this shipping zone',
     'Select the discount type that will be applied to original product prices' => 'Select the discount type that will be applied to original product prices',
     'Select the product attributes included in this operation' => 'Select the product attributes included in this operation',
     'Select the product brand, or supplier.' => 'Select the product brand, or supplier.',
