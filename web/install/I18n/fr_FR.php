@@ -5,7 +5,7 @@ return array(
 'Administrator password :' => 'Mot de passe administrateur :',
 'Administrator password verification :' => 'Vérification mot de passe administrateur :',
 'Checking permissions' => 'Permissions',
-'Choose your database' => 'Choissisez la base de donnée',
+'Choose your database' => 'Choisissez la base de donnée',
 'Company name :' => 'Nom de la société :',
 'Contact email :' => 'Email de contact :',
 'Continue' => 'Continuez',
