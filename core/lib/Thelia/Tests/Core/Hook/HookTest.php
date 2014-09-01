@@ -27,12 +27,8 @@ use Thelia\Tests\WebTestCase;
  * @package Thelia\Tests\Core\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class HookTest extends WebTestCase {
-
-    public static $templateTestPath;
-
-    public static $moduleTestPath;
-
+class HookTest extends WebTestCase
+{
     public static $templateBackupPath;
 
     public static $cache_dir;
@@ -46,9 +42,6 @@ class HookTest extends WebTestCase {
      */
     public function testHome()
     {
-        $this->cleanTest();
-        $this->prepareTest();
-
         $client = static::createClient();
 
         $client->request(
@@ -223,78 +216,11 @@ class HookTest extends WebTestCase {
         self::$cache_dir = THELIA_ROOT . "cache/test";
         self::$templateBackupPath = ConfigQuery::read('active-front-template', 'default');
         ConfigQuery::write('active-front-template', 'hooktest');
-        self::$templateTestPath = TemplateHelper::getInstance()->getActiveFrontTemplate()->getAbsolutePath();
-        self::$moduleTestPath = THELIA_MODULE_DIR . 'HookTest';
-    }
-
-    public function prepareTest()
-    {
-        // cache dir
-        $fs = new Filesystem();
-        $fs->mkdir($this::$cache_dir);
-
-        // copy test template
-
-
-        self::deleteDirectory($this::$templateTestPath);
-        if ( ! self::copyDirectory(__DIR__ . '/assets/template/hooktest', $this::$templateTestPath)){
-            throw new \Exception(sprintf("Can't copy test theme : %s -> %s", __DIR__ . '/assets/template/hooktest', $this::$templateTestPath));
-        }
-
-        // copy test module
-        self::deleteDirectory($this::$moduleTestPath);
-        if ( ! self::copyDirectory(__DIR__ . '/assets/module/HookTest', $this::$moduleTestPath ) ){
-            throw new \Exception(sprintf("Can't copy test module : %s -> %s", __DIR__ . '/assets/template/hooktest', $this::$moduleTestPath));
-        }
-
-        // install module
-        $module = new Module();
-        $module
-            ->setCode('HookTest')
-            ->setFullNamespace("HookTest\\HookTest")
-            ->setType(BaseModule::CLASSIC_MODULE_TYPE)
-            ->setActivate(1)
-            ->save();
-
-        $module = ModuleQuery::create()->findOneByCode('hooktest');
-        if (null === $module){
-            throw new \Exception(sprintf("Can't find module : hooktest"));
-        }
-
-        $moduleInstance = $module->createInstance();
-        $moduleInstance->setContainer($this->getContainer());
-        $moduleInstance->activate($module);
-    }
-
-    public static function cleanTest($resetTemplate=false)
-    {
-        // clear assets dir in web
-        try{
-            self::deleteDirectory(THELIA_WEB_DIR . "/assets");
-        } catch (\Exception $ex) {
-
-        }
-
-        // deactivate module
-        $module = ModuleQuery::create()->findOneByCode('HookTest');
-        if (null !== $module){
-            $module->delete();
-        }
-
-        // remove test module
-        self::deleteDirectory(self::$moduleTestPath);
-
-        // remove test template
-        self::deleteDirectory(self::$templateTestPath);
-
-        if ($resetTemplate && null !== self::$templateBackupPath){
-            ConfigQuery::write('active-front-template', self::$templateBackupPath);
-        }
     }
 
     public static function tearDownAfterClass()
     {
-        self::cleanTest(true);
+        ConfigQuery::write('active-front-template', self::$templateBackupPath);
     }
 
     protected function assertStringContains($data, $needle, $message="")
