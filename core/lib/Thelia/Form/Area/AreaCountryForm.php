@@ -26,45 +26,42 @@ class AreaCountryForm extends BaseForm
 {
 
     /**
-     *
-     * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->formBuilder attribute :
-     *
-     * $this->formBuilder->add("name", "text")
-     *   ->add("email", "email", array(
-     *           "attr" => array(
-     *               "class" => "field"
-     *           ),
-     *           "label" => "email",
-     *           "constraints" => array(
-     *               new \Symfony\Component\Validator\Constraints\NotBlank()
-     *           )
-     *       )
-     *   )
-     *   ->add('age', 'integer');
-     *
-     * @return null
+     * @inheritdoc
      */
     protected function buildForm()
     {
         $this->formBuilder
-            ->add('area_id', 'integer', array(
-                'constraints' => array(
-                    new GreaterThan(array('value' => 0)),
-                    new NotBlank()
-                )
-
-            ))
-            ->add('country_id', 'integer', array(
-                'constraints' => array(
-                    new GreaterThan(array('value' => 0)),
-                    new NotBlank()
-                ),
-                'label_attr' => array(
-                    'for' => 'area_country'
-                ),
-                'label' => Translator::getInstance()->trans('Country')
-            ));
+            ->add(
+                'area_id',
+                'hidden',
+                [
+                    'constraints' => [
+                        new GreaterThan(array('value' => 0)),
+                        new NotBlank()
+                    ]
+                ]
+            )
+            ->add(
+                'country_id',
+                'collection',
+                [
+                    'type'         => 'integer',
+                    'required'     => true,
+                    'constraints'  => [ new NotBlank() ],
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'label'        => Translator::getInstance()->trans('Countries'),
+                    'label_attr'   => [
+                        'for'         => 'products',
+                        'help'        => Translator::getInstance()->trans('Select the countries to include in this shipping zone')
+                    ],
+                    'attr' => [
+                        'size'     => 10,
+                        'multiple' => true
+                    ]
+                ]
+            )
+        ;
     }
 
     /**

@@ -394,6 +394,7 @@ return array(
     'Select the brand logo' => 'Logo de la marque',
     'Select the brand logo amongst the brand images' => 'Choisissez le logo de la marque parmis les images associées à cette marque',
     'Select the categories of the products covered by this operation' => 'Choisissez les catégories de produit incluses dans cette promotion',
+    'Select the countries to include in this shipping zone' => 'Choisissez les pays à inclure dans cette zone',
     'Select the discount type that will be applied to original product prices' => 'Choisissez le type de remise à appliquer aux prix des produits',
     'Select the product attributes included in this operation' => 'Choisissez les déclinaisons incluses dans cette promotion',
     'Select the product brand, or supplier.' => 'Choisissez la marque ou le fournisseur  du produit.',

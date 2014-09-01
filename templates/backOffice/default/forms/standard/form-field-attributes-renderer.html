@@ -48,6 +48,8 @@ In addition to the standard form_field block output, this fragment uses the foll
     id="{$label_attr.for}" name="{$name}" class="{$field_extra_class}" value="{$value}" {if $checked}checked="checked"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'choice'}
     id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+{elseif $type == 'collection'}
+    id="{$label_attr.for}" name="{$name}[]" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
     id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
