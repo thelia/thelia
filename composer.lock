@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e519e23c2194b3c99fe3b933d1ee6cbc",
+    "hash": "4d4fa13ac9fd4c5cf1b43738beee5c52",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2725,6 +2725,102 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2014-03-07 15:35:33"
+        },
+        {
+            "name": "thelia/hooktest-module",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/HookTest-module.git",
+                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/HookTest-module/zipball/24a0d4c62614adb08083cbb85605989ef9c25c43",
+                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43",
+                "shasum": ""
+            },
+            "require": {
+                "thelia/installer": "1.0"
+            },
+            "type": "thelia-module",
+            "extra": {
+                "installer-name": "HookTest"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2014-09-01 10:27:45"
+        },
+        {
+            "name": "thelia/hooktest-template",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/hooktest-template.git",
+                "reference": "e61b79dfad59f1877bb80f25ee62cf9546b71ba9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/hooktest-template/zipball/e61b79dfad59f1877bb80f25ee62cf9546b71ba9",
+                "reference": "e61b79dfad59f1877bb80f25ee62cf9546b71ba9",
+                "shasum": ""
+            },
+            "require": {
+                "thelia/installer": "1.0"
+            },
+            "type": "thelia-frontoffice-template",
+            "extra": {
+                "installer-name": "hooktest"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2014-09-01 10:45:00"
+        },
+        {
+            "name": "thelia/installer",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/installer.git",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/installer/zipball/02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "1.0.0"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Thelia\\Composer\\TheliaInstallerPlugin"
+            },
+            "autoload": {
+                "psr-0": {
+                    "Thelia\\Composer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL V3"
+            ],
+            "authors": [
+                {
+                    "name": "Manuel Raynaud",
+                    "email": "raynaud.manu@gmail.com",
+                    "homepage": "https://github.com/lunika"
+                }
+            ],
+            "description": "custom installer for Thelia.",
+            "keywords": [
+                "Thelia",
+                "Thelia-module",
+                "Thelia-template"
+            ],
+            "time": "2014-09-01 10:26:56"
         }
     ],
     "aliases": [
