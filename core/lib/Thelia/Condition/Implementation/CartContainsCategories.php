@@ -29,7 +29,7 @@ use Thelia\Model\CategoryQuery;
 class CartContainsCategories extends ConditionAbstract
 {
     /** Condition 1st parameter : quantity */
-    CONST CATEGORIES_LIST = 'categories';
+    const CATEGORIES_LIST = 'categories';
 
     /**
      * @inheritdoc

@@ -24,6 +24,7 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateDefinition;
 use Imagine\Exception\InvalidArgumentException;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -124,7 +125,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param  \Smarty_Internal_Template $template
      * @return string
      */
-    public function trimWhitespaces($source, \Smarty_Internal_Template $template)
+    public function trimWhitespaces($source, /** @noinspection PhpUnusedParameterInspection */ \Smarty_Internal_Template $template)
     {
         $compressionMode = ConfigQuery::read('html_output_trim_level', 1);
 
@@ -226,6 +227,8 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
     {
+        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName");
+
         if (true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
 
             $this->templateDirectories[$templateType][$templateName] = array_merge(
@@ -255,7 +258,7 @@ class SmartyParser extends Smarty implements ParserInterface
         return $this->templateDirectories[$templateType];
     }
 
-    public static function theliaEscape($content, $smarty)
+    public static function theliaEscape($content, /** @noinspection PhpUnusedParameterInspection */ $smarty)
     {
         if (is_scalar($content)) {
             return htmlspecialchars($content, ENT_QUOTES, Smarty::$_CHARSET);
@@ -306,7 +309,8 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getTemplateDefinition($webAssetTemplate = false)
     {
-        $ret = $this->templateDefinition;
+        $ret = clone $this->templateDefinition;
+
         if (false !== $webAssetTemplate) {
             $customPath = str_replace($ret->getName(), $webAssetTemplate, $ret->getPath());
             $ret->setName($webAssetTemplate);
@@ -345,9 +349,10 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template file
      *
-     * @param  string $realTemplateName the template name (from the template directory)
-     * @param  array  $parameters       an associative array of names / value pairs
-     * @return string the rendered template text
+     * @param  string                    $realTemplateName the template name (from the template directory)
+     * @param  array                     $parameters       an associative array of names / value pairs
+     * @return string                    the rendered template text
+     * @throws ResourceNotFoundException if the template cannot be found
      */
     public function render($realTemplateName, array $parameters = array())
     {
@@ -356,7 +361,6 @@ class SmartyParser extends Smarty implements ParserInterface
         }
 
         return $this->internalRenderer('file', $realTemplateName, $parameters);
-
     }
 
     private function checkTemplate($fileName)
@@ -364,6 +368,8 @@ class SmartyParser extends Smarty implements ParserInterface
         $templates = $this->getTemplateDir();
 
         $found = true;
+
+        /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($templates as $key => $value) {
             $absolutePath = rtrim(realpath(dirname($value.$fileName)), "/");
             $templateDir =  rtrim(realpath($value), "/");
@@ -372,7 +378,7 @@ class SmartyParser extends Smarty implements ParserInterface
             }
         }
 
-       return $found;
+        return $found;
     }
 
     /**
@@ -389,18 +395,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     /**
      *
-     * set $content with the body of the response or the Response object directly
-     *
-     * @param string|Thelia\Core\HttpFoundation\Response $content
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
-    }
-
-    /**
-     *
-     * @return type the status of the response
+     * @return int the status of the response
      */
     public function getStatus()
     {
@@ -425,6 +420,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public function registerPlugins()
     {
+        /** @var  AbstractSmartyPlugin $register_plugin */
         foreach ($this->plugins as $register_plugin) {
             $plugins = $register_plugin->getPluginDescriptors();
 
@@ -432,6 +428,7 @@ class SmartyParser extends Smarty implements ParserInterface
                 $plugins = array($plugins);
             }
 
+            /** @var SmartyPluginDescriptor $plugin */
             foreach ($plugins as $plugin) {
                 $this->registerPlugin(
                     $plugin->getType(),
@@ -444,5 +441,4 @@ class SmartyParser extends Smarty implements ParserInterface
             }
         }
     }
-
 }

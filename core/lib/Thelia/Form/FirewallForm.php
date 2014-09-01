@@ -11,7 +11,6 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\FormFirewall;

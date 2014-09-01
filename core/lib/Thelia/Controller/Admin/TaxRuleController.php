@@ -199,8 +199,7 @@ class TaxRuleController extends AbstractCrudController
 
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the feature edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes-rules.update",
             $this->getViewArguments($country),
             $this->getRouteArguments()
@@ -215,7 +214,7 @@ class TaxRuleController extends AbstractCrudController
      */
     protected function performAdditionalCreateAction($createEvent)
     {
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.configuration.taxes-rules.update",
             $this->getViewArguments(),
             $this->getRouteArguments($createEvent->getTaxRule()->getId())
@@ -224,9 +223,7 @@ class TaxRuleController extends AbstractCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.configuration.taxes-rules.list"
-        );
+        return $this->generateRedirectFromRoute("admin.configuration.taxes-rules.list");
     }
 
     public function updateAction()
@@ -261,7 +258,7 @@ class TaxRuleController extends AbstractCrudController
 
         $this->dispatch(TheliaEvents::TAX_RULE_SET_DEFAULT, $setDefaultEvent);
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     public function processUpdateTaxesAction()
@@ -295,7 +292,7 @@ class TaxRuleController extends AbstractCrudController
             }
 
             if ($response == null) {
-                $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
+                return $this->redirectToEditionTemplate($this->getRequest(), isset($data['country_list'][0]) ? $data['country_list'][0] : null);
             } else {
                 return $response;
             }

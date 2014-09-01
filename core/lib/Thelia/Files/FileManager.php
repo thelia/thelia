@@ -34,33 +34,34 @@ class FileManager
      *
      * @param array $supportedFileModels The key should have form type.parent, where type is the file type (document or image) and parent is the parent object of the file, form example product, brand, folder, etc.
      */
-    public function __construct($supportedFileModels) {
-
+    public function __construct($supportedFileModels)
+    {
         $this->supportedFileModels = $supportedFileModels;
     }
 
     /**
      * Create the file type identifier, to access the related class in the supportedFileModels table.
      *
-     * @param string $fileType the file type, e.g. document or image.
-     * @param string $parentType the parent object type, e.g. product, folder, brand, etc.
+     * @param  string $fileType   the file type, e.g. document or image.
+     * @param  string $parentType the parent object type, e.g. product, folder, brand, etc.
      * @return string
      */
-    protected function getFileTypeIdentifier($fileType, $parentType) {
+    protected function getFileTypeIdentifier($fileType, $parentType)
+    {
         return strtolower("$fileType.$parentType");
     }
     /**
      * Create a new FileModelInterface instance, from the supportedFileModels table
      *
-     * @param string $fileType the file type, such as document, image, etc.
+     * @param string $fileType   the file type, such as document, image, etc.
      * @param string $parentType the parent type, such as product, category, etc.
      *
      * @return FileModelInterface a file model interface instance
      *
      * @throws FileException if the file type is not supported, or if the class does not implements FileModelInterface
      */
-    public function getModelInstance($fileType, $parentType) {
-
+    public function getModelInstance($fileType, $parentType)
+    {
         if (! isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
             throw new FileException(
                 sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
@@ -85,11 +86,12 @@ class FileManager
     /**
      * A a new FileModelInterface class name to the supported class list.
      *
-     * @param string $fileType the file type, such as document, image, etc.
-     * @param string $parentType the parent type, such as Product, Category, etc.
+     * @param string $fileType                the file type, such as document, image, etc.
+     * @param string $parentType              the parent type, such as Product, Category, etc.
      * @param string $fullyQualifiedClassName the fully qualified class name
      */
-    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName) {
+    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName)
+    {
         $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)] = $fullyQualifiedClassName;
     }
 
@@ -97,12 +99,12 @@ class FileManager
      * Copy UploadedFile into the server storage directory
      *
      * @param FileModelInterface $model        Model saved
-     * @param UploadedFile $uploadedFile Ready to be uploaded file
+     * @param UploadedFile       $uploadedFile Ready to be uploaded file
      *
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile
      */
-    public function copyUploadedFile($model, $uploadedFile)
+    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
     {
         $newUploadedFile = null;
 
@@ -131,14 +133,14 @@ class FileManager
     /**
      * Save file into the database
      *
-     * @param int $parentId the parent object ID
+     * @param int                $parentId  the parent object ID
      * @param FileModelInterface $fileModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      *
      * @throws \Thelia\Exception\ImageException
      */
-    protected function saveFile($parentId, $fileModel)
+    protected function saveFile($parentId, FileModelInterface $fileModel)
     {
         $nbModifiedLines = 0;
 
@@ -164,12 +166,12 @@ class FileManager
     /**
      * Save file into the database
      *
-     * @param ImageCreateOrUpdateEvent $event the event
-     * @param FileModelInterface $imageModel the file model object (image or document) to save.
+     * @param ImageCreateOrUpdateEvent $event      the event
+     * @param FileModelInterface       $imageModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */
-    public function saveImage($event, $imageModel)
+    public function saveImage($event, FileModelInterface $imageModel)
     {
         return $this->saveFile($event->getParentId(), $imageModel);
     }
@@ -177,12 +179,12 @@ class FileManager
     /**
      * Save file into the database
      *
-     * @param DocumentCreateOrUpdateEvent $event the event
-     * @param FileModelInterface $documentModel the file model object (image or document) to save.
+     * @param DocumentCreateOrUpdateEvent $event         the event
+     * @param FileModelInterface          $documentModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */
-    public function saveDocument($event, $documentModel)
+    public function saveDocument($event, FileModelInterface $documentModel)
     {
         return $this->saveFile($event->getParentId(), $documentModel);
     }
@@ -208,7 +210,7 @@ class FileManager
      *
      * @param FileModelInterface $model File being deleted
      */
-    public function deleteFile($model)
+    public function deleteFile(FileModelInterface $model)
     {
         $url = $model->getUploadDir() . DS . $model->getFile();
 

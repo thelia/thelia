@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
@@ -37,6 +38,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -50,6 +52,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 abstract class BaseController extends ContainerAware
 {
     protected $tokenProvider;
+
+    protected $currentRouter;
 
     /**
      * Return an empty response (after an ajax request, for example)
@@ -272,32 +276,98 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
+     * Search success url in a form if present, in the query string otherwise
      *
-     * redirect request to the specified url
-     *
-     * @param string $url
-     * @param int    $status  http status. Must be a 30x status
-     * @param array  $cookies
+     * @param  BaseForm          $form
+     * @return mixed|null|string
      */
-    public function redirect($url, $status = 302, $cookies = array())
+    protected function retrieveSuccessUrl(BaseForm $form = null)
     {
-        Redirect::exec($url, $status, $cookies);
-    }
-
-    /**
-     * If success_url param is present in request or in the provided form, redirect to this URL.
-     *
-     * @param BaseForm $form a base form, which may contains the success URL
-     */
-    protected function redirectSuccess(BaseForm $form = null)
-    {
+        $url = null;
         if ($form != null) {
             $url = $form->getSuccessUrl();
         } else {
             $url = $this->getRequest()->get("success_url");
         }
 
-        if (null !== $url) $this->redirect($url);
+        return $url;
+    }
+
+    protected function retrieveUrlFromRouteId($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
+    {
+        return URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters);
+    }
+
+    /**
+     *
+     * create an instance of RedirectResponse
+     *
+     * @param $url
+     * @param  int                                        $status
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function generateRedirect($url, $status = 302)
+    {
+        return RedirectResponse::create($url, $status);
+    }
+
+    /**
+     * create an instance of RedirectReponse if a success url is present, return null otherwise
+     *
+     * @param  BaseForm                                        $form
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function generateSuccessRedirect(BaseForm $form = null)
+    {
+        $response = null;
+        if (null !== $url = $this->retrieveSuccessUrl($form)) {
+            $response = $this->generateRedirect($url);
+        }
+
+        return $response;
+    }
+
+    /**
+     *
+     * create an instance of RedriectResponse for a given route id.
+     *
+     * @param $routeId
+     * @param  array                                      $urlParameters
+     * @param  array                                      $routeParameters
+     * @param  bool                                       $referenceType
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function generateRedirectFromRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
+    {
+        return $this->generateRedirect(
+            $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
+        );
+    }
+
+    /**
+     * Return the route path defined for the givent route ID
+     *
+     * @param string         $routeId       a route ID, as defines in Config/Resources/routing/admin.xml
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference to be generated (one of the constants)
+     *
+     * @throws RouteNotFoundException              If the named route doesn't exist
+     * @throws MissingMandatoryParametersException When some parameters are missing that are mandatory for the route
+     * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
+     *                                             it does not match the requirement
+     * @throws \InvalidArgumentException           When the router doesn't exist
+     * @return string                              The generated URL
+     *
+     * @see \Thelia\Controller\BaseController::getRouteFromRouter()
+     */
+    protected function getRoute($routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
+    {
+        return $this->getRouteFromRouter(
+            $this->getCurrentRouter(),
+            $routeId,
+            $parameters,
+            $referenceType
+        );
     }
 
     /**
@@ -385,6 +455,16 @@ abstract class BaseController extends ContainerAware
         return $mailer->getSwiftMailer();
     }
 
+    protected function getCurrentRouter()
+    {
+        return $this->currentRouter;
+    }
+
+    protected function setCurrentRouter($routerId)
+    {
+        $this->currentRouter = $routerId;
+    }
+
     /**
      * @return a ParserInterface instance parser
      */
@@ -410,4 +490,59 @@ abstract class BaseController extends ContainerAware
      * @return string
      */
     abstract protected function renderRaw($templateName, $args = array(), $templateDir = null);
+
+    /****************** DEPRECATED METHODS ******************/
+
+    /**
+     *
+     * redirect request to the specified url
+     *
+     * @param string $url
+     * @param int    $status  http status. Must be a 30x status
+     * @param array  $cookies
+     *
+     * @deprecated redirect is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
+     * @see generateRedirect instead of this method
+     */
+    public function redirect($url, $status = 302, $cookies = array())
+    {
+        trigger_error('redirect is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response. ', E_USER_DEPRECATED);
+
+        Redirect::exec($url, $status, $cookies);
+    }
+
+    /**
+     * Redirect to à route ID related URL
+     *
+     * @param string $routeId         the route ID, as found in Config/Resources/routing/admin.xml
+     * @param array  $urlParameters   the URL parameters, as a var/value pair array
+     * @param array  $routeParameters
+     * @deprecated since 2.1 and will be removed in 2.3
+     * @see generateRedirectFromRoute
+     */
+    public function redirectToRoute($routeId, array $urlParameters = array(), array $routeParameters = array())
+    {
+        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters), $urlParameters));
+    }
+
+    /**
+     * If success_url param is present in request or in the provided form, redirect to this URL.
+     *
+     * @param BaseForm $form a base form, which may contains the success URL
+     *
+     * @deprecated redirectSuccess is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
+     * @see generateSuccessRedirect instead of this method
+     */
+    protected function redirectSuccess(BaseForm $form = null)
+    {
+        trigger_error('redirectSuccess is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response. ', E_USER_DEPRECATED);
+
+        if ($form != null) {
+            $url = $form->getSuccessUrl();
+        } else {
+            $url = $this->getRequest()->get("success_url");
+        }
+
+        if (null !== $url) $this->redirect($url);
+    }
 }

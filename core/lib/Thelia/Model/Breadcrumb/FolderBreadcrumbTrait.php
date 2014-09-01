@@ -12,13 +12,10 @@
 
 namespace Thelia\Model\Breadcrumb;
 
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Loop\FolderPath;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Content;
-use Thelia\Model\Folder;
 
 trait FolderBreadcrumbTrait
 {
@@ -52,7 +49,7 @@ trait FolderBreadcrumbTrait
 
     public function getFolderBreadcrumb(Router $router, $container, $tab, $locale)
     {
-        /** @var Folder $folder */
+        /** @var \Thelia\Model\Folder $folder */
         $folder = $this->getFolder();
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $this->getParentId());
 
@@ -68,7 +65,7 @@ trait FolderBreadcrumbTrait
 
     public function getContentBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
     {
-        /** @var Content $content */
+        /** @var \Thelia\Model\Content $content */
         $content = $this->getContent();
 
         $breadcrumb = $this->getBaseBreadcrumb($router, $container, $content->getDefaultFolderId());

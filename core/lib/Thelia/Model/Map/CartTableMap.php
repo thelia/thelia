@@ -186,6 +186,7 @@ class CartTableMap extends TableMap
         $this->addRelation('AddressRelatedByAddressDeliveryId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_delivery_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('AddressRelatedByAddressInvoiceId', '\\Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('address_invoice_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), null, null, 'Orders');
         $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'cart_id', ), 'CASCADE', 'RESTRICT', 'CartItems');
     } // buildRelations()
 

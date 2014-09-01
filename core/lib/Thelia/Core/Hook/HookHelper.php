@@ -103,8 +103,6 @@ class HookHelper
 
         try {
 
-            // Tlog::getInstance()->debug("Walking in $directory");
-
             /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
 
@@ -121,8 +119,6 @@ class HookHelper
                     if (in_array($ext, $allowed_exts)) {
 
                         if ($content = file_get_contents($fileInfo->getPathName())) {
-
-                            $short_path = $this->normalizePath($fileInfo->getPathName());
 
                             foreach (SmartyHelper::getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
                                 $hooks[] = $hook;
@@ -221,9 +217,6 @@ class HookHelper
 
     protected function loadFrontOfficeTrans($locale)
     {
-        $messages["context"] = array();
-        $messages["type"]    = array();
-
         $t = Translator::getInstance();
 
         $this->messages["context"]["404"]                   = $t->trans("Page 404", array(), "core", $locale);
@@ -299,8 +292,6 @@ class HookHelper
 
     protected function loadBackOfficeTrans($locale)
     {
-        $messages["context"] = array();
-        $messages["type"]    = array();
 
         $t = Translator::getInstance();
 
@@ -503,12 +494,13 @@ class HookHelper
 
     }
 
+    /**
+     * This method do nothing for now
+     *
+     * @param $locale
+     */
     protected function loadEmailTrans($locale)
     {
-        $messages["context"] = array();
-        $messages["type"]    = array();
-
-        $t = Translator::getInstance();
 
     }
 }

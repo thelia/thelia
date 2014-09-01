@@ -410,12 +410,12 @@ class ProductController extends AbstractSeoCrudController
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-                'admin.products.default',
-                array(
-                    'category_id' => $this->getCategoryId(),
-                    'page' => $this->getRequest()->get('page', 1)
-                )
+        return $this->generateRedirectFromRoute(
+            'admin.products.default',
+            [
+                'category_id' => $this->getCategoryId(),
+                'page' => $this->getRequest()->get('page', 1)
+            ]
         );
     }
 
@@ -426,7 +426,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute("admin.products.update", $this->getEditionArguments());
+        return $this->generateRedirectFromRoute("admin.products.update", $this->getEditionArguments());
     }
 
     /**
@@ -452,19 +452,17 @@ class ProductController extends AbstractSeoCrudController
 
     protected function performAdditionalDeleteAction($deleteEvent)
     {
-        // Redirect to parent product list
-        $this->redirectToRoute(
-                'admin.products.default',
-                array('category_id' => $this->getCategoryId())
+        return $this->generateRedirectFromRoute(
+            'admin.products.default',
+            ['category_id' => $this->getCategoryId()]
         );
     }
 
     protected function performAdditionalUpdatePositionAction($positionEvent)
     {
-        // Redirect to parent product list
-        $this->redirectToRoute(
-                'admin.categories.default',
-                array('category_id' => $this->getCategoryId())
+        return $this->generateRedirectFromRoute(
+            'admin.categories.default',
+            ['category_id' => $this->getCategoryId()]
         );
     }
 
@@ -518,7 +516,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteRelatedContentAction()
@@ -544,7 +542,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     // -- Accessories management ----------------------------------------------
@@ -596,7 +594,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteAccessoryAction()
@@ -621,7 +619,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -672,7 +670,7 @@ class ProductController extends AbstractSeoCrudController
             );
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -745,11 +743,11 @@ class ProductController extends AbstractSeoCrudController
         // If we have to stay on the same page, do not redirect to the succesUrl,
         // just redirect to the edit page again.
         if ($this->getRequest()->get('save_mode') == 'stay') {
-            $this->redirectToEditionTemplate($this->getRequest());
+            return $this->redirectToEditionTemplate($this->getRequest());
         }
 
         // Redirect to the category/product list
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     public function addAdditionalCategoryAction()
@@ -774,7 +772,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     public function deleteAdditionalCategoryAction()
@@ -799,7 +797,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     // -- Product combination management ---------------------------------------
@@ -892,7 +890,7 @@ class ProductController extends AbstractSeoCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -915,7 +913,7 @@ class ProductController extends AbstractSeoCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToEditionTemplate();
+        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -1004,11 +1002,11 @@ class ProductController extends AbstractSeoCrudController
 
             // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToEditionTemplate($this->getRequest());
+                return $this->redirectToEditionTemplate($this->getRequest());
             }
 
            // Redirect to the success URL
-           $this->redirect($changeForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($changeForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -1130,7 +1128,7 @@ class ProductController extends AbstractSeoCrudController
             $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("Combination generation for product reference %s", $event->getProduct()->getRef()));
 
            // Redirect to the success URL
-           $this->redirect($changeForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($changeForm);
 
         } catch (FormValidationException $ex) {
             // Form cannot be validated

@@ -153,10 +153,11 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         if (!isset($event['method'])) {
-            $event['method'] = 'on'.preg_replace(array(
-                    '/(?<=\b)[a-z]/ie',
-                    '/[^a-z0-9]/i'
-                ), array('strtoupper("\\0")', ''), $event['event']);
+            $event['method'] = 'on'.preg_replace_callback(array(
+                    '/(?<=\b)[a-z]/i',
+                    '/[^a-z0-9]/i',
+                ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
+            $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
         }
 
         // test if method exists
@@ -174,7 +175,6 @@ class RegisterListenersPass implements CompilerPassInterface
         if (null === $moduleHook) {
             // hook for module doesn't exist, we add it with default registered values
             $moduleHook = new ModuleHook();
-            //$moduleHook->setModuleId();
             $moduleHook->setHook($hook)
                 ->setModuleId($module)
                 ->setClassname($id)
@@ -297,7 +297,6 @@ class RegisterListenersPass implements CompilerPassInterface
                 HookDefinition::RENDER_BLOCK_EVENT :
                 HookDefinition::RENDER_FUNCTION_EVENT;
 
-            //if ( ! ($parameters[0]->getClass()->getName() instanceof $eventType) ) {
             if ( ! ($parameters[0]->getClass()->getName() == $eventType
                     || is_subclass_of($parameters[0]->getClass()->getName(), $eventType) ) ) {
                 Tlog::getInstance()->addAlert(sprintf("Method %s should use an event of type %s. found: %s", $methodName, $eventType, $parameters[0]->getClass()->getName()));

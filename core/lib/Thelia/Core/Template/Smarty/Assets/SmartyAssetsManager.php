@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
@@ -48,6 +49,7 @@ class SmartyAssetsManager
     {
         self::$assetsDirectory = $assets_directory;
 
+        /** @var SmartyParser $smartyParser */
         $smartyParser = $template->smarty;
         $templateDefinition = $smartyParser->getTemplateDefinition();
 
@@ -99,6 +101,8 @@ class SmartyAssetsManager
         $debug            = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $webAssetTemplate = isset($params['template']) ? $params['template'] : false;
 
+        Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $webAssetTemplate");
+
         $assetSource = "";
 
         /* we trick here relative thinking for file attribute */
@@ -107,8 +111,10 @@ class SmartyAssetsManager
             $file = substr($file, 3);
         }
 
+        /** @var SmartyParser $smartyParser */
         $smartyParser = $template->smarty;
-        /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
+
+        /** @var TemplateDefinition $templateDefinition */
         $templateDefinition = $smartyParser->getTemplateDefinition($webAssetTemplate);
 
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
@@ -118,6 +124,9 @@ class SmartyAssetsManager
         // if not we take the default asset from the assetOrigin (module)
 
         $paths = $this->getFallbackSources($templateDirectories, $templateDefinition->getName(), $assetOrigin);
+
+        // TODO we shoud add as TRACE level for such information
+        // Tlog::getInstance()->addDebug("Asset pathes found:", $paths);
 
         // Normalize path separator if required
         if (DS != '/') {
@@ -230,6 +239,7 @@ class SmartyAssetsManager
                 Tlog::getInstance()->addWarning("Failed to get real path of " . $params['file']);
             }
             $template->assign('asset_url', $url);
+
         } elseif (isset($content)) {
             return $content;
         }

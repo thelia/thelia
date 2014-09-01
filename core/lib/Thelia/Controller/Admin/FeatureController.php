@@ -194,18 +194,18 @@ class FeatureController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.features.update",
-                array(
-                        'feature_id' => $this->getRequest()->get('feature_id'),
-                        'featureav_order' => $this->getFeatureAvListOrder()
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.features.update",
+            [
+                'feature_id' => $this->getRequest()->get('feature_id'),
+                'featureav_order' => $this->getFeatureAvListOrder()
+            ]
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.features.default');
+        return $this->generateRedirectFromRoute('admin.configuration.features.default');
     }
 
     /**
@@ -242,7 +242,7 @@ class FeatureController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**

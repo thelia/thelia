@@ -217,10 +217,11 @@ class TranslationsController extends BaseAdminController
 
                             TemplateHelper::getInstance()->writeTranslation($file, $texts, $translations, true);
 
-                            if ($save_mode == 'stay')
-                                $this->redirectToRoute("admin.configuration.translations", $templateArguments);
-                            else
-                                $this->redirect(URL::getInstance()->adminViewUrl('configuration'));
+                            if ($save_mode == 'stay') {
+                                return $this->generateRedirectFromRoute("admin.configuration.translations", $templateArguments);
+                            } else {
+                                return $this->generateRedirect(URL::getInstance()->adminViewUrl('configuration'));
+                            }
                         }
                     }
                 }

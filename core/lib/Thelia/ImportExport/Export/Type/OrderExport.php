@@ -296,7 +296,6 @@ class OrderExport extends ExportHandler
 
                 $date = new \DateTime($line[OrderTableMap::CREATED_AT]);
 
-
                 $line[OrderTableMap::CREATED_AT] = $date->format($lang->getDatetimeFormat());
 
                 $current++;

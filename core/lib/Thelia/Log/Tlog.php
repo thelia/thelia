@@ -24,7 +24,7 @@ use Thelia\Core\Translation\Translator;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Tlog Implements LoggerInterface
+class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
     const VAR_LEVEL 		= "tlog_level";

@@ -51,6 +51,8 @@
                         </dl>
 
                         {block name='additional-payment-info'}{/block}
+
+                        {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE"}
                     </div>
                 </div>
             {/elsehook}

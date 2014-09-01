@@ -14,10 +14,7 @@ namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\TarArchiveException;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Thelia;
-use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotReadableException;
-use Thelia\Log\Tlog;
 use Thelia\Tools\FileDownload\FileDownloaderInterface;
 
 /**

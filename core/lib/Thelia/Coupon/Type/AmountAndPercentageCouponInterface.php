@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+use Thelia\Model\CartItem;
 
 /**
  * Represents a Coupon ready to be processed in a Checkout process
@@ -34,7 +35,7 @@ interface AmountAndPercentageCouponInterface
      * @param  CartItem $cartItem the cart item
      * @return float    the discount value
      */
-    public function getCartItemDiscount($cartItem);
+    public function getCartItemDiscount(CartItem $cartItem);
 
     /**
      * Renders the template which implements coupon specific user-input,

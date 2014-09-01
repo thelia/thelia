@@ -17,14 +17,6 @@ class ModuleHook extends BaseModuleHook
      */
     protected function addCriteriaToPositionQuery($query)
     {
-        // Find products in the same category
-        /*$produits = ModuleHookQuery::create()
-            ->filterByEvent($this->getEvent())
-            ->select('id')
-            ->find();*/
-
-        // Filtrer la requete sur ces produits
-        //if ($produits != null) $query->filterById($produits, Criteria::IN);
         $query->filterByHookId($this->getHookId());
     }
 

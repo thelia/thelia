@@ -84,6 +84,9 @@ class TemplateDefinition
         return $this->translationDomainPrefix . strtolower($this->getName());
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -133,6 +136,9 @@ class TemplateDefinition
         return $this;
     }
 
+    /**
+     * @return int
+     */
     public function getType()
     {
         return $this->type;

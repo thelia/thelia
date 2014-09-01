@@ -371,6 +371,9 @@ final class TheliaEvents
     const ORDER_CREATE_MANUAL = "action.order.createManual";
 
     const ORDER_UPDATE_STATUS = "action.order.updateStatus";
+
+    const ORDER_SEND_CONFIRMATION_EMAIL = "action.order.sendOrderConfirmationEmail";
+
     const ORDER_UPDATE_DELIVERY_REF = "action.order.updateDeliveryRef";
     const ORDER_UPDATE_ADDRESS = "action.order.updateAddress";
 

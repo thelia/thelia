@@ -31,6 +31,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
     // Permissions
     protected $resourceCode;
+    protected $moduleCode;
 
     // Events
     protected $createEventIdentifier;
@@ -66,7 +67,8 @@ abstract class AbstractCrudController extends BaseAdminController
             $updateEventIdentifier,
             $deleteEventIdentifier,
             $visibilityToggleEventIdentifier = null,
-            $changePositionEventIdentifier = null
+            $changePositionEventIdentifier = null,
+            $moduleCode = null
     ) {
             $this->objectName = $objectName;
 
@@ -80,6 +82,8 @@ abstract class AbstractCrudController extends BaseAdminController
             $this->deleteEventIdentifier = $deleteEventIdentifier;
             $this->visibilityToggleEventIdentifier = $visibilityToggleEventIdentifier;
             $this->changePositionEventIdentifier = $changePositionEventIdentifier;
+
+            $this->moduleCode = $moduleCode;
     }
 
     /**
@@ -164,12 +168,14 @@ abstract class AbstractCrudController extends BaseAdminController
     abstract protected function renderEditionTemplate();
 
     /**
-     * Redirect to the edition template
+     * Must return a RedirectResponse instance
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     abstract protected function redirectToEditionTemplate();
 
     /**
-     * Redirect to the list template
+     * Must return a RedirectResponse instance
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
     abstract protected function redirectToListTemplate();
 
@@ -239,6 +245,15 @@ abstract class AbstractCrudController extends BaseAdminController
         );
     }
 
+    protected function getModuleCode()
+    {
+        if (null !== $this->moduleCode) {
+            return [$this->moduleCode];
+        } else {
+            return [];
+        }
+    }
+
     /**
      * Render the object list, ensuring the sort order is set.
      *
@@ -257,7 +272,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function defaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::VIEW))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::VIEW))
             return $response;
 
         return $this->renderList();
@@ -271,7 +286,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function createAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::CREATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::CREATE))
             return $response;
 
         // Error (Default: false)
@@ -311,7 +326,7 @@ abstract class AbstractCrudController extends BaseAdminController
                 $successUrl = str_replace('_ID_', $this->getObjectId($createdObject), $creationForm->getSuccessUrl());
 
                 // Redirect to the success URL
-                $this->redirect($successUrl);
+                return $this->generateRedirect($successUrl);
             } else {
                 return $response;
             }
@@ -344,7 +359,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE))
             return $response;
 
         // Load object if exist
@@ -369,7 +384,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function processUpdateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE))
             return $response;
 
         // Error (Default: false)
@@ -408,11 +423,11 @@ abstract class AbstractCrudController extends BaseAdminController
                 // If we have to stay on the same page, do not redirect to the successUrl,
                 // just redirect to the edit page again.
                 if ($this->getRequest()->get('save_mode') == 'stay') {
-                    $this->redirectToEditionTemplate($this->getRequest());
+                    return $this->redirectToEditionTemplate($this->getRequest());
                 }
 
                 // Redirect to the success URL
-                $this->redirect($changeForm->getSuccessUrl());
+                return $this->generateSuccessRedirect($changeForm);
             } else {
                 return $response;
             }
@@ -444,7 +459,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function updatePositionAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE))
             return $response;
 
         try {
@@ -471,7 +486,7 @@ abstract class AbstractCrudController extends BaseAdminController
         $response = $this->performAdditionalUpdatePositionAction($event);
 
         if ($response == null) {
-            $this->redirectToListTemplate();
+            return $this->redirectToListTemplate();
         } else {
             return $response;
         }
@@ -480,7 +495,7 @@ abstract class AbstractCrudController extends BaseAdminController
     protected function genericUpdatePositionAction($object, $eventName, $doFinalRedirect = true)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE))
             return $response;
 
         if ($object != null) {
@@ -506,7 +521,9 @@ abstract class AbstractCrudController extends BaseAdminController
             }
         }
 
-        if ($doFinalRedirect) $this->redirectToEditionTemplate();
+        if ($doFinalRedirect) {
+            return $this->redirectToEditionTemplate();
+        }
     }
 
     /**
@@ -515,7 +532,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::UPDATE))
             return $response;
 
         $changeEvent = $this->createToggleVisibilityEvent($this->getRequest());
@@ -538,7 +555,7 @@ abstract class AbstractCrudController extends BaseAdminController
     public function deleteAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::DELETE))
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), AccessManager::DELETE))
             return $response;
 
         // Check token
@@ -559,9 +576,10 @@ abstract class AbstractCrudController extends BaseAdminController
 
         $response = $this->performAdditionalDeleteAction($deleteEvent);
 
-        if ($response == null)
-            $this->redirectToListTemplate();
-        else
+        if ($response == null) {
+            return $this->redirectToListTemplate();
+        } else {
             return $response;
+        }
     }
 }

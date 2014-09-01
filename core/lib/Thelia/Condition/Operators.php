@@ -24,21 +24,21 @@ use Thelia\Core\Translation\Translator;
 abstract class Operators
 {
     /** Param1 is inferior to Param2 */
-    CONST INFERIOR          =    '<';
+    const INFERIOR          =    '<';
     /** Param1 is inferior to Param2 */
-    CONST INFERIOR_OR_EQUAL =    '<=';
+    const INFERIOR_OR_EQUAL =    '<=';
     /** Param1 is equal to Param2 */
-    CONST EQUAL             =     '==';
+    const EQUAL             =     '==';
     /** Param1 is superior to Param2 */
-    CONST SUPERIOR_OR_EQUAL =     '>=';
+    const SUPERIOR_OR_EQUAL =     '>=';
     /** Param1 is superior to Param2 */
-    CONST SUPERIOR          =     '>';
+    const SUPERIOR          =     '>';
     /** Param1 is different to Param2 */
-    CONST DIFFERENT         =     '!=';
+    const DIFFERENT         =     '!=';
     /** Param1 is in Param2 */
-    CONST IN                =     'in';
+    const IN                =     'in';
     /** Param1 is not in Param2 */
-    CONST OUT               =     'out';
+    const OUT               =     'out';
 
     /**
      * Get operator translation

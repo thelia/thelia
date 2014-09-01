@@ -41,7 +41,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
      * @param  CartItem $cartItem the cart item
      * @return float    the discount value
      */
-    abstract public function getCartItemDiscount($cartItem);
+    abstract public function getCartItemDiscount(CartItem $cartItem);
 
     /**
      * @inheritdoc

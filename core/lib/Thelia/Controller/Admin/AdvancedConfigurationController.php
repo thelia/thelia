@@ -56,7 +56,7 @@ class AdvancedConfigurationController extends BaseAdminController
             Tlog::getInstance()->addError(sprintf("Flush cache error: %s", $e->getMessage()));
         }
 
-        $this->redirectToRoute('admin.configuration.advanced');
+        return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
     public function flushAssetsAction()
@@ -76,7 +76,7 @@ class AdvancedConfigurationController extends BaseAdminController
             Tlog::getInstance()->addError(sprintf("Flush assets error: %s", $e->getMessage()));
         }
 
-        $this->redirectToRoute('admin.configuration.advanced');
+        return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 
     public function flushImagesAndDocumentsAction()
@@ -99,6 +99,6 @@ class AdvancedConfigurationController extends BaseAdminController
             Tlog::getInstance()->addError(sprintf("Flush images and document error: %s", $e->getMessage()));
         }
 
-        $this->redirectToRoute('admin.configuration.advanced');
+        return $this->generateRedirectFromRoute('admin.configuration.advanced');
     }
 }

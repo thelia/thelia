@@ -59,7 +59,7 @@ class ConfigStoreController extends BaseAdminController
         if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::UPDATE)) return $response;
 
         $error_msg = false;
-
+        $response = null;
         $configStoreForm = new ConfigStoreForm($this->getRequest());
 
         try {
@@ -76,23 +76,25 @@ class ConfigStoreController extends BaseAdminController
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, "Store configuration changed");
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
-                $this->redirectToRoute('admin.configuration.store.default');
+                $response = $this->generateRedirectFromRoute('admin.configuration.store.default');
+            } else {
+                $response = $this->generateSuccessRedirect($configStoreForm);
             }
-
-            // Redirect to the success URL
-            $this->redirect($configStoreForm->getSuccessUrl());
-
         } catch (\Exception $ex) {
             $error_msg = $ex->getMessage();
         }
 
-        $this->setupFormErrorContext(
+        if (false !== $error_msg) {
+            $this->setupFormErrorContext(
                 $this->getTranslator()->trans("Store configuration failed."),
                 $error_msg,
                 $configStoreForm,
                 $ex
-        );
+            );
 
-        return $this->renderTemplate();
+            $response = $this->renderTemplate();
+        }
+
+        return $response;
     }
 }

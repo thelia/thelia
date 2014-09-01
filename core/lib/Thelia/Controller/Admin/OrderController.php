@@ -22,7 +22,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Tools\URL;
 
 /**
  * Class OrderController
@@ -88,12 +87,14 @@ class OrderController extends BaseAdminController
 
         if ($browsedPage) {
             $params["order_page"] = $browsedPage;
-            $this->redirectToRoute("admin.order.list", $params);
+            $response = $this->generateRedirectFromRoute("admin.order.list", $params);
         } else {
             $params["order_id"] = $order_id;
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
-            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params);
         }
+
+        return $response;
     }
 
     public function updateDeliveryRef($order_id)
@@ -128,7 +129,9 @@ class OrderController extends BaseAdminController
         $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+        return $this->generateRedirectFromRoute(
+            "admin.order.update.view", $params
+        );
     }
 
     public function updateAddress($order_id)
@@ -184,7 +187,10 @@ class OrderController extends BaseAdminController
         $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
-        $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", $params)));
+        return $this->generateRedirectFromRoute(
+            "admin.order.update.view", $params
+        );
+
     }
 
     public function generateInvoicePdf($order_id)
@@ -202,9 +208,11 @@ class OrderController extends BaseAdminController
     private function generateBackOfficeOrderPdf($order_id, $fileName)
     {
         if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
-            $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute("admin.order.update.view", array(
-                'order_id' => $order_id
-            ))));
+            return $this->generateRedirectFromRoute("admin.order.update.view",
+                [
+                    'order_id' => $order_id
+                ]
+            );
         }
 
         return $response;

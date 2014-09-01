@@ -55,7 +55,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     /**
      * @inheritdoc
      */
-    public function getCartItemDiscount($cartItem)
+    public function getCartItemDiscount(CartItem $cartItem)
     {
         // This method is not used, we use our own implementation of exec();
         return 0;

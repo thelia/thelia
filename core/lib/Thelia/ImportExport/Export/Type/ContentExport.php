@@ -20,14 +20,12 @@ use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\Content;
-use Thelia\Model\ContentDocumentI18nQuery;
 use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentImageQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\FolderDocumentQuery;
 use Thelia\Model\FolderImageQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\Map\ContentDocumentTableMap;
 use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Model\Map\ContentI18nTableMap;
 use Thelia\Model\Map\ContentTableMap;
@@ -81,7 +79,6 @@ class ContentExport extends ExportHandler implements
         $contentI18nJoin = new Join(ContentTableMap::ID, ContentI18nTableMap::ID, Criteria::LEFT_JOIN);
         $folderI18nJoin = new Join(FolderTableMap::ID, FolderI18nTableMap::ID, Criteria::LEFT_JOIN);
         $urlJoin = new Join(ContentTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-
 
         $query = ContentQuery::create()
             ->select([
@@ -168,7 +165,7 @@ class ContentExport extends ExportHandler implements
     }
 
     /**
-     * @param  Lang $lang
+     * @param  Lang                         $lang
      * @return ModelCriteria|array|BaseLoop
      */
     public function buildDataSet(Lang $lang)
@@ -251,7 +248,6 @@ class ContentExport extends ExportHandler implements
         ];
     }
 
-
     /**
      * @return array
      *
@@ -307,4 +303,4 @@ class ContentExport extends ExportHandler implements
 
         return $imagePaths;
     }
-} 
+}

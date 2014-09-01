@@ -204,6 +204,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
+        $placedOrder->setCart($cart);
+
         /* memorize discount */
         $placedOrder->setDiscount(
                 $cart->getDiscount()
@@ -354,7 +356,17 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Core\Event\Order\OrderEvent $event
+     * @param OrderEvent $event
+     */
+    public function orderBeforePayement(OrderEvent $event)
+    {
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
+    }
+
+    /**
+     * @param OrderEvent $event
+     *
+     * @throws \Exception if the message cannot be loaded.
      */
     public function sendOrderEmail(OrderEvent $event)
     {
@@ -483,7 +495,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
-            TheliaEvents::ORDER_BEFORE_PAYMENT => array("sendOrderEmail", 128),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayement", 128),
+            TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendOrderEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
             TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
             TheliaEvents::ORDER_UPDATE_ADDRESS => array("updateAddress", 128),

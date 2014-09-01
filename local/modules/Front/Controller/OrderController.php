@@ -101,7 +101,7 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
 
-            $this->redirectToRoute("order.invoice");
+            return $this->generateRedirectFromRoute("order.invoice");
 
         } catch (FormValidationException $e) {
             $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
@@ -157,7 +157,7 @@ class OrderController extends BaseFrontController
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_INVOICE_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_PAYMENT_MODULE, $orderEvent);
 
-            $this->redirectToRoute("order.payment.process");
+            return $this->generateRedirectFromRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
             $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
@@ -205,11 +205,11 @@ class OrderController extends BaseFrontController
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             } else {
-                $this->redirect(URL::getInstance()->absoluteUrl($this->getRoute('order.placed', array('order_id' => $orderEvent->getPlacedOrder()->getId()))));
+                return $this->generateRedirectFromRoute('order.placed', ['order_id' => $orderEvent->getPlacedOrder()->getId()]);
             }
         } else {
             /* order has not been placed */
-            $this->redirectToRoute('cart.view');
+            return $this->generateRedirectFromRoute('cart.view');
         }
     }
 

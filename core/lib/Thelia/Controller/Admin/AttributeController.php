@@ -194,18 +194,18 @@ class AttributeController extends AbstractCrudController
 
     protected function redirectToEditionTemplate()
     {
-        $this->redirectToRoute(
-                "admin.configuration.attributes.update",
-                array(
-                        'attribute_id' => $this->getRequest()->get('attribute_id'),
-                        'attributeav_order' => $this->getAttributeAvListOrder()
-                )
+        return $this->generateRedirectFromRoute(
+            "admin.configuration.attributes.update",
+            [
+                'attribute_id' => $this->getRequest()->get('attribute_id'),
+                'attributeav_order' => $this->getAttributeAvListOrder()
+            ]
         );
     }
 
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.configuration.attributes.default');
+        return $this->generateRedirectFromRoute('admin.configuration.attributes.default');
     }
 
     /**
@@ -242,7 +242,7 @@ class AttributeController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     /**

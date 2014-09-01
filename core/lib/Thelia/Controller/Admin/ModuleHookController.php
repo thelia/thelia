@@ -84,7 +84,7 @@ class ModuleHookController extends AbstractCrudController
                 $response = $this->nullResponse();
             }
         } else {
-            $this->redirectToRoute('admin.module-hook');
+            $response = $this->generateRedirectFromRoute('admin.module-hook');
         }
 
         return $response;
@@ -267,8 +267,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
-        // We always return to the module edition form
-        $this->redirectToRoute(
+        return $this->generateRedirectFromRoute(
             "admin.module-hook.update",
             $this->getViewArguments(),
             $this->getRouteArguments()
@@ -280,9 +279,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute(
-            "admin.module-hook"
-        );
+        return $this->generateRedirectFromRoute("admin.module-hook");
     }
 
     protected function getViewArguments()

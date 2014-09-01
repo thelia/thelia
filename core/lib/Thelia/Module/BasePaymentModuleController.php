@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Log\Tlog;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
@@ -154,13 +155,15 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         $this->getLog()->addInfo("Redirecting customer to payment success page");
 
-        $this->redirectToRoute(
-            'order.placed',
-            [],
-            [
-                'order_id' => $order_id
-            ],
-            Router::ABSOLUTE_PATH
+        throw new RedirectException(
+            $this->retrieveUrlFromRouteId(
+                'order.placed',
+                [],
+                [
+                    'order_id' => $order_id
+                ],
+                Router::ABSOLUTE_PATH
+            )
         );
     }
 
@@ -174,14 +177,16 @@ abstract class BasePaymentModuleController extends BaseFrontController
     {
         $this->getLog()->addInfo("Redirecting customer to payment failure page");
 
-        $this->redirectToRoute(
-            'order.failed',
-            [],
-            [
-                'order_id' => $order_id,
-                'message' => $message
-            ],
-            Router::ABSOLUTE_PATH
+        throw new RedirectException(
+            $this->retrieveUrlFromRouteId(
+                'order.failed',
+                [],
+                [
+                    'order_id' => $order_id,
+                    'message' => $message
+                ],
+                Router::ABSOLUTE_PATH
+            )
         );
     }
 }
