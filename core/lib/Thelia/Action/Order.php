@@ -225,7 +225,10 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* check still in stock */
             if ($cartItem->getQuantity() > $pse->getQuantity()) {
-                throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+                if (null != $checkAvailableStock = ConfigQuery::read("check-available-stock")){
+                    if($checkAvailableStock == 1)
+                        throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+                }
             }
 
             /* decrease stock */
