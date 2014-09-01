@@ -37,7 +37,7 @@ class Area extends BaseAction implements EventSubscriberInterface
 
         $areaId = $event->getAreaId();
 
-        foreach($countryIds as $countryId) {
+        foreach ($countryIds as $countryId) {
             if (null !== $country = CountryQuery::create()->findPk($countryId)) {
                 $country->setDispatcher($event->getDispatcher());
                 $country->setAreaId($areaId)
