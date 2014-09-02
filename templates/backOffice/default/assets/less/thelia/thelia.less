@@ -457,6 +457,20 @@ ul.document-list {
 
 }
 
+
+// document / image visibility
+.document-toggle-btn,
+.image-toggle-btn {
+  .glyphicon-eye-open{ display: none; }
+  .glyphicon-eye-close{ display: inline-block; }
+}
+.document-toggle-btn.visibility-visible,
+.image-toggle-btn.visibility-visible {
+  .glyphicon-eye-open{ display: inline-block; }
+  .glyphicon-eye-close{ display: none; }
+}
+
+
 // Loader (Overlay)
 .loader {
   position: fixed;

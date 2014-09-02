@@ -1832,6 +1832,61 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 ;
 
 # ======================================================================================================================
+# Image / Document visible
+# ======================================================================================================================
+
+ALTER TABLE `product_document`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `product_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `category_document`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `category_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `content_document`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `content_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `folder_document`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `folder_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `brand_document`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+ALTER TABLE `brand_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
+
+
+# ======================================================================================================================
 # End of changes
 # ======================================================================================================================
 

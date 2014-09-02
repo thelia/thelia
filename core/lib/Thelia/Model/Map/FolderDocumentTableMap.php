@@ -58,7 +58,7 @@ class FolderDocumentTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class FolderDocumentTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,11 @@ class FolderDocumentTableMap extends TableMap
      * the column name for the FILE field
      */
     const FILE = 'folder_document.FILE';
+
+    /**
+     * the column name for the VISIBLE field
+     */
+    const VISIBLE = 'folder_document.VISIBLE';
 
     /**
      * the column name for the POSITION field
@@ -121,12 +126,12 @@ class FolderDocumentTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'FolderId', 'File', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'folderId', 'file', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(FolderDocumentTableMap::ID, FolderDocumentTableMap::FOLDER_ID, FolderDocumentTableMap::FILE, FolderDocumentTableMap::POSITION, FolderDocumentTableMap::CREATED_AT, FolderDocumentTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'FOLDER_ID', 'FILE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'folder_id', 'file', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'FolderId', 'File', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'folderId', 'file', 'visible', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(FolderDocumentTableMap::ID, FolderDocumentTableMap::FOLDER_ID, FolderDocumentTableMap::FILE, FolderDocumentTableMap::VISIBLE, FolderDocumentTableMap::POSITION, FolderDocumentTableMap::CREATED_AT, FolderDocumentTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'FOLDER_ID', 'FILE', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'folder_id', 'file', 'visible', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -136,12 +141,12 @@ class FolderDocumentTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'FolderId' => 1, 'File' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'folderId' => 1, 'file' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(FolderDocumentTableMap::ID => 0, FolderDocumentTableMap::FOLDER_ID => 1, FolderDocumentTableMap::FILE => 2, FolderDocumentTableMap::POSITION => 3, FolderDocumentTableMap::CREATED_AT => 4, FolderDocumentTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FOLDER_ID' => 1, 'FILE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'folder_id' => 1, 'file' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'FolderId' => 1, 'File' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'folderId' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(FolderDocumentTableMap::ID => 0, FolderDocumentTableMap::FOLDER_ID => 1, FolderDocumentTableMap::FILE => 2, FolderDocumentTableMap::VISIBLE => 3, FolderDocumentTableMap::POSITION => 4, FolderDocumentTableMap::CREATED_AT => 5, FolderDocumentTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FOLDER_ID' => 1, 'FILE' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'folder_id' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -163,6 +168,7 @@ class FolderDocumentTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('FOLDER_ID', 'FolderId', 'INTEGER', 'folder', 'ID', true, null, null);
         $this->addColumn('FILE', 'File', 'VARCHAR', true, 255, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 1);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -341,6 +347,7 @@ class FolderDocumentTableMap extends TableMap
             $criteria->addSelectColumn(FolderDocumentTableMap::ID);
             $criteria->addSelectColumn(FolderDocumentTableMap::FOLDER_ID);
             $criteria->addSelectColumn(FolderDocumentTableMap::FILE);
+            $criteria->addSelectColumn(FolderDocumentTableMap::VISIBLE);
             $criteria->addSelectColumn(FolderDocumentTableMap::POSITION);
             $criteria->addSelectColumn(FolderDocumentTableMap::CREATED_AT);
             $criteria->addSelectColumn(FolderDocumentTableMap::UPDATED_AT);
@@ -348,6 +355,7 @@ class FolderDocumentTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.FOLDER_ID');
             $criteria->addSelectColumn($alias . '.FILE');
+            $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

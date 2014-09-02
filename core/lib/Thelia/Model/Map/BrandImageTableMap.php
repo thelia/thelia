@@ -58,7 +58,7 @@ class BrandImageTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class BrandImageTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,11 @@ class BrandImageTableMap extends TableMap
      * the column name for the FILE field
      */
     const FILE = 'brand_image.FILE';
+
+    /**
+     * the column name for the VISIBLE field
+     */
+    const VISIBLE = 'brand_image.VISIBLE';
 
     /**
      * the column name for the POSITION field
@@ -121,12 +126,12 @@ class BrandImageTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'BrandId', 'File', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'brandId', 'file', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(BrandImageTableMap::ID, BrandImageTableMap::BRAND_ID, BrandImageTableMap::FILE, BrandImageTableMap::POSITION, BrandImageTableMap::CREATED_AT, BrandImageTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'BRAND_ID', 'FILE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'brand_id', 'file', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'BrandId', 'File', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'brandId', 'file', 'visible', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(BrandImageTableMap::ID, BrandImageTableMap::BRAND_ID, BrandImageTableMap::FILE, BrandImageTableMap::VISIBLE, BrandImageTableMap::POSITION, BrandImageTableMap::CREATED_AT, BrandImageTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'BRAND_ID', 'FILE', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'brand_id', 'file', 'visible', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -136,12 +141,12 @@ class BrandImageTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'BrandId' => 1, 'File' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'brandId' => 1, 'file' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(BrandImageTableMap::ID => 0, BrandImageTableMap::BRAND_ID => 1, BrandImageTableMap::FILE => 2, BrandImageTableMap::POSITION => 3, BrandImageTableMap::CREATED_AT => 4, BrandImageTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'BRAND_ID' => 1, 'FILE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'brand_id' => 1, 'file' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'BrandId' => 1, 'File' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'brandId' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(BrandImageTableMap::ID => 0, BrandImageTableMap::BRAND_ID => 1, BrandImageTableMap::FILE => 2, BrandImageTableMap::VISIBLE => 3, BrandImageTableMap::POSITION => 4, BrandImageTableMap::CREATED_AT => 5, BrandImageTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'BRAND_ID' => 1, 'FILE' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'brand_id' => 1, 'file' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -163,6 +168,7 @@ class BrandImageTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('BRAND_ID', 'BrandId', 'INTEGER', 'brand', 'ID', true, null, null);
         $this->addColumn('FILE', 'File', 'VARCHAR', true, 255, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 1);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -343,6 +349,7 @@ class BrandImageTableMap extends TableMap
             $criteria->addSelectColumn(BrandImageTableMap::ID);
             $criteria->addSelectColumn(BrandImageTableMap::BRAND_ID);
             $criteria->addSelectColumn(BrandImageTableMap::FILE);
+            $criteria->addSelectColumn(BrandImageTableMap::VISIBLE);
             $criteria->addSelectColumn(BrandImageTableMap::POSITION);
             $criteria->addSelectColumn(BrandImageTableMap::CREATED_AT);
             $criteria->addSelectColumn(BrandImageTableMap::UPDATED_AT);
@@ -350,6 +357,7 @@ class BrandImageTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.BRAND_ID');
             $criteria->addSelectColumn($alias . '.FILE');
+            $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

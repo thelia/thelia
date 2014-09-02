@@ -10,7 +10,7 @@ Parameters:
 
 {ifloop rel="image"}
     <ul id="js-sort-image" class="row list-unstyled">
-        {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders"}
+        {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders" visible="*"}
             <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
                 <a href="{url path="/admin/image/type/$imageType/$ID/update"}" title="{intl l='Update this image'}" class="thumbnail">
                     <img src="{$IMAGE_URL}" alt="{$TITLE}">
@@ -18,6 +18,9 @@ Parameters:
 
                 <div class="btn-group" >
                     <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+                    <a class="image-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/image/type/$imageType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
+                        <span class="glyphicon glyphicon-eye-open"></span><span class="glyphicon glyphicon-eye-close"></span>
+                    </a>
                     <a class="image-update-btn btn btn-default btn-xs" href="{url path="/admin/image/type/$imageType/$ID/update"}" data-error-message="{intl l='Please retry'}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>

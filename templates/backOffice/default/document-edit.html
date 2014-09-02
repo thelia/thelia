@@ -9,7 +9,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="document" name="document_edit" source="{$documentType}" id="{$documentId}" backend_context="1" lang="$edit_language_id"}
+            {loop type="document" name="document_edit" source="{$documentType}" id="{$documentId}" backend_context="1" lang="$edit_language_id" visible="*"}
                 <ul class="breadcrumb">
                     {foreach $breadcrumb as $label=>$link}
                         <li><a href="{$link}">{$label}</a></li>
@@ -58,6 +58,20 @@
 
                                                 <div class="col-md-6">
                                                     {render_form_field form=$form field="file"}
+
+                                                    {form_field form=$form field='visible'}
+                                                    <div class="form-group {if $error}has-error{/if}">
+                                                        <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
+
+                                                        <div class="checkbox">
+                                                            <label>
+                                                                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VISIBLE != 0}checked="checked"{/if}>
+                                                                {$label}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    {/form_field}
+
                                                     {render_form_field form=$form field="title" value=$TITLE}
                                                     {render_form_field form=$form field="chapo" value=$CHAPO}
                                                     {render_form_field form=$form field="postscriptum" value=$POSTSCRIPTUM}

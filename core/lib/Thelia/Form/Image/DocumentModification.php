@@ -36,18 +36,35 @@ abstract class DocumentModification extends BaseForm
      */
     protected function buildForm()
     {
-        $this->formBuilder->add(
-            'file',
-            'file',
-            [
-                'required' => false,
-                'constraints' => [ ],
-                'label' => Translator::getInstance()->trans('Replace current document by this file'),
-                'label_attr' => [
-                    'for' => 'file'
+        $translator = Translator::getInstance();
+
+        $this->formBuilder
+            ->add(
+                'file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [ ],
+                    'label' => $translator->trans('Replace current document by this file'),
+                    'label_attr' => [
+                        'for' => 'file'
+                    ]
                 ]
-            ]
-        );
+            )
+            // Is this document online ?
+            ->add(
+                'visible',
+                'checkbox',
+                [
+                    'constraints' => [ ],
+                    'required'    => false,
+                    'label'       => $translator->trans('This document is online'),
+                    'label_attr' => [
+                        'for' => 'visible_create'
+                    ]
+                ]
+            );
+        ;
 
         // Add standard description fields
         $this->addStandardDescFields();

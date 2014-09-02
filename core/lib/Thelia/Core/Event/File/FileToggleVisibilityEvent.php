@@ -10,49 +10,44 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Event\File;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Event\ToggleVisibilityEvent;
 
-class ToggleVisibilityEvent  extends ActionEvent
+/**
+ * Class FileToggleVisibilityEvent
+ * @package Thelia\Core\Event\File
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+class FileToggleVisibilityEvent extends ToggleVisibilityEvent
 {
-    protected $object_id;
+    protected $query;
 
-    protected $object;
-
-    public function __construct($object_id)
+    /**
+     * @param ModelCriteria $query
+     * @param               $object_id
+     */
+    public function __construct(ModelCriteria $query, $object_id)
     {
-        $this->object_id = $object_id;
-    }
+        parent::__construct($object_id);
 
-    public function getObjectId()
-    {
-        return $this->object_id;
-    }
-
-    public function setObjectId($object_id)
-    {
-        $this->object_id = $object_id;
-
-        return $this;
+        $this->setQuery($query);
     }
 
     /**
-     * @param mixed $object
-     *
-     * @return $this
+     * @param ModelCriteria $query
      */
-    public function setObject($object)
+    public function setQuery(ModelCriteria $query)
     {
-        $this->object = $object;
-
-        return $this;
+        $this->query = $query;
     }
 
     /**
-     * @return mixed
+     * @return ModelCriteria|null
      */
-    public function getObject()
+    public function getQuery()
     {
-        return $this->object;
+        return $this->query;
     }
 
 }

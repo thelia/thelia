@@ -25,6 +25,7 @@ use Thelia\Model\Map\ProductDocumentTableMap;
  * @method     ChildProductDocumentQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductDocumentQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildProductDocumentQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildProductDocumentQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildProductDocumentQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductDocumentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductDocumentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ProductDocumentTableMap;
  * @method     ChildProductDocumentQuery groupById() Group by the id column
  * @method     ChildProductDocumentQuery groupByProductId() Group by the product_id column
  * @method     ChildProductDocumentQuery groupByFile() Group by the file column
+ * @method     ChildProductDocumentQuery groupByVisible() Group by the visible column
  * @method     ChildProductDocumentQuery groupByPosition() Group by the position column
  * @method     ChildProductDocumentQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductDocumentQuery groupByUpdatedAt() Group by the updated_at column
@@ -58,6 +60,7 @@ use Thelia\Model\Map\ProductDocumentTableMap;
  * @method     ChildProductDocument findOneById(int $id) Return the first ChildProductDocument filtered by the id column
  * @method     ChildProductDocument findOneByProductId(int $product_id) Return the first ChildProductDocument filtered by the product_id column
  * @method     ChildProductDocument findOneByFile(string $file) Return the first ChildProductDocument filtered by the file column
+ * @method     ChildProductDocument findOneByVisible(int $visible) Return the first ChildProductDocument filtered by the visible column
  * @method     ChildProductDocument findOneByPosition(int $position) Return the first ChildProductDocument filtered by the position column
  * @method     ChildProductDocument findOneByCreatedAt(string $created_at) Return the first ChildProductDocument filtered by the created_at column
  * @method     ChildProductDocument findOneByUpdatedAt(string $updated_at) Return the first ChildProductDocument filtered by the updated_at column
@@ -65,6 +68,7 @@ use Thelia\Model\Map\ProductDocumentTableMap;
  * @method     array findById(int $id) Return ChildProductDocument objects filtered by the id column
  * @method     array findByProductId(int $product_id) Return ChildProductDocument objects filtered by the product_id column
  * @method     array findByFile(string $file) Return ChildProductDocument objects filtered by the file column
+ * @method     array findByVisible(int $visible) Return ChildProductDocument objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildProductDocument objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductDocument objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductDocument objects filtered by the updated_at column
@@ -156,7 +160,7 @@ abstract class ProductDocumentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `product_document` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FILE`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `product_document` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -356,6 +360,47 @@ abstract class ProductDocumentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductDocumentTableMap::FILE, $file, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductDocumentQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(ProductDocumentTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(ProductDocumentTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ProductDocumentTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

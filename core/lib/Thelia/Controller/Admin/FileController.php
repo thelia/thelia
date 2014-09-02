@@ -16,6 +16,7 @@ use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
@@ -411,6 +412,10 @@ class FileController extends BaseAdminController
 
             $event = new FileCreateOrUpdateEvent(null);
 
+            if (array_key_exists('visible', $data)) {
+                $file->setVisible($data['visible'] ? 1 : 0);
+            }
+
             $file->setLocale($data['locale']);
 
             if (array_key_exists('title', $data)) {
@@ -700,4 +705,60 @@ class FileController extends BaseAdminController
 
         return $this->updateFilePositionAction($parentType, $documentId, 'document', TheliaEvents::DOCUMENT_UPDATE_POSITION);
     }
+
+    public function toggleVisibilityFileAction($documentId, $parentType, $objectType, $eventName)
+    {
+        $message = null;
+
+        //$position = $this->getRequest()->request->get('position');
+
+        $this->checkAuth(AdminResources::retrieve($parentType), array(), AccessManager::UPDATE);
+        $this->checkXmlHttpRequest();
+
+        $fileManager = $this->getFileManager();
+        $modelInstance = $fileManager->getModelInstance($objectType, $parentType);
+
+        $model = $modelInstance->getQueryInstance()->findPk($documentId);
+
+        if ($model === null) {
+            return $this->pageNotFound();
+        }
+
+        // Feed event
+        $event = new FileToggleVisibilityEvent(
+            $modelInstance->getQueryInstance(),
+            $documentId
+        );
+
+        // Dispatch Event to the Action
+        try {
+            $this->dispatch($eventName, $event);
+        } catch (\Exception $e) {
+
+            $message = $this->getTranslator()->trans(
+                'Fail to update %type% visibility: %err%',
+                [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
+            );
+        }
+
+        if (null === $message) {
+            $message = $this->getTranslator()->trans(
+                '%type% visibility updated',
+                [ '%type%' => ucfirst($objectType) ]
+            );
+        }
+
+        return new Response($message);
+    }
+
+    public function toggleVisibilityDocumentAction($parentType, $documentId)
+    {
+        return $this->toggleVisibilityFileAction($documentId, $parentType, 'document', TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY);
+    }
+
+    public function toggleVisibilityImageAction($parentType, $documentId)
+    {
+        return $this->toggleVisibilityFileAction($documentId, $parentType, 'image', TheliaEvents::IMAGE_TOGGLE_VISIBILITY);
+    }
+
 }
