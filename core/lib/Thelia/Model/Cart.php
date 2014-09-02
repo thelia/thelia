@@ -140,6 +140,17 @@ class Cart extends BaseCart
         return $total;
     }
 
+    
+    /**
+     * Return the VAT of all items
+     * @return float|int
+     */
+    public function getTotalVAT($taxCountry)
+    {
+        return ($this->getTaxedAmount($taxCountry) - $this->getTotalAmount());
+    }
+
+    
     /**
      * Retrieve the total weight for all products in cart
      *

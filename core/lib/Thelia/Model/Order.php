@@ -165,6 +165,26 @@ class Order extends BaseOrder
         return $total;
     }
 
+    
+    /**
+     * Return the postage without tax
+     * @return float|int
+     */    
+    public function getUntaxedPostage() {
+        // get default tax rule
+        $taxRuleQuery = new TaxRuleQuery();
+        $taxRule = $taxRuleQuery->findOneByIsDefault(true);
+        // get default country
+        $countryQuery = new CountryQuery();
+        $country = $countryQuery->findOneByByDefault(true);
+        // get calculator for this tax / country
+        $calculator = new \Thelia\TaxEngine\Calculator();
+        $calculator->loadTaxRuleWithoutProduct($taxRule,$country);        
+        // return untaxed price
+        return round($calculator->getUntaxedPrice($this->getPostage()),2);        
+    }
+
+    
     /**
      * Set the status of the current order to NOT PAID
      */
