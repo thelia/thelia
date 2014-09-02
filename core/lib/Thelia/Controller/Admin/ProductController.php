@@ -1576,12 +1576,15 @@ class ProductController extends AbstractSeoCrudController
 
             case null:
             default:
-                $modalTitle = $this->getTranslator()->trans("");
+                $modalTitle = $this->getTranslator()->trans("Unsupported type");
                 $data = [];
         }
 
         if (empty($data) && null === $errorMessage) {
-            $errorMessage = $this->getTranslator()->trans("There are no files to associate");
+            $errorMessage = $this->getTranslator()->trans("There are no files to associate.");
+            if ($type === "virtual"){
+                $errorMessage .= $this->getTranslator()->trans(" note: only non-visible documents can be associated.");
+            }
         }
 
         $this->getParserContext()
@@ -1646,8 +1649,10 @@ class ProductController extends AbstractSeoCrudController
          * Compute documents with the associated loop
          */
         $documentLoop = new Document($this->container);
+        // select only not visible documents
         $documentLoop->initializeArgs([
             "product" => $pse->getProductId(),
+            "visible" => 0
         ]);
 
         $documents = $documentLoop
