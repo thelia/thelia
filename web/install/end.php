@@ -75,8 +75,25 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
         </p>
 
         <p class="lead text-center">
-            <a href="<?php echo $request->getSchemeAndHttpHost().$website_url; ?>/admin"><?php echo $trans->trans('Go to back office'); ?></a>
+            <a href="<?php echo $website_url; ?>/index.php/admin" id="admin_url"><?php echo $trans->trans('Go to back office'); ?></a>
         </p>
 
     </div>
-<?php include "footer.php"; ?>
+
+<?php
+$scriptHook = <<<SCRIPT
+<script>
+    $(document).ready(function() {
+        var current_site_url = "{$website_url}";
+        var admin_link = $("#admin_url");
+
+        $.ajax(current_site_url + "/empty")
+         .success(function() {
+            admin_link.attr("href", current_site_url + "/admin");
+         })
+    });
+</script>
+SCRIPT;
+
+include "footer.php";
+?>

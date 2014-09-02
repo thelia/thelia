@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Front;
 
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model\ConfigQuery;
 
 use Thelia\Tools\URL;
@@ -61,5 +62,10 @@ class DefaultController extends BaseFrontController
                 }
             }
         }
+    }
+
+    public function emptyRoute()
+    {
+        return new Response(null, 204);
     }
 }
