@@ -36,6 +36,8 @@ abstract class DocumentModification extends BaseForm
      */
     protected function buildForm()
     {
+        $translator = Translator::getInstance();
+
         $this->formBuilder
             ->add(
                 'file',
@@ -43,7 +45,7 @@ abstract class DocumentModification extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [ ],
-                    'label' => Translator::getInstance()->trans('Replace current document by this file'),
+                    'label' => $translator->trans('Replace current document by this file'),
                     'label_attr' => [
                         'for' => 'file'
                     ]
@@ -56,7 +58,7 @@ abstract class DocumentModification extends BaseForm
                 [
                     'constraints' => [ ],
                     'required'    => false,
-                    'label'       => Translator::getInstance()->trans('This document is online'),
+                    'label'       => $translator->trans('This document is online'),
                     'label_attr' => [
                         'for' => 'visible_create'
                     ]

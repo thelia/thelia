@@ -37,6 +37,8 @@ abstract class ImageModification extends BaseForm
      */
     protected function buildForm()
     {
+        $translator = Translator::getInstance();
+
         $this->formBuilder
             ->add(
                 'file',
@@ -51,20 +53,20 @@ abstract class ImageModification extends BaseForm
                             ]
                         )
                     ],
-                    'label' => Translator::getInstance()->trans('Replace current image by this file'),
+                    'label' => $translator->trans('Replace current image by this file'),
                     'label_attr' => [
                         'for' => 'file'
                     ]
                 ]
             )
-            // Is this document online ?
+            // Is this image online ?
             ->add(
                 'visible',
                 'checkbox',
                 [
                     'constraints' => [ ],
                     'required'    => false,
-                    'label'       => Translator::getInstance()->trans('This image is online'),
+                    'label'       => $translator->trans('This image is online'),
                     'label_attr' => [
                         'for' => 'visible_create'
                     ]
