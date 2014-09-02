@@ -101,7 +101,7 @@
                                                         <td>
                                                             {ifloop rel="my_product_loop"}
                                                                 {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
-                                                                    <a href="{url path='/admin/products/update' product_id=$ID}">{$TITLE}</a>
+                                                                    <a href="{url path='/admin/products/update' product_id=$ID}">{$REF} - {$TITLE}</a>
                                                                 {/loop}
                                                             {/ifloop}
                                                             {elseloop rel="my_product_loop"}
