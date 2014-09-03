@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\Sale as BaseSale;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 

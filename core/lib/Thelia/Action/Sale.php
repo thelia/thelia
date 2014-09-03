@@ -50,15 +50,15 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update PSE for a given product
      *
-     * @param array $pseList an array of priduct sale elements
-     * @param bool $promoStatus true if the PSEs are on sale, false otherwise
-     * @param int $offsetType the offset type, see SaleModel::OFFSET_* constants
-     * @param Calculator $taxCalculator the tax calculator
-     * @param array $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
+     * @param array               $pseList              an array of priduct sale elements
+     * @param bool                $promoStatus          true if the PSEs are on sale, false otherwise
+     * @param int                 $offsetType           the offset type, see SaleModel::OFFSET_* constants
+     * @param Calculator          $taxCalculator        the tax calculator
+     * @param array               $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
      * @param ConnectionInterface $con
      */
-    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con) {
-
+    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con)
+    {
         /** @var ProductSaleElements $pse */
         foreach ($pseList as $pse) {
 
@@ -110,7 +110,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Update the promo status of the sale's selected products and combinations
      *
-     * @param ProductSaleStatusUpdateEvent $event
+     * @param  ProductSaleStatusUpdateEvent              $event
      * @throws \RuntimeException
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
@@ -142,7 +142,6 @@ class Sale extends BaseAction implements EventSubscriberInterface
                         ->filterByProductId($saleProduct->getProductId())
                         ->update([ 'Promo' => false], $con)
                     ;
-
 
                     $taxCalculator->load(
                         $saleProduct->getProduct($con),
@@ -321,7 +320,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Toggle Sale activity
      *
-     * @param SaleToggleActivityEvent $event
+     * @param  SaleToggleActivityEvent                   $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event)
@@ -358,7 +357,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a sale
      *
-     * @param SaleDeleteEvent $event
+     * @param  SaleDeleteEvent                           $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function delete(SaleDeleteEvent $event)

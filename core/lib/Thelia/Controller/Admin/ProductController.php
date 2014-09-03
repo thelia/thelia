@@ -201,7 +201,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ProductEvent $event
+     * @param  ProductEvent $event
      * @return mixed
      */
     protected function eventContainsObject($event)
@@ -210,10 +210,10 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ProductPrice $productPrice
+     * @param ProductPrice        $productPrice
      * @param ProductSaleElements $saleElement
-     * @param Currency $defaultCurrency
-     * @param Currency $currentCurrency
+     * @param Currency            $defaultCurrency
+     * @param Currency            $currentCurrency
      */
     protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency)
     {
@@ -358,7 +358,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param ProductEvent $event
+     * @param  ProductEvent $event
      * @return null
      */
     protected function getObjectFromEvent($event)
@@ -379,7 +379,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param Product $object
+     * @param  Product $object
      * @return mixed
      */
     protected function getObjectLabel($object)
@@ -388,7 +388,7 @@ class ProductController extends AbstractSeoCrudController
     }
 
     /**
-     * @param Product $object
+     * @param  Product $object
      * @return mixed
      */
     protected function getObjectId($object)
@@ -679,7 +679,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Change product template for a given product.
      *
-     * @param int $productId
+     * @param  int                                              $productId
      * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
     public function setProductTemplateAction($productId)
@@ -1291,8 +1291,8 @@ class ProductController extends AbstractSeoCrudController
      *
      * @param $price
      * @param $price_type
-     * @param Product $product
-     * @param bool $convert
+     * @param  Product $product
+     * @param  bool    $convert
      * @return string
      */
     protected function computePrice($price, $price_type, Product $product, $convert = false)

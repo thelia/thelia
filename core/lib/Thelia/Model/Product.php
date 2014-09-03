@@ -145,11 +145,11 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Create a new product, along with the default category ID
      *
-     * @param int $defaultCategoryId the default category ID of this product
-     * @param float $basePrice the product base price
-     * @param int $priceCurrencyId the price currency Id
-     * @param int $taxRuleId the product tax rule ID
-     * @param float $baseWeight base weight in Kg
+     * @param  int        $defaultCategoryId the default category ID of this product
+     * @param  float      $basePrice         the product base price
+     * @param  int        $priceCurrencyId   the price currency Id
+     * @param  int        $taxRuleId         the product tax rule ID
+     * @param  float      $baseWeight        base weight in Kg
      * @throws \Exception
      */
 

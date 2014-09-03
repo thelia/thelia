@@ -24,10 +24,6 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Sale\SaleCreationForm;
 use Thelia\Form\Sale\SaleModificationForm;
-use Thelia\Model\AttributeCombination;
-use Thelia\Model\AttributeCombinationQuery;
-use Thelia\Model\ProductSaleElements;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Sale;
 use Thelia\Model\SaleProduct;
 use Thelia\Model\SaleQuery;
@@ -98,7 +94,7 @@ class SaleController extends AbstractCrudController
 
         $product_attributes = [];
 
-        foreach($saleProductsAttributesAvs as $productId => $saleProductsAttributesAv) {
+        foreach ($saleProductsAttributesAvs as $productId => $saleProductsAttributesAv) {
             $product_attributes[$productId] = implode(',', $saleProductsAttributesAv);
         }
 

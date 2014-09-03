@@ -98,7 +98,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Update an existing product sale element
      *
-     * @param ProductSaleElementUpdateEvent $event
+     * @param  ProductSaleElementUpdateEvent $event
      * @throws \Exception
      */
     public function update(ProductSaleElementUpdateEvent $event)
@@ -192,7 +192,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Delete a product sale element
      *
-     * @param ProductSaleElementDeleteEvent $event
+     * @param  ProductSaleElementDeleteEvent $event
      * @throws \Exception
      */
     public function delete(ProductSaleElementDeleteEvent $event)
@@ -242,7 +242,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Generate combinations. All existing combinations for the product are deleted.
      *
-     * @param ProductCombinationGenerationEvent $event
+     * @param  ProductCombinationGenerationEvent $event
      * @throws \Exception
      */
     public function generateCombinations(ProductCombinationGenerationEvent $event)
