@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding='UTF-8'?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema
+        xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://thelia.net/schema/dic/module"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        >
+
     <xs:element name="module">
         <xs:complexType>
             <xs:sequence>
@@ -81,7 +88,7 @@
                 </xs:element>
                 <xs:element name="required" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Les plugins qui doivent déjà être présents</xs:documentation>
+                        <xs:documentation>Plugins that should be presents</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
@@ -97,7 +104,7 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="thelia">
+                <xs:element name="thelia" minOccurs="0">
                     <xs:annotation>
                         <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
                     </xs:annotation>
