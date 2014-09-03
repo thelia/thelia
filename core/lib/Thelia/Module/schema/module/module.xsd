@@ -8,9 +8,9 @@
                         <xs:documentation>The full namespace for the main class module (for example MyModule\MyModule)</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="descriptive" maxOccurs="unbounded">
+                <xs:element name="descriptive" minOccurs="1" maxOccurs="unbounded">
                     <xs:annotation>
-                        <xs:documentation>complete description, each description must be identify by ISO CODE 639</xs:documentation>
+                        <xs:documentation>Complete description, each description must be identify by ISO CODE 639</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
@@ -20,6 +20,27 @@
                             <xs:element type="xs:string" name="postscriptum" minOccurs="0" maxOccurs="1"/>
                         </xs:sequence>
                         <xs:attribute type="xs:string" name="locale"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="logo">
+                    <xs:annotation>
+                        <xs:documentation>The path to the logo of the module (for example myModule.png). The recommended size is 128x128.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element name="languages" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Module languages supported : fr_FR, en_US, ...</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="language" minOccurs="1" maxOccurs="unbounded">
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:pattern value="[a-z]{2}_[A-Z]{2}"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element type="xs:string" name="version">
@@ -42,13 +63,19 @@
                 </xs:element>
                 <xs:element name="type">
                     <xs:annotation>
-                        <xs:documentation>module type : classic, delivery, payment</xs:documentation>
+                        <xs:documentation>module type : classic, delivery, payment, ...</xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:enumeration value="classic"/>
                             <xs:enumeration value="delivery"/>
                             <xs:enumeration value="payment"/>
+                            <xs:enumeration value="marketplace"/>
+                            <xs:enumeration value="price"/>
+                            <xs:enumeration value="accounting"/>
+                            <xs:enumeration value="seo"/>
+                            <xs:enumeration value="administration"/>
+                            <xs:enumeration value="statistic"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
@@ -76,7 +103,27 @@
                     </xs:annotation>
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:pattern value="[0-9.]+"/>
+                            <xs:pattern value="[0-9\.]+"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="min">
+                    <xs:annotation>
+                        <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9\.]+"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+                <xs:element name="max">
+                    <xs:annotation>
+                        <xs:documentation>maximum supported version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:pattern value="[0-9\.]+"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
@@ -96,12 +143,17 @@
                 </xs:element>
                 <xs:element type="xs:string" name="documentation" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Le nom du fichier contenant la documentation. Ce fichier doit se trouver dans le répertoire du plugin.</xs:documentation>
+                        <xs:documentation>The name of the directory containing te documentation.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
                 <xs:element type="xs:anyURI" name="urlmiseajour" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>L'URL a interroger pour vérifier la présence d'une nouvelle version, appellé avec le nom du plugin et sa version</xs:documentation>
+                        <xs:documentation>URL to test if a new version of the module exists. Will be called with two get parameters : module name, current version</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element type="xs:anyURI" name="updateurl" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>URL to test if a new version of the module exists. Will be called with two get parameters : module name, current version</xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
