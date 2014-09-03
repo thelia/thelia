@@ -5,15 +5,17 @@
 - Added the `show_label` parameter to the `render_form_field Smarty` function.
 - Added the `exclude` parameter to `form_hidden_field` function.
 - Added the `product` parameter to the `attribute_availability` loop.
+- Added the `sale` parameter to the `product` loop.
 - Added visible argument to image/document classes
+- Added `new`, `promo` and `default` parameters to `product_sale_elements` loop
 
 ##DEPRECATED
-Redirect methods are deprecated. You have now two way for redirecting a user :
+Redirect methods are deprecated. You have now two ways for generating a redirect response :
 - Throwing a Thelia\Core\HttpKernel\Exception\RedirectException with a given URL
 - If you are in a controller, returning an instance of \Symfony\Component\HttpFoundation\RedirectResponse
-- Never ever send a response. Only the HttpKernel class is allow to do that.
+- Never ever send a response. Only the HttpKernel class is allowed to do that.
 
-### methods deprecated :
+### Deprecated methods :
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
