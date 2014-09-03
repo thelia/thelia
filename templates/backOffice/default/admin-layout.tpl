@@ -85,7 +85,7 @@
                                     <button class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu pull-right">
                                         <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
                                         <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
                                     </ul>
@@ -268,9 +268,10 @@
                             {ifhook rel="main.top-menu-tools"}
                             {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                                    <a href="{url path='/admin/tools'}" data-target="{url path='/admin/tools'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"}</a>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"}</a>
 
                                     <ul class="dropdown-menu" role="menu">
+                                        <li role="menuitem"><a href="{url path='/admin/tools'}">{intl l="All tools"}</a></li>
                                         {forhook rel="main.top-menu-tools"}
                                             <li role="menuitem">
                                                 <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">

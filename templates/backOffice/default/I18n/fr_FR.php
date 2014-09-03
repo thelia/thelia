@@ -63,6 +63,7 @@ return array(
     'All' => 'Tous',
     'All countries are assigned to a shipping zone.' => 'Tous les pays sont assignés à une zone de livraison.',
     'All orders' => 'Toutes les commandes',
+    'All tools' => 'Tous les outils',
     'Alpha code 2' => 'Code alpha 2',
     'Alpha code 3' => 'Code alpha 3',
     'Amount' => 'Montant',
