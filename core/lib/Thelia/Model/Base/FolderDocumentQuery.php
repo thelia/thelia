@@ -25,6 +25,7 @@ use Thelia\Model\Map\FolderDocumentTableMap;
  * @method     ChildFolderDocumentQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildFolderDocumentQuery orderByFolderId($order = Criteria::ASC) Order by the folder_id column
  * @method     ChildFolderDocumentQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildFolderDocumentQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildFolderDocumentQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFolderDocumentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildFolderDocumentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\FolderDocumentTableMap;
  * @method     ChildFolderDocumentQuery groupById() Group by the id column
  * @method     ChildFolderDocumentQuery groupByFolderId() Group by the folder_id column
  * @method     ChildFolderDocumentQuery groupByFile() Group by the file column
+ * @method     ChildFolderDocumentQuery groupByVisible() Group by the visible column
  * @method     ChildFolderDocumentQuery groupByPosition() Group by the position column
  * @method     ChildFolderDocumentQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildFolderDocumentQuery groupByUpdatedAt() Group by the updated_at column
@@ -54,6 +56,7 @@ use Thelia\Model\Map\FolderDocumentTableMap;
  * @method     ChildFolderDocument findOneById(int $id) Return the first ChildFolderDocument filtered by the id column
  * @method     ChildFolderDocument findOneByFolderId(int $folder_id) Return the first ChildFolderDocument filtered by the folder_id column
  * @method     ChildFolderDocument findOneByFile(string $file) Return the first ChildFolderDocument filtered by the file column
+ * @method     ChildFolderDocument findOneByVisible(int $visible) Return the first ChildFolderDocument filtered by the visible column
  * @method     ChildFolderDocument findOneByPosition(int $position) Return the first ChildFolderDocument filtered by the position column
  * @method     ChildFolderDocument findOneByCreatedAt(string $created_at) Return the first ChildFolderDocument filtered by the created_at column
  * @method     ChildFolderDocument findOneByUpdatedAt(string $updated_at) Return the first ChildFolderDocument filtered by the updated_at column
@@ -61,6 +64,7 @@ use Thelia\Model\Map\FolderDocumentTableMap;
  * @method     array findById(int $id) Return ChildFolderDocument objects filtered by the id column
  * @method     array findByFolderId(int $folder_id) Return ChildFolderDocument objects filtered by the folder_id column
  * @method     array findByFile(string $file) Return ChildFolderDocument objects filtered by the file column
+ * @method     array findByVisible(int $visible) Return ChildFolderDocument objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildFolderDocument objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFolderDocument objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildFolderDocument objects filtered by the updated_at column
@@ -152,7 +156,7 @@ abstract class FolderDocumentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `FOLDER_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `folder_document` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `FOLDER_ID`, `FILE`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `folder_document` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -352,6 +356,47 @@ abstract class FolderDocumentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FolderDocumentTableMap::FILE, $file, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderDocumentQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(FolderDocumentTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(FolderDocumentTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FolderDocumentTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

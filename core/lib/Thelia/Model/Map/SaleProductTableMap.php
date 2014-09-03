@@ -58,7 +58,7 @@ class SaleProductTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 3;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,12 @@ class SaleProductTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 3;
+    const NUM_HYDRATE_COLUMNS = 4;
+
+    /**
+     * the column name for the ID field
+     */
+    const ID = 'sale_product.ID';
 
     /**
      * the column name for the SALE_ID field
@@ -97,12 +102,12 @@ class SaleProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('SaleId', 'ProductId', 'AttributeAvId', ),
-        self::TYPE_STUDLYPHPNAME => array('saleId', 'productId', 'attributeAvId', ),
-        self::TYPE_COLNAME       => array(SaleProductTableMap::SALE_ID, SaleProductTableMap::PRODUCT_ID, SaleProductTableMap::ATTRIBUTE_AV_ID, ),
-        self::TYPE_RAW_COLNAME   => array('SALE_ID', 'PRODUCT_ID', 'ATTRIBUTE_AV_ID', ),
-        self::TYPE_FIELDNAME     => array('sale_id', 'product_id', 'attribute_av_id', ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id', 'SaleId', 'ProductId', 'AttributeAvId', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'saleId', 'productId', 'attributeAvId', ),
+        self::TYPE_COLNAME       => array(SaleProductTableMap::ID, SaleProductTableMap::SALE_ID, SaleProductTableMap::PRODUCT_ID, SaleProductTableMap::ATTRIBUTE_AV_ID, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'SALE_ID', 'PRODUCT_ID', 'ATTRIBUTE_AV_ID', ),
+        self::TYPE_FIELDNAME     => array('id', 'sale_id', 'product_id', 'attribute_av_id', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -112,12 +117,12 @@ class SaleProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('SaleId' => 0, 'ProductId' => 1, 'AttributeAvId' => 2, ),
-        self::TYPE_STUDLYPHPNAME => array('saleId' => 0, 'productId' => 1, 'attributeAvId' => 2, ),
-        self::TYPE_COLNAME       => array(SaleProductTableMap::SALE_ID => 0, SaleProductTableMap::PRODUCT_ID => 1, SaleProductTableMap::ATTRIBUTE_AV_ID => 2, ),
-        self::TYPE_RAW_COLNAME   => array('SALE_ID' => 0, 'PRODUCT_ID' => 1, 'ATTRIBUTE_AV_ID' => 2, ),
-        self::TYPE_FIELDNAME     => array('sale_id' => 0, 'product_id' => 1, 'attribute_av_id' => 2, ),
-        self::TYPE_NUM           => array(0, 1, 2, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'SaleId' => 1, 'ProductId' => 2, 'AttributeAvId' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'saleId' => 1, 'productId' => 2, 'attributeAvId' => 3, ),
+        self::TYPE_COLNAME       => array(SaleProductTableMap::ID => 0, SaleProductTableMap::SALE_ID => 1, SaleProductTableMap::PRODUCT_ID => 2, SaleProductTableMap::ATTRIBUTE_AV_ID => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'SALE_ID' => 1, 'PRODUCT_ID' => 2, 'ATTRIBUTE_AV_ID' => 3, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'sale_id' => 1, 'product_id' => 2, 'attribute_av_id' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -134,10 +139,11 @@ class SaleProductTableMap extends TableMap
         $this->setPhpName('SaleProduct');
         $this->setClassName('\\Thelia\\Model\\SaleProduct');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('SALE_ID', 'SaleId', 'INTEGER' , 'sale', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER' , 'product', 'ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('SALE_ID', 'SaleId', 'INTEGER', 'sale', 'ID', true, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addForeignKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER', 'attribute_av', 'ID', false, null, null);
     } // initialize()
 
@@ -150,59 +156,6 @@ class SaleProductTableMap extends TableMap
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('AttributeAv', '\\Thelia\\Model\\AttributeAv', RelationMap::MANY_TO_ONE, array('attribute_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
-
-    /**
-     * Adds an object to the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database. In some cases you may need to explicitly add objects
-     * to the cache in order to ensure that the same objects are always returned by find*()
-     * and findPk*() calls.
-     *
-     * @param \Thelia\Model\SaleProduct $obj A \Thelia\Model\SaleProduct object.
-     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
-     */
-    public static function addInstanceToPool($obj, $key = null)
-    {
-        if (Propel::isInstancePoolingEnabled()) {
-            if (null === $key) {
-                $key = serialize(array((string) $obj->getSaleId(), (string) $obj->getProductId()));
-            } // if key === null
-            self::$instances[$key] = $obj;
-        }
-    }
-
-    /**
-     * Removes an object from the instance pool.
-     *
-     * Propel keeps cached copies of objects in an instance pool when they are retrieved
-     * from the database.  In some cases -- especially when you override doDelete
-     * methods in your stub classes -- you may need to explicitly remove objects
-     * from the cache in order to prevent returning objects that no longer exist.
-     *
-     * @param mixed $value A \Thelia\Model\SaleProduct object or a primary key value.
-     */
-    public static function removeInstanceFromPool($value)
-    {
-        if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Thelia\Model\SaleProduct) {
-                $key = serialize(array((string) $value->getSaleId(), (string) $value->getProductId()));
-
-            } elseif (is_array($value) && count($value) === 2) {
-                // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1]));
-            } elseif ($value instanceof Criteria) {
-                self::$instances = [];
-
-                return;
-            } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\SaleProduct object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
-                throw $e;
-            }
-
-            unset(self::$instances[$key]);
-        }
-    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -218,11 +171,11 @@ class SaleProductTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
     }
 
     /**
@@ -240,7 +193,11 @@ class SaleProductTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return $pks;
+            return (int) $row[
+                            $indexType == TableMap::TYPE_NUM
+                            ? 0 + $offset
+                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                        ];
     }
 
     /**
@@ -338,10 +295,12 @@ class SaleProductTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
+            $criteria->addSelectColumn(SaleProductTableMap::ID);
             $criteria->addSelectColumn(SaleProductTableMap::SALE_ID);
             $criteria->addSelectColumn(SaleProductTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(SaleProductTableMap::ATTRIBUTE_AV_ID);
         } else {
+            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.SALE_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_ID');
@@ -396,17 +355,7 @@ class SaleProductTableMap extends TableMap
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(SaleProductTableMap::DATABASE_NAME);
-            // primary key is composite; we therefore, expect
-            // the primary key passed to be an array of pkey values
-            if (count($values) == count($values, COUNT_RECURSIVE)) {
-                // array is not multi-dimensional
-                $values = array($values);
-            }
-            foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(SaleProductTableMap::SALE_ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(SaleProductTableMap::PRODUCT_ID, $value[1]));
-                $criteria->addOr($criterion);
-            }
+            $criteria->add(SaleProductTableMap::ID, (array) $values, Criteria::IN);
         }
 
         $query = SaleProductQuery::create()->mergeWith($criteria);
@@ -450,6 +399,10 @@ class SaleProductTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from SaleProduct object
+        }
+
+        if ($criteria->containsKey(SaleProductTableMap::ID) && $criteria->keyContainsValue(SaleProductTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.SaleProductTableMap::ID.')');
         }
 
 

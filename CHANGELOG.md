@@ -3,6 +3,8 @@
 - - Added `module_id` parameter to Area loop
 - Added "Shipping configuration" button to the delivery module list, with a warning if no shipping zone is assigned to the module.
 - Added the `show_label` parameter to the `render_form_field Smarty` function.
+- Added the `exclude` parameter to `form_hidden_field` function.
+- Added the `product` parameter to the `attribute_availability` loop.
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two way for redirecting a user :

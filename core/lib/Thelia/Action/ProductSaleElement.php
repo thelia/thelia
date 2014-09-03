@@ -38,7 +38,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Create a new product sale element, with or without combination
      *
      * @param  ProductSaleElementCreateEvent $event
-     * @throws Exception
+     * @throws \Exception
      */
     public function create(ProductSaleElementCreateEvent $event)
     {
@@ -99,6 +99,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Update an existing product sale element
      *
      * @param ProductSaleElementUpdateEvent $event
+     * @throws \Exception
      */
     public function update(ProductSaleElementUpdateEvent $event)
     {
@@ -118,6 +119,16 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 $salesElement = new ProductSaleElements();
 
                 $salesElement->setProduct($event->getProduct());
+            }
+
+            // If this PSE is the default one, be sure to have *only one* default for this product
+            if ($event->getIsDefault()) {
+                ProductSaleElementsQuery::create()
+                    ->filterByProduct($event->getProduct())
+                    ->filterByIsDefault(true)
+                    ->filterById($event->getProductSaleElementId(), Criteria::NOT_EQUAL)
+                    ->update(['IsDefault' => false], $con)
+                ;
             }
 
             // Update sale element
@@ -182,6 +193,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Delete a product sale element
      *
      * @param ProductSaleElementDeleteEvent $event
+     * @throws \Exception
      */
     public function delete(ProductSaleElementDeleteEvent $event)
     {
@@ -197,23 +209,27 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 $pse->delete($con);
 
-                if ($product->countSaleElements() <= 0) {
+                if ($product->countSaleElements($con) <= 0) {
                     // If we just deleted the last PSE, create a default one
                     $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
                 } elseif ($pse->getIsDefault()) {
 
                     // If we deleted the default PSE, make the last created one the default
-                    $pse = ProductSaleElementsQuery::create()
+                    $newDefaultPse = ProductSaleElementsQuery::create()
                         ->filterByProductId($product->getId())
+                        ->filterById($pse->getId(), Criteria::NOT_EQUAL)
                         ->orderByCreatedAt(Criteria::DESC)
                         ->findOne($con)
                     ;
 
-                    $pse->setIsDefault(true)->save($con);
+                    if (null !== $newDefaultPse) {
+                        $newDefaultPse->setIsDefault(true)->save($con);
+                    }
                 }
 
                 // Store all the stuff !
                 $con->commit();
+
             } catch (\Exception $ex) {
 
                 $con->rollback();
@@ -227,6 +243,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Generate combinations. All existing combinations for the product are deleted.
      *
      * @param ProductCombinationGenerationEvent $event
+     * @throws \Exception
      */
     public function generateCombinations(ProductCombinationGenerationEvent $event)
     {
@@ -278,8 +295,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
      * Create a combination for a given product sale element
      *
      * @param ConnectionInterface $con                   the Propel connection
-     * @param ProductSaleElement  $salesElement          the product sale element
-     * @param unknown             $combinationAttributes an array oif attributes av IDs
+     * @param ProductSaleElements $salesElement          the product sale element
+     * @param array               $combinationAttributes an array oif attributes av IDs
      */
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
     {

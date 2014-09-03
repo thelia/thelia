@@ -5,6 +5,7 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\Sale\SaleEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\Tlog;
 use Thelia\Model\Base\Sale as BaseSale;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 
@@ -66,7 +67,7 @@ class Sale extends BaseSale
     }
 
     /**
-     * Return the product attributes for each of the selected products.
+     * Return the selected attributes values for each of the selected products.
      *
      * @return array an array of (product ID => array of attribute availability ID)
      */
@@ -74,22 +75,23 @@ class Sale extends BaseSale
     {
         $saleProducts = SaleProductQuery::create()->filterBySaleId($this->getId())->orderByProductId()->find();
 
-        $productSaleElements = [];
+        $selectedAttributes = [];
 
         $currentProduct = false;
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
+
             if ($currentProduct != $saleProduct->getProductId()) {
                 $currentProduct = $saleProduct->getProductId();
 
-                $productSaleElements[$currentProduct] = [];
+                $selectedAttributes[$currentProduct] = [];
             }
 
-            $productSaleElements[$currentProduct][] = $saleProduct->getAttributeAvId();
+            $selectedAttributes[$currentProduct][] = $saleProduct->getAttributeAvId();
         }
 
-        return $saleProducts;
+        return $selectedAttributes;
     }
 
     /**

@@ -25,6 +25,7 @@ use Thelia\Model\Map\ProductImageTableMap;
  * @method     ChildProductImageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductImageQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildProductImageQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildProductImageQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildProductImageQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductImageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductImageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\ProductImageTableMap;
  * @method     ChildProductImageQuery groupById() Group by the id column
  * @method     ChildProductImageQuery groupByProductId() Group by the product_id column
  * @method     ChildProductImageQuery groupByFile() Group by the file column
+ * @method     ChildProductImageQuery groupByVisible() Group by the visible column
  * @method     ChildProductImageQuery groupByPosition() Group by the position column
  * @method     ChildProductImageQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductImageQuery groupByUpdatedAt() Group by the updated_at column
@@ -58,6 +60,7 @@ use Thelia\Model\Map\ProductImageTableMap;
  * @method     ChildProductImage findOneById(int $id) Return the first ChildProductImage filtered by the id column
  * @method     ChildProductImage findOneByProductId(int $product_id) Return the first ChildProductImage filtered by the product_id column
  * @method     ChildProductImage findOneByFile(string $file) Return the first ChildProductImage filtered by the file column
+ * @method     ChildProductImage findOneByVisible(int $visible) Return the first ChildProductImage filtered by the visible column
  * @method     ChildProductImage findOneByPosition(int $position) Return the first ChildProductImage filtered by the position column
  * @method     ChildProductImage findOneByCreatedAt(string $created_at) Return the first ChildProductImage filtered by the created_at column
  * @method     ChildProductImage findOneByUpdatedAt(string $updated_at) Return the first ChildProductImage filtered by the updated_at column
@@ -65,6 +68,7 @@ use Thelia\Model\Map\ProductImageTableMap;
  * @method     array findById(int $id) Return ChildProductImage objects filtered by the id column
  * @method     array findByProductId(int $product_id) Return ChildProductImage objects filtered by the product_id column
  * @method     array findByFile(string $file) Return ChildProductImage objects filtered by the file column
+ * @method     array findByVisible(int $visible) Return ChildProductImage objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildProductImage objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductImage objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductImage objects filtered by the updated_at column
@@ -156,7 +160,7 @@ abstract class ProductImageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `product_image` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FILE`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `product_image` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -356,6 +360,47 @@ abstract class ProductImageQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductImageTableMap::FILE, $file, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductImageQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(ProductImageTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(ProductImageTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ProductImageTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

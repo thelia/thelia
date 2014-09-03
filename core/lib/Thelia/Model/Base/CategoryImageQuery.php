@@ -25,6 +25,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
  * @method     ChildCategoryImageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCategoryImageQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
  * @method     ChildCategoryImageQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildCategoryImageQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCategoryImageQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildCategoryImageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCategoryImageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -32,6 +33,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
  * @method     ChildCategoryImageQuery groupById() Group by the id column
  * @method     ChildCategoryImageQuery groupByCategoryId() Group by the category_id column
  * @method     ChildCategoryImageQuery groupByFile() Group by the file column
+ * @method     ChildCategoryImageQuery groupByVisible() Group by the visible column
  * @method     ChildCategoryImageQuery groupByPosition() Group by the position column
  * @method     ChildCategoryImageQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCategoryImageQuery groupByUpdatedAt() Group by the updated_at column
@@ -54,6 +56,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
  * @method     ChildCategoryImage findOneById(int $id) Return the first ChildCategoryImage filtered by the id column
  * @method     ChildCategoryImage findOneByCategoryId(int $category_id) Return the first ChildCategoryImage filtered by the category_id column
  * @method     ChildCategoryImage findOneByFile(string $file) Return the first ChildCategoryImage filtered by the file column
+ * @method     ChildCategoryImage findOneByVisible(int $visible) Return the first ChildCategoryImage filtered by the visible column
  * @method     ChildCategoryImage findOneByPosition(int $position) Return the first ChildCategoryImage filtered by the position column
  * @method     ChildCategoryImage findOneByCreatedAt(string $created_at) Return the first ChildCategoryImage filtered by the created_at column
  * @method     ChildCategoryImage findOneByUpdatedAt(string $updated_at) Return the first ChildCategoryImage filtered by the updated_at column
@@ -61,6 +64,7 @@ use Thelia\Model\Map\CategoryImageTableMap;
  * @method     array findById(int $id) Return ChildCategoryImage objects filtered by the id column
  * @method     array findByCategoryId(int $category_id) Return ChildCategoryImage objects filtered by the category_id column
  * @method     array findByFile(string $file) Return ChildCategoryImage objects filtered by the file column
+ * @method     array findByVisible(int $visible) Return ChildCategoryImage objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildCategoryImage objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildCategoryImage objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCategoryImage objects filtered by the updated_at column
@@ -152,7 +156,7 @@ abstract class CategoryImageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CATEGORY_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `category_image` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CATEGORY_ID`, `FILE`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `category_image` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -352,6 +356,47 @@ abstract class CategoryImageQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryImageTableMap::FILE, $file, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCategoryImageQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(CategoryImageTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(CategoryImageTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CategoryImageTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

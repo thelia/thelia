@@ -1341,7 +1341,7 @@
         <default key="_controller">Thelia\Controller\Admin\SaleController::resetSaleStatus</default>
     </route>
 
-    <route id="admin.sale.reset" path="/admin/sales/check-activation">
+    <route id="admin.sale.check-activation" path="/admin/sales/check-activation">
         <default key="_controller">Thelia\Controller\Admin\SaleController::checkSalesActivationStatus</default>
     </route>
 

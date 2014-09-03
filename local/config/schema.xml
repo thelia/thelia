@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <database defaultIdMethod="native" name="thelia">
-  <vendor type="mysql">
-    <parameter name="Engine" value="InnoDB"/>
-    <parameter name="Charset" value="utf8"/>
-  </vendor>
+    <vendor type="mysql">
+        <parameter name="Engine" value="InnoDB"/>
+        <parameter name="Charset" value="utf8"/>
+    </vendor>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
@@ -518,6 +519,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -542,6 +544,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -602,7 +605,7 @@
       <reference foreign="id" local="lang_id" />
     </foreign-key>
     <foreign-key foreignTable="cart" name="fk_order_cart_id">
-        <reference foreign="id" local="cart_id" />
+      <reference foreign="id" local="cart_id" />
     </foreign-key>
     <index name="idx_order_currency_id">
       <index-column name="currency_id" />
@@ -1105,6 +1108,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1129,6 +1133,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1153,6 +1158,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="content_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1177,6 +1183,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1197,6 +1204,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="content_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1217,6 +1225,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1313,6 +1322,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="module_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
@@ -1478,6 +1488,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="brand_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column defaultValue="NULL" name="position" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
     <column defaultValue="NULL" name="description" type="CLOB" />
@@ -1498,6 +1509,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="brand_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column defaultValue="NULL" name="title" size="255" type="VARCHAR" />
     <column defaultValue="NULL" name="description" type="CLOB" />
@@ -1567,8 +1579,9 @@
     </index>
   </table>
   <table name="sale_product" namespace="Thelia\Model">
-    <column name="sale_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="sale_id" required="true" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="NULL" name="attribute_av_id" type="INTEGER" />
     <foreign-key foreignTable="sale" name="fk_sale_product_sales_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="sale_id" />
@@ -1579,10 +1592,10 @@
     <foreign-key foreignTable="attribute_av" name="fk_sale_product_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_av_id" />
     </foreign-key>
-    <index name="fk_sale_product_product1_idx">
+    <index name="fk_sale_product_product_idx">
       <index-column name="product_id" />
     </index>
-    <index name="fk_sale_product_attribute_av1_idx">
+    <index name="fk_sale_product_attribute_av_idx">
       <index-column name="attribute_av_id" />
     </index>
     <index name="idx_sale_product_sales_id_product_id">

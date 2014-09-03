@@ -68,9 +68,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Return PSE count fir this product.
      */
-    public function countSaleElements()
+    public function countSaleElements($con = null)
     {
-        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->filterByIsDefault(true)->count();
+        return ProductSaleElementsQuery::create()->filterByProductId($this->id)->count($con);
     }
 
     /**
@@ -145,11 +145,12 @@ class Product extends BaseProduct implements FileModelParentInterface
     /**
      * Create a new product, along with the default category ID
      *
-     * @param int   $defaultCategoryId the default category ID of this product
-     * @param float $basePrice         the product base price
-     * @param int   $priceCurrencyId   the price currency Id
-     * @param int   $taxRuleId         the product tax rule ID
-     * @param float $baseWeight        base weight in Kg
+     * @param int $defaultCategoryId the default category ID of this product
+     * @param float $basePrice the product base price
+     * @param int $priceCurrencyId the price currency Id
+     * @param int $taxRuleId the product tax rule ID
+     * @param float $baseWeight base weight in Kg
+     * @throws \Exception
      */
 
     public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight)
@@ -193,9 +194,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     public function createProductSaleElement(ConnectionInterface $con, $weight, $basePrice, $salePrice, $currencyId, $isDefault, $isPromo = false, $isNew = false, $quantity = 0, $eanCode = '', $ref = false)
     {
         // Create an empty product sale element
-        $sale_elements = new ProductSaleElements();
+        $saleElements = new ProductSaleElements();
 
-        $sale_elements
+        $saleElements
             ->setProduct($this)
             ->setRef($ref == false ? $this->getRef() : $ref)
             ->setPromo($isPromo)
@@ -208,10 +209,10 @@ class Product extends BaseProduct implements FileModelParentInterface
         ;
 
         // Create an empty product price in the provided currency
-        $product_price = new ProductPrice();
+        $productPrice = new ProductPrice();
 
-        $product_price
-            ->setProductSaleElements($sale_elements)
+        $productPrice
+            ->setProductSaleElements($saleElements)
             ->setPromoPrice($salePrice)
             ->setPrice($basePrice)
             ->setCurrencyId($currencyId)
@@ -219,7 +220,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->save($con)
         ;
 
-        return $sale_elements;
+        return $saleElements;
     }
 
     /**

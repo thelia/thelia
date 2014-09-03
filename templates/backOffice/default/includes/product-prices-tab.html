@@ -370,6 +370,18 @@
 	                        {for $idx = 0 to $total_value_count-1}
 	                        <tr>
                                 <td colspan="10">
+
+                                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
+                                        <input type="hidden" name="{$name}" value="{$value}" />
+                                        {$current_pse_id = $value}
+
+                                        {capture assign="combination_label"}
+                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
+                                            {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
+                                            {/loop}
+                                        {/capture}
+                                    {/form_field}
+
                                     <div class="btn-group">
                                         <a class="btn btn-default btn-xs pse-assoc-image pse-assoc-image-document" data-target="#pse-assoc-image-document-modal" data-id="{$value}" title="{intl l="Associate images"}">
                                             <span class="glyphicon glyphicon-picture"></span>
@@ -381,14 +393,7 @@
 
                                     <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
 
-                                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
-                                            <input type="hidden" name="{$name}" value="{$value}" />
-                                        {$current_pse_id = $value}
-
-                                        {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
-                                            {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
-                                        {/loop}
-                                    {/form_field}
+                                    {$combination_label}
                                 </td>
 
                                 <td class="text-right">ID: {$current_pse_id}</td>

@@ -172,6 +172,9 @@ class ProductSaleElementUpdateEvent extends ProductSaleElementEvent
         return $this;
     }
 
+    /**
+     * @return Product
+     */
     public function getProduct()
     {
         return $this->product;

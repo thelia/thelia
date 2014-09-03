@@ -13,6 +13,7 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -47,10 +48,72 @@ class Sale extends BaseAction implements EventSubscriberInterface
 {
 
     /**
+     * Update PSE for a given product
+     *
+     * @param array $pseList an array of priduct sale elements
+     * @param bool $promoStatus true if the PSEs are on sale, false otherwise
+     * @param int $offsetType the offset type, see SaleModel::OFFSET_* constants
+     * @param Calculator $taxCalculator the tax calculator
+     * @param array $saleOffsetByCurrency an array of price offset for each currency (currency ID => offset_amount)
+     * @param ConnectionInterface $con
+     */
+    protected function updateProductSaleElementsPrices($pseList, $promoStatus, $offsetType, Calculator $taxCalculator, $saleOffsetByCurrency, ConnectionInterface $con) {
+
+        /** @var ProductSaleElements $pse */
+        foreach ($pseList as $pse) {
+
+            if ($pse->getPromo()!= $promoStatus) {
+                $pse
+                    ->setPromo($promoStatus)
+                    ->save($con)
+                ;
+            }
+
+            /** @var SaleOffsetCurrency $offsetByCurrency */
+            foreach ($saleOffsetByCurrency as $currencyId => $offset) {
+
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByProductSaleElementsId($pse->getId())
+                    ->filterByCurrencyId($currencyId)
+                    ->findOne($con);
+
+                if (null !== $productPrice) {
+
+                    // Get the taxed price
+                    $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
+
+                    // Remove the price offset to get the taxed promo price
+                    switch ($offsetType) {
+                        case SaleModel::OFFSET_TYPE_AMOUNT :
+                            $promoPrice = max(0, $priceWithTax - $offset);
+                            break;
+
+                        case SaleModel::OFFSET_TYPE_PERCENTAGE :
+                            $promoPrice = $priceWithTax * (1 - $offset / 100);
+                            break;
+
+                        default:
+                            $promoPrice = $priceWithTax;
+                    }
+
+                    // and then get the untaxed promo price.
+                    $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);
+
+                    $productPrice
+                        ->setPromoPrice($promoPrice)
+                        ->save($con)
+                    ;
+                }
+            }
+        }
+    }
+    /**
      * Update the promo status of the sale's selected products and combinations
      *
-     * @param  ProductSaleStatusUpdateEvent $event
+     * @param ProductSaleStatusUpdateEvent $event
      * @throws \RuntimeException
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function updateProductsSaleStatus(ProductSaleStatusUpdateEvent $event)
     {
@@ -59,7 +122,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
         $sale = $event->getSale();
 
         // Get all selected product sale elements for this sale
-        if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)) {
+        if (null !== $saleProducts = SaleProductQuery::create()->filterBySale($sale)->orderByProductId()) {
 
             $saleOffsetByCurrency = $sale->getPriceOffsets();
 
@@ -74,65 +137,53 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 /** @var SaleProduct $saleProduct */
                 foreach ($saleProducts as $saleProduct) {
 
+                    // Reset all sale status on product's PSE
+                    ProductSaleElementsQuery::create()
+                        ->filterByProductId($saleProduct->getProductId())
+                        ->update([ 'Promo' => false], $con)
+                    ;
+
+
                     $taxCalculator->load(
                         $saleProduct->getProduct($con),
                         CountryModel::getShopLocation()
                     );
 
+                    $attributeAvId = $saleProduct->getAttributeAvId();
+
+                    $pseRequest = ProductSaleElementsQuery::create()
+                        ->filterByProductId($saleProduct->getProductId())
+                    ;
+
                     // If no attribute AV id is defined, consider ALL product combinations
-                    if (is_null($saleProduct->getAttributeAvId())) {
-                        ProductSaleElementsQuery::create()
-                            ->filterByProductId($saleProduct->getProductId())
-                            ->update([ 'Promo' => $sale->getActive()], $con)
+                    if (! is_null($attributeAvId)) {
+
+                        // Find PSE attached to combination containing this attribute av :
+                        // SELECT * from product_sale_elements pse
+                        // left join attribute_combination ac on ac.product_sale_elements_id = pse.id
+                        // where pse.product_id=363
+                        // and ac.attribute_av_id = 7
+                        // group by pse.id
+
+                        $pseRequest
+                            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                                ->filterByAttributeAvId($attributeAvId)
+                            ->endUse()
                         ;
+                    }
 
-                        $pseList = ProductSaleElementsQuery::create()
-                            ->filterByProductId($saleProduct->getProductId());
+                    $pseList = $pseRequest->find();
 
-                        /** @var ProductSaleElements $pse */
-                        foreach ($pseList as $pse) {
+                    if (null !== $pseList) {
 
-                            /** @var SaleOffsetCurrency $offsetByCurrency */
-                            foreach ($saleOffsetByCurrency as $currencyId => $offset) {
-
-                                $productPrice = ProductPriceQuery::create()
-                                    ->filterByProductSaleElementsId($pse->getId())
-                                    ->filterByCurrencyId($currencyId)
-                                    ->findOne($con);
-
-                                if (null !== $productPrice) {
-
-                                    // Get the taxed price
-                                    $priceWithTax = $taxCalculator->getTaxedPrice($productPrice->getPrice());
-
-                                    // Remove the price offset to get the taxed promo price
-                                    switch ($offsetType) {
-                                        case SaleModel::OFFSET_TYPE_AMOUNT :
-                                            $promoPrice = max(0, $priceWithTax - $offset);
-                                            break;
-
-                                        case SaleModel::OFFSET_TYPE_PERCENTAGE :
-                                            $promoPrice = $priceWithTax * (1 - $offset / 100);
-                                            break;
-
-                                        default:
-                                            $promoPrice = $priceWithTax;
-                                    }
-
-                                    // and then get the untaxed promo price.
-                                    $promoPrice = $taxCalculator->getUntaxedPrice($promoPrice);
-
-                                    $productPrice
-                                        ->setPromoPrice($promoPrice)
-                                        ->save($con)
-                                    ;
-                                }
-                            }
-                        }
-                    } else {
-                        // Consider only combinations which contains the selected AttributeAv ID
-                        // TODO not yet coded.
-                        throw new \RuntimeException("Not yet implemented !");
+                        $this->updateProductSaleElementsPrices(
+                            $pseList,
+                            $sale->getActive(),
+                            $offsetType,
+                            $taxCalculator,
+                            $saleOffsetByCurrency,
+                            $con
+                        );
                     }
                 }
 
@@ -182,8 +233,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             try {
 
-                // Disable all promo flag on sale's current selected products,
-                // to get a correct selection, even if a product has been de-selected.
+                // Disable all promo flag on sale's currently selected products,
+                // to reset promo statsu of the products that have been removed from the selection.
                 $sale->setActive(false);
 
                 $event->getDispatcher()->dispatch(
@@ -225,19 +276,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
                 // Update products
                 SaleProductQuery::create()->filterBySaleId($sale->getId())->delete($con);
 
-                foreach ($event->getProducts() as $productId => $attributeIdArray) {
+                $productAttributesArray = $event->getProductAttributes();
 
-                    if (empty($attributeIdArray)) {
-                        $saleProduct = new SaleProduct();
+                foreach ($event->getProducts() as $productId) {
 
-                        $saleProduct
-                            ->setSaleId($sale->getId())
-                            ->setProductId($productId)
-                            ->setAttributeAvId(null)
-                            ->save($con)
-                        ;
-                    } else {
-                        foreach ($attributeIdArray as $attributeId) {
+                    if (isset($productAttributesArray[$productId])) {
+                        foreach ($productAttributesArray[$productId] as $attributeId) {
                             $saleProduct = new SaleProduct();
 
                             $saleProduct
@@ -247,6 +291,15 @@ class Sale extends BaseAction implements EventSubscriberInterface
                                 ->save($con)
                             ;
                         }
+                    } else {
+                        $saleProduct = new SaleProduct();
+
+                        $saleProduct
+                            ->setSaleId($sale->getId())
+                            ->setProductId($productId)
+                            ->setAttributeAvId(null)
+                            ->save($con)
+                        ;
                     }
                 }
 
@@ -269,48 +322,77 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * Toggle Sale activity
      *
      * @param SaleToggleActivityEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function toggleActivity(SaleToggleActivityEvent $event)
     {
         $sale = $event->getSale();
 
-        $sale
+        $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+
+            $sale
             ->setDispatcher($event->getDispatcher())
             ->setActive(!$sale->getActive())
-            ->save();
-
-        // Update related products sale status
-        $event->getDispatcher()->dispatch(
-            TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-            new ProductSaleStatusUpdateEvent($sale)
-        );
-
-        $event->setSale($sale);
-    }
-
-    /**
-     * Delete a sale
-     *
-     * @param SaleDeleteEvent $event
-     */
-    public function delete(SaleDeleteEvent $event)
-    {
-        if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
-
-            $sale->setDispatcher($event->getDispatcher())->delete();
-
-            $event->setSale($sale);
-        }
-
-        // Update related products sale status, if required
-        if ($sale->getActive()) {
-            $sale->setActive(false);
+            ->save($con);
 
             // Update related products sale status
             $event->getDispatcher()->dispatch(
                 TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
                 new ProductSaleStatusUpdateEvent($sale)
             );
+
+            $event->setSale($sale);
+
+            $con->commit();
+
+        } catch (PropelException $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Delete a sale
+     *
+     * @param SaleDeleteEvent $event
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    public function delete(SaleDeleteEvent $event)
+    {
+        if (null !== $sale = SaleQuery::create()->findPk($event->getSaleId())) {
+
+            $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
+
+            $con->beginTransaction();
+
+            try {
+
+                // Update related products sale status, if required
+                if ($sale->getActive()) {
+
+                    $sale->setActive(false);
+
+                    // Update related products sale status
+                    $event->getDispatcher()->dispatch(
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                        new ProductSaleStatusUpdateEvent($sale)
+                    );
+                }
+
+                $sale->setDispatcher($event->getDispatcher())->delete($con);
+
+                $event->setSale($sale);
+
+                $con->commit();
+
+            } catch (PropelException $e) {
+                $con->rollback();
+                throw $e;
+            }
         }
     }
 
@@ -320,7 +402,7 @@ class Sale extends BaseAction implements EventSubscriberInterface
      * @param  SaleClearStatusEvent                      $event
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function clearStatus(SaleClearStatusEvent $event)
+    public function clearStatus(/** @noinspection PhpUnusedParameterInspection */ SaleClearStatusEvent $event)
     {
         $con = Propel::getWriteConnection(SaleTableMap::DATABASE_NAME);
         $con->beginTransaction();

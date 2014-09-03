@@ -92,6 +92,16 @@ class SaleController extends AbstractCrudController
 
         $dateFormat = SaleModificationForm::PHP_DATE_FORMAT;
 
+        // Transform the selected attributes list (product_id => array of attributes av id) into
+        // product_id => comma separated list of attributes av id, to math the collection type (text)
+        $saleProductsAttributesAvs = $sale->getSaleProductsAttributeList();
+
+        $product_attributes = [];
+
+        foreach($saleProductsAttributesAvs as $productId => $saleProductsAttributesAv) {
+            $product_attributes[$productId] = implode(',', $saleProductsAttributesAv);
+        }
+
         // Prepare the data that will hydrate the form
         $data = [
             'id'            => $sale->getId(),
@@ -109,7 +119,7 @@ class SaleController extends AbstractCrudController
             'price_offset'          => $sale->getPriceOffsets(),
             'categories'            => $categories,
             'products'              => $products,
-            'product_attributes'    => array() // $sale->getSaleProductsAttributeList()
+            'product_attributes'    => $product_attributes
         ];
 
         // Setup the object form
@@ -143,16 +153,12 @@ class SaleController extends AbstractCrudController
      */
     protected function getUpdateEvent($formData)
     {
-        // Build the products array
-        $products = [];
+        // Build the product attributes array
+        $productAttributes = [];
 
-        foreach ($formData['products'] as $productId) {
-            $products[$productId] = [];
-            /*
-            if (isset($formData['product_attributes'])) {
-                $products[]
-            }
-            */
+        foreach ($formData['product_attributes'] as $productId => $attributeAvIdList) {
+            if (! empty($attributeAvIdList))
+                $productAttributes[$productId] = explode(',', $attributeAvIdList);
         }
 
         $saleUpdateEvent = new SaleUpdateEvent($formData['id']);
@@ -164,7 +170,8 @@ class SaleController extends AbstractCrudController
             ->setDisplayInitialPrice($formData['display_initial_price'])
             ->setPriceOffsetType($formData['price_offset_type'])
             ->setPriceOffsets($formData['price_offset'])
-            ->setProducts($products)
+            ->setProducts($formData['products'])
+            ->setProductAttributes($productAttributes)
             ->setLocale($formData['locale'])
             ->setTitle($formData['title'])
             ->setSaleLabel($formData['label'])
@@ -346,42 +353,13 @@ class SaleController extends AbstractCrudController
         if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
             return $response;
 
-        $attributesInfo = [];
+        $selectedAttributesAvId = explode(',', $this->getRequest()->get('selected_attributes_av_id', []));
 
         $productId = $this->getRequest()->get('product_id');
 
-        // Get PSE for this product
-        if (null !== $pseList = ProductSaleElementsQuery::create()->filterByProductId($productId)->find()) {
-
-            /** @var ProductSaleElements $pse */
-            foreach ($pseList as $pse) {
-
-                // Find all combinations
-                if (null !== $combinations = AttributeCombinationQuery::create()->filterByProductSaleElementsId($pse->getId())) {
-
-                    /** @var AttributeCombination $combination */
-                    foreach ($combinations as $combination) {
-
-                        $attrId = $combination->getAttributeId();
-                        $attrAvId = $combination->getAttributeAvId();
-
-                        // Store each AttributeAv
-                        if (! isset($attributesInfo[$attrId])) {
-
-                            $attributesInfo[$attrId] = [];
-                        }
-echo "PSE=".$pse->getId().", attr=$attrId: c=".$combination->getAttributeAvId()."<br />";
-                        if (! in_array($attrAvId, $attributesInfo[$attrId])) {
-                            $attributesInfo[$attrId][] = $attrAvId;
-                        }
-                    }
-                };
-            }
-        }
-
         return $this->render('ajax/sale-edit-product-attributes',[
-            'product_id'       => $productId,
-            'attributes_info'   => $attributesInfo
+            'product_id'                => $productId,
+            'selected_attributes_av_id' => $selectedAttributesAvId
         ]);
     }
 

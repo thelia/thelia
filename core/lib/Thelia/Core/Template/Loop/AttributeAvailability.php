@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -22,6 +23,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\Map\AttributeCombinationTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -45,6 +48,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('attribute'),
+            Argument::createIntTypeArgument('product'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -79,6 +83,35 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
 
         if (null !== $attribute) {
             $search->filterByAttributeId($attribute, Criteria::IN);
+        }
+
+        $product = $this->getProduct();
+
+        if (null !== $product) {
+            // Return only Attributes Av that are part on a product's combination
+
+            /* The request is:
+            select * from attribute_av aav
+            left join attribute_combination ac on ac.attribute_av_id = aav.id
+            left join product_sale_elements pse on pse.id = ac.product_sale_elements_id
+            where aav.attribute_id=3 and pse.product_id = 279
+            group by aav.id
+             */
+
+            $pseJoin = new Join();
+            $pseJoin->addCondition(
+                AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID,
+                ProductSaleElementsTableMap::ID,
+                Criteria::EQUAL
+            );
+            $pseJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search
+                ->leftJoinAttributeCombination('attribute_combination')
+                ->groupById()
+                ->addJoinObject($pseJoin)
+                ->where(ProductSaleElementsTableMap::PRODUCT_ID."=?", $product, \PDO::PARAM_INT)
+            ;
         }
 
         $orders  = $this->getOrder();

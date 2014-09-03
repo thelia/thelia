@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
+use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
@@ -42,7 +43,10 @@ use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\AttributeAv;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Content;
+use Thelia\Model\Feature;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
@@ -54,6 +58,7 @@ use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductSaleElements as ProductSaleElementsModel;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
@@ -195,11 +200,21 @@ class ProductController extends AbstractSeoCrudController
         return new ProductDeleteEvent($this->getRequest()->get('product_id', 0));
     }
 
+    /**
+     * @param ProductEvent $event
+     * @return mixed
+     */
     protected function eventContainsObject($event)
     {
         return $event->hasProduct();
     }
 
+    /**
+     * @param ProductPrice $productPrice
+     * @param ProductSaleElements $saleElement
+     * @param Currency $defaultCurrency
+     * @param Currency $currentCurrency
+     */
     protected function updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency)
     {
         // Get price for default currency
@@ -244,6 +259,7 @@ class ProductController extends AbstractSeoCrudController
             "tax_rule"    => $object->getTaxRuleId()
         );
 
+        /** @var ProductSaleElements $saleElement */
         foreach ($saleElements as $saleElement) {
 
             // Get the product price for the current currency
@@ -262,12 +278,10 @@ class ProductController extends AbstractSeoCrudController
                 if ($currentCurrency->getId() != $defaultCurrency->getId()) {
 
                     $productPrice->setFromDefaultCurrency(true);
-
-                    $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
                 }
             }
 
-            // Caclulate prices if we have to use the rate * defaulkt currency price
+            // Caclulate prices if we have to use the rate * default currency price
             if ($productPrice->getFromDefaultCurrency() == true) {
                 $this->updatePriceFromDefaultCurrency($productPrice, $saleElement, $defaultCurrency, $currentCurrency);
             }
@@ -343,6 +357,10 @@ class ProductController extends AbstractSeoCrudController
         return new ProductModificationForm($this->getRequest(), "form", $data);
     }
 
+    /**
+     * @param ProductEvent $event
+     * @return null
+     */
     protected function getObjectFromEvent($event)
     {
         return $event->hasProduct() ? $event->getProduct() : null;
@@ -360,11 +378,19 @@ class ProductController extends AbstractSeoCrudController
         return $product;
     }
 
+    /**
+     * @param Product $object
+     * @return mixed
+     */
     protected function getObjectLabel($object)
     {
         return $object->getTitle();
     }
 
+    /**
+     * @param Product $object
+     * @return mixed
+     */
     protected function getObjectId($object)
     {
         return $object->getId();
@@ -484,6 +510,7 @@ class ProductController extends AbstractSeoCrudController
                 ;
 
             if ($list !== null) {
+                /** @var Content $item */
                 foreach ($list as $item) {
                     $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
                 }
@@ -563,6 +590,7 @@ class ProductController extends AbstractSeoCrudController
             ;
 
             if ($list !== null) {
+                /** @var Product $item */
                 foreach ($list as $item) {
                     $result[] = array('id' => $item->getId(), 'title' => $item->getTitle());
                 }
@@ -651,7 +679,8 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Change product template for a given product.
      *
-     * @param unknown $productId
+     * @param int $productId
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
      */
     public function setProductTemplateAction($productId)
     {
@@ -729,6 +758,7 @@ class ProductController extends AbstractSeoCrudController
                 }
 
                 // Delete features which don't have any values
+                /** @var Feature $feature */
                 foreach ($allFeatures as $feature) {
 
                     if (! in_array($feature->getId(), $updatedFeatures)) {
@@ -802,7 +832,7 @@ class ProductController extends AbstractSeoCrudController
 
     // -- Product combination management ---------------------------------------
 
-    public function getAttributeValuesAction($productId, $attributeId)
+    public function getAttributeValuesAction(/** @noinspection PhpUnusedParameterInspection */ $productId, $attributeId)
     {
         $result = array();
 
@@ -818,6 +848,7 @@ class ProductController extends AbstractSeoCrudController
             ;
 
             if ($values !== null) {
+                /** @var AttributeAv $value */
                 foreach ($values as $value) {
                     $result[] = array('id' => $value->getId(), 'title' => $value->getTitle());
                 }
@@ -827,7 +858,7 @@ class ProductController extends AbstractSeoCrudController
         return $this->jsonResponse(json_encode($result));
     }
 
-    public function addAttributeValueToCombinationAction($productId, $attributeAvId, $combination)
+    public function addAttributeValueToCombinationAction(/** @noinspection PhpUnusedParameterInspection */ $productId, $attributeAvId, $combination)
     {
         $result = array();
 
@@ -919,8 +950,7 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Process a single PSE update, using form data array.
      *
-     * @param  array     $data the form data
-     * @throws Exception is someting goes wrong.
+     * @param array $data the form data
      */
     protected function processSingleProductSaleElementUpdate($data)
     {
@@ -959,8 +989,6 @@ class ProductController extends AbstractSeoCrudController
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
-
-        $error_msg = false;
 
         try {
 
@@ -1070,8 +1098,6 @@ class ProductController extends AbstractSeoCrudController
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
 
-        $error_msg = false;
-
         $changeForm = new ProductCombinationGenerationForm($this->getRequest());
 
         try {
@@ -1087,7 +1113,7 @@ class ProductController extends AbstractSeoCrudController
             //
             // First, create an array of attributes_av ID in the form $attributes_av_list[$attribute_id] = array of attributes_av ID
             // from the list of attribute_id:attributes_av ID from the form.
-            $combinations = $attributes_av_list = array();
+            $combinations = $attributes_av_list = $tmp = array();
 
             foreach ($data['attribute_av'] as $item) {
                 list($attribute_id, $attribute_av_id) = explode(':', $item);
@@ -1100,8 +1126,6 @@ class ProductController extends AbstractSeoCrudController
             }
 
             // Next, recursively combine array
-            $combinations = $tmp = array();
-
             $this->combine($attributes_av_list, $combinations, $tmp);
 
             // Create event
@@ -1265,10 +1289,11 @@ class ProductController extends AbstractSeoCrudController
     /**
      * Calculate taxed/untexted price for a product
      *
-     * @param  unknown  $price
-     * @param  unknown  $price_type
-     * @param  Product  $product
-     * @return Ambigous <unknown, number>
+     * @param $price
+     * @param $price_type
+     * @param Product $product
+     * @param bool $convert
+     * @return string
      */
     protected function computePrice($price, $price_type, Product $product, $convert = false)
     {
@@ -1350,6 +1375,8 @@ class ProductController extends AbstractSeoCrudController
             );
         }
 
+        $assoc = null;
+
         if ($type === "image") {
             $image = ProductImageQuery::create()->findPk($typeId);
 
@@ -1417,7 +1444,7 @@ class ProductController extends AbstractSeoCrudController
             $responseData["product_document_id"] = $typeId;
         }
 
-        $responseData["is-associated"] = (int) (!$assoc->isDeleted());
+        $responseData["is-associated"] = $assoc !== null && !$assoc->isDeleted() ? 1 : 0;
 
         return $responseData;
     }
