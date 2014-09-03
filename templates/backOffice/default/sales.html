@@ -37,6 +37,9 @@
                                        <a class="btn btn-default btn-primary action-btn" href="#confirm_sale_status_reset" data-toggle="modal">
                                            {intl l='Reset sale status for all products'}
                                        </a>
+                                       <a class="btn btn-default btn-default action-btn" href="{url path="/admin/sales/check-activation"}">
+                                           {intl l='Check sale activation'}
+                                       </a>
                                    {/loop}
                                 </caption>
 
@@ -127,7 +130,7 @@
                                             </td>
 
                                             <td class="text-center">
-                                                {if is_null($START_DATE)}
+                                                {if $HAS_START_DATE}
                                                     {format_date date=$START_DATE}
                                                 {else}
                                                     {intl l='None defined'}
@@ -135,7 +138,7 @@
                                             </td>
 
                                             <td class="text-center">
-                                                {if is_null($END_DATE)}
+                                                {if $HAS_END_DATE}
                                                     {format_date date=$END_DATE}
                                                 {else}
                                                     {intl l='None defined'}

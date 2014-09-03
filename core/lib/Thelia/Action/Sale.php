@@ -463,8 +463,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // Enable sales that should be enabled.
             if (null !== $salesToDisable = SaleQuery::create()
                     ->filterByActive(false)
-                    ->filterByStartDate($now, Criteria::GREATER_THAN)
-                    ->filterByEndDate($now, Criteria::LESS_THAN))
+                    ->filterByStartDate($now, Criteria::LESS_EQUAL)
+                    ->filterByEndDate($now, Criteria::GREATER_EQUAL))
                 {
                 /** @var SaleModel $sale */
                 foreach ($salesToDisable as $sale) {
