@@ -52,11 +52,8 @@ class CartController extends BaseFrontController
             $form = $this->validateForm($cartAdd);
 
             $cartEvent = $this->getCartEvent();
-            $cartEvent->setNewness($form->get("newness")->getData());
-            $cartEvent->setAppend($form->get("append")->getData());
-            $cartEvent->setQuantity($form->get("quantity")->getData());
-            $cartEvent->setProductSaleElementsId($form->get("product_sale_elements_id")->getData());
-            $cartEvent->setProduct($form->get("product")->getData());
+
+            $cartEvent->bindForm($form);
 
             $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
 
