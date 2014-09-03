@@ -304,35 +304,12 @@
                 form_name = "thelia.admin.sale.creation"
             }
 
-            {* Inline editing of object position using bootstrap-editable *}
-
-            $('.salePositionChange').editable({
-                type        : 'text',
-                title       : '{intl l="Enter new sale position"}',
-                mode        : 'popup',
-                inputclass  : 'input-mini',
-                placement   : 'left',
-                success     : function(response, newValue) {
-                    // The URL template
-                    var url = "{url noamp='1' path='/admin/sale/update-position' sale_id='__ID__' position='__POS__'}";
-
-                    // Perform subtitutions
-                    url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
-
-                    // Reload the page
-                    location.href = url;
-                }
-            });
-
-            {* Visibility toggle *}
+            {* Activity toggle *}
 
             $(".visibleToggle").on('switch-change', function(event, data) {
+                var url =
                 $.ajax({
-                    url : "{url path='admin/sale/toggle-online'}",
-                    data : {
-                        sale_id : $(this).data('id'),
-                        action : 'visibilityToggle'
-                    }
+                    url : "{url path='/admin/sale/toggle-activity/'}" + $(this).data('id')
                 });
             });
 

@@ -95,7 +95,6 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
     public function buildModelCriteria()
     {
-
         $search = SaleQuery::create();
 
         /* manage translations */
@@ -123,6 +122,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             $search
                 ->useSaleProductQuery()
                     ->filterByProductId($productIdList, Criteria::IN)
+                    ->groupByProductId()
                 ->endUse()
             ;
         }

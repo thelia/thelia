@@ -309,7 +309,7 @@ class SaleController extends AbstractCrudController
      *
      * @return Response
      */
-    protected function toggleActivity()
+    public function toggleActivity()
     {
         if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
             return $response;
