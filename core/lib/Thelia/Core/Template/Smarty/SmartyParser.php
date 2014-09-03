@@ -71,27 +71,21 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/compile';
+        $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'compile';
         if (! is_dir($compile_dir)) @mkdir($compile_dir, 0777, true);
 
-        $cache_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/cache';
+        $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-        $this->debugging = $debug;
-
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
-        // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-
-        if ($debug) {
-            $this->setCaching(Smarty::CACHING_OFF);
-            $this->setForceCompile(true);
-        } else {
-            $this->setForceCompile(false);
+        if (! $debug) {
+            // Increase cache lifetime
+            $this->setCacheLifetime(54000); // 15 minutes
         }
 
         // The default HTTP status
