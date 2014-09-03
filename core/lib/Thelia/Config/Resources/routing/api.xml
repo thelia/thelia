@@ -57,6 +57,9 @@
         <requirement key="product_id">\d+</requirement>
     </route>
 
+    <route id="api.product.create" path="/api/products" methods="post">
+        <default key="_controller">Thelia\Controller\Api\ProductController::createAction</default>
+    </route>
     <!-- end product route -->
 
     <!-- category route -->

@@ -12,6 +12,9 @@
 
 namespace Thelia\Tests\Api;
 
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\CurrencyQuery;
+use Thelia\Model\TaxRuleQuery;
 use Thelia\Tests\ApiTestCase;
 
 
@@ -93,5 +96,43 @@ class ProductControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
+    }
+
+    public function testCreateAction()
+    {
+        $client  = static::createClient();
+
+        $category = CategoryQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
+        $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
+        $taxRule = TaxRuleQuery::create()->findOneByIsDefault(1);
+        $product = [
+            'thelia_product_creation' => [
+                'ref' => uniqid('testCreateProduct'),
+                'locale' => 'en_US',
+                'title' => 'product create from api',
+                'default_category' => $category->getId(),
+                'visible' => 1,
+                'price' => '10',
+                'currency' => $defaultCurrency->getId(),
+                'tax_rule' => $taxRule->getId(),
+                'weight' => 10
+            ]
+        ];
+
+        $requestContent = json_encode($product);
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'POST',
+            '/api/products?&sign='.$this->getSignParameter($requestContent), [], [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertEquals('en_US', $content[0]['LOCALE']);
     }
 }

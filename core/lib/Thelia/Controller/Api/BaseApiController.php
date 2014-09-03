@@ -27,6 +27,7 @@ class BaseApiController extends BaseController
 {
 
     protected $apiUser;
+    protected $currentRouter = "router.api";
 
     protected function checkAuth($resources, $modules, $accesses)
     {

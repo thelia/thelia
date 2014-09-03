@@ -12,11 +12,15 @@
 
 namespace Thelia\Controller\Api;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
+use Thelia\Form\ProductCreationForm;
 
 
 /**
@@ -72,5 +76,33 @@ class ProductController extends BaseApiController
 
         $paginate = 0;
         return $productLoop->exec($paginate);
+    }
+
+    public function createAction()
+    {
+        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::CREATE);
+
+        $request = $this->getRequest();
+        $form = new ProductCreationForm($request, 'form', [], ['csrf_protection' => false]);
+
+        try {
+            $creationForm = $this->validateForm($form);
+
+            $event = new ProductCreateEvent();
+            $event->bindForm($creationForm);
+
+            $this->dispatch(TheliaEvents::PRODUCT_CREATE, $event);
+
+            $product = $event->getProduct();
+
+            $request->query->set('lang', $creationForm->get('locale')->getData());
+            $response = $this->getProductAction($product->getId());
+            $response->setStatusCode(201);
+
+            return $response;
+
+        } catch (\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 400);
+        }
     }
 }
