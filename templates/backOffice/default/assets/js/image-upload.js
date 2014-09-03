@@ -11,6 +11,7 @@ $(function($){
         $.imageUploadManager.onClickModal();
         $.imageUploadManager.onModalHidden();
         $.imageUploadManager.sortImage();
+        $.imageUploadManager.onClickToggleVisibilityImage();
 
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
@@ -42,6 +43,7 @@ $(function($){
             imageDropzone.removeFile(file);
             $.imageUploadManager.updateImageListAjax();
             $.imageUploadManager.onClickDeleteImage();
+            $.imageUploadManager.onClickToggleVisibilityImage();
         });
         
               
@@ -68,6 +70,7 @@ $(function($){
                 );
                 $.imageUploadManager.onClickDeleteImage();
                 $.imageUploadManager.sortImage();
+                $.imageUploadManager.onClickToggleVisibilityImage();
             });
     };
 
@@ -130,6 +133,34 @@ $(function($){
             })
 
             ;
+        });
+    };
+
+    // toggle document on click
+    $.imageUploadManager.onClickToggleVisibilityImage = function() {
+        $('.image-manager').on('click', '.image-toggle-btn', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            var $url = $this.attr("href");
+            var errorMessage = $this.attr("data-error-message");
+            $.ajax({
+                type: "GET",
+                url: $url,
+                statusCode: {
+                    404: function() {
+                        $(".image-manager .message").html(
+                            errorMessage
+                        );
+                    }
+                }
+            }).done(function(data) {
+                $(".image-manager .message").html(
+                    data
+                );
+
+                $this.toggleClass("visibility-visible");
+            });
+            return false;
         });
     };
 

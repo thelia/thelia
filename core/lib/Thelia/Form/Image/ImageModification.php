@@ -37,25 +37,42 @@ abstract class ImageModification extends BaseForm
      */
     protected function buildForm()
     {
-        $this->formBuilder->add(
-            'file',
-            'file',
-            [
-                'required' => false,
-                'constraints' => [
-                    new Image(
-                        [
-//                            'minWidth' => 200,
-//                            'minHeight' => 200
-                        ]
-                    )
-                ],
-                'label' => Translator::getInstance()->trans('Replace current image by this file'),
-                'label_attr' => [
-                    'for' => 'file'
+        $translator = Translator::getInstance();
+
+        $this->formBuilder
+            ->add(
+                'file',
+                'file',
+                [
+                    'required' => false,
+                    'constraints' => [
+                        new Image(
+                            [
+    //                            'minWidth' => 200,
+    //                            'minHeight' => 200
+                            ]
+                        )
+                    ],
+                    'label' => $translator->trans('Replace current image by this file'),
+                    'label_attr' => [
+                        'for' => 'file'
+                    ]
                 ]
-            ]
-        );
+            )
+            // Is this image online ?
+            ->add(
+                'visible',
+                'checkbox',
+                [
+                    'constraints' => [ ],
+                    'required'    => false,
+                    'label'       => $translator->trans('This image is online'),
+                    'label_attr' => [
+                        'for' => 'visible_create'
+                    ]
+                ]
+            )
+        ;
 
         // Add standard description fields
         $this->addStandardDescFields();

@@ -9,13 +9,16 @@ Parameters:
 *}
 {ifloop rel="document"}
     <ul id="js-sort-document" class="list-unstyled document-list">
-        {loop type="document" name="document" source="{$documentType}" order="manual" source_id="{$parentId}"}
+        {loop type="document" name="document" source="{$documentType}" order="manual" source_id="{$parentId}" visible="*"}
             <li class="clearfix ui-state-default" data-sort-id="{$ID}">
                 <a href="{$DOCUMENT_PATH}" title="{$TITLE}" class="pull-left" target="_blank">{$TITLE}</a>
 
 
                 <div class="btn-group pull-right">
-                    <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+                    <a class="document-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+                    <a class="document-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/document/type/$documentType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
+                        <span class="glyphicon glyphicon-eye-open"></span><span class="glyphicon glyphicon-eye-close"></span>
+                    </a>
                     <a class="document-update-btn btn btn-default btn-xs" href="{url path="/admin/document/type/$documentType/$ID/update"}" data-error-message="{intl l='Please retry'}">
                         <span class="glyphicon glyphicon-edit"></span>
                     </a>

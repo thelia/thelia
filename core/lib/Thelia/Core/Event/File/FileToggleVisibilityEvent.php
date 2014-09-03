@@ -10,23 +10,44 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-?>
-</div>
-</div>
-</div>
-</div>
-</div>
-<hr />
-<footer class="footer">
-    <div class="container">
-        <p>&copy; Thelia 2013
-            - <a href="http://www.openstudio.fr/" target="_blank">Édité par OpenStudio</a>
-            - <a href="http://forum.thelia.net/" target="_blank">Forum Thelia</a>
-            - <a href="http://contrib.thelia.net/" target="_blank">Contributions Thelia</a>
-        </p>
-    </div>
-</footer>
-<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
-<?php if (isset($scriptHook)) { echo $scriptHook; } ?>
-</body>
-</html>
+namespace Thelia\Core\Event\File;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Event\ToggleVisibilityEvent;
+
+/**
+ * Class FileToggleVisibilityEvent
+ * @package Thelia\Core\Event\File
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+class FileToggleVisibilityEvent extends ToggleVisibilityEvent
+{
+    protected $query;
+
+    /**
+     * @param ModelCriteria $query
+     * @param               $object_id
+     */
+    public function __construct(ModelCriteria $query, $object_id)
+    {
+        parent::__construct($object_id);
+
+        $this->setQuery($query);
+    }
+
+    /**
+     * @param ModelCriteria $query
+     */
+    public function setQuery(ModelCriteria $query)
+    {
+        $this->query = $query;
+    }
+
+    /**
+     * @return ModelCriteria|null
+     */
+    public function getQuery()
+    {
+        return $this->query;
+    }
+
+}

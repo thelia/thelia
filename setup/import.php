@@ -165,14 +165,14 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
                 $stock = new \Thelia\Model\ProductSaleElements();
                 $stock->setProduct($product);
                 $stock->setRef($product->getId() . '_' . uniqid('', true));
-                $stock->setQuantity($faker->randomNumber(1,50));
+                $stock->setQuantity($faker->numberBetween(1,50));
                 if (!empty($data[9])) {
                     $stock->setPromo(1);
                 } else {
                     $stock->setPromo(0);
                 }
 
-                $stock->setNewness($faker->randomNumber(0,1));
+                $stock->setNewness($faker->numberBetween(0,1));
                 $stock->setWeight($faker->randomFloat(2, 1,30));
                 $stock->save($con);
 

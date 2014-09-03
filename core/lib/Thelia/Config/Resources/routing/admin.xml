@@ -77,6 +77,11 @@
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
     </route>
+    <route id="admin.image.toggle.process" path="/admin/image/type/{parentType}/{documentId}/toggle">
+        <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityImageAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
+    </route>
     <route id="admin.image.update.view" path="/admin/image/type/{parentType}/{imageId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewImageAction</default>
         <requirement key="parentType">.*</requirement>
@@ -112,6 +117,11 @@
         <default key="_controller">Thelia\Controller\Admin\FileController::updateDocumentPositionAction</default>
         <requirement key="parentType">.*</requirement>
         <requirement key="parentId">\d+</requirement>
+    </route>
+    <route id="admin.document.toggle.process" path="/admin/document/type/{parentType}/{documentId}/toggle">
+        <default key="_controller">Thelia\Controller\Admin\FileController::toggleVisibilityDocumentAction</default>
+        <requirement key="parentType">.*</requirement>
+        <requirement key="documentId">\d+</requirement>
     </route>
     <route id="admin.document.update.view" path="/admin/document/type/{parentType}/{documentId}/update" methods="get">
         <default key="_controller">Thelia\Controller\Admin\FileController::viewDocumentAction</default>

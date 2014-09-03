@@ -220,11 +220,15 @@
     </route>
     <!-- end feed generator -->
 
+    <!-- Route used to check if the rewrite engine is activated -->
+    <route id="empty" path="/empty">
+        <default key="_controller">Thelia\Controller\Front\DefaultController::emptyRoute</default>
+    </route>
+
     <!-- Default Route -->
     <route id="default" path="/{_view}">
         <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
         <default key="_view">index</default>
         <requirement key="_view">^(?!admin)[^/]+</requirement>
     </route>
-
 </routes>

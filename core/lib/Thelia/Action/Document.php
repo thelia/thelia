@@ -112,6 +112,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
             TheliaEvents::DOCUMENT_SAVE => array("saveFile", 128),
             TheliaEvents::DOCUMENT_UPDATE => array("updateFile", 128),
             TheliaEvents::DOCUMENT_UPDATE_POSITION => array("updatePosition", 128),
+            TheliaEvents::DOCUMENT_TOGGLE_VISIBILITY => array("toggleVisibility", 128),
         );
     }
 }

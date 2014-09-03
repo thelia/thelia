@@ -42,29 +42,25 @@
                             {ifloop rel="country-without-area"}
                             {form name="thelia.admin.area.country"}
                             <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
-                                {form_hidden_fields form=$form}
 
-                                {form_field form=$form field='success_url'}
-                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_configuration/update/{$area_id}"}" >
-                                {/form_field}
+                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                {form_field form=$form field='area_id'}
-                                    <input type="hidden" name="{$name}" value="{$area_id}">
-                                {/form_field}
-                                {form_field form=$form field='country_id'}
-                                <label class="control-label" for="{$label_attr.for}">{intl l="Unassigned countries"}</label>
+                                {form_hidden_fields form=$form exclude="area_id"}
 
-                                <div class="input-group">                                                            
-                                    <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
+                                <input type="hidden" name="area_id" value="{$area_id}">
+
+                                {render_form_field form=$form field="success_url" value={url path="/admin/configuration/shipping_configuration/update/{$area_id}"}}
+                                {render_form_field form=$form field="area_id" value=$area_id}
+
+                                {custom_render_form_field form=$form field='country_id'}
+                                    <select multiple {form_field_attributes form=$form field="country_id"}>
                                         {loop name="country-without-area" type="country" with_area="0"  backend_context="1" lang=$lang_id}
-                                        <option value="{$ID}">{$TITLE}</option>
+                                            <option value="{$ID}">{$TITLE}</option>
                                         {/loop}
                                     </select>
-                                    <span class="input-group-btn">
-                                        <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add this country"}</button>
-                                    </span>
-                                </div>                                    
-                                {/form_field}
+                                {/custom_render_form_field}
+
+                                <button type="submit" class="btn btn-default btn-block btn-primary"><span class="glyphicon glyphicon-plus-sign"></span> {intl l="Add selected countries"}</button>
                             </form>
                             {/form}
                             {/ifloop}

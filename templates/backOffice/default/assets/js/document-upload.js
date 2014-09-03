@@ -10,6 +10,7 @@ $(function($){
     $.documentUploadManager.initDocumentDropZone = function() {
         $.documentUploadManager.onClickDeleteDocument();
         $.documentUploadManager.sortDocument();
+        $.documentUploadManager.onClickToggleVisibilityDocument();
 
         var documentDropzone = new Dropzone("#documents-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
@@ -40,6 +41,7 @@ $(function($){
             documentDropzone.removeFile(file);
             $.documentUploadManager.updateDocumentListAjax();
             $.documentUploadManager.onClickDeleteDocument();
+            $.documentUploadManager.onClickToggleVisibilityDocument();
         });
 
 
@@ -61,12 +63,13 @@ $(function($){
                 }
             }
         }).done(function(data) {
-                $documentListArea.html(
-                    data
-                );
-                $.documentUploadManager.onClickDeleteDocument();
-                $.documentUploadManager.sortDocument();
-            });
+            $documentListArea.html(
+                data
+            );
+            $.documentUploadManager.onClickDeleteDocument();
+            $.documentUploadManager.sortDocument();
+            $.documentUploadManager.onClickToggleVisibilityDocument();
+        });
     };
 
     // Remove document on click
@@ -100,6 +103,36 @@ $(function($){
                 $( "#js-sort-document").children('li').each(function(position, element) {
                     $(element).find('.js-sorted-position').html(position + 1);
                 });
+            });
+            return false;
+        });
+    };
+
+
+    // toggle document on click
+    $.documentUploadManager.onClickToggleVisibilityDocument = function() {
+        $('.document-manager').on('click', '.document-toggle-btn', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            //$parent.append('<div class="loading" ></div>');
+            var $url = $this.attr("href");
+            var errorMessage = $this.attr("data-error-message");
+            $.ajax({
+                type: "GET",
+                url: $url,
+                statusCode: {
+                    404: function() {
+                        $(".document-manager .message").html(
+                            errorMessage
+                        );
+                    }
+                }
+            }).done(function(data) {
+                $(".document-manager .message").html(
+                    data
+                );
+
+                $this.toggleClass("visibility-visible");
             });
             return false;
         });

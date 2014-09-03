@@ -10,12 +10,58 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace HookTest;
+namespace Thelia\Tests\Core\Event;
 
-use Thelia\Core\Event\Hook\HookRenderEvent;
-use Thelia\Module\BaseModule;
+use Thelia\Core\Event\ActionEvent;
 
-class HookTest extends BaseModule
+
+/**
+ * Class FooEvent
+ * @package Thelia\Tests\Core\Event
+ * @author manuel raynaud <mraynaud@openstudio.fr>
+ */
+class FooEvent extends ActionEvent
 {
 
-}
+    protected $foo;
+    protected $bar;
+
+    /**
+     * @return mixed
+     */
+    public function getBar()
+    {
+        return $this->bar;
+    }
+
+    /**
+     * @param mixed $bar
+     * @return $this
+     */
+    public function setBar($bar)
+    {
+        $this->bar = $bar;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFoo()
+    {
+        return $this->foo;
+    }
+
+    /**
+     * @param mixed $foo
+     * @return $this
+     */
+    public function setFoo($foo)
+    {
+        $this->foo = $foo;
+        return $this;
+    }
+
+
+
+} 

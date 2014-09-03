@@ -17,8 +17,10 @@ before_script:
   - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
   - php Thelia thelia:install --db_host=localhost --db_username=$DB_USER --db_name=thelia
   - php setup/faker.php
+  - php Thelia module:refresh
   - php Thelia module:activate Colissimo
   - php Thelia module:activate Cheque
+  - php Thelia module:activate HookTest
   - "export PHANTOMJS_EXECUTABLE='phantomjs --local-to-remote-url-access=yes --ignore-ssl-errors=yes'"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"

@@ -34,4 +34,25 @@ class ToggleVisibilityEvent  extends ActionEvent
 
         return $this;
     }
+
+    /**
+     * @param mixed $object
+     *
+     * @return $this
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
 }
