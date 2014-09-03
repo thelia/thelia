@@ -12,7 +12,10 @@
 
 namespace Thelia\Core\Event;
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\Form;
+
 /**
  *
  * Class thrown on Thelia.action event
@@ -36,5 +39,21 @@ abstract class ActionEvent extends Event
         }
 
         return null;
+    }
+
+    public function bindForm(Form $form)
+    {
+        $fields = $form->getIterator();
+
+        /** @var \Symfony\Component\Form\Form $field */
+        foreach ($fields as $field) {
+            $functionName = sprintf("set%s", Container::camelize($field->getName()));
+            if (method_exists($this, $functionName)) {
+                $this->{$functionName}($field->getData());
+            } else {
+                $this->{$field->getName()} = $field->getData();
+            }
+
+        }
     }
 }
