@@ -83,11 +83,6 @@ class SmartyParser extends Smarty implements ParserInterface
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
-        if (! $debug) {
-            // Increase cache lifetime
-            $this->setCacheLifetime(54000); // 15 minutes
-        }
-
         // The default HTTP status
         $this->status = 200;
 
