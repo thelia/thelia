@@ -25,7 +25,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Base\ProductDocumentQuery;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;

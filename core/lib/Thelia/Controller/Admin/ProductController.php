@@ -43,7 +43,6 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Log\Tlog;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\CategoryQuery;
@@ -1582,7 +1581,7 @@ class ProductController extends AbstractSeoCrudController
 
         if (empty($data) && null === $errorMessage) {
             $errorMessage = $this->getTranslator()->trans("There are no files to associate.");
-            if ($type === "virtual"){
+            if ($type === "virtual") {
                 $errorMessage .= $this->getTranslator()->trans(" note: only non-visible documents can be associated.");
             }
         }
