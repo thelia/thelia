@@ -12,12 +12,11 @@
 
 namespace Thelia\Core\Template\Smarty\Assets;
 
-use Symfony\Component\Finder\Finder;
+use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Smarty\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
 use Thelia\Tools\URL;
-use Thelia\Core\Template\Assets\AssetManagerInterface;
 
 class SmartyAssetsManager
 {
