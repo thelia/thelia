@@ -154,7 +154,7 @@
                                 {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
-                                    <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Customers"}</a>
+                                    <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Customers"} <span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-customer"}
@@ -178,7 +178,7 @@
                             {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
                                 <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"}</a>
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
 
@@ -216,7 +216,7 @@
                             {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
-                                    <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Catalog"}</a>
+                                    <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Catalog"} <span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-catalog"}
@@ -242,7 +242,7 @@
                             {hookblock name="main.top-menu-content" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
-                                    <a href="{url path='/admin/contents'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Folders"}</a>
+                                    <a href="{url path='/admin/folders'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Folders"} <span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-content"}
@@ -264,25 +264,6 @@
                             {/loop}
 
                             {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
-
-                            {ifhook rel="main.top-menu-tools"}
-                            {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
-                                <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                                    <a href="{url path='/admin/tools'}" data-target="{url path='/admin/tools'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"}</a>
-
-                                    <ul class="dropdown-menu" role="menu">
-                                        {forhook rel="main.top-menu-tools"}
-                                            <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                                    {$title}
-                                                </a>
-                                            </li>
-                                        {/forhook}
-                                    </ul>
-                                </li>
-                            {/hookblock}
-                            {/ifhook}
-                            {elsehook rel="main.top-menu-tools"}
                                 <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
                                     {* <a href="{url path='/admin/tools'}">{intl l="Tools"}</a> *}
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"} <span class="caret"></span></a>
@@ -308,16 +289,25 @@
                                             <li role="menuitem"><a href="{url path='/admin/import'}">{intl l="Import"}</a></li>
                                         {/loop}
 
+                                        {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
+                                            {forhook rel="main.top-menu-tools"}
+                                                <li role="menuitem">
+                                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                        {$title}
+                                                    </a>
+                                                </li>
+                                            {/forhook}
+                                        {/hookblock}
+
                                     </ul>
                                 </li>
-                            {/elsehook}
                             {/loop}
 
                             {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
                             {ifhook rel="main.top-menu-modules"}
                             {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                                    <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Modules"}</a>
+                                    <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Modules"}<span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-modules"}
@@ -342,7 +332,7 @@
                             {ifhook rel="main.top-menu-configuration"}
                             {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
                                 <li class="dropdown {if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                                    <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Configuration"}</a>
+                                    <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Configuration"}<span class="caret"></span></a>
 
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-configuration"}

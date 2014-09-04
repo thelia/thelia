@@ -21,10 +21,12 @@ use Thelia\Model\Map\SaleProductTableMap;
  *
  *
  *
+ * @method     ChildSaleProductQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildSaleProductQuery orderBySaleId($order = Criteria::ASC) Order by the sale_id column
  * @method     ChildSaleProductQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildSaleProductQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
  *
+ * @method     ChildSaleProductQuery groupById() Group by the id column
  * @method     ChildSaleProductQuery groupBySaleId() Group by the sale_id column
  * @method     ChildSaleProductQuery groupByProductId() Group by the product_id column
  * @method     ChildSaleProductQuery groupByAttributeAvId() Group by the attribute_av_id column
@@ -48,10 +50,12 @@ use Thelia\Model\Map\SaleProductTableMap;
  * @method     ChildSaleProduct findOne(ConnectionInterface $con = null) Return the first ChildSaleProduct matching the query
  * @method     ChildSaleProduct findOneOrCreate(ConnectionInterface $con = null) Return the first ChildSaleProduct matching the query, or a new ChildSaleProduct object populated from the query conditions when no match is found
  *
+ * @method     ChildSaleProduct findOneById(int $id) Return the first ChildSaleProduct filtered by the id column
  * @method     ChildSaleProduct findOneBySaleId(int $sale_id) Return the first ChildSaleProduct filtered by the sale_id column
  * @method     ChildSaleProduct findOneByProductId(int $product_id) Return the first ChildSaleProduct filtered by the product_id column
  * @method     ChildSaleProduct findOneByAttributeAvId(int $attribute_av_id) Return the first ChildSaleProduct filtered by the attribute_av_id column
  *
+ * @method     array findById(int $id) Return ChildSaleProduct objects filtered by the id column
  * @method     array findBySaleId(int $sale_id) Return ChildSaleProduct objects filtered by the sale_id column
  * @method     array findByProductId(int $product_id) Return ChildSaleProduct objects filtered by the product_id column
  * @method     array findByAttributeAvId(int $attribute_av_id) Return ChildSaleProduct objects filtered by the attribute_av_id column
@@ -102,10 +106,10 @@ abstract class SaleProductQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34), $con);
+     * $obj  = $c->findPk(12, $con);
      * </code>
      *
-     * @param array[$sale_id, $product_id] $key Primary key to use for the query
+     * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildSaleProduct|array|mixed the result, formatted by the current formatter
@@ -115,7 +119,7 @@ abstract class SaleProductQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = SaleProductTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
+        if ((null !== ($obj = SaleProductTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -143,11 +147,10 @@ abstract class SaleProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `SALE_ID`, `PRODUCT_ID`, `ATTRIBUTE_AV_ID` FROM `sale_product` WHERE `SALE_ID` = :p0 AND `PRODUCT_ID` = :p1';
+        $sql = 'SELECT `ID`, `SALE_ID`, `PRODUCT_ID`, `ATTRIBUTE_AV_ID` FROM `sale_product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
-            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -157,7 +160,7 @@ abstract class SaleProductQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildSaleProduct();
             $obj->hydrate($row);
-            SaleProductTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
+            SaleProductTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -186,7 +189,7 @@ abstract class SaleProductQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
+     * $objs = $c->findPks(array(12, 56, 832), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     ConnectionInterface $con an optional connection object
@@ -216,10 +219,8 @@ abstract class SaleProductQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(SaleProductTableMap::SALE_ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(SaleProductTableMap::PRODUCT_ID, $key[1], Criteria::EQUAL);
 
-        return $this;
+        return $this->addUsingAlias(SaleProductTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -231,17 +232,49 @@ abstract class SaleProductQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
-        if (empty($keys)) {
-            return $this->add(null, '1<>1', Criteria::CUSTOM);
-        }
-        foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(SaleProductTableMap::SALE_ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(SaleProductTableMap::PRODUCT_ID, $key[1], Criteria::EQUAL);
-            $cton0->addAnd($cton1);
-            $this->addOr($cton0);
+
+        return $this->addUsingAlias(SaleProductTableMap::ID, $keys, Criteria::IN);
+    }
+
+    /**
+     * Filter the query on the id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterById(1234); // WHERE id = 1234
+     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
+     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * </code>
+     *
+     * @param     mixed $id The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildSaleProductQuery The current query, for fluid interface
+     */
+    public function filterById($id = null, $comparison = null)
+    {
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(SaleProductTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(SaleProductTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
-        return $this;
+        return $this->addUsingAlias(SaleProductTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -608,9 +641,7 @@ abstract class SaleProductQuery extends ModelCriteria
     public function prune($saleProduct = null)
     {
         if ($saleProduct) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(SaleProductTableMap::SALE_ID), $saleProduct->getSaleId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(SaleProductTableMap::PRODUCT_ID), $saleProduct->getProductId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
+            $this->addUsingAlias(SaleProductTableMap::ID, $saleProduct->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;

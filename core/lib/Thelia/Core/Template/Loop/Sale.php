@@ -95,7 +95,6 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
     public function buildModelCriteria()
     {
-
         $search = SaleQuery::create();
 
         /* manage translations */
@@ -123,6 +122,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
             $search
                 ->useSaleProductQuery()
                     ->filterByProductId($productIdList, Criteria::IN)
+                    ->groupByProductId()
                 ->endUse()
             ;
         }
@@ -224,9 +224,9 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 ->set("ACTIVE"                  , $sale->getActive())
                 ->set("DISPLAY_INITIAL_PRICE"   , $sale->getDisplayInitialPrice())
                 ->set("START_DATE"              , $sale->getStartDate())
-                ->set("HAS_START_DATE"          , $sale->hasStartDate() ? 0 : 1)
+                ->set("HAS_START_DATE"          , $sale->hasStartDate() ? 1 : 0)
                 ->set("END_DATE"                , $sale->getEndDate())
-                ->set("HAS_END_DATE"            , $sale->hasEndDate() ? 0 : 1)
+                ->set("HAS_END_DATE"            , $sale->hasEndDate() ? 1 : 0)
                 ->set("PRICE_OFFSET_TYPE"       , $priceOffsetType)
                 ->set("PRICE_OFFSET_SYMBOL"     , $priceOffsetSymbol)
                 ->set("PRICE_OFFSET_VALUE"      , $sale->getVirtualColumn('price_offset_value'))

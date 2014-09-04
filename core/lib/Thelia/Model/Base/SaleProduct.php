@@ -58,6 +58,12 @@ abstract class SaleProduct implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
+     * The value for the id field.
+     * @var        int
+     */
+    protected $id;
+
+    /**
      * The value for the sale_id field.
      * @var        int
      */
@@ -357,6 +363,17 @@ abstract class SaleProduct implements ActiveRecordInterface
     }
 
     /**
+     * Get the [id] column value.
+     *
+     * @return   int
+     */
+    public function getId()
+    {
+
+        return $this->id;
+    }
+
+    /**
      * Get the [sale_id] column value.
      *
      * @return   int
@@ -388,6 +405,27 @@ abstract class SaleProduct implements ActiveRecordInterface
 
         return $this->attribute_av_id;
     }
+
+    /**
+     * Set the value of [id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\SaleProduct The current object (for fluent API support)
+     */
+    public function setId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->id !== $v) {
+            $this->id = $v;
+            $this->modifiedColumns[SaleProductTableMap::ID] = true;
+        }
+
+
+        return $this;
+    } // setId()
 
     /**
      * Set the value of [sale_id] column.
@@ -501,13 +539,16 @@ abstract class SaleProduct implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleProductTableMap::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : SaleProductTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleProductTableMap::translateFieldName('SaleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sale_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : SaleProductTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SaleProductTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : SaleProductTableMap::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : SaleProductTableMap::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_av_id = (null !== $col) ? (int) $col : null;
             $this->resetModified();
 
@@ -517,7 +558,7 @@ abstract class SaleProduct implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 3; // 3 = SaleProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = SaleProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\SaleProduct object", 0, $e);
@@ -758,8 +799,15 @@ abstract class SaleProduct implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[SaleProductTableMap::ID] = true;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . SaleProductTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
+        if ($this->isColumnModified(SaleProductTableMap::ID)) {
+            $modifiedColumns[':p' . $index++]  = '`ID`';
+        }
         if ($this->isColumnModified(SaleProductTableMap::SALE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`SALE_ID`';
         }
@@ -780,6 +828,9 @@ abstract class SaleProduct implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
+                    case '`ID`':
+                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
+                        break;
                     case '`SALE_ID`':
                         $stmt->bindValue($identifier, $this->sale_id, PDO::PARAM_INT);
                         break;
@@ -796,6 +847,13 @@ abstract class SaleProduct implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -845,12 +903,15 @@ abstract class SaleProduct implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getSaleId();
+                return $this->getId();
                 break;
             case 1:
-                return $this->getProductId();
+                return $this->getSaleId();
                 break;
             case 2:
+                return $this->getProductId();
+                break;
+            case 3:
                 return $this->getAttributeAvId();
                 break;
             default:
@@ -876,15 +937,16 @@ abstract class SaleProduct implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['SaleProduct'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['SaleProduct'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['SaleProduct'][serialize($this->getPrimaryKey())] = true;
+        $alreadyDumpedObjects['SaleProduct'][$this->getPrimaryKey()] = true;
         $keys = SaleProductTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getSaleId(),
-            $keys[1] => $this->getProductId(),
-            $keys[2] => $this->getAttributeAvId(),
+            $keys[0] => $this->getId(),
+            $keys[1] => $this->getSaleId(),
+            $keys[2] => $this->getProductId(),
+            $keys[3] => $this->getAttributeAvId(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -936,12 +998,15 @@ abstract class SaleProduct implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setSaleId($value);
+                $this->setId($value);
                 break;
             case 1:
-                $this->setProductId($value);
+                $this->setSaleId($value);
                 break;
             case 2:
+                $this->setProductId($value);
+                break;
+            case 3:
                 $this->setAttributeAvId($value);
                 break;
         } // switch()
@@ -968,9 +1033,10 @@ abstract class SaleProduct implements ActiveRecordInterface
     {
         $keys = SaleProductTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setSaleId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAttributeAvId($arr[$keys[2]]);
+        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setSaleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setAttributeAvId($arr[$keys[3]]);
     }
 
     /**
@@ -982,6 +1048,7 @@ abstract class SaleProduct implements ActiveRecordInterface
     {
         $criteria = new Criteria(SaleProductTableMap::DATABASE_NAME);
 
+        if ($this->isColumnModified(SaleProductTableMap::ID)) $criteria->add(SaleProductTableMap::ID, $this->id);
         if ($this->isColumnModified(SaleProductTableMap::SALE_ID)) $criteria->add(SaleProductTableMap::SALE_ID, $this->sale_id);
         if ($this->isColumnModified(SaleProductTableMap::PRODUCT_ID)) $criteria->add(SaleProductTableMap::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(SaleProductTableMap::ATTRIBUTE_AV_ID)) $criteria->add(SaleProductTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
@@ -1000,36 +1067,29 @@ abstract class SaleProduct implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(SaleProductTableMap::DATABASE_NAME);
-        $criteria->add(SaleProductTableMap::SALE_ID, $this->sale_id);
-        $criteria->add(SaleProductTableMap::PRODUCT_ID, $this->product_id);
+        $criteria->add(SaleProductTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return   int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getSaleId();
-        $pks[1] = $this->getProductId();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param       int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setSaleId($keys[0]);
-        $this->setProductId($keys[1]);
+        $this->setId($key);
     }
 
     /**
@@ -1039,7 +1099,7 @@ abstract class SaleProduct implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getSaleId()) && (null === $this->getProductId());
+        return null === $this->getId();
     }
 
     /**
@@ -1060,6 +1120,7 @@ abstract class SaleProduct implements ActiveRecordInterface
         $copyObj->setAttributeAvId($this->getAttributeAvId());
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1243,6 +1304,7 @@ abstract class SaleProduct implements ActiveRecordInterface
      */
     public function clear()
     {
+        $this->id = null;
         $this->sale_id = null;
         $this->product_id = null;
         $this->attribute_av_id = null;

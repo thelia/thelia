@@ -235,7 +235,7 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  array $products an array of (product_id => product_sale_elements ids[])
+     * @param  array $products an array of product ID
      * @return $this
      */
     public function setProducts($products)
@@ -271,5 +271,4 @@ class SaleUpdateEvent extends SaleCreateEvent
     {
         return $this->productAttributes;
     }
-
 }

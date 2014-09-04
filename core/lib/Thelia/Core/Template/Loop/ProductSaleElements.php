@@ -49,6 +49,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('currency'),
             Argument::createIntTypeArgument('product'),
+            Argument::createBooleanTypeArgument('promo'),
+            Argument::createBooleanTypeArgument('new'),
+            Argument::createBooleanTypeArgument('default'),
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
@@ -81,6 +84,24 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             } else {
                 throw new \InvalidArgumentException("Either 'id' or 'product' argument should be present");
             }
+        }
+
+        $promo = $this->getPromo();
+
+        if (null !== $promo) {
+            $search->filterByPromo($promo);
+        }
+
+        $new = $this->getNew();
+
+        if (null !== $new) {
+            $search->filterByPromo($new);
+        }
+
+        $default = $this->getDefault();
+
+        if (null !== $default) {
+            $search->filterByIsDefault($default);
         }
 
         $orders  = $this->getOrder();

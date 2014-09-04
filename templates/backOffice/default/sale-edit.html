@@ -229,7 +229,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {intl l='Cancel'}</button>
-                <button type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {intl l='Save'}</button>
+                <button type="button" data-dismiss="modal" class="btn btn-default btn-primary" aria-hidden="true" id="submit-attribute-selector"><span class="glyphicon glyphicon-check"></span> {intl l='Save'}</button>
             </div>
         </div>
     </div>
@@ -269,11 +269,16 @@
         $(document.body).on('change', '.product-selector-checkbox', function() {
             var $is_on = $(this).is(':checked');
             var $row = $('tr[data-product-id=' + $(this).data('product-id') + ']');
+            var $attrButton = $('button[data-product-id=' + $(this).data('product-id') + ']');
 
-            if ($is_on)
+            if ($is_on) {
                 $row.addClass('success');
-            else
+            }
+            else {
                 $row.removeClass('success');
+            }
+
+            $attrButton.prop('disabled', ! $is_on);
         });
 
         $(document.body).on('click', '.product-attribute-selector', function(ev) {
@@ -330,11 +335,49 @@
             ev.preventDefault();
         });
 
+        $('#submit-attribute-selector').click(function(ev) {
+            // Build the products attribute list
+            var attrAvIds = [];
 
+            $('input.attribute-selector-box:checked').each(function(idx, val) {
+                attrAvIds.push($(this).val());
+            });
 
+            var productId = $('input[name=attribute-selector-product-id]').val();
+
+            var attrAvIdsStr = attrAvIds.join(',');
+
+            setProductAttributeIds(productId, attrAvIdsStr);
+        });
+
+        function setProductAttributeIds(productId, attrAvIdsStr) {
+
+            $('input.product-selected-attributes-ids[data-product-id='+productId+']').val(attrAvIdsStr);
+
+            var $attrSelectButton = $('button[data-product-id=' + productId + ']');
+
+            if (attrAvIdsStr == '') {
+                $attrSelectButton
+                        .removeClass('btn-success')
+                        .addClass('btn-primary')
+                        .html("{intl l='All' js=1}");
+            }
+            else {
+                $attrSelectButton
+                        .removeClass('btn-primary')
+                        .addClass('btn-success')
+                        .html("{intl l='Click to view' js=1}");
+            }
+
+        }
         {form_field form=$form field="products"}
-        // This is the products IDs as hydrated in the controler.
-        var selected_product_ids_at_page_load = [ {$value|implode:','} ];
+            // This is the products IDs as hydrated in the controller.
+            var selected_product_ids_at_page_load = [ {$value|implode:','} ];
+        {/form_field}
+
+        {form_field form=$form field="product_attributes"}
+            // This is the products IDs as hydrated in the controller.
+            var selected_attributes_avs_ids_at_page_load = {$value|@json_encode nofilter};
         {/form_field}
 
         function update_product_list() {
@@ -351,16 +394,24 @@
             //
             // If the page have just been loaded, use the product IDs from selected_product_ids_at_page_load variable
             // otherwise, use the checkboxes in the products table.
-            // We should do that, as the form is nor hydrated by the controller when the sale-edit-products template is processed.
+            // We should do that, as the form is not hydrated by the controller when the sale-edit-products template is processed.
 
             var selected_products;
+            var selected_attributes;
 
             if (selected_product_ids_at_page_load) {
                 selected_products = selected_product_ids_at_page_load;
+                selected_attributes = selected_attributes_avs_ids_at_page_load;
 
                 selected_product_ids_at_page_load = false;
             }
             else {
+                selected_attributes = new Object();
+
+                $('input.product-selected-attributes-ids').each(function(idx, checkbox) {
+                    selected_attributes[$(this).data('product-id')] = $(this).val();
+                });
+
                 selected_products = $.map($('.product-selector-checkbox:checked') ,function(box) {
                     return box.value;
                 });
@@ -379,6 +430,10 @@
             }).done(function(data, textStatus, jqXHR) {
                 $('#sale-products-list').html(data)
                 $('button.category-manipulation').prop('disabled', false);
+
+                $.each(selected_attributes, function(productId, attrAvIdsStr) {
+                    setProductAttributeIds(productId, attrAvIdsStr);
+                });
             });
         }
 
@@ -397,7 +452,7 @@
             $.ajax(url, {
                 type: 'POST',
                 data: {
-
+                    selected_attributes_av_id: $('input.product-selected-attributes-ids[data-product-id=' + product_id + ']').val()
                 }
             }).always(function() {
                 $('#loading-product-attributes').hide();
@@ -405,7 +460,6 @@
                 $('.product-attributes-list', $dialog).html(data)
                 $('button.category-manipulation').prop('disabled', false);
             });
-
         }
 
         update_product_list();

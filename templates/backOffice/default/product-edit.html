@@ -291,8 +291,6 @@ $(function() {
                 type     : 'get',
                 dataType : 'json',
                 success  : function(json) {
-                	console.log(json);
-
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="price-with-tax"]').val(json.price_with_tax);
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="price-without-tax"]').val(json.price_without_tax);
                     $('input[data-pse-id="'+pse_id+'"][data-price-type="sale-price-with-tax"]').val(json.sale_price_with_tax);
@@ -383,20 +381,15 @@ $(function() {
     	var list = $('.attribute_av_value:checked');
 
     	if (list.length > 0) {
-    		console.log("ok !");
 
 	    	list.each(function() {
 	    		var attr_id = $(this).data('attribute-id');
-
-	    		console.log("att="+attr_id);
 
 	    		if (undefined != counter[attr_id])
 	    			counter[attr_id]++;
 	    		else
 	    			counter[attr_id] = 1;
 	    	});
-
-	    	console.log(counter);
 
 	    	total = 1;
 

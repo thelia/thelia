@@ -191,7 +191,7 @@ class CategoryController extends AbstractSeoCrudController
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute(
-            'admin.categories',
+            'admin.categories.default',
             [
                 'category_id' => $this->getRequest()->get('category_id', 0),
                 'page' => $this->getRequest()->get('page', 1)
