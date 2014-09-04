@@ -315,6 +315,7 @@ class ContentController extends AbstractSeoCrudController
     {
         return $this->generateRedirectFromRoute(
             'admin.content.update',
+            [],
             $this->getEditionArguments()
         );
     }
