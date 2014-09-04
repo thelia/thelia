@@ -276,7 +276,6 @@ form_error_message = $form_error_message
                 $fEmpty  = $('#hooks-filter-empty');
 
             var filterProcess = function filterProcess(){
-                console.log(this, isFilterProcessing);
                 if (! isFilterProcessing) {
                     isFilterProcessing = true;
 
@@ -286,7 +285,6 @@ form_error_message = $form_error_message
                         type: $fType.val(),
                         empty: $fEmpty.is(":checked")
                     };
-                    console.log("filtering", formData);
 
                     // filters hook type first
                     $(".hooks .hook").each(function(){

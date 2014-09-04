@@ -19,6 +19,7 @@ use Thelia\Core\Event\Sale\SaleCreateEvent;
 use Thelia\Core\Event\Sale\SaleDeleteEvent;
 use Thelia\Core\Event\Sale\SaleToggleActivityEvent;
 use Thelia\Core\Event\Sale\SaleUpdateEvent;
+use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -97,6 +98,8 @@ class SaleTest extends TestCaseWithURLToolSetup
 
         $date = new \DateTime();
 
+        $product = ProductQuery::create()->findOne();
+
         $event = new SaleUpdateEvent($sale->getId());
         $event->setDispatcher($this->dispatcher);
         $event
@@ -106,7 +109,50 @@ class SaleTest extends TestCaseWithURLToolSetup
             ->setDisplayInitialPrice(1)
             ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_AMOUNT)
             ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
-            ->setProducts([ProductQuery::create()->findOne()->getId() => []])
+            ->setProducts([$product->getId()])
+            ->setProductAttributes([])
+            ->setLocale('en_US')
+            ->setTitle('test update sale title')
+            ->setChapo('test update sale short description')
+            ->setDescription('test update sale description')
+            ->setPostscriptum('test update sale postscriptum')
+            ->setSaleLabel('test create sale label')
+        ;
+
+        $saleAction = new Sale($this->getContainer());
+        $saleAction->update($event);
+
+        $updatedSale = $event->getSale();
+
+        $this->assertInstanceOf('Thelia\Model\Sale', $updatedSale);
+        $this->assertEquals(1, $updatedSale->getActive());
+        $this->assertEquals('test update sale title', $updatedSale->getTitle());
+        $this->assertEquals('test update sale short description', $updatedSale->getChapo());
+        $this->assertEquals('test update sale description', $updatedSale->getDescription());
+        $this->assertEquals('test update sale postscriptum', $updatedSale->getPostscriptum());
+        $this->assertEquals('test create sale label', $updatedSale->getSaleLabel());
+    }
+
+    public function testUpdatePseSale()
+    {
+        $sale = $this->getRandomSale();
+
+        $date = new \DateTime();
+
+        $product = ProductQuery::create()->findOne();
+        $attrAv = AttributeAvQuery::create()->findOne();
+
+        $event = new SaleUpdateEvent($sale->getId());
+        $event->setDispatcher($this->dispatcher);
+        $event
+            ->setStartDate($date->setTimestamp(strtotime("today - 1 month")))
+            ->setEndDate($date->setTimestamp(strtotime("today + 1 month")))
+            ->setActive(1)
+            ->setDisplayInitialPrice(1)
+            ->setPriceOffsetType(\Thelia\Model\Sale::OFFSET_TYPE_AMOUNT)
+            ->setPriceOffsets([ CurrencyQuery::create()->findOne()->getId() => 10 ])
+            ->setProducts([$product->getId()])
+            ->setProductAttributes([$product->getId() => [ $attrAv->getId()] ])
             ->setLocale('en_US')
             ->setTitle('test update sale title')
             ->setChapo('test update sale short description')

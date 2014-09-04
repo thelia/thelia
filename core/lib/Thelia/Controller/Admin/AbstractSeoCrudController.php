@@ -123,7 +123,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     /**
      * Hydrate the SEO form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param mixed $object
      */
     protected function hydrateSeoForm($object)
     {

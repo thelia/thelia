@@ -1942,12 +1942,13 @@ DROP TABLE IF EXISTS `sale_product`;
 
 CREATE TABLE `sale_product`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `sale_id` INTEGER NOT NULL,
     `product_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER,
-    PRIMARY KEY (`sale_id`,`product_id`),
-    INDEX `fk_sale_product_product1_idx` (`product_id`),
-    INDEX `fk_sale_product_attribute_av1_idx` (`attribute_av_id`),
+    PRIMARY KEY (`id`),
+    INDEX `fk_sale_product_product_idx` (`product_id`),
+    INDEX `fk_sale_product_attribute_av_idx` (`attribute_av_id`),
     INDEX `idx_sale_product_sales_id_product_id` (`sale_id`, `product_id`),
     CONSTRAINT `fk_sale_product_sales_id`
         FOREIGN KEY (`sale_id`)

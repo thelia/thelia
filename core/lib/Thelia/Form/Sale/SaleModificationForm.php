@@ -196,7 +196,7 @@ class SaleModificationForm extends SaleCreationForm
             'product_attributes',
             'collection',
             [
-                'type'         => 'integer',
+                'type'         => 'text',
                 'required'     => false,
                 'allow_add'    => true,
                 'allow_delete' => true,

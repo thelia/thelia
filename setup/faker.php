@@ -488,15 +488,16 @@ try {
         }
 
         //associate PSE and stocks to products
-        for ($i=0; $i<rand(1,7); $i++) {
+        $pse_count = rand(1,7);
+        for ($pse_idx=0; $pse_idx<$pse_count; $pse_idx++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
-            $stock->setRef($productId . '_' . $i . '_' . $faker->randomNumber(8));
+            $stock->setRef($productId . '_' . $pse_idx . '_' . $faker->randomNumber(8));
             $stock->setQuantity($faker->numberBetween(1,50));
             $stock->setPromo($faker->numberBetween(0,1));
             $stock->setNewness($faker->numberBetween(0,1));
             $stock->setWeight($faker->randomFloat(2, 1, 5));
-            $stock->setIsDefault($i == 0);
+            $stock->setIsDefault($pse_idx == 0 ? true : false);
             $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
             $stock->save();
 
@@ -510,7 +511,10 @@ try {
             //associate attributes - or not - to PSE
 
             $alreadyPicked = array();
-            for ($i=0; $i<rand(-2,count($attributeList)); $i++) {
+            $minAttrCount = $pse_count == 1 ? 0 : 1;
+
+            for ($attrIdx=0; $attrIdx<rand($minAttrCount,count($attributeList)); $attrIdx++) {
+
                 $featureProduct = new Thelia\Model\AttributeCombination();
                 do {
                     $pick = array_rand($attributeList, 1);
