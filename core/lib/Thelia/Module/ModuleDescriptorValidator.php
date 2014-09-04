@@ -12,6 +12,8 @@
 
 namespace Thelia\Module;
 
+use ErrorException;
+use Symfony\Component\Finder\Finder;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
 /**
@@ -21,11 +23,13 @@ use Thelia\Module\Exception\InvalidXmlDocumentException;
  */
 class ModuleDescriptorValidator
 {
-    private $xsd_file;
 
     public function __construct()
     {
-        $this->xsd_file = __DIR__ . '/schema/module/module.xsd';
+        $this->xsdFinder = new Finder();
+        $this->xsdFinder
+            ->name('*.xsd')
+            ->in(__DIR__ . '/schema/module/');
     }
 
     public function validate($xml_file)
@@ -33,8 +37,13 @@ class ModuleDescriptorValidator
         $dom = new \DOMDocument();
 
         if ($dom->load($xml_file)) {
-            if ($dom->schemaValidate($this->xsd_file)) {
-                return true;
+            // todo: detect the right version of xsd for the module
+            foreach ($this->xsdFinder as $xsdFile){
+                try{
+                    if ($dom->schemaValidate($xsdFile->getRealPath())) {
+                        return true;
+                    }
+                } catch (ErrorException $ex) {}
             }
         }
 
