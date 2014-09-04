@@ -212,13 +212,10 @@ class SmartyAssetsManager
 
         $full_path = rtrim($dir, DS) . DS . ltrim($file, DS);
 
-        $path = dirname($full_path);
-        $name = basename($full_path);
-
         try {
-            $finder = new Finder();
+            $files = glob($full_path);
 
-            $files_found = $finder->files()->in($path)->name($name)->count() > 0;
+            $files_found = ! empty($files);
         } catch (\Exception $ex) {
             Tlog::getInstance()->addError($ex->getMessage());
 
