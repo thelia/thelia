@@ -310,7 +310,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function redirectToEditionTemplate(Request $request = null)
     {
-        return $this->generateRedirectFromRoute('admin.folders.update', $this->getEditionArguments($request));
+        return $this->generateRedirectFromRoute('admin.folders.update', [], $this->getEditionArguments($request));
     }
 
     /**

@@ -205,7 +205,7 @@ class OrderController extends BaseFrontController
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             } else {
-                return $this->generateRedirectFromRoute('order.placed', ['order_id' => $orderEvent->getPlacedOrder()->getId()]);
+                return $this->generateRedirectFromRoute('order.placed', [], ['order_id' => $orderEvent->getPlacedOrder()->getId()]);
             }
         } else {
             /* order has not been placed */

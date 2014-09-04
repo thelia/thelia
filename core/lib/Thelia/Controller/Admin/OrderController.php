@@ -91,7 +91,7 @@ class OrderController extends BaseAdminController
         } else {
             $params["order_id"] = $order_id;
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
-            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params);
+            $response = $this->generateRedirectFromRoute("admin.order.update.view", [], $params);
         }
 
         return $response;
@@ -130,7 +130,7 @@ class OrderController extends BaseAdminController
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", $params
+            "admin.order.update.view", [], $params
         );
     }
 
@@ -188,7 +188,7 @@ class OrderController extends BaseAdminController
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", $params
+            "admin.order.update.view", [], $params
         );
 
     }
