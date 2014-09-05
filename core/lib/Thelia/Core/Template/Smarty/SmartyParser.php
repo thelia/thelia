@@ -318,10 +318,10 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template, either from file or ftom a string
      *
-     * @param string $resourceType either 'string' (rendering from a string) or 'file' (rendering a file)
+     * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
      * @param string $resourceContent the resource content (a text, or a template file name)
-     * @param array $parameters an associative array of names / value pairs
-     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param array  $parameters      an associative array of names / value pairs
+     * @param bool   $compressOutput  if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @return string the rendered template text
      */
@@ -352,7 +352,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param  string                    $realTemplateName the template name (from the template directory)
      * @param  array                     $parameters       an associative array of names / value pairs
      * @return string                    the rendered template text
-     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @throws ResourceNotFoundException if the template cannot be found
      */
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
@@ -385,9 +385,9 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template text
      *
-     * @param  string $templateText the template text
-     * @param  array  $parameters   an associative array of names / value pairs
-     * @param bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param  string $templateText   the template text
+     * @param  array  $parameters     an associative array of names / value pairs
+     * @param  bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @return string the rendered template text
      */
     public function renderString($templateText, array $parameters = array(), $compressOutput = true)

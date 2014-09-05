@@ -11,6 +11,7 @@
 - Added `store_notification_emails`, which contains the recipients of shop notification (such as order placed)
 - Added admin notification e-mail for order placed
 - Improved other emails (specially text versions)
+- Added ORDER_SEND_NOTIFICATION_EMAIL event
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :

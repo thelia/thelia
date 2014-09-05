@@ -22,10 +22,10 @@ class ConfigStoreForm extends BaseForm
     protected function buildForm()
     {
         $tr = Translator::getInstance();
-        
+
         $this->formBuilder
             ->add(
-                'store_name', 
+                'store_name',
                 'text', [
                     'data' => ConfigQuery::read('store_name'),
                     'constraints' => [ new Constraints\NotBlank() ],
@@ -197,13 +197,13 @@ class ConfigStoreForm extends BaseForm
             ;
     }
 
-    function checkEmailList($value, ExecutionContextInterface $context)
+    public function checkEmailList($value, ExecutionContextInterface $context)
     {
         $list = preg_split('/[,;]/', $value);
 
         $emailValidator = new Constraints\Email();
 
-        foreach($list as $email) {
+        foreach ($list as $email) {
 
             $email = trim($email);
 

@@ -370,13 +370,13 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param \Thelia\Model\Order $order
-     * @param string $messageCode
+     * @param  \Thelia\Model\Order       $order
+     * @param  string                    $messageCode
      * @return \Swift_Mime_SimpleMessage
      * @throws \Exception
      */
-    protected function createOrderMessage($order, $messageCode) {
-
+    protected function createOrderMessage($order, $messageCode)
+    {
         $message = MessageQuery::create()
             ->filterByName($messageCode)
             ->findOne();
@@ -438,7 +438,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         }
     }
 
-
     /**
      * @param OrderEvent $event
      *
@@ -455,14 +454,13 @@ class Order extends BaseAction implements EventSubscriberInterface
             // Send the order notification to the shop owner
             $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_notification');
 
-
             $emailMessage
                 ->addFrom($contactEmail, $storeName)
             ;
 
             $recipients = ConfigQuery::getNotificationEmailsList();
 
-            foreach($recipients as $recipient) {
+            foreach ($recipients as $recipient) {
                 $emailMessage
                     ->addTo($recipient, $storeName)
                 ;

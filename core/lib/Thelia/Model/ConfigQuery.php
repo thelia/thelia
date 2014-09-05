@@ -116,15 +116,15 @@ class ConfigQuery extends BaseConfigQuery
     /**
      * @return array a list of email addresses to send the shop's notifications
      */
-    public static function getNotificationEmailsList() {
-
+    public static function getNotificationEmailsList()
+    {
         $contactEmail = self::read('store_email', '<undefined>');
 
         $list = preg_split("/[,;]/", self::read('store_notification_emails', $contactEmail));
 
         $arr = [];
 
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $arr[] = trim($item);
         }
 

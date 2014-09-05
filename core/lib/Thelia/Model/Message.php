@@ -71,7 +71,7 @@ class Message extends BaseMessage
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
 
-     * @param ParserInterface $parser
+     * @param  ParserInterface $parser
      * @param $message
      * @param $layout
      * @param $template
