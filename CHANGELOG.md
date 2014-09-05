@@ -12,6 +12,7 @@
 - Added admin notification e-mail for order placed
 - Improved other emails (specially text versions)
 - Added ORDER_SEND_NOTIFICATION_EMAIL event
+- class-loader component is removed, it was not used anymore.
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :
