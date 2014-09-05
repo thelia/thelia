@@ -23,6 +23,7 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\CustomerVersionQuery as ChildCustomerVersionQuery;
 use Thelia\Model\Lang as ChildLang;
 use Thelia\Model\LangQuery as ChildLangQuery;
 use Thelia\Model\Module as ChildModule;
@@ -3884,6 +3885,10 @@ abstract class Order implements ActiveRecordInterface
         if (ChildOrderQuery::isVersioningEnabled() && ($this->isNew() || $this->isModified()) || $this->isDeleted()) {
             return true;
         }
+        if (null !== ($object = $this->getCustomer($con)) && $object->isVersioningNecessary($con)) {
+            return true;
+        }
+
 
         return false;
     }
@@ -3924,6 +3929,9 @@ abstract class Order implements ActiveRecordInterface
         $version->setVersionCreatedAt($this->getVersionCreatedAt());
         $version->setVersionCreatedBy($this->getVersionCreatedBy());
         $version->setOrder($this);
+        if (($related = $this->getCustomer($con)) && $related->getVersion()) {
+            $version->setCustomerIdVersion($related->getVersion());
+        }
         $version->save($con);
 
         return $version;
@@ -3983,6 +3991,20 @@ abstract class Order implements ActiveRecordInterface
         $this->setVersion($version->getVersion());
         $this->setVersionCreatedAt($version->getVersionCreatedAt());
         $this->setVersionCreatedBy($version->getVersionCreatedBy());
+        if ($fkValue = $version->getCustomerId()) {
+            if (isset($loadedObjects['ChildCustomer']) && isset($loadedObjects['ChildCustomer'][$fkValue]) && isset($loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()])) {
+                $related = $loadedObjects['ChildCustomer'][$fkValue][$version->getCustomerIdVersion()];
+            } else {
+                $related = new ChildCustomer();
+                $relatedVersion = ChildCustomerVersionQuery::create()
+                    ->filterById($fkValue)
+                    ->filterByVersion($version->getCustomerIdVersion())
+                    ->findOne($con);
+                $related->populateFromVersion($relatedVersion, $con, $loadedObjects);
+                $related->setNew(false);
+            }
+            $this->setCustomer($related);
+        }
 
         return $this;
     }

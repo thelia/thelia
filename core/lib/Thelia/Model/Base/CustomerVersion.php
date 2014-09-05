@@ -16,17 +16,17 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Order as ChildOrder;
-use Thelia\Model\OrderQuery as ChildOrderQuery;
-use Thelia\Model\OrderVersionQuery as ChildOrderVersionQuery;
-use Thelia\Model\Map\OrderVersionTableMap;
+use Thelia\Model\Customer as ChildCustomer;
+use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\CustomerVersionQuery as ChildCustomerVersionQuery;
+use Thelia\Model\Map\CustomerVersionTableMap;
 
-abstract class OrderVersion implements ActiveRecordInterface
+abstract class CustomerVersion implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\OrderVersionTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CustomerVersionTableMap';
 
 
     /**
@@ -68,58 +68,58 @@ abstract class OrderVersion implements ActiveRecordInterface
     protected $ref;
 
     /**
-     * The value for the customer_id field.
+     * The value for the title_id field.
      * @var        int
      */
-    protected $customer_id;
+    protected $title_id;
 
     /**
-     * The value for the invoice_order_address_id field.
+     * The value for the firstname field.
+     * @var        string
+     */
+    protected $firstname;
+
+    /**
+     * The value for the lastname field.
+     * @var        string
+     */
+    protected $lastname;
+
+    /**
+     * The value for the email field.
+     * @var        string
+     */
+    protected $email;
+
+    /**
+     * The value for the password field.
+     * @var        string
+     */
+    protected $password;
+
+    /**
+     * The value for the algo field.
+     * @var        string
+     */
+    protected $algo;
+
+    /**
+     * The value for the reseller field.
      * @var        int
      */
-    protected $invoice_order_address_id;
+    protected $reseller;
 
     /**
-     * The value for the delivery_order_address_id field.
-     * @var        int
-     */
-    protected $delivery_order_address_id;
-
-    /**
-     * The value for the invoice_date field.
+     * The value for the lang field.
      * @var        string
      */
-    protected $invoice_date;
+    protected $lang;
 
     /**
-     * The value for the currency_id field.
-     * @var        int
-     */
-    protected $currency_id;
-
-    /**
-     * The value for the currency_rate field.
-     * @var        double
-     */
-    protected $currency_rate;
-
-    /**
-     * The value for the transaction_ref field.
+     * The value for the sponsor field.
      * @var        string
      */
-    protected $transaction_ref;
-
-    /**
-     * The value for the delivery_ref field.
-     * @var        string
-     */
-    protected $delivery_ref;
-
-    /**
-     * The value for the invoice_ref field.
-     * @var        string
-     */
-    protected $invoice_ref;
+    protected $sponsor;
 
     /**
      * The value for the discount field.
@@ -128,40 +128,16 @@ abstract class OrderVersion implements ActiveRecordInterface
     protected $discount;
 
     /**
-     * The value for the postage field.
-     * @var        double
+     * The value for the remember_me_token field.
+     * @var        string
      */
-    protected $postage;
+    protected $remember_me_token;
 
     /**
-     * The value for the payment_module_id field.
-     * @var        int
+     * The value for the remember_me_serial field.
+     * @var        string
      */
-    protected $payment_module_id;
-
-    /**
-     * The value for the delivery_module_id field.
-     * @var        int
-     */
-    protected $delivery_module_id;
-
-    /**
-     * The value for the status_id field.
-     * @var        int
-     */
-    protected $status_id;
-
-    /**
-     * The value for the lang_id field.
-     * @var        int
-     */
-    protected $lang_id;
-
-    /**
-     * The value for the cart_id field.
-     * @var        int
-     */
-    protected $cart_id;
+    protected $remember_me_serial;
 
     /**
      * The value for the created_at field.
@@ -195,16 +171,35 @@ abstract class OrderVersion implements ActiveRecordInterface
     protected $version_created_by;
 
     /**
-     * The value for the customer_id_version field.
-     * Note: this column has a database default value of: 0
-     * @var        int
+     * The value for the order_ids field.
+     * @var        array
      */
-    protected $customer_id_version;
+    protected $order_ids;
 
     /**
-     * @var        Order
+     * The unserialized $order_ids value - i.e. the persisted object.
+     * This is necessary to avoid repeated calls to unserialize() at runtime.
+     * @var object
      */
-    protected $aOrder;
+    protected $order_ids_unserialized;
+
+    /**
+     * The value for the order_versions field.
+     * @var        array
+     */
+    protected $order_versions;
+
+    /**
+     * The unserialized $order_versions value - i.e. the persisted object.
+     * This is necessary to avoid repeated calls to unserialize() at runtime.
+     * @var object
+     */
+    protected $order_versions_unserialized;
+
+    /**
+     * @var        Customer
+     */
+    protected $aCustomer;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -223,11 +218,10 @@ abstract class OrderVersion implements ActiveRecordInterface
     public function applyDefaultValues()
     {
         $this->version = 0;
-        $this->customer_id_version = 0;
     }
 
     /**
-     * Initializes internal state of Thelia\Model\Base\OrderVersion object.
+     * Initializes internal state of Thelia\Model\Base\CustomerVersion object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -324,9 +318,9 @@ abstract class OrderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>OrderVersion</code> instance.  If
-     * <code>obj</code> is an instance of <code>OrderVersion</code>, delegates to
-     * <code>equals(OrderVersion)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CustomerVersion</code> instance.  If
+     * <code>obj</code> is an instance of <code>CustomerVersion</code>, delegates to
+     * <code>equals(CustomerVersion)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -409,7 +403,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return OrderVersion The current object, for fluid interface
+     * @return CustomerVersion The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -441,7 +435,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return OrderVersion The current object, for fluid interface
+     * @return CustomerVersion The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -509,111 +503,102 @@ abstract class OrderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [customer_id] column value.
+     * Get the [title_id] column value.
      *
      * @return   int
      */
-    public function getCustomerId()
+    public function getTitleId()
     {
 
-        return $this->customer_id;
+        return $this->title_id;
     }
 
     /**
-     * Get the [invoice_order_address_id] column value.
+     * Get the [firstname] column value.
      *
-     * @return   int
-     */
-    public function getInvoiceOrderAddressId()
-    {
-
-        return $this->invoice_order_address_id;
-    }
-
-    /**
-     * Get the [delivery_order_address_id] column value.
-     *
-     * @return   int
-     */
-    public function getDeliveryOrderAddressId()
-    {
-
-        return $this->delivery_order_address_id;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [invoice_date] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getInvoiceDate($format = NULL)
-    {
-        if ($format === null) {
-            return $this->invoice_date;
-        } else {
-            return $this->invoice_date instanceof \DateTime ? $this->invoice_date->format($format) : null;
-        }
-    }
-
-    /**
-     * Get the [currency_id] column value.
-     *
-     * @return   int
-     */
-    public function getCurrencyId()
-    {
-
-        return $this->currency_id;
-    }
-
-    /**
-     * Get the [currency_rate] column value.
-     *
-     * @return   double
-     */
-    public function getCurrencyRate()
-    {
-
-        return $this->currency_rate;
-    }
-
-    /**
-     * Get the [transaction_ref] column value.
-     * transaction reference - usually use to identify a transaction with banking modules
      * @return   string
      */
-    public function getTransactionRef()
+    public function getFirstname()
     {
 
-        return $this->transaction_ref;
+        return $this->firstname;
     }
 
     /**
-     * Get the [delivery_ref] column value.
-     * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
+     * Get the [lastname] column value.
+     *
      * @return   string
      */
-    public function getDeliveryRef()
+    public function getLastname()
     {
 
-        return $this->delivery_ref;
+        return $this->lastname;
     }
 
     /**
-     * Get the [invoice_ref] column value.
-     * the invoice reference
+     * Get the [email] column value.
+     *
      * @return   string
      */
-    public function getInvoiceRef()
+    public function getEmail()
     {
 
-        return $this->invoice_ref;
+        return $this->email;
+    }
+
+    /**
+     * Get the [password] column value.
+     *
+     * @return   string
+     */
+    public function getPassword()
+    {
+
+        return $this->password;
+    }
+
+    /**
+     * Get the [algo] column value.
+     *
+     * @return   string
+     */
+    public function getAlgo()
+    {
+
+        return $this->algo;
+    }
+
+    /**
+     * Get the [reseller] column value.
+     *
+     * @return   int
+     */
+    public function getReseller()
+    {
+
+        return $this->reseller;
+    }
+
+    /**
+     * Get the [lang] column value.
+     *
+     * @return   string
+     */
+    public function getLang()
+    {
+
+        return $this->lang;
+    }
+
+    /**
+     * Get the [sponsor] column value.
+     *
+     * @return   string
+     */
+    public function getSponsor()
+    {
+
+        return $this->sponsor;
     }
 
     /**
@@ -628,69 +613,25 @@ abstract class OrderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [postage] column value.
+     * Get the [remember_me_token] column value.
      *
-     * @return   double
+     * @return   string
      */
-    public function getPostage()
+    public function getRememberMeToken()
     {
 
-        return $this->postage;
+        return $this->remember_me_token;
     }
 
     /**
-     * Get the [payment_module_id] column value.
+     * Get the [remember_me_serial] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getPaymentModuleId()
+    public function getRememberMeSerial()
     {
 
-        return $this->payment_module_id;
-    }
-
-    /**
-     * Get the [delivery_module_id] column value.
-     *
-     * @return   int
-     */
-    public function getDeliveryModuleId()
-    {
-
-        return $this->delivery_module_id;
-    }
-
-    /**
-     * Get the [status_id] column value.
-     *
-     * @return   int
-     */
-    public function getStatusId()
-    {
-
-        return $this->status_id;
-    }
-
-    /**
-     * Get the [lang_id] column value.
-     *
-     * @return   int
-     */
-    public function getLangId()
-    {
-
-        return $this->lang_id;
-    }
-
-    /**
-     * Get the [cart_id] column value.
-     *
-     * @return   int
-     */
-    public function getCartId()
-    {
-
-        return $this->cart_id;
+        return $this->remember_me_serial;
     }
 
     /**
@@ -776,21 +717,68 @@ abstract class OrderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [customer_id_version] column value.
+     * Get the [order_ids] column value.
      *
-     * @return   int
+     * @return   array
      */
-    public function getCustomerIdVersion()
+    public function getOrderIds()
     {
+        if (null === $this->order_ids_unserialized) {
+            $this->order_ids_unserialized = array();
+        }
+        if (!$this->order_ids_unserialized && null !== $this->order_ids) {
+            $order_ids_unserialized = substr($this->order_ids, 2, -2);
+            $this->order_ids_unserialized = $order_ids_unserialized ? explode(' | ', $order_ids_unserialized) : array();
+        }
 
-        return $this->customer_id_version;
+        return $this->order_ids_unserialized;
     }
+
+    /**
+     * Test the presence of a value in the [order_ids] array column value.
+     * @param      mixed $value
+     *
+     * @return boolean
+     */
+    public function hasOrderId($value)
+    {
+        return in_array($value, $this->getOrderIds());
+    } // hasOrderId()
+
+    /**
+     * Get the [order_versions] column value.
+     *
+     * @return   array
+     */
+    public function getOrderVersions()
+    {
+        if (null === $this->order_versions_unserialized) {
+            $this->order_versions_unserialized = array();
+        }
+        if (!$this->order_versions_unserialized && null !== $this->order_versions) {
+            $order_versions_unserialized = substr($this->order_versions, 2, -2);
+            $this->order_versions_unserialized = $order_versions_unserialized ? explode(' | ', $order_versions_unserialized) : array();
+        }
+
+        return $this->order_versions_unserialized;
+    }
+
+    /**
+     * Test the presence of a value in the [order_versions] array column value.
+     * @param      mixed $value
+     *
+     * @return boolean
+     */
+    public function hasOrderVersion($value)
+    {
+        return in_array($value, $this->getOrderVersions());
+    } // hasOrderVersion()
 
     /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -800,11 +788,11 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::ID] = true;
+            $this->modifiedColumns[CustomerVersionTableMap::ID] = true;
         }
 
-        if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
-            $this->aOrder = null;
+        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
+            $this->aCustomer = null;
         }
 
 
@@ -815,7 +803,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * Set the value of [ref] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setRef($v)
     {
@@ -825,7 +813,7 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($this->ref !== $v) {
             $this->ref = $v;
-            $this->modifiedColumns[OrderVersionTableMap::REF] = true;
+            $this->modifiedColumns[CustomerVersionTableMap::REF] = true;
         }
 
 
@@ -833,199 +821,199 @@ abstract class OrderVersion implements ActiveRecordInterface
     } // setRef()
 
     /**
-     * Set the value of [customer_id] column.
+     * Set the value of [title_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setCustomerId($v)
+    public function setTitleId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->customer_id !== $v) {
-            $this->customer_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::CUSTOMER_ID] = true;
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::TITLE_ID] = true;
         }
 
 
         return $this;
-    } // setCustomerId()
+    } // setTitleId()
 
     /**
-     * Set the value of [invoice_order_address_id] column.
+     * Set the value of [firstname] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setInvoiceOrderAddressId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->invoice_order_address_id !== $v) {
-            $this->invoice_order_address_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID] = true;
-        }
-
-
-        return $this;
-    } // setInvoiceOrderAddressId()
-
-    /**
-     * Set the value of [delivery_order_address_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setDeliveryOrderAddressId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->delivery_order_address_id !== $v) {
-            $this->delivery_order_address_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID] = true;
-        }
-
-
-        return $this;
-    } // setDeliveryOrderAddressId()
-
-    /**
-     * Sets the value of [invoice_date] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setInvoiceDate($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->invoice_date !== null || $dt !== null) {
-            if ($dt !== $this->invoice_date) {
-                $this->invoice_date = $dt;
-                $this->modifiedColumns[OrderVersionTableMap::INVOICE_DATE] = true;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setInvoiceDate()
-
-    /**
-     * Set the value of [currency_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setCurrencyId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->currency_id !== $v) {
-            $this->currency_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::CURRENCY_ID] = true;
-        }
-
-
-        return $this;
-    } // setCurrencyId()
-
-    /**
-     * Set the value of [currency_rate] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setCurrencyRate($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->currency_rate !== $v) {
-            $this->currency_rate = $v;
-            $this->modifiedColumns[OrderVersionTableMap::CURRENCY_RATE] = true;
-        }
-
-
-        return $this;
-    } // setCurrencyRate()
-
-    /**
-     * Set the value of [transaction_ref] column.
-     * transaction reference - usually use to identify a transaction with banking modules
      * @param      string $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setTransactionRef($v)
+    public function setFirstname($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->transaction_ref !== $v) {
-            $this->transaction_ref = $v;
-            $this->modifiedColumns[OrderVersionTableMap::TRANSACTION_REF] = true;
+        if ($this->firstname !== $v) {
+            $this->firstname = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::FIRSTNAME] = true;
         }
 
 
         return $this;
-    } // setTransactionRef()
+    } // setFirstname()
 
     /**
-     * Set the value of [delivery_ref] column.
-     * delivery reference - usually use to identify a delivery progress on a distant delivery tracker website
+     * Set the value of [lastname] column.
+     *
      * @param      string $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setDeliveryRef($v)
+    public function setLastname($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->delivery_ref !== $v) {
-            $this->delivery_ref = $v;
-            $this->modifiedColumns[OrderVersionTableMap::DELIVERY_REF] = true;
+        if ($this->lastname !== $v) {
+            $this->lastname = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::LASTNAME] = true;
         }
 
 
         return $this;
-    } // setDeliveryRef()
+    } // setLastname()
 
     /**
-     * Set the value of [invoice_ref] column.
-     * the invoice reference
+     * Set the value of [email] column.
+     *
      * @param      string $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setInvoiceRef($v)
+    public function setEmail($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->invoice_ref !== $v) {
-            $this->invoice_ref = $v;
-            $this->modifiedColumns[OrderVersionTableMap::INVOICE_REF] = true;
+        if ($this->email !== $v) {
+            $this->email = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::EMAIL] = true;
         }
 
 
         return $this;
-    } // setInvoiceRef()
+    } // setEmail()
+
+    /**
+     * Set the value of [password] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setPassword($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->password !== $v) {
+            $this->password = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::PASSWORD] = true;
+        }
+
+
+        return $this;
+    } // setPassword()
+
+    /**
+     * Set the value of [algo] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setAlgo($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->algo !== $v) {
+            $this->algo = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::ALGO] = true;
+        }
+
+
+        return $this;
+    } // setAlgo()
+
+    /**
+     * Set the value of [reseller] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setReseller($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->reseller !== $v) {
+            $this->reseller = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::RESELLER] = true;
+        }
+
+
+        return $this;
+    } // setReseller()
+
+    /**
+     * Set the value of [lang] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setLang($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->lang !== $v) {
+            $this->lang = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::LANG] = true;
+        }
+
+
+        return $this;
+    } // setLang()
+
+    /**
+     * Set the value of [sponsor] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setSponsor($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->sponsor !== $v) {
+            $this->sponsor = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::SPONSOR] = true;
+        }
+
+
+        return $this;
+    } // setSponsor()
 
     /**
      * Set the value of [discount] column.
      *
      * @param      double $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
@@ -1035,7 +1023,7 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($this->discount !== $v) {
             $this->discount = $v;
-            $this->modifiedColumns[OrderVersionTableMap::DISCOUNT] = true;
+            $this->modifiedColumns[CustomerVersionTableMap::DISCOUNT] = true;
         }
 
 
@@ -1043,137 +1031,53 @@ abstract class OrderVersion implements ActiveRecordInterface
     } // setDiscount()
 
     /**
-     * Set the value of [postage] column.
+     * Set the value of [remember_me_token] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setPostage($v)
+    public function setRememberMeToken($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
-        if ($this->postage !== $v) {
-            $this->postage = $v;
-            $this->modifiedColumns[OrderVersionTableMap::POSTAGE] = true;
+        if ($this->remember_me_token !== $v) {
+            $this->remember_me_token = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::REMEMBER_ME_TOKEN] = true;
         }
 
 
         return $this;
-    } // setPostage()
+    } // setRememberMeToken()
 
     /**
-     * Set the value of [payment_module_id] column.
+     * Set the value of [remember_me_serial] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setPaymentModuleId($v)
+    public function setRememberMeSerial($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->payment_module_id !== $v) {
-            $this->payment_module_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::PAYMENT_MODULE_ID] = true;
+        if ($this->remember_me_serial !== $v) {
+            $this->remember_me_serial = $v;
+            $this->modifiedColumns[CustomerVersionTableMap::REMEMBER_ME_SERIAL] = true;
         }
 
 
         return $this;
-    } // setPaymentModuleId()
-
-    /**
-     * Set the value of [delivery_module_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setDeliveryModuleId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->delivery_module_id !== $v) {
-            $this->delivery_module_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::DELIVERY_MODULE_ID] = true;
-        }
-
-
-        return $this;
-    } // setDeliveryModuleId()
-
-    /**
-     * Set the value of [status_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setStatusId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->status_id !== $v) {
-            $this->status_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::STATUS_ID] = true;
-        }
-
-
-        return $this;
-    } // setStatusId()
-
-    /**
-     * Set the value of [lang_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setLangId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->lang_id !== $v) {
-            $this->lang_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::LANG_ID] = true;
-        }
-
-
-        return $this;
-    } // setLangId()
-
-    /**
-     * Set the value of [cart_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
-     */
-    public function setCartId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->cart_id !== $v) {
-            $this->cart_id = $v;
-            $this->modifiedColumns[OrderVersionTableMap::CART_ID] = true;
-        }
-
-
-        return $this;
-    } // setCartId()
+    } // setRememberMeSerial()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -1181,7 +1085,7 @@ abstract class OrderVersion implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[OrderVersionTableMap::CREATED_AT] = true;
+                $this->modifiedColumns[CustomerVersionTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -1194,7 +1098,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -1202,7 +1106,7 @@ abstract class OrderVersion implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[OrderVersionTableMap::UPDATED_AT] = true;
+                $this->modifiedColumns[CustomerVersionTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -1214,7 +1118,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * Set the value of [version] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setVersion($v)
     {
@@ -1224,7 +1128,7 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($this->version !== $v) {
             $this->version = $v;
-            $this->modifiedColumns[OrderVersionTableMap::VERSION] = true;
+            $this->modifiedColumns[CustomerVersionTableMap::VERSION] = true;
         }
 
 
@@ -1236,7 +1140,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setVersionCreatedAt($v)
     {
@@ -1244,7 +1148,7 @@ abstract class OrderVersion implements ActiveRecordInterface
         if ($this->version_created_at !== null || $dt !== null) {
             if ($dt !== $this->version_created_at) {
                 $this->version_created_at = $dt;
-                $this->modifiedColumns[OrderVersionTableMap::VERSION_CREATED_AT] = true;
+                $this->modifiedColumns[CustomerVersionTableMap::VERSION_CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -1256,7 +1160,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * Set the value of [version_created_by] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
     public function setVersionCreatedBy($v)
     {
@@ -1266,7 +1170,7 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($this->version_created_by !== $v) {
             $this->version_created_by = $v;
-            $this->modifiedColumns[OrderVersionTableMap::VERSION_CREATED_BY] = true;
+            $this->modifiedColumns[CustomerVersionTableMap::VERSION_CREATED_BY] = true;
         }
 
 
@@ -1274,25 +1178,108 @@ abstract class OrderVersion implements ActiveRecordInterface
     } // setVersionCreatedBy()
 
     /**
-     * Set the value of [customer_id_version] column.
+     * Set the value of [order_ids] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @param      array $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
      */
-    public function setCustomerIdVersion($v)
+    public function setOrderIds($v)
     {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->customer_id_version !== $v) {
-            $this->customer_id_version = $v;
-            $this->modifiedColumns[OrderVersionTableMap::CUSTOMER_ID_VERSION] = true;
+        if ($this->order_ids_unserialized !== $v) {
+            $this->order_ids_unserialized = $v;
+            $this->order_ids = '| ' . implode(' | ', $v) . ' |';
+            $this->modifiedColumns[CustomerVersionTableMap::ORDER_IDS] = true;
         }
 
 
         return $this;
-    } // setCustomerIdVersion()
+    } // setOrderIds()
+
+    /**
+     * Adds a value to the [order_ids] array column value.
+     * @param      mixed $value
+     *
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function addOrderId($value)
+    {
+        $currentArray = $this->getOrderIds();
+        $currentArray []= $value;
+        $this->setOrderIds($currentArray);
+
+        return $this;
+    } // addOrderId()
+
+    /**
+     * Removes a value from the [order_ids] array column value.
+     * @param      mixed $value
+     *
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function removeOrderId($value)
+    {
+        $targetArray = array();
+        foreach ($this->getOrderIds() as $element) {
+            if ($element != $value) {
+                $targetArray []= $element;
+            }
+        }
+        $this->setOrderIds($targetArray);
+
+        return $this;
+    } // removeOrderId()
+
+    /**
+     * Set the value of [order_versions] column.
+     *
+     * @param      array $v new value
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function setOrderVersions($v)
+    {
+        if ($this->order_versions_unserialized !== $v) {
+            $this->order_versions_unserialized = $v;
+            $this->order_versions = '| ' . implode(' | ', $v) . ' |';
+            $this->modifiedColumns[CustomerVersionTableMap::ORDER_VERSIONS] = true;
+        }
+
+
+        return $this;
+    } // setOrderVersions()
+
+    /**
+     * Adds a value to the [order_versions] array column value.
+     * @param      mixed $value
+     *
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function addOrderVersion($value)
+    {
+        $currentArray = $this->getOrderVersions();
+        $currentArray []= $value;
+        $this->setOrderVersions($currentArray);
+
+        return $this;
+    } // addOrderVersion()
+
+    /**
+     * Removes a value from the [order_versions] array column value.
+     * @param      mixed $value
+     *
+     * @return   \Thelia\Model\CustomerVersion The current object (for fluent API support)
+     */
+    public function removeOrderVersion($value)
+    {
+        $targetArray = array();
+        foreach ($this->getOrderVersions() as $element) {
+            if ($element != $value) {
+                $targetArray []= $element;
+            }
+        }
+        $this->setOrderVersions($targetArray);
+
+        return $this;
+    } // removeOrderVersion()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -1305,10 +1292,6 @@ abstract class OrderVersion implements ActiveRecordInterface
     public function hasOnlyDefaultValues()
     {
             if ($this->version !== 0) {
-                return false;
-            }
-
-            if ($this->customer_id_version !== 0) {
                 return false;
             }
 
@@ -1339,89 +1322,79 @@ abstract class OrderVersion implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : OrderVersionTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerVersionTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : OrderVersionTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerVersionTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : OrderVersionTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerVersionTableMap::translateFieldName('TitleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : OrderVersionTableMap::translateFieldName('InvoiceOrderAddressId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->invoice_order_address_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerVersionTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->firstname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderVersionTableMap::translateFieldName('DeliveryOrderAddressId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->delivery_order_address_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerVersionTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->lastname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderVersionTableMap::translateFieldName('InvoiceDate', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00') {
-                $col = null;
-            }
-            $this->invoice_date = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerVersionTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : OrderVersionTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->currency_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CustomerVersionTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->password = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : OrderVersionTableMap::translateFieldName('CurrencyRate', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->currency_rate = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CustomerVersionTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->algo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderVersionTableMap::translateFieldName('TransactionRef', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->transaction_ref = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CustomerVersionTableMap::translateFieldName('Reseller', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->reseller = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderVersionTableMap::translateFieldName('DeliveryRef', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->delivery_ref = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CustomerVersionTableMap::translateFieldName('Lang', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->lang = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderVersionTableMap::translateFieldName('InvoiceRef', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->invoice_ref = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CustomerVersionTableMap::translateFieldName('Sponsor', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->sponsor = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderVersionTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerVersionTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->discount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderVersionTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage = (null !== $col) ? (double) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerVersionTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->remember_me_token = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderVersionTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->payment_module_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CustomerVersionTableMap::translateFieldName('RememberMeSerial', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->remember_me_serial = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderVersionTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->delivery_module_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderVersionTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->status_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderVersionTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->lang_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderVersionTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->cart_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : CustomerVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : CustomerVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : CustomerVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : CustomerVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 23 + $startcol : OrderVersionTableMap::translateFieldName('CustomerIdVersion', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_id_version = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : CustomerVersionTableMap::translateFieldName('OrderIds', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->order_ids = $col;
+            $this->order_ids_unserialized = null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : CustomerVersionTableMap::translateFieldName('OrderVersions', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->order_versions = $col;
+            $this->order_versions_unserialized = null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -1430,10 +1403,10 @@ abstract class OrderVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 24; // 24 = OrderVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 21; // 21 = CustomerVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\OrderVersion object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CustomerVersion object", 0, $e);
         }
     }
 
@@ -1452,8 +1425,8 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aOrder !== null && $this->id !== $this->aOrder->getId()) {
-            $this->aOrder = null;
+        if ($this->aCustomer !== null && $this->id !== $this->aCustomer->getId()) {
+            $this->aCustomer = null;
         }
     } // ensureConsistency
 
@@ -1478,13 +1451,13 @@ abstract class OrderVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(OrderVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CustomerVersionTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildOrderVersionQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCustomerVersionQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -1494,7 +1467,7 @@ abstract class OrderVersion implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aOrder = null;
+            $this->aCustomer = null;
         } // if (deep)
     }
 
@@ -1504,8 +1477,8 @@ abstract class OrderVersion implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see OrderVersion::setDeleted()
-     * @see OrderVersion::isDeleted()
+     * @see CustomerVersion::setDeleted()
+     * @see CustomerVersion::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -1514,12 +1487,12 @@ abstract class OrderVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerVersionTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildOrderVersionQuery::create()
+            $deleteQuery = ChildCustomerVersionQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -1556,7 +1529,7 @@ abstract class OrderVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CustomerVersionTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -1576,7 +1549,7 @@ abstract class OrderVersion implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                OrderVersionTableMap::addInstanceToPool($this);
+                CustomerVersionTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -1611,11 +1584,11 @@ abstract class OrderVersion implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aOrder !== null) {
-                if ($this->aOrder->isModified() || $this->aOrder->isNew()) {
-                    $affectedRows += $this->aOrder->save($con);
+            if ($this->aCustomer !== null) {
+                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
+                    $affectedRows += $this->aCustomer->save($con);
                 }
-                $this->setOrder($this->aOrder);
+                $this->setCustomer($this->aCustomer);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1651,81 +1624,72 @@ abstract class OrderVersion implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(OrderVersionTableMap::ID)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::REF)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::REF)) {
             $modifiedColumns[':p' . $index++]  = '`REF`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_ID`';
+        if ($this->isColumnModified(CustomerVersionTableMap::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`TITLE_ID`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`INVOICE_ORDER_ADDRESS_ID`';
+        if ($this->isColumnModified(CustomerVersionTableMap::FIRSTNAME)) {
+            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`DELIVERY_ORDER_ADDRESS_ID`';
+        if ($this->isColumnModified(CustomerVersionTableMap::LASTNAME)) {
+            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_DATE)) {
-            $modifiedColumns[':p' . $index++]  = '`INVOICE_DATE`';
+        if ($this->isColumnModified(CustomerVersionTableMap::EMAIL)) {
+            $modifiedColumns[':p' . $index++]  = '`EMAIL`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CURRENCY_ID`';
+        if ($this->isColumnModified(CustomerVersionTableMap::PASSWORD)) {
+            $modifiedColumns[':p' . $index++]  = '`PASSWORD`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::CURRENCY_RATE)) {
-            $modifiedColumns[':p' . $index++]  = '`CURRENCY_RATE`';
+        if ($this->isColumnModified(CustomerVersionTableMap::ALGO)) {
+            $modifiedColumns[':p' . $index++]  = '`ALGO`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::TRANSACTION_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`TRANSACTION_REF`';
+        if ($this->isColumnModified(CustomerVersionTableMap::RESELLER)) {
+            $modifiedColumns[':p' . $index++]  = '`RESELLER`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`DELIVERY_REF`';
+        if ($this->isColumnModified(CustomerVersionTableMap::LANG)) {
+            $modifiedColumns[':p' . $index++]  = '`LANG`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`INVOICE_REF`';
+        if ($this->isColumnModified(CustomerVersionTableMap::SPONSOR)) {
+            $modifiedColumns[':p' . $index++]  = '`SPONSOR`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::DISCOUNT)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::DISCOUNT)) {
             $modifiedColumns[':p' . $index++]  = '`DISCOUNT`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::POSTAGE)) {
-            $modifiedColumns[':p' . $index++]  = '`POSTAGE`';
+        if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_TOKEN)) {
+            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_TOKEN`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::PAYMENT_MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PAYMENT_MODULE_ID`';
+        if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_SERIAL)) {
+            $modifiedColumns[':p' . $index++]  = '`REMEMBER_ME_SERIAL`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`DELIVERY_MODULE_ID`';
-        }
-        if ($this->isColumnModified(OrderVersionTableMap::STATUS_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`STATUS_ID`';
-        }
-        if ($this->isColumnModified(OrderVersionTableMap::LANG_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`LANG_ID`';
-        }
-        if ($this->isColumnModified(OrderVersionTableMap::CART_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CART_ID`';
-        }
-        if ($this->isColumnModified(OrderVersionTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION)) {
             $modifiedColumns[':p' . $index++]  = '`VERSION`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION_CREATED_AT)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION_CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION_CREATED_BY)) {
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION_CREATED_BY)) {
             $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
         }
-        if ($this->isColumnModified(OrderVersionTableMap::CUSTOMER_ID_VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_ID_VERSION`';
+        if ($this->isColumnModified(CustomerVersionTableMap::ORDER_IDS)) {
+            $modifiedColumns[':p' . $index++]  = '`ORDER_IDS`';
+        }
+        if ($this->isColumnModified(CustomerVersionTableMap::ORDER_VERSIONS)) {
+            $modifiedColumns[':p' . $index++]  = '`ORDER_VERSIONS`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `order_version` (%s) VALUES (%s)',
+            'INSERT INTO `customer_version` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1740,53 +1704,41 @@ abstract class OrderVersion implements ActiveRecordInterface
                     case '`REF`':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`CUSTOMER_ID`':
-                        $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
+                    case '`TITLE_ID`':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
-                    case '`INVOICE_ORDER_ADDRESS_ID`':
-                        $stmt->bindValue($identifier, $this->invoice_order_address_id, PDO::PARAM_INT);
+                    case '`FIRSTNAME`':
+                        $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`DELIVERY_ORDER_ADDRESS_ID`':
-                        $stmt->bindValue($identifier, $this->delivery_order_address_id, PDO::PARAM_INT);
+                    case '`LASTNAME`':
+                        $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`INVOICE_DATE`':
-                        $stmt->bindValue($identifier, $this->invoice_date ? $this->invoice_date->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case '`EMAIL`':
+                        $stmt->bindValue($identifier, $this->email, PDO::PARAM_STR);
                         break;
-                    case '`CURRENCY_ID`':
-                        $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
+                    case '`PASSWORD`':
+                        $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
                         break;
-                    case '`CURRENCY_RATE`':
-                        $stmt->bindValue($identifier, $this->currency_rate, PDO::PARAM_STR);
+                    case '`ALGO`':
+                        $stmt->bindValue($identifier, $this->algo, PDO::PARAM_STR);
                         break;
-                    case '`TRANSACTION_REF`':
-                        $stmt->bindValue($identifier, $this->transaction_ref, PDO::PARAM_STR);
+                    case '`RESELLER`':
+                        $stmt->bindValue($identifier, $this->reseller, PDO::PARAM_INT);
                         break;
-                    case '`DELIVERY_REF`':
-                        $stmt->bindValue($identifier, $this->delivery_ref, PDO::PARAM_STR);
+                    case '`LANG`':
+                        $stmt->bindValue($identifier, $this->lang, PDO::PARAM_STR);
                         break;
-                    case '`INVOICE_REF`':
-                        $stmt->bindValue($identifier, $this->invoice_ref, PDO::PARAM_STR);
+                    case '`SPONSOR`':
+                        $stmt->bindValue($identifier, $this->sponsor, PDO::PARAM_STR);
                         break;
                     case '`DISCOUNT`':
                         $stmt->bindValue($identifier, $this->discount, PDO::PARAM_STR);
                         break;
-                    case '`POSTAGE`':
-                        $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
+                    case '`REMEMBER_ME_TOKEN`':
+                        $stmt->bindValue($identifier, $this->remember_me_token, PDO::PARAM_STR);
                         break;
-                    case '`PAYMENT_MODULE_ID`':
-                        $stmt->bindValue($identifier, $this->payment_module_id, PDO::PARAM_INT);
-                        break;
-                    case '`DELIVERY_MODULE_ID`':
-                        $stmt->bindValue($identifier, $this->delivery_module_id, PDO::PARAM_INT);
-                        break;
-                    case '`STATUS_ID`':
-                        $stmt->bindValue($identifier, $this->status_id, PDO::PARAM_INT);
-                        break;
-                    case '`LANG_ID`':
-                        $stmt->bindValue($identifier, $this->lang_id, PDO::PARAM_INT);
-                        break;
-                    case '`CART_ID`':
-                        $stmt->bindValue($identifier, $this->cart_id, PDO::PARAM_INT);
+                    case '`REMEMBER_ME_SERIAL`':
+                        $stmt->bindValue($identifier, $this->remember_me_serial, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1803,8 +1755,11 @@ abstract class OrderVersion implements ActiveRecordInterface
                     case '`VERSION_CREATED_BY`':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
-                    case '`CUSTOMER_ID_VERSION`':
-                        $stmt->bindValue($identifier, $this->customer_id_version, PDO::PARAM_INT);
+                    case '`ORDER_IDS`':
+                        $stmt->bindValue($identifier, $this->order_ids, PDO::PARAM_STR);
+                        break;
+                    case '`ORDER_VERSIONS`':
+                        $stmt->bindValue($identifier, $this->order_versions, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1845,7 +1800,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = OrderVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CustomerVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1868,70 +1823,61 @@ abstract class OrderVersion implements ActiveRecordInterface
                 return $this->getRef();
                 break;
             case 2:
-                return $this->getCustomerId();
+                return $this->getTitleId();
                 break;
             case 3:
-                return $this->getInvoiceOrderAddressId();
+                return $this->getFirstname();
                 break;
             case 4:
-                return $this->getDeliveryOrderAddressId();
+                return $this->getLastname();
                 break;
             case 5:
-                return $this->getInvoiceDate();
+                return $this->getEmail();
                 break;
             case 6:
-                return $this->getCurrencyId();
+                return $this->getPassword();
                 break;
             case 7:
-                return $this->getCurrencyRate();
+                return $this->getAlgo();
                 break;
             case 8:
-                return $this->getTransactionRef();
+                return $this->getReseller();
                 break;
             case 9:
-                return $this->getDeliveryRef();
+                return $this->getLang();
                 break;
             case 10:
-                return $this->getInvoiceRef();
+                return $this->getSponsor();
                 break;
             case 11:
                 return $this->getDiscount();
                 break;
             case 12:
-                return $this->getPostage();
+                return $this->getRememberMeToken();
                 break;
             case 13:
-                return $this->getPaymentModuleId();
+                return $this->getRememberMeSerial();
                 break;
             case 14:
-                return $this->getDeliveryModuleId();
-                break;
-            case 15:
-                return $this->getStatusId();
-                break;
-            case 16:
-                return $this->getLangId();
-                break;
-            case 17:
-                return $this->getCartId();
-                break;
-            case 18:
                 return $this->getCreatedAt();
                 break;
-            case 19:
+            case 15:
                 return $this->getUpdatedAt();
                 break;
-            case 20:
+            case 16:
                 return $this->getVersion();
                 break;
-            case 21:
+            case 17:
                 return $this->getVersionCreatedAt();
                 break;
-            case 22:
+            case 18:
                 return $this->getVersionCreatedBy();
                 break;
-            case 23:
-                return $this->getCustomerIdVersion();
+            case 19:
+                return $this->getOrderIds();
+                break;
+            case 20:
+                return $this->getOrderVersions();
                 break;
             default:
                 return null;
@@ -1956,36 +1902,33 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['OrderVersion'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['CustomerVersion'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['OrderVersion'][serialize($this->getPrimaryKey())] = true;
-        $keys = OrderVersionTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CustomerVersion'][serialize($this->getPrimaryKey())] = true;
+        $keys = CustomerVersionTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRef(),
-            $keys[2] => $this->getCustomerId(),
-            $keys[3] => $this->getInvoiceOrderAddressId(),
-            $keys[4] => $this->getDeliveryOrderAddressId(),
-            $keys[5] => $this->getInvoiceDate(),
-            $keys[6] => $this->getCurrencyId(),
-            $keys[7] => $this->getCurrencyRate(),
-            $keys[8] => $this->getTransactionRef(),
-            $keys[9] => $this->getDeliveryRef(),
-            $keys[10] => $this->getInvoiceRef(),
+            $keys[2] => $this->getTitleId(),
+            $keys[3] => $this->getFirstname(),
+            $keys[4] => $this->getLastname(),
+            $keys[5] => $this->getEmail(),
+            $keys[6] => $this->getPassword(),
+            $keys[7] => $this->getAlgo(),
+            $keys[8] => $this->getReseller(),
+            $keys[9] => $this->getLang(),
+            $keys[10] => $this->getSponsor(),
             $keys[11] => $this->getDiscount(),
-            $keys[12] => $this->getPostage(),
-            $keys[13] => $this->getPaymentModuleId(),
-            $keys[14] => $this->getDeliveryModuleId(),
-            $keys[15] => $this->getStatusId(),
-            $keys[16] => $this->getLangId(),
-            $keys[17] => $this->getCartId(),
-            $keys[18] => $this->getCreatedAt(),
-            $keys[19] => $this->getUpdatedAt(),
-            $keys[20] => $this->getVersion(),
-            $keys[21] => $this->getVersionCreatedAt(),
-            $keys[22] => $this->getVersionCreatedBy(),
-            $keys[23] => $this->getCustomerIdVersion(),
+            $keys[12] => $this->getRememberMeToken(),
+            $keys[13] => $this->getRememberMeSerial(),
+            $keys[14] => $this->getCreatedAt(),
+            $keys[15] => $this->getUpdatedAt(),
+            $keys[16] => $this->getVersion(),
+            $keys[17] => $this->getVersionCreatedAt(),
+            $keys[18] => $this->getVersionCreatedBy(),
+            $keys[19] => $this->getOrderIds(),
+            $keys[20] => $this->getOrderVersions(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1993,8 +1936,8 @@ abstract class OrderVersion implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aOrder) {
-                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCustomer) {
+                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -2014,7 +1957,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = OrderVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CustomerVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -2037,70 +1980,69 @@ abstract class OrderVersion implements ActiveRecordInterface
                 $this->setRef($value);
                 break;
             case 2:
-                $this->setCustomerId($value);
+                $this->setTitleId($value);
                 break;
             case 3:
-                $this->setInvoiceOrderAddressId($value);
+                $this->setFirstname($value);
                 break;
             case 4:
-                $this->setDeliveryOrderAddressId($value);
+                $this->setLastname($value);
                 break;
             case 5:
-                $this->setInvoiceDate($value);
+                $this->setEmail($value);
                 break;
             case 6:
-                $this->setCurrencyId($value);
+                $this->setPassword($value);
                 break;
             case 7:
-                $this->setCurrencyRate($value);
+                $this->setAlgo($value);
                 break;
             case 8:
-                $this->setTransactionRef($value);
+                $this->setReseller($value);
                 break;
             case 9:
-                $this->setDeliveryRef($value);
+                $this->setLang($value);
                 break;
             case 10:
-                $this->setInvoiceRef($value);
+                $this->setSponsor($value);
                 break;
             case 11:
                 $this->setDiscount($value);
                 break;
             case 12:
-                $this->setPostage($value);
+                $this->setRememberMeToken($value);
                 break;
             case 13:
-                $this->setPaymentModuleId($value);
+                $this->setRememberMeSerial($value);
                 break;
             case 14:
-                $this->setDeliveryModuleId($value);
-                break;
-            case 15:
-                $this->setStatusId($value);
-                break;
-            case 16:
-                $this->setLangId($value);
-                break;
-            case 17:
-                $this->setCartId($value);
-                break;
-            case 18:
                 $this->setCreatedAt($value);
                 break;
-            case 19:
+            case 15:
                 $this->setUpdatedAt($value);
                 break;
-            case 20:
+            case 16:
                 $this->setVersion($value);
                 break;
-            case 21:
+            case 17:
                 $this->setVersionCreatedAt($value);
                 break;
-            case 22:
+            case 18:
                 $this->setVersionCreatedBy($value);
                 break;
-            case 23:
-                $this->setCustomerIdVersion($value);
+            case 19:
+                if (!is_array($value)) {
+                    $v = trim(substr($value, 2, -2));
+                    $value = $v ? explode(' | ', $v) : array();
+                }
+                $this->setOrderIds($value);
+                break;
+            case 20:
+                if (!is_array($value)) {
+                    $v = trim(substr($value, 2, -2));
+                    $value = $v ? explode(' | ', $v) : array();
+                }
+                $this->setOrderVersions($value);
                 break;
         } // switch()
     }
@@ -2124,32 +2066,29 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = OrderVersionTableMap::getFieldNames($keyType);
+        $keys = CustomerVersionTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCustomerId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setInvoiceOrderAddressId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDeliveryOrderAddressId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setInvoiceDate($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCurrencyId($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setCurrencyRate($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setTransactionRef($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setDeliveryRef($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setInvoiceRef($arr[$keys[10]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setFirstname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setLastname($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setEmail($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPassword($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setAlgo($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setReseller($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setLang($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setSponsor($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setPostage($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setPaymentModuleId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setDeliveryModuleId($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setStatusId($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setLangId($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setCartId($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setCreatedAt($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setUpdatedAt($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedAt($arr[$keys[21]]);
-        if (array_key_exists($keys[22], $arr)) $this->setVersionCreatedBy($arr[$keys[22]]);
-        if (array_key_exists($keys[23], $arr)) $this->setCustomerIdVersion($arr[$keys[23]]);
+        if (array_key_exists($keys[12], $arr)) $this->setRememberMeToken($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setRememberMeSerial($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setCreatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setUpdatedAt($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setVersion($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setVersionCreatedAt($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setVersionCreatedBy($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setOrderIds($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setOrderVersions($arr[$keys[20]]);
     }
 
     /**
@@ -2159,32 +2098,29 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(OrderVersionTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CustomerVersionTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(OrderVersionTableMap::ID)) $criteria->add(OrderVersionTableMap::ID, $this->id);
-        if ($this->isColumnModified(OrderVersionTableMap::REF)) $criteria->add(OrderVersionTableMap::REF, $this->ref);
-        if ($this->isColumnModified(OrderVersionTableMap::CUSTOMER_ID)) $criteria->add(OrderVersionTableMap::CUSTOMER_ID, $this->customer_id);
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID)) $criteria->add(OrderVersionTableMap::INVOICE_ORDER_ADDRESS_ID, $this->invoice_order_address_id);
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID)) $criteria->add(OrderVersionTableMap::DELIVERY_ORDER_ADDRESS_ID, $this->delivery_order_address_id);
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_DATE)) $criteria->add(OrderVersionTableMap::INVOICE_DATE, $this->invoice_date);
-        if ($this->isColumnModified(OrderVersionTableMap::CURRENCY_ID)) $criteria->add(OrderVersionTableMap::CURRENCY_ID, $this->currency_id);
-        if ($this->isColumnModified(OrderVersionTableMap::CURRENCY_RATE)) $criteria->add(OrderVersionTableMap::CURRENCY_RATE, $this->currency_rate);
-        if ($this->isColumnModified(OrderVersionTableMap::TRANSACTION_REF)) $criteria->add(OrderVersionTableMap::TRANSACTION_REF, $this->transaction_ref);
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_REF)) $criteria->add(OrderVersionTableMap::DELIVERY_REF, $this->delivery_ref);
-        if ($this->isColumnModified(OrderVersionTableMap::INVOICE_REF)) $criteria->add(OrderVersionTableMap::INVOICE_REF, $this->invoice_ref);
-        if ($this->isColumnModified(OrderVersionTableMap::DISCOUNT)) $criteria->add(OrderVersionTableMap::DISCOUNT, $this->discount);
-        if ($this->isColumnModified(OrderVersionTableMap::POSTAGE)) $criteria->add(OrderVersionTableMap::POSTAGE, $this->postage);
-        if ($this->isColumnModified(OrderVersionTableMap::PAYMENT_MODULE_ID)) $criteria->add(OrderVersionTableMap::PAYMENT_MODULE_ID, $this->payment_module_id);
-        if ($this->isColumnModified(OrderVersionTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderVersionTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
-        if ($this->isColumnModified(OrderVersionTableMap::STATUS_ID)) $criteria->add(OrderVersionTableMap::STATUS_ID, $this->status_id);
-        if ($this->isColumnModified(OrderVersionTableMap::LANG_ID)) $criteria->add(OrderVersionTableMap::LANG_ID, $this->lang_id);
-        if ($this->isColumnModified(OrderVersionTableMap::CART_ID)) $criteria->add(OrderVersionTableMap::CART_ID, $this->cart_id);
-        if ($this->isColumnModified(OrderVersionTableMap::CREATED_AT)) $criteria->add(OrderVersionTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(OrderVersionTableMap::UPDATED_AT)) $criteria->add(OrderVersionTableMap::UPDATED_AT, $this->updated_at);
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION)) $criteria->add(OrderVersionTableMap::VERSION, $this->version);
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION_CREATED_AT)) $criteria->add(OrderVersionTableMap::VERSION_CREATED_AT, $this->version_created_at);
-        if ($this->isColumnModified(OrderVersionTableMap::VERSION_CREATED_BY)) $criteria->add(OrderVersionTableMap::VERSION_CREATED_BY, $this->version_created_by);
-        if ($this->isColumnModified(OrderVersionTableMap::CUSTOMER_ID_VERSION)) $criteria->add(OrderVersionTableMap::CUSTOMER_ID_VERSION, $this->customer_id_version);
+        if ($this->isColumnModified(CustomerVersionTableMap::ID)) $criteria->add(CustomerVersionTableMap::ID, $this->id);
+        if ($this->isColumnModified(CustomerVersionTableMap::REF)) $criteria->add(CustomerVersionTableMap::REF, $this->ref);
+        if ($this->isColumnModified(CustomerVersionTableMap::TITLE_ID)) $criteria->add(CustomerVersionTableMap::TITLE_ID, $this->title_id);
+        if ($this->isColumnModified(CustomerVersionTableMap::FIRSTNAME)) $criteria->add(CustomerVersionTableMap::FIRSTNAME, $this->firstname);
+        if ($this->isColumnModified(CustomerVersionTableMap::LASTNAME)) $criteria->add(CustomerVersionTableMap::LASTNAME, $this->lastname);
+        if ($this->isColumnModified(CustomerVersionTableMap::EMAIL)) $criteria->add(CustomerVersionTableMap::EMAIL, $this->email);
+        if ($this->isColumnModified(CustomerVersionTableMap::PASSWORD)) $criteria->add(CustomerVersionTableMap::PASSWORD, $this->password);
+        if ($this->isColumnModified(CustomerVersionTableMap::ALGO)) $criteria->add(CustomerVersionTableMap::ALGO, $this->algo);
+        if ($this->isColumnModified(CustomerVersionTableMap::RESELLER)) $criteria->add(CustomerVersionTableMap::RESELLER, $this->reseller);
+        if ($this->isColumnModified(CustomerVersionTableMap::LANG)) $criteria->add(CustomerVersionTableMap::LANG, $this->lang);
+        if ($this->isColumnModified(CustomerVersionTableMap::SPONSOR)) $criteria->add(CustomerVersionTableMap::SPONSOR, $this->sponsor);
+        if ($this->isColumnModified(CustomerVersionTableMap::DISCOUNT)) $criteria->add(CustomerVersionTableMap::DISCOUNT, $this->discount);
+        if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_TOKEN)) $criteria->add(CustomerVersionTableMap::REMEMBER_ME_TOKEN, $this->remember_me_token);
+        if ($this->isColumnModified(CustomerVersionTableMap::REMEMBER_ME_SERIAL)) $criteria->add(CustomerVersionTableMap::REMEMBER_ME_SERIAL, $this->remember_me_serial);
+        if ($this->isColumnModified(CustomerVersionTableMap::CREATED_AT)) $criteria->add(CustomerVersionTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CustomerVersionTableMap::UPDATED_AT)) $criteria->add(CustomerVersionTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION)) $criteria->add(CustomerVersionTableMap::VERSION, $this->version);
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION_CREATED_AT)) $criteria->add(CustomerVersionTableMap::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(CustomerVersionTableMap::VERSION_CREATED_BY)) $criteria->add(CustomerVersionTableMap::VERSION_CREATED_BY, $this->version_created_by);
+        if ($this->isColumnModified(CustomerVersionTableMap::ORDER_IDS)) $criteria->add(CustomerVersionTableMap::ORDER_IDS, $this->order_ids);
+        if ($this->isColumnModified(CustomerVersionTableMap::ORDER_VERSIONS)) $criteria->add(CustomerVersionTableMap::ORDER_VERSIONS, $this->order_versions);
 
         return $criteria;
     }
@@ -2199,9 +2135,9 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(OrderVersionTableMap::DATABASE_NAME);
-        $criteria->add(OrderVersionTableMap::ID, $this->id);
-        $criteria->add(OrderVersionTableMap::VERSION, $this->version);
+        $criteria = new Criteria(CustomerVersionTableMap::DATABASE_NAME);
+        $criteria->add(CustomerVersionTableMap::ID, $this->id);
+        $criteria->add(CustomerVersionTableMap::VERSION, $this->version);
 
         return $criteria;
     }
@@ -2248,7 +2184,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\OrderVersion (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CustomerVersion (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -2257,28 +2193,25 @@ abstract class OrderVersion implements ActiveRecordInterface
     {
         $copyObj->setId($this->getId());
         $copyObj->setRef($this->getRef());
-        $copyObj->setCustomerId($this->getCustomerId());
-        $copyObj->setInvoiceOrderAddressId($this->getInvoiceOrderAddressId());
-        $copyObj->setDeliveryOrderAddressId($this->getDeliveryOrderAddressId());
-        $copyObj->setInvoiceDate($this->getInvoiceDate());
-        $copyObj->setCurrencyId($this->getCurrencyId());
-        $copyObj->setCurrencyRate($this->getCurrencyRate());
-        $copyObj->setTransactionRef($this->getTransactionRef());
-        $copyObj->setDeliveryRef($this->getDeliveryRef());
-        $copyObj->setInvoiceRef($this->getInvoiceRef());
+        $copyObj->setTitleId($this->getTitleId());
+        $copyObj->setFirstname($this->getFirstname());
+        $copyObj->setLastname($this->getLastname());
+        $copyObj->setEmail($this->getEmail());
+        $copyObj->setPassword($this->getPassword());
+        $copyObj->setAlgo($this->getAlgo());
+        $copyObj->setReseller($this->getReseller());
+        $copyObj->setLang($this->getLang());
+        $copyObj->setSponsor($this->getSponsor());
         $copyObj->setDiscount($this->getDiscount());
-        $copyObj->setPostage($this->getPostage());
-        $copyObj->setPaymentModuleId($this->getPaymentModuleId());
-        $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
-        $copyObj->setStatusId($this->getStatusId());
-        $copyObj->setLangId($this->getLangId());
-        $copyObj->setCartId($this->getCartId());
+        $copyObj->setRememberMeToken($this->getRememberMeToken());
+        $copyObj->setRememberMeSerial($this->getRememberMeSerial());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         $copyObj->setVersion($this->getVersion());
         $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
         $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
-        $copyObj->setCustomerIdVersion($this->getCustomerIdVersion());
+        $copyObj->setOrderIds($this->getOrderIds());
+        $copyObj->setOrderVersions($this->getOrderVersions());
         if ($makeNew) {
             $copyObj->setNew(true);
         }
@@ -2293,7 +2226,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\OrderVersion Clone of current object.
+     * @return                 \Thelia\Model\CustomerVersion Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -2307,13 +2240,13 @@ abstract class OrderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildOrder object.
+     * Declares an association between this object and a ChildCustomer object.
      *
-     * @param                  ChildOrder $v
-     * @return                 \Thelia\Model\OrderVersion The current object (for fluent API support)
+     * @param                  ChildCustomer $v
+     * @return                 \Thelia\Model\CustomerVersion The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrder(ChildOrder $v = null)
+    public function setCustomer(ChildCustomer $v = null)
     {
         if ($v === null) {
             $this->setId(NULL);
@@ -2321,12 +2254,12 @@ abstract class OrderVersion implements ActiveRecordInterface
             $this->setId($v->getId());
         }
 
-        $this->aOrder = $v;
+        $this->aCustomer = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildOrder object, it will not be re-added.
+        // If this object has already been added to the ChildCustomer object, it will not be re-added.
         if ($v !== null) {
-            $v->addOrderVersion($this);
+            $v->addCustomerVersion($this);
         }
 
 
@@ -2335,26 +2268,26 @@ abstract class OrderVersion implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildOrder object
+     * Get the associated ChildCustomer object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildOrder The associated ChildOrder object.
+     * @return                 ChildCustomer The associated ChildCustomer object.
      * @throws PropelException
      */
-    public function getOrder(ConnectionInterface $con = null)
+    public function getCustomer(ConnectionInterface $con = null)
     {
-        if ($this->aOrder === null && ($this->id !== null)) {
-            $this->aOrder = ChildOrderQuery::create()->findPk($this->id, $con);
+        if ($this->aCustomer === null && ($this->id !== null)) {
+            $this->aCustomer = ChildCustomerQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aOrder->addOrderVersions($this);
+                $this->aCustomer->addCustomerVersions($this);
              */
         }
 
-        return $this->aOrder;
+        return $this->aCustomer;
     }
 
     /**
@@ -2364,28 +2297,27 @@ abstract class OrderVersion implements ActiveRecordInterface
     {
         $this->id = null;
         $this->ref = null;
-        $this->customer_id = null;
-        $this->invoice_order_address_id = null;
-        $this->delivery_order_address_id = null;
-        $this->invoice_date = null;
-        $this->currency_id = null;
-        $this->currency_rate = null;
-        $this->transaction_ref = null;
-        $this->delivery_ref = null;
-        $this->invoice_ref = null;
+        $this->title_id = null;
+        $this->firstname = null;
+        $this->lastname = null;
+        $this->email = null;
+        $this->password = null;
+        $this->algo = null;
+        $this->reseller = null;
+        $this->lang = null;
+        $this->sponsor = null;
         $this->discount = null;
-        $this->postage = null;
-        $this->payment_module_id = null;
-        $this->delivery_module_id = null;
-        $this->status_id = null;
-        $this->lang_id = null;
-        $this->cart_id = null;
+        $this->remember_me_token = null;
+        $this->remember_me_serial = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->version = null;
         $this->version_created_at = null;
         $this->version_created_by = null;
-        $this->customer_id_version = null;
+        $this->order_ids = null;
+        $this->order_ids_unserialized = null;
+        $this->order_versions = null;
+        $this->order_versions_unserialized = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
@@ -2408,7 +2340,7 @@ abstract class OrderVersion implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aOrder = null;
+        $this->aCustomer = null;
     }
 
     /**
@@ -2418,7 +2350,7 @@ abstract class OrderVersion implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(OrderVersionTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(CustomerVersionTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

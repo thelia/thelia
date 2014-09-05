@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 
 use Thelia\Model\Base\Customer as BaseCustomer;
@@ -129,7 +130,17 @@ class Customer extends BaseCustomer implements UserInterface
 
     protected function generateRef()
     {
-        return sprintf('CUS%s', str_pad($this->getId(), 12, 0, STR_PAD_LEFT));
+        $lastCustomer = CustomerQuery::create()
+            ->orderById(Criteria::DESC)
+            ->findOne()
+        ;
+
+        $id = 1;
+        if (null !== $lastCustomer) {
+            $id = $lastCustomer->getId() + 1;
+        }
+
+        return sprintf('CUS%s', str_pad($id, 12, 0, STR_PAD_LEFT));
     }
 
     /**
@@ -282,6 +293,10 @@ class Customer extends BaseCustomer implements UserInterface
         // Set the serial number (for auto-login)
         $this->setRememberMeSerial(uniqid());
 
+        if (null === $this->getRef()) {
+            $this->setRef($this->generateRef());
+        }
+
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, new CustomerEvent($this));
 
         return true;
@@ -292,11 +307,6 @@ class Customer extends BaseCustomer implements UserInterface
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        if (null === $this->getRef()) {
-            $this->setRef($this->generateRef())
-                ->save($con);
-        }
-
         $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, new CustomerEvent($this));
     }
 
