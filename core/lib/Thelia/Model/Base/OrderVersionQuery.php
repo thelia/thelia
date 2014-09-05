@@ -44,6 +44,7 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     ChildOrderVersionQuery orderByVersion($order = Criteria::ASC) Order by the version column
  * @method     ChildOrderVersionQuery orderByVersionCreatedAt($order = Criteria::ASC) Order by the version_created_at column
  * @method     ChildOrderVersionQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
+ * @method     ChildOrderVersionQuery orderByCustomerIdVersion($order = Criteria::ASC) Order by the customer_id_version column
  *
  * @method     ChildOrderVersionQuery groupById() Group by the id column
  * @method     ChildOrderVersionQuery groupByRef() Group by the ref column
@@ -68,6 +69,7 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     ChildOrderVersionQuery groupByVersion() Group by the version column
  * @method     ChildOrderVersionQuery groupByVersionCreatedAt() Group by the version_created_at column
  * @method     ChildOrderVersionQuery groupByVersionCreatedBy() Group by the version_created_by column
+ * @method     ChildOrderVersionQuery groupByCustomerIdVersion() Group by the customer_id_version column
  *
  * @method     ChildOrderVersionQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildOrderVersionQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -103,6 +105,7 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     ChildOrderVersion findOneByVersion(int $version) Return the first ChildOrderVersion filtered by the version column
  * @method     ChildOrderVersion findOneByVersionCreatedAt(string $version_created_at) Return the first ChildOrderVersion filtered by the version_created_at column
  * @method     ChildOrderVersion findOneByVersionCreatedBy(string $version_created_by) Return the first ChildOrderVersion filtered by the version_created_by column
+ * @method     ChildOrderVersion findOneByCustomerIdVersion(int $customer_id_version) Return the first ChildOrderVersion filtered by the customer_id_version column
  *
  * @method     array findById(int $id) Return ChildOrderVersion objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildOrderVersion objects filtered by the ref column
@@ -127,6 +130,7 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     array findByVersion(int $version) Return ChildOrderVersion objects filtered by the version column
  * @method     array findByVersionCreatedAt(string $version_created_at) Return ChildOrderVersion objects filtered by the version_created_at column
  * @method     array findByVersionCreatedBy(string $version_created_by) Return ChildOrderVersion objects filtered by the version_created_by column
+ * @method     array findByCustomerIdVersion(int $customer_id_version) Return ChildOrderVersion objects filtered by the customer_id_version column
  *
  */
 abstract class OrderVersionQuery extends ModelCriteria
@@ -215,7 +219,7 @@ abstract class OrderVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `CUSTOMER_ID_VERSION` FROM `order_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -1207,6 +1211,47 @@ abstract class OrderVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderVersionTableMap::VERSION_CREATED_BY, $versionCreatedBy, $comparison);
+    }
+
+    /**
+     * Filter the query on the customer_id_version column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCustomerIdVersion(1234); // WHERE customer_id_version = 1234
+     * $query->filterByCustomerIdVersion(array(12, 34)); // WHERE customer_id_version IN (12, 34)
+     * $query->filterByCustomerIdVersion(array('min' => 12)); // WHERE customer_id_version > 12
+     * </code>
+     *
+     * @param     mixed $customerIdVersion The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderVersionQuery The current query, for fluid interface
+     */
+    public function filterByCustomerIdVersion($customerIdVersion = null, $comparison = null)
+    {
+        if (is_array($customerIdVersion)) {
+            $useMinMax = false;
+            if (isset($customerIdVersion['min'])) {
+                $this->addUsingAlias(OrderVersionTableMap::CUSTOMER_ID_VERSION, $customerIdVersion['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($customerIdVersion['max'])) {
+                $this->addUsingAlias(OrderVersionTableMap::CUSTOMER_ID_VERSION, $customerIdVersion['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderVersionTableMap::CUSTOMER_ID_VERSION, $customerIdVersion, $comparison);
     }
 
     /**
