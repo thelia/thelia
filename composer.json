@@ -37,7 +37,6 @@
         "symfony/finder": "2.3.*",
         "symfony/browser-kit": "2.3.*",
         "symfony/http-foundation": "2.3.*",
-        "symfony/class-loader": "2.3.*",
         "symfony/form": "2.3.*"
     },
     "require-dev": {

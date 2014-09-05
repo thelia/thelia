@@ -26,6 +26,7 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -48,6 +49,15 @@ class Thelia extends Kernel
 {
 
     const THELIA_VERSION = '2.1.0-alpha1';
+
+    public function __construct($environment, $debug)
+    {
+        parent::__construct($environment, $debug);
+
+        if ($debug) {
+            Debug::enable();
+        }
+    }
 
     public function init()
     {

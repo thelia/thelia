@@ -106,11 +106,11 @@ class Format extends AbstractSmartyPlugin
     {
         if (function_exists('setlocale')) {
             // Save the current locale
-            $systemLocale = setlocale('LC_TIME', 0);
-            setlocale('LC_TIME', $locale);
+            $systemLocale = setlocale(LC_TIME, 0);
+            setlocale(LC_TIME, $locale);
             $localizedDate =  strftime($format, $date->getTimestamp());
             // Restore the locale
-            setlocale('LC_TIME', $systemLocale);
+            setlocale(LC_TIME, $systemLocale);
 
             return $localizedDate;
         } else {
