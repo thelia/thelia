@@ -54,7 +54,7 @@ class ModuleHookCreationForm extends BaseForm
     protected function getModuleChoices()
     {
         $choices = array();
-        $modules = ModuleQuery::getActivated();
+        $modules = ModuleQuery::getActivatedAsc();
         /** @var Module $module */
         foreach ($modules as $module) {
             $choices[$module->getId()] = $module->getTitle();
