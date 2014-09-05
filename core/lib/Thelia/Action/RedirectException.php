@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Tools\URL;
 
 /**
  * Class RedirectException
@@ -24,13 +25,29 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
+
+    /**
+    * @var ParserInterface
+    */
+    protected $urlManager;
+
+    public function __construct(URL $urlManager)
+    {
+        $this->urlManager = $urlManager;
+    }
+
     public function checkRedirectException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
         if ($exception instanceof \Thelia\Core\HttpKernel\Exception\RedirectException) {
             $response = RedirectResponse::create($exception->getUrl(), $exception->getStatusCode());
             $event->setResponse($response);
+        } elseif ($exception instanceof \Thelia\Core\Security\Exception\AuthenticationException) {
+            // Redirect to the login template
+            $response = RedirectResponse::create($this->urlManager->viewUrl($exception->getLoginTemplate()));
+            $event->setResponse($response);
         }
+
     }
     /**
      * Returns an array of event names this subscriber wants to listen to.

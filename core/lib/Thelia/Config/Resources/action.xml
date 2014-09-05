@@ -39,11 +39,12 @@
         </service>
 
         <service id="thelia.action.httpException" class="Thelia\Action\HttpException" scope="request">
-            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.parser" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.RedirectException" class="Thelia\Action\RedirectException">
+            <argument type="service" id="thelia.url.manager" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -68,7 +69,7 @@
 
         <service id="thelia.action.image" class="Thelia\Action\Image">
             <argument type="service" id="thelia.file_manager"/>
-             <tag name="kernel.event_subscriber"/>
+            <tag name="kernel.event_subscriber"/>
         </service>
         <service id="thelia.action.document" class="Thelia\Action\Document">
             <argument type="service" id="thelia.file_manager"/>
