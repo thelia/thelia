@@ -8,6 +8,9 @@
 - Added the `sale` parameter to the `product` loop.
 - Added visible argument to image/document classes
 - Added `new`, `promo` and `default` parameters to `product_sale_elements` loop
+- Added `store_notification_emails`, which contains the recipients of shop notification (such as order placed)
+- Added admin notification e-mail for order placed
+- Improved other emails (specially text versions)
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :

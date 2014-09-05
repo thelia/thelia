@@ -1945,6 +1945,15 @@ SELECT @store_email := `value` FROM `config` where name='store_email';
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('store_notification_emails',@store_email, 1, 1, NOW(), NOW());
 
+SELECT @max_id := MAX(`id`) FROM `message`;
+
+INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
+  (@max_id+1, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW());
+
+INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
+  (@max_id+1, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key="store_name"}', NULL, NULL),
+  (@max_id+1, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL);
+
 # ======================================================================================================================
 # End of changes
 # ======================================================================================================================

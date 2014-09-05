@@ -2,6 +2,7 @@
 
 {* Do not provide a "Open in browser" link  *}
 {block name="browser"}{/block}
+{* No pre-header *}
 {block name="pre-header"}{/block}
 
 {* Subject  *}
@@ -54,7 +55,7 @@
         <br />
 
         <p>
-            {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
+            {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}<br />
             {intl l="Order Number:"} {$REF}<br />
             {intl l="Paid With:"} {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
             {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="datetime"}<br />

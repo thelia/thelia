@@ -367,8 +367,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
 
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
-echo "done.";
-        exit;
     }
 
     /**
