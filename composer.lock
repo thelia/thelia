@@ -1976,12 +1976,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "c8969fc264875e8bae33e977d71f0abab3b8e8b3"
+                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/c8969fc264875e8bae33e977d71f0abab3b8e8b3",
-                "reference": "c8969fc264875e8bae33e977d71f0abab3b8e8b3",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
+                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
                 "shasum": ""
             },
             "require": {
