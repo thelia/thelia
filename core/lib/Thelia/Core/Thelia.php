@@ -57,11 +57,7 @@ class Thelia extends Kernel
         if ($debug) {
             Debug::enable();
         }
-    }
 
-    public function init()
-    {
-        parent::init();
         $this->initPropel();
     }
 
