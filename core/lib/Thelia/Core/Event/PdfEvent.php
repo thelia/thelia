@@ -57,7 +57,7 @@ class PdfEvent extends ActionEvent
     {
         $this->content = $content;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -72,7 +72,7 @@ class PdfEvent extends ActionEvent
     {
         $this->pdf = $pdf;
 		
-		return $this;
+	return $this;
     }
 
     public function getPdf()
@@ -92,7 +92,7 @@ class PdfEvent extends ActionEvent
     {
         $this->encoding = $encoding;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -110,7 +110,7 @@ class PdfEvent extends ActionEvent
     {
         $this->format = $format;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -128,7 +128,7 @@ class PdfEvent extends ActionEvent
     {
         $this->lang = $lang;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -146,7 +146,7 @@ class PdfEvent extends ActionEvent
     {
         $this->marges = $marges;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -164,7 +164,7 @@ class PdfEvent extends ActionEvent
     {
         $this->orientation = $orientation;
 		
-		return $this;
+	return $this;
     }
 
     /**
@@ -182,7 +182,7 @@ class PdfEvent extends ActionEvent
     {
         $this->unicode = $unicode;
 		
-		return $this;
+	return $this;
     }
 
     /**
