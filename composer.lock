@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "789422be6917677af2e8cd89029e9dd8",
+    "hash": "ff99a4f33022a81641dd0e96065cd617",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -533,16 +533,16 @@
         },
         {
             "name": "simplepie/simplepie",
-            "version": "dev-master",
+            "version": "1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/simplepie/simplepie.git",
-                "reference": "9a9faaa0d563426cf6d897c169373c5b62f1b252"
+                "reference": "ce53709778bc1e2e4deda1651b66e5081398d5cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/9a9faaa0d563426cf6d897c169373c5b62f1b252",
-                "reference": "9a9faaa0d563426cf6d897c169373c5b62f1b252",
+                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/ce53709778bc1e2e4deda1651b66e5081398d5cc",
+                "reference": "ce53709778bc1e2e4deda1651b66e5081398d5cc",
                 "shasum": ""
             },
             "require": {
@@ -583,7 +583,7 @@
                 "feeds",
                 "rss"
             ],
-            "time": "2014-04-28 12:50:39"
+            "time": "2012-10-30 17:54:03"
         },
         {
             "name": "smarty/smarty",
@@ -2858,7 +2858,6 @@
     "stability-flags": {
         "propel/propel": 20,
         "kriswallsmith/assetic": 20,
-        "simplepie/simplepie": 20,
         "maximebf/debugbar": 20,
         "fzaninotto/faker": 20
     },

@@ -28,7 +28,7 @@
         "leafo/lessphp": "0.4.*",
         "ptachoire/cssembed": "1.0.*",
         "doctrine/cache": "v1.3.0",
-        "simplepie/simplepie": "dev-master",
+        "simplepie/simplepie": "1.3.*",
         "imagine/imagine": "0.*",
         "symfony/icu": "1.0",
         "swiftmailer/swiftmailer": "5.2.*",
