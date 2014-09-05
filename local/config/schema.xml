@@ -405,6 +405,10 @@
       <unique-column name="ref" />
     </unique>
     <behavior name="timestampable" />
+    <behavior name="versionable">
+      <parameter name="log_created_at" value="true" />
+      <parameter name="log_created_by" value="true" />
+    </behavior>
   </table>
   <table name="address" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
