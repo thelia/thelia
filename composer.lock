@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "96c41ade986a4f662f2ae2e1ed51c08b",
+    "hash": "789422be6917677af2e8cd89029e9dd8",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -537,12 +537,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/simplepie/simplepie.git",
-                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a"
+                "reference": "9a9faaa0d563426cf6d897c169373c5b62f1b252"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
-                "reference": "f97c8ef9be655c35e6fecdb608bdf5af05a4374a",
+                "url": "https://api.github.com/repos/simplepie/simplepie/zipball/9a9faaa0d563426cf6d897c169373c5b62f1b252",
+                "reference": "9a9faaa0d563426cf6d897c169373c5b62f1b252",
                 "shasum": ""
             },
             "require": {
@@ -583,7 +583,7 @@
                 "feeds",
                 "rss"
             ],
-            "time": "2013-08-31 01:38:46"
+            "time": "2014-04-28 12:50:39"
         },
         {
             "name": "smarty/smarty",
@@ -1976,12 +1976,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/maximebf/php-debugbar.git",
-                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d"
+                "reference": "c8969fc264875e8bae33e977d71f0abab3b8e8b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
-                "reference": "7fbe0a5d4ffc7f4e205c2b15542382308d34bd0d",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/c8969fc264875e8bae33e977d71f0abab3b8e8b3",
+                "reference": "c8969fc264875e8bae33e977d71f0abab3b8e8b3",
                 "shasum": ""
             },
             "require": {
@@ -1989,13 +1989,19 @@
                 "psr/log": "~1.0"
             },
             "require-dev": {
-                "php": ">=5.3.0"
+                "phpunit/phpunit": "~4.0"
             },
             "suggest": {
                 "kriswallsmith/assetic": "The best way to manage assets",
-                "monolog/monolog": "Log using Monolog"
+                "monolog/monolog": "Log using Monolog",
+                "predis/predis": "Redis storage"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
+            },
             "autoload": {
                 "psr-0": {
                     "DebugBar": "src/"
@@ -2017,7 +2023,7 @@
             "keywords": [
                 "debug"
             ],
-            "time": "2013-09-11 13:01:19"
+            "time": "2014-08-28 22:03:39"
         },
         {
             "name": "phenx/php-font-lib",
