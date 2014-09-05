@@ -55,9 +55,14 @@ class Thelia extends Kernel
         $this->initPropel();
     }
 
+    public static function isInstalled()
+    {
+        return file_exists(THELIA_CONF_DIR . 'database.yml');
+    }
+
     protected function initPropel()
     {
-        if (file_exists(THELIA_CONF_DIR . 'database.yml') === false) {
+        if (self::isInstalled() === false) {
             return ;
         }
 
@@ -83,7 +88,7 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
+        if (self::isInstalled()) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
     }

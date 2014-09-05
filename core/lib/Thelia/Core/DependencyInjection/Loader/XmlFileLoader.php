@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
+use Thelia\Core\Thelia;
 use Thelia\Log\Tlog;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategory;
@@ -83,39 +84,28 @@ class XmlFileLoader extends FileLoader
 
         $this->propelOnlyRun(
             [$this, "parseExportCategories"],
-            $xml,
-            ExportCategoryTableMap::DATABASE_NAME
+            $xml
         );
 
         $this->propelOnlyRun(
             [$this, "parseExports"],
-            $xml,
-            ExportTableMap::DATABASE_NAME
+            $xml
         );
 
         $this->propelOnlyRun(
             [$this, "parseImportCategories"],
-            $xml,
-            ImportCategoryTableMap::DATABASE_NAME
+            $xml
         );
 
         $this->propelOnlyRun(
             [$this, "parseImports"],
-            $xml,
-            ImportTableMap::DATABASE_NAME
+            $xml
         );
     }
 
-    public function propelOnlyRun(callable $method, $arg, $name)
+    public function propelOnlyRun(callable $method, $arg)
     {
-        $doRun = false;
-
-        try {
-            Propel::getConnection($name);
-            $doRun = true;
-        } catch (\ErrorException $e) {}
-
-        if ($doRun) {
+        if (Thelia::isInstalled()) {
             call_user_func($method, $arg);
         }
     }
