@@ -31,6 +31,7 @@
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
         <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductTax" name="order_product_tax"/>
         <loop class="Thelia\Core\Template\Loop\OrderCoupon" name="order_coupon"/>
         <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
