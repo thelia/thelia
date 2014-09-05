@@ -33,21 +33,8 @@ class ConfigStoreController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::VIEW)) return $response;
 
-        // Hydrate the store configuration form
-        $configStoreForm = new ConfigStoreForm($this->getRequest(), 'form', array(
-            'store_name'             => ConfigQuery::read("store_name"),
-            'store_description'      => ConfigQuery::read("store_description"),
-            'store_email'            => ConfigQuery::read("store_email"),
-            'store_business_id'      => ConfigQuery::read("store_business_id"),
-            'store_phone'            => ConfigQuery::read("store_phone"),
-            'store_fax'              => ConfigQuery::read("store_fax"),
-            'store_address1'         => ConfigQuery::read("store_address1"),
-            'store_address2'         => ConfigQuery::read("store_address2"),
-            'store_address3'         => ConfigQuery::read("store_address3"),
-            'store_zipcode'          => ConfigQuery::read("store_zipcode"),
-            'store_city'             => ConfigQuery::read("store_city"),
-            'store_country'          => ConfigQuery::read("store_country")
-        ));
+        // The form is self-hydrated
+        $configStoreForm = new ConfigStoreForm($this->getRequest(), 'form');
 
         $this->getParserContext()->addForm($configStoreForm);
 

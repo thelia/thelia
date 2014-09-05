@@ -200,7 +200,7 @@ class TemplateHelper
         } elseif ($walkMode == self::WALK_MODE_TEMPLATE) {
             $prefix = '\{intl(?:.*?)l=[\s]*';
 
-            $allowed_exts = array('html', 'tpl', 'xml');
+            $allowed_exts = array('html', 'tpl', 'xml', 'txt');
         } else {
             throw new \InvalidArgumentException(
                     Translator::getInstance()->trans('Invalid value for walkMode parameter: %value', array('%value' => $walkMode))

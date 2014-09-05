@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -23,6 +24,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ContentCreationForm;
 use Thelia\Form\ContentModificationForm;
+use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 
 /**
@@ -126,7 +128,8 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param \Thelia\Form\ContentModificationForm $object
+     * @param Content $object
+     * @return \Thelia\Form\ContentModificationForm
      */
     protected function hydrateObjectForm($object)
     {
@@ -151,7 +154,8 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return \Thelia\Core\Event\Content\ContentCreateEvent
      */
     protected function getCreationEvent($formData)
     {
@@ -170,7 +174,8 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return \Thelia\Core\Event\Content\ContentUpdateEvent
      */
     protected function getUpdateEvent($formData)
     {
@@ -200,6 +205,7 @@ class ContentController extends AbstractSeoCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param \Thelia\Core\Event\Content\ContentEvent $event
+     * @return bool
      */
     protected function eventContainsObject($event)
     {
@@ -278,7 +284,8 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
+     * @param int $currentOrder , if any, null otherwise.
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)
     {

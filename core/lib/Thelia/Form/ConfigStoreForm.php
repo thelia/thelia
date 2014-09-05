@@ -13,115 +13,206 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 
 class ConfigStoreForm extends BaseForm
 {
     protected function buildForm()
     {
+        $tr = Translator::getInstance();
+        
         $this->formBuilder
-            ->add("store_name", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans('Store name'),
-                "label_attr" => array(
-                        "for" => "store_name"
+            ->add(
+                'store_name', 
+                'text', [
+                    'data' => ConfigQuery::read('store_name'),
+                    'constraints' => [ new Constraints\NotBlank() ],
+                    'label' => $tr->trans('Store name'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('Used in your store front')
+                    ]
+                ]
+            )
+            ->add(
+                'store_description',
+                'text', [
+                    'data' => ConfigQuery::read('store_description'),
+                    'required' => false,
+                    'label' => $tr->trans('Store description'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('Used in your store front')
+                    ]
+                ]
+            )
+            ->add(
+                'store_email',
+                'text', [
+                    'data' => ConfigQuery::read('store_email'),
+                    'constraints' => [
+                        new Constraints\NotBlank(),
+                        new Constraints\Email()
+                    ],
+                    'label' => $tr->trans('Store email address'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('Contact and sender email address')
+                    ],
+                    'label_attr' => [
+                        'help' => $tr->trans('This is the contact email address, and the sender email of all e-mails sent by your store.')
+                    ]
+                ]
+            )
+            ->add(
+                'store_notification_emails',
+                'text', [
+                    'data' => ConfigQuery::read('store_notification_emails'),
+                    'constraints' => [
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback([
+                            'methods' => [
+                                [ $this, 'checkEmailList']
+                            ]
+                        ])
+                    ],
+                    'label' => $tr->trans('Email addresses of notification recipients'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('A comma separated list of email addresses')
+                    ],
+                    'label_attr' => [
+                        'help' => $tr->trans('This is a comma separated list of email addresses where store notifications (such as order placed) are sent.')
+                    ]
+                ]
+            )            ->add(
+                'store_business_id',
+                'text', [
+                    'data' => ConfigQuery::read('store_business_id'),
+                    'label' => $tr->trans('Business ID'),
+                    'required' => false,
+                    'attr' => [
+                        'placeholder' => $tr->trans('Store Business Identification Number (SIRET, etc).')
+                    ]
+                ]
+            )
+            ->add(
+                'store_phone',
+                'text', [
+                    'data' => ConfigQuery::read('store_phone'),
+                    'label' => $tr->trans('Phone'),
+                     'required' => false,
+                    'attr' => [
+                        'placeholder' => $tr->trans('The store phone number.')
+                    ]
+                ]
+            )
+            ->add(
+                'store_fax',
+                'text', [
+                    'data' => ConfigQuery::read('store_fax'),
+                    'label' => $tr->trans('Fax'),
+                    'required' => false,
+                    'attr' => [
+                        'placeholder' => $tr->trans('The store fax number.')
+                    ]
+                ]
+            )
+            ->add(
+                'store_address1',
+                'text', [
+                    'data' => ConfigQuery::read('store_address1'),
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'label' => $tr->trans('Street Address'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('Address.')
+                    ]
+                ]
+            )
+            ->add(
+                'store_address2',
+                'text', [
+                    'data' => ConfigQuery::read('store_address2'),
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'attr' => [
+                        'placeholder' => $tr->trans('Additional address information')
+                    ]
+                ]
+            )
+            ->add(
+                'store_address3',
+                'text', [
+                    'data' => ConfigQuery::read('store_address3'),
+                    'required' => false,
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'attr' => [
+                        'placeholder' => $tr->trans('Additional address information')
+                    ]
+                ]
+            )
+            ->add(
+                'store_zipcode',
+                'text', [
+                    'data' => ConfigQuery::read('store_zipcode'),
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'label' => $tr->trans('Zip code'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('Zip code')
+                    ]
+                ]
+            )
+            ->add(
+                'store_city',
+                'text', [
+                    'data' => ConfigQuery::read('store_city'),
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'label' => $tr->trans('City'),
+                    'attr' => [
+                        'placeholder' => $tr->trans('City')
+                    ]
+                ]
+            )
+            ->add(
+                'store_country',
+                'integer', [
+                    'data' => ConfigQuery::read('store_country'),
+                    'constraints' => [
+                        new Constraints\NotBlank()
+                    ],
+                    'label' => $tr->trans('Country'),
+                        'attr' => [
+                            'placeholder' => $tr->trans('Country')
+                        ]
+                    ]
                 )
-            ))
-            ->add("store_description", "text", array(
-                    "label" => Translator::getInstance()->trans('Store description'),
-                    "label_attr" => array(
-                        "for" => "store_description"
-                    ),
-                    "required" => false
-                ))
-            ->add("store_email", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Email()
-                ),
-                "label" => Translator::getInstance()->trans('Store email address'),
-                "label_attr" => array(
-                    "for" => "store_email"
-                )
-            ))
-            ->add("store_business_id", "text", array(
-                "label" => Translator::getInstance()->trans('Business ID'),
-                "label_attr" => array(
-                    "for" => "store_business_id"
-                ),
-                "required" => false
-            ))
-            ->add("store_phone", "text", array(
-                "label" => Translator::getInstance()->trans("Phone"),
-                "label_attr" => array(
-                    "for" => "store_phone"
-                ),
-                "required" => false
-            ))
-            ->add("store_fax", "text", array(
-                "label" => Translator::getInstance()->trans("Fax"),
-                "label_attr" => array(
-                    "for" => "store_fax"
-                ),
-                "required" => false
-            ))
-            ->add("store_address1", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Street Address"),
-                "label_attr" => array(
-                    "for" => "store_address1"
-                )
-            ))
-            ->add("store_address2", "text", array(
-                "label" => Translator::getInstance()->trans("Address Line 2"),
-                "label_attr" => array(
-                    "for" => "store_address2"
-                ),
-                "required" => false
-            ))
-            ->add("store_address3", "text", array(
-                "label" => Translator::getInstance()->trans("Address Line 3"),
-                "label_attr" => array(
-                    "for" => "store_address3"
-                ),
-                "required" => false
-            ))
-            ->add("store_zipcode", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Zip code"),
-                "label_attr" => array(
-                    "for" => "store_zipcode"
-                )
-            ))
-            ->add("store_city", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("City"),
-                "label_attr" => array(
-                    "for" => "store_city"
-                )
-            ))
-            ->add("store_country", "text", array(
-                "constraints" => array(
-                    new Constraints\NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Country"),
-                "label_attr" => array(
-                    "for" => "store_country"
-                )
-            ))
             ;
+    }
+
+    function checkEmailList($value, ExecutionContextInterface $context)
+    {
+        $list = preg_split('/[,;]/', $value);
+
+        $emailValidator = new Constraints\Email();
+
+        foreach($list as $email) {
+
+            $email = trim($email);
+
+            $context->validateValue($email, $emailValidator);
+        }
     }
 
     public function getName()
     {
-        return "thelia_configuration_store";
+        return 'thelia_configuration_store';
     }
 }

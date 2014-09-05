@@ -70,8 +70,14 @@ class Message extends BaseMessage
 
     /**
      * Calculate the message body, given the HTML entered in the back-office, the message layout, and the message template
+
+     * @param ParserInterface $parser
+     * @param $message
+     * @param $layout
+     * @param $template
+     * @return bool
      */
-    protected function getMessageBody($parser, $message, $layout, $template)
+    protected function getMessageBody($parser, $message, $layout, $template, $compressOutput = true)
     {
         $body = false;
 
@@ -79,7 +85,7 @@ class Message extends BaseMessage
         if (! empty($template)) {
             try {
 
-                $body = $parser->render($template);
+                $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException $ex) {
                 // Ignore this.
             }
@@ -87,7 +93,7 @@ class Message extends BaseMessage
 
         // We did not get it ? Use the message entered in the back-office
         if ($body === false) {
-            $body = $parser->renderString($message);
+            $body = $parser->renderString($message, [], $compressOutput);
         }
 
         // Do we have a layout ?
@@ -97,7 +103,7 @@ class Message extends BaseMessage
             $parser->assign('message_body', $body);
 
             // Render the layout file
-            $body = $parser->render($layout);
+            $body = $parser->render($layout, [], $compressOutput);
         }
 
         return $body;
@@ -125,7 +131,8 @@ class Message extends BaseMessage
                 $parser,
                 $this->getTextMessage(),
                 $this->getTextLayoutFileName(),
-                $this->getTextTemplateFileName()
+                $this->getTextTemplateFileName(),
+                true // Do not compress the output, and keep empty lines.
         );
     }
 

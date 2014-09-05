@@ -1,7 +1,8 @@
 {extends file="email-layout.tpl"}
 
-{* Open in browser  *}
+{* Do not provide a "Open in browser" link  *}
 {block name="browser"}{/block}
+{block name="pre-header"}{/block}
 
 {* Subject  *}
 {block name="email-subject"}{intl l="Your order confirmation Nº %ref" ref={$order_ref}}{/block}
@@ -56,7 +57,7 @@
             {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol} <span style="font-size:90%;color:#777">{$orderCurrencyIsoCode}</span><br />
             {intl l="Order Number:"} {$REF}<br />
             {intl l="Paid With:"} {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
-            {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="date"}<br />
+            {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="datetime"}<br />
             {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
         </p>
 
@@ -103,6 +104,10 @@
             </tr>
         </table>
     {/loop}
+
+    <br />
+
+    <p><a href="{url path="/account"}">{intl l="View this order in your account at %shop_name" shop_name={config key="store_name"}}</a></p>
 
     <br />
 

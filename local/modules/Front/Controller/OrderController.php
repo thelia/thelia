@@ -251,7 +251,7 @@ class OrderController extends BaseFrontController
         $customer = $this->getSecurityContext()->getCustomerUser();
 
         if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
-            throw new TheliaProcessException("Received failed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
+            throw new TheliaProcessException("Received failed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $failedOrder);
         }
 
         $this->getParserContext()

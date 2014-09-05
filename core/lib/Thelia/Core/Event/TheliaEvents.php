@@ -374,6 +374,8 @@ final class TheliaEvents
 
     const ORDER_SEND_CONFIRMATION_EMAIL = "action.order.sendOrderConfirmationEmail";
 
+    const ORDER_SEND_NOTIFICATION_EMAIL = "action.order.sendOrderNotificationEmail";
+
     const ORDER_UPDATE_DELIVERY_REF = "action.order.updateDeliveryRef";
     const ORDER_UPDATE_ADDRESS = "action.order.updateAddress";
 
