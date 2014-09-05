@@ -150,6 +150,14 @@ class ZipArchiveBuilder extends AbstractArchiveBuilder
 
         $filePath = $this->getFilePath($directoryInArchive . DS . $name);
 
+        if (!is_scalar($content)) {
+            throw new \ErrorException(
+                $this->translator->trans(
+                    "The content is not correct"
+                )
+            );
+        }
+
         if (!$this->zip->addFromString($filePath, $content)) {
             throw new \ErrorException(
                 $this->translator->trans(
