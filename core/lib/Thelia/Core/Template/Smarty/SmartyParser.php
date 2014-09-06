@@ -328,8 +328,9 @@ class SmartyParser extends Smarty implements ParserInterface
     protected function internalRenderer($resourceType, $resourceContent, array $parameters, $compressOutput = true)
     {
         // If we have to diable the output compression, just unregister the output filter temporarly
-        if ($compressOutput == false)
+        if ($compressOutput == false) {
             $this->unregisterFilter('output', array($this, "trimWhitespaces"));
+        }
 
         // Assign the parserContext variables
         foreach ($this->parserContext as $var => $value) {
@@ -340,8 +341,9 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $output = $this->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
 
-        if ($compressOutput == false)
+        if ($compressOutput == false) {
             $this->registerFilter('output', array($this, "trimWhitespaces"));
+        }
 
         return $output;
     }
