@@ -1157,7 +1157,7 @@ return array(
     'tax rules' => 'tax rules',
     'taxes' => 'taxes',
     'title' => 'title',
-    'tracking reference' => 'tracking reference',
+    'tracking reference' => 'Tracking reference',
     'uncheck all' => 'uncheck all',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.',
 );

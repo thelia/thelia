@@ -128,7 +128,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param Content $object
+     * @param  Content                              $object
      * @return \Thelia\Form\ContentModificationForm
      */
     protected function hydrateObjectForm($object)
@@ -154,7 +154,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param array $formData
+     * @param  array                                         $formData
      * @return \Thelia\Core\Event\Content\ContentCreateEvent
      */
     protected function getCreationEvent($formData)
@@ -174,7 +174,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param array $formData
+     * @param  array                                         $formData
      * @return \Thelia\Core\Event\Content\ContentUpdateEvent
      */
     protected function getUpdateEvent($formData)
@@ -204,7 +204,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param \Thelia\Core\Event\Content\ContentEvent $event
+     * @param  \Thelia\Core\Event\Content\ContentEvent $event
      * @return bool
      */
     protected function eventContainsObject($event)
@@ -284,7 +284,7 @@ class ContentController extends AbstractSeoCrudController
     /**
      * Render the main list template
      *
-     * @param int $currentOrder , if any, null otherwise.
+     * @param  int                                  $currentOrder , if any, null otherwise.
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)

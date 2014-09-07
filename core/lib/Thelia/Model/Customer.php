@@ -179,7 +179,7 @@ class Customer extends BaseCustomer implements UserInterface
         if ($password !== null && trim($password) != "") {
             $this->setAlgo("PASSWORD_BCRYPT");
 
-            return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+            parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
 
         return $this;
