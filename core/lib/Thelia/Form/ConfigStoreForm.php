@@ -134,9 +134,6 @@ class ConfigStoreForm extends BaseForm
                 'text', [
                     'data' => ConfigQuery::read('store_address2'),
                     'required' => false,
-                    'constraints' => [
-                        new Constraints\NotBlank()
-                    ],
                     'attr' => [
                         'placeholder' => $tr->trans('Additional address information')
                     ]
@@ -147,9 +144,6 @@ class ConfigStoreForm extends BaseForm
                 'text', [
                     'data' => ConfigQuery::read('store_address3'),
                     'required' => false,
-                    'constraints' => [
-                        new Constraints\NotBlank()
-                    ],
                     'attr' => [
                         'placeholder' => $tr->trans('Additional address information')
                     ]
