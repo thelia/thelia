@@ -29,10 +29,12 @@
             {form_field form=$form field="account"}
             <input type="hidden" name="{$name}" value="1">
             {/form_field}
-            <div class="group-btn">
+            <div class="form-group group-btn">
                 <button type="submit" class="btn btn-login-mini">{intl l="Sign In" d="hookcustomer.fo.default"}</button>
                 <a href="{url path="/register"}" class="btn btn-register-mini">{intl l="Register" d="hookcustomer.fo.default"}</a>
             </div>
+
+            <a href="{url path="/password"}" class="mini-forgot-password">{intl l="Forgot your Password?"}</a>
             </form>
             {/form}
         </div>
