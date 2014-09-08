@@ -134,6 +134,7 @@
 
         <service id="mailer" class="Thelia\Mailer\MailerFactory">
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="thelia.parser"/>
         </service>
 
         <service id="response.listener" class="Thelia\Core\EventListener\ResponseListener">
