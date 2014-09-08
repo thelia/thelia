@@ -63,7 +63,7 @@ class Export extends BaseAdminController
                 ->find();
 
             $export = "";
-            $store_name = ConfigQuery::read("store_name");
+            $store_name = ConfigQuery::getStoreName();
             /** @var $order \Thelia\Model\Order */
             foreach ($orders as $order) {
 

@@ -217,7 +217,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
                 $instance = \Swift_Message::newInstance()
                     ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                    ->addFrom($contact_email, ConfigQuery::read('store_name'))
+                    ->addFrom($contact_email, ConfigQuery::getStoreName())
                 ;
 
                 // Build subject and body

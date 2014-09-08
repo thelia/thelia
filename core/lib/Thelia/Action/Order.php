@@ -419,7 +419,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $emailMessage
                 ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom($contactEmail, ConfigQuery::read('store_name'))
+                ->addFrom($contactEmail, ConfigQuery::getStoreName())
             ;
 
             $success = $this->getMailer()->send($emailMessage);
