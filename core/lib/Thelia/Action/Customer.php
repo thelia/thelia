@@ -16,18 +16,18 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
+use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
-use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\LangQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Tools\Password;
 
@@ -56,20 +56,24 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function create(CustomerCreateOrUpdateEvent $event)
     {
-
         $customer = new CustomerModel();
 
         $this->createOrUpdateCustomer($customer, $event);
 
+        $this->mailer->sendEmailToCustomer('customer_account_created', $customer);
     }
 
     public function modify(CustomerCreateOrUpdateEvent $event)
     {
+        $plainPassword = $event->getPassword();
 
         $customer = $event->getCustomer();
 
         $this->createOrUpdateCustomer($customer, $event);
 
+        if (! empty($plainPassword)) {
+            $this->mailer->sendEmailToCustomer('customer_password_changed', $customer, ['password' => $plainPassword]);
+        }
     }
 
     public function updateProfile(CustomerCreateOrUpdateEvent $event)
@@ -129,7 +133,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
-        $customer->setDispatcher($event->getDispatcher());
+         $customer->setDispatcher($event->getDispatcher());
 
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -171,7 +175,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function logout(ActionEvent $event)
+    public function logout(/** @noinspection PhpUnusedParameterInspection */ ActionEvent $event)
     {
         $this->securityContext->clearCustomerUser();
     }
@@ -190,42 +194,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
                     ->save()
                 ;
 
-                if ($customer->getLang() !== null) {
-                    $lang = LangQuery::create()
-                        ->findPk($customer->getLang());
-
-                    $locale = $lang->getLocale();
-                } else {
-                    $lang = LangQuery::create()
-                        ->filterByByDefault(1)
-                        ->findOne();
-
-                    $locale = $lang->getLocale();
-                }
-
-                $message = MessageQuery::create()
-                    ->filterByName('lost_password')
-                    ->findOne();
-
-                $message->setLocale($locale);
-
-                if (false === $message) {
-                    throw new \Exception("Failed to load message 'lost_password'.");
-                }
-
-                $this->parser->assign('password', $password);
-
-                $instance = \Swift_Message::newInstance()
-                    ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                    ->addFrom($contact_email, ConfigQuery::getStoreName())
-                ;
-
-                // Build subject and body
-
-                $message->buildMessage($this->parser, $instance);
-
-                $this->mailer->send($instance);
-
+                $this->mailer->sendEmailToCustomer('lost_password', $customer, ['password' => $password]);
             }
         }
     }

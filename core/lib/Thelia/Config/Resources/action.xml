@@ -23,7 +23,6 @@
 
         <service id="thelia.action.order" class="Thelia\Action\Order" scope="request">
             <argument type="service" id="request"/>
-            <argument type="service" id="thelia.parser"/>
             <argument type="service" id="mailer"/>
             <argument type="service" id="thelia.securityContext"/>
             <tag name="kernel.event_subscriber"/>

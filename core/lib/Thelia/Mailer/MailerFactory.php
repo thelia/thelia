@@ -190,4 +190,63 @@ class MailerFactory
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
         }
     }
+
+
+    /**
+     * Send a message to the customer.
+     *
+     * @param string $messageCode
+     * @param array $from From addresses. An array of (name => email-address)
+     * @param array $to To addresses. An array of (name => email-address)
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param string locale. If null, the default store locale is used.
+     */
+    public function sendEmail($from, $to, $subject, $body)
+    {
+        $store_email = ConfigQuery::getStoreEmail();
+
+        if (! empty($store_email)) {
+            $message = MessageQuery::getFromName($messageCode);
+
+            if ($locale == null) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+            }
+
+            $message->setLocale($locale);
+
+            // Assign parameters
+            foreach($messageParameters as $name => $value) {
+                $this->parser->assign($name, $value);
+            }
+
+            $instance = \Swift_Message::newInstance();
+
+            // Add from addresses
+            foreach($from as $name => $address)
+                $instance->addFrom($address, $name);
+
+            // Add to addresses
+            foreach($to as $name => $address)
+                $instance->addTo($address, $name);
+
+            $message->buildMessage($this->parser, $instance);
+
+            $sentCount = $this->send($instance, $failedRecipients);
+
+            if ($sentCount == 0) {
+                Tlog::getInstance()->addError(
+                    Translator::getInstance()->trans(
+                        "Failed to send message %code. Failed recipients: %failed_addresses",
+                        [
+                            '%code'       => $messageCode,
+                            '%failed_addresses' => is_array($failedRecipients) ? implode(',', $failedRecipients) : 'none'
+                        ]
+                    ));
+            }
+        }
+        else {
+            Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
+        }
+    }
+
 }

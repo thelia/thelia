@@ -128,6 +128,24 @@ class Customer extends BaseCustomer implements UserInterface
         }
     }
 
+    /**
+     * Return the customer lang, or the default one if none is defined.
+     *
+     * @return Lang the customer lang
+     */
+    public function getCustomerLang() {
+        if ($this->getLang() !== null) {
+            $lang = LangQuery::create()
+                ->findPk($this->getLang());
+        } else {
+            $lang = LangQuery::create()
+                ->filterByByDefault(1)
+                ->findOne();
+        }
+
+        return $lang;
+    }
+
     protected function generateRef()
     {
         $lastCustomer = CustomerQuery::create()
