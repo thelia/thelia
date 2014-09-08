@@ -86,6 +86,16 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element name="tags" minOccurs="1" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>Module tags</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element type="xs:string" name="tag" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element name="required" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Plugins that should be presents</xs:documentation>
@@ -114,7 +124,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="min">
+                <xs:element name="min" minOccurs="1">
                     <xs:annotation>
                         <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
                     </xs:annotation>
@@ -124,7 +134,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="max">
+                <xs:element name="max" minOccurs="1">
                     <xs:annotation>
                         <xs:documentation>maximum supported version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
                     </xs:annotation>
