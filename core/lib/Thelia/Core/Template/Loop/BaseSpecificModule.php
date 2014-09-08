@@ -17,6 +17,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ModuleQuery;
+use Thelia\Type\EnumType;
+use Thelia\Type\TypeCollection;
 
 /**
  * @package Thelia\Core\Template\Loop
@@ -62,7 +64,22 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumType([
+                        'id',
+                        'id_reverse',
+                        'alpha',
+                        'alpha_reverse',
+                        'manual',
+                        'manual_reverse',
+                        ]
+                    )
+                ),
+                'manual'
+            )
         );
     }
 
@@ -83,6 +100,30 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
         $this->configureI18nProcessing($search);
 
         $search->filterByType($this->getModuleType(), Criteria::EQUAL);
+
+        $order  = $this->getOrder();
+
+        switch($order) {
+            case "id":
+                $search->orderById(Criteria::ASC);
+                break;
+            case "id_reverse":
+                $search->orderById(Criteria::DESC);
+                break;
+            case "alpha":
+                $search->addAscendingOrderByColumn('i18n_TITLE');
+                break;
+            case "alpha_reverse":
+                $search->addDescendingOrderByColumn('i18n_TITLE');
+                break;
+            case "manual_reverse":
+                $search->orderByPosition(Criteria::DESC);
+                break;
+            case "manual":
+            default:
+                $search->orderByPosition(Criteria::ASC);
+                break;
+        }
 
         return $search;
     }
