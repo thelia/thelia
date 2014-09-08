@@ -22,4 +22,22 @@ use OutOfBoundsException;
  */
 class InvalidModuleException extends OutOfBoundsException{
 
+    protected $errors = array();
+
+    /**
+     * @param array $errors
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
 } 
