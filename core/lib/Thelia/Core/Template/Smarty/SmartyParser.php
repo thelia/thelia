@@ -314,17 +314,24 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         return $this->templateDefinition->getPath();
     }
+
     /**
      * Return a rendered template, either from file or ftom a string
      *
      * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
      * @param string $resourceContent the resource content (a text, or a template file name)
      * @param array  $parameters      an associative array of names / value pairs
+     * @param bool   $compressOutput  if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      *
      * @return string the rendered template text
      */
-    protected function internalRenderer($resourceType, $resourceContent, array $parameters)
+    protected function internalRenderer($resourceType, $resourceContent, array $parameters, $compressOutput = true)
     {
+        // If we have to diable the output compression, just unregister the output filter temporarly
+        if ($compressOutput == false) {
+            $this->unregisterFilter('output', array($this, "trimWhitespaces"));
+        }
+
         // Assign the parserContext variables
         foreach ($this->parserContext as $var => $value) {
             $this->assign($var, $value);
@@ -332,7 +339,13 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->assign($parameters);
 
-        return $this->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
+        $output = $this->fetch(sprintf("%s:%s", $resourceType, $resourceContent));
+
+        if ($compressOutput == false) {
+            $this->registerFilter('output', array($this, "trimWhitespaces"));
+        }
+
+        return $output;
     }
 
     /**
@@ -341,15 +354,16 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param  string                    $realTemplateName the template name (from the template directory)
      * @param  array                     $parameters       an associative array of names / value pairs
      * @return string                    the rendered template text
+     * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @throws ResourceNotFoundException if the template cannot be found
      */
-    public function render($realTemplateName, array $parameters = array())
+    public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
     {
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
 
-        return $this->internalRenderer('file', $realTemplateName, $parameters);
+        return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }
 
     private function checkTemplate($fileName)
@@ -373,13 +387,14 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template text
      *
-     * @param  string $templateText the template text
-     * @param  array  $parameters   an associative array of names / value pairs
+     * @param  string $templateText   the template text
+     * @param  array  $parameters     an associative array of names / value pairs
+     * @param  bool   $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @return string the rendered template text
      */
-    public function renderString($templateText, array $parameters = array())
+    public function renderString($templateText, array $parameters = array(), $compressOutput = true)
     {
-        return $this->internalRenderer('string', $templateText, $parameters);
+        return $this->internalRenderer('string', $templateText, $parameters, $compressOutput);
     }
 
     /**

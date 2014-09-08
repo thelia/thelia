@@ -108,85 +108,86 @@ GNU General Public License : http://www.gnu.org/licenses/
             <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
                 {hook name="main.navbar-secondary"}
                 {elsehook rel="main.navbar-secondary"}
-                {if {count type="currency" exclude={currency attr="id"}} != 0 }
-                <ul class="nav navbar-nav navbar-currency navbar-left">
-                    <li class="dropdown">
-                        <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
-                        <ul class="dropdown-menu">
-                            {loop type="currency" name="currency_available" exclude={currency attr="id"} }
-                                <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
-                            {/loop}
-                        </ul>
-                    </li>
-                </ul>
-                {/if}
-                {if {count type="lang" exclude={lang attr='id'}} != 0 }
-                <ul class="nav navbar-nav navbar-lang navbar-left">
-                    <li class="dropdown">
-                        <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
-                        <ul class="dropdown-menu">
-                            {loop type="lang" name="lang_available" exclude={lang attr="id"}}
-                                <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
-                            {/loop}
-                        </ul>
-                    </li>
-                </ul>
-                {/if}
-                <div class="search-container navbar-form navbar-left">
-                    <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
-                        <label id="search-label" for="q">{intl l="Search a product"}</label>
-                        <div class="input-group">
-                            <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
-                            <div class="input-group-btn">
-                                <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
+                    {if {count type="currency" exclude={currency attr="id"}} != 0 }
+                    <ul class="nav navbar-nav navbar-currency navbar-left">
+                        <li class="dropdown">
+                            <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
+                            <ul class="dropdown-menu">
+                                {loop type="currency" name="currency_available" exclude={currency attr="id"} }
+                                    <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+                                {/loop}
+                            </ul>
+                        </li>
+                    </ul>
+                    {/if}
+                    {if {count type="lang" exclude={lang attr='id'}} != 0 }
+                    <ul class="nav navbar-nav navbar-lang navbar-left">
+                        <li class="dropdown">
+                            <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
+                            <ul class="dropdown-menu">
+                                {loop type="lang" name="lang_available" exclude={lang attr="id"}}
+                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
+                                {/loop}
+                            </ul>
+                        </li>
+                    </ul>
+                    {/if}
+                    <div class="search-container navbar-form navbar-left">
+                        <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
+                            <label id="search-label" for="q">{intl l="Search a product"}</label>
+                            <div class="input-group">
+                                <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
+                                <div class="input-group-btn">
+                                    <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
+                                </div>
                             </div>
+                        </form>
+                    </div>
+                    <ul class="nav navbar-nav navbar-cart navbar-right">
+                        {include file="includes/mini-cart.html" nocache}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-customer navbar-right">
+                        {loop type="auth" name="customer_info_block" role="CUSTOMER"}
+                            <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
+                            <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
+                        {/loop}
+                        {elseloop rel="customer_info_block"}
+                        <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
+                        <li class="dropdown">
+                            <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!"}</a>
+                            <div class="dropdown-menu">
+                                {form name="thelia.front.customer.login"}
+                                <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
+                                    {form_hidden_fields form=$form}
+                                    {form_field form=$form field="success_url"}
+                                        <input type="hidden" name="{$name}" value="{navigate to="current"}">
+                                    {/form_field}
+                                    {form_field form=$form field="email"}
+                                    <div class="form-group group-email">
+                                        <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
+                                        <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
+                                    </div>
+                                    {/form_field}
+                                    {form_field form=$form field="password"}
+                                    <div class="form-group group-password">
+                                        <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
+                                        <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
+                                    </div>
+                                    {/form_field}
+                                    {form_field form=$form field="account"}
+                                    <input type="hidden" name="{$name}" value="1">
+                                    {/form_field}
+                                    <div class="form-group group-btn">
+                                        <button type="submit" class="btn btn-login-mini">{intl l="Sign In" d="hookcustomer.fo.default"}</button>
+                                        <a href="{url path="/register"}" class="btn btn-register-mini">{intl l="Register" d="hookcustomer.fo.default"}</a>
+                                    </div>
+                                    <a href="{url path="/password"}" class="mini-forgot-password">{intl l="Forgot your Password?"}</a>
+                                </form>
+                                {/form}
                         </div>
-                    </form>
-                </div>
-                <ul class="nav navbar-nav navbar-cart navbar-right">
-                    {include file="includes/mini-cart.html" nocache}
-                </ul>
-                <ul class="nav navbar-nav navbar-customer navbar-right">
-                    {loop type="auth" name="customer_info_block" role="CUSTOMER"}
-                        <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
-                        <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
-                    {/loop}
-                    {elseloop rel="customer_info_block"}
-                    <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
-                    <li class="dropdown">
-                        <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!"}</a>
-                        <div class="dropdown-menu">
-                            {form name="thelia.front.customer.login"}
-                            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
-                                {form_hidden_fields form=$form}
-                                {form_field form=$form field="success_url"}
-                                    <input type="hidden" name="{$name}" value="{navigate to="current"}">
-                                {/form_field}
-                                {form_field form=$form field="email"}
-                                <div class="form-group group-email">
-                                    <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
-                                </div>
-                                {/form_field}
-                                {form_field form=$form field="password"}
-                                <div class="form-group group-password">
-                                    <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
-                                    <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
-                                </div>
-                                {/form_field}
-                                {form_field form=$form field="account"}
-                                <input type="hidden" name="{$name}" value="1">
-                                {/form_field}
-                                <div class="group-btn">
-                                    <button type="submit" class="btn btn-login-mini">{intl l="Sign In"}</button>
-                                    <a href="{url path="/register"}" class="btn btn-register-mini">{intl l="Register"}</a>
-                                </div>
-                            </form>
-                            {/form}
-                        </div>
-                    </li>
-                    {/elseloop}
-                </ul>
+                        </li>
+                        {/elseloop}
+                    </ul>
                 {/elsehook}
             </nav>
         </div>

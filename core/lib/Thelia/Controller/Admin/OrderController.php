@@ -89,9 +89,9 @@ class OrderController extends BaseAdminController
             $params["order_page"] = $browsedPage;
             $response = $this->generateRedirectFromRoute("admin.order.list", $params);
         } else {
-            $params["order_id"] = $order_id;
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
-            $response = $this->generateRedirectFromRoute("admin.order.update.view", [], $params);
+
+            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params, [ 'order_id' => $order_id ] );
         }
 
         return $response;
@@ -126,11 +126,10 @@ class OrderController extends BaseAdminController
             $params["update_status_error_message"] = $message;
         }
 
-        $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", [], $params
+            "admin.order.update.view", $params, [ 'order_id' => $order_id ]
         );
     }
 
@@ -184,11 +183,10 @@ class OrderController extends BaseAdminController
             $params["update_status_error_message"] = $message;
         }
 
-        $params["order_id"] = $order_id;
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", [], $params
+            "admin.order.update.view", $params, [ 'order_id' => $order_id ]
         );
 
     }
@@ -208,10 +206,8 @@ class OrderController extends BaseAdminController
     private function generateBackOfficeOrderPdf($order_id, $fileName)
     {
         if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
-            return $this->generateRedirectFromRoute("admin.order.update.view",
-                [
-                    'order_id' => $order_id
-                ]
+            return $this->generateRedirectFromRoute(
+                "admin.order.update.view", [], ['order_id' => $order_id ]
             );
         }
 

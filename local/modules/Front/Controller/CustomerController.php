@@ -57,10 +57,11 @@ class CustomerController extends BaseFrontController
 
     public function newPasswordAction()
     {
-        if (! $this->getSecurityContext()->hasCustomerUser()) {
-            $message = false;
+        $message = false;
 
-            $passwordLost = new CustomerLostPasswordForm($this->getRequest());
+        $passwordLost = new CustomerLostPasswordForm($this->getRequest());
+
+        if (! $this->getSecurityContext()->hasCustomerUser()) {
 
             try {
 
@@ -78,14 +79,19 @@ class CustomerController extends BaseFrontController
 
             if ($message !== false) {
                 Tlog::getInstance()->error(sprintf("Error during customer creation process : %s. Exception was %s", $message, $e->getMessage()));
-
-                $passwordLost->setErrorMessage($message);
-
-                $this->getParserContext()
-                    ->addForm($passwordLost)
-                    ->setGeneralError($message)
-                ;
             }
+        }
+        else {
+            $message = $this->getTranslator()->trans("You're currently logged in. Please log out before requesting a new password.");
+        }
+
+        if ($message !== false) {
+            $passwordLost->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($passwordLost)
+                ->setGeneralError($message)
+            ;
         }
     }
 

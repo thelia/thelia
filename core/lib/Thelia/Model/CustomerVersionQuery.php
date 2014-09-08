@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CustomerVersionQuery as BaseCustomerVersionQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'customer_version' table.
  *

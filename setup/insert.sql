@@ -45,6 +45,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('store_name','', 0, 1, NOW(), NOW()),
 ('store_description','', 0, 1, NOW(), NOW()),
 ('store_email','', 0, 1, NOW(), NOW()),
+('store_notification_emails','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
 ('thelia_version','2.1.0-alpha1', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
@@ -61,6 +62,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('from_firewall_active', '1', 0, 0, NOW(), NOW());
+
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),
@@ -2990,14 +2992,17 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
-(1, 'order_confirmation', NULL, NULL, NULL, NULL, 'order_confirmation.html', NOW(), NOW()),
-(2, 'lost_password', NULL, NULL, NULL, NULL, 'password.html', NOW(), NOW());
+(1, 'order_confirmation', NULL, NULL, 'order_confirmation.txt', NULL, 'order_confirmation.html', NOW(), NOW()),
+(2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
+(3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-(1, 'en_US', 'order confirmation', 'Order : {$order_ref}', '{assign var="order_id" value=1}\\r\\n\\r\\n{loop name="order.invoice" type="order" id=$order_id customer="*"}\\r\\n    {loop name="currency.order" type="currency" id=$CURRENCY}\\r\\n        {assign "orderCurrency" $CODE}\\r\\n    {/loop}\\r\\n{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}\\r\\n{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\\\\r\\\\n\\r\\n{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\\\\r\\\\n\\r\\n{$ZIPCODE} {$CITY}\\\\r\\\\n\\r\\n{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\\\\r\\\\n\\r\\n{/loop}\\r\\nConfirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\\\\r\\\\n\\\\r\\\\n\\r\\nLes articles commandés:\\\\r\\\\n\\r\\n{loop type="order_product" name="order-products" order=$ID}\\r\\n{if $WAS_IN_PROMO == 1}\\r\\n    {assign "realPrice" $PROMO_PRICE}\\r\\n    {assign "realTax" $PROMO_PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}\\r\\n{else}\\r\\n    {assign "realPrice" $PRICE}\\r\\n    {assign "realTax" $PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PRICE}\\r\\n{/if}\\r\\n    \\\\r\\\\n\\r\\n    Article : {$TITLE}\\r\\n{ifloop rel="combinations"}\\r\\n    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}\\r\\n    {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\\\\r\\\\n\\r\\n{/loop}\\r\\n{/ifloop}\\\\r\\\\n\\r\\n    Quantité : {$QUANTITY}\\\\r\\\\n\\r\\n    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\\\\r\\\\n\\r\\n{/loop}\\r\\n\\\\r\\\\n-----------------------------------------\\\\r\\\\n\\r\\nMontant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nFrais de port TTC :    {$POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nSomme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \\\\r\\\\n\\r\\n==================================\\\\r\\\\n\\\\r\\\\n\\r\\nVotre facture est disponible dans la rubrique mon compte sur {config key="url_site"}\\r\\n{/loop}', NULL),
-(1, 'fr_FR', 'Confirmation de commande', 'Commande : {$order_ref}', '{assign var="order_id" value=1}\\r\\n\\r\\n{loop name="order.invoice" type="order" id=$order_id customer="*"}\\r\\n    {loop name="currency.order" type="currency" id=$CURRENCY}\\r\\n        {assign "orderCurrency" $CODE}\\r\\n    {/loop}\\r\\n{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}\\r\\n{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}\\\\r\\\\n\\r\\n{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}\\\\r\\\\n\\r\\n{$ZIPCODE} {$CITY}\\\\r\\\\n\\r\\n{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}\\\\r\\\\n\\r\\n{/loop}\\r\\nConfirmation de commande {$REF} du {format_date date=$INVOICE_DATE}\\\\r\\\\n\\\\r\\\\n\\r\\nLes articles commandés:\\\\r\\\\n\\r\\n{loop type="order_product" name="order-products" order=$ID}\\r\\n{if $WAS_IN_PROMO == 1}\\r\\n    {assign "realPrice" $PROMO_PRICE}\\r\\n    {assign "realTax" $PROMO_PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}\\r\\n{else}\\r\\n    {assign "realPrice" $PRICE}\\r\\n    {assign "realTax" $PRICE_TAX}\\r\\n    {assign "realTaxedPrice" $TAXED_PRICE}\\r\\n{/if}\\r\\n    \\\\r\\\\n\\r\\n    Article : {$TITLE}\\r\\n{ifloop rel="combinations"}\\r\\n    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}\\r\\n    {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}\\\\r\\\\n\\r\\n{/loop}\\r\\n{/ifloop}\\\\r\\\\n\\r\\n    Quantité : {$QUANTITY}\\\\r\\\\n\\r\\n    Prix unitaire TTC : {$realTaxedPrice} {$orderCurrency}\\\\r\\\\n\\r\\n{/loop}\\r\\n\\\\r\\\\n-----------------------------------------\\\\r\\\\n\\r\\nMontant total TTC :    {$TOTAL_TAXED_AMOUNT - $POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nFrais de port TTC :    {$POSTAGE} {$orderCurrency} \\\\r\\\\n\\r\\nSomme totale:            {$TOTAL_TAXED_AMOUNT} {$orderCurrency} \\\\r\\\\n\\r\\n==================================\\\\r\\\\n\\\\r\\\\n\\r\\nVotre facture est disponible dans la rubrique mon compte sur {config key="url_site"}\\r\\n{/loop}', NULL),
-(2, 'en_US', 'Your new password', 'Your new password', 'Your new passord is : {$password}', NULL),
-(2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe est : {$password}', NULL);
+(1, 'en_US', 'order confirmation', 'Your order {$order_ref} at {config key="store_name"}', NULL, NULL),
+(1, 'fr_FR', 'Confirmation de commande', 'Votre commande {$order_ref} chez {config key="store_name"}', NULL, NULL),
+(2, 'en_US', 'Your new password', 'Your new password for {config key="store_name"}', NULL, NULL),
+(2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe {config key="store_name"}', NULL, NULL),
+(3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key="store_name"}', NULL, NULL),
+(3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL);
 
 -- Add firewall i18n
 SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';

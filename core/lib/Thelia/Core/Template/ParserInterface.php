@@ -20,7 +20,9 @@ namespace Thelia\Core\Template;
 
 interface ParserInterface
 {
-    public function render($realTemplateName, array $parameters = array());
+    public function render($realTemplateName, array $parameters = array(), $compressOutput = true);
+
+    public function renderString($templateText, array $parameters = array(), $compressOutput = true);
 
     public function getStatus();
 

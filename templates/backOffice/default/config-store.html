@@ -55,113 +55,51 @@
                                         {/if}
 
                                         <fieldset>
-                                            {form_field form=$form field='store_name'}
-                                            <div class="form-group {if $error}has-error{/if}">
-                                                <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                            {render_form_field form=$form field='store_name'}
+                                            {render_form_field form=$form field='store_description'}
+                                            {render_form_field form=$form field='store_business_id'}
 
-                                                <div class="form-group">
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Used in your store front'}">
-                                                </div>
-                                            </div>
-                                            {/form_field}
+                                            <p class="title title-without-tabs">{intl l='Email addresses'}</p>
 
-                                            {form_field form=$form field='store_description'}
-                                            <div class="form-group {if $error}has-error{/if}">
-                                                <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-
-                                                <div class="form-group">
-                                                    <textarea name="{$name}" id="{$label_attr.for}" title="{$label}" class="form-control" placeholder="{intl l='Used in your store front'}" rows="3"{if $required} aria-required="true" required{/if}>{$value}</textarea>
-                                                </div>
-                                            </div>
-                                            {/form_field}
-
-                                            {form_field form=$form field='store_business_id'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-
-                                                    <div class="form-group">
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Store Business Identification Number (SIRET, etc).'}">
-                                                    </div>
-                                                </div>
-                                            {/form_field}
-
-                                            {form_field form=$form field='store_email'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-
-                                                    <div class="form-group">
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Email used when you send an email to your customers (Order confirmations, etc).'}">
-                                                    </div>
-                                                </div>
-                                            {/form_field}
-
-                                            {form_field form=$form field='store_phone'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-
-                                                    <div class="form-group">
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Phone number'}">
-                                                    </div>
-                                                </div>
-                                            {/form_field}
-
-                                            {form_field form=$form field='store_fax'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-
-                                                    <div class="form-group">
-                                                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Fax number'}">
-                                                    </div>
-                                                </div>
-                                            {/form_field}
+                                            {render_form_field form=$form field='store_email'}
+                                            {render_form_field form=$form field='store_notification_emails'}
                                         </div>
+
                                         <div class="col-md-6">
 
                                             <p class="title title-without-tabs">{intl l="Store address"}</p>
 
-                                            {form_field form=$form field='store_address1'}
-                                                <div style="margin-bottom: 5px" class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Address'}">
-                                                </div>
-                                            {/form_field}
+                                            {render_form_field form=$form field='store_address1'}
+                                            {render_form_field form=$form field='store_address2' show_label=false}
+                                            {render_form_field form=$form field='store_address3' show_label=false}
 
-                                            {form_field form=$form field='store_address2'}
-                                                <div style="margin-bottom: 5px" class="form-group">
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Additional address'}">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    {render_form_field form=$form field='store_zipcode'}
                                                 </div>
-                                            {/form_field}
+                                                <div class="col-md-9">
+                                                    {render_form_field form=$form field='store_city'}
+                                                </div>
+                                            </div>
 
-                                            {form_field form=$form field='store_address3'}
-                                                <div class="form-group">
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Additional address'}">
-                                                </div>
-                                            {/form_field}
+                                            {custom_render_form_field form=$form field='store_country'}
+                                                <select {form_field_attributes form=$form field='store_country'}>
+                                                    {loop type="country" name="country1"}
+                                                        <option value="{$ID}" {if {$value} == $ID || (empty($value) && $IS_DEFAULT)}selected{/if}>{$TITLE}</option>
+                                                    {/loop}
+                                                </select>
+                                            {/custom_render_form_field}
 
-                                            {form_field form=$form field='store_zipcode'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if} </label>
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='Zip code'}">
-                                                </div>
-                                            {/form_field}
+                                            <p class="title title-without-tabs">{intl l='Phone &amp; Fax'}</p>
 
-                                            {form_field form=$form field='store_city'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                                                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}"{if $required} aria-required="true" required{/if} title="{$label}" placeholder="{intl l='City'}">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    {render_form_field form=$form field='store_phone'}
                                                 </div>
-                                            {/form_field}
-
-                                            {form_field form=$form field='store_country'}
-                                                <div class="form-group {if $error}has-error{/if}">
-                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
-                                                    <select name="{$name}" id="{$label_attr.for}" class="form-control"{if $required} aria-required="true" required{/if}>
-                                                        {loop type="country" name="country1"}
-                                                            <option value="{$ID}" {if {$value} == $ID || (empty($value) && $IS_DEFAULT)}selected{/if}>{$TITLE}</option>
-                                                        {/loop}
-                                                    </select>
+                                                <div class="col-md-6">
+                                                    {render_form_field form=$form field='store_fax'}
                                                 </div>
-                                            {/form_field}
+                                            </div>
 
                                         </fieldset>
                                     </div>
@@ -170,6 +108,7 @@
                                 {include
                                 file = "includes/inner-form-toolbar.html"
                                 hide_flags = true
+                                page_bottom = true
 
                                 page_url  = "{url path='/admin/configuration/store'}"
                                 close_url = "{url path='/admin/configuration'}"

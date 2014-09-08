@@ -112,6 +112,25 @@ class ConfigQuery extends BaseConfigQuery
     {
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
+
+    /**
+     * @return array a list of email addresses to send the shop's notifications
+     */
+    public static function getNotificationEmailsList()
+    {
+        $contactEmail = self::read('store_email', '<undefined>');
+
+        $list = preg_split("/[,;]/", self::read('store_notification_emails', $contactEmail));
+
+        $arr = [];
+
+        foreach ($list as $item) {
+            $arr[] = trim($item);
+        }
+
+        return $arr;
+    }
+
     /* smtp config */
     public static function isSmtpEnable()
     {
@@ -170,42 +189,42 @@ class ConfigQuery extends BaseConfigQuery
 
     public static function setSmtpHost($value)
     {
-        return self::write('smtp.host', $value, 1, 1);
+        self::write('smtp.host', $value, 1, 1);
     }
 
     public static function setSmtpPort($value)
     {
-        return self::write('smtp.port', $value, 1, 1);
+        self::write('smtp.port', $value, 1, 1);
     }
 
     public static function setSmtpEncryption($value)
     {
-        return self::write('smtp.encryption', $value, 1, 1);
+        self::write('smtp.encryption', $value, 1, 1);
     }
 
     public static function setSmtpUsername($value)
     {
-        return self::write('smtp.username', $value, 1, 1);
+        self::write('smtp.username', $value, 1, 1);
     }
 
     public static function setSmtpPassword($value)
     {
-        return self::write('smtp.password', $value, 1, 1);
+        self::write('smtp.password', $value, 1, 1);
     }
 
     public static function setSmtpAuthMode($value)
     {
-        return self::write('smtp.authmode', $value, 1, 1);
+        self::write('smtp.authmode', $value, 1, 1);
     }
 
     public static function setSmtpTimeout($value)
     {
-        return self::write('smtp.timeout', $value, 1, 1);
+        self::write('smtp.timeout', $value, 1, 1);
     }
 
     public static function setSmtpSourceIp($value)
     {
-        return self::write('smtp.sourceip', $value, 1, 1);
+        self::write('smtp.sourceip', $value, 1, 1);
     }
     /* end smtp config */
 } // ConfigQuery

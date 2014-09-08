@@ -23,7 +23,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
@@ -363,6 +365,40 @@ class Order extends BaseAction implements EventSubscriberInterface
     public function orderBeforePayement(OrderEvent $event)
     {
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
+
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
+    }
+
+    /**
+     * @param  \Thelia\Model\Order       $order
+     * @param  string                    $messageCode
+     * @return \Swift_Mime_SimpleMessage
+     * @throws \Exception
+     */
+    protected function createOrderMessage($order, $messageCode)
+    {
+        $message = MessageQuery::create()
+            ->filterByName($messageCode)
+            ->findOne();
+
+        if (false === $message) {
+            throw new \Exception("Failed to load message 'order_confirmation'.");
+        }
+
+        $customer = $order->getCustomer();
+
+        $this->parser->assign('order_id', $order->getId());
+        $this->parser->assign('order_ref', $order->getRef());
+
+        $message
+            ->setLocale($order->getLang()->getLocale());
+
+        $instance = \Swift_Message::newInstance();
+
+        // Build subject and body
+        $message->buildMessage($this->parser, $instance);
+
+        return $instance;
     }
 
     /**
@@ -370,39 +406,78 @@ class Order extends BaseAction implements EventSubscriberInterface
      *
      * @throws \Exception if the message cannot be loaded.
      */
-    public function sendOrderEmail(OrderEvent $event)
+    public function sendConfirmationEmail(OrderEvent $event)
     {
-        $contact_email = ConfigQuery::read('store_email');
+        $contactEmail = ConfigQuery::read('store_email');
 
-        if ($contact_email) {
+        if ($contactEmail) {
 
-            $message = MessageQuery::create()
-                ->filterByName('order_confirmation')
-                ->findOne();
+            // Send the order confirmation to the customer
+            $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_confirmation');
 
-            if (false === $message) {
-                throw new \Exception("Failed to load message 'order_confirmation'.");
-            }
+            $customer = $event->getOrder()->getCustomer();
 
-            $order = $event->getOrder();
-            $customer = $order->getCustomer();
-
-            $this->parser->assign('order_id', $order->getId());
-            $this->parser->assign('order_ref', $order->getRef());
-
-            $message
-                ->setLocale($order->getLang()->getLocale());
-
-            $instance = \Swift_Message::newInstance()
+            $emailMessage
                 ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom($contact_email, ConfigQuery::read('store_name'))
+                ->addFrom($contactEmail, ConfigQuery::read('store_name'))
             ;
 
-            // Build subject and body
+            $success = $this->getMailer()->send($emailMessage);
 
-            $message->buildMessage($this->parser, $instance);
+            if ($success == 0) {
+                Tlog::getInstance()->addError(
+                    Translator::getInstance()->trans(
+                        "Failed to send confirmation email for order %order_ref to customer %cust_email, ref. %cust_ref",
+                        [
+                            '%order_ref'  => $event->getOrder()->getRef(),
+                            '%cust_email' => $customer->getEmail(),
+                            '%cust_ref'   => $customer->getRef()
+                        ]
+                ));
+            }
+        }
+    }
 
-            $this->getMailer()->send($instance);
+    /**
+     * @param OrderEvent $event
+     *
+     * @throws \Exception if the message cannot be loaded.
+     */
+    public function sendNotificationEmail(OrderEvent $event)
+    {
+        $contactEmail = ConfigQuery::read('store_email');
+
+        if ($contactEmail) {
+
+            $storeName = ConfigQuery::read('store_name');
+
+            // Send the order notification to the shop owner
+            $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_notification');
+
+            $emailMessage
+                ->addFrom($contactEmail, $storeName)
+            ;
+
+            $recipients = ConfigQuery::getNotificationEmailsList();
+
+            foreach ($recipients as $recipient) {
+                $emailMessage
+                    ->addTo($recipient, $storeName)
+                ;
+            }
+
+            $success = $this->getMailer()->send($emailMessage);
+
+            if ($success == 0) {
+                Tlog::getInstance()->addError(
+                    Translator::getInstance()->trans(
+                        "Failed to send notification email to shop manager %email for order %order_ref ",
+                        [
+                            '%order_ref'  => $event->getOrder()->getRef(),
+                            '%email' => $contactEmail
+                        ]
+                ));
+            }
         }
     }
 
@@ -498,7 +573,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayement", 128),
-            TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendOrderEmail", 128),
+            TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendConfirmationEmail", 128),
+            TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => array("sendNotificationEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
             TheliaEvents::ORDER_UPDATE_DELIVERY_REF => array("updateDeliveryRef", 128),
             TheliaEvents::ORDER_UPDATE_ADDRESS => array("updateAddress", 128),
