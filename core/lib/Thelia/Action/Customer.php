@@ -23,7 +23,6 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\Password;
