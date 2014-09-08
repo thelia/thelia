@@ -160,6 +160,24 @@ class UrlGenerator extends AbstractSmartyPlugin
     }
 
     /**
+     * Set the _previous_url request attribute, to define the previous URL, or
+     * prevent saving the current URL as the previous one.
+     *
+     * @param array $params
+     * @param \Smarty_Internal_Template $smarty
+     */
+    public function setPreviousUrlFunction($params, &$smarty) {
+        $ignore_current = $this->getParam($params, 'ignore_current', false);
+
+        if ($ignore_current !== false) {
+            $this->request->attributes->set('_previous_url', 'dont-save');
+        }
+        else {
+            $this->request->attributes->set('_previous_url', $this->generateUrlFunction($params, $smarty));
+        }
+    }
+
+    /**
      * Define the various smarty plugins handled by this class
      *
      * @return an array of smarty plugin descriptors
@@ -172,6 +190,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
+            new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction'),
         );
     }
 
