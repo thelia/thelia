@@ -148,30 +148,8 @@ class MailerFactory
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
-            $message = MessageQuery::getFromName($messageCode);
 
-            if ($locale == null) {
-                $locale = Lang::getDefaultLanguage()->getLocale();
-            }
-
-            $message->setLocale($locale);
-
-            // Assign parameters
-            foreach ($messageParameters as $name => $value) {
-                $this->parser->assign($name, $value);
-            }
-
-            $instance = \Swift_Message::newInstance();
-
-            // Add from addresses
-            foreach($from as $address => $name)
-                $instance->addFrom($address, $name);
-
-            // Add to addresses
-            foreach($to as $address => $name)
-                $instance->addTo($address, $name);
-
-            $message->buildMessage($this->parser, $instance);
+            $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale);
 
             $sentCount = $this->send($instance, $failedRecipients);
 
@@ -191,59 +169,42 @@ class MailerFactory
     }
 
     /**
-     * Send a message to the customer.
+     * Create a SwiftMessage instance from a given message code.
      *
      * @param string $messageCode
-     * @param array  $from              From addresses. An array of (name => email-address)
-     * @param array  $to                To addresses. An array of (name => email-address)
-     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array $from From addresses. An array of (name => email-address)
+     * @param array $to To addresses. An array of (name => email-address)
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
      * @param string locale. If null, the default store locale is used.
+     * @return \Swift_Message the generated and built message.
      */
-    public function sendEmail($from, $to, $subject, $body)
+    public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
     {
-        $store_email = ConfigQuery::getStoreEmail();
+        $message = MessageQuery::getFromName($messageCode);
 
-        if (! empty($store_email)) {
-            $message = MessageQuery::getFromName($messageCode);
-
-            if ($locale == null) {
-                $locale = Lang::getDefaultLanguage()->getLocale();
-            }
-
-            $message->setLocale($locale);
-
-            // Assign parameters
-            foreach ($messageParameters as $name => $value) {
-                $this->parser->assign($name, $value);
-            }
-
-            $instance = \Swift_Message::newInstance();
-
-            // Add from addresses
-            foreach($from as $name => $address)
-                $instance->addFrom($address, $name);
-
-            // Add to addresses
-            foreach($to as $name => $address)
-                $instance->addTo($address, $name);
-
-            $message->buildMessage($this->parser, $instance);
-
-            $sentCount = $this->send($instance, $failedRecipients);
-
-            if ($sentCount == 0) {
-                Tlog::getInstance()->addError(
-                    Translator::getInstance()->trans(
-                        "Failed to send message %code. Failed recipients: %failed_addresses",
-                        [
-                            '%code'       => $messageCode,
-                            '%failed_addresses' => is_array($failedRecipients) ? implode(',', $failedRecipients) : 'none'
-                        ]
-                    ));
-            }
-        } else {
-            Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
+        if ($locale == null) {
+            $locale = Lang::getDefaultLanguage()->getLocale();
         }
-    }
 
+        $message->setLocale($locale);
+
+        // Assign parameters
+        foreach ($messageParameters as $name => $value) {
+            $this->parser->assign($name, $value);
+        }
+
+        $instance = \Swift_Message::newInstance();
+
+        // Add from addresses
+        foreach($from as $address => $name)
+            $instance->addFrom($address, $name);
+
+        // Add to addresses
+        foreach($to as $address => $name)
+            $instance->addTo($address, $name);
+
+        $message->buildMessage($this->parser, $instance);
+
+        return $instance;
+    }
 }
