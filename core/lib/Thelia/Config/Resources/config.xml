@@ -132,7 +132,7 @@
         <service id="kernel" synthetic="true" />
 
 
-        <service id="mailer" class="Thelia\Mailer\MailerFactory">
+        <service id="mailer" class="Thelia\Mailer\MailerFactory" scope="request">
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser"/>
         </service>

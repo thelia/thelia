@@ -65,6 +65,9 @@ class CustomerController extends AbstractCrudController
 
         $event->setCustomer($this->getExistingObject());
 
+        // We allow customer email modification
+        $event->setEmailUpdateAllowed(true);
+
         return $event;
     }
 

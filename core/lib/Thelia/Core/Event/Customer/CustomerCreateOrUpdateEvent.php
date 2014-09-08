@@ -39,6 +39,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $discount;
     protected $company;
     protected $ref;
+    protected $emailUpdateAllowed;
 
     /**
      * @param int    $title     the title customer id
@@ -235,4 +236,22 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this->ref;
     }
 
+    /**
+     * @param mixed $emailUpdateAllowed
+     * @return $this
+     */
+    public function setEmailUpdateAllowed($emailUpdateAllowed)
+    {
+        $this->emailUpdateAllowed = $emailUpdateAllowed;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailUpdateAllowed()
+    {
+        return $this->emailUpdateAllowed;
+    }
 }

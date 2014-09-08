@@ -41,7 +41,7 @@ class MailerFactory
     {
 
         $this->dispatcher = $dispatcher;
-        $this->$parser    = $parser;
+        $this->parser    = $parser;
 
         $transporterEvent = new MailTransporterEvent();
         $this->dispatcher->dispatch(TheliaEvents::MAILTRANSPORTER_CONFIG, $transporterEvent);
@@ -100,8 +100,8 @@ class MailerFactory
 
         $this->sendEmailMessage(
             $messageCode,
-            [ ConfigQuery::getStoreName() => ConfigQuery::getStoreEmail() ],
-            [ $customer->getFirstname()." ".$customer->getLastname() => $customer->getEmail()],
+            [ ConfigQuery::getStoreEmail() => ConfigQuery::getStoreName() ],
+            [ $customer->getEmail() => $customer->getFirstname()." ".$customer->getLastname() ],
             $messageParameters,
             $customer->getCustomerLang()->getLocale()
         );
@@ -115,10 +115,11 @@ class MailerFactory
      */
     public function sendEmailToShopManagers($messageCode, $messageParameters = [])
     {
-        // Build the list of email recipients
-        $recipients = ConfigQuery::getNotificationEmailsList();
 
         $storeName = ConfigQuery::getStoreName();
+
+        // Build the list of email recipients
+        $recipients = ConfigQuery::getNotificationEmailsList();
 
         $to = [];
 
@@ -138,10 +139,10 @@ class MailerFactory
      * Send a message to the customer.
      *
      * @param string $messageCode
-     * @param array $from From addresses. An array of (name => email-address)
-     * @param array $to To addresses. An array of (name => email-address)
+     * @param array $from From addresses. An array of (email-address => name)
+     * @param array $to To addresses. An array of (email-address => name)
      * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
-     * @param string locale. If null, the default store locale is used.
+     * @param string $locale. If null, the default store locale is used.
      */
     public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
     {
@@ -164,11 +165,11 @@ class MailerFactory
             $instance = \Swift_Message::newInstance();
 
             // Add from addresses
-            foreach($from as $name => $address)
+            foreach($from as $address => $name)
                 $instance->addFrom($address, $name);
 
             // Add to addresses
-            foreach($to as $name => $address)
+            foreach($to as $address => $name)
                 $instance->addTo($address, $name);
 
             $message->buildMessage($this->parser, $instance);

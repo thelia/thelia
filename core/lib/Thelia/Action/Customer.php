@@ -69,10 +69,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         $customer = $event->getCustomer();
 
+        $emailChanged = $customer->getEmail() !== $event->getEmail();
+
         $this->createOrUpdateCustomer($customer, $event);
 
-        if (! empty($plainPassword)) {
-            $this->mailer->sendEmailToCustomer('customer_password_changed', $customer, ['password' => $plainPassword]);
+        if (! empty($plainPassword) || $emailChanged) {
+            $this->mailer->sendEmailToCustomer('customer_account_changed', $customer, ['password' => $plainPassword]);
         }
     }
 
@@ -154,7 +156,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getSponsor(),
             $event->getDiscount(),
             $event->getCompany(),
-            $event->getRef()
+            $event->getRef(),
+            $event->getEmailUpdateAllowed()
         );
 
         $event->setCustomer($customer);

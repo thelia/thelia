@@ -239,6 +239,8 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
+                // We do not allow customer email modification
+                $customerChangeEvent->setEmailUpdateAllowed(false);
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
