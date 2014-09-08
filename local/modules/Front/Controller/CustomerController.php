@@ -97,7 +97,8 @@ class CustomerController extends BaseFrontController
         }
     }
 
-    public function newPasswordSentAction() {
+    public function newPasswordSentAction()
+    {
         $this->getParser()->assign('password_sent', true);
     }
 
