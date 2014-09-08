@@ -41,12 +41,20 @@ class MessageModificationForm extends BaseForm
                     "placeholder" => Translator::getInstance()->trans('Message name')
                 ]
             ))
-
+/*
             ->add("secured"      , "checkbox"  , array(
                 "constraints" => array(new Type([ 'type' => 'bool'])),
                 'required' => false,
                 "label" => Translator::getInstance()->trans('Prevent mailing template modification or deletion, except for super-admin')
             ))
+*/
+            // The "secured" function is useless, as all mails are required for the system to work.
+            // Define all messages as not secured.
+            ->add("secured"      , "hidden"  , array(
+                    "constraints" => array(new Type([ 'type' => 'bool'])),
+                    'required' => false,
+                    'data' => false
+                ))
 
             ->add("locale"       , "hidden"  , array())
 

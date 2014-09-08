@@ -23,12 +23,10 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\CustomerException;
-use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\MessageQuery;
 use Thelia\Tools\Password;
 
 /**
@@ -58,9 +56,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $customer = new CustomerModel();
 
+        $plainPassword = $event->getPassword();
+
         $this->createOrUpdateCustomer($customer, $event);
 
-        $this->mailer->sendEmailToCustomer('customer_account_created', $customer);
+        if ($event->getNotifyCustomerOfAccountCreation()) {
+            $this->mailer->sendEmailToCustomer('customer_account_created', $customer, [ 'password' => $plainPassword ]);
+        }
     }
 
     public function modify(CustomerCreateOrUpdateEvent $event)

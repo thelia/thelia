@@ -36,14 +36,10 @@ class MessageCreationForm extends BaseForm
                 "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
                     "for" => "name",
-                    'help' => Translator::getInstance()->trans(
-                            "Enter here the mail template purpose in the default language (%title%)",
-                            [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
-                    )
+                    'help' => Translator::getInstance()->trans("This is an identifier that will be used in the code to get this message")
                 ),
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans("Mail template name")
-
                 ]
             ))
             ->add("title", "text", array(
@@ -52,7 +48,11 @@ class MessageCreationForm extends BaseForm
                 ),
                 "label" => Translator::getInstance()->trans('Purpose'),
                 "label_attr" => array(
-                    "for" => "purpose"
+                    "for" => "purpose",
+                    'help' => Translator::getInstance()->trans(
+                            "Enter here the mail template purpose in the default language (%title%)",
+                            [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
+                        )
                 ),
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans("Mail template purpose")
