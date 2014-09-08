@@ -59,8 +59,7 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
 
         $this->customerAction = new Customer(
             $this->securityContext,
-            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)),
-            new MailerFactory($dispatcher)
+            new MailerFactory($dispatcher, new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)))
         );
     }
 

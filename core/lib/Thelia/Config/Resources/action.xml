@@ -49,7 +49,6 @@
 
         <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
             <argument type="service" id="thelia.securityContext"/>
-            <argument type="service" id="thelia.parser"/>
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>

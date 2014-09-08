@@ -41,15 +41,12 @@ class Customer extends BaseAction implements EventSubscriberInterface
 {
     protected $securityContext;
 
-    protected $parser;
-
     protected $mailer;
 
-    public function __construct(SecurityContext $securityContext, ParserInterface $parser, MailerFactory $mailer)
+    public function __construct(SecurityContext $securityContext, MailerFactory $mailer)
     {
         $this->securityContext = $securityContext;
         $this->mailer = $mailer;
-        $this->parser = $parser;
     }
 
     public function create(CustomerCreateOrUpdateEvent $event)
