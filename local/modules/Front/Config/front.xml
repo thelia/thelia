@@ -32,6 +32,11 @@
         <default key="_view">password</default>
     </route>
 
+    <route id="customer.password.retrieve.sent" path="/password-sent">
+        <default key="_controller">Front\Controller\CustomerController::newPasswordSentAction</default>
+        <default key="_view">password</default>
+    </route>
+
     <!-- Logout -->
     <route id="customer.logout.process" path="/logout">
         <default key="_controller">Front\Controller\CustomerController::logoutAction</default>

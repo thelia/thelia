@@ -71,6 +71,8 @@ class CustomerController extends BaseFrontController
 
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
+                return $this->generateSuccessRedirect($passwordLost);
+
             } catch (FormValidationException $e) {
                 $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
@@ -93,6 +95,10 @@ class CustomerController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+    }
+
+    public function newPasswordSentAction() {
+        $this->getParser()->assign('password_sent', true);
     }
 
     /**
