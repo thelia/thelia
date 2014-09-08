@@ -114,7 +114,6 @@ class MailerFactory
      */
     public function sendEmailToShopManagers($messageCode, $messageParameters = [])
     {
-
         $storeName = ConfigQuery::getStoreName();
 
         // Build the list of email recipients
