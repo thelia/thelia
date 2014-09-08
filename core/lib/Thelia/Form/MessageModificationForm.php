@@ -16,7 +16,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Type;
 use Thelia\Core\Translation\Translator;
-use Thelia\Type\BooleanType;
 
 class MessageModificationForm extends BaseForm
 {

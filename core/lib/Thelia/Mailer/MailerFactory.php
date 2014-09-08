@@ -85,13 +85,12 @@ class MailerFactory
         return $this->swiftMailer;
     }
 
-
     /**
      * Send a message to the customer.
      *
-     * @param string $messageCode
+     * @param string   $messageCode
      * @param Customer $customer
-     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array    $messageParameters an array of (name => value) parameters that will be available in the message.
      */
     public function sendEmailToCustomer($messageCode, $customer, $messageParameters = [])
     {
@@ -111,7 +110,7 @@ class MailerFactory
      * Send a message to the shop managers.
      *
      * @param string $messageCode
-     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
      */
     public function sendEmailToShopManagers($messageCode, $messageParameters = [])
     {
@@ -139,10 +138,10 @@ class MailerFactory
      * Send a message to the customer.
      *
      * @param string $messageCode
-     * @param array $from From addresses. An array of (email-address => name)
-     * @param array $to To addresses. An array of (email-address => name)
-     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
-     * @param string $locale. If null, the default store locale is used.
+     * @param array  $from              From addresses. An array of (email-address => name)
+     * @param array  $to                To addresses. An array of (email-address => name)
+     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param string $locale.           If null, the default store locale is used.
      */
     public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
     {
@@ -158,7 +157,7 @@ class MailerFactory
             $message->setLocale($locale);
 
             // Assign parameters
-            foreach($messageParameters as $name => $value) {
+            foreach ($messageParameters as $name => $value) {
                 $this->parser->assign($name, $value);
             }
 
@@ -186,20 +185,18 @@ class MailerFactory
                         ]
                     ));
             }
-        }
-        else {
+        } else {
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
         }
     }
-
 
     /**
      * Send a message to the customer.
      *
      * @param string $messageCode
-     * @param array $from From addresses. An array of (name => email-address)
-     * @param array $to To addresses. An array of (name => email-address)
-     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param array  $from              From addresses. An array of (name => email-address)
+     * @param array  $to                To addresses. An array of (name => email-address)
+     * @param array  $messageParameters an array of (name => value) parameters that will be available in the message.
      * @param string locale. If null, the default store locale is used.
      */
     public function sendEmail($from, $to, $subject, $body)
@@ -216,7 +213,7 @@ class MailerFactory
             $message->setLocale($locale);
 
             // Assign parameters
-            foreach($messageParameters as $name => $value) {
+            foreach ($messageParameters as $name => $value) {
                 $this->parser->assign($name, $value);
             }
 
@@ -244,8 +241,7 @@ class MailerFactory
                         ]
                     ));
             }
-        }
-        else {
+        } else {
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
         }
     }

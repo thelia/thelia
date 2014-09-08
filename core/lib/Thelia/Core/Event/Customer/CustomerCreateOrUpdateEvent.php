@@ -166,12 +166,13 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @param string $password
+     * @param  string $password
      * @return $this
      */
     public function setPassword($password)
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -248,7 +249,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @param mixed $emailUpdateAllowed
+     * @param  mixed $emailUpdateAllowed
      * @return $this
      */
     public function setEmailUpdateAllowed($emailUpdateAllowed)
@@ -267,12 +268,13 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
-     * @param bool $notifyCustomerOfAccountCreation
+     * @param  bool  $notifyCustomerOfAccountCreation
      * @return $this
      */
     public function setNotifyCustomerOfAccountCreation($notifyCustomerOfAccountCreation)
     {
         $this->notifyCustomerOfAccountCreation = $notifyCustomerOfAccountCreation;
+
         return $this;
     }
 

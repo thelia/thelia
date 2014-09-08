@@ -22,7 +22,6 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;

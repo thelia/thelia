@@ -34,26 +34,26 @@ class Customer extends BaseCustomer implements UserInterface
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
-     * @param  int $titleId customer title id (from customer_title table)
-     * @param  string $firstname customer first name
-     * @param  string $lastname customer last name
-     * @param  string $address1 customer address
-     * @param  string $address2 customer adress complement 1
-     * @param  string $address3 customer adress complement 2
-     * @param  string $phone customer phone number
-     * @param  string $cellphone customer cellphone number
-     * @param  string $zipcode customer zipcode
-     * @param  string $city
-     * @param  int $countryId customer country id (from Country table)
-     * @param  string $email customer email, must be unique
-     * @param  string $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
-     * @param  string $lang
-     * @param  int $reseller
-     * @param  null $sponsor
-     * @param  int $discount
-     * @param  null $company
-     * @param  null $ref
-     * @param bool $forceEmailUpdate true if the email address could be updated.
+     * @param  int                                       $titleId          customer title id (from customer_title table)
+     * @param  string                                    $firstname        customer first name
+     * @param  string                                    $lastname         customer last name
+     * @param  string                                    $address1         customer address
+     * @param  string                                    $address2         customer adress complement 1
+     * @param  string                                    $address3         customer adress complement 2
+     * @param  string                                    $phone            customer phone number
+     * @param  string                                    $cellphone        customer cellphone number
+     * @param  string                                    $zipcode          customer zipcode
+     * @param  string                                    $city
+     * @param  int                                       $countryId        customer country id (from Country table)
+     * @param  string                                    $email            customer email, must be unique
+     * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param  string                                    $lang
+     * @param  int                                       $reseller
+     * @param  null                                      $sponsor
+     * @param  int                                       $discount
+     * @param  null                                      $company
+     * @param  null                                      $ref
+     * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -138,7 +138,8 @@ class Customer extends BaseCustomer implements UserInterface
      *
      * @return Lang the customer lang
      */
-    public function getCustomerLang() {
+    public function getCustomerLang()
+    {
         if ($this->getLang() !== null) {
             $lang = LangQuery::create()
                 ->findPk($this->getLang());
