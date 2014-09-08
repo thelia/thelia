@@ -20,6 +20,11 @@ use Thelia\Type\BooleanType;
 
 class MessageModificationForm extends BaseForm
 {
+    public function getName()
+    {
+        return "thelia_message_modification";
+    }
+
     protected function buildForm()
     {
         $this->formBuilder
@@ -56,6 +61,7 @@ class MessageModificationForm extends BaseForm
                     "placeholder" => Translator::getInstance()->trans('Title')
                 ],
                 ))
+
             ->add("subject"      , "text"  , array(
                 "constraints" => array(new NotBlank()),
                 "label" => Translator::getInstance()->trans('Message subject'),
@@ -67,6 +73,7 @@ class MessageModificationForm extends BaseForm
                     "placeholder" => Translator::getInstance()->trans('Message subject')
                 ],
             ))
+
             ->add("html_message" , "text"  , array(
                 "label" => Translator::getInstance()->trans('HTML Message'),
                 "label_attr" => array(
@@ -75,13 +82,16 @@ class MessageModificationForm extends BaseForm
                 ),
                 "required" => false
             ))
+
             ->add("text_message" , "textarea"  , array(
                 "label" => Translator::getInstance()->trans('Text Message'),
                 "label_attr" => array(
                     "for" => "text_message",
                     "help" => Translator::getInstance()->trans("The mailing template in text-only format.")
                 ),
+                'required' => false
             ))
+
             ->add("html_layout_file_name" , "text"  , array(
                     "label" => Translator::getInstance()->trans('Name of the HTML layout file'),
                     "label_attr" => array(
@@ -89,6 +99,7 @@ class MessageModificationForm extends BaseForm
                 ),
                 "required" => false
             ))
+
             ->add("html_template_file_name" , "text"  , array(
                     "label" => Translator::getInstance()->trans('Name of the HTML template file'),
                     "label_attr" => array(
@@ -96,6 +107,7 @@ class MessageModificationForm extends BaseForm
                 ),
                 "required" => false
             ))
+
             ->add("text_layout_file_name" , "text"  , array(
                     "label" => Translator::getInstance()->trans('Name of the text layout file'),
                     "label_attr" => array(
@@ -103,6 +115,7 @@ class MessageModificationForm extends BaseForm
                 ),
                 "required" => false
             ))
+
             ->add("text_template_file_name" , "text"  , array(
                     "label" => Translator::getInstance()->trans('Name of the text template file'),
                     "label_attr" => array(
@@ -111,10 +124,5 @@ class MessageModificationForm extends BaseForm
                 "required" => false
             ))
             ;
-    }
-
-    public function getName()
-    {
-        return "thelia_message_modification";
     }
 }
