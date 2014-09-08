@@ -178,7 +178,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     public function lostPassword(LostPasswordEvent $event)
     {
-        $contact_email = ConfigQuery::read('store_email');
+        $contact_email = ConfigQuery::getStoreEmail();
 
         if ($contact_email) {
             if (null !== $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {

@@ -408,7 +408,7 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendConfirmationEmail(OrderEvent $event)
     {
-        $contactEmail = ConfigQuery::read('store_email');
+        $contactEmail = ConfigQuery::getStoreEmail();
 
         if ($contactEmail) {
 
@@ -445,11 +445,11 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendNotificationEmail(OrderEvent $event)
     {
-        $contactEmail = ConfigQuery::read('store_email');
+        $contactEmail = ConfigQuery::getStoreEmail();
 
         if ($contactEmail) {
 
-            $storeName = ConfigQuery::read('store_name');
+            $storeName = ConfigQuery::getStoreName();
 
             // Send the order notification to the shop owner
             $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_notification');

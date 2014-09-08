@@ -49,7 +49,7 @@ class SendMail implements EventSubscriberInterface
         $colissimo = new Colissimo();
 
         if ($order->isSent() && $order->getDeliveryModuleId() == $colissimo->getModuleModel()->getId()) {
-            $contact_email = ConfigQuery::read('store_email');
+            $contact_email = ConfigQuery::getStoreEmail();
 
             if ($contact_email) {
 

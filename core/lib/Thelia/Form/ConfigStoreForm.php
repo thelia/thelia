@@ -27,7 +27,7 @@ class ConfigStoreForm extends BaseForm
             ->add(
                 'store_name',
                 'text', [
-                    'data' => ConfigQuery::read('store_name'),
+                    'data' => ConfigQuery::getStoreName(),
                     'constraints' => [ new Constraints\NotBlank() ],
                     'label' => $tr->trans('Store name'),
                     'attr' => [
@@ -38,7 +38,7 @@ class ConfigStoreForm extends BaseForm
             ->add(
                 'store_description',
                 'text', [
-                    'data' => ConfigQuery::read('store_description'),
+                    'data' => ConfigQuery::getStoreDescription(),
                     'required' => false,
                     'label' => $tr->trans('Store description'),
                     'attr' => [
@@ -49,7 +49,7 @@ class ConfigStoreForm extends BaseForm
             ->add(
                 'store_email',
                 'text', [
-                    'data' => ConfigQuery::read('store_email'),
+                    'data' => ConfigQuery::getStoreEmail(),
                     'constraints' => [
                         new Constraints\NotBlank(),
                         new Constraints\Email()
