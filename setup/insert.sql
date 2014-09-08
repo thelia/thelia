@@ -2990,12 +2990,6 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (38, 'fr_FR', 'Gestion des promotions')
 ;
 
-
-INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
-(1, 'order_confirmation', NULL, NULL, 'order_confirmation.txt', NULL, 'order_confirmation.html', NOW(), NOW()),
-(2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
-(3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW());
-
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`,) VALUES
 (1, 'order_confirmation', NULL, NULL, 'order_confirmation.txt', NULL, 'order_confirmation.html', NOW(), NOW()),
 (2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
