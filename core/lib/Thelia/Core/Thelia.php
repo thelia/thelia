@@ -26,6 +26,7 @@ use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -49,15 +50,25 @@ class Thelia extends Kernel
 
     const THELIA_VERSION = '2.1.0-alpha1';
 
-    public function init()
+    public function __construct($environment, $debug)
     {
-        parent::init();
+        parent::__construct($environment, $debug);
+
+        if ($debug) {
+            Debug::enable();
+        }
+
         $this->initPropel();
+    }
+
+    public static function isInstalled()
+    {
+        return file_exists(THELIA_CONF_DIR . 'database.yml');
     }
 
     protected function initPropel()
     {
-        if (file_exists(THELIA_CONF_DIR . 'database.yml') === false) {
+        if (self::isInstalled() === false) {
             return ;
         }
 
@@ -83,7 +94,7 @@ class Thelia extends Kernel
     {
         parent::boot();
 
-        if (file_exists(THELIA_CONF_DIR . 'database.yml') === true) {
+        if (self::isInstalled()) {
             $this->getContainer()->get("event_dispatcher")->dispatch(TheliaEvents::BOOT);
         }
     }
