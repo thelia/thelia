@@ -15,9 +15,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailTransporterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Model\Lang;
 use Thelia\Model\MessageQuery;
 
 /**
@@ -75,7 +77,7 @@ class MailerFactory
 
     public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
     {
-        $this->swiftMailer->send($message, $failedRecipients);
+        return $this->swiftMailer->send($message, $failedRecipients);
     }
 
     public function getSwiftMailer()
@@ -93,33 +95,99 @@ class MailerFactory
      */
     public function sendEmailToCustomer($messageCode, $customer, $messageParameters = [])
     {
+        // Always add the customer ID to the parameters
+        $messageParameters['customer_id'] = $customer->getId();
+
+        $this->sendEmailMessage(
+            $messageCode,
+            [ ConfigQuery::getStoreName() => ConfigQuery::getStoreEmail() ],
+            [ $customer->getFirstname()." ".$customer->getLastname() => $customer->getEmail()],
+            $messageParameters,
+            $customer->getCustomerLang()->getLocale()
+        );
+     }
+
+    /**
+     * Send a message to the shop managers.
+     *
+     * @param string $messageCode
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     */
+    public function sendEmailToShopManagers($messageCode, $messageParameters = [])
+    {
+        // Build the list of email recipients
+        $recipients = ConfigQuery::getNotificationEmailsList();
+
+        $storeName = ConfigQuery::getStoreName();
+
+        $to = [];
+
+        foreach ($recipients as $recipient) {
+            $to[$recipient] = $storeName;
+        }
+
+        $this->sendEmailMessage(
+            $messageCode,
+            [ $storeName => ConfigQuery::getStoreEmail() ],
+            $to,
+            $messageParameters
+        );
+     }
+
+    /**
+     * Send a message to the customer.
+     *
+     * @param string $messageCode
+     * @param array $from From addresses. An array of (name => email-address)
+     * @param array $to To addresses. An array of (name => email-address)
+     * @param array $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param string locale. If null, the default store locale is used.
+     */
+    public function sendEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
+    {
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
             $message = MessageQuery::getFromName($messageCode);
 
-            $locale = $customer->getCustomerLang()->getLocale();
+            if ($locale == null) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+            }
 
             $message->setLocale($locale);
 
+            // Assign parameters
             foreach($messageParameters as $name => $value) {
                 $this->parser->assign($name, $value);
             }
 
-            $this->parser->assign('customer_id', $customer->getId());
+            $instance = \Swift_Message::newInstance();
 
-            $instance = \Swift_Message::newInstance()
-                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom($store_email, ConfigQuery::getStoreName())
-            ;
+            // Add from addresses
+            foreach($from as $name => $address)
+                $instance->addFrom($address, $name);
+
+            // Add to addresses
+            foreach($to as $name => $address)
+                $instance->addTo($address, $name);
 
             $message->buildMessage($this->parser, $instance);
 
-            $this->send($instance);
+            $sentCount = $this->send($instance, $failedRecipients);
+
+            if ($sentCount == 0) {
+                Tlog::getInstance()->addError(
+                    Translator::getInstance()->trans(
+                        "Failed to send message %code. Failed recipients: %failed_addresses",
+                        [
+                            '%code'       => $messageCode,
+                            '%failed_addresses' => is_array($failedRecipients) ? implode(',', $failedRecipients) : 'none'
+                        ]
+                    ));
+            }
         }
         else {
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
         }
     }
-
 }
