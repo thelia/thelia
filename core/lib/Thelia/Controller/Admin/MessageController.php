@@ -64,7 +64,7 @@ class MessageController extends AbstractCrudController
             ->setMessageName($formData['name'])
             ->setLocale($formData["locale"])
             ->setTitle($formData['title'])
-            ->setSecured($formData['secured'])
+            ->setSecured($formData['secured'] ? true : false)
             ;
 
         return $createEvent;
@@ -108,7 +108,7 @@ class MessageController extends AbstractCrudController
         $data = array(
             'id'            => $object->getId(),
             'name'          => $object->getName(),
-            'secured'       => $object->getSecured(),
+            'secured'       => $object->getSecured() ? true : false,
             'locale'        => $object->getLocale(),
             'title'         => $object->getTitle(),
             'subject'       => $object->getSubject(),

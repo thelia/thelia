@@ -1,4 +1,4 @@
-{*
+{strip}{*
 This file defines the standard fields attributes, depending on input types.
 
 In addition to the standard form_field block output, this fragment uses the following additional variables :
@@ -38,10 +38,6 @@ In addition to the standard form_field block output, this fragment uses the foll
     {$sRequired='aria-required="true" required'}
 {/if}
 
-{if $attr_list.placeholder}
-    {$sPlaceholder = "placeholder=\"{$attr_list.placeholder}\""}
-{/if}
-
 {if $type == 'hidden'}
    id="{$label_attr.for}" name="{$name}" value="{$value}" {$attr}
 {elseif $type == 'checkbox' || $type == 'radio'}
@@ -51,7 +47,8 @@ In addition to the standard form_field block output, this fragment uses the foll
 {elseif $type == 'collection'}
     id="{$label_attr.for}" name="{$name}[]" class="form-control {$field_extra_class}" {if $multiple}multiple{/if} {if $attr_list.size}size="{$attr_list.size}"{/if} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {elseif $type == 'textarea'}
-    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}" class="form-control {$field_extra_class}" {if $attr_list.rows}rows="{$attr_list.rows}"{/if} {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {else}
-    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sPlaceholder nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
+    id="{$label_attr.for}" name="{$name}" value="{$value}" class="form-control {$field_extra_class}" {$sMaxLength nofilter} {$sDisabled} {$sReadonly} {$sRequired nofilter}  {$attr nofilter}
 {/if}
+{/strip}

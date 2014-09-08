@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Thelia\Model\Lang;
 use Thelia\Model\MessageQuery;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -32,19 +33,30 @@ class MessageCreationForm extends BaseForm
         $this->formBuilder
             ->add("name", "text", array(
                 "constraints" => $name_constraints,
-                "label" => Translator::getInstance()->trans('Name *'),
+                "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
-                    "for" => "name"
-                )
+                    "for" => "name",
+                    'help' => Translator::getInstance()->trans(
+                            "Enter here the mail template purpose in the default language (%title%)",
+                            [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
+                    )
+                ),
+                'attr' => [
+                    'placeholder' => Translator::getInstance()->trans("Mail template name")
+
+                ]
             ))
             ->add("title", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans('Purpose *'),
+                "label" => Translator::getInstance()->trans('Purpose'),
                 "label_attr" => array(
                     "for" => "purpose"
-                )
+                ),
+                'attr' => [
+                    'placeholder' => Translator::getInstance()->trans("Mail template purpose")
+                ]
             ))
             ->add("locale", "hidden", array(
                 "constraints" => array(
