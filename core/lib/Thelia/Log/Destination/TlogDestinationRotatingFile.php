@@ -47,16 +47,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
         if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
 
-            $idx = 1;
+            $backupFile = $file_path . '.' . strftime('%Y-%m-%d_%H-%M-%S');
 
-            do {
-                $file_path_bk = "$file_path.$idx";
-
-                $idx++;
-
-            } while (file_exists($file_path_bk));
-
-            @rename($file_path, $file_path_bk);
+            @rename($file_path, $backupFile);
 
             @touch($file_path);
             @chmod($file_path, 0666);
@@ -72,11 +65,13 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
                 ->name(basename($file_path).'.*')
                 ->sortByModifiedTime();
 
-            $count = 1;
+            $deleteCount = 1 + $files->count() - $maxCount;
 
-            foreach($files as $file) {
-                if (++$count > $maxCount) {
+            if ($deleteCount > 0) {
+                foreach($files as $file) {
                     @unlink($file);
+
+                    if (--$deleteCount <= 0) break;
                 }
             }
         }
@@ -109,7 +104,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
         $arr[] =
             new TlogDestinationConfig(
-                 self::MAX_FILE_COUNT,
+                 self::VAR_MAX_FILE_COUNT,
                  'Maximum number of files to keep',
                  'When this number if exeeded, the oldest files are deleted.',
                  self::MAX_FILE_COUNT_DEFAULT,
