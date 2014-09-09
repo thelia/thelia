@@ -210,7 +210,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
                 $message->setLocale($locale);
 
                 if (false === $message) {
-                    throw new \Exception("Failed to load message 'order_confirmation'.");
+                    throw new \Exception("Failed to load message 'lost_password'.");
                 }
 
                 $this->parser->assign('password', $password);
