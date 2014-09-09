@@ -80,8 +80,7 @@ class RequestListener implements EventSubscriberInterface
             }
 
             // Here, a previous URL has been specified. Use it.
-        }
-        else {
+        } else {
             // The current URL will become the previous URL
             $referrer = $request->getUri();
         }

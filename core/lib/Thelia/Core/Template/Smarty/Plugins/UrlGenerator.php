@@ -163,16 +163,16 @@ class UrlGenerator extends AbstractSmartyPlugin
      * Set the _previous_url request attribute, to define the previous URL, or
      * prevent saving the current URL as the previous one.
      *
-     * @param array $params
+     * @param array                     $params
      * @param \Smarty_Internal_Template $smarty
      */
-    public function setPreviousUrlFunction($params, &$smarty) {
+    public function setPreviousUrlFunction($params, &$smarty)
+    {
         $ignore_current = $this->getParam($params, 'ignore_current', false);
 
         if ($ignore_current !== false) {
             $this->request->attributes->set('_previous_url', 'dont-save');
-        }
-        else {
+        } else {
             $this->request->attributes->set('_previous_url', $this->generateUrlFunction($params, $smarty));
         }
     }
