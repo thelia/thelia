@@ -73,13 +73,11 @@ class RequestListener implements EventSubscriberInterface
         $referrer = $request->attributes->get('_previous_url', null);
 
         if (null !== $referrer) {
-
+            // A previous URL (or the keyword 'dont-save') has been specified.
             if ('dont-save' == $referrer) {
                 // We should not save the current URL as the previous URL
                 $referrer = null;
             }
-
-            // Here, a previous URL has been specified. Use it.
         } else {
             // The current URL will become the previous URL
             $referrer = $request->getUri();
