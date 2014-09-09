@@ -12,6 +12,7 @@
 
 namespace Thelia\Log\Destination;
 
+use Symfony\Component\Finder\Finder;
 use Thelia\Log\TlogDestinationConfig;
 use Thelia\Core\Translation\Translator;
 
@@ -21,7 +22,10 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     // ----------------------------------
 
     const VAR_MAX_FILE_SIZE_KB = "tlog_destinationfile_max_file_size";
+    const VAR_MAX_FILE_COUNT = "tlog_destinationfile_max_file_count";
+
     const MAX_FILE_SIZE_KB_DEFAULT = 1024; // 1 Mb
+    const MAX_FILE_COUNT_DEFAULT = 10;
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
@@ -56,6 +60,25 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
             @touch($file_path);
             @chmod($file_path, 0666);
+
+            // Keep the number of files below VAR_MAX_FILE_COUNT
+            $maxCount = $this->getConfig(self::VAR_MAX_FILE_COUNT, self::MAX_FILE_COUNT_DEFAULT);
+
+            $finder = new Finder();
+
+            $files = $finder
+                ->in(dirname($file_path))
+                ->files()
+                ->name(basename($file_path).'.*')
+                ->sortByModifiedTime();
+
+            $count = 1;
+
+            foreach($files as $file) {
+                if (++$count > $maxCount) {
+                    @unlink($file);
+                }
+            }
         }
 
         $this->fh = fopen($file_path, $mode);
@@ -76,13 +99,22 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         $arr = parent::getConfigs();
 
         $arr[] =
-             new TlogDestinationConfig(
+            new TlogDestinationConfig(
                 self::VAR_MAX_FILE_SIZE_KB,
                 'Maximum log file size, in Kb',
                 'When this size if exeeded, a backup copy of the file is made, and a new log file is opened. As the file size check is performed only at the beginning of a request, the file size may be bigger thant this limit. Note: 1 Mb = 1024 Kb',
                 self::MAX_FILE_SIZE_KB_DEFAULT,
                 TlogDestinationConfig::TYPE_TEXTFIELD
-        );
+            );
+
+        $arr[] =
+            new TlogDestinationConfig(
+                 self::MAX_FILE_COUNT,
+                 'Maximum number of files to keep',
+                 'When this number if exeeded, the oldest files are deleted.',
+                 self::MAX_FILE_COUNT_DEFAULT,
+                 TlogDestinationConfig::TYPE_TEXTFIELD
+            );
 
         return $arr;
     }
