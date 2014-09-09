@@ -1,4 +1,4 @@
-#!/usr/bin/env/sh
+#!/bin/bash
 # --------------------------------------------------------------
 # This script is started by Travis to perform all Thelia 2 tests
 # --------------------------------------------------------------
