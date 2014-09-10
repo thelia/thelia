@@ -90,10 +90,38 @@ abstract class Module implements ActiveRecordInterface
     protected $code;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: ''
+     * @var        string
+     */
+    protected $version;
+
+    /**
+     * The value for the version_min field.
+     * Note: this column has a database default value of: ''
+     * @var        string
+     */
+    protected $version_min;
+
+    /**
+     * The value for the version_max field.
+     * Note: this column has a database default value of: ''
+     * @var        string
+     */
+    protected $version_max;
+
+    /**
      * The value for the type field.
      * @var        int
      */
     protected $type;
+
+    /**
+     * The value for the category field.
+     * Note: this column has a database default value of: 'classic'
+     * @var        string
+     */
+    protected $category;
 
     /**
      * The value for the activate field.
@@ -290,10 +318,26 @@ abstract class Module implements ActiveRecordInterface
     protected $moduleI18nsScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = '';
+        $this->version_min = '';
+        $this->version_max = '';
+        $this->category = 'classic';
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Module object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -570,6 +614,39 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Get the [version] column value.
+     *
+     * @return   string
+     */
+    public function getVersion()
+    {
+
+        return $this->version;
+    }
+
+    /**
+     * Get the [version_min] column value.
+     *
+     * @return   string
+     */
+    public function getVersionMin()
+    {
+
+        return $this->version_min;
+    }
+
+    /**
+     * Get the [version_max] column value.
+     *
+     * @return   string
+     */
+    public function getVersionMax()
+    {
+
+        return $this->version_max;
+    }
+
+    /**
      * Get the [type] column value.
      *
      * @return   int
@@ -578,6 +655,17 @@ abstract class Module implements ActiveRecordInterface
     {
 
         return $this->type;
+    }
+
+    /**
+     * Get the [category] column value.
+     *
+     * @return   string
+     */
+    public function getCategory()
+    {
+
+        return $this->category;
     }
 
     /**
@@ -696,6 +784,69 @@ abstract class Module implements ActiveRecordInterface
     } // setCode()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[ModuleTableMap::VERSION] = true;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Set the value of [version_min] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setVersionMin($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_min !== $v) {
+            $this->version_min = $v;
+            $this->modifiedColumns[ModuleTableMap::VERSION_MIN] = true;
+        }
+
+
+        return $this;
+    } // setVersionMin()
+
+    /**
+     * Set the value of [version_max] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setVersionMax($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_max !== $v) {
+            $this->version_max = $v;
+            $this->modifiedColumns[ModuleTableMap::VERSION_MAX] = true;
+        }
+
+
+        return $this;
+    } // setVersionMax()
+
+    /**
      * Set the value of [type] column.
      *
      * @param      int $v new value
@@ -715,6 +866,27 @@ abstract class Module implements ActiveRecordInterface
 
         return $this;
     } // setType()
+
+    /**
+     * Set the value of [category] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function setCategory($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->category !== $v) {
+            $this->category = $v;
+            $this->modifiedColumns[ModuleTableMap::CATEGORY] = true;
+        }
+
+
+        return $this;
+    } // setCategory()
 
     /**
      * Set the value of [activate] column.
@@ -831,6 +1003,22 @@ abstract class Module implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== '') {
+                return false;
+            }
+
+            if ($this->version_min !== '') {
+                return false;
+            }
+
+            if ($this->version_max !== '') {
+                return false;
+            }
+
+            if ($this->category !== 'classic') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -864,25 +1052,37 @@ abstract class Module implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ModuleTableMap::translateFieldName('Code', TableMap::TYPE_PHPNAME, $indexType)];
             $this->code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleTableMap::translateFieldName('VersionMin', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_min = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleTableMap::translateFieldName('VersionMax', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->version_max = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('Type', TableMap::TYPE_PHPNAME, $indexType)];
             $this->type = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('Category', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->category = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('Activate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->activate = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ModuleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ModuleTableMap::translateFieldName('FullNamespace', TableMap::TYPE_PHPNAME, $indexType)];
             $this->full_namespace = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ModuleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ModuleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -895,7 +1095,7 @@ abstract class Module implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 12; // 12 = ModuleTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Module object", 0, $e);
@@ -1367,8 +1567,20 @@ abstract class Module implements ActiveRecordInterface
         if ($this->isColumnModified(ModuleTableMap::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
+        if ($this->isColumnModified(ModuleTableMap::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(ModuleTableMap::VERSION_MIN)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_MIN`';
+        }
+        if ($this->isColumnModified(ModuleTableMap::VERSION_MAX)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_MAX`';
+        }
         if ($this->isColumnModified(ModuleTableMap::TYPE)) {
             $modifiedColumns[':p' . $index++]  = '`TYPE`';
+        }
+        if ($this->isColumnModified(ModuleTableMap::CATEGORY)) {
+            $modifiedColumns[':p' . $index++]  = '`CATEGORY`';
         }
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) {
             $modifiedColumns[':p' . $index++]  = '`ACTIVATE`';
@@ -1402,8 +1614,20 @@ abstract class Module implements ActiveRecordInterface
                     case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_MIN`':
+                        $stmt->bindValue($identifier, $this->version_min, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_MAX`':
+                        $stmt->bindValue($identifier, $this->version_max, PDO::PARAM_STR);
+                        break;
                     case '`TYPE`':
                         $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
+                        break;
+                    case '`CATEGORY`':
+                        $stmt->bindValue($identifier, $this->category, PDO::PARAM_STR);
                         break;
                     case '`ACTIVATE`':
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
@@ -1489,21 +1713,33 @@ abstract class Module implements ActiveRecordInterface
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getType();
+                return $this->getVersion();
                 break;
             case 3:
-                return $this->getActivate();
+                return $this->getVersionMin();
                 break;
             case 4:
-                return $this->getPosition();
+                return $this->getVersionMax();
                 break;
             case 5:
-                return $this->getFullNamespace();
+                return $this->getType();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getCategory();
                 break;
             case 7:
+                return $this->getActivate();
+                break;
+            case 8:
+                return $this->getPosition();
+                break;
+            case 9:
+                return $this->getFullNamespace();
+                break;
+            case 10:
+                return $this->getCreatedAt();
+                break;
+            case 11:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1537,12 +1773,16 @@ abstract class Module implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getType(),
-            $keys[3] => $this->getActivate(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getFullNamespace(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[2] => $this->getVersion(),
+            $keys[3] => $this->getVersionMin(),
+            $keys[4] => $this->getVersionMax(),
+            $keys[5] => $this->getType(),
+            $keys[6] => $this->getCategory(),
+            $keys[7] => $this->getActivate(),
+            $keys[8] => $this->getPosition(),
+            $keys[9] => $this->getFullNamespace(),
+            $keys[10] => $this->getCreatedAt(),
+            $keys[11] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1621,21 +1861,33 @@ abstract class Module implements ActiveRecordInterface
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setType($value);
+                $this->setVersion($value);
                 break;
             case 3:
-                $this->setActivate($value);
+                $this->setVersionMin($value);
                 break;
             case 4:
-                $this->setPosition($value);
+                $this->setVersionMax($value);
                 break;
             case 5:
-                $this->setFullNamespace($value);
+                $this->setType($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setCategory($value);
                 break;
             case 7:
+                $this->setActivate($value);
+                break;
+            case 8:
+                $this->setPosition($value);
+                break;
+            case 9:
+                $this->setFullNamespace($value);
+                break;
+            case 10:
+                $this->setCreatedAt($value);
+                break;
+            case 11:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1664,12 +1916,16 @@ abstract class Module implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setActivate($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setFullNamespace($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[2], $arr)) $this->setVersion($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setVersionMin($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setVersionMax($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setType($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCategory($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setActivate($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setPosition($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setFullNamespace($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setCreatedAt($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setUpdatedAt($arr[$keys[11]]);
     }
 
     /**
@@ -1683,7 +1939,11 @@ abstract class Module implements ActiveRecordInterface
 
         if ($this->isColumnModified(ModuleTableMap::ID)) $criteria->add(ModuleTableMap::ID, $this->id);
         if ($this->isColumnModified(ModuleTableMap::CODE)) $criteria->add(ModuleTableMap::CODE, $this->code);
+        if ($this->isColumnModified(ModuleTableMap::VERSION)) $criteria->add(ModuleTableMap::VERSION, $this->version);
+        if ($this->isColumnModified(ModuleTableMap::VERSION_MIN)) $criteria->add(ModuleTableMap::VERSION_MIN, $this->version_min);
+        if ($this->isColumnModified(ModuleTableMap::VERSION_MAX)) $criteria->add(ModuleTableMap::VERSION_MAX, $this->version_max);
         if ($this->isColumnModified(ModuleTableMap::TYPE)) $criteria->add(ModuleTableMap::TYPE, $this->type);
+        if ($this->isColumnModified(ModuleTableMap::CATEGORY)) $criteria->add(ModuleTableMap::CATEGORY, $this->category);
         if ($this->isColumnModified(ModuleTableMap::ACTIVATE)) $criteria->add(ModuleTableMap::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModuleTableMap::POSITION)) $criteria->add(ModuleTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ModuleTableMap::FULL_NAMESPACE)) $criteria->add(ModuleTableMap::FULL_NAMESPACE, $this->full_namespace);
@@ -1753,7 +2013,11 @@ abstract class Module implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionMin($this->getVersionMin());
+        $copyObj->setVersionMax($this->getVersionMax());
         $copyObj->setType($this->getType());
+        $copyObj->setCategory($this->getCategory());
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setFullNamespace($this->getFullNamespace());
@@ -4942,7 +5206,11 @@ abstract class Module implements ActiveRecordInterface
     {
         $this->id = null;
         $this->code = null;
+        $this->version = null;
+        $this->version_min = null;
+        $this->version_max = null;
         $this->type = null;
+        $this->category = null;
         $this->activate = null;
         $this->position = null;
         $this->full_namespace = null;
@@ -4950,6 +5218,7 @@ abstract class Module implements ActiveRecordInterface
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

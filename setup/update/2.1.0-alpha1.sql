@@ -2073,6 +2073,37 @@ UPDATE `customer_title_i18n`
     AND `customer_title_i18n`.`locale` = 'fr_FR';
 
 
+
+# ======================================================================================================================
+# Module version, min & max Thelia version supported
+# ======================================================================================================================
+
+ALTER TABLE `module`
+  ADD COLUMN `category` VARCHAR(50) DEFAULT 'classic' NOT NULL
+  AFTER `type`
+;
+
+UPDATE `module` SET `category` = 'classic' WHERE `type` = 1;
+UPDATE `module` SET `category` = 'delivery' WHERE `type` = 2;
+UPDATE `module` SET `category` = 'payment' WHERE `type` = 3;
+
+
+ALTER TABLE `module`
+  ADD COLUMN `version` VARCHAR(10) DEFAULT '' NOT NULL
+  AFTER `code`
+;
+
+ALTER TABLE `module`
+  ADD COLUMN `version_min` VARCHAR(10) DEFAULT '' NOT NULL
+  AFTER `version`
+;
+
+ALTER TABLE `module`
+  ADD COLUMN `version_max` VARCHAR(10) DEFAULT '' NOT NULL
+  AFTER `version_min`
+;
+
+
 # ======================================================================================================================
 # Adding missing resources
 # ======================================================================================================================

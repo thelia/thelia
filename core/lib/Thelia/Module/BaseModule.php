@@ -42,11 +42,13 @@ use Thelia\Tools\Image;
 
 class BaseModule extends ContainerAware implements BaseModuleInterface
 {
-    const CLASSIC_MODULE_TYPE = 1;
+    const CLASSIC_MODULE_TYPE  = 1;
     const DELIVERY_MODULE_TYPE = 2;
-    const PAYMENT_MODULE_TYPE = 3;
+    const PAYMENT_MODULE_TYPE  = 3;
 
-    const IS_ACTIVATED = 1;
+    const MODULE_CATEGORIES = 'classic,delivery,payment,marketplace,price,accounting,seo,administration,statistic';
+
+    const IS_ACTIVATED     = 1;
     const IS_NOT_ACTIVATED = 0;
 
     protected $reflected;
@@ -794,4 +796,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
         return $value;
     }
+
+    public static function getModuleCategories()
+    {
+        return self::$moduleCategories;
+    }
+
 }

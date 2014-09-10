@@ -69,6 +69,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 )
             ),
             new Argument(
+                'module_category',
+                new Type\TypeCollection(
+                    new Type\EnumListType(explode(',', BaseModule::MODULE_CATEGORIES))
+                )
+            ),
+            new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'title', 'title_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
@@ -111,6 +117,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $moduleType) {
             $search->filterByType($moduleType, Criteria::IN);
+        }
+
+        $moduleCategory = $this->getModule_category();
+
+        if (null !== $moduleCategory) {
+            $search->filterByCategory($moduleCategory, Criteria::IN);
         }
 
         $exclude = $this->getExclude();
@@ -183,17 +195,21 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow
                     ->set("ID", $module->getId())
                     ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE", $this->locale)
-                    ->set("TITLE", $module->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("CODE", $module->getCode())
-                    ->set("TYPE", $module->getType())
-                    ->set("ACTIVE", $module->getActivate())
-                    ->set("CLASS", $module->getFullNamespace())
-                    ->set("POSITION", $module->getPosition())
-                    ->set("EXISTS", $exists)
+                    ->set("LOCALE"       , $this->locale)
+                    ->set("TITLE"        , $module->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO"        , $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION"  , $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM" , $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("CODE"         , $module->getCode())
+                    ->set("TYPE"         , $module->getType())
+                    ->set("CATEGORY"     , $module->getCategory())
+                    ->set("ACTIVE"       , $module->getActivate())
+                    ->set("VERSION"      , $module->getVersion())
+                    ->set("VERSION_MIN"  , $module->getVersionMin())
+                    ->set("VERSION_MAX"  , $module->getVersionMax())
+                    ->set("CLASS"        , $module->getFullNamespace())
+                    ->set("POSITION"     , $module->getPosition())
+                    ->set("EXISTS"       , $exists)
                 ;
 
                 $hasConfigurationInterface = false;
