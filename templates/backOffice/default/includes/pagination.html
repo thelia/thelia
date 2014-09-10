@@ -32,7 +32,7 @@ $page_url : the URL of the page. The parameter page=x is appended to this URL.
             {if $PAGE == $START}
                 {if $has_prev}
                     <li><a title="{intl l="Go to first page"}" href="{$page_url}page=1">&laquo;</a></li>
-                    <li><a title="{intl l="Go to previous page"}" href="{$page_url}page=$prev_page">&lsaquo;</a></li>
+                    <li><a title="{intl l="Go to previous page"}" href="{$page_url}page={$prev_page}">&lsaquo;</a></li>
 
                     {if $has_pages_before}
                         <li title="{intl l="More pages before"}" class="disabled"><a href="#">&hellip;</a></li>
