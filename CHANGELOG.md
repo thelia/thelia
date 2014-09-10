@@ -17,6 +17,7 @@
 - Added virtual products feature.
     - Added new delivery module for virtual products.
 - Added meta data feature to associate core elements and various data.
+- Added `allow_negative_stock` configuration variable to allow negative stock or not (default is no)
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :

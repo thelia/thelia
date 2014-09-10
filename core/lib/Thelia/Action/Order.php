@@ -229,18 +229,20 @@ class Order extends BaseAction implements EventSubscriberInterface
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
-            /* decrease stock */
-            $allowNegativeStock = intval(ConfigQuery::read('allow-negative-stock', 0));
-            $newStock = $pse->getQuantity() - $cartItem->getQuantity();
-            //Forbid negative stock
-            if ($newStock < 0 && 0 === $allowNegativeStock) {
-                $newStock = 0;
-            }
-            $pse->setQuantity(
-                $newStock
-            );
+            if (0 === $product->getVirtual()){
+                /* decrease stock for non virtual product */
+                $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
+                $newStock = $pse->getQuantity() - $cartItem->getQuantity();
+                //Forbid negative stock
+                if ($newStock < 0 && 0 === $allowNegativeStock) {
+                    $newStock = 0;
+                }
+                $pse->setQuantity(
+                    $newStock
+                );
 
-            $pse->save($con);
+                $pse->save($con);
+            }
 
             /* get tax */
             $taxRuleI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'TaxRule', $product->getTaxRuleId());
