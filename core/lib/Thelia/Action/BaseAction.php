@@ -96,7 +96,7 @@ class BaseAction
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
 
-            $newVisibility = ($object->getVisible() === 1) ? 0 : 1;
+            $newVisibility = !$object->getVisible();
             $object
                 ->setDispatcher($event->getDispatcher())
 
