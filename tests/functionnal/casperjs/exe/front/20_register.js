@@ -89,7 +89,7 @@ casper.test.begin('Register', 15, function suite(test) {
     casper.wait(thelia_default_timeout, function() {
 
         this.capture(screenshot_dir + 'front/20_register-ok.png');
-        test.assertSelectorHasText('h1#main-label', 'My Account');
+        test.assertSelectorHasText('.navbar-customer a.account', 'My Account');
         test.assertExists('a.logout', 'Logout button exists');
 
         casper.test.comment('== Logout');

@@ -9,6 +9,10 @@
 {/block}
 
 {block name="main-content"}
+
+    {* This page should not replace the current previous URL *}
+    {set_previous_url ignore_current="1"}
+
     <div class="main">
 
         <article class="col-main" role="main" aria-labelledby="main-label">
@@ -18,7 +22,7 @@
             {form name="thelia.front.customer.create"}
             <form id="form-register" class="form-horizontal" action="{url path="/register"}" method="post">
                 {form_field form=$form field='success_url'}
-                    <input type="hidden" name="{$name}" value="{url path="/account"}" /> {* the url the user is redirected to on registration success *}
+                    <input type="hidden" name="{$name}" value="{navigate to="previous"}" /> {* the url the user is redirected to on registration success *}
                 {/form_field}
 
                 {form_field form=$form field='error_message'}
