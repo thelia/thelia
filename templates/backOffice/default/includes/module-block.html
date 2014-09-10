@@ -38,6 +38,8 @@
                 }
                 </th>
 
+                <th>{intl l="version"}</th>
+
                 <th>
                 {admin_sortable_header
                    current_order=$module_order
@@ -84,6 +86,7 @@
                     <td>{$ID}</td>
                     <td>{$TITLE}</td>
                     <td>{$CODE}</td>
+                    <td>{$VERSION}</td>
                     <td>{$CHAPO}</td>
 
                     {if $EXISTS}

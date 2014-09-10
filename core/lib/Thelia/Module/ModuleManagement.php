@@ -58,8 +58,12 @@ class ModuleManagement
 
                     $module
                         ->setCode($code)
+                        ->setVersion((string) $content->version)
+                        ->setVersionMin((string) $content->min)
+                        ->setVersionMax((string) $content->max)
                         ->setFullNamespace((string) $content->fullnamespace)
                         ->setType($this->getModuleType($reflected))
+                        ->setCategory((string) $content->type)
                         ->setActivate(0)
                         ->save($con);
                 }
