@@ -7,6 +7,7 @@ return array(
     '+ View All' => '+ Voir tout',
     '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Désolé !</strong>Nous ne pouvons pas trouver de mode de livraison pour votre commande.',
+    'A new password has been sent to your e-mail address. Please check your mailbox.' => 'Un nouveau mot de passe vient d\'être envoyé à votre adresse e-mail. Merci de vérifier votre boite de réception.',
     'A problem occured' => 'Un problème est survenu',
     'A summary of your order email has been sent to the following address' => 'Un récapitulatif de commande vous a été envoyé par e-mail à l\'adresse suivante : ',
     'Account' => 'Mon compte',
@@ -155,11 +156,7 @@ return array(
     'Price descending' => 'Prix décroissant',
     'Proceed checkout' => 'Continuer la commande',
     'Product Empty Button' => 'Ajouter mon premier produit',
-    'Product Empty Message' => 'Ajouter rapidement un produit.
-<ol>
-<li>Cochez <strong>Nouveau</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Nouveautés.</li>
-<li>Cochez <strong>En promo</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Offres.</li>
-</ol>',
+    'Product Empty Message' => 'Ajouter rapidement un produit.<ol><li>Cochez <strong>Nouveau</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Nouveautés.</li><li>Cochez <strong>En promo</strong> dans l\'onglet Prix si vous voulez voir votre produit dans la section Offres.</li></ol>',
     'Product Empty Title' => 'Bienvenue',
     'Product Name' => 'Nom du produit',
     'Product Offers' => 'Offre spéciale',
@@ -192,10 +189,12 @@ return array(
     'Select Title' => 'Civilité',
     'Select your country:' => 'Sélectionnez votre pays :',
     'Send' => 'Envoyer',
+    'Send new password again' => 'Renvoyer un mot de passe',
     'Send us a message' => 'Envoyez nous un message.',
     'Shipping Tax' => 'Frais de livraison',
     'Show' => 'Voir',
     'Sign In' => 'Se connecter',
+    'Sign in' => 'Se connecter',
     'Sign up to receive our latest news.' => 'Inscrivez-vous pour recevoir les dernières nouveautés.',
     'Skip to content' => 'Aller au contenu',
     'Sorry but this combination does not exist.' => 'Désolé, cette déclinaison n\'existe pas.',

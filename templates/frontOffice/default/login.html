@@ -12,6 +12,10 @@
 
 
 {block name="main-content"}
+
+    {* This page should not replace the current previous URL *}
+    {set_previous_url ignore_current="1"}
+
     {hook name="login.top"}
     <div class="main">
         {hook name="login.main-top"}

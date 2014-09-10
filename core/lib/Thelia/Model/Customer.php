@@ -34,35 +34,40 @@ class Customer extends BaseCustomer implements UserInterface
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**
-     * @param  int                                       $titleId       customer title id (from customer_title table)
-     * @param  string                                    $firstname     customer first name
-     * @param  string                                    $lastname      customer last name
-     * @param  string                                    $address1      customer address
-     * @param  string                                    $address2      customer adress complement 1
-     * @param  string                                    $address3      customer adress complement 2
-     * @param  string                                    $phone         customer phone number
-     * @param  string                                    $cellphone     customer cellphone number
-     * @param  string                                    $zipcode       customer zipcode
+     * @param  int                                       $titleId          customer title id (from customer_title table)
+     * @param  string                                    $firstname        customer first name
+     * @param  string                                    $lastname         customer last name
+     * @param  string                                    $address1         customer address
+     * @param  string                                    $address2         customer adress complement 1
+     * @param  string                                    $address3         customer adress complement 2
+     * @param  string                                    $phone            customer phone number
+     * @param  string                                    $cellphone        customer cellphone number
+     * @param  string                                    $zipcode          customer zipcode
      * @param  string                                    $city
-     * @param  int                                       $countryId     customer country id (from Country table)
-     * @param  string                                    $email         customer email, must be unique
-     * @param  string                                    $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param  int                                       $countryId        customer country id (from Country table)
+     * @param  string                                    $email            customer email, must be unique
+     * @param  string                                    $plainPassword    customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
      * @param  string                                    $lang
      * @param  int                                       $reseller
      * @param  null                                      $sponsor
      * @param  int                                       $discount
      * @param  null                                      $company
      * @param  null                                      $ref
+     * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0, $company = null, $ref = null)
+    public function createOrUpdate(
+        $titleId, $firstname, $lastname, $address1, $address2, $address3,
+        $phone, $cellphone, $zipcode, $city, $countryId, $email = null,
+        $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null,
+        $discount = 0, $company = null, $ref = null, $forceEmailUpdate = false)
     {
         $this
             ->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
-            ->setEmail($email)
+            ->setEmail($email, $forceEmailUpdate)
             ->setPassword($plainPassword)
             ->setReseller($reseller)
             ->setSponsor($sponsor)
@@ -126,6 +131,25 @@ class Customer extends BaseCustomer implements UserInterface
             $con->rollback();
             throw $e;
         }
+    }
+
+    /**
+     * Return the customer lang, or the default one if none is defined.
+     *
+     * @return Lang the customer lang
+     */
+    public function getCustomerLang()
+    {
+        if ($this->getLang() !== null) {
+            $lang = LangQuery::create()
+                ->findPk($this->getLang());
+        } else {
+            $lang = LangQuery::create()
+                ->filterByByDefault(1)
+                ->findOne();
+        }
+
+        return $lang;
     }
 
     protected function generateRef()
@@ -200,8 +224,8 @@ class Customer extends BaseCustomer implements UserInterface
     {
         $email = trim($email);
 
-        if ($this->isNew() && ($email === null || $email == "")) {
-            throw new InvalidArgumentException("customer email is mandatory on creation");
+        if (($this->isNew() || $force === true) && ($email === null || $email == "")) {
+            throw new InvalidArgumentException("customer email is mandatory");
         }
 
         if (!$this->isNew() && $force === false) {

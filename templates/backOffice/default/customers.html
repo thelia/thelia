@@ -181,7 +181,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="6">
+                                            <td colspan="100">
                                                 {include
                                                     file = "includes/pagination.html"
 
@@ -218,12 +218,19 @@
                <input type="hidden" name="{$name}" value="{url path='/admin/customer/update' customer_id='_ID_'}" />
             {/form_field}
 
+            {*
+            We use "dummmy-password" here, because the creation form is common to back & front, and that we need a
+            valid password. This is just a workaround.
+            The password will be forced to a more secure value in the CustomerController.
+            *}
+
+
             {form_field form=$form field="password"}
-                <input type="hidden" name="{$name}" value="random" />
+                <input type="hidden" name="{$name}" value="dummmy-password" />
             {/form_field}
 
             {form_field form=$form field="password_confirm"}
-                <input type="hidden" name="{$name}" value="random" />
+                <input type="hidden" name="{$name}" value="dummmy-password" />
             {/form_field}
 
             {form_field form=$form field='company'}

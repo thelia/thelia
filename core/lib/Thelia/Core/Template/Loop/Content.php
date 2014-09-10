@@ -72,7 +72,9 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'created',
                             'created_reverse',
                             'updated',
-                            'updated_reverse'
+                            'updated_reverse',
+                            'position',
+                            'position_reverse'
                         )
                     )
                 ),
@@ -220,6 +222,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "updated_reverse":
                     $search->addDescendingOrderByColumn('updated_at');
+                    break;
+                case "position":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "position_reverse":
+                    $search->orderByPosition(Criteria::DESC);
                     break;
             }
         }

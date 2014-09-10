@@ -1948,11 +1948,18 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 SELECT @max_id := MAX(`id`) FROM `message`;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
-  (@max_id+1, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW());
+  (@max_id+1, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
+  (@max_id+2, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
+  (@max_id+3, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
   (@max_id+1, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key="store_name"}', NULL, NULL),
-  (@max_id+1, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL);
+  (@max_id+1, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL),
+  (@max_id+2, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key="store_name"} has been changed.', NULL, NULL),
+  (@max_id+2, 'fr_FR', 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office', 'L''accès à votre compte {config key="store_name"} a changé', NULL, NULL),
+  (@max_id+3, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key="store_name"} account has been created for you', NULL, NULL),
+  (@max_id+3, 'fr_FR', 'Mail envoyé au client lorsque son compte est crée depuis le back-office par un administrateur', 'Un compte {config key="store_name"} vient d''être crée pour vous.', NULL, NULL);
+
 
 # ======================================================================================================================
 # End of changes

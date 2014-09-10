@@ -113,12 +113,28 @@ class ConfigQuery extends BaseConfigQuery
         return self::read('unknown-flag-path', '/assets/img/flags/unknown.png');
     }
 
+    public static function getStoreEmail()
+    {
+        return self::read('store_email', null);
+    }
+
+    public static function getStoreName()
+    {
+        return self::read('store_name', '');
+    }
+
+    public static function getStoreDescription()
+    {
+        return self::read('store_description', '');
+
+    }
+
     /**
      * @return array a list of email addresses to send the shop's notifications
      */
     public static function getNotificationEmailsList()
     {
-        $contactEmail = self::read('store_email', '<undefined>');
+        $contactEmail = self::getStoreEmail();
 
         $list = preg_split("/[,;]/", self::read('store_notification_emails', $contactEmail));
 

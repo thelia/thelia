@@ -2990,19 +2990,24 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (38, 'fr_FR', 'Gestion des promotions')
 ;
 
-
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
 (1, 'order_confirmation', NULL, NULL, 'order_confirmation.txt', NULL, 'order_confirmation.html', NOW(), NOW()),
 (2, 'lost_password', NULL, NULL, 'password.txt', NULL, 'password.html', NOW(), NOW()),
-(3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW());
+(3, 'order_notification', NULL, NULL, 'order_notification.txt', NULL, 'order_notification.html', NOW(), NOW()),
+(4, 'customer_account_changed', 0, NULL, 'account_changed_by_admin.txt', NULL, 'account_changed_by_admin.html', NOW(), NOW()),
+(5, 'customer_account_created', 0, NULL, 'account_created_by_admin.txt', NULL, 'account_created_by_admin.html', NOW(), NOW());
 
 INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, `html_message`) VALUES
-(1, 'en_US', 'order confirmation', 'Your order {$order_ref} at {config key="store_name"}', NULL, NULL),
-(1, 'fr_FR', 'Confirmation de commande', 'Votre commande {$order_ref} chez {config key="store_name"}', NULL, NULL),
+(1, 'en_US', 'Order confirmation sent to the customer', 'Your order {$order_ref} at {config key="store_name"}', NULL, NULL),
+(1, 'fr_FR', 'Confirmation de commande envoyée au client', 'Votre commande {$order_ref} chez {config key="store_name"}', NULL, NULL),
 (2, 'en_US', 'Your new password', 'Your new password for {config key="store_name"}', NULL, NULL),
 (2, 'fr_FR', 'Votre nouveau mot de passe', 'Votre nouveau mot de passe {config key="store_name"}', NULL, NULL),
 (3, 'en_US', 'Message sent to the shop owner when a new order is placed', 'New order {$order_ref} placed on {config key="store_name"}', NULL, NULL),
-(3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL);
+(3, 'fr_FR', 'Message envoyé au gestionnaire de la boutique lors d''une nouvelle commande.', 'Nouvelle commande {$order_ref} reçue sur {config key="store_name"}', NULL, NULL),
+(4, 'en_US', 'Mail sent to the customer when its password or email is changed in the back-office', 'Your account information on {config key="store_name"} has been changed.', NULL, NULL),
+(4, 'fr_FR', 'Message envoyé au client lorsque son mot de passe ou son email est changé dans le back-office', 'L''accès à votre compte {config key="store_name"} a changé', NULL, NULL),
+(5, 'en_US', 'Mail sent to the customer when its account is created by an administrator in the back-office', 'A {config key="store_name"} account has been created for you', NULL, NULL),
+(5, 'fr_FR', 'Mail envoyé au client lorsque son compte est crée depuis le back-office par un administrateur', 'Un compte {config key="store_name"} vient d''être crée pour vous.', NULL, NULL);
 
 -- Add firewall i18n
 SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';

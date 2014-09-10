@@ -1,4 +1,7 @@
-#/usr/bin/env/sh
+#!/bin/bash
+# --------------------------------------------------------------
+# This script is started by Travis to perform all Thelia 2 tests
+# --------------------------------------------------------------
 
 # will exit with non-zero error code if any of the command fails
 set -e
