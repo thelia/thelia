@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Exception;
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -20,12 +21,14 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
+use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Form\ModuleInstallForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
@@ -140,6 +143,51 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+
+    /**
+     * @param \Thelia\Core\Event\Module\ModuleInstallEvent $event
+     */
+    public function install(ModuleInstallEvent $event)
+    {
+        $moduleDefinition = $event->getModuleDefinition();
+
+        $oldModule = ModuleQuery::create()->findOneByFullNamespace($moduleDefinition->getNamespace());
+
+        $dispatcher = $event->getDispatcher();
+
+        $activated = false;
+
+        // check existing module
+        if (null !== $oldModule){
+            $activated = $oldModule->getActivate();
+
+            if ($activated) {
+                // deactivate
+                $toggleEvent = new ModuleToggleActivationEvent($oldModule);
+                $toggleEvent->setDispatcher($dispatcher);
+
+                $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
+            }
+
+            // delete
+            $deleteEvent = new ModuleDeleteEvent($oldModule);
+            $deleteEvent->setDispatcher($dispatcher);
+
+            try {
+                $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
+            } catch (Exception $ex) {
+
+            }
+
+            // clear cache
+
+        }
+        // move new module
+
+        // activate if old was activated
+
+    }
+
     /**
      * Call the payment method of the payment module of the given order
      *
@@ -220,6 +268,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             TheliaEvents::MODULE_UPDATE_POSITION => array('updatePosition', 128),
             TheliaEvents::MODULE_DELETE => array('delete', 128),
             TheliaEvents::MODULE_UPDATE => array('update', 128),
+            TheliaEvents::MODULE_INSTALL => array('install', 128),
             TheliaEvents::MODULE_PAY => array('pay', 128),
         );
     }

@@ -19,6 +19,8 @@ use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Form\ModuleInstallForm;
 use Thelia\Form\ModuleModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
@@ -288,4 +290,68 @@ class ModuleController extends AbstractCrudController
 
         return $response;
     }
+
+    public function installAction()
+    {
+
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)){
+            return $response;
+        }
+
+
+        $message = false;
+
+        $moduleInstall = new ModuleInstallForm($this->getRequest());
+
+        try {
+            $form = $this->validateForm($moduleInstall, "post");
+
+            $moduleDefinition = $moduleInstall->getModuleDefinition();
+            $modulePath       = $moduleInstall->getModuleTemporyPath();
+
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            $file = $form->get("module")->getData();
+
+            $moduleInstallEvent = new ModuleInstallEvent();
+            $moduleInstallEvent
+                ->setModulePath($modulePath)
+                ->setModuleDefinition($moduleDefinition)
+            ;
+
+            $this->dispatch(TheliaEvents::MODULE_INSTALL, $moduleInstallEvent);
+
+            $newModule = $moduleInstallEvent->getModule();
+
+            if (null !== $newModule) {
+                $response = $this->generateRedirectFromRoute('admin.module');
+                return $response;
+            } else {
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured."
+                );
+            }
+
+        } catch (FormValidationException $e) {
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()]);
+        } catch (\Exception $e) {
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()]);
+        }
+
+        if ($message !== false) {
+            Tlog::getInstance()->error(sprintf("Error during module installation process. Exception was %s", $message));
+
+            $moduleInstall->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($moduleInstall)
+                ->setGeneralError($message)
+            ;
+
+            return $this->render("modules");
+        } else {
+            return $this->generateRedirectFromRoute('admin.module');
+        }
+
+    }
+
 }
