@@ -20,6 +20,7 @@ use Thelia\Exception\CustomerException;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerUpdateForm;
 use Thelia\Model\CustomerQuery;
+use Thelia\Tools\Password;
 
 /**
  * Class CustomerController
@@ -56,7 +57,15 @@ class CustomerController extends AbstractCrudController
 
     protected function getCreationEvent($formData)
     {
-        return $this->createEventInstance($formData);
+        $event = $this->createEventInstance($formData);
+
+        // Create a secure password
+        $event->setPassword(Password::generateRandom(8));
+
+        // We will notify the customer of account creation
+        $event->setNotifyCustomerOfAccountCreation(true);
+
+        return $event;
     }
 
     protected function getUpdateEvent($formData)
@@ -64,6 +73,9 @@ class CustomerController extends AbstractCrudController
         $event = $this->createEventInstance($formData);
 
         $event->setCustomer($this->getExistingObject());
+
+        // We allow customer email modification
+        $event->setEmailUpdateAllowed(true);
 
         return $event;
     }

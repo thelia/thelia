@@ -39,6 +39,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $discount;
     protected $company;
     protected $ref;
+    protected $emailUpdateAllowed;
+    protected $notifyCustomerOfAccountCreation;
 
     /**
      * @param int    $title     the title customer id
@@ -164,6 +166,17 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     }
 
     /**
+     * @param  string $password
+     * @return $this
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getPhone()
@@ -235,4 +248,41 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         return $this->ref;
     }
 
+    /**
+     * @param  mixed $emailUpdateAllowed
+     * @return $this
+     */
+    public function setEmailUpdateAllowed($emailUpdateAllowed)
+    {
+        $this->emailUpdateAllowed = $emailUpdateAllowed;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailUpdateAllowed()
+    {
+        return $this->emailUpdateAllowed;
+    }
+
+    /**
+     * @param  bool  $notifyCustomerOfAccountCreation
+     * @return $this
+     */
+    public function setNotifyCustomerOfAccountCreation($notifyCustomerOfAccountCreation)
+    {
+        $this->notifyCustomerOfAccountCreation = $notifyCustomerOfAccountCreation;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNotifyCustomerOfAccountCreation()
+    {
+        return $this->notifyCustomerOfAccountCreation;
+    }
 }

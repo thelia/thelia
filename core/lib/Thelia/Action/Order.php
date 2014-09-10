@@ -22,10 +22,7 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
-use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
@@ -34,7 +31,6 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\MessageQuery;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
@@ -61,18 +57,13 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     protected $mailer;
     /**
-     * @var ParserInterface
-     */
-    protected $parser;
-    /**
      * @var SecurityContext
      */
     protected $securityContext;
 
-    public function __construct(Request $request, ParserInterface $parser, MailerFactory $mailer, SecurityContext $securityContext)
+    public function __construct(Request $request, MailerFactory $mailer, SecurityContext $securityContext)
     {
         $this->request = $request;
-        $this->parser = $parser;
         $this->mailer = $mailer;
         $this->securityContext = $securityContext;
     }
@@ -370,72 +361,20 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param  \Thelia\Model\Order       $order
-     * @param  string                    $messageCode
-     * @return \Swift_Mime_SimpleMessage
-     * @throws \Exception
-     */
-    protected function createOrderMessage($order, $messageCode)
-    {
-        $message = MessageQuery::create()
-            ->filterByName($messageCode)
-            ->findOne();
-
-        if (false === $message) {
-            throw new \Exception("Failed to load message 'order_confirmation'.");
-        }
-
-        $customer = $order->getCustomer();
-
-        $this->parser->assign('order_id', $order->getId());
-        $this->parser->assign('order_ref', $order->getRef());
-
-        $message
-            ->setLocale($order->getLang()->getLocale());
-
-        $instance = \Swift_Message::newInstance();
-
-        // Build subject and body
-        $message->buildMessage($this->parser, $instance);
-
-        return $instance;
-    }
-
-    /**
      * @param OrderEvent $event
      *
      * @throws \Exception if the message cannot be loaded.
      */
     public function sendConfirmationEmail(OrderEvent $event)
     {
-        $contactEmail = ConfigQuery::read('store_email');
-
-        if ($contactEmail) {
-
-            // Send the order confirmation to the customer
-            $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_confirmation');
-
-            $customer = $event->getOrder()->getCustomer();
-
-            $emailMessage
-                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom($contactEmail, ConfigQuery::read('store_name'))
-            ;
-
-            $success = $this->getMailer()->send($emailMessage);
-
-            if ($success == 0) {
-                Tlog::getInstance()->addError(
-                    Translator::getInstance()->trans(
-                        "Failed to send confirmation email for order %order_ref to customer %cust_email, ref. %cust_ref",
-                        [
-                            '%order_ref'  => $event->getOrder()->getRef(),
-                            '%cust_email' => $customer->getEmail(),
-                            '%cust_ref'   => $customer->getRef()
-                        ]
-                ));
-            }
-        }
+        $this->mailer->sendEmailToCustomer(
+            'order_confirmation',
+            $event->getOrder()->getCustomer(),
+            [
+                'order_id' => $event->getOrder()->getId(),
+                'order_ref' => $event->getOrder()->getRef()
+            ]
+        );
     }
 
     /**
@@ -445,51 +384,12 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function sendNotificationEmail(OrderEvent $event)
     {
-        $contactEmail = ConfigQuery::read('store_email');
-
-        if ($contactEmail) {
-
-            $storeName = ConfigQuery::read('store_name');
-
-            // Send the order notification to the shop owner
-            $emailMessage = $this->createOrderMessage($event->getOrder(), 'order_notification');
-
-            $emailMessage
-                ->addFrom($contactEmail, $storeName)
-            ;
-
-            $recipients = ConfigQuery::getNotificationEmailsList();
-
-            foreach ($recipients as $recipient) {
-                $emailMessage
-                    ->addTo($recipient, $storeName)
-                ;
-            }
-
-            $success = $this->getMailer()->send($emailMessage);
-
-            if ($success == 0) {
-                Tlog::getInstance()->addError(
-                    Translator::getInstance()->trans(
-                        "Failed to send notification email to shop manager %email for order %order_ref ",
-                        [
-                            '%order_ref'  => $event->getOrder()->getRef(),
-                            '%email' => $contactEmail
-                        ]
-                ));
-            }
-        }
-    }
-
-    /**
-     *
-     * return an instance of \Swift_Mailer with good Transporter configured.
-     *
-     * @return \Swift_Mailer
-     */
-    public function getMailer()
-    {
-        return $this->mailer->getSwiftMailer();
+        $this->mailer->sendEmailToShopManagers(
+            'order_notification',
+            [
+                'order_id' => $event->getOrder()->getId(),
+                'order_ref' => $event->getOrder()->getRef()
+            ]);
     }
 
     /**

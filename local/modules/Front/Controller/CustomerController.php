@@ -71,6 +71,8 @@ class CustomerController extends BaseFrontController
 
                 $this->dispatch(TheliaEvents::LOST_PASSWORD, $event);
 
+                return $this->generateSuccessRedirect($passwordLost);
+
             } catch (FormValidationException $e) {
                 $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
@@ -93,6 +95,11 @@ class CustomerController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+    }
+
+    public function newPasswordSentAction()
+    {
+        $this->getParser()->assign('password_sent', true);
     }
 
     /**
@@ -239,6 +246,8 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
+                // We do not allow customer email modification
+                $customerChangeEvent->setEmailUpdateAllowed(false);
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();

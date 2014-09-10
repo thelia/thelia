@@ -27,6 +27,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\FirewallForm;
+use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -446,13 +447,11 @@ abstract class BaseController extends ContainerAware
      *
      * return an instance of \Swift_Mailer with good Transporter configured.
      *
-     * @return \Swift_Mailer
+     * @return MailerFactory
      */
     public function getMailer()
     {
-        $mailer = $this->container->get('mailer');
-
-        return $mailer->getSwiftMailer();
+        return $this->container->get('mailer');
     }
 
     protected function getCurrentRouter()

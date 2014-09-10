@@ -107,10 +107,13 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         // public function __construct(Request $this->request, ParserInterface $parser, MailerFactory $mailer, SecurityContext $securityContext)
 
+        $mailerFactory = new MailerFactory($dispatcher,
+            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request))
+        );
+
         $this->orderAction = new Order(
             $this->request,
-            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)),
-            new MailerFactory($dispatcher),
+            $mailerFactory,
             $this->securityContext
         );
 

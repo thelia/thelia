@@ -41,57 +41,18 @@
 
                                 {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/messages'}"}
 
-						        {form_hidden_fields form=$form}
+						        {form_hidden_fields form=$form exclude="success_url,locale"}
 
-						        {form_field form=$form field='success_url'}
-						        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/messages'}" />
-						        {/form_field}
-
-                                {form_field form=$form field='id'}
-                                <input type="hidden" name="{$name}" value="{$value}" />
-                                {/form_field}
-
-		                        {form_field form=$form field='locale'}
-		                        <input type="hidden" name="{$name}" value="{{$edit_language_locale}}" />
-		                        {/form_field}
+                                {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/messages'}"}
+                                {render_form_field form=$form field='locale' value="{$edit_language_locale}"}
 
 					            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-								{form_field form=$form field='name'}
-								<div class="form-group {if $error}has-error{/if}">
-									<label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
-									<span class="label-help-block">{intl l="This the unique name of this message. Do not change this value unless you understand what you do."}</span>
-									</label>
-									<input type="text" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Variable name'}" placeholder="{intl l='Variable name'}" class="form-control">
-								</div>
-					            {/form_field}
+                                {render_form_field form=$form field='name'}
+                                {render_form_field form=$form field='secured'}
+								{render_form_field form=$form field='title'}
+                                {render_form_field form=$form field='subject'}
 
-								{form_field form=$form field='secured'}
-		                        <div class="checkbox {if $error}has-error{/if}">
-		                            <label>
-		                                <input type="checkbox" name="{$name}" value="1" {if $value == 1}checked="checked"{/if}>
-		                                {$label}
-									</label>
-		                        </div>
-		                        {/form_field}
-
-								{form_field form=$form field='title'}
-								<div class="form-group {if $error}has-error{/if}">
-								    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
-								        <span class="label-help-block">{intl l="This is the message purpose, such as 'Order confirmation'."}</span>
-								    </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" {if $required}{if $required}required="required"{/if}{/if} title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{$value}">
-								</div>
-								{/form_field}
-
-                                {form_field form=$form field='subject'}
-                                <div class="form-group {if $error}has-error{/if}">
-                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
-                                        <span class="label-help-block">{intl l="This is the subject of the e-mail, such as 'Your order is confirmed'."}</span>
-                                    </label>
-									<input type="text" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{intl l='Subject'}" placeholder="{intl l='Subject'}" class="form-control" value="{$value}">
-								</div>
-                                {/form_field}
 
                                 <div class="panel panel-default">
                                     <div class="panel-heading"><h3 class="panel-title">{intl l="HTML version of this message"}</h3></div>
@@ -99,47 +60,35 @@
                                     <div class="panel-body">
 	                                    <div class="row">
 		                                    <div class="col-md-6">
-			                                {form_field form=$form field='html_layout_file_name'}
-				                                <div class="form-group {if $error}has-error{/if}">
-				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-				                                    <select id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="form-control">
-				                                        <option value="">{intl l='Use default layout'}</option>
-				                                        {foreach $layout_list as $layout}
-				                                            <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
-				                                        {/foreach}
-				                                    </select>
-				                                </div>
-			                                {/form_field}
+                                            {custom_render_form_field form=$form field='html_layout_file_name'}
+                                                <select {form_field_attributes form=$form field='html_layout_file_name'}>
+                                                    <option value="">{intl l='Use default layout'}</option>
+                                                    {foreach $layout_list as $layout}
+                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+                                                    {/foreach}
+                                                </select>
+			                                {/custom_render_form_field}
 			                                </div>
 
 			                                <div class="col-md-6">
-				                                {form_field form=$form field='html_template_file_name'}
-				                                <div class="form-group {if $error}has-error{/if}">
-				                                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="html_message" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
-			                                            <option value="">{intl l='Use HTML message defined below'}</option>
-	                                                    {foreach $html_template_list as $template}
-	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
-	                                                    {/foreach}
-			                                        </select>
-				                                </div>
-				                                {if ! empty($value)}{$disable_html='readonly="true"'}{/if}
-			                                {/form_field}
+                                            {custom_render_form_field form=$form field='html_template_file_name'}
+                                                <select data-toggle-textarea="html_message" {form_field_attributes form=$form field='html_template_file_name' extra_class="textarea-toggle"}>
+                                                    <option value="">{intl l='Use HTML message defined below'}</option>
+                                                    {foreach $html_template_list as $template}
+                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
+                                                    {/foreach}
+                                                </select>
+                                                {if ! empty($value)}{$disable_html='readonly="true"'}{/if}
+                                            {/custom_render_form_field}
 			                                </div>
                                         </div>
 
                                         <div class="row">
 											<div class="col-md-12">
-												{form_field form=$form field='html_message'}
-												<div class="form-group {if $error}has-error{/if}">
-												    <label for="{$label_attr.for}" class="control-label">
-												    	{$label}{if $required} <span class="required">*</span>{/if} :
-												      <span class="label-help-block">{intl l="The mailing template in HTML format."}</span>
-												    </label>
-												    <textarea {$disable_html} {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
+												{custom_render_form_field form=$form field='html_message'}
+												    <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value}</textarea>
                                                     <div id="{$name}" style="height: 500px;">{$value}</div>
-												</div>
-												{/form_field}
+												{/custom_render_form_field}
 											</div>
 										</div>
                                     </div>
@@ -151,48 +100,36 @@
                                     <div class="panel-body">
                                         <div class="row">
 		                                    <div class="col-md-6">
-			                                    {form_field form=$form field='text_layout_file_name'}
-			                                    <div class="form-group {if $error}has-error{/if}">
-			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="form-control">
-			                                            <option value="">{intl l='Use default layout'}</option>
-	                                                    {foreach $layout_list as $layout}
-	                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
-	                                                    {/foreach}
-			                                        </select>
-			                                    </div>
-			                                    {/form_field}
+                                            {custom_render_form_field form=$form field='text_layout_file_name'}
+                                                <select {form_field_attributes form=$form field='text_layout_file_name'}>
+                                                    <option value="">{intl l='Use default layout'}</option>
+                                                    {foreach $layout_list as $layout}
+                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+                                                    {/foreach}
+                                                </select>
+                                            {/custom_render_form_field}
 		                                    </div>
 
 		                                    <div class="col-md-6">
-			                                    {form_field form=$form field='text_template_file_name'}
-			                                    <div class="form-group {if $error}has-error{/if}">
-			                                        <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
-			                                        <select data-toggle-textarea="text_message" id="{$label_attr.for}" name="{$name}" {if $required}required="required"{/if} title="{$label}" class="textarea-toggle form-control">
+                                                {custom_render_form_field form=$form field='text_template_file_name'}
+			                                        <select data-toggle-textarea="text_message" {form_field_attributes form=$form field='text_template_file_name' extra_class='textarea-toggle'}>
 			                                            <option value="">{intl l='Use Text message defined below'}</option>
 	                                                    {foreach $text_template_list as $template}
 	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
 	                                                    {/foreach}
 			                                        </select>
-			                                    </div>
-			                                    {if ! empty($value)}{$disable_text='readonly="true"'}{/if}
-			                                    {/form_field}
+			                                        {if ! empty($value)}{$disable_text='readonly="true"'}{/if}
+			                                    {/custom_render_form_field}
 		                                    </div>
 		                                </div>
 
                                         <div class="row">
 	                                        <div class="col-md-12">
-				                                {form_field form=$form field='text_message'}
-				                                <div class="form-group {if $error}has-error{/if}">
-				                                    <label for="{$label_attr.for}" class="control-label">
-				                                    	{$label}{if $required} <span class="required">*</span>{/if} :
-				                                      <span class="label-help-block">{intl l="The mailing template in text-only format."}</span>
-				                                    </label>
-				                                    <textarea {$disable_text} {if $required}required="required"{/if} name="{$name}" rows="10" class="fixedfont form-control">{$value}</textarea>
-                                                    <div id="{$name}" style="height: 500px;">{$value}</div>
-				                                </div>
-				                                {/form_field}
-			                                </div>
+                                                {custom_render_form_field form=$form field='text_message'}
+                                                <textarea {$disable_html} {form_field_attributes form=$form field='text_message' extra_class="fixedfont"}>{$value}</textarea>
+                                                <div id="{$name}" style="height: 500px;">{$value}</div>
+                                            </div>
+                                            {/custom_render_form_field}
 			                            </div>
                                     </div>
                                 </div>
