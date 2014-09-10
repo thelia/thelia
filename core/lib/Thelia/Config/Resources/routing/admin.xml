@@ -1078,6 +1078,11 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::configureAction</default>
     </route>
 
+    <route id="admin.module.install" path="/admin/module/install" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
+    </route>
+
+
     <!-- end Modules rule management -->
 
     <!-- Hooks rule management -->
