@@ -14,14 +14,13 @@ namespace Thelia\Exception;
 
 use OutOfBoundsException;
 
-
 /**
  * Class InvalidModuleException
  * @package Thelia\Exception
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class InvalidModuleException extends OutOfBoundsException{
-
+class InvalidModuleException extends OutOfBoundsException
+{
     protected $errors = array();
 
     /**
@@ -40,4 +39,4 @@ class InvalidModuleException extends OutOfBoundsException{
         return $this->errors;
     }
 
-} 
+}

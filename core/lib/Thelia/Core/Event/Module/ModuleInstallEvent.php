@@ -34,7 +34,6 @@ class ModuleInstallEvent extends ActionEvent
     /** @var  string $modulePath */
     protected $modulePath;
 
-
     public function __construct(Module $module = null)
     {
         $this->module = $module;
@@ -104,6 +103,5 @@ class ModuleInstallEvent extends ActionEvent
     {
         return $this->modulePath;
     }
-
 
 }

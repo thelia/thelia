@@ -82,7 +82,7 @@
             <tbody>
             {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
                 {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
-                <tr {if ! $EXISTS}class="warning"{/if}>
+                <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
                     <td>{$ID}</td>
                     <td>{$TITLE}</td>
                     <td>{$CODE}</td>

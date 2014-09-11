@@ -12,13 +12,16 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Core\Event\Module\ModuleEvent;
+use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Exception\InvalidModuleException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
 use Thelia\Form\ModuleModificationForm;
@@ -30,10 +33,13 @@ use Thelia\Core\Event\UpdatePositionEvent;
 /**
  * Class ModuleController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class ModuleController extends AbstractCrudController
 {
+
+    protected $moduleErrors = [];
+
     public function __construct()
     {
         parent::__construct(
@@ -88,9 +94,9 @@ class ModuleController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('module_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('module_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -159,7 +165,10 @@ class ModuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'modules',
-            array('module_order' => $currentOrder)
+            array(
+                'module_order'  => $currentOrder,
+                'module_errors' => $this->moduleErrors
+            )
         );
     }
 
@@ -187,8 +196,14 @@ class ModuleController extends AbstractCrudController
     {
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
 
-        $moduleManagement = new ModuleManagement();
-        $moduleManagement->updateModules();
+        try {
+            $moduleManagement = new ModuleManagement();
+            $moduleManagement->updateModules();
+        } catch (InvalidModuleException $ex) {
+            $this->moduleErrors = $ex->getErrors();
+        } catch (Exception $ex) {
+            Tlog::getInstance()->addError("Failed to list modules:", $ex);
+        }
 
         return $this->renderList();
     }
@@ -288,12 +303,13 @@ class ModuleController extends AbstractCrudController
     public function installAction()
     {
 
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)){
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)) {
             return $response;
         }
 
-
-        $message = false;
+        $newModule        = null;
+        $moduleDefinition = null;
+        $message          = false;
 
         $moduleInstall = new ModuleInstallForm($this->getRequest());
 
@@ -301,7 +317,7 @@ class ModuleController extends AbstractCrudController
             $form = $this->validateForm($moduleInstall, "post");
 
             $moduleDefinition = $moduleInstall->getModuleDefinition();
-            $modulePath       = $moduleInstall->getModuleTemporyPath();
+            $modulePath       = $moduleInstall->getModulePath();
 
             /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
             $file = $form->get("module")->getData();
@@ -309,16 +325,24 @@ class ModuleController extends AbstractCrudController
             $moduleInstallEvent = new ModuleInstallEvent();
             $moduleInstallEvent
                 ->setModulePath($modulePath)
-                ->setModuleDefinition($moduleDefinition)
-            ;
+                ->setModuleDefinition($moduleDefinition);
 
             $this->dispatch(TheliaEvents::MODULE_INSTALL, $moduleInstallEvent);
 
             $newModule = $moduleInstallEvent->getModule();
 
             if (null !== $newModule) {
-                $response = $this->generateRedirectFromRoute('admin.module');
-                return $response;
+
+                $this->getSession()->getFlashBag()->add(
+                    'module-installed',
+                    $this->getTranslator()->trans(
+                        'The module %module has been installed successfully.',
+                        ['%module' => $moduleDefinition->getCode()]
+                    )
+                );
+
+                return $this->generateRedirectFromRoute('admin.module');
+
             } else {
                 $message = $this->getTranslator()->trans(
                     "Sorry, an error occured."
@@ -338,12 +362,9 @@ class ModuleController extends AbstractCrudController
 
             $this->getParserContext()
                 ->addForm($moduleInstall)
-                ->setGeneralError($message)
-            ;
+                ->setGeneralError($message);
 
             return $this->render("modules");
-        } else {
-            return $this->generateRedirectFromRoute('admin.module');
         }
 
     }

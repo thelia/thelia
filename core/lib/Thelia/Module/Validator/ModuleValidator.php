@@ -13,28 +13,22 @@
 namespace Thelia\Module\Validator;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\Finder\Finder;
-use Thelia\Action\Lang;
 use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
-use Thelia\Exception\InvalidModuleException;
 use Thelia\Exception\ModuleException;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\LangQuery;
-use Thelia\Model\Map\LangTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptorValidator;
 
-
 /**
  * Class ModuleValidartor
- * @package MarketPlace\Module
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @package Thelia\Module\Validator
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleValidator {
+class ModuleValidator
+{
 
     protected $modulePath;
 
@@ -50,7 +44,7 @@ class ModuleValidator {
     /** @var array array of errors */
     protected $errors = [];
 
-    function __construct($modulePath = null)
+    public function __construct($modulePath = null)
     {
         $this->modulePath = $modulePath;
 
@@ -97,8 +91,6 @@ class ModuleValidator {
         return $this->errors;
     }
 
-
-
     public function load()
     {
         $this->checkDirectoryStructure();
@@ -108,12 +100,11 @@ class ModuleValidator {
         $this->loadModuleDefinition();
     }
 
-
     public function validate()
     {
         $this->load();
 
-        if (null === $this->moduleDescriptor){
+        if (null === $this->moduleDescriptor) {
             throw new Exception(
                 $this->translator->trans(
                     "The module definition has not been initialized."
@@ -131,24 +122,23 @@ class ModuleValidator {
 
     }
 
-
     protected function checkDirectoryStructure()
     {
-        if (false === file_exists($this->modulePath)){
+        if (false === file_exists($this->modulePath)) {
             throw new FileNotFoundException(
                 $this->translator->trans("Module directory doesn't exist.")
             );
         }
 
         $path = sprintf("%s/Config/module.xml", $this->modulePath);
-        if (false === file_exists($path)){
+        if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->translator->trans("Module should have a module.xml in the Config directory.")
             );
         }
 
         $path = sprintf("%s/Config/config.xml", $this->modulePath);
-        if (false === file_exists($path)){
+        if (false === file_exists($path)) {
             throw new FileNotFoundException(
                 $this->translator->trans("Module should have a config.xml in the Config directory.")
             );
@@ -171,7 +161,7 @@ class ModuleValidator {
 
     public function loadModuleDefinition()
     {
-        if (null === $this->moduleDescriptor){
+        if (null === $this->moduleDescriptor) {
             throw new Exception(
                 $this->translator->trans(
                     "The module descriptor has not been initialized."
@@ -180,6 +170,8 @@ class ModuleValidator {
         }
 
         $moduleDefinition = new ModuleDefinition();
+
+        $moduleDefinition->setCode(basename($this->modulePath));
         $moduleDefinition->setNamespace((string) $this->moduleDescriptor->fullnamespace);
         $moduleDefinition->setVersion((string) $this->moduleDescriptor->version);
 
@@ -192,23 +184,22 @@ class ModuleValidator {
         $descriptives = [];
         foreach ($this->moduleDescriptor->descriptive as $descriptive) {
             $descriptives[(string) $descriptive['locale']] = [
-                'title' => (string) $descriptive->title,
-                'subtitle' => (string) $descriptive->subtitle,
-                'description' => (string) $descriptive->description,
+                'title'        => (string) $descriptive->title,
+                'subtitle'     => (string) $descriptive->subtitle,
+                'description'  => (string) $descriptive->description,
                 'postscriptum' => (string) $descriptive->postscriptum,
             ];
         }
         $moduleDefinition->setDescriptives($descriptives);
 
         $dependencies = [];
-        foreach ($this->moduleDescriptor->required as $dependency) {
+        foreach ($this->moduleDescriptor->required->module as $dependency) {
             $dependencies[] = [
-                (string) $dependency->module,
-                (string) $dependency->module['version'],
+                (string) $dependency,
+                (string) $dependency['version'],
             ];
         }
         $moduleDefinition->setDependencies($dependencies);
-
 
         $moduleDefinition->setLogo((string) $this->moduleDescriptor->logo);
         $moduleDefinition->setMinVersion((string) $this->moduleDescriptor->min);
@@ -255,7 +246,7 @@ class ModuleValidator {
         $module = ModuleQuery::create()
             ->findOneByFullNamespace($this->moduleDefinition->getNamespace());
 
-        if (null !== $module){
+        if (null !== $module) {
             if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
                 throw new ModuleException(
                     $this->translator->trans(
@@ -272,26 +263,31 @@ class ModuleValidator {
         $errors = [];
 
         foreach ($this->moduleDefinition->getDependencies() as $dependency) {
+
             $module = ModuleQuery::create()
-                ->findOneByFullNamespace($dependency[0]);
+                ->findOneByCode($dependency[0])
+            ;
 
             $pass = false;
 
-            if (null !== $module){
+            if (null !== $module) {
                 if ($module->getActivate() !== BaseModule::IS_ACTIVATED) {
-                    if ("" != $dependency[1] &&
-                        version_compare($module->getVersion(), $dependency[1], ">=")) {
+
+                    if ("" == $dependency[1] ||
+                        version_compare($module->getVersion(), $dependency[1], ">=")
+                    ) {
                         $pass = true;
                     }
+
                 }
             }
 
-            if (false === $pass){
-                if ('' !== $dependency[1]){
+            if (false === $pass) {
+                if ('' !== $dependency[1]) {
                     $errors[] = $this->translator->trans(
                         '%module (version: %version)',
                         [
-                            '%module' => $dependency[0],
+                            '%module'  => $dependency[0],
                             '%version' => $dependency[1]
                         ]
                     );
@@ -302,14 +298,15 @@ class ModuleValidator {
 
         }
 
-        if (count($errors) > 0){
+        if (count($errors) > 0) {
             $errors = $this->translator->trans(
-                'The module required this activated modules : %modules',
+                'The module requires this activated modules : %modules',
                 ['%modules' => implode(', ', $errors)]
             );
 
             throw new ModuleException($errors);
         }
+
     }
 
-} 
+}

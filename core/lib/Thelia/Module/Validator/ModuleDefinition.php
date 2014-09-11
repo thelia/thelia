@@ -12,14 +12,15 @@
 
 namespace Thelia\Module\Validator;
 
-
-
 /**
  * Class ModuleDefinition
- * @package MarketPlace\Module
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @package Thelia\Module\Validator
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleDefinition {
+class ModuleDefinition
+{
+
+    protected $code;
 
     protected $namespace;
 
@@ -44,6 +45,22 @@ class ModuleDefinition {
     protected $stability;
 
     protected $authors;
+
+    /**
+     * @param mixed $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
     /**
      * @param mixed $authors
@@ -252,6 +269,5 @@ class ModuleDefinition {
     {
         return $this->dependencies;
     }
-
 
 }
