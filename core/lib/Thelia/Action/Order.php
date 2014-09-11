@@ -38,6 +38,8 @@ use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Tools\I18n;
 
 /**
@@ -252,6 +254,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setOrderId($placedOrder->getId())
                 ->setProductRef($product->getRef())
                 ->setProductSaleElementsRef($pse->getRef())
+                ->setProductSaleElementsId($pse->getId())
                 ->setTitle($productI18n->getTitle())
                 ->setChapo($productI18n->getChapo())
                 ->setDescription($productI18n->getDescription())
@@ -413,11 +416,53 @@ class Order extends BaseAction implements EventSubscriberInterface
     public function updateStatus(OrderEvent $event)
     {
         $order = $event->getOrder();
+        $status = $event->getStatus();
+
+        $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
+
+        if ($status == $canceledStatus || $order->getStatusId() == $canceledStatus ) {
+
+            $this->updateQuantity($event->getOrder(),$status,$canceledStatus);
+        }
 
         $order->setStatusId($event->getStatus());
         $order->save();
 
         $event->setOrder($order);
+    }
+
+    /**
+     * @param ModelOrder $order
+     */
+    public function updateQuantity(ModelOrder $order,$status,$canceledStatus)
+    {
+        $orderProductList = $order->getOrderProducts();
+
+        /** @var OrderProduct  $orderProduct */
+        foreach ($orderProductList as $orderProduct) {
+
+            $productSaleElementsId = $orderProduct->getProductSaleElementsId();
+
+            /** @var ProductSaleElements $productSaleElements */
+            if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
+
+                if ($status == $canceledStatus) {
+
+                    $productSaleElements->setQuantity($productSaleElements->getQuantity() + $orderProduct->getQuantity());
+                } else {
+
+                    /* check still in stock */
+                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+                        throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock");
+                    }
+
+                    $productSaleElements->setQuantity($productSaleElements->getQuantity() - $orderProduct->getQuantity());
+                }
+
+                $productSaleElements->save();
+
+            }
+        }
     }
 
     /**

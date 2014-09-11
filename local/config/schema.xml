@@ -691,6 +691,7 @@
     <column name="order_id" required="true" type="INTEGER" />
     <column name="product_ref" required="true" size="255" type="VARCHAR" />
     <column name="product_sale_elements_ref" required="true" size="255" type="VARCHAR" />
+    <column name="product_sale_elements_id" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="description" type="CLOB" />
