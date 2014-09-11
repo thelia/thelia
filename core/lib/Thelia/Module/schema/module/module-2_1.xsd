@@ -86,7 +86,7 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="tags" minOccurs="1" maxOccurs="1">
+                <xs:element name="tags" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Module tags</xs:documentation>
                     </xs:annotation>
@@ -98,7 +98,7 @@
                 </xs:element>
                 <xs:element name="required" minOccurs="0" maxOccurs="1">
                     <xs:annotation>
-                        <xs:documentation>Plugins that should be presents</xs:documentation>
+                        <xs:documentation>Plugins that should be presents. Plugins are identified by their codes and an optional minimal version</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
