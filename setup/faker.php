@@ -641,6 +641,7 @@ try {
                 ->setOrderId($placedOrder->getId())
                 ->setProductRef($product->getRef())
                 ->setProductSaleElementsRef($pse->getRef())
+                ->setProductSaleElementsId($pse->id())
                 ->setTitle($product->getTitle())
                 ->setChapo($product->getChapo())
                 ->setDescription($product->getDescription())
