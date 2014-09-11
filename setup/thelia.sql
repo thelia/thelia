@@ -812,6 +812,7 @@ CREATE TABLE `order_product`
     `order_id` INTEGER NOT NULL,
     `product_ref` VARCHAR(255) NOT NULL,
     `product_sale_elements_ref` VARCHAR(255) NOT NULL,
+    `product_sale_elements_id` INTEGER,
     `title` VARCHAR(255),
     `chapo` TEXT,
     `description` LONGTEXT,
