@@ -1,3 +1,6 @@
+#2.0.4
+-Updating stock when changing order : canceled status
+
 #2.0.3
 - Fix js syntax in order-delivery template
 - price are now save without any round.
