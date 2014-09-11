@@ -105,6 +105,7 @@
         <service id="smarty.plugin.flashMessage" class="Thelia\Core\Template\Smarty\Plugins\FlashMessage" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request" />
+            <argument type="service" id="thelia.translator" />
         </service>
 
         <service id="smarty.plugin.esi" class="Thelia\Core\Template\Smarty\Plugins\Esi" scope="request">
