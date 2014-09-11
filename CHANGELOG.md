@@ -13,7 +13,7 @@
 - Improved other emails (specially text versions)
 - Added ORDER_SEND_NOTIFICATION_EMAIL event
 - class-loader component is removed, it was not used anymore.
-- Opdating stock when changing order : canceled status
+- Updating stock when changing order : canceled status
 
 
 ##DEPRECATED
