@@ -14,9 +14,11 @@ namespace Thelia\Action;
 
 use Exception;
 use Propel\Runtime\Propel;
+use SplFileInfo;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
@@ -28,16 +30,16 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
-use Thelia\Form\ModuleInstallForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Module\ModuleManagement;
 
 /**
  * Class Module
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class Module extends BaseAction implements EventSubscriberInterface
 {
@@ -134,8 +136,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 ->setTitle($event->getTitle())
                 ->setChapo($event->getChapo())
                 ->setDescription($event->getDescription())
-                ->setPostscriptum($event->getPostscriptum())
-            ;
+                ->setPostscriptum($event->getPostscriptum());
 
             $module->save();
 
@@ -143,9 +144,12 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
-
     /**
      * @param \Thelia\Core\Event\Module\ModuleInstallEvent $event
+     *
+     * @throws \Exception
+     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws \Exception
      */
     public function install(ModuleInstallEvent $event)
     {
@@ -155,10 +159,12 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         $dispatcher = $event->getDispatcher();
 
+        $fs = new Filesystem();
+
         $activated = false;
 
         // check existing module
-        if (null !== $oldModule){
+        if (null !== $oldModule) {
             $activated = $oldModule->getActivate();
 
             if ($activated) {
@@ -170,6 +176,8 @@ class Module extends BaseAction implements EventSubscriberInterface
             }
 
             // delete
+            $modulePath = $oldModule->getAbsoluteBaseDir();
+
             $deleteEvent = new ModuleDeleteEvent($oldModule);
             $deleteEvent->setDispatcher($dispatcher);
 
@@ -177,21 +185,45 @@ class Module extends BaseAction implements EventSubscriberInterface
                 $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
             } catch (Exception $ex) {
 
+                // if module has not been deleted
+                if ($fs->exists($modulePath)) {
+                    throw $ex;
+                }
             }
-
-            // clear cache
-
         }
+
         // move new module
+        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, basename($event->getModulePath()));
+        try {
+            $fs->mirror($event->getModulePath(), $modulePath);
+        } catch (IOException $ex) {
+            if (!$fs->exists($modulePath)) {
+                throw $ex;
+            }
+        }
+
+        // Update the module
+        $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
+        $moduleManagement     = new ModuleManagement();
+        $file                 = new SplFileInfo($moduleDescriptorFile);
+        $module               = $moduleManagement->updateModule($file);
 
         // activate if old was activated
+        if ($activated) {
+            $toggleEvent = new ModuleToggleActivationEvent($module);
+            $toggleEvent->setDispatcher($dispatcher);
 
+            $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
+        }
+
+        $event->setModule($module);
     }
 
     /**
      * Call the payment method of the payment module of the given order
      *
-     * @param  OrderPaymentEvent $event
+     * @param OrderPaymentEvent $event
+     *
      * @throws \RuntimeException if no payment module can be found.
      */
     public function pay(OrderPaymentEvent $event)
@@ -265,11 +297,11 @@ class Module extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128),
-            TheliaEvents::MODULE_UPDATE_POSITION => array('updatePosition', 128),
-            TheliaEvents::MODULE_DELETE => array('delete', 128),
-            TheliaEvents::MODULE_UPDATE => array('update', 128),
-            TheliaEvents::MODULE_INSTALL => array('install', 128),
-            TheliaEvents::MODULE_PAY => array('pay', 128),
+            TheliaEvents::MODULE_UPDATE_POSITION   => array('updatePosition', 128),
+            TheliaEvents::MODULE_DELETE            => array('delete', 128),
+            TheliaEvents::MODULE_UPDATE            => array('update', 128),
+            TheliaEvents::MODULE_INSTALL           => array('install', 128),
+            TheliaEvents::MODULE_PAY               => array('pay', 128),
         );
     }
 }

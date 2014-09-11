@@ -13,26 +13,23 @@
 namespace Thelia\Form;
 
 use Exception;
-use MarketPlace\MarketPlace;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\InvalidModuleException;
-use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
+use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Module\Validator\ModuleValidator;
 use ZipArchive;
 
-
 /**
  * Class ProductCreationForm
- * @package MarketPlace\Form
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * @package Thelia\Form
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleInstallForm  extends BaseForm {
+class ModuleInstallForm extends BaseForm
+{
 
-
-    /** @var ModuleDefinition  */
+    /** @var ModuleDefinition */
     protected $moduleDefinition = null;
 
     protected $modulePath = null;
@@ -45,11 +42,11 @@ class ModuleInstallForm  extends BaseForm {
                 'module',
                 'file',
                 [
-                    'required' => true,
+                    'required'    => true,
                     'constraints' => array(
                         new Constraints\File(
                             array(
-                                'mimeTypes' => array(
+                                'mimeTypes'        => array(
                                     'application/zip'
                                 ),
                                 'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file')
@@ -61,13 +58,12 @@ class ModuleInstallForm  extends BaseForm {
                             )
                         ))
                     ),
-                    'label' => Translator::getInstance()->trans('The module zip file'),
-                    'label_attr' => [
+                    'label'       => Translator::getInstance()->trans('The module zip file'),
+                    'label_attr'  => [
                         'for' => 'module'
                     ]
                 ]
-            )
-        ;
+            );
 
     }
 
@@ -81,7 +77,7 @@ class ModuleInstallForm  extends BaseForm {
 
         $modulePath = $this->unzipModule($file);
 
-        if ($modulePath !== false){
+        if ($modulePath !== false) {
 
             try {
                 // get the first directory
@@ -102,13 +98,12 @@ class ModuleInstallForm  extends BaseForm {
 
                 $this->moduleDefinition = $moduleValidator->getModuleDefinition();
 
-            } catch (Exception $ex){
+            } catch (Exception $ex) {
 
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         "The module is not valid : %message",
-                        array('%message' => $ex->getMessage()),
-                        MarketPlace::MESSAGE_DOMAIN
+                        array('%message' => $ex->getMessage())
                     )
                 );
 
@@ -129,7 +124,6 @@ class ModuleInstallForm  extends BaseForm {
         return $this->modulePath;
     }
 
-
     /**
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
@@ -138,7 +132,7 @@ class ModuleInstallForm  extends BaseForm {
     protected function unzipModule($file)
     {
         $extractPath = false;
-        $zip = new ZipArchive();
+        $zip         = new ZipArchive();
         if ($zip->open($file->getRealPath()) === true) {
 
             $extractPath = $this->tempdir();
@@ -158,7 +152,7 @@ class ModuleInstallForm  extends BaseForm {
 
     protected function tempdir()
     {
-        $tempfile = tempnam(sys_get_temp_dir(),'');
+        $tempfile = tempnam(sys_get_temp_dir(), '');
         if (file_exists($tempfile)) {
             unlink($tempfile);
         }
@@ -170,17 +164,18 @@ class ModuleInstallForm  extends BaseForm {
         return false;
     }
 
-    protected function getDirContents($dir){
+    protected function getDirContents($dir)
+    {
 
         $paths = array_diff(scandir($dir), array('..', '.'));
 
         $out = [
             'directories' => [],
-            'files' => [],
+            'files'       => [],
         ];
 
-        foreach($paths as $path){
-            if(is_dir($dir . DS .$path)){
+        foreach ($paths as $path) {
+            if (is_dir($dir . DS . $path)) {
                 $out['directories'][] = $path;
             } else {
                 $out['files'][] = $path;
@@ -192,7 +187,7 @@ class ModuleInstallForm  extends BaseForm {
 
     public function getName()
     {
-        return "marketplace_product_module_creation";
+        return "module_install";
     }
 
 }

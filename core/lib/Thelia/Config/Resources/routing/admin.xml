@@ -1070,6 +1070,11 @@
     <route id="admin.module.update-position" path="/admin/module/update-position">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::updatePositionAction</default>
     </route>
+
+    <route id="admin.module.install" path="/admin/module/install" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
+    </route>
+
     <!--
         Generic module route.
         Will be use if module route is not define in module own config file.
@@ -1078,9 +1083,6 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::configureAction</default>
     </route>
 
-    <route id="admin.module.install" path="/admin/module/install" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
-    </route>
 
 
     <!-- end Modules rule management -->

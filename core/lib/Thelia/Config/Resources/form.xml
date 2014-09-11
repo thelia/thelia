@@ -127,6 +127,7 @@
         <form name="thelia.system-logs.configuration" class="Thelia\Form\SystemLogConfigurationForm"/>
 
         <form name="thelia.admin.module.modification" class="Thelia\Form\ModuleModificationForm"/>
+        <form name="thelia.admin.module.install" class="Thelia\Form\ModuleInstallForm"/>
 
         <form name="thelia.admin.hook.creation" class="Thelia\Form\HookCreationForm"/>
         <form name="thelia.admin.hook.modification" class="Thelia\Form\HookModificationForm"/>
