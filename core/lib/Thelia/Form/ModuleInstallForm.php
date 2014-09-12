@@ -73,8 +73,6 @@ class ModuleInstallForm extends BaseForm
      */
     public function checkModuleValidity($file, ExecutionContextInterface $context)
     {
-        Tlog::getInstance()->warning(sprintf(" GUGU %s", print_r($file, true)));
-
         $modulePath = $this->unzipModule($file);
 
         if ($modulePath !== false) {

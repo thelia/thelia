@@ -356,7 +356,7 @@ class ModuleController extends AbstractCrudController
             }
 
         } catch (FormValidationException $e) {
-            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()]);
+            $message = $e->getMessage();
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()]);
         }
