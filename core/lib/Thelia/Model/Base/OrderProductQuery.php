@@ -25,6 +25,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery orderByOrderId($order = Criteria::ASC) Order by the order_id column
  * @method     ChildOrderProductQuery orderByProductRef($order = Criteria::ASC) Order by the product_ref column
  * @method     ChildOrderProductQuery orderByProductSaleElementsRef($order = Criteria::ASC) Order by the product_sale_elements_ref column
+ * @method     ChildOrderProductQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildOrderProductQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method     ChildOrderProductQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
  * @method     ChildOrderProductQuery orderByDescription($order = Criteria::ASC) Order by the description column
@@ -48,6 +49,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery groupByOrderId() Group by the order_id column
  * @method     ChildOrderProductQuery groupByProductRef() Group by the product_ref column
  * @method     ChildOrderProductQuery groupByProductSaleElementsRef() Group by the product_sale_elements_ref column
+ * @method     ChildOrderProductQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildOrderProductQuery groupByTitle() Group by the title column
  * @method     ChildOrderProductQuery groupByChapo() Group by the chapo column
  * @method     ChildOrderProductQuery groupByDescription() Group by the description column
@@ -90,6 +92,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneByOrderId(int $order_id) Return the first ChildOrderProduct filtered by the order_id column
  * @method     ChildOrderProduct findOneByProductRef(string $product_ref) Return the first ChildOrderProduct filtered by the product_ref column
  * @method     ChildOrderProduct findOneByProductSaleElementsRef(string $product_sale_elements_ref) Return the first ChildOrderProduct filtered by the product_sale_elements_ref column
+ * @method     ChildOrderProduct findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildOrderProduct filtered by the product_sale_elements_id column
  * @method     ChildOrderProduct findOneByTitle(string $title) Return the first ChildOrderProduct filtered by the title column
  * @method     ChildOrderProduct findOneByChapo(string $chapo) Return the first ChildOrderProduct filtered by the chapo column
  * @method     ChildOrderProduct findOneByDescription(string $description) Return the first ChildOrderProduct filtered by the description column
@@ -113,6 +116,7 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findByOrderId(int $order_id) Return ChildOrderProduct objects filtered by the order_id column
  * @method     array findByProductRef(string $product_ref) Return ChildOrderProduct objects filtered by the product_ref column
  * @method     array findByProductSaleElementsRef(string $product_sale_elements_ref) Return ChildOrderProduct objects filtered by the product_sale_elements_ref column
+ * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildOrderProduct objects filtered by the product_sale_elements_id column
  * @method     array findByTitle(string $title) Return ChildOrderProduct objects filtered by the title column
  * @method     array findByChapo(string $chapo) Return ChildOrderProduct objects filtered by the chapo column
  * @method     array findByDescription(string $description) Return ChildOrderProduct objects filtered by the description column
@@ -219,7 +223,7 @@ abstract class OrderProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `PRODUCT_SALE_ELEMENTS_REF`, `TITLE`, `CHAPO`, `DESCRIPTION`, `POSTSCRIPTUM`, `VIRTUAL`, `VIRTUAL_DOCUMENT`, `QUANTITY`, `PRICE`, `PROMO_PRICE`, `WAS_NEW`, `WAS_IN_PROMO`, `WEIGHT`, `EAN_CODE`, `TAX_RULE_TITLE`, `TAX_RULE_DESCRIPTION`, `PARENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `PRODUCT_SALE_ELEMENTS_REF`, `PRODUCT_SALE_ELEMENTS_ID`, `TITLE`, `CHAPO`, `DESCRIPTION`, `POSTSCRIPTUM`, `VIRTUAL`, `VIRTUAL_DOCUMENT`, `QUANTITY`, `PRICE`, `PROMO_PRICE`, `WAS_NEW`, `WAS_IN_PROMO`, `WEIGHT`, `EAN_CODE`, `TAX_RULE_TITLE`, `TAX_RULE_DESCRIPTION`, `PARENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -448,6 +452,47 @@ abstract class OrderProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_REF, $productSaleElementsRef, $comparison);
+    }
+
+    /**
+     * Filter the query on the product_sale_elements_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByProductSaleElementsId(1234); // WHERE product_sale_elements_id = 1234
+     * $query->filterByProductSaleElementsId(array(12, 34)); // WHERE product_sale_elements_id IN (12, 34)
+     * $query->filterByProductSaleElementsId(array('min' => 12)); // WHERE product_sale_elements_id > 12
+     * </code>
+     *
+     * @param     mixed $productSaleElementsId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByProductSaleElementsId($productSaleElementsId = null, $comparison = null)
+    {
+        if (is_array($productSaleElementsId)) {
+            $useMinMax = false;
+            if (isset($productSaleElementsId['min'])) {
+                $this->addUsingAlias(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($productSaleElementsId['max'])) {
+                $this->addUsingAlias(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
     }
 
     /**
