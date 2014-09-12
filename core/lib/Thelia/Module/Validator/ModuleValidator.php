@@ -38,6 +38,8 @@ class ModuleValidator
     /** @var ModuleDefinition */
     protected $moduleDefinition;
 
+    protected $moduleVersion;
+
     /** @var Translator */
     protected $translator;
 
@@ -47,8 +49,6 @@ class ModuleValidator
     public function __construct($modulePath = null)
     {
         $this->modulePath = $modulePath;
-
-        $this->translator = Translator::getInstance();
     }
 
     /**
@@ -84,12 +84,42 @@ class ModuleValidator
     }
 
     /**
+     * @return mixed
+     */
+    public function getModuleVersion()
+    {
+        return $this->moduleVersion;
+    }
+
+
+    /**
      * @return array
      */
     public function getErrors()
     {
         return $this->errors;
     }
+
+    /**
+     * @param \Thelia\Core\Translation\Translator $translator
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
+     * @return \Thelia\Core\Translation\Translator
+     */
+    public function getTranslator()
+    {
+        if (null === $this->translator){
+            $this->translator = Translator::getInstance();
+        }
+
+        return $this->translator;
+    }
+
 
     public function load()
     {
@@ -106,7 +136,7 @@ class ModuleValidator
 
         if (null === $this->moduleDescriptor) {
             throw new Exception(
-                $this->translator->trans(
+                $this->getTranslator()->trans(
                     "The module definition has not been initialized."
                 )
             );
@@ -126,21 +156,21 @@ class ModuleValidator
     {
         if (false === file_exists($this->modulePath)) {
             throw new FileNotFoundException(
-                $this->translator->trans("Module directory doesn't exist.")
+                $this->getTranslator()->trans("Module directory doesn't exist.")
             );
         }
 
         $path = sprintf("%s/Config/module.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->translator->trans("Module should have a module.xml in the Config directory.")
+                $this->getTranslator()->trans("Module should have a module.xml in the Config directory.")
             );
         }
 
         $path = sprintf("%s/Config/config.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->translator->trans("Module should have a config.xml in the Config directory.")
+                $this->getTranslator()->trans("Module should have a config.xml in the Config directory.")
             );
         }
     }
@@ -154,6 +184,7 @@ class ModuleValidator
         try {
             // validation with xsd
             $this->moduleDescriptor = $descriptorValidator->getDescriptor($path);
+            $this->moduleVersion    = $descriptorValidator->getModuleVersion();
         } catch (InvalidXmlDocumentException $ex) {
             throw $ex;
         }
@@ -163,7 +194,7 @@ class ModuleValidator
     {
         if (null === $this->moduleDescriptor) {
             throw new Exception(
-                $this->translator->trans(
+                $this->getTranslator()->trans(
                     "The module descriptor has not been initialized."
                 )
             );
@@ -176,8 +207,10 @@ class ModuleValidator
         $moduleDefinition->setVersion((string) $this->moduleDescriptor->version);
 
         $languages = [];
-        foreach ($this->moduleDescriptor->languages->language as $language) {
-            $languages[] = (string) $language;
+        if ($this->getModuleVersion() != "1"){
+            foreach ($this->moduleDescriptor->languages->language as $language) {
+                $languages[] = (string) $language;
+            }
         }
         $moduleDefinition->setLanguages($languages);
 
@@ -193,11 +226,13 @@ class ModuleValidator
         $moduleDefinition->setDescriptives($descriptives);
 
         $dependencies = [];
-        foreach ($this->moduleDescriptor->required->module as $dependency) {
-            $dependencies[] = [
-                (string) $dependency,
-                (string) $dependency['version'],
-            ];
+        if (isset($this->moduleDescriptor->required)){
+            foreach ($this->moduleDescriptor->required->module as $dependency) {
+                $dependencies[] = [
+                    (string) $dependency,
+                    (string) $dependency['version'],
+                ];
+            }
         }
         $moduleDefinition->setDependencies($dependencies);
 
@@ -218,7 +253,7 @@ class ModuleValidator
         if ($this->moduleDefinition->getMinVersion()) {
             if (version_compare(Thelia::THELIA_VERSION, $this->moduleDefinition->getMinVersion(), '<=')) {
                 throw new ModuleException(
-                    $this->translator->trans(
+                    $this->getTranslator()->trans(
                         "The module requires a version of Thelia >= %version",
                         ['%version' => $this->moduleDefinition->getMinVersion()]
                     )
@@ -232,7 +267,7 @@ class ModuleValidator
         if ($this->moduleDefinition->getMaxVersion()) {
             if (version_compare(Thelia::THELIA_VERSION, $this->moduleDefinition->getMaxVersion(), '>=')) {
                 throw new ModuleException(
-                    $this->translator->trans(
+                    $this->getTranslator()->trans(
                         "The module requires a version of Thelia <= %version",
                         ['%version' => $this->moduleDefinition->getMaxVersion()]
                     )
@@ -249,7 +284,7 @@ class ModuleValidator
         if (null !== $module) {
             if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
                 throw new ModuleException(
-                    $this->translator->trans(
+                    $this->getTranslator()->trans(
                         "The module is already installed in the same or greater version."
                     )
                 );
@@ -284,7 +319,7 @@ class ModuleValidator
 
             if (false === $pass) {
                 if ('' !== $dependency[1]) {
-                    $errors[] = $this->translator->trans(
+                    $errors[] = $this->getTranslator()->trans(
                         '%module (version: %version)',
                         [
                             '%module'  => $dependency[0],
@@ -299,7 +334,7 @@ class ModuleValidator
         }
 
         if (count($errors) > 0) {
-            $errors = $this->translator->trans(
+            $errors = $this->getTranslator()->trans(
                 'The module requires this activated modules : %modules',
                 ['%modules' => implode(', ', $errors)]
             );
