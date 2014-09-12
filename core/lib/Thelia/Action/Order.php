@@ -32,7 +32,6 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\MessageQuery;
 use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Order as ModelOrder;
@@ -229,7 +228,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
-            if (0 === $product->getVirtual()){
+            if (0 === $product->getVirtual()) {
                 /* decrease stock for non virtual product */
                 $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
