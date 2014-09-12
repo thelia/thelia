@@ -419,6 +419,11 @@ $(function() {
         } else if ($this.hasClass("pse-assoc-document")) {
             type = "document";
             toggle_event = "switch-change";
+        } else {
+            if ($this.data("type")){
+                type = $this.data("type");
+                toggle_event = "switch-change";
+            }
         }
 
         var $modal_container = $("#pse-modal-container");
@@ -449,8 +454,18 @@ $(function() {
                             $file.addClass("is-associated");
                             $file.parent().append("<span class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></span>");
                         }
+                    } else if (type == "virtual") {
+                        if ( $file.bootstrapSwitch('status') ) {
+                            $(".do-associate").each(function(){
+                                if (type_id != $(this).data("id") && $(this).bootstrapSwitch('status')) {
+                                    $(this).bootstrapSwitch('setState', false);
+                                }
+                            });
+                        }
                     }
+
                 }).fail(function(data) {
+                    var $body = $(".modal-body", $modal_container);
                     $errorMessage = $("<div class='alert alert-danger'>"+data["error"]+"</div>");
 
                     $body.html($errorMessage + $body.html());

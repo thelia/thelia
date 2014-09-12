@@ -79,6 +79,11 @@
         <default key="_controller">Front\Controller\OrderController::generateInvoicePdf</default>
         <requirement key="order_id">\d+</requirement>
     </route>
+
+    <route id="customer.order.product.download" path="/account/download/{order_product_id}">
+        <default key="_controller">Front\Controller\OrderController::downloadVirtualProduct</default>
+        <requirement key="order_product_id">\d+</requirement>
+    </route>
     <!-- end customer routes -->
 
     <!-- customer address routes -->
@@ -148,7 +153,7 @@
     </route>
 
     <route id="order.delivery" path="/order/delivery">
-        <default key="_controller">Thelia\Controller\Front\DefaultController::noAction</default>
+        <default key="_controller">Front\Controller\OrderController::deliverView</default>
         <default key="_view">order-delivery</default>
     </route>
 

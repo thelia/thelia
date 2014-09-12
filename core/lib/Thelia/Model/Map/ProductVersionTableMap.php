@@ -58,7 +58,7 @@ class ProductVersionTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 13;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ProductVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 13;
 
     /**
      * the column name for the ID field
@@ -84,6 +84,11 @@ class ProductVersionTableMap extends TableMap
      * the column name for the REF field
      */
     const REF = 'product_version.REF';
+
+    /**
+     * the column name for the VIRTUAL field
+     */
+    const VIRTUAL = 'product_version.VIRTUAL';
 
     /**
      * the column name for the VISIBLE field
@@ -142,12 +147,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'Ref', 'Visible', 'Position', 'TemplateId', 'BrandId', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'ref', 'visible', 'position', 'templateId', 'brandId', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID, ProductVersionTableMap::TAX_RULE_ID, ProductVersionTableMap::REF, ProductVersionTableMap::VISIBLE, ProductVersionTableMap::POSITION, ProductVersionTableMap::TEMPLATE_ID, ProductVersionTableMap::BRAND_ID, ProductVersionTableMap::CREATED_AT, ProductVersionTableMap::UPDATED_AT, ProductVersionTableMap::VERSION, ProductVersionTableMap::VERSION_CREATED_AT, ProductVersionTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'REF', 'VISIBLE', 'POSITION', 'TEMPLATE_ID', 'BRAND_ID', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'ref', 'visible', 'position', 'template_id', 'brand_id', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'Ref', 'Virtual', 'Visible', 'Position', 'TemplateId', 'BrandId', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'ref', 'virtual', 'visible', 'position', 'templateId', 'brandId', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID, ProductVersionTableMap::TAX_RULE_ID, ProductVersionTableMap::REF, ProductVersionTableMap::VIRTUAL, ProductVersionTableMap::VISIBLE, ProductVersionTableMap::POSITION, ProductVersionTableMap::TEMPLATE_ID, ProductVersionTableMap::BRAND_ID, ProductVersionTableMap::CREATED_AT, ProductVersionTableMap::UPDATED_AT, ProductVersionTableMap::VERSION, ProductVersionTableMap::VERSION_CREATED_AT, ProductVersionTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'REF', 'VIRTUAL', 'VISIBLE', 'POSITION', 'TEMPLATE_ID', 'BRAND_ID', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'ref', 'virtual', 'visible', 'position', 'template_id', 'brand_id', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
     );
 
     /**
@@ -157,12 +162,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Visible' => 3, 'Position' => 4, 'TemplateId' => 5, 'BrandId' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, 'Version' => 9, 'VersionCreatedAt' => 10, 'VersionCreatedBy' => 11, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'templateId' => 5, 'brandId' => 6, 'createdAt' => 7, 'updatedAt' => 8, 'version' => 9, 'versionCreatedAt' => 10, 'versionCreatedBy' => 11, ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID => 0, ProductVersionTableMap::TAX_RULE_ID => 1, ProductVersionTableMap::REF => 2, ProductVersionTableMap::VISIBLE => 3, ProductVersionTableMap::POSITION => 4, ProductVersionTableMap::TEMPLATE_ID => 5, ProductVersionTableMap::BRAND_ID => 6, ProductVersionTableMap::CREATED_AT => 7, ProductVersionTableMap::UPDATED_AT => 8, ProductVersionTableMap::VERSION => 9, ProductVersionTableMap::VERSION_CREATED_AT => 10, ProductVersionTableMap::VERSION_CREATED_BY => 11, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'TEMPLATE_ID' => 5, 'BRAND_ID' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, 'VERSION' => 9, 'VERSION_CREATED_AT' => 10, 'VERSION_CREATED_BY' => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'template_id' => 5, 'brand_id' => 6, 'created_at' => 7, 'updated_at' => 8, 'version' => 9, 'version_created_at' => 10, 'version_created_by' => 11, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Virtual' => 3, 'Visible' => 4, 'Position' => 5, 'TemplateId' => 6, 'BrandId' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'Version' => 10, 'VersionCreatedAt' => 11, 'VersionCreatedBy' => 12, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'virtual' => 3, 'visible' => 4, 'position' => 5, 'templateId' => 6, 'brandId' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'version' => 10, 'versionCreatedAt' => 11, 'versionCreatedBy' => 12, ),
+        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID => 0, ProductVersionTableMap::TAX_RULE_ID => 1, ProductVersionTableMap::REF => 2, ProductVersionTableMap::VIRTUAL => 3, ProductVersionTableMap::VISIBLE => 4, ProductVersionTableMap::POSITION => 5, ProductVersionTableMap::TEMPLATE_ID => 6, ProductVersionTableMap::BRAND_ID => 7, ProductVersionTableMap::CREATED_AT => 8, ProductVersionTableMap::UPDATED_AT => 9, ProductVersionTableMap::VERSION => 10, ProductVersionTableMap::VERSION_CREATED_AT => 11, ProductVersionTableMap::VERSION_CREATED_BY => 12, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'VIRTUAL' => 3, 'VISIBLE' => 4, 'POSITION' => 5, 'TEMPLATE_ID' => 6, 'BRAND_ID' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, 'VERSION' => 10, 'VERSION_CREATED_AT' => 11, 'VERSION_CREATED_BY' => 12, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'virtual' => 3, 'visible' => 4, 'position' => 5, 'template_id' => 6, 'brand_id' => 7, 'created_at' => 8, 'updated_at' => 9, 'version' => 10, 'version_created_at' => 11, 'version_created_by' => 12, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
     );
 
     /**
@@ -184,6 +189,7 @@ class ProductVersionTableMap extends TableMap
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product', 'ID', true, null, null);
         $this->addColumn('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', false, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
+        $this->addColumn('VIRTUAL', 'Virtual', 'TINYINT', true, null, 0);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, 0);
         $this->addColumn('TEMPLATE_ID', 'TemplateId', 'INTEGER', false, null, null);
@@ -270,11 +276,11 @@ class ProductVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 9 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 10 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 9 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 10 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -393,6 +399,7 @@ class ProductVersionTableMap extends TableMap
             $criteria->addSelectColumn(ProductVersionTableMap::ID);
             $criteria->addSelectColumn(ProductVersionTableMap::TAX_RULE_ID);
             $criteria->addSelectColumn(ProductVersionTableMap::REF);
+            $criteria->addSelectColumn(ProductVersionTableMap::VIRTUAL);
             $criteria->addSelectColumn(ProductVersionTableMap::VISIBLE);
             $criteria->addSelectColumn(ProductVersionTableMap::POSITION);
             $criteria->addSelectColumn(ProductVersionTableMap::TEMPLATE_ID);
@@ -406,6 +413,7 @@ class ProductVersionTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
             $criteria->addSelectColumn($alias . '.REF');
+            $criteria->addSelectColumn($alias . '.VIRTUAL');
             $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.TEMPLATE_ID');

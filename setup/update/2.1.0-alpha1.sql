@@ -1973,6 +1973,21 @@ ALTER TABLE  `order_product`
   ADD  `product_sale_elements_id` INT NOT NULL
   AFTER  `product_sale_elements_ref`;
 
+
+# ======================================================================================================================
+# Allow negative stock
+# ======================================================================================================================
+
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+  ('allow_negative_stock', '0', 0, 0, NOW(), NOW());
+
+SELECT @max_id := MAX(`id`) FROM `config`;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@max_id, 'en_US', 'Allow negative product stock (1) or not (0, default)', NULL, NULL, NULL),
+  (@max_id, 'fr_FR', 'Autoriser un stock négatif sur les produits (1) ou pas (0, défaut)', NULL, NULL, NULL);
+
+
 # ======================================================================================================================
 # End of changes
 # ======================================================================================================================

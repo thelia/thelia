@@ -46,6 +46,10 @@ class ProductModificationForm extends ProductCreationForm
                     'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
                 ],
             ])
+            ->add("virtual_document_id", "integer", array(
+                "label"      => Translator::getInstance()->trans("Virtual document"),
+                "label_attr" => array("for" => "virtual_document_id_field")
+            ))
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class

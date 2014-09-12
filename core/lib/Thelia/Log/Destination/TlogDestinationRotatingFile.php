@@ -68,7 +68,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $deleteCount = 1 + $files->count() - $maxCount;
 
             if ($deleteCount > 0) {
-                foreach($files as $file) {
+                foreach ($files as $file) {
                     @unlink($file);
 
                     if (--$deleteCount <= 0) break;

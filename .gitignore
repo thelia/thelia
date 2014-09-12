@@ -36,13 +36,14 @@ local/modules/*
 !local/modules/Tinymce/
 !local/modules/Colissimo/
 !local/modules/Hook*/
+!local/modules/VirtualProductDelivery/
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
-!templates/backOffice/default
-!templates/email/default
-!templates/frontOffice/default
-!templates/pdf/default
+!templates/backOffice/default/
+!templates/email/default/
+!templates/frontOffice/default/
+!templates/pdf/default/
 
 #Ignore CodeKit
 codekit-config.json

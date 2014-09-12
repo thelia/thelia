@@ -190,6 +190,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.metadata" class="Thelia\Action\MetaData">
+            <tag name="kernel.event_subscriber" />
+        </service>
+
     </services>
 
 </config>

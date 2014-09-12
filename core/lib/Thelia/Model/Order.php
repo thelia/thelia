@@ -168,6 +168,22 @@ class Order extends BaseOrder
     }
 
     /**
+     * Check if the current order contains at less 1 virtual product with a file to download
+     *
+     * @return bool true if this order have at less 1 file to download, false otherwise.
+     */
+    public function hasVirtualProduct()
+    {
+        $virtualProductCount = OrderProductQuery::create()
+            ->filterByOrderId($this->getId())
+            ->filterByVirtual(1, Criteria::EQUAL)
+            ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
+            ->count();
+
+        return ($virtualProductCount !== 0);
+    }
+
+    /**
      * Set the status of the current order to NOT PAID
      */
     public function setNotPaid()

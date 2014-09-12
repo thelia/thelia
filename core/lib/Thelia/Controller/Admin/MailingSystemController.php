@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\MailingSystemModificationForm;
@@ -103,4 +104,51 @@ class MailingSystemController extends BaseAdminController
 
         return $response;
     }
+
+    public function testAction()
+    {
+
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) return $response;
+
+        $contactEmail = ConfigQuery::read('store_email');
+        $storeName = ConfigQuery::read('store_name', 'Thelia');
+
+        $json_data = array(
+            "success" => false,
+            "message" => "",
+        );
+
+        if ($contactEmail) {
+
+            $emailTest = $this->getRequest()->get("email", $contactEmail);
+
+            $message = $this->getTranslator()->trans("Email test from : %store%", array("%store%" => $storeName));
+
+            $htmlMessage = "<p>$message</p>";
+
+            $instance = \Swift_Message::newInstance()
+                ->addTo($emailTest, $storeName)
+                ->addFrom($contactEmail, $storeName)
+                ->setSubject($message)
+                ->setBody($message, 'text/plain')
+                ->setBody($htmlMessage, 'text/html')
+            ;
+
+            try {
+                $this->getMailer()->send($instance);
+                $json_data["success"] = true;
+                $json_data["message"] = $this->getTranslator()->trans("Your configuration seems to be ok. Checked out your mailbox : %email%", array("%email%" => $emailTest));
+            } catch (\Exception $ex) {
+                $json_data["message"] = $ex->getMessage();
+            }
+        } else {
+            $json_data["message"] = $this->getTranslator()->trans("You have to configure your store email first !");
+        }
+
+        $response = JsonResponse::create($json_data);
+
+        return $response;
+    }
+
 }

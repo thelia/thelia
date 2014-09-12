@@ -69,6 +69,40 @@
                      </div>
                 {/form_field}
 
+                {form_field form=$form field='virtual'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{intl l='Virtual product'}</label>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $VIRTUAL != 0}checked="checked"{/if}>
+                            {$label}
+                        </label>
+                    </div>
+                </div>
+                {/form_field}
+
+                {if $VIRTUAL != 0}
+                <div id="virtual-product-file" class="form-group {if $error}has-error{/if}">
+                    {if $PSE_COUNT == 1}
+                        {custom_render_form_field form=$form field='virtual_document_id'}
+                        <select {form_field_attributes form=$form field='virtual_document_id' extra_class='document-selector'} >
+                            <option value="0">{intl l="No document"}</option>
+                            {loop name="virtual-documents" type="document" product=$ID visible="0" }
+                            <option value="{$ID}" {if $value == $ID}selected="selected"{/if}>{$TITLE}</option>
+                            {/loop}
+                        </select>
+                        {/custom_render_form_field}
+                    {else}
+                        {form_field form=$form field='virtual_document_id'}
+                            <input type="hidden" name="{$name}" value="-1" />
+                        {/form_field}
+                        <p>
+                            <a href="#prices" data-toggle="tab">{intl l="Associate files to your combinations"}</a>
+                        </p>
+                    {/if}
+                </div>
+                {/if}
+
                 {custom_render_form_field form=$form field='brand_id'}
                     <select {form_field_attributes form=$form field='brand_id'}>
                         <option value="0">{intl l="No brand"}</option>

@@ -51,7 +51,7 @@ class Cart extends BaseCart
             if ($product &&
                 $productSaleElements &&
                 $product->getVisible() == 1 &&
-                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || ! ConfigQuery::checkAvailableStock()))
+                ($productSaleElements->getQuantity() > $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock()))
             {
 
                 $item = new CartItem();
@@ -158,4 +158,22 @@ class Cart extends BaseCart
 
         return $weight;
     }
+
+    /**
+     * Tell if the cart contains only virtual products
+     *
+     * @return bool
+     */
+    public function isVirtual()
+    {
+        foreach ($this->getCartItems() as $cartItem) {
+            $product = $cartItem->getProductSaleElements()->getProduct();
+            if (!$product->getVirtual()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 }

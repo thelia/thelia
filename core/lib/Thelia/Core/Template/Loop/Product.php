@@ -72,6 +72,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
+            Argument::createBooleanOrBothTypeArgument('virtual', Type\BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntTypeArgument('currency'),
             Argument::createAnyTypeArgument('title'),
@@ -300,6 +301,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
             ->set("META_KEYWORDS"           , $product->getVirtualColumn('i18n_META_KEYWORDS'))
             ->set("POSITION"                , $product->getPosition())
+            ->set("VIRTUAL"                 , $product->getVirtual() ? "1" : "0")
             ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
             ->set("TEMPLATE"                , $product->getTemplateId())
             ->set("DEFAULT_CATEGORY"        , $default_category_id)
@@ -570,6 +572,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         if ($visible !== Type\BooleanOrBothType::ANY) {
             $search->filterByVisible($visible ? 1 : 0);
+        }
+
+        $virtual = $this->getVirtual();
+
+        if ($virtual !== Type\BooleanOrBothType::ANY) {
+            $search->filterByVirtual($virtual ? 1 : 0);
         }
 
         $exclude = $this->getExclude();
@@ -852,8 +860,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
 
-        // Check if we have to display the initial price, as defined in an active sale operation
-
         // First join sale_product table...
         $search
             ->leftJoinSaleProduct('SaleProductPriceDisplay')
@@ -972,4 +978,5 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         return $search;
     }
+
 }

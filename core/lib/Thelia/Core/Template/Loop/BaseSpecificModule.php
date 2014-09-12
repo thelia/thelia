@@ -103,7 +103,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 
         $order  = $this->getOrder();
 
-        switch($order) {
+        switch ($order) {
             case "id":
                 $search->orderById(Criteria::ASC);
                 break;

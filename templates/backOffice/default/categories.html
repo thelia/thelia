@@ -302,7 +302,10 @@
                              {/loop}
                              </td>
 
-                             <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a></td>
+                             <td class="object-title">
+                                 <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
+                                 {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                             </td>
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
@@ -591,6 +594,17 @@
 
                 <div class="help-block">{intl l='Enter here the product weight, in Kilogrammes'}</div>
             </div>
+        {/form_field}
+
+        {form_field form=$form field='virtual'}
+        <div class="form-group {if $error}has-error{/if}">
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1">
+                    {$label}
+                </label>
+            </div>
+        </div>
         {/form_field}
 
         {form_field form=$form field='visible'}

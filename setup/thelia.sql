@@ -36,6 +36,7 @@ CREATE TABLE `product`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tax_rule_id` INTEGER,
     `ref` VARCHAR(255) NOT NULL,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
@@ -817,6 +818,8 @@ CREATE TABLE `order_product`
     `chapo` TEXT,
     `description` LONGTEXT,
     `postscriptum` TEXT,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
+    `virtual_document` VARCHAR(255),
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` VARCHAR(45),
@@ -2156,6 +2159,24 @@ CREATE TABLE `module_hook`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- meta_data
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `meta_data`;
+
+CREATE TABLE `meta_data`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `meta_key` VARCHAR(100) NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `is_serialized` TINYINT(1) NOT NULL,
+    `value` LONGTEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -3001,6 +3022,7 @@ CREATE TABLE `product_version`
     `id` INTEGER NOT NULL,
     `tax_rule_id` INTEGER,
     `ref` VARCHAR(255) NOT NULL,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,

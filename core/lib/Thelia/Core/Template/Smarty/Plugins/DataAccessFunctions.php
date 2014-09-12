@@ -28,6 +28,7 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Model\ProductQuery;
@@ -211,6 +212,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case "total_taxed_price_without_discount":
                 $result = $cart->getTaxedAmount($taxCountry, false);
                 break;
+            case "is_virtual":
+                $result = $cart->isVirtual();
+                break;
         }
 
         return $result;
@@ -233,6 +237,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return $order->getDeliveryModuleId();
             case 'payment_module':
                 return $order->getPaymentModuleId();
+            case 'has_virtual_product':
+                return $order->hasVirtualProduct();
+
         }
 
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
@@ -354,6 +361,50 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     }
 
     /**
+     * Retrieve meta data associated to an element
+     *
+     * params should contain at least key an id attributes. Thus it will return
+     * an array of associated datas.
+     *
+     * If meta argument is specified then it will return an unique value.
+     *
+     * @param $params
+     * @param $smarty
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return string|array|null
+     */
+    public function metaAccess($params, $smarty)
+    {
+        $meta = $this->getParam($params, 'meta', null);
+        $key = $this->getParam($params, 'key', null);
+        $id = $this->getParam($params, 'id', null);
+
+        $cacheKey = sprintf('meta_%s_%s_%s', $meta, $key, $id);
+
+        $out = null;
+
+        if (array_key_exists($cacheKey, self::$dataAccessCache)) {
+            return self::$dataAccessCache[$cacheKey];
+        }
+
+        if ($key !== null && $id !== null) {
+            if ($meta === null) {
+                $out = MetaDataQuery::getAllVal($key, (int) $id);
+            } else {
+                $out = MetaDataQuery::getVal($meta, $key, (int) $id);
+            }
+        } else {
+            throw new \InvalidArgumentException("key and id attributes are required in meta access function");
+        }
+
+        self::$dataAccessCache[$cacheKey] = $out;
+
+        return $out;
+    }
+
+    /**
      * @param               $objectLabel
      * @param               $params
      * @param ModelCriteria $search
@@ -415,7 +466,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
-        if (! empty($attribute)) {
+        if (!empty($attribute)) {
 
             if (null != $data) {
 
@@ -426,7 +477,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
 
                 $getter = sprintf("get%s", $this->underscoreToCamelcase($attribute));
                 if (method_exists($data, $getter)) {
-                    $return =  $data->$getter();
+                    $return = $data->$getter();
 
                     if ($return instanceof \DateTime) {
                         if (array_key_exists("format", $params)) {
@@ -492,6 +543,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'order', $this, 'orderDataAccess'),
             new SmartyPluginDescriptor('function', 'config', $this, 'configDataAccess'),
             new SmartyPluginDescriptor('function', 'stats', $this, 'statsAccess'),
+            new SmartyPluginDescriptor('function', 'meta', $this, 'metaAccess'),
         );
     }
 

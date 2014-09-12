@@ -116,6 +116,19 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $postscriptum;
 
     /**
+     * The value for the virtual field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $virtual;
+
+    /**
+     * The value for the virtual_document field.
+     * @var        string
+     */
+    protected $virtual_document;
+
+    /**
      * The value for the quantity field.
      * @var        double
      */
@@ -225,10 +238,23 @@ abstract class OrderProduct implements ActiveRecordInterface
     protected $orderProductTaxesScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->virtual = 0;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\OrderProduct object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -582,6 +608,28 @@ abstract class OrderProduct implements ActiveRecordInterface
     }
 
     /**
+     * Get the [virtual] column value.
+     *
+     * @return   int
+     */
+    public function getVirtual()
+    {
+
+        return $this->virtual;
+    }
+
+    /**
+     * Get the [virtual_document] column value.
+     *
+     * @return   string
+     */
+    public function getVirtualDocument()
+    {
+
+        return $this->virtual_document;
+    }
+
+    /**
      * Get the [quantity] column value.
      *
      * @return   double
@@ -925,6 +973,48 @@ abstract class OrderProduct implements ActiveRecordInterface
     } // setPostscriptum()
 
     /**
+     * Set the value of [virtual] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setVirtual($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->virtual !== $v) {
+            $this->virtual = $v;
+            $this->modifiedColumns[OrderProductTableMap::VIRTUAL] = true;
+        }
+
+
+        return $this;
+    } // setVirtual()
+
+    /**
+     * Set the value of [virtual_document] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
+     */
+    public function setVirtualDocument($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->virtual_document !== $v) {
+            $this->virtual_document = $v;
+            $this->modifiedColumns[OrderProductTableMap::VIRTUAL_DOCUMENT] = true;
+        }
+
+
+        return $this;
+    } // setVirtualDocument()
+
+    /**
      * Set the value of [quantity] column.
      *
      * @param      double $v new value
@@ -1186,6 +1276,10 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->virtual !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -1240,43 +1334,49 @@ abstract class OrderProduct implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : OrderProductTableMap::translateFieldName('Postscriptum', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postscriptum = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderProductTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : OrderProductTableMap::translateFieldName('Virtual', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->virtual = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderProductTableMap::translateFieldName('VirtualDocument', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->virtual_document = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderProductTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderProductTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderProductTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
             $this->price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderProductTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderProductTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo_price = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderProductTableMap::translateFieldName('WasNew', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderProductTableMap::translateFieldName('WasNew', TableMap::TYPE_PHPNAME, $indexType)];
             $this->was_new = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderProductTableMap::translateFieldName('WasInPromo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderProductTableMap::translateFieldName('WasInPromo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->was_in_promo = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderProductTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderProductTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
             $this->weight = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderProductTableMap::translateFieldName('EanCode', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderProductTableMap::translateFieldName('EanCode', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ean_code = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_rule_title = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleDescription', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderProductTableMap::translateFieldName('TaxRuleDescription', TableMap::TYPE_PHPNAME, $indexType)];
             $this->tax_rule_description = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderProductTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
             $this->parent = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1289,7 +1389,7 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 21; // 21 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 23; // 23 = OrderProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderProduct object", 0, $e);
@@ -1590,6 +1690,12 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::POSTSCRIPTUM)) {
             $modifiedColumns[':p' . $index++]  = '`POSTSCRIPTUM`';
         }
+        if ($this->isColumnModified(OrderProductTableMap::VIRTUAL)) {
+            $modifiedColumns[':p' . $index++]  = '`VIRTUAL`';
+        }
+        if ($this->isColumnModified(OrderProductTableMap::VIRTUAL_DOCUMENT)) {
+            $modifiedColumns[':p' . $index++]  = '`VIRTUAL_DOCUMENT`';
+        }
         if ($this->isColumnModified(OrderProductTableMap::QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = '`QUANTITY`';
         }
@@ -1663,6 +1769,12 @@ abstract class OrderProduct implements ActiveRecordInterface
                         break;
                     case '`POSTSCRIPTUM`':
                         $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
+                        break;
+                    case '`VIRTUAL`':
+                        $stmt->bindValue($identifier, $this->virtual, PDO::PARAM_INT);
+                        break;
+                    case '`VIRTUAL_DOCUMENT`':
+                        $stmt->bindValue($identifier, $this->virtual_document, PDO::PARAM_STR);
                         break;
                     case '`QUANTITY`':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
@@ -1790,39 +1902,45 @@ abstract class OrderProduct implements ActiveRecordInterface
                 return $this->getPostscriptum();
                 break;
             case 9:
-                return $this->getQuantity();
+                return $this->getVirtual();
                 break;
             case 10:
-                return $this->getPrice();
+                return $this->getVirtualDocument();
                 break;
             case 11:
-                return $this->getPromoPrice();
+                return $this->getQuantity();
                 break;
             case 12:
-                return $this->getWasNew();
+                return $this->getPrice();
                 break;
             case 13:
-                return $this->getWasInPromo();
+                return $this->getPromoPrice();
                 break;
             case 14:
-                return $this->getWeight();
+                return $this->getWasNew();
                 break;
             case 15:
-                return $this->getEanCode();
+                return $this->getWasInPromo();
                 break;
             case 16:
-                return $this->getTaxRuleTitle();
+                return $this->getWeight();
                 break;
             case 17:
-                return $this->getTaxRuleDescription();
+                return $this->getEanCode();
                 break;
             case 18:
-                return $this->getParent();
+                return $this->getTaxRuleTitle();
                 break;
             case 19:
-                return $this->getCreatedAt();
+                return $this->getTaxRuleDescription();
                 break;
             case 20:
+                return $this->getParent();
+                break;
+            case 21:
+                return $this->getCreatedAt();
+                break;
+            case 22:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1863,18 +1981,20 @@ abstract class OrderProduct implements ActiveRecordInterface
             $keys[6] => $this->getChapo(),
             $keys[7] => $this->getDescription(),
             $keys[8] => $this->getPostscriptum(),
-            $keys[9] => $this->getQuantity(),
-            $keys[10] => $this->getPrice(),
-            $keys[11] => $this->getPromoPrice(),
-            $keys[12] => $this->getWasNew(),
-            $keys[13] => $this->getWasInPromo(),
-            $keys[14] => $this->getWeight(),
-            $keys[15] => $this->getEanCode(),
-            $keys[16] => $this->getTaxRuleTitle(),
-            $keys[17] => $this->getTaxRuleDescription(),
-            $keys[18] => $this->getParent(),
-            $keys[19] => $this->getCreatedAt(),
-            $keys[20] => $this->getUpdatedAt(),
+            $keys[9] => $this->getVirtual(),
+            $keys[10] => $this->getVirtualDocument(),
+            $keys[11] => $this->getQuantity(),
+            $keys[12] => $this->getPrice(),
+            $keys[13] => $this->getPromoPrice(),
+            $keys[14] => $this->getWasNew(),
+            $keys[15] => $this->getWasInPromo(),
+            $keys[16] => $this->getWeight(),
+            $keys[17] => $this->getEanCode(),
+            $keys[18] => $this->getTaxRuleTitle(),
+            $keys[19] => $this->getTaxRuleDescription(),
+            $keys[20] => $this->getParent(),
+            $keys[21] => $this->getCreatedAt(),
+            $keys[22] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1953,39 +2073,45 @@ abstract class OrderProduct implements ActiveRecordInterface
                 $this->setPostscriptum($value);
                 break;
             case 9:
-                $this->setQuantity($value);
+                $this->setVirtual($value);
                 break;
             case 10:
-                $this->setPrice($value);
+                $this->setVirtualDocument($value);
                 break;
             case 11:
-                $this->setPromoPrice($value);
+                $this->setQuantity($value);
                 break;
             case 12:
-                $this->setWasNew($value);
+                $this->setPrice($value);
                 break;
             case 13:
-                $this->setWasInPromo($value);
+                $this->setPromoPrice($value);
                 break;
             case 14:
-                $this->setWeight($value);
+                $this->setWasNew($value);
                 break;
             case 15:
-                $this->setEanCode($value);
+                $this->setWasInPromo($value);
                 break;
             case 16:
-                $this->setTaxRuleTitle($value);
+                $this->setWeight($value);
                 break;
             case 17:
-                $this->setTaxRuleDescription($value);
+                $this->setEanCode($value);
                 break;
             case 18:
-                $this->setParent($value);
+                $this->setTaxRuleTitle($value);
                 break;
             case 19:
-                $this->setCreatedAt($value);
+                $this->setTaxRuleDescription($value);
                 break;
             case 20:
+                $this->setParent($value);
+                break;
+            case 21:
+                $this->setCreatedAt($value);
+                break;
+            case 22:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -2021,18 +2147,20 @@ abstract class OrderProduct implements ActiveRecordInterface
         if (array_key_exists($keys[6], $arr)) $this->setChapo($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setDescription($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setPostscriptum($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setQuantity($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setPrice($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setPromoPrice($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setWasNew($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setWasInPromo($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setWeight($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setEanCode($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setTaxRuleTitle($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setTaxRuleDescription($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setParent($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setCreatedAt($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setUpdatedAt($arr[$keys[20]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVirtual($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setVirtualDocument($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setQuantity($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setPrice($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPromoPrice($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setWasNew($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setWasInPromo($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setWeight($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setEanCode($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setTaxRuleTitle($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setTaxRuleDescription($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setParent($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setCreatedAt($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setUpdatedAt($arr[$keys[22]]);
     }
 
     /**
@@ -2053,6 +2181,8 @@ abstract class OrderProduct implements ActiveRecordInterface
         if ($this->isColumnModified(OrderProductTableMap::CHAPO)) $criteria->add(OrderProductTableMap::CHAPO, $this->chapo);
         if ($this->isColumnModified(OrderProductTableMap::DESCRIPTION)) $criteria->add(OrderProductTableMap::DESCRIPTION, $this->description);
         if ($this->isColumnModified(OrderProductTableMap::POSTSCRIPTUM)) $criteria->add(OrderProductTableMap::POSTSCRIPTUM, $this->postscriptum);
+        if ($this->isColumnModified(OrderProductTableMap::VIRTUAL)) $criteria->add(OrderProductTableMap::VIRTUAL, $this->virtual);
+        if ($this->isColumnModified(OrderProductTableMap::VIRTUAL_DOCUMENT)) $criteria->add(OrderProductTableMap::VIRTUAL_DOCUMENT, $this->virtual_document);
         if ($this->isColumnModified(OrderProductTableMap::QUANTITY)) $criteria->add(OrderProductTableMap::QUANTITY, $this->quantity);
         if ($this->isColumnModified(OrderProductTableMap::PRICE)) $criteria->add(OrderProductTableMap::PRICE, $this->price);
         if ($this->isColumnModified(OrderProductTableMap::PROMO_PRICE)) $criteria->add(OrderProductTableMap::PROMO_PRICE, $this->promo_price);
@@ -2136,6 +2266,8 @@ abstract class OrderProduct implements ActiveRecordInterface
         $copyObj->setChapo($this->getChapo());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setPostscriptum($this->getPostscriptum());
+        $copyObj->setVirtual($this->getVirtual());
+        $copyObj->setVirtualDocument($this->getVirtualDocument());
         $copyObj->setQuantity($this->getQuantity());
         $copyObj->setPrice($this->getPrice());
         $copyObj->setPromoPrice($this->getPromoPrice());
@@ -2716,6 +2848,8 @@ abstract class OrderProduct implements ActiveRecordInterface
         $this->chapo = null;
         $this->description = null;
         $this->postscriptum = null;
+        $this->virtual = null;
+        $this->virtual_document = null;
         $this->quantity = null;
         $this->price = null;
         $this->promo_price = null;
@@ -2730,6 +2864,7 @@ abstract class OrderProduct implements ActiveRecordInterface
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

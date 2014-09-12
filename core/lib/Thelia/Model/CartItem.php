@@ -50,10 +50,14 @@ class CartItem extends BaseCartItem
         }
 
         if (ConfigQuery::checkAvailableStock()) {
-            $productSaleElements = $this->getProductSaleElements();
 
-            if ($productSaleElements->getQuantity() < $value) {
-                $value = $currentQuantity;
+            $productSaleElements = $this->getProductSaleElements();
+            $product = $productSaleElements->getProduct();
+
+            if ($product->getVirtual() === 0) {
+                if ($productSaleElements->getQuantity() < $value) {
+                    $value = $currentQuantity;
+                }
             }
         }
 
@@ -67,15 +71,15 @@ class CartItem extends BaseCartItem
         $currentQuantity = $this->getQuantity();
         $newQuantity = $currentQuantity + $value;
 
-        if ($value <= 0) {
-            $value = $currentQuantity;
-        }
-
         if (ConfigQuery::checkAvailableStock()) {
-            $productSaleElements = $this->getProductSaleElements();
 
-            if ($productSaleElements->getQuantity() < $newQuantity) {
-                $newQuantity = $currentQuantity;
+            $productSaleElements = $this->getProductSaleElements();
+            $product = $productSaleElements->getProduct();
+
+            if ($product->getVirtual() === 0) {
+                if ($productSaleElements->getQuantity() < $newQuantity) {
+                    $newQuantity = $currentQuantity;
+                }
             }
         }
 

@@ -1,0 +1,58 @@
+<?xml version='1.0' standalone='yes'?>
+<message>
+    <title>Virtual product download message</title>
+    <subject>Order {$order_ref} validated. Download your files.</subject>
+    <text><![CDATA[
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
+
+Your order {$REF} has been validated. You can download your files.
+
+----------------------------------------------------------------------
+Products:
+----------------------------------------------------------------------
+{loop type="order_product" name="order-products" order=$ID virtual="1" backend_context="1"}
+{$TITLE} : {url path="/account/download/$ID"}
+{ifloop rel="combinations"}
+{loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+{$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+{/loop}
+{/ifloop}
+----------------------------------------------------------------------
+{/loop}
+{/loop}
+
+You have to be logged in to your account to download this files.
+
+Feel free to contact us for any further information.
+
+Best Regards.
+]]></text>
+    <html><![CDATA[
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
+<p>
+Your order {$REF} has been validated. You can download your files.</p>
+
+<p>Products:</p>
+
+<ul>
+{loop type="order_product" name="order-products" order=$ID virtual="1" backend_context="1"}
+    <li>
+        {$TITLE} : <a href="{url path="/account/download/$ID"}">{url path="/account/download/$ID"}</a>
+        {ifloop rel="combinations"}
+            <br><em>
+            {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+            {/loop}</em>
+        {/ifloop}
+    </li>
+{/loop}
+</ul>
+{/loop}
+
+<p>have to be logged in to your account to download this files.</p>
+
+<p>Feel free to contact us for any further information.</p>
+
+<p>Best Regards.</p>
+]]></html>
+</message>

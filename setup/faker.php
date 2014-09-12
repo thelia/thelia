@@ -175,7 +175,10 @@ try {
     \Thelia\Model\CouponQuery::create()->find()->delete();
     \Thelia\Model\OrderQuery::create()->find()->delete();
 
+
     \Thelia\Model\SaleQuery::create()->find()->delete();
+
+    \Thelia\Model\MetaDataQuery::create()->find()->delete();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
@@ -437,6 +440,7 @@ try {
 
     //categories and products
     $productIdList = array();
+    $virtualProductList = array();
     $categoryIdList = array();
     for ($i=1; $i<20; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
@@ -445,12 +449,12 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for ($k=0; $k<rand(0, 20); $k++) {
-                createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList);
+                createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList, $virtualProductList);
             }
         }
 
         for ($k=1; $k<rand(1, 50); $k++) {
-            createProduct($faker, $category, $k, $template, $brandIdList, $productIdList);
+            createProduct($faker, $category, $k, $template, $brandIdList, $productIdList, $virtualProductList);
         }
     }
 
@@ -501,11 +505,25 @@ try {
             $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
             $stock->save();
 
+            // associate document to virtual product
+            if (array_key_exists($productId, $virtualProductList)){
+                $virtualDocument = new \Thelia\Model\MetaData();
+                $virtualDocument
+                    ->setMetaKey('virtual')
+                    ->setElementKey(\Thelia\Model\MetaData::PSE_KEY)
+                    ->setElementId($stock->getId())
+                    ->setValue($virtualProductList[$productId])
+                    ->save();
+            }
+
+            $price = $faker->randomFloat(2, 20, 250);
+            $promoPrice = $price * $faker->randomFloat(2, 0, 1);
+
             $productPrice = new \Thelia\Model\ProductPrice();
             $productPrice->setProductSaleElements($stock);
             $productPrice->setCurrency($currency);
-            $productPrice->setPrice($faker->randomFloat(2, 20, 250));
-            $productPrice->setPromoPrice($faker->randomFloat(2, 20, 250));
+            $productPrice->setPrice($price);
+            $productPrice->setPromoPrice($promoPrice);
             $productPrice->save();
 
             //associate attributes - or not - to PSE
@@ -731,7 +749,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, Thelia\Model\Category $category, $position, $template, $brandIdList, &$productIdList)
+function createProduct($faker, Thelia\Model\Category $category, $position, $template, $brandIdList, &$productIdList, &$virtualProductList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
@@ -741,6 +759,7 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $collection = new \Propel\Runtime\Collection\Collection();
     $collection->prepend($productCategories[0]->setDefaultCategory(1));
     $product->setProductCategories($collection);
+    $product->setVirtual((mt_rand(1, 5) > 1) ? 0 : 1);
     $product->setVisible(1);
     $product->setPosition($position);
     $product->setTaxRuleId(1);
@@ -760,6 +779,10 @@ function createProduct($faker, Thelia\Model\Category $category, $position, $temp
     $document = new \Thelia\Model\ProductDocument();
     $document->setProductId($productId);
     generate_document($document, 'product', $productId);
+
+    if ($product->getVirtual() == 1){
+        $virtualProductList[$productId] = $document->getId();
+    }
 
     return $product;
 }

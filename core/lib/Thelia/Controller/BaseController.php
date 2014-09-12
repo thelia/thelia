@@ -250,6 +250,15 @@ abstract class BaseController extends ContainerAware
 
     protected function generateOrderPdf($order_id, $fileName)
     {
+        $order = OrderQuery::create()->findPk($order_id);
+
+        // check if the order has the paid status
+        if (!$this->getSecurityContext()->hasAdminUser()) {
+            if (!$order->isPaid()) {
+                throw new NotFoundHttpException();
+            }
+        }
+
         $html = $this->renderRaw(
             $fileName,
             array(
@@ -257,8 +266,6 @@ abstract class BaseController extends ContainerAware
             ),
             TemplateHelper::getInstance()->getActivePdfTemplate()
         );
-
-        $order = OrderQuery::create()->findPk($order_id);
 
         try {
             $pdfEvent = new PdfEvent($html);

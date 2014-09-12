@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <!-- sample definition
+        <loop name="MySuperLoop" class="VirtualProductDelivery\Loop\MySuperLoop" />
+        -->
+    </loops>
+
+    <forms>
+        <!--
+        <form name="MyFormName" class="VirtualProductDelivery\Form\MySuperForm" />
+        -->
+    </forms>
+
+    <commands>
+        <!--
+        <command class="VirtualProductDelivery\Command\MySuperCommand" />
+        -->
+    </commands>
+
+    <services>
+        <service id="virtualproductdelivery.mail" class="VirtualProductDelivery\EventListeners\SendMail" scope="request">
+            <argument type="service" id="thelia.parser" />
+            <argument type="service" id="mailer"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
+
+    <hooks>
+        <hook id="virtualproductdelivery.hook" class="VirtualProductDelivery\Hook\HookManager" scope="request">
+            <tag name="hook.event_listener" event="order-invoice.delivery-address" type="front" method="onDeliveryAddress" />
+            <tag name="hook.event_listener" event="delivery.delivery-address" type="pdf" method="onDeliveryAddress" />
+            <tag name="hook.event_listener" event="invoice.delivery-address" type="pdf" method="onDeliveryAddress" />
+        </hook>
+    </hooks>
+
+    <!--
+    <exports>
+
+    </exports>
+    -->
+
+    <!--
+    <imports>
+
+    </imports>
+    -->
+</config>

@@ -23,10 +23,13 @@
 namespace Front\Controller;
 
 use Front\Front;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -38,6 +41,7 @@ use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
+use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
@@ -53,6 +57,55 @@ use Thelia\Tools\URL;
 class OrderController extends BaseFrontController
 {
     use CartTrait;
+
+
+    /**
+     * Check if the cart contains only virtual products.
+     */
+    public function deliverView()
+    {
+        $this->checkAuth();
+        $this->checkCartNotEmpty();
+
+        // check if the cart contains only virtual products
+        $cart = $this->getSession()->getCart();
+
+        if ( $cart->isVirtual()){
+            // get the virtual product module
+            $customer = $this->getSecurityContext()->getCustomerUser();
+
+            $deliveryAddress = AddressQuery::create()
+                ->filterByCustomerId($customer->getId())
+                ->orderByIsDefault(Criteria::DESC)
+                ->findOne();
+
+            if (null !== $deliveryAddress) {
+
+                $deliveryModule = ModuleQuery::create()
+                    ->findOneByCode('VirtualProductDelivery');
+
+                if (null !== $deliveryModule) {
+                    /* get postage amount */
+                    $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+
+                    $orderEvent = $this->getOrderEvent();
+                    $orderEvent->setDeliveryAddress($deliveryAddress->getId());
+                    $orderEvent->setDeliveryModule($deliveryModule->getId());
+                    $orderEvent->setPostage($postage);
+
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+
+                    $this->redirectToRoute("order.invoice");
+                }
+            }
+        }
+
+        return $this->render('order-delivery');
+    }
+
     /**
      * set delivery address
      * set delivery module
@@ -295,6 +348,53 @@ class OrderController extends BaseFrontController
         $this->checkOrderCustomer($order_id);
 
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
+    }
+
+
+    public function downloadVirtualProduct($order_product_id)
+    {
+
+        if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)){
+
+            $order = $orderProduct->getOrder();
+
+            if ($order->isPaid()){
+
+                // check customer
+                $this->checkOrderCustomer($order->getId());
+
+                if ($orderProduct->getVirtualDocument()) {
+
+                    // try to get the file
+                    $path = THELIA_ROOT
+                        . ConfigQuery::read('documents_library_path', 'local/media/documents')
+                        . DS . "product" . DS
+                        . $orderProduct->getVirtualDocument();
+
+                    if (!is_file($path) || !is_readable($path)) {
+                        throw new \ErrorException(
+                            Translator::getInstance()->trans(
+                                "The file [%file] does not exist",
+                                [
+                                    "%file" => $order_product_id
+                                ]
+                            )
+                        );
+                    }
+
+                    $data = file_get_contents($path);
+
+                    $mime = MimeTypeGuesser::getInstance()
+                        ->guess($path)
+                    ;
+
+                    return new Response($data, 200, ["Content-Type" => $mime]);
+                }
+            }
+        }
+
+        throw new AccessDeniedHttpException();
+
     }
 
     private function checkOrderCustomer($order_id)

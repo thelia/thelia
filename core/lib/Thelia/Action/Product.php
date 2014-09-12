@@ -68,6 +68,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
             ->setVisible($event->getVisible() ? 1 : 0)
+            ->setVirtual($event->getVirtual() ? 1 : 0)
 
             // Set the default tax rule to this product
             ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
@@ -102,6 +103,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setChapo($event->getChapo())
                 ->setPostscriptum($event->getPostscriptum())
                 ->setVisible($event->getVisible() ? 1 : 0)
+                ->setVirtual($event->getVirtual() ? 1 : 0)
                 ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
 
                 ->save()

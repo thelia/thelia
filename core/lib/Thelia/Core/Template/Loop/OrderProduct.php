@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\OrderProductQuery;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -42,7 +43,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('order', null, true),
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createBooleanOrBothTypeArgument('virtual', BooleanOrBothType::ANY)
         );
     }
 
@@ -59,6 +61,18 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
         $search->filterByOrderId($order, Criteria::EQUAL);
 
+        $virtual = $this->getVirtual();
+        if ($virtual !== BooleanOrBothType::ANY) {
+            if ($virtual) {
+                $search
+                    ->filterByVirtual(1, Criteria::EQUAL)
+                    ->filterByVirtualDocument(null, Criteria::NOT_EQUAL);
+            } else {
+                $search
+                    ->filterByVirtual(0);
+            }
+        }
+
         if (null !== $this->getId()) {
             $search->filterById($this->getId(), Criteria::IN);
         }
@@ -71,6 +85,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\OrderProduct $orderProduct */
         foreach ($loopResult->getResultDataCollection() as $orderProduct) {
             $loopResultRow = new LoopResultRow($orderProduct);
 
@@ -89,6 +104,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set("CHAPO", $orderProduct->getChapo())
                 ->set("DESCRIPTION", $orderProduct->getDescription())
                 ->set("POSTSCRIPTUM", $orderProduct->getPostscriptum())
+                ->set("VIRTUAL", $orderProduct->getVirtual())
+                ->set("VIRTUAL_DOCUMENT", $orderProduct->getVirtualDocument())
                 ->set("QUANTITY", $orderProduct->getQuantity())
                 ->set("PRICE", $price)
                 ->set("PRICE_TAX", $taxedPrice - $price)
