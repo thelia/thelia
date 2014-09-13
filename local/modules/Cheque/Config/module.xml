@@ -13,6 +13,6 @@
         <email>mraynaud@openstudio.fr</email>
     </author>
     <type>payment</type>
-    <thelia>2.0.0</thelia>
-    <stability>alpha</stability>
+    <thelia>2.1.0</thelia>
+    <stability>beta</stability>
 </module>

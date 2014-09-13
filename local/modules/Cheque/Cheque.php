@@ -13,41 +13,29 @@
 namespace Cheque;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Install\Database;
 use Thelia\Model\ModuleImageQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
+use Thelia\Tools\URL;
 
 class Cheque extends BaseModule implements PaymentModuleInterface
 {
-    protected $request;
-    protected $dispatcher;
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
+    const MESSAGE_DOMAIN = "Cheque";
 
     public function pay(Order $order)
     {
         // no special process, waiting for the cheque.
+        $router = $this->getContainer()->get('router.cheque');
+
+        $thankYouPageUrl = URL::getInstance()->absoluteUrl(
+            $router->generate('cheque.order-placed', ['orderId' => $order->getId()])
+        );
+
+        // Redirect to our own route, so that our payment page is displayed.
+        return RedirectResponse::create($thankYouPageUrl);
     }
 
     /**
@@ -64,29 +52,23 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         return true;
     }
 
-
     public function postActivation(ConnectionInterface $con = null)
     {
         /* insert the images from image folder if first module activation */
-        $module = $this->getModuleModel();
-        if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
-            $this->deployImageFolder($module, sprintf('%s/images', __DIR__), $con);
+        $moduleModel = $this->getModuleModel();
+
+        if (! $moduleModel->isModuleImageDeployed($con)) {
+            $this->deployImageFolder($moduleModel, sprintf('%s/images', __DIR__), $con);
         }
 
-        /* set module title */
-        $this->setTitle(
-            $module,
-            array(
-                "en_US" => "Cheque",
-                "fr_FR" => "Cheque",
-            )
-        );
-    }
+        $database = new Database($con->getWrappedConnection());
 
+        // Insert email message
+        $database->insertSql(null, array(__DIR__ . "/Config/cheque.sql"));
+    }
 
     public function getCode()
     {
         return 'Cheque';
     }
-
 }
