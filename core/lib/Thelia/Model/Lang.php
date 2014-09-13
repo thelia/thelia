@@ -16,6 +16,10 @@ use Thelia\Model\Map\LangTableMap;
 
 class Lang extends BaseLang
 {
+    // Constants to define behavior when a request string does not exists in the current language
+    const STRICTLY_USE_REQUESTED_LANGUAGE = 0;
+    const REPLACE_BY_DEFAULT_LANGUAGE = 1;
+
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     protected static $defaultLanguage;

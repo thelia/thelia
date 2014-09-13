@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ProductVersion;
-use Thelia\Model\ProductVersionQuery;
+use Thelia\Model\ModuleConfigI18n;
+use Thelia\Model\ModuleConfigI18nQuery;
 
 
 /**
- * This class defines the structure of the 'product_version' table.
+ * This class defines the structure of the 'module_config_i18n' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\ProductVersionQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ProductVersionTableMap extends TableMap
+class ModuleConfigI18nTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ProductVersionTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ModuleConfigI18nTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class ProductVersionTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'product_version';
+    const TABLE_NAME = 'module_config_i18n';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ProductVersion';
+    const OM_CLASS = '\\Thelia\\Model\\ModuleConfigI18n';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ProductVersion';
+    const CLASS_DEFAULT = 'Thelia.Model.ModuleConfigI18n';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 13;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -68,72 +68,22 @@ class ProductVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 13;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'product_version.ID';
+    const ID = 'module_config_i18n.ID';
 
     /**
-     * the column name for the TAX_RULE_ID field
+     * the column name for the LOCALE field
      */
-    const TAX_RULE_ID = 'product_version.TAX_RULE_ID';
+    const LOCALE = 'module_config_i18n.LOCALE';
 
     /**
-     * the column name for the REF field
+     * the column name for the VALUE field
      */
-    const REF = 'product_version.REF';
-
-    /**
-     * the column name for the VISIBLE field
-     */
-    const VISIBLE = 'product_version.VISIBLE';
-
-    /**
-     * the column name for the POSITION field
-     */
-    const POSITION = 'product_version.POSITION';
-
-    /**
-     * the column name for the TEMPLATE_ID field
-     */
-    const TEMPLATE_ID = 'product_version.TEMPLATE_ID';
-
-    /**
-     * the column name for the BRAND_ID field
-     */
-    const BRAND_ID = 'product_version.BRAND_ID';
-
-    /**
-     * the column name for the VIRTUAL field
-     */
-    const VIRTUAL = 'product_version.VIRTUAL';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'product_version.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'product_version.UPDATED_AT';
-
-    /**
-     * the column name for the VERSION field
-     */
-    const VERSION = 'product_version.VERSION';
-
-    /**
-     * the column name for the VERSION_CREATED_AT field
-     */
-    const VERSION_CREATED_AT = 'product_version.VERSION_CREATED_AT';
-
-    /**
-     * the column name for the VERSION_CREATED_BY field
-     */
-    const VERSION_CREATED_BY = 'product_version.VERSION_CREATED_BY';
+    const VALUE = 'module_config_i18n.VALUE';
 
     /**
      * The default string format for model objects of the related table
@@ -147,12 +97,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'Ref', 'Visible', 'Position', 'TemplateId', 'BrandId', 'Virtual', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'ref', 'visible', 'position', 'templateId', 'brandId', 'virtual', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID, ProductVersionTableMap::TAX_RULE_ID, ProductVersionTableMap::REF, ProductVersionTableMap::VISIBLE, ProductVersionTableMap::POSITION, ProductVersionTableMap::TEMPLATE_ID, ProductVersionTableMap::BRAND_ID, ProductVersionTableMap::VIRTUAL, ProductVersionTableMap::CREATED_AT, ProductVersionTableMap::UPDATED_AT, ProductVersionTableMap::VERSION, ProductVersionTableMap::VERSION_CREATED_AT, ProductVersionTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'REF', 'VISIBLE', 'POSITION', 'TEMPLATE_ID', 'BRAND_ID', 'VIRTUAL', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'ref', 'visible', 'position', 'template_id', 'brand_id', 'virtual', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Value', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'value', ),
+        self::TYPE_COLNAME       => array(ModuleConfigI18nTableMap::ID, ModuleConfigI18nTableMap::LOCALE, ModuleConfigI18nTableMap::VALUE, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'VALUE', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'value', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -162,12 +112,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Visible' => 3, 'Position' => 4, 'TemplateId' => 5, 'BrandId' => 6, 'Virtual' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, 'Version' => 10, 'VersionCreatedAt' => 11, 'VersionCreatedBy' => 12, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'templateId' => 5, 'brandId' => 6, 'virtual' => 7, 'createdAt' => 8, 'updatedAt' => 9, 'version' => 10, 'versionCreatedAt' => 11, 'versionCreatedBy' => 12, ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID => 0, ProductVersionTableMap::TAX_RULE_ID => 1, ProductVersionTableMap::REF => 2, ProductVersionTableMap::VISIBLE => 3, ProductVersionTableMap::POSITION => 4, ProductVersionTableMap::TEMPLATE_ID => 5, ProductVersionTableMap::BRAND_ID => 6, ProductVersionTableMap::VIRTUAL => 7, ProductVersionTableMap::CREATED_AT => 8, ProductVersionTableMap::UPDATED_AT => 9, ProductVersionTableMap::VERSION => 10, ProductVersionTableMap::VERSION_CREATED_AT => 11, ProductVersionTableMap::VERSION_CREATED_BY => 12, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'TEMPLATE_ID' => 5, 'BRAND_ID' => 6, 'VIRTUAL' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, 'VERSION' => 10, 'VERSION_CREATED_AT' => 11, 'VERSION_CREATED_BY' => 12, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'template_id' => 5, 'brand_id' => 6, 'virtual' => 7, 'created_at' => 8, 'updated_at' => 9, 'version' => 10, 'version_created_at' => 11, 'version_created_by' => 12, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Value' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'value' => 2, ),
+        self::TYPE_COLNAME       => array(ModuleConfigI18nTableMap::ID => 0, ModuleConfigI18nTableMap::LOCALE => 1, ModuleConfigI18nTableMap::VALUE => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'VALUE' => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'value' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -180,25 +130,15 @@ class ProductVersionTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('product_version');
-        $this->setPhpName('ProductVersion');
-        $this->setClassName('\\Thelia\\Model\\ProductVersion');
+        $this->setName('module_config_i18n');
+        $this->setPhpName('ModuleConfigI18n');
+        $this->setClassName('\\Thelia\\Model\\ModuleConfigI18n');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product', 'ID', true, null, null);
-        $this->addColumn('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', false, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, 0);
-        $this->addColumn('TEMPLATE_ID', 'TemplateId', 'INTEGER', false, null, null);
-        $this->addColumn('BRAND_ID', 'BrandId', 'INTEGER', false, null, null);
-        $this->addColumn('VIRTUAL', 'Virtual', 'TINYINT', true, null, 0);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'module_config', 'ID', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('VALUE', 'Value', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -206,7 +146,7 @@ class ProductVersionTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('ModuleConfig', '\\Thelia\\Model\\ModuleConfig', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
@@ -217,14 +157,14 @@ class ProductVersionTableMap extends TableMap
      * to the cache in order to ensure that the same objects are always returned by find*()
      * and findPk*() calls.
      *
-     * @param \Thelia\Model\ProductVersion $obj A \Thelia\Model\ProductVersion object.
+     * @param \Thelia\Model\ModuleConfigI18n $obj A \Thelia\Model\ModuleConfigI18n object.
      * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getVersion()));
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -238,13 +178,13 @@ class ProductVersionTableMap extends TableMap
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param mixed $value A \Thelia\Model\ProductVersion object or a primary key value.
+     * @param mixed $value A \Thelia\Model\ModuleConfigI18n object or a primary key value.
      */
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
-            if (is_object($value) && $value instanceof \Thelia\Model\ProductVersion) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getVersion()));
+            if (is_object($value) && $value instanceof \Thelia\Model\ModuleConfigI18n) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
 
             } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key";
@@ -254,7 +194,7 @@ class ProductVersionTableMap extends TableMap
 
                 return;
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ProductVersion object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\ModuleConfigI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
                 throw $e;
             }
 
@@ -276,11 +216,11 @@ class ProductVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 10 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 10 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -314,7 +254,7 @@ class ProductVersionTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProductVersionTableMap::CLASS_DEFAULT : ProductVersionTableMap::OM_CLASS;
+        return $withPrefix ? ModuleConfigI18nTableMap::CLASS_DEFAULT : ModuleConfigI18nTableMap::OM_CLASS;
     }
 
     /**
@@ -328,21 +268,21 @@ class ProductVersionTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ProductVersion object, last column rank)
+     * @return array (ModuleConfigI18n object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProductVersionTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProductVersionTableMap::getInstanceFromPool($key))) {
+        $key = ModuleConfigI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ModuleConfigI18nTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProductVersionTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ModuleConfigI18nTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductVersionTableMap::OM_CLASS;
+            $cls = ModuleConfigI18nTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProductVersionTableMap::addInstanceToPool($obj, $key);
+            ModuleConfigI18nTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -365,8 +305,8 @@ class ProductVersionTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProductVersionTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProductVersionTableMap::getInstanceFromPool($key))) {
+            $key = ModuleConfigI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ModuleConfigI18nTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -375,7 +315,7 @@ class ProductVersionTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductVersionTableMap::addInstanceToPool($obj, $key);
+                ModuleConfigI18nTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -396,33 +336,13 @@ class ProductVersionTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductVersionTableMap::ID);
-            $criteria->addSelectColumn(ProductVersionTableMap::TAX_RULE_ID);
-            $criteria->addSelectColumn(ProductVersionTableMap::REF);
-            $criteria->addSelectColumn(ProductVersionTableMap::VISIBLE);
-            $criteria->addSelectColumn(ProductVersionTableMap::POSITION);
-            $criteria->addSelectColumn(ProductVersionTableMap::TEMPLATE_ID);
-            $criteria->addSelectColumn(ProductVersionTableMap::BRAND_ID);
-            $criteria->addSelectColumn(ProductVersionTableMap::VIRTUAL);
-            $criteria->addSelectColumn(ProductVersionTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ProductVersionTableMap::UPDATED_AT);
-            $criteria->addSelectColumn(ProductVersionTableMap::VERSION);
-            $criteria->addSelectColumn(ProductVersionTableMap::VERSION_CREATED_AT);
-            $criteria->addSelectColumn(ProductVersionTableMap::VERSION_CREATED_BY);
+            $criteria->addSelectColumn(ModuleConfigI18nTableMap::ID);
+            $criteria->addSelectColumn(ModuleConfigI18nTableMap::LOCALE);
+            $criteria->addSelectColumn(ModuleConfigI18nTableMap::VALUE);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.TEMPLATE_ID');
-            $criteria->addSelectColumn($alias . '.BRAND_ID');
-            $criteria->addSelectColumn($alias . '.VIRTUAL');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.VALUE');
         }
     }
 
@@ -435,7 +355,7 @@ class ProductVersionTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProductVersionTableMap::DATABASE_NAME)->getTable(ProductVersionTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ModuleConfigI18nTableMap::DATABASE_NAME)->getTable(ModuleConfigI18nTableMap::TABLE_NAME);
     }
 
     /**
@@ -443,16 +363,16 @@ class ProductVersionTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductVersionTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ProductVersionTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProductVersionTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ModuleConfigI18nTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ModuleConfigI18nTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ModuleConfigI18nTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ProductVersion or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ModuleConfigI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ProductVersion object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ModuleConfigI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -463,17 +383,17 @@ class ProductVersionTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleConfigI18nTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ProductVersion) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ModuleConfigI18n) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductVersionTableMap::DATABASE_NAME);
+            $criteria = new Criteria(ModuleConfigI18nTableMap::DATABASE_NAME);
             // primary key is composite; we therefore, expect
             // the primary key passed to be an array of pkey values
             if (count($values) == count($values, COUNT_RECURSIVE)) {
@@ -481,17 +401,17 @@ class ProductVersionTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(ProductVersionTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(ProductVersionTableMap::VERSION, $value[1]));
+                $criterion = $criteria->getNewCriterion(ModuleConfigI18nTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ModuleConfigI18nTableMap::LOCALE, $value[1]));
                 $criteria->addOr($criterion);
             }
         }
 
-        $query = ProductVersionQuery::create()->mergeWith($criteria);
+        $query = ModuleConfigI18nQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ProductVersionTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ModuleConfigI18nTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ProductVersionTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ModuleConfigI18nTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -499,20 +419,20 @@ class ProductVersionTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the product_version table.
+     * Deletes all rows from the module_config_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProductVersionQuery::create()->doDeleteAll($con);
+        return ModuleConfigI18nQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ProductVersion or Criteria object.
+     * Performs an INSERT on the database, given a ModuleConfigI18n or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ProductVersion object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ModuleConfigI18n object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -521,18 +441,18 @@ class ProductVersionTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleConfigI18nTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ProductVersion object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ModuleConfigI18n object
         }
 
 
         // Set the correct dbName
-        $query = ProductVersionQuery::create()->mergeWith($criteria);
+        $query = ModuleConfigI18nQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -548,7 +468,7 @@ class ProductVersionTableMap extends TableMap
         return $pk;
     }
 
-} // ProductVersionTableMap
+} // ModuleConfigI18nTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProductVersionTableMap::buildTableMap();
+ModuleConfigI18nTableMap::buildTableMap();

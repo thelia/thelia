@@ -24,6 +24,8 @@ use Thelia\Model\CouponModule as ChildCouponModule;
 use Thelia\Model\CouponModuleQuery as ChildCouponModuleQuery;
 use Thelia\Model\CouponQuery as ChildCouponQuery;
 use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleConfig as ChildModuleConfig;
+use Thelia\Model\ModuleConfigQuery as ChildModuleConfigQuery;
 use Thelia\Model\ModuleHook as ChildModuleHook;
 use Thelia\Model\ModuleHookQuery as ChildModuleHookQuery;
 use Thelia\Model\ModuleI18n as ChildModuleI18n;
@@ -172,6 +174,12 @@ abstract class Module implements ActiveRecordInterface
     protected $collModuleHooksPartial;
 
     /**
+     * @var        ObjectCollection|ChildModuleConfig[] Collection to store aggregation of ChildModuleConfig objects.
+     */
+    protected $collModuleConfigs;
+    protected $collModuleConfigsPartial;
+
+    /**
      * @var        ObjectCollection|ChildModuleI18n[] Collection to store aggregation of ChildModuleI18n objects.
      */
     protected $collModuleI18ns;
@@ -268,6 +276,12 @@ abstract class Module implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $moduleHooksScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $moduleConfigsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -958,6 +972,8 @@ abstract class Module implements ActiveRecordInterface
 
             $this->collModuleHooks = null;
 
+            $this->collModuleConfigs = null;
+
             $this->collModuleI18ns = null;
 
             $this->collCoupons = null;
@@ -1285,6 +1301,23 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            if ($this->moduleConfigsScheduledForDeletion !== null) {
+                if (!$this->moduleConfigsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleConfigQuery::create()
+                        ->filterByPrimaryKeys($this->moduleConfigsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleConfigsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleConfigs !== null) {
+            foreach ($this->collModuleConfigs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->moduleI18nsScheduledForDeletion !== null) {
                 if (!$this->moduleI18nsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\ModuleI18nQuery::create()
@@ -1541,6 +1574,9 @@ abstract class Module implements ActiveRecordInterface
             if (null !== $this->collModuleHooks) {
                 $result['ModuleHooks'] = $this->collModuleHooks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collModuleConfigs) {
+                $result['ModuleConfigs'] = $this->collModuleConfigs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collModuleI18ns) {
                 $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1777,6 +1813,12 @@ abstract class Module implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getModuleConfigs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleConfig($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getModuleI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addModuleI18n($relObj->copy($deepCopy));
@@ -1847,6 +1889,9 @@ abstract class Module implements ActiveRecordInterface
         }
         if ('ModuleHook' == $relationName) {
             return $this->initModuleHooks();
+        }
+        if ('ModuleConfig' == $relationName) {
+            return $this->initModuleConfigs();
         }
         if ('ModuleI18n' == $relationName) {
             return $this->initModuleI18ns();
@@ -4082,6 +4127,224 @@ abstract class Module implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collModuleConfigs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleConfigs()
+     */
+    public function clearModuleConfigs()
+    {
+        $this->collModuleConfigs = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleConfigs collection loaded partially.
+     */
+    public function resetPartialModuleConfigs($v = true)
+    {
+        $this->collModuleConfigsPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleConfigs collection.
+     *
+     * By default this just sets the collModuleConfigs collection to an empty array (like clearcollModuleConfigs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleConfigs($overrideExisting = true)
+    {
+        if (null !== $this->collModuleConfigs && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleConfigs = new ObjectCollection();
+        $this->collModuleConfigs->setModel('\Thelia\Model\ModuleConfig');
+    }
+
+    /**
+     * Gets an array of ChildModuleConfig objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModule is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleConfig[] List of ChildModuleConfig objects
+     * @throws PropelException
+     */
+    public function getModuleConfigs($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigs) {
+                // return empty collection
+                $this->initModuleConfigs();
+            } else {
+                $collModuleConfigs = ChildModuleConfigQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleConfigsPartial && count($collModuleConfigs)) {
+                        $this->initModuleConfigs(false);
+
+                        foreach ($collModuleConfigs as $obj) {
+                            if (false == $this->collModuleConfigs->contains($obj)) {
+                                $this->collModuleConfigs->append($obj);
+                            }
+                        }
+
+                        $this->collModuleConfigsPartial = true;
+                    }
+
+                    reset($collModuleConfigs);
+
+                    return $collModuleConfigs;
+                }
+
+                if ($partial && $this->collModuleConfigs) {
+                    foreach ($this->collModuleConfigs as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleConfigs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleConfigs = $collModuleConfigs;
+                $this->collModuleConfigsPartial = false;
+            }
+        }
+
+        return $this->collModuleConfigs;
+    }
+
+    /**
+     * Sets a collection of ModuleConfig objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleConfigs A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModule The current object (for fluent API support)
+     */
+    public function setModuleConfigs(Collection $moduleConfigs, ConnectionInterface $con = null)
+    {
+        $moduleConfigsToDelete = $this->getModuleConfigs(new Criteria(), $con)->diff($moduleConfigs);
+
+
+        $this->moduleConfigsScheduledForDeletion = $moduleConfigsToDelete;
+
+        foreach ($moduleConfigsToDelete as $moduleConfigRemoved) {
+            $moduleConfigRemoved->setModule(null);
+        }
+
+        $this->collModuleConfigs = null;
+        foreach ($moduleConfigs as $moduleConfig) {
+            $this->addModuleConfig($moduleConfig);
+        }
+
+        $this->collModuleConfigs = $moduleConfigs;
+        $this->collModuleConfigsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleConfig objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleConfig objects.
+     * @throws PropelException
+     */
+    public function countModuleConfigs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigs) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleConfigs());
+            }
+
+            $query = ChildModuleConfigQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleConfigs);
+    }
+
+    /**
+     * Method called to associate a ChildModuleConfig object to this object
+     * through the ChildModuleConfig foreign key attribute.
+     *
+     * @param    ChildModuleConfig $l ChildModuleConfig
+     * @return   \Thelia\Model\Module The current object (for fluent API support)
+     */
+    public function addModuleConfig(ChildModuleConfig $l)
+    {
+        if ($this->collModuleConfigs === null) {
+            $this->initModuleConfigs();
+            $this->collModuleConfigsPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleConfigs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleConfig($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleConfig $moduleConfig The moduleConfig object to add.
+     */
+    protected function doAddModuleConfig($moduleConfig)
+    {
+        $this->collModuleConfigs[]= $moduleConfig;
+        $moduleConfig->setModule($this);
+    }
+
+    /**
+     * @param  ModuleConfig $moduleConfig The moduleConfig object to remove.
+     * @return ChildModule The current object (for fluent API support)
+     */
+    public function removeModuleConfig($moduleConfig)
+    {
+        if ($this->getModuleConfigs()->contains($moduleConfig)) {
+            $this->collModuleConfigs->remove($this->collModuleConfigs->search($moduleConfig));
+            if (null === $this->moduleConfigsScheduledForDeletion) {
+                $this->moduleConfigsScheduledForDeletion = clone $this->collModuleConfigs;
+                $this->moduleConfigsScheduledForDeletion->clear();
+            }
+            $this->moduleConfigsScheduledForDeletion[]= clone $moduleConfig;
+            $moduleConfig->setModule(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears out the collModuleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -4744,6 +5007,11 @@ abstract class Module implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collModuleConfigs) {
+                foreach ($this->collModuleConfigs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collModuleI18ns) {
                 foreach ($this->collModuleI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -4773,6 +5041,7 @@ abstract class Module implements ActiveRecordInterface
         $this->collCouponModules = null;
         $this->collOrderCouponModules = null;
         $this->collModuleHooks = null;
+        $this->collModuleConfigs = null;
         $this->collModuleI18ns = null;
         $this->collCoupons = null;
         $this->collOrderCoupons = null;

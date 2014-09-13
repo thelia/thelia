@@ -30,8 +30,6 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
  * @method     ChildOrderProductQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method     ChildOrderProductQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
- * @method     ChildOrderProductQuery orderByVirtual($order = Criteria::ASC) Order by the virtual column
- * @method     ChildOrderProductQuery orderByVirtualDocument($order = Criteria::ASC) Order by the virtual_document column
  * @method     ChildOrderProductQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildOrderProductQuery orderByPrice($order = Criteria::ASC) Order by the price column
  * @method     ChildOrderProductQuery orderByPromoPrice($order = Criteria::ASC) Order by the promo_price column
@@ -42,6 +40,8 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery orderByTaxRuleTitle($order = Criteria::ASC) Order by the tax_rule_title column
  * @method     ChildOrderProductQuery orderByTaxRuleDescription($order = Criteria::ASC) Order by the tax_rule_description column
  * @method     ChildOrderProductQuery orderByParent($order = Criteria::ASC) Order by the parent column
+ * @method     ChildOrderProductQuery orderByVirtual($order = Criteria::ASC) Order by the virtual column
+ * @method     ChildOrderProductQuery orderByVirtualDocument($order = Criteria::ASC) Order by the virtual_document column
  * @method     ChildOrderProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -54,8 +54,6 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery groupByChapo() Group by the chapo column
  * @method     ChildOrderProductQuery groupByDescription() Group by the description column
  * @method     ChildOrderProductQuery groupByPostscriptum() Group by the postscriptum column
- * @method     ChildOrderProductQuery groupByVirtual() Group by the virtual column
- * @method     ChildOrderProductQuery groupByVirtualDocument() Group by the virtual_document column
  * @method     ChildOrderProductQuery groupByQuantity() Group by the quantity column
  * @method     ChildOrderProductQuery groupByPrice() Group by the price column
  * @method     ChildOrderProductQuery groupByPromoPrice() Group by the promo_price column
@@ -66,6 +64,8 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProductQuery groupByTaxRuleTitle() Group by the tax_rule_title column
  * @method     ChildOrderProductQuery groupByTaxRuleDescription() Group by the tax_rule_description column
  * @method     ChildOrderProductQuery groupByParent() Group by the parent column
+ * @method     ChildOrderProductQuery groupByVirtual() Group by the virtual column
+ * @method     ChildOrderProductQuery groupByVirtualDocument() Group by the virtual_document column
  * @method     ChildOrderProductQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderProductQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -97,8 +97,6 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneByChapo(string $chapo) Return the first ChildOrderProduct filtered by the chapo column
  * @method     ChildOrderProduct findOneByDescription(string $description) Return the first ChildOrderProduct filtered by the description column
  * @method     ChildOrderProduct findOneByPostscriptum(string $postscriptum) Return the first ChildOrderProduct filtered by the postscriptum column
- * @method     ChildOrderProduct findOneByVirtual(int $virtual) Return the first ChildOrderProduct filtered by the virtual column
- * @method     ChildOrderProduct findOneByVirtualDocument(string $virtual_document) Return the first ChildOrderProduct filtered by the virtual_document column
  * @method     ChildOrderProduct findOneByQuantity(double $quantity) Return the first ChildOrderProduct filtered by the quantity column
  * @method     ChildOrderProduct findOneByPrice(double $price) Return the first ChildOrderProduct filtered by the price column
  * @method     ChildOrderProduct findOneByPromoPrice(string $promo_price) Return the first ChildOrderProduct filtered by the promo_price column
@@ -109,6 +107,8 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     ChildOrderProduct findOneByTaxRuleTitle(string $tax_rule_title) Return the first ChildOrderProduct filtered by the tax_rule_title column
  * @method     ChildOrderProduct findOneByTaxRuleDescription(string $tax_rule_description) Return the first ChildOrderProduct filtered by the tax_rule_description column
  * @method     ChildOrderProduct findOneByParent(int $parent) Return the first ChildOrderProduct filtered by the parent column
+ * @method     ChildOrderProduct findOneByVirtual(int $virtual) Return the first ChildOrderProduct filtered by the virtual column
+ * @method     ChildOrderProduct findOneByVirtualDocument(string $virtual_document) Return the first ChildOrderProduct filtered by the virtual_document column
  * @method     ChildOrderProduct findOneByCreatedAt(string $created_at) Return the first ChildOrderProduct filtered by the created_at column
  * @method     ChildOrderProduct findOneByUpdatedAt(string $updated_at) Return the first ChildOrderProduct filtered by the updated_at column
  *
@@ -121,8 +121,6 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findByChapo(string $chapo) Return ChildOrderProduct objects filtered by the chapo column
  * @method     array findByDescription(string $description) Return ChildOrderProduct objects filtered by the description column
  * @method     array findByPostscriptum(string $postscriptum) Return ChildOrderProduct objects filtered by the postscriptum column
- * @method     array findByVirtual(int $virtual) Return ChildOrderProduct objects filtered by the virtual column
- * @method     array findByVirtualDocument(string $virtual_document) Return ChildOrderProduct objects filtered by the virtual_document column
  * @method     array findByQuantity(double $quantity) Return ChildOrderProduct objects filtered by the quantity column
  * @method     array findByPrice(double $price) Return ChildOrderProduct objects filtered by the price column
  * @method     array findByPromoPrice(string $promo_price) Return ChildOrderProduct objects filtered by the promo_price column
@@ -133,6 +131,8 @@ use Thelia\Model\Map\OrderProductTableMap;
  * @method     array findByTaxRuleTitle(string $tax_rule_title) Return ChildOrderProduct objects filtered by the tax_rule_title column
  * @method     array findByTaxRuleDescription(string $tax_rule_description) Return ChildOrderProduct objects filtered by the tax_rule_description column
  * @method     array findByParent(int $parent) Return ChildOrderProduct objects filtered by the parent column
+ * @method     array findByVirtual(int $virtual) Return ChildOrderProduct objects filtered by the virtual column
+ * @method     array findByVirtualDocument(string $virtual_document) Return ChildOrderProduct objects filtered by the virtual_document column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderProduct objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderProduct objects filtered by the updated_at column
  *
@@ -223,7 +223,7 @@ abstract class OrderProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `PRODUCT_SALE_ELEMENTS_REF`, `PRODUCT_SALE_ELEMENTS_ID`, `TITLE`, `CHAPO`, `DESCRIPTION`, `POSTSCRIPTUM`, `VIRTUAL`, `VIRTUAL_DOCUMENT`, `QUANTITY`, `PRICE`, `PROMO_PRICE`, `WAS_NEW`, `WAS_IN_PROMO`, `WEIGHT`, `EAN_CODE`, `TAX_RULE_TITLE`, `TAX_RULE_DESCRIPTION`, `PARENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `PRODUCT_SALE_ELEMENTS_REF`, `PRODUCT_SALE_ELEMENTS_ID`, `TITLE`, `CHAPO`, `DESCRIPTION`, `POSTSCRIPTUM`, `QUANTITY`, `PRICE`, `PROMO_PRICE`, `WAS_NEW`, `WAS_IN_PROMO`, `WEIGHT`, `EAN_CODE`, `TAX_RULE_TITLE`, `TAX_RULE_DESCRIPTION`, `PARENT`, `VIRTUAL`, `VIRTUAL_DOCUMENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -612,76 +612,6 @@ abstract class OrderProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the virtual column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVirtual(1234); // WHERE virtual = 1234
-     * $query->filterByVirtual(array(12, 34)); // WHERE virtual IN (12, 34)
-     * $query->filterByVirtual(array('min' => 12)); // WHERE virtual > 12
-     * </code>
-     *
-     * @param     mixed $virtual The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildOrderProductQuery The current query, for fluid interface
-     */
-    public function filterByVirtual($virtual = null, $comparison = null)
-    {
-        if (is_array($virtual)) {
-            $useMinMax = false;
-            if (isset($virtual['min'])) {
-                $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($virtual['max'])) {
-                $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual, $comparison);
-    }
-
-    /**
-     * Filter the query on the virtual_document column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVirtualDocument('fooValue');   // WHERE virtual_document = 'fooValue'
-     * $query->filterByVirtualDocument('%fooValue%'); // WHERE virtual_document LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $virtualDocument The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildOrderProductQuery The current query, for fluid interface
-     */
-    public function filterByVirtualDocument($virtualDocument = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($virtualDocument)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $virtualDocument)) {
-                $virtualDocument = str_replace('*', '%', $virtualDocument);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(OrderProductTableMap::VIRTUAL_DOCUMENT, $virtualDocument, $comparison);
-    }
-
-    /**
      * Filter the query on the quantity column
      *
      * Example usage:
@@ -1029,6 +959,76 @@ abstract class OrderProductQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderProductTableMap::PARENT, $parent, $comparison);
+    }
+
+    /**
+     * Filter the query on the virtual column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVirtual(1234); // WHERE virtual = 1234
+     * $query->filterByVirtual(array(12, 34)); // WHERE virtual IN (12, 34)
+     * $query->filterByVirtual(array('min' => 12)); // WHERE virtual > 12
+     * </code>
+     *
+     * @param     mixed $virtual The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByVirtual($virtual = null, $comparison = null)
+    {
+        if (is_array($virtual)) {
+            $useMinMax = false;
+            if (isset($virtual['min'])) {
+                $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($virtual['max'])) {
+                $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::VIRTUAL, $virtual, $comparison);
+    }
+
+    /**
+     * Filter the query on the virtual_document column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVirtualDocument('fooValue');   // WHERE virtual_document = 'fooValue'
+     * $query->filterByVirtualDocument('%fooValue%'); // WHERE virtual_document LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $virtualDocument The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderProductQuery The current query, for fluid interface
+     */
+    public function filterByVirtualDocument($virtualDocument = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($virtualDocument)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $virtualDocument)) {
+                $virtualDocument = str_replace('*', '%', $virtualDocument);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderProductTableMap::VIRTUAL_DOCUMENT, $virtualDocument, $comparison);
     }
 
     /**

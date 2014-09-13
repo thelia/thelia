@@ -10,23 +10,27 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Product as ChildProduct;
-use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\ProductVersionQuery as ChildProductVersionQuery;
-use Thelia\Model\Map\ProductVersionTableMap;
+use Thelia\Model\Module as ChildModule;
+use Thelia\Model\ModuleConfig as ChildModuleConfig;
+use Thelia\Model\ModuleConfigI18n as ChildModuleConfigI18n;
+use Thelia\Model\ModuleConfigI18nQuery as ChildModuleConfigI18nQuery;
+use Thelia\Model\ModuleConfigQuery as ChildModuleConfigQuery;
+use Thelia\Model\ModuleQuery as ChildModuleQuery;
+use Thelia\Model\Map\ModuleConfigTableMap;
 
-abstract class ProductVersion implements ActiveRecordInterface
+abstract class ModuleConfig implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductVersionTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ModuleConfigTableMap';
 
 
     /**
@@ -62,49 +66,16 @@ abstract class ProductVersion implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the tax_rule_id field.
+     * The value for the module_id field.
      * @var        int
      */
-    protected $tax_rule_id;
+    protected $module_id;
 
     /**
-     * The value for the ref field.
+     * The value for the name field.
      * @var        string
      */
-    protected $ref;
-
-    /**
-     * The value for the visible field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $visible;
-
-    /**
-     * The value for the position field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $position;
-
-    /**
-     * The value for the template_id field.
-     * @var        int
-     */
-    protected $template_id;
-
-    /**
-     * The value for the brand_id field.
-     * @var        int
-     */
-    protected $brand_id;
-
-    /**
-     * The value for the virtual field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $virtual;
+    protected $name;
 
     /**
      * The value for the created_at field.
@@ -119,28 +90,15 @@ abstract class ProductVersion implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * The value for the version field.
-     * Note: this column has a database default value of: 0
-     * @var        int
+     * @var        Module
      */
-    protected $version;
+    protected $aModule;
 
     /**
-     * The value for the version_created_at field.
-     * @var        string
+     * @var        ObjectCollection|ChildModuleConfigI18n[] Collection to store aggregation of ChildModuleConfigI18n objects.
      */
-    protected $version_created_at;
-
-    /**
-     * The value for the version_created_by field.
-     * @var        string
-     */
-    protected $version_created_by;
-
-    /**
-     * @var        Product
-     */
-    protected $aProduct;
+    protected $collModuleConfigI18ns;
+    protected $collModuleConfigI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -150,27 +108,31 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     protected $alreadyInSave = false;
 
-    /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->visible = 0;
-        $this->position = 0;
-        $this->virtual = 0;
-        $this->version = 0;
-    }
+    // i18n behavior
 
     /**
-     * Initializes internal state of Thelia\Model\Base\ProductVersion object.
-     * @see applyDefaults()
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_US';
+
+    /**
+     * Current translation objects
+     * @var        array[ChildModuleConfigI18n]
+     */
+    protected $currentTranslations;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $moduleConfigI18nsScheduledForDeletion = null;
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\ModuleConfig object.
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -262,9 +224,9 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ProductVersion</code> instance.  If
-     * <code>obj</code> is an instance of <code>ProductVersion</code>, delegates to
-     * <code>equals(ProductVersion)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ModuleConfig</code> instance.  If
+     * <code>obj</code> is an instance of <code>ModuleConfig</code>, delegates to
+     * <code>equals(ModuleConfig)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -347,7 +309,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ProductVersion The current object, for fluid interface
+     * @return ModuleConfig The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -379,7 +341,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ProductVersion The current object, for fluid interface
+     * @return ModuleConfig The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -436,80 +398,25 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [tax_rule_id] column value.
+     * Get the [module_id] column value.
      *
      * @return   int
      */
-    public function getTaxRuleId()
+    public function getModuleId()
     {
 
-        return $this->tax_rule_id;
+        return $this->module_id;
     }
 
     /**
-     * Get the [ref] column value.
+     * Get the [name] column value.
      *
      * @return   string
      */
-    public function getRef()
+    public function getName()
     {
 
-        return $this->ref;
-    }
-
-    /**
-     * Get the [visible] column value.
-     *
-     * @return   int
-     */
-    public function getVisible()
-    {
-
-        return $this->visible;
-    }
-
-    /**
-     * Get the [position] column value.
-     *
-     * @return   int
-     */
-    public function getPosition()
-    {
-
-        return $this->position;
-    }
-
-    /**
-     * Get the [template_id] column value.
-     *
-     * @return   int
-     */
-    public function getTemplateId()
-    {
-
-        return $this->template_id;
-    }
-
-    /**
-     * Get the [brand_id] column value.
-     *
-     * @return   int
-     */
-    public function getBrandId()
-    {
-
-        return $this->brand_id;
-    }
-
-    /**
-     * Get the [virtual] column value.
-     *
-     * @return   int
-     */
-    public function getVirtual()
-    {
-
-        return $this->virtual;
+        return $this->name;
     }
 
     /**
@@ -553,52 +460,10 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [version] column value.
-     *
-     * @return   int
-     */
-    public function getVersion()
-    {
-
-        return $this->version;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [version_created_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getVersionCreatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->version_created_at;
-        } else {
-            return $this->version_created_at instanceof \DateTime ? $this->version_created_at->format($format) : null;
-        }
-    }
-
-    /**
-     * Get the [version_created_by] column value.
-     *
-     * @return   string
-     */
-    public function getVersionCreatedBy()
-    {
-
-        return $this->version_created_by;
-    }
-
-    /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -608,11 +473,7 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[ProductVersionTableMap::ID] = true;
-        }
-
-        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
-            $this->aProduct = null;
+            $this->modifiedColumns[ModuleConfigTableMap::ID] = true;
         }
 
 
@@ -620,158 +481,57 @@ abstract class ProductVersion implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [tax_rule_id] column.
+     * Set the value of [module_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
      */
-    public function setTaxRuleId($v)
+    public function setModuleId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->tax_rule_id !== $v) {
-            $this->tax_rule_id = $v;
-            $this->modifiedColumns[ProductVersionTableMap::TAX_RULE_ID] = true;
+        if ($this->module_id !== $v) {
+            $this->module_id = $v;
+            $this->modifiedColumns[ModuleConfigTableMap::MODULE_ID] = true;
+        }
+
+        if ($this->aModule !== null && $this->aModule->getId() !== $v) {
+            $this->aModule = null;
         }
 
 
         return $this;
-    } // setTaxRuleId()
+    } // setModuleId()
 
     /**
-     * Set the value of [ref] column.
+     * Set the value of [name] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
      */
-    public function setRef($v)
+    public function setName($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->ref !== $v) {
-            $this->ref = $v;
-            $this->modifiedColumns[ProductVersionTableMap::REF] = true;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[ModuleConfigTableMap::NAME] = true;
         }
 
 
         return $this;
-    } // setRef()
-
-    /**
-     * Set the value of [visible] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setVisible($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->visible !== $v) {
-            $this->visible = $v;
-            $this->modifiedColumns[ProductVersionTableMap::VISIBLE] = true;
-        }
-
-
-        return $this;
-    } // setVisible()
-
-    /**
-     * Set the value of [position] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setPosition($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->position !== $v) {
-            $this->position = $v;
-            $this->modifiedColumns[ProductVersionTableMap::POSITION] = true;
-        }
-
-
-        return $this;
-    } // setPosition()
-
-    /**
-     * Set the value of [template_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setTemplateId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->template_id !== $v) {
-            $this->template_id = $v;
-            $this->modifiedColumns[ProductVersionTableMap::TEMPLATE_ID] = true;
-        }
-
-
-        return $this;
-    } // setTemplateId()
-
-    /**
-     * Set the value of [brand_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setBrandId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->brand_id !== $v) {
-            $this->brand_id = $v;
-            $this->modifiedColumns[ProductVersionTableMap::BRAND_ID] = true;
-        }
-
-
-        return $this;
-    } // setBrandId()
-
-    /**
-     * Set the value of [virtual] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setVirtual($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->virtual !== $v) {
-            $this->virtual = $v;
-            $this->modifiedColumns[ProductVersionTableMap::VIRTUAL] = true;
-        }
-
-
-        return $this;
-    } // setVirtual()
+    } // setName()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -779,7 +539,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[ProductVersionTableMap::CREATED_AT] = true;
+                $this->modifiedColumns[ModuleConfigTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -792,7 +552,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -800,76 +560,13 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[ProductVersionTableMap::UPDATED_AT] = true;
+                $this->modifiedColumns[ModuleConfigTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
 
         return $this;
     } // setUpdatedAt()
-
-    /**
-     * Set the value of [version] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setVersion($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->version !== $v) {
-            $this->version = $v;
-            $this->modifiedColumns[ProductVersionTableMap::VERSION] = true;
-        }
-
-
-        return $this;
-    } // setVersion()
-
-    /**
-     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setVersionCreatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->version_created_at !== null || $dt !== null) {
-            if ($dt !== $this->version_created_at) {
-                $this->version_created_at = $dt;
-                $this->modifiedColumns[ProductVersionTableMap::VERSION_CREATED_AT] = true;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setVersionCreatedAt()
-
-    /**
-     * Set the value of [version_created_by] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setVersionCreatedBy($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->version_created_by !== $v) {
-            $this->version_created_by = $v;
-            $this->modifiedColumns[ProductVersionTableMap::VERSION_CREATED_BY] = true;
-        }
-
-
-        return $this;
-    } // setVersionCreatedBy()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -881,22 +578,6 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->visible !== 0) {
-                return false;
-            }
-
-            if ($this->position !== 0) {
-                return false;
-            }
-
-            if ($this->virtual !== 0) {
-                return false;
-            }
-
-            if ($this->version !== 0) {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -924,53 +605,26 @@ abstract class ProductVersion implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductVersionTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ModuleConfigTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductVersionTableMap::translateFieldName('TaxRuleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->tax_rule_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ModuleConfigTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductVersionTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ref = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ModuleConfigTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductVersionTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->visible = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductVersionTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->position = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductVersionTableMap::translateFieldName('TemplateId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->template_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductVersionTableMap::translateFieldName('BrandId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->brand_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductVersionTableMap::translateFieldName('Virtual', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->virtual = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ModuleConfigTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ModuleConfigTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->version = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -979,10 +633,10 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 13; // 13 = ProductVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = ModuleConfigTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ProductVersion object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ModuleConfig object", 0, $e);
         }
     }
 
@@ -1001,8 +655,8 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aProduct !== null && $this->id !== $this->aProduct->getId()) {
-            $this->aProduct = null;
+        if ($this->aModule !== null && $this->module_id !== $this->aModule->getId()) {
+            $this->aModule = null;
         }
     } // ensureConsistency
 
@@ -1027,13 +681,13 @@ abstract class ProductVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProductVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ModuleConfigTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildProductVersionQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildModuleConfigQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -1043,7 +697,9 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProduct = null;
+            $this->aModule = null;
+            $this->collModuleConfigI18ns = null;
+
         } // if (deep)
     }
 
@@ -1053,8 +709,8 @@ abstract class ProductVersion implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ProductVersion::setDeleted()
-     * @see ProductVersion::isDeleted()
+     * @see ModuleConfig::setDeleted()
+     * @see ModuleConfig::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -1063,12 +719,12 @@ abstract class ProductVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleConfigTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildProductVersionQuery::create()
+            $deleteQuery = ChildModuleConfigQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -1105,7 +761,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductVersionTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ModuleConfigTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -1114,8 +770,19 @@ abstract class ProductVersion implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(ModuleConfigTableMap::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(ModuleConfigTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ModuleConfigTableMap::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -1125,7 +792,7 @@ abstract class ProductVersion implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ProductVersionTableMap::addInstanceToPool($this);
+                ModuleConfigTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -1160,11 +827,11 @@ abstract class ProductVersion implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aProduct !== null) {
-                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
-                    $affectedRows += $this->aProduct->save($con);
+            if ($this->aModule !== null) {
+                if ($this->aModule->isModified() || $this->aModule->isNew()) {
+                    $affectedRows += $this->aModule->save($con);
                 }
-                $this->setProduct($this->aProduct);
+                $this->setModule($this->aModule);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1176,6 +843,23 @@ abstract class ProductVersion implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->moduleConfigI18nsScheduledForDeletion !== null) {
+                if (!$this->moduleConfigI18nsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ModuleConfigI18nQuery::create()
+                        ->filterByPrimaryKeys($this->moduleConfigI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleConfigI18nsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collModuleConfigI18ns !== null) {
+            foreach ($this->collModuleConfigI18ns as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -1198,50 +882,30 @@ abstract class ProductVersion implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
+        $this->modifiedColumns[ModuleConfigTableMap::ID] = true;
+        if (null !== $this->id) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ModuleConfigTableMap::ID . ')');
+        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProductVersionTableMap::ID)) {
+        if ($this->isColumnModified(ModuleConfigTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(ProductVersionTableMap::TAX_RULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_ID`';
+        if ($this->isColumnModified(ModuleConfigTableMap::MODULE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`MODULE_ID`';
         }
-        if ($this->isColumnModified(ProductVersionTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = '`REF`';
+        if ($this->isColumnModified(ModuleConfigTableMap::NAME)) {
+            $modifiedColumns[':p' . $index++]  = '`NAME`';
         }
-        if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::TEMPLATE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TEMPLATE_ID`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::BRAND_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`BRAND_ID`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::VIRTUAL)) {
-            $modifiedColumns[':p' . $index++]  = '`VIRTUAL`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(ModuleConfigTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(ProductVersionTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(ModuleConfigTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `product_version` (%s) VALUES (%s)',
+            'INSERT INTO `module_config` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1253,41 +917,17 @@ abstract class ProductVersion implements ActiveRecordInterface
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_RULE_ID`':
-                        $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
+                    case '`MODULE_ID`':
+                        $stmt->bindValue($identifier, $this->module_id, PDO::PARAM_INT);
                         break;
-                    case '`REF`':
-                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
-                        break;
-                    case '`VISIBLE`':
-                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
-                        break;
-                    case '`POSITION`':
-                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
-                        break;
-                    case '`TEMPLATE_ID`':
-                        $stmt->bindValue($identifier, $this->template_id, PDO::PARAM_INT);
-                        break;
-                    case '`BRAND_ID`':
-                        $stmt->bindValue($identifier, $this->brand_id, PDO::PARAM_INT);
-                        break;
-                    case '`VIRTUAL`':
-                        $stmt->bindValue($identifier, $this->virtual, PDO::PARAM_INT);
+                    case '`NAME`':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case '`VERSION`':
-                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
-                        break;
-                    case '`VERSION_CREATED_AT`':
-                        $stmt->bindValue($identifier, $this->version_created_at ? $this->version_created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case '`VERSION_CREATED_BY`':
-                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1296,6 +936,13 @@ abstract class ProductVersion implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
+
+        try {
+            $pk = $con->lastInsertId();
+        } catch (Exception $e) {
+            throw new PropelException('Unable to get autoincrement id.', 0, $e);
+        }
+        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1328,7 +975,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ModuleConfigTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1348,40 +995,16 @@ abstract class ProductVersion implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getTaxRuleId();
+                return $this->getModuleId();
                 break;
             case 2:
-                return $this->getRef();
+                return $this->getName();
                 break;
             case 3:
-                return $this->getVisible();
-                break;
-            case 4:
-                return $this->getPosition();
-                break;
-            case 5:
-                return $this->getTemplateId();
-                break;
-            case 6:
-                return $this->getBrandId();
-                break;
-            case 7:
-                return $this->getVirtual();
-                break;
-            case 8:
                 return $this->getCreatedAt();
                 break;
-            case 9:
+            case 4:
                 return $this->getUpdatedAt();
-                break;
-            case 10:
-                return $this->getVersion();
-                break;
-            case 11:
-                return $this->getVersionCreatedAt();
-                break;
-            case 12:
-                return $this->getVersionCreatedBy();
                 break;
             default:
                 return null;
@@ -1406,25 +1029,17 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProductVersion'][serialize($this->getPrimaryKey())])) {
+        if (isset($alreadyDumpedObjects['ModuleConfig'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProductVersion'][serialize($this->getPrimaryKey())] = true;
-        $keys = ProductVersionTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ModuleConfig'][$this->getPrimaryKey()] = true;
+        $keys = ModuleConfigTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getTaxRuleId(),
-            $keys[2] => $this->getRef(),
-            $keys[3] => $this->getVisible(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getTemplateId(),
-            $keys[6] => $this->getBrandId(),
-            $keys[7] => $this->getVirtual(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
-            $keys[10] => $this->getVersion(),
-            $keys[11] => $this->getVersionCreatedAt(),
-            $keys[12] => $this->getVersionCreatedBy(),
+            $keys[1] => $this->getModuleId(),
+            $keys[2] => $this->getName(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1432,8 +1047,11 @@ abstract class ProductVersion implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aProduct) {
-                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aModule) {
+                $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collModuleConfigI18ns) {
+                $result['ModuleConfigI18ns'] = $this->collModuleConfigI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1453,7 +1071,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductVersionTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ModuleConfigTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1473,40 +1091,16 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setTaxRuleId($value);
+                $this->setModuleId($value);
                 break;
             case 2:
-                $this->setRef($value);
+                $this->setName($value);
                 break;
             case 3:
-                $this->setVisible($value);
-                break;
-            case 4:
-                $this->setPosition($value);
-                break;
-            case 5:
-                $this->setTemplateId($value);
-                break;
-            case 6:
-                $this->setBrandId($value);
-                break;
-            case 7:
-                $this->setVirtual($value);
-                break;
-            case 8:
                 $this->setCreatedAt($value);
                 break;
-            case 9:
+            case 4:
                 $this->setUpdatedAt($value);
-                break;
-            case 10:
-                $this->setVersion($value);
-                break;
-            case 11:
-                $this->setVersionCreatedAt($value);
-                break;
-            case 12:
-                $this->setVersionCreatedBy($value);
                 break;
         } // switch()
     }
@@ -1530,21 +1124,13 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ProductVersionTableMap::getFieldNames($keyType);
+        $keys = ModuleConfigTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setTaxRuleId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setRef($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setTemplateId($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setBrandId($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setVirtual($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setVersion($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setVersionCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setVersionCreatedBy($arr[$keys[12]]);
+        if (array_key_exists($keys[1], $arr)) $this->setModuleId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1554,21 +1140,13 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ProductVersionTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ModuleConfigTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProductVersionTableMap::ID)) $criteria->add(ProductVersionTableMap::ID, $this->id);
-        if ($this->isColumnModified(ProductVersionTableMap::TAX_RULE_ID)) $criteria->add(ProductVersionTableMap::TAX_RULE_ID, $this->tax_rule_id);
-        if ($this->isColumnModified(ProductVersionTableMap::REF)) $criteria->add(ProductVersionTableMap::REF, $this->ref);
-        if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) $criteria->add(ProductVersionTableMap::VISIBLE, $this->visible);
-        if ($this->isColumnModified(ProductVersionTableMap::POSITION)) $criteria->add(ProductVersionTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(ProductVersionTableMap::TEMPLATE_ID)) $criteria->add(ProductVersionTableMap::TEMPLATE_ID, $this->template_id);
-        if ($this->isColumnModified(ProductVersionTableMap::BRAND_ID)) $criteria->add(ProductVersionTableMap::BRAND_ID, $this->brand_id);
-        if ($this->isColumnModified(ProductVersionTableMap::VIRTUAL)) $criteria->add(ProductVersionTableMap::VIRTUAL, $this->virtual);
-        if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) $criteria->add(ProductVersionTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ProductVersionTableMap::UPDATED_AT)) $criteria->add(ProductVersionTableMap::UPDATED_AT, $this->updated_at);
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION)) $criteria->add(ProductVersionTableMap::VERSION, $this->version);
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_AT)) $criteria->add(ProductVersionTableMap::VERSION_CREATED_AT, $this->version_created_at);
-        if ($this->isColumnModified(ProductVersionTableMap::VERSION_CREATED_BY)) $criteria->add(ProductVersionTableMap::VERSION_CREATED_BY, $this->version_created_by);
+        if ($this->isColumnModified(ModuleConfigTableMap::ID)) $criteria->add(ModuleConfigTableMap::ID, $this->id);
+        if ($this->isColumnModified(ModuleConfigTableMap::MODULE_ID)) $criteria->add(ModuleConfigTableMap::MODULE_ID, $this->module_id);
+        if ($this->isColumnModified(ModuleConfigTableMap::NAME)) $criteria->add(ModuleConfigTableMap::NAME, $this->name);
+        if ($this->isColumnModified(ModuleConfigTableMap::CREATED_AT)) $criteria->add(ModuleConfigTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ModuleConfigTableMap::UPDATED_AT)) $criteria->add(ModuleConfigTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1583,37 +1161,30 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ProductVersionTableMap::DATABASE_NAME);
-        $criteria->add(ProductVersionTableMap::ID, $this->id);
-        $criteria->add(ProductVersionTableMap::VERSION, $this->version);
+        $criteria = new Criteria(ModuleConfigTableMap::DATABASE_NAME);
+        $criteria->add(ModuleConfigTableMap::ID, $this->id);
 
         return $criteria;
     }
 
     /**
-     * Returns the composite primary key for this object.
-     * The array elements will be in same order as specified in XML.
-     * @return array
+     * Returns the primary key for this object (row).
+     * @return   int
      */
     public function getPrimaryKey()
     {
-        $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getVersion();
-
-        return $pks;
+        return $this->getId();
     }
 
     /**
-     * Set the [composite] primary key.
+     * Generic method to set the primary key (id column).
      *
-     * @param      array $keys The elements of the composite key (order must match the order in XML file).
+     * @param       int $key Primary key.
      * @return void
      */
-    public function setPrimaryKey($keys)
+    public function setPrimaryKey($key)
     {
-        $this->setId($keys[0]);
-        $this->setVersion($keys[1]);
+        $this->setId($key);
     }
 
     /**
@@ -1623,7 +1194,7 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getVersion());
+        return null === $this->getId();
     }
 
     /**
@@ -1632,28 +1203,34 @@ abstract class ProductVersion implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ProductVersion (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ModuleConfig (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setId($this->getId());
-        $copyObj->setTaxRuleId($this->getTaxRuleId());
-        $copyObj->setRef($this->getRef());
-        $copyObj->setVisible($this->getVisible());
-        $copyObj->setPosition($this->getPosition());
-        $copyObj->setTemplateId($this->getTemplateId());
-        $copyObj->setBrandId($this->getBrandId());
-        $copyObj->setVirtual($this->getVirtual());
+        $copyObj->setModuleId($this->getModuleId());
+        $copyObj->setName($this->getName());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-        $copyObj->setVersion($this->getVersion());
-        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
-        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getModuleConfigI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleConfigI18n($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
+            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1666,7 +1243,7 @@ abstract class ProductVersion implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ProductVersion Clone of current object.
+     * @return                 \Thelia\Model\ModuleConfig Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1680,26 +1257,26 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProduct object.
+     * Declares an association between this object and a ChildModule object.
      *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\ProductVersion The current object (for fluent API support)
+     * @param                  ChildModule $v
+     * @return                 \Thelia\Model\ModuleConfig The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProduct(ChildProduct $v = null)
+    public function setModule(ChildModule $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setModuleId(NULL);
         } else {
-            $this->setId($v->getId());
+            $this->setModuleId($v->getId());
         }
 
-        $this->aProduct = $v;
+        $this->aModule = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
+        // If this object has already been added to the ChildModule object, it will not be re-added.
         if ($v !== null) {
-            $v->addProductVersion($this);
+            $v->addModuleConfig($this);
         }
 
 
@@ -1708,26 +1285,267 @@ abstract class ProductVersion implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildProduct object
+     * Get the associated ChildModule object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
+     * @return                 ChildModule The associated ChildModule object.
      * @throws PropelException
      */
-    public function getProduct(ConnectionInterface $con = null)
+    public function getModule(ConnectionInterface $con = null)
     {
-        if ($this->aProduct === null && ($this->id !== null)) {
-            $this->aProduct = ChildProductQuery::create()->findPk($this->id, $con);
+        if ($this->aModule === null && ($this->module_id !== null)) {
+            $this->aModule = ChildModuleQuery::create()->findPk($this->module_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addProductVersions($this);
+                $this->aModule->addModuleConfigs($this);
              */
         }
 
-        return $this->aProduct;
+        return $this->aModule;
+    }
+
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('ModuleConfigI18n' == $relationName) {
+            return $this->initModuleConfigI18ns();
+        }
+    }
+
+    /**
+     * Clears out the collModuleConfigI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleConfigI18ns()
+     */
+    public function clearModuleConfigI18ns()
+    {
+        $this->collModuleConfigI18ns = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collModuleConfigI18ns collection loaded partially.
+     */
+    public function resetPartialModuleConfigI18ns($v = true)
+    {
+        $this->collModuleConfigI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleConfigI18ns collection.
+     *
+     * By default this just sets the collModuleConfigI18ns collection to an empty array (like clearcollModuleConfigI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleConfigI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collModuleConfigI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleConfigI18ns = new ObjectCollection();
+        $this->collModuleConfigI18ns->setModel('\Thelia\Model\ModuleConfigI18n');
+    }
+
+    /**
+     * Gets an array of ChildModuleConfigI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildModuleConfig is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildModuleConfigI18n[] List of ChildModuleConfigI18n objects
+     * @throws PropelException
+     */
+    public function getModuleConfigI18ns($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigI18nsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigI18ns) {
+                // return empty collection
+                $this->initModuleConfigI18ns();
+            } else {
+                $collModuleConfigI18ns = ChildModuleConfigI18nQuery::create(null, $criteria)
+                    ->filterByModuleConfig($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleConfigI18nsPartial && count($collModuleConfigI18ns)) {
+                        $this->initModuleConfigI18ns(false);
+
+                        foreach ($collModuleConfigI18ns as $obj) {
+                            if (false == $this->collModuleConfigI18ns->contains($obj)) {
+                                $this->collModuleConfigI18ns->append($obj);
+                            }
+                        }
+
+                        $this->collModuleConfigI18nsPartial = true;
+                    }
+
+                    reset($collModuleConfigI18ns);
+
+                    return $collModuleConfigI18ns;
+                }
+
+                if ($partial && $this->collModuleConfigI18ns) {
+                    foreach ($this->collModuleConfigI18ns as $obj) {
+                        if ($obj->isNew()) {
+                            $collModuleConfigI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleConfigI18ns = $collModuleConfigI18ns;
+                $this->collModuleConfigI18nsPartial = false;
+            }
+        }
+
+        return $this->collModuleConfigI18ns;
+    }
+
+    /**
+     * Sets a collection of ModuleConfigI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $moduleConfigI18ns A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildModuleConfig The current object (for fluent API support)
+     */
+    public function setModuleConfigI18ns(Collection $moduleConfigI18ns, ConnectionInterface $con = null)
+    {
+        $moduleConfigI18nsToDelete = $this->getModuleConfigI18ns(new Criteria(), $con)->diff($moduleConfigI18ns);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->moduleConfigI18nsScheduledForDeletion = clone $moduleConfigI18nsToDelete;
+
+        foreach ($moduleConfigI18nsToDelete as $moduleConfigI18nRemoved) {
+            $moduleConfigI18nRemoved->setModuleConfig(null);
+        }
+
+        $this->collModuleConfigI18ns = null;
+        foreach ($moduleConfigI18ns as $moduleConfigI18n) {
+            $this->addModuleConfigI18n($moduleConfigI18n);
+        }
+
+        $this->collModuleConfigI18ns = $moduleConfigI18ns;
+        $this->collModuleConfigI18nsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ModuleConfigI18n objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ModuleConfigI18n objects.
+     * @throws PropelException
+     */
+    public function countModuleConfigI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collModuleConfigI18nsPartial && !$this->isNew();
+        if (null === $this->collModuleConfigI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleConfigI18ns) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getModuleConfigI18ns());
+            }
+
+            $query = ChildModuleConfigI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModuleConfig($this)
+                ->count($con);
+        }
+
+        return count($this->collModuleConfigI18ns);
+    }
+
+    /**
+     * Method called to associate a ChildModuleConfigI18n object to this object
+     * through the ChildModuleConfigI18n foreign key attribute.
+     *
+     * @param    ChildModuleConfigI18n $l ChildModuleConfigI18n
+     * @return   \Thelia\Model\ModuleConfig The current object (for fluent API support)
+     */
+    public function addModuleConfigI18n(ChildModuleConfigI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collModuleConfigI18ns === null) {
+            $this->initModuleConfigI18ns();
+            $this->collModuleConfigI18nsPartial = true;
+        }
+
+        if (!in_array($l, $this->collModuleConfigI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleConfigI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ModuleConfigI18n $moduleConfigI18n The moduleConfigI18n object to add.
+     */
+    protected function doAddModuleConfigI18n($moduleConfigI18n)
+    {
+        $this->collModuleConfigI18ns[]= $moduleConfigI18n;
+        $moduleConfigI18n->setModuleConfig($this);
+    }
+
+    /**
+     * @param  ModuleConfigI18n $moduleConfigI18n The moduleConfigI18n object to remove.
+     * @return ChildModuleConfig The current object (for fluent API support)
+     */
+    public function removeModuleConfigI18n($moduleConfigI18n)
+    {
+        if ($this->getModuleConfigI18ns()->contains($moduleConfigI18n)) {
+            $this->collModuleConfigI18ns->remove($this->collModuleConfigI18ns->search($moduleConfigI18n));
+            if (null === $this->moduleConfigI18nsScheduledForDeletion) {
+                $this->moduleConfigI18nsScheduledForDeletion = clone $this->collModuleConfigI18ns;
+                $this->moduleConfigI18nsScheduledForDeletion->clear();
+            }
+            $this->moduleConfigI18nsScheduledForDeletion[]= clone $moduleConfigI18n;
+            $moduleConfigI18n->setModuleConfig(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -1736,21 +1554,12 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->tax_rule_id = null;
-        $this->ref = null;
-        $this->visible = null;
-        $this->position = null;
-        $this->template_id = null;
-        $this->brand_id = null;
-        $this->virtual = null;
+        $this->module_id = null;
+        $this->name = null;
         $this->created_at = null;
         $this->updated_at = null;
-        $this->version = null;
-        $this->version_created_at = null;
-        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1768,9 +1577,19 @@ abstract class ProductVersion implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collModuleConfigI18ns) {
+                foreach ($this->collModuleConfigI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aProduct = null;
+        // i18n behavior
+        $this->currentLocale = 'en_US';
+        $this->currentTranslations = null;
+
+        $this->collModuleConfigI18ns = null;
+        $this->aModule = null;
     }
 
     /**
@@ -1780,7 +1599,144 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ProductVersionTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ModuleConfigTableMap::DEFAULT_STRING_FORMAT);
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    ChildModuleConfig The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_US')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
+     *
+     * @return ChildModuleConfigI18n */
+    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collModuleConfigI18ns) {
+                foreach ($this->collModuleConfigI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ChildModuleConfigI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ChildModuleConfigI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addModuleConfigI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     ConnectionInterface $con an optional connection object
+     *
+     * @return    ChildModuleConfig The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    {
+        if (!$this->isNew()) {
+            ChildModuleConfigI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collModuleConfigI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collModuleConfigI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     ConnectionInterface $con an optional connection object
+     *
+     * @return ChildModuleConfigI18n */
+    public function getCurrentTranslation(ConnectionInterface $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [value] column value.
+         *
+         * @return   string
+         */
+        public function getValue()
+        {
+        return $this->getCurrentTranslation()->getValue();
+    }
+
+
+        /**
+         * Set the value of [value] column.
+         *
+         * @param      string $v new value
+         * @return   \Thelia\Model\ModuleConfigI18n The current object (for fluent API support)
+         */
+        public function setValue($v)
+        {    $this->getCurrentTranslation()->setValue($v);
+
+        return $this;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildModuleConfig The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[ModuleConfigTableMap::UPDATED_AT] = true;
+
+        return $this;
     }
 
     /**
