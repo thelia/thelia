@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -36,7 +37,6 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="tax_rule_id" type="INTEGER" />
     <column name="ref" required="true" size="255" type="VARCHAR" />
-    <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <column defaultValue="0" name="visible" required="true" type="TINYINT" />
     <column defaultValue="0" name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -48,6 +48,7 @@
     <column name="meta_title" size="255" type="VARCHAR" />
     <column name="meta_description" type="LONGVARCHAR" />
     <column name="meta_keywords" type="LONGVARCHAR" />
+    <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
     <foreign-key foreignTable="tax_rule" name="fk_product_tax_rule_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="tax_rule_id" />
     </foreign-key>
@@ -703,8 +704,6 @@
     <column name="chapo" type="LONGVARCHAR" />
     <column name="description" type="CLOB" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <column name="virtual" required="true" type="TINYINT" defaultValue="0" />
-    <column name="virtual_document" type="VARCHAR" size="255" />
     <column name="quantity" required="true" type="FLOAT" />
     <column name="price" required="true" type="FLOAT" />
     <column name="promo_price" size="45" type="VARCHAR" />
@@ -715,6 +714,8 @@
     <column name="tax_rule_title" size="255" type="VARCHAR" />
     <column name="tax_rule_description" type="CLOB" />
     <column description="not managed yet" name="parent" type="INTEGER" />
+    <column defaultValue="0" name="virtual" required="true" type="TINYINT" />
+    <column name="virtual_document" size="255" type="VARCHAR" />
     <foreign-key foreignTable="order" name="fk_order_product_order_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="order_id" />
     </foreign-key>
@@ -1776,5 +1777,22 @@
       <index-column name="element_key" />
       <index-column name="element_id" />
     </index>
+  </table>
+  <table name="module_config" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="name" required="true" size="255" type="VARCHAR" />
+    <column name="value" type="LONGVARCHAR" />
+    <foreign-key foreignTable="module" name="fk_module_config_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <index name="idx_module_id_name">
+      <index-column name="module_id" />
+      <index-column name="name" />
+    </index>
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="value" />
+    </behavior>
+    <behavior name="timestampable" />
   </table>
 </database>
