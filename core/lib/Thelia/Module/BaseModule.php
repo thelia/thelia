@@ -345,7 +345,9 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      */
     public static function getModuleCode()
     {
-        return basename(get_called_class());
+        $fullClassName = explode('\\', get_called_class());
+
+        return end($fullClassName);
     }
 
     /*
