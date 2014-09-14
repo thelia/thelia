@@ -91,4 +91,23 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
         return $this;
     }
 
+    /**
+     * Delete a module's configuration variable
+     *
+     * @param  int    $moduleId     the module id
+     * @param  string $variableName the variable name
+     * @return $this;
+     */
+    public function deleteConfigValue($moduleId, $variableName)
+    {
+        if (null !== $moduleConfig = self::create()
+            ->filterByModuleId($moduleId)
+            ->filterByName($variableName)
+            ->findOne()
+        ) {
+            $moduleConfig->delete();
+        };
+
+        return $this;
+    }
 } // ModuleConfigQuery
