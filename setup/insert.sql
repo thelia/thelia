@@ -164,8 +164,8 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL),
 ('4',  'en_US',  'Front office integration', NULL,  NULL,  NULL),
 ('4',  'fr_FR',  'Module Front office', NULL,  NULL,  NULL),
-('5',  'en_US',  'tinymce wysiwyg editor', NULL,  NULL,  NULL),
-('5',  'fr_FR',  'éditeur wysiwyg tinymce', NULL,  NULL,  NULL),
+('5',  'en_US',  'TinyMCE WYSIWYG editor', NULL,  NULL,  NULL),
+('5',  'fr_FR',  'Editeur visuel TinyMCE', NULL,  NULL,  NULL),
 ('6', 'en_US',  'Navigation block', NULL,  NULL,  NULL),
 ('6', 'fr_FR',  'Bloc menu', NULL,  NULL,  NULL),
 ('7',  'en_US',  'Currency block', NULL,  NULL,  NULL),
@@ -1715,8 +1715,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (2022, 'fr_FR', 'Confirmation de commande - après les récapitulatif de commande', '', ''),
 (2022, 'en_US', 'Order confirmation - after the order summary', '', ''),
 
-(2023, 'fr_FR', 'Partout ou l''éditeur WYSYWIG est nécessaire', '', ''),
-(2023, 'en_US', 'Where the WYSYWIG editor is required', '', '')
+(2023, 'fr_FR', 'Partout ou l''éditeur WYSIWYG est nécessaire', '', ''),
+(2023, 'en_US', 'Where the WYSIWYG editor is required', '', '')
 ;
 
 

@@ -23,7 +23,7 @@ use Thelia\Core\Hook\BaseHook;
  */
 class HookManager extends BaseHook {
 
-    public function onJsWysywig(HookRenderEvent $event)
+    public function onJsWysiwyg(HookRenderEvent $event)
     {
         $content = $this->render("tinymce_init.tpl");
         $event->add($content);

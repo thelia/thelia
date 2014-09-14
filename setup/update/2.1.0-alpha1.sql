@@ -1788,8 +1788,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (2022, 'fr_FR', 'Confirmation de commande - après les récapitulatif de commande', '', ''),
   (2022, 'en_US', 'Order confirmation - after the order summary', '', ''),
 
-  (2023, 'fr_FR', 'Partout ou l''éditeur WYSYWIG est nécessaire', '', ''),
-  (2023, 'en_US', 'Where the WYSYWIG editor is required', '', '');
+  (2023, 'fr_FR', 'Partout ou l''éditeur WYSIWYG est nécessaire', '', ''),
+  (2023, 'en_US', 'Where the WYSIWYG editor is required', '', '');
 
 -- ---------------------------------------------------------------------
 -- hook_i18n
