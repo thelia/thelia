@@ -701,7 +701,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 
-(2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+(2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+
+(2023, 'wysywyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
 ;
 
 
@@ -1711,7 +1713,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (2021, 'en_US', 'Delivery - after the order summary', '', ''),
 
 (2022, 'fr_FR', 'Confirmation de commande - après les récapitulatif de commande', '', ''),
-(2022, 'en_US', 'Order confirmation - after the order summary', '', '')
+(2022, 'en_US', 'Order confirmation - after the order summary', '', ''),
+
+(2023, 'fr_FR', 'Partout ou l''éditeur WYSYWIG est nécessaire', '', ''),
+(2023, 'en_US', 'Where the WYSYWIG editor is required', '', '')
 ;
 
 

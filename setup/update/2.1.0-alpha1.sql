@@ -774,7 +774,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
   (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 
-  (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+  (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+
+  (2023, 'wysywyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
 ;
 
 
@@ -1784,8 +1786,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (2021, 'en_US', 'Delivery - after the order summary', '', ''),
 
   (2022, 'fr_FR', 'Confirmation de commande - après les récapitulatif de commande', '', ''),
-  (2022, 'en_US', 'Order confirmation - after the order summary', '', '')
-;
+  (2022, 'en_US', 'Order confirmation - after the order summary', '', ''),
+
+  (2023, 'fr_FR', 'Partout ou l''éditeur WYSYWIG est nécessaire', '', ''),
+  (2023, 'en_US', 'Where the WYSYWIG editor is required', '', '');
 
 -- ---------------------------------------------------------------------
 -- hook_i18n
@@ -1987,6 +1991,49 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
   (@max_id, 'en_US', 'Allow negative product stock (1) or not (0, default)', NULL, NULL, NULL),
   (@max_id, 'fr_FR', 'Autoriser un stock négatif sur les produits (1) ou pas (0, défaut)', NULL, NULL, NULL);
 
+# ======================================================================================================================
+# Module configuration
+# ======================================================================================================================
+
+-- ---------------------------------------------------------------------
+-- module_config
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config`;
+
+CREATE TABLE `module_config`
+(
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `module_id` INTEGER NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `created_at` DATETIME,
+  `updated_at` DATETIME,
+  PRIMARY KEY (`id`),
+  INDEX `idx_module_id_name` (`module_id`, `name`),
+  CONSTRAINT `fk_module_config_module_id`
+  FOREIGN KEY (`module_id`)
+  REFERENCES `module` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- module_config_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config_i18n`;
+
+CREATE TABLE `module_config_i18n`
+(
+  `id` INTEGER NOT NULL,
+  `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+  `value` TEXT,
+  PRIMARY KEY (`id`,`locale`),
+  CONSTRAINT `module_config_i18n_FK_1`
+  FOREIGN KEY (`id`)
+  REFERENCES `module_config` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # ======================================================================================================================
 # End of changes

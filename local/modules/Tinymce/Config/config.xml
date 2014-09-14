@@ -11,4 +11,10 @@
         </service>
     </services>
 
+    <hooks>
+        <hook id="tinymce.hook" class="Tinymce\Hook\HookManager" scope="request">
+            <tag name="hook.event_listener" event="wysywig.js" type="back" method="onJsWysywig" />
+        </hook>
+    </hooks>
+
 </config>
