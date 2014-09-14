@@ -389,6 +389,20 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
     }
 
+
+    /**
+     * @param OrderEvent $event
+     */
+    public function orderAfterPayement(OrderEvent $event) {
+
+        // Empty cart and clear current order
+        $session = $this->getSession();
+
+        $this->createCart($session);
+
+        $session->setOrder(new \Thelia\Model\Order());
+    }
+
     /**
      * @param OrderEvent $event
      *
@@ -543,6 +557,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
+            TheliaEvents::ORDER_AFTER_PAYMENT => array("orderAfterPayement", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayement", 128),
             TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendConfirmationEmail", 128),
             TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => array("sendNotificationEmail", 128),
