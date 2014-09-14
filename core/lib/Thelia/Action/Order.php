@@ -389,12 +389,11 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
     }
 
-
     /**
      * @param OrderEvent $event
      */
-    public function orderAfterPayement(OrderEvent $event) {
-
+    public function orderAfterPayement(OrderEvent $event)
+    {
         // Empty cart and clear current order
         $session = $this->getSession();
 
