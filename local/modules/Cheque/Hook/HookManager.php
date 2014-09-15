@@ -18,7 +18,7 @@ use Thelia\Core\Hook\BaseHook;
 /**
  * Class HookManager
  *
- * @package Tinymce\Hook
+ * @package Cheque\Hook
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class HookManager extends BaseHook {

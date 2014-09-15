@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Cheque\Cheque;
 use Thelia\Core\Template\Loop\ModuleConfig;
-use Thelia\Model\SaleQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
 /**

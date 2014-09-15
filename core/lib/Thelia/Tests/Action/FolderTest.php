@@ -21,8 +21,6 @@ use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\FolderQuery;
-use Thelia\Model\LangQuery;
-use Thelia\Model\Map\FolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**

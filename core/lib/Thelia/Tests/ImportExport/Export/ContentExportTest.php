@@ -26,7 +26,6 @@ use Thelia\Model\Map\ContentDocumentTableMap;
 use Thelia\Model\Map\ContentImageTableMap;
 use Thelia\Model\Map\FolderDocumentTableMap;
 use Thelia\Model\Map\FolderImageTableMap;
-use Thelia\Model\Map\FolderTableMap;
 
 /**
  * Class ContentExportTest

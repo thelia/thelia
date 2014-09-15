@@ -15,7 +15,6 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\Propel;
 use Thelia\Action\Address;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 

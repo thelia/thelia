@@ -34,7 +34,7 @@ class HookUpdateEvent extends HookCreateEvent
     }
 
     /**
-     * @param int $hook_id
+     * @param  int   $hook_id
      * @return $this
      */
     public function setHookId($hook_id)

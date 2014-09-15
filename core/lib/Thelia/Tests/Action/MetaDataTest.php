@@ -18,7 +18,6 @@ use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
 use Thelia\Action\MetaData;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
-use Thelia\Core\Event\MetaData\MetaDataEvent;
 use Thelia\Model\ProductQuery;
 
 

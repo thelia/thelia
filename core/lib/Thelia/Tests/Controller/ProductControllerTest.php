@@ -13,7 +13,6 @@
 namespace Thelia\Tests\Controller;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ProductController;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;

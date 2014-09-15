@@ -470,7 +470,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param ModelOrder $order
+     * @param  ModelOrder                               $order
      * @param $status
      * @param $canceledStatus
      * @throws \Thelia\Exception\TheliaProcessException
