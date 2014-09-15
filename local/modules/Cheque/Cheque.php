@@ -29,20 +29,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
 
     public function pay(Order $order)
     {
-        // no special process, waiting for the cheque.
-        $router = $this->getContainer()->get('router.cheque');
-
-        $thankYouPageUrl = URL::getInstance()->absoluteUrl(
-            $router->generate('cheque.order-placed', ['orderId' => $order->getId()])
-        );
-
-        $orderEvent = new OrderEvent($order);
-
-        // Clear the cart
-        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $orderEvent);
-
-        // Redirect to our own route, so that our payment page is displayed.
-        return RedirectResponse::create($thankYouPageUrl);
+        // Nothing special to to.
     }
 
     /**

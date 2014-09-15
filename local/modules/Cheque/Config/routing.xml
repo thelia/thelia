@@ -6,9 +6,4 @@
     <route id="cheque.configure" path="/admin/cheque/configure" methods="post">
         <default key="_controller">Cheque\Controller\ConfigureController::configure</default>
     </route>
-
-    <route id="cheque.order-placed" path="/cheque/order-placed/{orderId}" methods="get">
-        <default key="_controller">Cheque\Controller\PaymentController::orderPlaced</default>
-        <requirement key="orderId">\d+</requirement>
-    </route>
 </routes>

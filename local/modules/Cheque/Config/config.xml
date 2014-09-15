@@ -8,6 +8,12 @@
         <form name="cheque.instructions.configure" class="Cheque\Form\ConfigurationForm" />
     </forms>
 
+    <hooks>
+        <hook id="cheque.hook" class="Cheque\Hook\HookManager" scope="request">
+            <tag name="hook.event_listener" event="order-placed.additional-payment-info" type="front" method="onAdditionalPaymentInfo" />
+        </hook>
+    </hooks>
+
     <services>
         <service id="send.cheque.mail" class="Cheque\Listener\SendPaymentConfirmationEmail" scope="request">
             <argument type="service" id="mailer"/>
