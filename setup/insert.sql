@@ -162,6 +162,8 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('1',  'fr_FR',  'Debug bar', NULL,  NULL,  NULL),
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL),
+('3',  'en_US',  'Pay by cheque', NULL,  NULL,  NULL),
+('3',  'fr_FR',  'Payer par chèque', NULL,  NULL,  NULL),
 ('4',  'en_US',  'Front office integration', NULL,  NULL,  NULL),
 ('4',  'fr_FR',  'Module Front office', NULL,  NULL,  NULL),
 ('5',  'en_US',  'TinyMCE WYSIWYG editor', NULL,  NULL,  NULL),
