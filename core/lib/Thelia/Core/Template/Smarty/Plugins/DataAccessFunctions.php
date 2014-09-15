@@ -211,6 +211,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case "total_taxed_price_without_discount":
                 $result = $cart->getTaxedAmount($taxCountry, false);
                 break;
+            case "total_vat":
+                $result = $cart->getTotalVAT($taxCountry);
+                break;                        
         }
 
         return $result;
@@ -221,6 +224,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $order = $this->request->getSession()->getOrder();
         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
         switch ($attribute) {
+            case 'untaxed_postage':
+                return $order->getUntaxedPostage();
             case 'postage':
                 return $order->getPostage();
             case 'discount':
