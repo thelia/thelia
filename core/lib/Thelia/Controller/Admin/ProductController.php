@@ -37,6 +37,7 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 
 use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 
@@ -531,6 +532,44 @@ class ProductController extends AbstractSeoCrudController
             }
         }
     }
+
+    /**
+     * return a list of document which will be displayed in AJAX
+     *
+     * @param $productId
+     * @param $pseId
+     *
+     * @return Response
+     */
+    public function getVirtualDocumentListAjaxAction($productId ,$pseId)
+    {
+        $this->checkAuth(AdminResources::PRODUCT, array(), AccessManager::VIEW);
+        $this->checkXmlHttpRequest();
+
+        $selectedId = intval(MetaDataQuery::getVal('virtual', MetaData::PSE_KEY, $pseId));
+
+        $documents = ProductDocumentQuery::create()
+            ->filterByProductId($productId)
+            ->filterByVisible(0)
+            ->orderByPosition()
+            ->find()
+            ->toArray();
+
+        $results = [];
+
+        if (null !== $documents) {
+            foreach ($documents as $document){
+                $results[] = [
+                    'id'       => $document['Id'],
+                    'title'    => $document['File'],
+                    'selected' => ($document['Id'] == $selectedId)
+                ];
+            }
+        }
+
+        return $this->jsonResponse(json_encode($results));
+    }
+
 
     // -- Related content management -------------------------------------------
 
