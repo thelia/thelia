@@ -51,12 +51,12 @@ php Thelia module:activate Colissimo
 echo [INFO] Activating Payment Module(s)
 php Thelia module:activate Cheque
 
+:casperjs
+
 for %%X in (casperjs.bat) do (set FOUND=%%~$PATH:X)
 if NOT defined FOUND (
     echo [ERROR] casperjs not found. Please add to your PATH the casperjs batchbin directory, and the phantomjs bin directory.
     goto :EOF
 )
-
-:casperjs
 
 casperjs test .\tests\functionnal\casperjs\exe\front --pre=.\tests\functionnal\casperjs\conf\local.js --verbose
