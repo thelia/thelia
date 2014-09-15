@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Install\Database;
+use Thelia\Model\MessageQuery;
 use Thelia\Model\ModuleImageQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
@@ -46,23 +47,28 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         return true;
     }
 
-    public function postActivation(ConnectionInterface $con = null)
+    public function install(ConnectionInterface $con = null)
     {
-        /* insert the images from image folder if first module activation */
+        $database = new Database($con->getWrappedConnection());
+
+        // Insert email message
+        $database->insertSql(null, array(__DIR__ . "/Config/setup.sql"));
+
+        /* insert the images from image folder if not already done */
         $moduleModel = $this->getModuleModel();
 
         if (! $moduleModel->isModuleImageDeployed($con)) {
             $this->deployImageFolder($moduleModel, sprintf('%s/images', __DIR__), $con);
         }
-
-        $database = new Database($con->getWrappedConnection());
-
-        // Insert email message
-        $database->insertSql(null, array(__DIR__ . "/Config/cheque.sql"));
     }
 
-    public function getCode()
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
-        return 'Cheque';
+        // Delete our message
+        if (null !== $message = MessageQuery::create()->findOneByName('order_confirmation_cheque')) {
+            $message->delete($con);
+        }
+
+        parent::destroy($con, $deleteModuleData);
     }
 }
