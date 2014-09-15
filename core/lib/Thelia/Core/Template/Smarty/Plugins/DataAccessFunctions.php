@@ -217,7 +217,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 break;
             case "total_vat":
                 $result = $cart->getTotalVAT($taxCountry);
-                break;                        
+                break;
         }
 
         return $result;

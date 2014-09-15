@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Core\Smarty\Plugins;
+namespace Thelia\Tests\Core\Template\Smarty\Plugins;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;

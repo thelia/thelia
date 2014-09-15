@@ -263,7 +263,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     /**
      * @depends testAddCategory
      */
-    public function testRemoveCategory(Array $productCategory)
+    public function testRemoveCategory(array $productCategory)
     {
         $product = $productCategory['product'];
         $category = $productCategory['category'];

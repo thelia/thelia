@@ -10,10 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Condition\Implementation;
+namespace Thelia\Tests\Condition;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
+use Thelia\Condition\Implementation\MatchForEveryone;
+use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Condition\ConditionCollection;

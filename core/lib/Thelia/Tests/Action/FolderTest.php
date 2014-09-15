@@ -281,7 +281,6 @@ class FolderTest extends TestCaseWithURLToolSetup
 
     }
 
-
     /**
      * generates a folder and its sub folders to be used in Position tests
      *

@@ -19,6 +19,7 @@ call php-cs-fixer fix core\lib\Thelia\Model\Tools --level=all
 call php-cs-fixer fix core\lib\Thelia\Module --level=all
 call php-cs-fixer fix core\lib\Thelia\Rewriting --level=all
 call php-cs-fixer fix core\lib\Thelia\TaxEngine --level=all
+call php-cs-fixer fix core\lib\Thelia\Tests --level=all
 call php-cs-fixer fix core\lib\Thelia\Tools --level=all
 call php-cs-fixer fix core\lib\Thelia\Type --level=all
 echo "Done."

@@ -81,8 +81,8 @@ class RemoveAmountOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count) {
-
+    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
+    {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
             ->getMock()
@@ -140,7 +140,6 @@ class RemoveAmountOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(1))
         ;
 
-
         $cartItem2Stub = $this->getMockBuilder('\Thelia\Model\CartItem')
             ->disableOriginalConstructor()
             ->getMock()
@@ -175,8 +174,8 @@ class RemoveAmountOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade) {
-
+    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    {
         $attrCombination1 = $this->getMockBuilder('\Thelia\Model\AttributeCombination')
             ->disableOriginalConstructor()
             ->getMock()

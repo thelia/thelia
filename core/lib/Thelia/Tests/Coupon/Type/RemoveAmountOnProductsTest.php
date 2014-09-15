@@ -82,8 +82,8 @@ class RemoveAmountOnProductsTest extends \PHPUnit_Framework_TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count) {
-
+    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
+    {
         $product1 = new Product();
         $product1->setId(10);
 
@@ -140,8 +140,8 @@ class RemoveAmountOnProductsTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade) {
-
+    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    {
         $product2 = new Product();
         $product2->setId(30);
 
@@ -156,7 +156,6 @@ class RemoveAmountOnProductsTest extends \PHPUnit_Framework_TestCase
         $cartItem2Stub->expects($this->any())
             ->method('getQuantity')
             ->will($this->returnValue(2));
-
 
         $cartStub = $this->getMockBuilder('\Thelia\Model\Cart')
             ->disableOriginalConstructor()

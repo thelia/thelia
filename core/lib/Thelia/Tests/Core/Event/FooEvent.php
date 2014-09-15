@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Event;
 
 use Thelia\Core\Event\ActionEvent;
 
-
 /**
  * Class FooEvent
  * @package Thelia\Tests\Core\Event
@@ -35,12 +34,13 @@ class FooEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $bar
+     * @param  mixed $bar
      * @return $this
      */
     public function setBar($bar)
     {
         $this->bar = $bar;
+
         return $this;
     }
 
@@ -53,15 +53,14 @@ class FooEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $foo
+     * @param  mixed $foo
      * @return $this
      */
     public function setFoo($foo)
     {
         $this->foo = $foo;
+
         return $this;
     }
 
-
-
-} 
+}

@@ -83,8 +83,8 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade) {
-
+    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    {
         $category1 = new Category();
         $category1->setId(10);
 
@@ -154,8 +154,8 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade) {
-
+    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    {
         $category3 = new Category();
         $category3->setId(30);
 

@@ -19,5 +19,6 @@ php-cs-fixer fix core/lib/Thelia/Model/Tools --level=all
 php-cs-fixer fix core/lib/Thelia/Module/ --level=all
 php-cs-fixer fix core/lib/Thelia/Rewriting/ --level=all
 php-cs-fixer fix core/lib/Thelia/TaxEngine/ --level=all
+php-cs-fixer fix core/lib/Thelia/Tests --level=all
 php-cs-fixer fix core/lib/Thelia/Tools/ --level=all
 php-cs-fixer fix core/lib/Thelia/Type/ --level=all

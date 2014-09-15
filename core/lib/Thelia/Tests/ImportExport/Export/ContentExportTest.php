@@ -52,7 +52,6 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
     {
         $data = $this->handler->buildData($this->lang)->getData();
 
-
         $max = count($data);
         if ($max > 50) {
             $max = 50;
@@ -72,7 +71,6 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($content->getMetaTitle(), $data[$i]["seo_title"]);
             $this->assertEquals($content->getMetaDescription(), $data[$i]["seo_description"]);
             $this->assertEquals($content->getMetaKeywords(), $data[$i]["seo_keywords"]);
-
 
             do {
                 if (null !== $data[$i]["folder_id"]) {
@@ -97,7 +95,7 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
 
                     $this->assertEquals(
                         $contentFolder->getDefaultFolder(),
-                        (bool)((int)$data[$i]["is_default_folder"])
+                        (bool) ((int) $data[$i]["is_default_folder"])
                     );
                 }
             } while (
@@ -213,4 +211,4 @@ class ContentExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($folderDocuments, $data[$i]["folder_documents"]);
         }
     }
-} 
+}

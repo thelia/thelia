@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Action\ImageTest;
+namespace Thelia\Tests\Action;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;

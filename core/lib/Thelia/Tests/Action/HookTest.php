@@ -23,7 +23,6 @@ use Thelia\Core\Event\Hook\HookCreateEvent;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\LangQuery;
 
-
 /**
  * Class HookTest
  * @package Thelia\Tests\Action
@@ -238,5 +237,4 @@ class HookTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deletedHook->isDeleted());
     }
 
-
-} 
+}

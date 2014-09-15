@@ -178,5 +178,4 @@ class LangTest extends \PHPUnit_Framework_TestCase
         @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TES.png");
     }
 
-
 }

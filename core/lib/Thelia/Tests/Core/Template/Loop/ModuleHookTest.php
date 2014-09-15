@@ -15,7 +15,6 @@ use Thelia\Core\Template\Loop\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-
 /**
  * Class ModuleHookTest
  * @package Thelia\Tests\Core\Template\Loop
@@ -41,7 +40,7 @@ class ModuleHookTest extends BaseLoopTestor
     public function testSearchByHookId()
     {
         $moduleHook = ModuleHookQuery::create()->findOne();
-        if (null !== $moduleHook){
+        if (null !== $moduleHook) {
             $this->baseTestSearchById($moduleHook->getId());
         }
     }

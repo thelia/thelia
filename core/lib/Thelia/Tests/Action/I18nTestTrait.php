@@ -14,7 +14,6 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Model\LangQuery;
 
-
 /**
  * Class I18NTestTrait
  * @package Thelia\Tests\Action
@@ -56,4 +55,4 @@ trait I18nTestTrait
 
     }
 
-} 
+}
