@@ -1993,6 +1993,29 @@ ALTER TABLE  `order_product`
 
 
 # ======================================================================================================================
+# Add Meta data
+# ======================================================================================================================
+
+-- ---------------------------------------------------------------------
+-- meta_data
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `meta_data`;
+
+CREATE TABLE `meta_data`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `meta_key` VARCHAR(100) NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `is_serialized` TINYINT(1) NOT NULL,
+    `value` LONGTEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+
+# ======================================================================================================================
 # Allow negative stock
 # ======================================================================================================================
 
