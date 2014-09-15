@@ -27,8 +27,6 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Attribute;
-use Thelia\Model\AttributeAv;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -310,10 +308,10 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* fulfill order_attribute_combination and decrease stock */
             foreach ($pse->getAttributeCombinations() as $attributeCombination) {
-                /** @var Attribute $attribute */
+                /** @var \Thelia\Model\Attribute $attribute */
                 $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
 
-                /** @var AttributeAv $attributeAv */
+                /** @var \Thelia\Model\AttributeAv $attributeAv */
                 $attributeAv = I18n::forceI18nRetrieving($lang->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 
                 $orderAttributeCombination = new OrderProductAttributeCombination();
