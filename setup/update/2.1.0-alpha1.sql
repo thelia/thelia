@@ -1962,16 +1962,34 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 
 
 # ======================================================================================================================
-# End of changes
-# ======================================================================================================================
-
-# ======================================================================================================================
 # Add product_sale_elements_id IN order_product
 # ======================================================================================================================
 
 ALTER TABLE  `order_product`
   ADD  `product_sale_elements_id` INT NOT NULL
   AFTER  `product_sale_elements_ref`;
+
+
+# ======================================================================================================================
+# Add Virtual product
+# ======================================================================================================================
+
+ALTER TABLE  `product`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `ref`;
+
+ALTER TABLE  `product_version`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `ref`;
+
+
+ALTER TABLE  `order_product`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `postscriptum`;
+
+ALTER TABLE  `order_product`
+  ADD  `virtual_document` VARCHAR(255)
+  AFTER  `virtual`;
 
 
 # ======================================================================================================================
