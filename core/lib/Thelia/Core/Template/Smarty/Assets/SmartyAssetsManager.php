@@ -124,9 +124,6 @@ class SmartyAssetsManager
 
         $paths = $this->getFallbackSources($templateDirectories, $templateDefinition->getName(), $assetOrigin);
 
-        // TODO we shoud add as TRACE level for such information
-        // Tlog::getInstance()->addDebug("Asset pathes found:", $paths);
-
         // Normalize path separator if required
         if (DS != '/') {
             // Just to be sure to generate a clean pathname

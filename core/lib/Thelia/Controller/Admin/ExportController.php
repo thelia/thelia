@@ -75,14 +75,6 @@ class ExportController extends BaseAdminController
         $formatterManager = $this->getFormatterManager($this->container);
 
         /**
-         * Get the archive builders
-         */
-        $archiveBuilders = [];
-        foreach ($archiveBuilderManager->getNames() as $archiveBuilder) {
-            $archiveBuilders[$archiveBuilder] = $archiveBuilder;
-        }
-
-        /**
          * Define and validate the form
          */
         $form = new ExportForm($this->getRequest());

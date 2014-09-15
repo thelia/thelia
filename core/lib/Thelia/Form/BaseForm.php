@@ -121,7 +121,7 @@ abstract class BaseForm
      * @param  FormView $fieldView
      * @return bool
      */
-    public function isTemplateDefinedHiddenField($fieldView)
+    public function isTemplateDefinedHiddenField(FormView $fieldView)
     {
         $name = $fieldView->vars['name'];
 

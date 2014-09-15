@@ -22,14 +22,6 @@ class CurrencyCreationForm extends BaseForm
 {
     protected function buildForm($change_mode = false)
     {
-        $code_constraints = array(new Constraints\NotBlank());
-
-        if (!$change_mode) {
-            $code_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateCode"))
-            ));
-        }
-
         $this->formBuilder
             ->add("name"   , "text"  , array(
                 "constraints" => array(

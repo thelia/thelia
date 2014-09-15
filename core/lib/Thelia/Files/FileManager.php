@@ -13,8 +13,7 @@
 namespace Thelia\Files;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\Document\DocumentCreateOrUpdateEvent;
-use Thelia\Core\Event\Image\ImageCreateOrUpdateEvent;
+use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Exception\FileException;
 use Thelia\Exception\ImageException;
 
@@ -166,12 +165,12 @@ class FileManager
     /**
      * Save file into the database
      *
-     * @param ImageCreateOrUpdateEvent $event      the event
+     * @param FileCreateOrUpdateEvent $event      the event
      * @param FileModelInterface       $imageModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */
-    public function saveImage($event, FileModelInterface $imageModel)
+    public function saveImage(FileCreateOrUpdateEvent $event, FileModelInterface $imageModel)
     {
         return $this->saveFile($event->getParentId(), $imageModel);
     }
@@ -179,12 +178,12 @@ class FileManager
     /**
      * Save file into the database
      *
-     * @param DocumentCreateOrUpdateEvent $event         the event
+     * @param FileCreateOrUpdateEvent $event         the event
      * @param FileModelInterface          $documentModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */
-    public function saveDocument($event, FileModelInterface $documentModel)
+    public function saveDocument(FileCreateOrUpdateEvent $event, FileModelInterface $documentModel)
     {
         return $this->saveFile($event->getParentId(), $documentModel);
     }
@@ -227,7 +226,7 @@ class FileManager
      *
      * @return string
      */
-    public function renameFile($modelId, $uploadedFile)
+    public function renameFile($modelId, UploadedFile $uploadedFile)
     {
         $extension = $uploadedFile->getClientOriginalExtension();
         if (!empty($extension)) {

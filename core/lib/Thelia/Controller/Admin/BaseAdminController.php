@@ -13,26 +13,24 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Model\ConfigQuery;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Tools\URL;
-use Thelia\Model\AdminLog;
-
-use Thelia\Model\LangQuery;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Symfony\Component\Routing\Router;
 use Thelia\Model\Admin;
-use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Model\AdminLog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\LangQuery;
+use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
 {

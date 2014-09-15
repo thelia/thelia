@@ -67,7 +67,6 @@ class CustomerExport extends ExportHandler
     public function buildDataSet(Lang $lang)
     {
         $locale = $lang->getLocale();
-        $defaultLocale = Lang::getDefaultLanguage()->getLocale();
         /**
          * This first query get each customer info and addresses.
          */
