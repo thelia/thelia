@@ -36,7 +36,8 @@ class ModuleConfigTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return [            "module" => "cheque",
+        return [
+            "module" => "cheque",
             "variable" => "test"
         ];
     }

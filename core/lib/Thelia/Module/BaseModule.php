@@ -26,7 +26,6 @@ use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
-use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\ModuleImageTableMap;
@@ -160,6 +159,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return EventDispatcherInterface
+     * @throws \RuntimeException
+     */
     public function getDispatcher()
     {
         if ($this->hasDispatcher() === false) {
@@ -341,7 +344,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     }
 
     /**
-     * @return string The module code, in a static way
+     * @return string The module code, in a static wayord
      */
     public static function getModuleCode()
     {
@@ -580,6 +583,9 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();
 
+            /**
+             * @var EventDispatcherInterface $dispatcher
+             */
             $dispatcher = $this->container->get("event_dispatcher");
 
             foreach ($moduleHooks as $hook) {
@@ -600,7 +606,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 /**
                  * Create or update hook db entry.
                  *
-                 * @var Hook $hookModel
+                 * @var \Thelia\Model\Hook $hookModel
                  */
                 list($hookModel, $updateData) = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
 

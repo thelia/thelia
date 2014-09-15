@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Cart\CartTrait;
@@ -22,25 +23,31 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\Attribute;
+use Thelia\Model\AttributeAv;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
-use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\MetaDataQuery;
+use Thelia\Model\Order as OrderModel;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductAttributeCombination;
+use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\TaxRuleI18n;
 use Thelia\Tools\I18n;
 
 /**
@@ -140,9 +147,9 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, LangModel $lang, CartModel $cart, CustomerModel $customer)
+    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, LangModel $lang, CartModel $cart, UserInterface $customer)
     {
-        $con = \Propel\Runtime\Propel::getConnection(
+        $con = Propel::getConnection(
                 OrderTableMap::DATABASE_NAME
         );
 
@@ -217,6 +224,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             $product = $cartItem->getProduct();
 
             /* get translation */
+            /** @var ProductI18n $productI18n */
             $productI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'Product', $product->getId());
 
             $pse = $cartItem->getProductSaleElements();
@@ -244,6 +252,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             }
 
             /* get tax */
+            /** @var TaxRuleI18n $taxRuleI18n */
             $taxRuleI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'TaxRule', $product->getTaxRuleId());
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
@@ -293,6 +302,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ;
 
             /* fulfill order_product_tax */
+            /** @var OrderProductTax $tax */
             foreach ($taxDetail as $tax) {
                 $tax->setOrderProductId($orderProduct->getId());
                 $tax->save($con);
@@ -300,7 +310,10 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /* fulfill order_attribute_combination and decrease stock */
             foreach ($pse->getAttributeCombinations() as $attributeCombination) {
+                /** @var Attribute $attribute */
                 $attribute = I18n::forceI18nRetrieving($lang->getLocale(), 'Attribute', $attributeCombination->getAttributeId());
+
+                /** @var AttributeAv $attributeAv */
                 $attributeAv = I18n::forceI18nRetrieving($lang->getLocale(), 'AttributeAv', $attributeCombination->getAttributeAvId());
 
                 $orderAttributeCombination = new OrderProductAttributeCombination();
@@ -339,7 +352,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             )
         );
 
-        $event->setOrder(new \Thelia\Model\Order());
+        $event->setOrder(new OrderModel());
     }
 
     /**
@@ -363,7 +376,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
 
         /* but memorize placed order */
-        $event->setOrder(new \Thelia\Model\Order());
+        $event->setOrder(new OrderModel());
         $event->setPlacedOrder($placedOrder);
 
         /* empty cart */
@@ -390,16 +403,19 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Clear the cart and the order in the customer session once the order is placed,
+     * and the payment performed.
+     *
      * @param OrderEvent $event
      */
-    public function orderAfterPayement(OrderEvent $event)
+    public function orderCartClear(/** @noinspection PhpUnusedParameterInspection */ OrderEvent $event)
     {
         // Empty cart and clear current order
         $session = $this->getSession();
 
         $this->createCart($session);
 
-        $session->setOrder(new \Thelia\Model\Order());
+        $session->setOrder(new OrderModel());
     }
 
     /**
@@ -457,6 +473,9 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param ModelOrder $order
+     * @param $status
+     * @param $canceledStatus
+     * @throws \Thelia\Exception\TheliaProcessException
      */
     public function updateQuantity(ModelOrder $order,$status,$canceledStatus)
     {
@@ -556,7 +575,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_INVOICE_ADDRESS => array("setInvoiceAddress", 128),
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
-            TheliaEvents::ORDER_AFTER_PAYMENT => array("orderAfterPayement", 128),
+            TheliaEvents::ORDER_CART_CLEAR => array("orderCartClear", 128),
             TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayement", 128),
             TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendConfirmationEmail", 128),
             TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => array("sendNotificationEmail", 128),

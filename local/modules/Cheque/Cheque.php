@@ -14,6 +14,8 @@ namespace Cheque;
 
 use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Install\Database;
 use Thelia\Model\ModuleImageQuery;
 use Thelia\Model\Order;
@@ -33,6 +35,11 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         $thankYouPageUrl = URL::getInstance()->absoluteUrl(
             $router->generate('cheque.order-placed', ['orderId' => $order->getId()])
         );
+
+        $orderEvent = new OrderEvent($order);
+
+        // Clear the cart
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $orderEvent);
 
         // Redirect to our own route, so that our payment page is displayed.
         return RedirectResponse::create($thankYouPageUrl);
