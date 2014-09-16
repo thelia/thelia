@@ -193,6 +193,7 @@ class ModuleTableMap extends TableMap
         $this->addRelation('CouponModule', '\\Thelia\\Model\\CouponModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', null, 'CouponModules');
         $this->addRelation('OrderCouponModule', '\\Thelia\\Model\\OrderCouponModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', null, 'OrderCouponModules');
         $this->addRelation('ModuleHook', '\\Thelia\\Model\\ModuleHook', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleHooks');
+        $this->addRelation('ModuleConfig', '\\Thelia\\Model\\ModuleConfig', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleConfigs');
         $this->addRelation('ModuleI18n', '\\Thelia\\Model\\ModuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ModuleI18ns');
         $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Coupons');
         $this->addRelation('OrderCoupon', '\\Thelia\\Model\\OrderCoupon', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'OrderCoupons');
@@ -224,6 +225,7 @@ class ModuleTableMap extends TableMap
                 CouponModuleTableMap::clearInstancePool();
                 OrderCouponModuleTableMap::clearInstancePool();
                 ModuleHookTableMap::clearInstancePool();
+                ModuleConfigTableMap::clearInstancePool();
                 ModuleI18nTableMap::clearInstancePool();
             }
 

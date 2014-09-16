@@ -22,7 +22,7 @@ trait BrandBreadcrumbTrait
     /**
      * @inheritdoc
      */
-    public function getBreadcrumb(Router $router, ContainerInterface $container, $tab, $locale)
+    public function getBreadcrumb(Router $router, /** @noinspection PhpUnusedParameterInspection */ ContainerInterface $container, $tab, $locale)
     {
         $breadcrumb = [
             Translator::getInstance()->trans('Home') => $router->generate('admin.home.view', [], Router::ABSOLUTE_URL),

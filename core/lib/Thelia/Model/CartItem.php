@@ -100,7 +100,7 @@ class CartItem extends BaseCartItem
         $translation = $product->getTranslation($locale);
 
         if ($translation->isNew()) {
-            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable()) {
+            if (ConfigQuery::getDefaultLangWhenNoTranslationAvailable() == Lang::REPLACE_BY_DEFAULT_LANGUAGE) {
                 $locale = Lang::getDefaultLanguage()->getLocale();
             }
         }

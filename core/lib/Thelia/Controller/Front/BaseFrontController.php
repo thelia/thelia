@@ -12,7 +12,6 @@
 
 namespace Thelia\Controller\Front;
 
-use Symfony\Component\Routing\Router;
 use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\HttpKernel\Exception\RedirectException;

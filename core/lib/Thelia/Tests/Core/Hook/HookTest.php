@@ -11,14 +11,8 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Hook;
-use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Core\Template\TemplateHelper;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleQuery;
-use Thelia\Module\BaseModule;
-use Thelia\Module\ModuleManagement;
 use Thelia\Tests\WebTestCase;
 
 

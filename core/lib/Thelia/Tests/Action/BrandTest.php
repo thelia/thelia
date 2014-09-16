@@ -14,15 +14,12 @@ namespace Thelia\Tests\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Brand;
-use Thelia\Core\Event\Brand\BrandAddFolderEvent;
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
-use Thelia\Core\Event\Brand\BrandRemoveFolderEvent;
 use Thelia\Core\Event\Brand\BrandToggleVisibilityEvent;
 use Thelia\Core\Event\Brand\BrandUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\BrandQuery;
-use Thelia\Model\FolderQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**

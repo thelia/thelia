@@ -13,41 +13,24 @@
 namespace Cheque;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Install\Database;
+use Thelia\Model\MessageQuery;
 use Thelia\Model\ModuleImageQuery;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
+use Thelia\Tools\URL;
 
 class Cheque extends BaseModule implements PaymentModuleInterface
 {
-    protected $request;
-    protected $dispatcher;
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function getRequest()
-    {
-        return $this->request;
-    }
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
+    const MESSAGE_DOMAIN = "Cheque";
 
     public function pay(Order $order)
     {
-        // no special process, waiting for the cheque.
+        // Nothing special to to.
     }
 
     /**
@@ -64,29 +47,28 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         return true;
     }
 
-
-    public function postActivation(ConnectionInterface $con = null)
+    public function install(ConnectionInterface $con = null)
     {
-        /* insert the images from image folder if first module activation */
-        $module = $this->getModuleModel();
-        if(ModuleImageQuery::create()->filterByModule($module)->count() == 0) {
-            $this->deployImageFolder($module, sprintf('%s/images', __DIR__), $con);
+        $database = new Database($con->getWrappedConnection());
+
+        // Insert email message
+        $database->insertSql(null, array(__DIR__ . "/Config/setup.sql"));
+
+        /* insert the images from image folder if not already done */
+        $moduleModel = $this->getModuleModel();
+
+        if (! $moduleModel->isModuleImageDeployed($con)) {
+            $this->deployImageFolder($moduleModel, sprintf('%s/images', __DIR__), $con);
+        }
+    }
+
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    {
+        // Delete our message
+        if (null !== $message = MessageQuery::create()->findOneByName('order_confirmation_cheque')) {
+            $message->delete($con);
         }
 
-        /* set module title */
-        $this->setTitle(
-            $module,
-            array(
-                "en_US" => "Cheque",
-                "fr_FR" => "Cheque",
-            )
-        );
+        parent::destroy($con, $deleteModuleData);
     }
-
-
-    public function getCode()
-    {
-        return 'Cheque';
-    }
-
 }

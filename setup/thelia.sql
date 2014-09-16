@@ -36,11 +36,11 @@ CREATE TABLE `product`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tax_rule_id` INTEGER,
     `ref` VARCHAR(255) NOT NULL,
-    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
     `brand_id` INTEGER,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -818,8 +818,6 @@ CREATE TABLE `order_product`
     `chapo` TEXT,
     `description` LONGTEXT,
     `postscriptum` TEXT,
-    `virtual` TINYINT DEFAULT 0 NOT NULL,
-    `virtual_document` VARCHAR(255),
     `quantity` FLOAT NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` VARCHAR(45),
@@ -830,6 +828,8 @@ CREATE TABLE `order_product`
     `tax_rule_title` VARCHAR(255),
     `tax_rule_description` LONGTEXT,
     `parent` INTEGER COMMENT 'not managed yet',
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
+    `virtual_document` VARCHAR(255),
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -2177,6 +2177,28 @@ CREATE TABLE `meta_data`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- module_config
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config`;
+
+CREATE TABLE `module_config`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `module_id` INTEGER NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_module_id_name` (`module_id`, `name`),
+    CONSTRAINT `fk_module_config_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -2988,6 +3010,24 @@ CREATE TABLE `hook_i18n`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- module_config_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `module_config_i18n`;
+
+CREATE TABLE `module_config_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `value` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `module_config_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `module_config` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_version
 -- ---------------------------------------------------------------------
 
@@ -3022,11 +3062,11 @@ CREATE TABLE `product_version`
     `id` INTEGER NOT NULL,
     `tax_rule_id` INTEGER,
     `ref` VARCHAR(255) NOT NULL,
-    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `visible` TINYINT DEFAULT 0 NOT NULL,
     `position` INTEGER DEFAULT 0 NOT NULL,
     `template_id` INTEGER,
     `brand_id` INTEGER,
+    `virtual` TINYINT DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

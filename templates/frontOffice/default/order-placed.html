@@ -52,7 +52,7 @@
 
                         {block name='additional-payment-info'}{/block}
 
-                        {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE"}
+                        {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE" placed_order_id=$placed_order_id}
                     </div>
                 </div>
             {/elsehook}

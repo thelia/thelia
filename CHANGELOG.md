@@ -18,11 +18,18 @@
     - Added new delivery module for virtual products.
 - Added meta data feature to associate core elements and various data.
 - Added `allow_negative_stock` configuration variable to allow negative stock or not (default is no)
+- Added the ModuleConfig table, to provide modules an easy way to store their configuration parameters, with I18n if required.
+- Added the `module-config` loop
+- Added getConfigValue() and setConfigValue() static helper methods to BaseModule to offer an easy way to get/set a module parameters
+- Refactored the Cheque module, to use the new ModuleConfig, and send an email to the customer when its payment is received.
+- Added the wysywig.js hook to official hooks, so that any page which needs a WYSYWIG editor will only have to put this hook in the JS section to get one.
+- Refactored Tynimce module according to wysywig.js hook
+- Moved cart and order flush in the Order action, triggered by the ORDER_CART_CLEAR event. Payment modules which redirects to a non-strandard route (e.g., not /order/placed/{order_id}) should fire this event.
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :
 - Throwing a Thelia\Core\HttpKernel\Exception\RedirectException with a given URL
-- If you are in a controller, returning an instance of \Symfony\Component\HttpFoundation\RedirectResponse
+- If you are in a controller, return an instance of \Symfony\Component\HttpFoundation\RedirectResponse
 - Never ever send a response. Only the HttpKernel class is allowed to do that.
 
 ### Deprecated methods :

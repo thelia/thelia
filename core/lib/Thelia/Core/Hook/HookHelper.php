@@ -473,10 +473,7 @@ class HookHelper
 
     protected function loadPdfOfficeTrans($locale)
     {
-        $messages["context"] = array();
-        $messages["type"]    = array();
-
-        $t = Translator::getInstance();
+       $t = Translator::getInstance();
 
         $this->messages["context"]["delivery"]       = $t->trans("Delivery", array(), "core", $locale);
         $this->messages["context"]["invoice"]        = $t->trans("Invoice", array(), "core", $locale);

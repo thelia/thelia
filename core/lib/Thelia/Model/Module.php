@@ -185,6 +185,14 @@ class Module extends BaseModule
     }
 
     /**
+     * @return bool true if the module image has been deployed, false otherwise.
+     */
+    public function isModuleImageDeployed()
+    {
+        return ModuleImageQuery::create()->filterByModuleId($this->getId())->count() > 0;
+    }
+
+    /**
      * @param  ContainerInterface        $container the Thelia container
      * @return BaseModuleInterface       a module instance
      * @throws \InvalidArgumentException if the module could not be found in the container/

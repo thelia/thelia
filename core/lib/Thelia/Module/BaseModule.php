@@ -31,6 +31,7 @@ use Thelia\Model\Lang;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleConfigQuery;
 use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModuleImage;
@@ -52,6 +53,9 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
     protected $dispatcher = null;
     protected $request = null;
+
+    // Do no use this attribute directly, use getModuleModel() instead.
+    private $_moduleModel = null;
 
     public function activate($moduleModel = null)
     {
@@ -155,6 +159,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return EventDispatcherInterface
+     * @throws \RuntimeException
+     */
     public function getDispatcher()
     {
         if ($this->hasDispatcher() === false) {
@@ -189,6 +197,36 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 }
             }
         }
+    }
+
+    /**
+     * Get a module's configuration variable
+     *
+     * @param  string $variableName the variable name
+     * @param  string $defaultValue the default value, if variable is not defined
+     * @param  null   $valueLocale  the required locale, or null to get default one
+     * @return string the variable value
+     */
+    public static function getConfigValue($variableName, $defaultValue = null, $valueLocale = null)
+    {
+        return ModuleConfigQuery::create()
+            ->getConfigValue(self::getModuleId(), $variableName, $defaultValue, $valueLocale);
+    }
+
+    /**
+     * Set module configuration variable, creating it if required
+     *
+     * @param  string          $variableName      the variable name
+     * @param  string          $variableValue     the variable value
+     * @param  null            $valueLocale       the locale, or null if not required
+     * @param  bool            $createIfNotExists if true, the variable will be created if not already defined
+     * @throws \LogicException if variable does not exists and $createIfNotExists is false
+     * @return $this;
+     */
+    public static function setConfigValue($variableName, $variableValue, $valueLocale = null, $createIfNotExists = true)
+    {
+        ModuleConfigQuery::create()
+            ->setConfigValue(self::getModuleId(), $variableName, $variableValue, $valueLocale, $createIfNotExists);
     }
 
     /**
@@ -276,22 +314,51 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      */
     public function getModuleModel()
     {
-        $moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
+        if (null === $this->_moduleModel) {
+            $this->_moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
 
-        if (null === $moduleModel) {
-            throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
+            if (null === $this->_moduleModel) {
+                throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
+            }
         }
 
-        return $moduleModel;
+        return $this->_moduleModel;
     }
 
-    public function getCode()
+    /**
+     * @return int The module id, in a static way, with a cache
+     */
+    private static $moduleId = null;
+
+    public static function getModuleId()
     {
-        if (null === $this->reflected) {
-            $this->reflected = new \ReflectionObject($this);
+        if (self::$moduleId === null) {
+            if (null === $module = ModuleQuery::create()->findOneByCode(self::getModuleCode())) {
+                throw new ModuleException(sprintf("Module Code `%s` not found", self::getModuleCode()), ModuleException::CODE_NOT_FOUND);
+            }
+
+            self::$moduleId = $module->getId();
         }
 
-        return basename(dirname($this->reflected->getFileName()));
+        return self::$moduleId;
+    }
+
+    /**
+     * @return string The module code, in a static wayord
+     */
+    public static function getModuleCode()
+    {
+        $fullClassName = explode('\\', get_called_class());
+
+        return end($fullClassName);
+    }
+
+    /*
+     * The module code
+     */
+    public function getCode()
+    {
+        return self::getModuleCode();
     }
 
     /**
@@ -516,6 +583,9 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $defaultLang = Lang::getDefaultLanguage();
             $defaultLocale = $defaultLang->getLocale();
 
+            /**
+             * @var EventDispatcherInterface $dispatcher
+             */
             $dispatcher = $this->container->get("event_dispatcher");
 
             foreach ($moduleHooks as $hook) {
@@ -535,6 +605,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
                 /**
                  * Create or update hook db entry.
+                 *
+                 * @var \Thelia\Model\Hook $hookModel
                  */
                 list($hookModel, $updateData) = $this->createOrUpdateHook($hook, $dispatcher, $defaultLocale);
 

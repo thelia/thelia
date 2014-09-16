@@ -25,13 +25,17 @@ class HookUpdateEvent extends HookCreateEvent
     protected $chapo;
     protected $description;
 
+    /**
+     * @param int $hook_id
+     */
     public function __construct($hook_id)
     {
         $this->hook_id = $hook_id;
     }
 
     /**
-     * @param \Thelia\Model\Hook $hook_id
+     * @param  int   $hook_id
+     * @return $this
      */
     public function setHookId($hook_id)
     {

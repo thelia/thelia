@@ -13,7 +13,6 @@
 namespace Thelia\Form\Sale;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\True;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\Lang;

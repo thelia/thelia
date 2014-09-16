@@ -254,6 +254,7 @@ class OrderController extends BaseFrontController
         $placedOrder = $orderEvent->getPlacedOrder();
 
         if (null !== $placedOrder && null !== $placedOrder->getId()) {
+
             /* order has been placed */
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
@@ -282,10 +283,8 @@ class OrderController extends BaseFrontController
         if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
             throw new TheliaProcessException("Received placed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
         }
-        $session = $this->getRequest()->getSession();
-        $this->createCart($this->getRequest()->getSession());
 
-        $session->setOrder(new Order());
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $this->getOrderEvent());
 
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }

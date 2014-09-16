@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Core\Event;
 use Symfony\Component\Form\Forms;
-use Thelia\Core\HttpFoundation\Request;
 
 
 /**

@@ -22,13 +22,11 @@ use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Model\LangQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
-use Thelia\Model\Map\ContentFolderTableMap;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
