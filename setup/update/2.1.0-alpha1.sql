@@ -163,8 +163,8 @@ CREATE TABLE `product_sale_elements_product_document`
 # Hooks
 # ======================================================================================================================
 
-SELECT @max_pos := MAX(`position`) FROM `module`;
-SELECT @max_id := MAX(`id`) FROM `module`;
+SELECT @max_pos := IFNULL(MAX(`position`),0) FROM `module`;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
   (@max_id+1, 'HookNavigation', 1, 1, @max_pos+1, 'HookNavigation\\HookNavigation', NOW(), NOW()),
