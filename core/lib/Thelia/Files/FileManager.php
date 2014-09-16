@@ -166,7 +166,7 @@ class FileManager
      * Save file into the database
      *
      * @param FileCreateOrUpdateEvent $event      the event
-     * @param FileModelInterface       $imageModel the file model object (image or document) to save.
+     * @param FileModelInterface      $imageModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */
@@ -179,7 +179,7 @@ class FileManager
      * Save file into the database
      *
      * @param FileCreateOrUpdateEvent $event         the event
-     * @param FileModelInterface          $documentModel the file model object (image or document) to save.
+     * @param FileModelInterface      $documentModel the file model object (image or document) to save.
      *
      * @return int number of modified rows in database
      */

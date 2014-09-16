@@ -15,7 +15,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Tests\WebTestCase;
 
-
 /**
  * Class HookTest
  * @package Thelia\Tests\Core\Hook
@@ -26,7 +25,6 @@ class HookTest extends WebTestCase
     public static $templateBackupPath;
 
     public static $cache_dir;
-
 
     /**
      * get the content of the test page with our test template and test module.
@@ -57,7 +55,6 @@ class HookTest extends WebTestCase
         return $content;
     }
 
-
     /**
      * @params string $content
      * @depends testHome
@@ -71,7 +68,6 @@ class HookTest extends WebTestCase
         $this->assertStringNotContains($content, "main.head-top test3");
     }
 
-
     /**
      * @params string $content
      * @depends testHome
@@ -83,7 +79,6 @@ class HookTest extends WebTestCase
         $this->assertStringContains($content, "main.body-top 2");
         $this->assertStringBefore($content, "main.body-top 1", "main.body-top 2");
     }
-
 
     /**
      * @params string $content
@@ -107,7 +102,6 @@ class HookTest extends WebTestCase
 
     }
 
-
     /**
      * @params string $content
      * @depends testHome
@@ -123,7 +117,8 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookGlobal($content){
+    public function testBaseHookGlobal($content)
+    {
         $this->assertStringContains($content, ":: main.content-top ::");
         $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
         $this->assertRegExp('/:: session : [a-f0-9]{40} ::/', $content);
@@ -138,7 +133,8 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookRender($content){
+    public function testBaseHookRender($content)
+    {
         $this->assertStringContains($content, ":: function render ::");
     }
 
@@ -146,7 +142,8 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookDump($content){
+    public function testBaseHookDump($content)
+    {
         $this->assertStringContains($content, ":: function dump ::");
     }
 
@@ -154,7 +151,8 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookAddCSS($content){
+    public function testBaseHookAddCSS($content)
+    {
         $this->assertRegExp("/<link\\s+rel='stylesheet'\\s+type='text\\/css'\\s+href='http:\\/\\/localhost\\/assets\\/assets\\/css\\/HookTest\\/assets\\/css\\/.*\\.css'\\s*\\/>/", $content);
         $this->assertRegExp("/<link\\s+rel='stylesheet'\\s+type='text\\/css'\\s+href='http:\\/\\/localhost\\/assets\\/assets\\/css\\/HookTest\\/assets\\/css\\/.*\\.css'\\s+media='print'\\s*\\/>/", $content);
     }
@@ -163,7 +161,8 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookAddJS($content){
+    public function testBaseHookAddJS($content)
+    {
         $this->assertRegExp("/<script\\s+type='text\\/javascript'\\s+src='http:\\/\\/localhost\\/assets\\/assets\\/js\\/HookTest\\/assets\\/js\\/.*\\.js'\\s*>/", $content);
     }
 
@@ -171,19 +170,20 @@ class HookTest extends WebTestCase
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookTrans($content){
+    public function testBaseHookTrans($content)
+    {
         $this->assertStringContains($content, ":: Hodor en_US Hodor ::");
         $this->assertStringContains($content, ":: Hello en_US World ::");
         $this->assertStringContains($content, ":: Hello Hodor ::");
         $this->assertStringContains($content, ":: Salut fr_FR Hodor ::");
     }
 
-
     /**
      * @params string $content
      * @depends testHome
      */
-    public function testBaseHookAssetsOverride($content){
+    public function testBaseHookAssetsOverride($content)
+    {
         $this->assertStringContains($content, ":: file override1 from module/default ::");
         $this->assertStringContains($content, ":: file override2 from module/hooktest ::");
         $this->assertStringContains($content, ":: file override3 from template/hooktest ::");
@@ -222,14 +222,15 @@ class HookTest extends WebTestCase
         $this->assertTrue((false !== strpos($data, $needle)), $message);
     }
 
-    protected function assertStringNotContains($data, $needle, $message=""){
+    protected function assertStringNotContains($data, $needle, $message="")
+    {
         $this->assertTrue((false === strpos($data, $needle)), $message);
     }
 
-    protected function assertStringBefore($data, $string1, $string2, $message=""){
+    protected function assertStringBefore($data, $string1, $string2, $message="")
+    {
         $this->assertTrue((strpos($data, $string1) < strpos($data, $string2)), $message);
     }
-
 
     public function getKernel()
     {
@@ -253,6 +254,7 @@ class HookTest extends WebTestCase
             if ($item == '.' || $item == '..') continue;
             if (!self::deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) return false;
         }
+
         return rmdir($dir);
     }
 
@@ -265,6 +267,7 @@ class HookTest extends WebTestCase
             if ($item == '.' || $item == '..') continue;
             if (!self::copyDirectory($sourceDir.DIRECTORY_SEPARATOR.$item, $targetDir.DIRECTORY_SEPARATOR.$item)) return false;
         }
+
         return true;
     }
-} 
+}

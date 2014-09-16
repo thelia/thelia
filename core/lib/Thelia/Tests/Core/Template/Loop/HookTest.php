@@ -12,11 +12,9 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
-
 use Thelia\Core\Template\Loop\Hook;
 use Thelia\Model\HookQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 
 /**
  * Class HookTest

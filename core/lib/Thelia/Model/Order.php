@@ -167,12 +167,12 @@ class Order extends BaseOrder
         return $total;
     }
 
-    
     /**
      * Return the postage without tax
      * @return float|int
-     */    
-    public function getUntaxedPostage() {
+     */
+    public function getUntaxedPostage()
+    {
         // get default tax rule
         $taxRuleQuery = new TaxRuleQuery();
         $taxRule = $taxRuleQuery->findOneByIsDefault(true);
@@ -181,12 +181,11 @@ class Order extends BaseOrder
         $country = $countryQuery->findOneByByDefault(true);
         // get calculator for this tax / country
         $calculator = new \Thelia\TaxEngine\Calculator();
-        $calculator->loadTaxRuleWithoutProduct($taxRule,$country);        
+        $calculator->loadTaxRuleWithoutProduct($taxRule,$country);
         // return untaxed price
-        return round($calculator->getUntaxedPrice($this->getPostage()),2);        
+        return round($calculator->getUntaxedPrice($this->getPostage()),2);
     }
 
-    
     /**
      * Check if the current order contains at less 1 virtual product with a file to download
      *

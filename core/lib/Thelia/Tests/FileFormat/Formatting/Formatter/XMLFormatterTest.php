@@ -70,7 +70,6 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
         $node->setAttribute("name", "foo");
         $node->setAttribute("value", "bar");
 
-
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 

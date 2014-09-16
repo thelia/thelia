@@ -20,7 +20,6 @@ use Thelia\Action\MetaData;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Model\ProductQuery;
 
-
 /**
  * Class MetaDataTest
  * @package Thelia\Tests\Action
@@ -40,7 +39,6 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         $boom = MetaDataQuery::create()
             ->deleteAll();
     }
-
 
     public function testCreate()
     {
@@ -97,7 +95,6 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         return $product;
     }
 
-
     /**
      * @params Product $product
      *
@@ -133,7 +130,6 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         return $product;
     }
-
 
     /**
      * @params Product $product
@@ -176,7 +172,6 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         return $product;
     }
 
-
     /**
      * @params Product $product
      *
@@ -205,6 +200,5 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deleted->isDeleted());
 
     }
-
 
 }

@@ -14,7 +14,6 @@ namespace Thelia\Tests;
 
 use Thelia\Core\Thelia;
 
-
 /**
  * Class WebTestCase
  * @package Thelia\Tests
@@ -28,8 +27,8 @@ class WebTestCase extends \PHPUnit_Framework_TestCase
     protected static $kernel;
 
     /**
-     * @param array $options
-     * @param array $server
+     * @param  array                                $options
+     * @param  array                                $server
      * @return \Symfony\Component\HttpKernel\Client
      */
     protected static function createClient(array $options = [], array $server = [])

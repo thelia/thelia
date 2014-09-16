@@ -23,7 +23,6 @@ use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleQuery;
 
-
 /**
  * Class HookTest
  * @package Thelia\Tests\Action
@@ -142,6 +141,5 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\ModuleHook', $deletedModuleHook);
         $this->assertTrue($deletedModuleHook->isDeleted());
     }
-
 
 }

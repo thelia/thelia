@@ -10,9 +10,8 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Core\Smarty;
+namespace Thelia\Tests\Core\Template\Smarty;
 use Thelia\Core\Template\Smarty\SmartyHelper;
-
 
 /**
  * Class SmartyHelperTest
@@ -91,7 +90,7 @@ EOT;
 
         $this->assertCount(2, $functions);
 
-        for ($i = 0 ; $i <= 1 ; $i++){
+        for ($i = 0 ; $i <= 1 ; $i++) {
             $this->assertArrayHasKey("name", $functions[$i]);
             $this->assertEquals("hook", $functions[$i]["name"]);
             $this->assertArrayHasKey("attributes", $functions[$i]);
@@ -116,7 +115,6 @@ EOT;
 
         $this->assertCount(1, $functions);
 
-
         $this->assertArrayHasKey("name", $functions[0]);
         $this->assertEquals("hook", $functions[0]["name"]);
         $this->assertArrayHasKey("attributes", $functions[0]);
@@ -125,4 +123,4 @@ EOT;
 
     }
 
-} 
+}

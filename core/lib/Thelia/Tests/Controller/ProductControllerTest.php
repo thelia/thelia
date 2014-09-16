@@ -50,7 +50,6 @@ class ProductControllerTest extends ControllerTestBase
         return $controller;
     }
 
-
     public function testAssociatePSEImage()
     {
         /**
@@ -140,4 +139,4 @@ class ProductControllerTest extends ControllerTestBase
 
         $this->assertFalse($isAssociated === $isNowAssociated);
     }
-} 
+}

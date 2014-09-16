@@ -32,7 +32,8 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
     protected $session;
 
-       public function getDispatcher() {
+       public function getDispatcher()
+       {
            return $this->getMock("Symfony\\Component\\EventDispatcher\\EventDispatcherInterface");
        }
 

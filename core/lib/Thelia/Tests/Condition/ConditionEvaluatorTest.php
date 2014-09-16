@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Condition\Implementation;
+namespace Thelia\Tests\Condition;
 
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\Operators;

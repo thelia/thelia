@@ -355,8 +355,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 $orderProduct->getOrderProductAttributeCombinations()->count()
             );
 
-
-            if ($orderProduct->getVirtual()){
+            if ($orderProduct->getVirtual()) {
                 /* check same stock*/
                 $this->assertEquals(
                     $itemsStock[$index],

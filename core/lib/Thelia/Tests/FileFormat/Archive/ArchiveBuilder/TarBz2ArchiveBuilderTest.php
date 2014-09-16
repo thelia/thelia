@@ -25,7 +25,6 @@ class TarBz2ArchiveBuilderTest extends TarArchiveBuilderTest
         return new TarBz2ArchiveBuilder();
     }
 
-
     public function testCompression()
     {
         $this->assertEquals(
