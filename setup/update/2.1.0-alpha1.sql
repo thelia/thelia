@@ -85,12 +85,13 @@ DROP TABLE IF EXISTS `sale_product`;
 
 CREATE TABLE `sale_product`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `sale_id` INTEGER NOT NULL,
     `product_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER,
-    PRIMARY KEY (`sale_id`,`product_id`),
-    INDEX `fk_sale_product_product1_idx` (`product_id`),
-    INDEX `fk_sale_product_attribute_av1_idx` (`attribute_av_id`),
+    PRIMARY KEY (`id`),
+    INDEX `fk_sale_product_product_idx` (`product_id`),
+    INDEX `fk_sale_product_attribute_av_idx` (`attribute_av_id`),
     INDEX `idx_sale_product_sales_id_product_id` (`sale_id`, `product_id`),
     CONSTRAINT `fk_sale_product_sales_id`
         FOREIGN KEY (`sale_id`)
@@ -163,8 +164,8 @@ CREATE TABLE `product_sale_elements_product_document`
 # Hooks
 # ======================================================================================================================
 
-SELECT @max_pos := MAX(`position`) FROM `module`;
-SELECT @max_id := MAX(`id`) FROM `module`;
+SELECT @max_pos := IFNULL(MAX(`position`),0) FROM `module`;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
   (@max_id+1, 'HookNavigation', 1, 1, @max_pos+1, 'HookNavigation\\HookNavigation', NOW(), NOW()),
@@ -267,6 +268,28 @@ CREATE TABLE `module_hook`
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
+
+
+-- ---------------------------------------------------------------------
+-- hook_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook_i18n`;
+
+CREATE TABLE `hook_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `hook_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `hook` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
   (1, 'order-invoice.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1791,25 +1814,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (2023, 'fr_FR', 'Partout ou l''éditeur WYSIWYG est nécessaire', '', ''),
   (2023, 'en_US', 'Where the WYSIWYG editor is required', '', '');
 
--- ---------------------------------------------------------------------
--- hook_i18n
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `hook_i18n`;
-
-CREATE TABLE `hook_i18n`
-(
-    `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
-    `title` VARCHAR(255),
-    `description` LONGTEXT,
-    `chapo` TEXT,
-    PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `hook_i18n_FK_1`
-        FOREIGN KEY (`id`)
-        REFERENCES `hook` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # ======================================================================================================================
 # Admin resources
@@ -1879,6 +1883,10 @@ ALTER TABLE `folder_image`
   AFTER `file`
 ;
 
+ALTER TABLE `module_image`
+  ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
+  AFTER `file`
+;
 ALTER TABLE `brand_document`
   ADD COLUMN `visible` TINYINT DEFAULT 1 NOT NULL
   AFTER `file`
@@ -1966,16 +1974,53 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 
 
 # ======================================================================================================================
-# End of changes
-# ======================================================================================================================
-
-# ======================================================================================================================
 # Add product_sale_elements_id IN order_product
 # ======================================================================================================================
 
 ALTER TABLE  `order_product`
   ADD  `product_sale_elements_id` INT NOT NULL
   AFTER  `product_sale_elements_ref`;
+
+
+# ======================================================================================================================
+# Add Virtual product
+# ======================================================================================================================
+
+ALTER TABLE  `product`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `ref`;
+
+ALTER TABLE  `product_version`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `ref`;
+
+
+ALTER TABLE  `order_product`
+  ADD  `virtual` TINYINT DEFAULT 0 NOT NULL
+  AFTER  `postscriptum`;
+
+ALTER TABLE  `order_product`
+  ADD  `virtual_document` VARCHAR(255)
+  AFTER  `virtual`;
+
+
+# ======================================================================================================================
+# Add Meta data
+# ======================================================================================================================
+
+DROP TABLE IF EXISTS `meta_data`;
+
+CREATE TABLE `meta_data`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `meta_key` VARCHAR(100) NOT NULL,
+    `element_key` VARCHAR(100) NOT NULL,
+    `element_id` INTEGER NOT NULL,
+    `is_serialized` TINYINT(1) NOT NULL,
+    `value` LONGTEXT NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 
 # ======================================================================================================================

@@ -23,6 +23,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
 
 use Thelia\Module\BaseModule;
@@ -200,15 +202,29 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 /* first test if module defines it's own config route  */
                 if ($module->getActivate()) {
-                    // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
-                    $routerId = "router." . $module->getBaseDir();
-                    if ($this->container->has($routerId)) {
-                        try {
-                            if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
-                                $hasConfigurationInterface = true;
+                    // test if a hook
+                    $hookConfiguration = ModuleHookQuery::create()
+                        ->filterByModuleId($module->getId())
+                        ->filterByActive(true)
+                        ->useHookQuery()
+                            ->filterByCode('module.configuration')
+                            ->filterByType(TemplateDefinition::BACK_OFFICE)
+                        ->endUse()
+                        ->findOne()
+                    ;
+                    $hasConfigurationInterface = (null !== $hookConfiguration);
+
+                    if (false === $hasConfigurationInterface) {
+                        // Works only fo activated modules - see Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass
+                        $routerId = "router." . $module->getBaseDir();
+                        if ($this->container->has($routerId)) {
+                            try {
+                                if ($this->container->get($routerId)->match('/admin/module/' . $module->getCode())) {
+                                    $hasConfigurationInterface = true;
+                                }
+                            } catch (ResourceNotFoundException $e) {
+                                /* $hasConfigurationInterface stays false */
                             }
-                        } catch (ResourceNotFoundException $e) {
-                            /* $hasConfigurationInterface stays false */
                         }
                     }
 
@@ -219,14 +235,23 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         }
                     }
                 } else {
-                    // Make a quick and dirty test on the module's routing.xml file
-                    $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
+                    // Make a quick and dirty test on the module's config.xml file
+                    $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
-                    if ($routing && strpos($routing, '/admin/module/') !== false) {
+                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/',$configContent) !== false) {
                         $hasConfigurationInterface = true;
-                    } else {
-                        if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                    }
+
+                    if (false === $hasConfigurationInterface) {
+                        // Make a quick and dirty test on the module's routing.xml file
+                        $routing = @file_get_contents($module->getAbsoluteConfigPath() . DS . "routing.xml");
+
+                        if ($routing && strpos($routing, '/admin/module/') !== false) {
                             $hasConfigurationInterface = true;
+                        } else {
+                            if (file_exists($module->getAbsoluteAdminIncludesPath() . DS . "module_configuration.html")) {
+                                $hasConfigurationInterface = true;
+                            }
                         }
                     }
                 }

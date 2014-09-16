@@ -166,7 +166,7 @@
                                     {if $STATUS >=2}
                                         <a href="{url path="/account/order/pdf/invoice/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a>
                                         {if $VIRTUAL}
-                                        <a href="#" class="btn btn-virtual-details btn-order-details" data-order="{$ID}" title="{intl l="View order virtual downloads"}"><span class="glyphicon glyphicon-download"></span> {intl l="Download files"}</a>
+                                        <a href="#" class="btn btn-virtual-details btn-order-details" data-order="{$ID}" title="{intl l="Download files"}"><span class="glyphicon glyphicon-download"></span> {intl l="Download files"}</a>
                                         {/if}
                                     {/if}
                                     </td>
@@ -174,7 +174,7 @@
                                     {if $STATUS >=2 && $VIRTUAL}
                                     <tr id="virtual-product-{$ID}" class="hide">
                                         <td colspan="5">
-                                            <table class="table table-condensed table-order-products" summary="{intl l="List of files"}">
+                                            <table class="table table-condensed table-order-products" summary="{intl l="List of downloadable files"}">
                                                 <thead>
                                                     <tr>
                                                         <th>{intl l="File"}</th>

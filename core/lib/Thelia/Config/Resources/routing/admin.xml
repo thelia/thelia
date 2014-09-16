@@ -448,6 +448,12 @@
         <requirement key="type">.+</requirement>
     </route>
 
+    <route id="admin.product.virtual_documents" path="/admin/product/virtual-documents/{productId}/{pseId}" methods="get">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::getVirtualDocumentListAjaxAction</default>
+        <requirement key="productId">\d+</requirement>
+        <requirement key="pseId">\d+</requirement>
+    </route>
+
 
     <!--  Folder routes management -->
 

@@ -40,7 +40,7 @@
                         <div class="col-md-12">
 
                             <ul class="nav nav-tabs" id="tabbed-menu">
-                                <li><a href="#general" data-toggle="tab">{intl l="General"}</a></li>
+                                <li><a href="#general" data-toggle="tab" data-trigger="#virtual_field::change">{intl l="General"}</a></li>
                                 <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
                                 <li><a href="#prices" data-toggle="tab">{intl l="Price"}</a></li>
                                 <li>
@@ -65,6 +65,7 @@
                                 </li>
                                 <li>
                                     <a href="#documents"
+                                       id="tab-documents"
                                        data-toggle="tab"
                                        data-href="{url path="/admin/document/type/product/{$ID}/form-ajax"}"
                                        data-callback="$.documentUploadManager.initDocumentDropZone">
@@ -172,10 +173,67 @@ $(function() {
                 eval($this.data('callback') + '();');
             }
         });
+
     });
+    $('.nav-tabs a[data-trigger]').on('shown.bs.tab', function(ev) {
+        var $this = $(this);
+        var trigger = $this.data('trigger');
+        var triggers = trigger.split('::');
+        if (triggers.length == 2) {
+            $(triggers[0]).trigger(triggers[1]);
+        }
+    });
+
 
     // Load active tab
     $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
+
+    $('.nav-tabs a[href="#general"]').trigger("change");
+
+    // vitual product
+    $('#virtual_field').change(function(event) {
+        var $virtual = $(this);
+
+        if ($virtual.prop("checked")){
+            var $virtualDocumentsSelector;
+            $('#virtual-product-file').removeClass("hidden");
+            $virtualDocumentsSelector = $('#virtual-product-file select');
+            if ($virtualDocumentsSelector.length > 0){
+                // update options
+                $.ajax({
+                    url      : '{url path="/admin/product/virtual-documents/"}' +
+                               $virtualDocumentsSelector.data('product') + '/' +
+                               $virtualDocumentsSelector.data('pse'),
+                    type     : 'get',
+                    dataType : 'json',
+                    success  : function(data) {
+                        var i = 0,
+                            selectedOption = 0,
+                            virtualDocumentsSelector,
+                            option;
+                        virtualDocumentsSelector = $virtualDocumentsSelector.get(0);
+                        virtualDocumentsSelector.options.length = 1
+                        if (data.length == 0){
+                            $('#virtual-product-message').removeClass('hidden');
+                        } else {
+                            $('#virtual-product-message').addClass('hidden');
+                            for (; i < data.length ; i++ ){
+                                if (data[i].selected){
+                                    selectedOption = i + 1;
+                                }
+                                virtualDocumentsSelector.options[virtualDocumentsSelector.options.length] = new Option(data[i].title, data[i].id);
+                            }
+                            virtualDocumentsSelector.selectedIndex = selectedOption;
+
+                        }
+                    }
+                });
+            }
+
+        } else {
+            $('#virtual-product-file').addClass("hidden");
+        }
+    });
 
     // -- Product prices management tab ---------------------------------------
 
