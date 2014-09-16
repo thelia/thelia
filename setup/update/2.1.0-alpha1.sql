@@ -268,6 +268,28 @@ CREATE TABLE `module_hook`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
+
+-- ---------------------------------------------------------------------
+-- hook_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `hook_i18n`;
+
+CREATE TABLE `hook_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `hook_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `hook` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
   (1, 'order-invoice.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
   (2, 'order-invoice.delivery-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
@@ -1787,25 +1809,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (2022, 'en_US', 'Order confirmation - after the order summary', '', '')
 ;
 
--- ---------------------------------------------------------------------
--- hook_i18n
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `hook_i18n`;
-
-CREATE TABLE `hook_i18n`
-(
-    `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
-    `title` VARCHAR(255),
-    `description` LONGTEXT,
-    `chapo` TEXT,
-    PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `hook_i18n_FK_1`
-        FOREIGN KEY (`id`)
-        REFERENCES `hook` (`id`)
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
 
 # ======================================================================================================================
 # Admin resources
