@@ -558,7 +558,7 @@ class ProductController extends AbstractSeoCrudController
         $results = [];
 
         if (null !== $documents) {
-            foreach ($documents as $document){
+            foreach ($documents as $document) {
                 $results[] = [
                     'id'       => $document['Id'],
                     'title'    => $document['File'],
@@ -569,7 +569,6 @@ class ProductController extends AbstractSeoCrudController
 
         return $this->jsonResponse(json_encode($results));
     }
-
 
     // -- Related content management -------------------------------------------
 
