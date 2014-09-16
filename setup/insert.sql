@@ -1722,8 +1722,8 @@ INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `upda
 (3, 0, 3, NOW(), NOW());
 
 INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
-(1, 'fr_FR', 'Mr', 'Monsieur'),
-(1, 'en_US', 'M', 'Mister'),
+(1, 'fr_FR', 'M.', 'Monsieur'),
+(1, 'en_US', 'Mr.', 'Mister'),
 (2, 'fr_FR', 'Mme', 'Madame'),
 (2, 'en_US', 'Mrs', 'Misses'),
 (3, 'fr_FR', 'Mlle', 'Mademoiselle'),
