@@ -1,6 +1,6 @@
 casper.test.comment('== Order process ==');
 
-casper.test.begin('Order process', 3, function suite(test) {
+casper.test.begin('Order process', 4, function suite(test) {
 
     //first log in user
 
