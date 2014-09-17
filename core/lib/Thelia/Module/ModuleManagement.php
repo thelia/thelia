@@ -106,7 +106,7 @@ class ModuleManagement
             $locale = $description->attributes()->locale;
 
             $module
-                ->setLocale("$locale")
+                ->setLocale(strval($locale))
                 ->setTitle($description->title)
                 ->setDescription(isset($description->description)?$description->description:null)
                 ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
