@@ -45,36 +45,31 @@ class ModuleManagement
             ->in($this->baseModuleDir . '/*/Config');
 
         $descriptorValidator = new ModuleDescriptorValidator();
-
-        $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-
         foreach ($finder as $file) {
             $content = $descriptorValidator->getDescriptor($file->getRealPath());
             $reflected = new \ReflectionClass((string) $content->fullnamespace);
             $code = basename(dirname($reflected->getFileName()));
-            $module = ModuleQuery::create()->filterByCode($code)->findOne();
-            if (null === $module) {
-                $module = new Module();
-                try {
+
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+            try {
+                $module = ModuleQuery::create()->filterByCode($code)->findOne();
+                if (null === $module) {
+                    $module = new Module();
+
                     $module
                         ->setCode($code)
                         ->setFullNamespace((string) $content->fullnamespace)
                         ->setType($this->getModuleType($reflected))
                         ->setActivate(0)
                         ->save($con);
-
-                    $this->saveDescription($module, $content, $con);
-
-                    $con->commit();
-                } catch (PropelException $e) {
-                    $con->rollBack();
-                    throw $e;
                 }
-            }
-            else{
-                $this->updateDescription($module, $content, $con);
+
+                $this->saveDescription($module, $content, $con);
                 $con->commit();
+            } catch (PropelException $e) {
+                $con->rollBack();
+                throw $e;
             }
 
         }
@@ -84,29 +79,10 @@ class ModuleManagement
     {
 
         foreach ($content->descriptive as $description) {
-            $locale = $description->attributes()->locale;
-
-            $moduleI18n = new ModuleI18n();
-
-            $moduleI18n
-                ->setLocale($locale)
-                ->setModule($module)
-                ->setTitle($description->title)
-                ->setDescription(isset($description->description)?$description->description:null)
-                ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
-                ->setChapo(isset($description->subtitle)?$description->subtitle:null)
-                ->save($con);
-        }
-    }
-
-    private function updateDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
-    {
-
-        foreach ($content->descriptive as $description) {
-            $locale = $description->attributes()->locale;
+            $locale = (string) $description->attributes()->locale;
 
             $module
-                ->setLocale(strval($locale))
+                ->setLocale($locale)
                 ->setTitle($description->title)
                 ->setDescription(isset($description->description)?$description->description:null)
                 ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
