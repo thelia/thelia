@@ -45,14 +45,17 @@ class ModuleManagement
             ->in($this->baseModuleDir . '/*/Config');
 
         $descriptorValidator = new ModuleDescriptorValidator();
+
+        $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
         foreach ($finder as $file) {
             $content = $descriptorValidator->getDescriptor($file->getRealPath());
             $reflected = new \ReflectionClass((string) $content->fullnamespace);
             $code = basename(dirname($reflected->getFileName()));
-            if (null === ModuleQuery::create()->filterByCode($code)->findOne()) {
+            $module = ModuleQuery::create()->filterByCode($code)->findOne();
+            if (null === $module) {
                 $module = new Module();
-                $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-                $con->beginTransaction();
                 try {
                     $module
                         ->setCode($code)
@@ -68,8 +71,12 @@ class ModuleManagement
                     $con->rollBack();
                     throw $e;
                 }
-
             }
+            else{
+                $this->updateDescription($module, $content, $con);
+                $con->commit();
+            }
+
         }
     }
 
@@ -92,6 +99,22 @@ class ModuleManagement
         }
     }
 
+    private function updateDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
+    {
+
+        foreach ($content->descriptive as $description) {
+            $locale = $description->attributes()->locale;
+
+            $module
+                ->setLocale("$locale")
+                ->setTitle($description->title)
+                ->setDescription(isset($description->description)?$description->description:null)
+                ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
+                ->setChapo(isset($description->subtitle)?$description->subtitle:null)
+                ->save($con);
+        }
+    }
+
     private function getModuleType(\ReflectionClass $reflected)
     {
         if ($reflected->implementsInterface('Thelia\Module\DeliveryModuleInterface')) {
@@ -105,3 +128,4 @@ class ModuleManagement
     }
 
 }
+
