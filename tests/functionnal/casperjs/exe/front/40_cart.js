@@ -35,7 +35,7 @@ casper.test.begin('Cart', 5, function suite(test) {
             this.echo(this.getTitle());
             //this.echo(this.getHTML());
             test.assertExists("#cart .table-cart", "Cart table exists");
-            test.assertElementCount("#cart .table-cart tbody tr", 2, "Cart contains 1 product")
+            test.assertElementCount("#cart .table-cart tbody tr h3.name a", 1, "Cart contains 1 product")
             var link = this.getElementInfo('#cart .table-cart tbody tr h3.name a');
             test.assertTruthy( link.attributes.href == productUrl, "This is the right product in cart");
             this.capture(screenshot_dir + 'front/40_cart.png');
