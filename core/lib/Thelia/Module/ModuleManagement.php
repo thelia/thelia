@@ -49,27 +49,29 @@ class ModuleManagement
             $content = $descriptorValidator->getDescriptor($file->getRealPath());
             $reflected = new \ReflectionClass((string) $content->fullnamespace);
             $code = basename(dirname($reflected->getFileName()));
-            if (null === ModuleQuery::create()->filterByCode($code)->findOne()) {
-                $module = new Module();
-                $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-                $con->beginTransaction();
-                try {
+
+            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+            try {
+                $module = ModuleQuery::create()->filterByCode($code)->findOne();
+                if (null === $module) {
+                    $module = new Module();
+
                     $module
                         ->setCode($code)
                         ->setFullNamespace((string) $content->fullnamespace)
                         ->setType($this->getModuleType($reflected))
                         ->setActivate(0)
                         ->save($con);
-
-                    $this->saveDescription($module, $content, $con);
-
-                    $con->commit();
-                } catch (PropelException $e) {
-                    $con->rollBack();
-                    throw $e;
                 }
 
+                $this->saveDescription($module, $content, $con);
+                $con->commit();
+            } catch (PropelException $e) {
+                $con->rollBack();
+                throw $e;
             }
+
         }
     }
 
@@ -77,13 +79,10 @@ class ModuleManagement
     {
 
         foreach ($content->descriptive as $description) {
-            $locale = $description->attributes()->locale;
+            $locale = (string) $description->attributes()->locale;
 
-            $moduleI18n = new ModuleI18n();
-
-            $moduleI18n
+            $module
                 ->setLocale($locale)
-                ->setModule($module)
                 ->setTitle($description->title)
                 ->setDescription(isset($description->description)?$description->description:null)
                 ->setPostscriptum(isset($description->postscriptum)?$description->postscriptum:null)
@@ -105,3 +104,4 @@ class ModuleManagement
     }
 
 }
+
