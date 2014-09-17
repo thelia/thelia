@@ -40,10 +40,18 @@ local/modules/*
 
 # Ignore everything in the "templates" directory, except the "default template"
 templates/*
-!templates/backOffice/default/
-!templates/email/default/
-!templates/frontOffice/default/
-!templates/pdf/default/
+!templates/frontOffice
+templates/frontOffice/*
+!templates/frontOffice/default
+!templates/backOffice
+templates/backOffice/*
+!templates/backOffice/default
+!templates/email
+templates/email/*
+!templates/email/default
+!templates/pdf
+templates/pdf/*
+!templates/pdf/default
 
 #Ignore CodeKit
 codekit-config.json
