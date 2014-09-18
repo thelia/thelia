@@ -65,6 +65,7 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
         return new ArgumentCollection(
             Argument::createIntTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createAnyTypeArgument('code'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -95,6 +96,10 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
 
         if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        if (null !== $code = $this->getCode()) {
+            $search->filterByCode($code);
         }
 
         $this->configureI18nProcessing($search);
