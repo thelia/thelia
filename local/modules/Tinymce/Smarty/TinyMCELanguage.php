@@ -30,7 +30,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
             $this->locale = $request->getSession()->getLang()->getLocale();
         }else{
             $this->locale = Lang::getDefaultLanguage()->getLocale();
-        }
+        } 
     }
 
     public function guessTinyMCELanguage($params, \Smarty_Internal_Template $template)
