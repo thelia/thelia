@@ -1,0 +1,20 @@
+
+<div class="col-md-12">
+    <div class="general-block-decorator">
+
+        <div class="col-md-12 title title-without-tabs">
+            {intl l='Errors'}
+        </div>
+
+        <div class="form-container">
+            <div class="col-md-12">
+                {foreach $module_errors as $module_error}
+                <div class="alert alert-warning">
+                    {$module_error->getMessage()} <a href="#" class="module-error-more">{intl l="more..."}</a>
+                    <div class="more hidden"><br><pre><code>{$module_error}</code></pre></div>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+</div>
