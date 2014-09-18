@@ -18,7 +18,6 @@ use Propel\Runtime\Propel;
 use Symfony\Component\Finder\Finder;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModuleQuery;
 
 /**
@@ -104,4 +103,3 @@ class ModuleManagement
     }
 
 }
-
