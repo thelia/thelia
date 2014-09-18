@@ -26,10 +26,11 @@ class TinyMCELanguage extends AbstractSmartyPlugin
 
     public function __construct(Request $request)
     {
-        if($request->getSession() != null)
+        if($request->getSession() != null){
             $this->locale = $request->getSession()->getLang()->getLocale();
-        else
+        }else{
             $this->locale = Lang::getDefaultLanguage()->getLocale();
+        }
     }
 
     public function guessTinyMCELanguage($params, \Smarty_Internal_Template $template)
