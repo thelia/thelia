@@ -51,7 +51,7 @@ class Cart extends BaseCart
             if ($product &&
                 $productSaleElements &&
                 $product->getVisible() == 1 &&
-                ($productSaleElements->getQuantity() > $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock()))
+                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock()))
             {
 
                 $item = new CartItem();

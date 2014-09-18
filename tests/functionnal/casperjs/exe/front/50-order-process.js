@@ -16,7 +16,7 @@ casper.test.begin('Order process', 4, function suite(test) {
 
     casper.thenOpen(thelia2_base_url + "order/delivery", function() {
 
-        test.assertTitle("Billing and delivery - Cart - Thelia V2", "title is the one expected");
+        test.assertTitle("Billing and delivery - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
         this.capture(screenshot_dir + 'front/50_delivery_list.png');
 
         test.assertEval(function() {
@@ -27,7 +27,7 @@ casper.test.begin('Order process', 4, function suite(test) {
     });
 
     casper.wait(thelia_default_timeout, function(){
-        test.assertTitle("My order - Cart - Thelia V2", "title is the one expected");
+        test.assertTitle("My order - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
 
         test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
     });
