@@ -1,0 +1,114 @@
+{extends file="email-layout.tpl"}
+
+{* Do not provide a "Open in browser" link  *}
+{block name="browser"}{/block}
+{* No big image header *}
+{block name="image-header"}{/block}
+{* No logo header *}
+{block name="logo-header"}{/block}
+{* No pre-header *}
+{block name="pre-header"}{/block}
+
+{* Subject  *}
+{block name="email-subject"}{intl l="New order placed on %store_name Nº %ref" ref={$order_ref} store_name={config key="store_name"}}{/block}
+
+{* Title  *}
+{block name="email-title"}{intl l="Hello, a new order has been placed."}{/block}
+
+{* Content  *}
+{block name="email-content"}
+        {loop name="order.invoice" type="order" id=$order_id customer="*"}
+            {loop name="currency.order" type="currency" id=$CURRENCY}
+                {assign "orderCurrencySymbol" $SYMBOL}
+                {assign var="orderCurrencyIsoCode" value=$ISOCODE}
+            {/loop}
+
+            {loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}
+                {assign var="customerRef" value=$REF}
+            {/loop}
+
+            <p><a href="{url path="/admin/order/update/$ID"}">{intl l="View this order in your shop back-office."}</a></p>
+
+        <table width="100%" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td valign="top" width="55%">
+                    <strong>{intl l="Customer delivery address:"}</strong><br>
+                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1}<br>
+                    {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                    {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                    {$CITY}<br />
+                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {/loop}
+                </td>
+                <td valign="top">
+                    <strong>{intl l="Customer billing address:"}</strong><br />
+                    {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                    {$FIRSTNAME} {$LASTNAME}<br />
+                    {$ADDRESS1}<br>
+                    {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                    {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                    {$CITY}<br />
+                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {/loop}
+                </td>
+            </tr>
+        </table>
+
+        <p>
+            {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}<br />
+            {intl l="Order Number:"} {$REF}<br />
+            {intl l="Paid With:"} {loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}<br />
+            {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="datetime"}<br />
+            {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
+        </p>
+
+        <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
+            <tr style="color:#999;font-size:11px">
+                <td style="color:#999;border-bottom:1px solid #000">{intl l="What You Purchased"}</td>
+                <td align="right" style="color:#999;border-bottom:1px solid #000">{intl l="Price in"} {$orderCurrencyIsoCode}</td>
+            </tr>
+            {loop type="order_product" name="order-products" order=$ID}
+            {if $WAS_IN_PROMO == 1}
+                {assign "realPrice" $PROMO_PRICE}
+                {assign "realTax" $PROMO_PRICE_TAX}
+                {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+            {else}
+                {assign "realPrice" $PRICE}
+                {assign "realTax" $PRICE_TAX}
+                {assign "realTaxedPrice" $TAXED_PRICE}
+            {/if}
+                <tr>
+                    <td style="border-bottom:1px solid #000">
+                        <b>{$TITLE}</b> <i>({$REF})</i>
+                        {ifloop rel="combinations"}<br />
+                        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                            <span style="color:#999;display:block;font-size:11px;line-height:1.2">* {$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}</span>
+                        {/loop}
+                        {/ifloop}
+                    </td>
+                    <td align="right" style="border-bottom:1px solid #000">
+                        {$QUANTITY} x {format_money number=$realTaxedPrice symbol=$orderCurrencySymbol}
+                    </td>
+                </tr>
+            {/loop}
+            <tr>
+                <td align="right" style="text-align:right">{intl l="Total"}</td>
+                <td align="right" style="text-align:right">{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrencySymbol} </td>
+            </tr>
+            <tr>
+                <td align="right" style="text-align:right">{intl l="Shipping:"}</td>
+                <td align="right" style="text-align:right">{format_money number=$POSTAGE symbol=$orderCurrencySymbol}</td>
+            </tr>
+            <tr>
+                <td align="right" style="text-align:right"><strong>{intl l="Order Total"}</strong></td>
+                <td align="right" style="text-align:right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}</strong></td>
+            </tr>
+        </table>
+    {/loop}
+
+    <br />
+
+    {intl l="Have a nice day."}<br />
+{/block}
