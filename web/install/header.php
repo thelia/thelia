@@ -10,9 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
+ini_set('display_errors', '1');
+
 set_time_limit(0);
 
 session_start();
+
 include 'bootstrap.php';
 
 use Symfony\Component\Translation\Translator;
@@ -29,7 +32,6 @@ elseif(!$lang && !isset($_SESSION['install']['lang'])){
 $trans = new Translator($_SESSION['install']['lang']);
 $trans->addLoader("php",  new Symfony\Component\Translation\Loader\PhpFileLoader());
 $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php', $_SESSION['install']['lang']);
-
 
 ?>
 <!DOCTYPE html>
