@@ -18,59 +18,20 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
 
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
-
-use Thelia\Core\Security\Exception\TokenAuthenticationException;
 
 class SessionController extends BaseAdminController
 {
     public function showLoginAction()
     {
-        // Check if we can authenticate the user with a cookie-based token
-        if (null !== $key = $this->getRememberMeKeyFromCookie()) {
-            // Create the authenticator
-            $authenticator = new AdminTokenAuthenticator($key);
-
-            try {
-                // If have found a user, store it in the security context
-                $user = $authenticator->getAuthentifiedUser();
-
-                $this->getSecurityContext()->setAdminUser($user);
-
-                $this->adminLogAppend("admin", "LOGIN", "Successful token authentication");
-
-                // Update the cookie
-                $this->createAdminRememberMeCookie($user);
-
-                $this->applyUserLocale($user);
-
-                // Render the home page
-                return $this->render("home");
-            } catch (TokenAuthenticationException $ex) {
-                $this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
-
-                // Clear the cookie
-                $this->clearRememberMeCookie();
-            }
+        // Check if user is already authanticate
+        if ($this->getSecurityContext()->hasAdminUser()) {
+            // Render the home page
+            return $this->render("home");
         }
 
         return $this->render("login");
-    }
-
-    protected function applyUserLocale(Admin $user)
-    {
-        // Set the current language according to Admin locale preference
-        $locale = $user->getLocale();
-
-        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
-            $lang = Lang::getDefaultLanguage();
-        }
-
-        $this->getSession()->setLang($lang);
     }
 
     public function checkLogoutAction()
@@ -113,7 +74,7 @@ class SessionController extends BaseAdminController
             if (intval($form->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
-                $this->createAdminRememberMeCookie($user);
+                $this->createRememberMeCookie($user);
             }
 
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);

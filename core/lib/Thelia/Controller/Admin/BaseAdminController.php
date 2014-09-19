@@ -18,7 +18,6 @@ use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
@@ -306,45 +305,16 @@ class BaseAdminController extends BaseController
         return $order;
     }
 
-    /**
-     * Create the remember me cookie for the given user.
-     */
-    protected function createAdminRememberMeCookie(Admin $user)
+    protected function getRememberMeCookieName()
     {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-        $cookieExpiration = ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
-
-        $ctp->createCookie($user, $cookieName, $cookieExpiration);
+        return ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
     }
 
-    /**
-     * Get the rememberme key from the cookie.
-     *
-     * @return string hte key found, or null if no key was found.
-     */
-    protected function getRememberMeKeyFromCookie()
+    protected function getRememberMeCookieExpiration()
     {
-        // Check if we can authenticate the user with a cookie-based token
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp = new CookieTokenProvider();
-
-        return $ctp->getKeyFromCookie($this->getRequest(), $cookieName);
+        return ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
     }
 
-    /** Clear the remember me cookie.
-     *
-     */
-    protected function clearRememberMeCookie()
-    {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp->clearCookie($cookieName);
-    }
 
     /**
      * Render the given template, and returns the result as an Http Response.

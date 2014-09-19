@@ -327,6 +327,12 @@ class CustomerController extends BaseFrontController
 
                         $this->processLogin($customer);
 
+                        if (intval($form->get('remember_me')->getData()) > 0) {
+                            // If a remember me field if present and set in the form, create
+                            // the cookie thant store "remember me" information
+                            $this->createRememberMeCookie($customer);
+                        }
+
                         return $this->generateSuccessRedirect($customerLoginForm);
 
                     } catch (UsernameNotFoundException $e) {
@@ -363,6 +369,8 @@ class CustomerController extends BaseFrontController
         if ($this->getSecurityContext()->hasCustomerUser()) {
             $this->dispatch(TheliaEvents::CUSTOMER_LOGOUT);
         }
+
+        $this->clearRememberMeCookie();
 
         // Redirect to home page
         return $this->generateRedirect(URL::getInstance()->getIndexPage());

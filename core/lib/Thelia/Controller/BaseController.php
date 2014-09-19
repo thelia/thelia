@@ -24,10 +24,15 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\FirewallForm;
 use Thelia\Mailer\MailerFactory;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -178,6 +183,68 @@ abstract class BaseController extends ContainerAware
         }
 
         return $this->tokenProvider;
+    }
+
+    /**
+     * Get the name of the remember me cookie
+     *
+     * @return mixed
+     */
+    abstract protected function getRememberMeCookieName();
+
+    /**
+     * Get the Expiration value of the remember me cookie
+     *
+     * @return mixed
+     */
+    abstract protected function getRememberMeCookieExpiration();
+
+    /**
+     * Get the remember me key from the cookie.
+     *
+     * @return string hte key found, or null if no key was found.
+     */
+    protected function getRememberMeKeyFromCookie()
+    {
+        $ctp = new CookieTokenProvider();
+
+        return $ctp->getKeyFromCookie($this->getRequest(), $this->getRememberMeCookieName());
+    }
+
+    /**
+     * Create the remember me cookie for the given user.
+     */
+    protected function createRememberMeCookie(UserInterface $user)
+    {
+        $ctp = new CookieTokenProvider();
+
+        $ctp->createCookie(
+            $user,
+            $this->getRememberMeCookieName(),
+            $this->getRememberMeCookieExpiration()
+        );
+    }
+
+    /**
+     * Clear the remember me cookie.
+     */
+    protected function clearRememberMeCookie()
+    {
+        $ctp = new CookieTokenProvider();
+
+        $ctp->clearCookie($this->getRememberMeCookieName());
+    }
+
+    protected function applyUserLocale(UserInterface $user)
+    {
+        // Set the current language according to locale preference
+        $locale = $user->getLocale();
+
+        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+            $lang = Lang::getDefaultLanguage();
+        }
+
+        $this->getSession()->setLang($lang);
     }
 
     /**
