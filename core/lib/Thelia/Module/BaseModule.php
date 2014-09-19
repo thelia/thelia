@@ -721,11 +721,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $data = array();
 
         foreach ($locales as $locale) {
-            $row = array();
-
-            $row["title"] = !isset($titles[$locale]) ?: $titles[$locale];
-            $row["description"] = !isset($descriptions[$locale]) ?: $descriptions[$locale];
-            $row["chapo"] = !isset($chapos[$locale]) ?: $chapos[$locale];
+            $data[$locale] = [
+                'title' => !isset($titles[$locale]) ? null : $titles[$locale],
+                'description' => !isset($descriptions[$locale]) ? null: $descriptions[$locale],
+                'chapo' => !isset($chapos[$locale]) ? null : $chapos[$locale]
+            ];
         }
 
         return $data;
