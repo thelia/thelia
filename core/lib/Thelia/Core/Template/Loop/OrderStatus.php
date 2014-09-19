@@ -42,7 +42,8 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createAnyTypeArgument('code')
         );
     }
 
@@ -57,6 +58,12 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        $code = $this->getCode();
+
+        if (null !== $code) {
+            $search->filterByCode($code, Criteria::EQUAL);
         }
 
         return $search;

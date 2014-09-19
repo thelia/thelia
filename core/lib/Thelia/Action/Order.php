@@ -181,7 +181,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setCity($deliveryAddress->getCity())
             ->setPhone($deliveryAddress->getPhone())
             ->setCountryId($deliveryAddress->getCountryId())
-        ->save($con)
+            ->save($con)
         ;
 
         $invoiceOrderAddress = new OrderAddress();
@@ -197,21 +197,21 @@ class Order extends BaseAction implements EventSubscriberInterface
             ->setCity($invoiceAddress->getCity())
             ->setPhone($invoiceAddress->getPhone())
             ->setCountryId($invoiceAddress->getCountryId())
-        ->save($con)
+            ->save($con)
         ;
 
         $placedOrder->setDeliveryOrderAddressId($deliveryOrderAddress->getId());
         $placedOrder->setInvoiceOrderAddressId($invoiceOrderAddress->getId());
 
         $placedOrder->setStatusId(
-                OrderStatusQuery::getNotPaidStatus()->getId()
+            OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
         $placedOrder->setCart($cart);
 
         /* memorize discount */
         $placedOrder->setDiscount(
-                $cart->getDiscount()
+            $cart->getDiscount()
         );
 
         $placedOrder->save($con);
@@ -232,6 +232,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                     && true === ConfigQuery::checkAvailableStock()
                     && 0 === $product->getVirtual()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
+
             }
 
             if (0 === $product->getVirtual()) {
@@ -254,11 +255,11 @@ class Order extends BaseAction implements EventSubscriberInterface
             $taxRuleI18n = I18n::forceI18nRetrieving($lang->getLocale(), 'TaxRule', $product->getTaxRuleId());
 
             $taxDetail = $product->getTaxRule()->getTaxDetail(
-                    $product,
-                    $taxCountry,
-                    $cartItem->getPrice(),
-                    $cartItem->getPromoPrice(),
-                    $lang->getLocale()
+                $product,
+                $taxCountry,
+                $cartItem->getPrice(),
+                $cartItem->getPromoPrice(),
+                $lang->getLocale()
             );
 
             // get the virtual document path
@@ -296,7 +297,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setEanCode($pse->getEanCode())
                 ->setCartIemId($cartItem->getId())
                 ->setDispatcher($dispatcher)
-            ->save($con)
+                ->save($con)
             ;
 
             /* fulfill order_product_tax */
@@ -325,7 +326,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                     ->setAttributeAvChapo($attributeAv->getChapo())
                     ->setAttributeAvDescription($attributeAv->getDescription())
                     ->setAttributeAvPostscriptum($attributeAv->getPostscriptum())
-                ->save($con);
+                    ->save($con);
             }
         }
 

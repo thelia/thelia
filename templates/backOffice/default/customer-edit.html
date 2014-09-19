@@ -283,6 +283,7 @@
                                             <th>{intl l="Date & Hour"}</th>
                                             <th>{intl l="Amount"}</th>
                                             <th>{intl l="Status"}</th>
+                                            {hook name="customer.orders-table-header" location="orders_table_header" customer_id=$customer_id }
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -298,6 +299,7 @@
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
+                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
                                             </tr>
                                         {/loop}
                                         </tbody>
