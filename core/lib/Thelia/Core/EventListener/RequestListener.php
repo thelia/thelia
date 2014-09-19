@@ -13,13 +13,23 @@
 namespace Thelia\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
+use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Security\Token\CookieTokenProvider;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
@@ -29,15 +39,41 @@ use Thelia\Model\LangQuery;
  */
 class RequestListener implements EventSubscriberInterface
 {
-    protected $translator;
 
-    public function __construct(Translator $translator)
+    /**
+     *
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    private $container;
+
+    /**
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerInterfac $container
+     */
+    public function __construct(ContainerInterface $container)
     {
-        $this->translator = $translator;
+        $this->container = $container;
+    }
+
+    /**
+     * @return SecurityContext
+     */
+    public function getSecurityContext()
+    {
+        return $this->container->get('thelia.securityContext');
+    }
+
+    /**
+     * @return Translator
+     */
+    public function getTranslator()
+    {
+        return $this->container->get('thelia.translator');
     }
 
     public function registerValidatorTranslator(GetResponseEvent $event)
     {
+        /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
         $lang = $request->getSession()->getLang();
         $vendorDir = THELIA_ROOT.'core'.DS.'vendor';
@@ -45,18 +81,135 @@ class RequestListener implements EventSubscriberInterface
         $vendorValidatorDir =
             $vendorDir.DS.'symfony'.DS.'validator'.DS.'Symfony'.DS.'Component'.DS.'Validator';
 
-        $this->translator->addResource(
+        $translator = $this->getTranslator();
+        $translator->addResource(
             'xlf',
             sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
-        $this->translator->addResource(
+        $translator->addResource(
             'xlf',
             sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
+    }
+
+    public function rememberMeLoader(GetResponseEvent $event)
+    {
+        /** @var \Thelia\Core\HttpFoundation\Request $request */
+        $request = $event->getRequest();
+        /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
+        $session = $request->getSession();
+
+        // Check customer remenber me token
+        if (null === $customer = $session->getCustomerUser()) {
+            // try to get the remember me cookie
+            $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
+            $cookie = $this->getRememberMeKeyFromCookie(
+                $request,
+                $cookieCustomerName
+            );
+
+            if (null !== $cookie) {
+                // try to log
+                $authenticator = new CustomerTokenAuthenticator($cookie);
+
+                try {
+                    // If have found a user, store it in the security context
+                    $user = $authenticator->getAuthentifiedUser();
+
+                    $this->getSecurityContext()->setCustomerUser($user);
+
+                } catch (TokenAuthenticationException $ex) {
+                    //$this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
+
+                    // Clear the cookie
+                    $this->clearRememberMeCookie($cookieCustomerName);
+                }
+            }
+
+        }
+
+        // Check admin remember me token
+        if (null === $admin = $session->getAdminUser()) {
+
+            // try to get the remember me cookie
+            $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+            $cookie = $this->getRememberMeKeyFromCookie(
+                $request,
+                $cookieAdminName
+            );
+
+            if (null !== $cookie) {
+
+                // try to log
+                $authenticator = new AdminTokenAuthenticator($cookie);
+
+                try {
+                    // If have found a user, store it in the security context
+                    $user = $authenticator->getAuthentifiedUser();
+
+                    $this->getSecurityContext()->setAdminUser($user);
+
+                    $this->applyUserLocale($user, $session);
+
+                    AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+                } catch (TokenAuthenticationException $ex) {
+                    AdminLog::append("admin", "LOGIN", "Token based authentication failed.", $request);
+
+                    // Clear the cookie
+                    $this->clearRememberMeCookie($cookieAdminName);
+                }
+            }
+
+        }
+
+    }
+
+    /**
+     * Get the rememberme key from the cookie.
+     *
+     * @return string hte key found, or null if no key was found.
+     */
+    protected function getRememberMeKeyFromCookie($request, $cookieName)
+    {
+        $ctp = new CookieTokenProvider();
+
+        return $ctp->getKeyFromCookie($request, $cookieName);
+    }
+
+    /**
+     * Create the remember me cookie for the given user.
+     */
+    protected function createRememberMeCookie(UserInterface $user, $cookieName, $cookieExpiration)
+    {
+        $ctp = new CookieTokenProvider();
+
+        $ctp->createCookie($user, $cookieName, $cookieExpiration);
+    }
+
+    /**
+     * Clear the remember me cookie.
+     */
+    protected function clearRememberMeCookie($cookieName)
+    {
+        $ctp = new CookieTokenProvider();
+
+        $ctp->clearCookie($cookieName);
+    }
+
+    protected function applyUserLocale(UserInterface $user, Session $session)
+    {
+        // Set the current language according to locale preference
+        $locale = $user->getLocale();
+
+        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+            $lang = Lang::getDefaultLanguage();
+        }
+
+        $session->setLang($lang);
     }
 
     /**
@@ -112,7 +265,8 @@ class RequestListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ["registerValidatorTranslator", 128]
+                ["registerValidatorTranslator", 128],
+                ["rememberMeLoader", 128]
             ],
             KernelEvents::TERMINATE => [
                 ["registerPreviousUrl", 128]
