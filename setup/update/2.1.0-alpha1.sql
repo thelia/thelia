@@ -773,6 +773,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (1291, 'imports.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (1292, 'import.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (1293, 'brand.tab-content', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+  (1294, 'customer.orders-table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (1295, 'customer.orders-table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
   (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
   (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1764,6 +1766,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (1292, 'fr_FR', 'Export - JavaScript', '', ''),
   (1293, 'en_US', 'Brand - content', '', ''),
   (1293, 'fr_FR', 'Marque - contenu', '', ''),
+  (1294, 'en_US', 'Customer - Orders header', '', ''),
+  (1294, 'fr_FR', 'Client - Commandes entête', '', ''),
+  (1295, 'en_US', 'Customer - Orders row', '', ''),
+  (1295, 'fr_FR', 'Client - Commandes ligne', '', ''),
 
   (2001, 'fr_FR', 'Facture - CSS', '', ''),
   (2001, 'en_US', 'Invoice - CSS', '', ''),
