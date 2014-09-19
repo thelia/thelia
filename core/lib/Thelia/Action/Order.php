@@ -233,7 +233,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                     && 0 === $product->getVirtual()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
 
-
             }
 
             if (0 === $product->getVirtual()) {
