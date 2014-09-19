@@ -98,7 +98,7 @@ class OrderController extends BaseFrontController
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
 
-                    $this->redirectToRoute("order.invoice");
+                    $this->generateRedirectFromRoute("order.invoice");
                 }
             }
         }
