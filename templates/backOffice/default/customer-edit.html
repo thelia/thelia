@@ -281,7 +281,7 @@
                                         <tr>
                                             <th>{intl l="Order n°"}</th>
                                             <th>{intl l="Date & Hour"}</th>
-                                            <th>{intl l="Amount"}</th>
+                                            <th class="text-right">{intl l="Amount"}</th>
                                             <th>{intl l="Status"}</th>
                                             {hook name="customer.orders-table-header" location="orders_table_header" customer_id=$customer_id }
                                         </tr>
@@ -295,7 +295,7 @@
                                             <tr>
                                                 <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
                                                 <td>{format_date date=$CREATE_DATE}</td>
-                                                <td>{$TOTAL_TAXED_AMOUNT}</td>
+                                                <td class="text-right">{format_money number={$TOTAL_TAXED_AMOUNT}}</td>
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
