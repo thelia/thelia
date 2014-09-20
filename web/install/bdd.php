@@ -13,37 +13,38 @@
 $step=4;
 include("header.php");
 
-if (isset($_POST['host']) && isset($_POST['username'])  && isset($_POST['password']) && isset($_POST['port'])){
+try {
+    if (isset($_POST['host']) && isset($_POST['username'])  && isset($_POST['password']) && isset($_POST['port'])){
 
-    $_SESSION['install']['host'] = $_POST['host'];
-    $_SESSION['install']['username'] = $_POST['username'];
-    $_SESSION['install']['password'] = $_POST['password'];
-    $_SESSION['install']['port'] = $_POST['port'];
+        $_SESSION['install']['host'] = $_POST['host'];
+        $_SESSION['install']['username'] = $_POST['username'];
+        $_SESSION['install']['password'] = $_POST['password'];
+        $_SESSION['install']['port'] = $_POST['port'];
 
-    $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_POST['host'], $_POST['username'], $_POST['password'], $_POST['port']);
-    if(!$checkConnection->exec()) {
+        $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_POST['host'], $_POST['username'], $_POST['password'], $_POST['port']);
+        if(!$checkConnection->exec()) {
+            header('location: connection.php?err=1');
+            exit;
+        }
+        $databases = $checkConnection->getConnection()->query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
+
+        if(false === $databases){
+            header('location: connection.php?err=1');
+            exit;
+        }
+    }
+    elseif($_SESSION['install']['step'] >=3) {
+
+        $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_SESSION['install']['host'], $_SESSION['install']['username'], $_SESSION['install']['password'], $_SESSION['install']['port']);
+    }
+    else {
         header('location: connection.php?err=1');
         exit;
     }
-    $databases = $checkConnection->getConnection()->query('SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA');
+    $_SESSION['install']['step'] = 4;
+    $connection = $checkConnection->getConnection();
 
-    if(false === $databases){
-        header('location: connection.php?err=1');
-        exit;
-    }
-}
-elseif($_SESSION['install']['step'] >=3) {
-
-    $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_SESSION['install']['host'], $_SESSION['install']['username'], $_SESSION['install']['password'], $_SESSION['install']['port']);
-}
-else {
-    header('location: connection.php?err=1');
-    exit;
-}
-$_SESSION['install']['step'] = 4;
-$connection = $checkConnection->getConnection();
-
-?>
+    ?>
     <div class="well">
         <form action="config.php" method="post">
             <fieldset>
@@ -79,9 +80,9 @@ $connection = $checkConnection->getConnection();
                     $connection->exec('use information_schema');
 
                     $permissions = $connection->query("SELECT COUNT( * ) FROM  `USER_PRIVILEGES`
-				WHERE PRIVILEGE_TYPE =  'CREATE'
-				AND GRANTEE LIKE  '%".$_SESSION['install']['username']."%'
-				AND IS_GRANTABLE =  'YES';");
+                WHERE PRIVILEGE_TYPE =  'CREATE'
+                AND GRANTEE LIKE  '%".$_SESSION['install']['username']."%'
+                AND IS_GRANTABLE =  'YES';");
 
                 $writePermission = false;
                 if($permissions->fetchColumn(0) > 0) {
@@ -109,5 +110,20 @@ $connection = $checkConnection->getConnection();
             </div>
         </form>
     </div>
+    <?php
+}
+catch (\Exception $ex) {
+    ?>
+    <div class="alert alert-danger">
+        <?php echo $trans->trans(
+            '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
+            [
+                '%err' => $ex->getMessage(),
+                '%details' => nl2br($ex->getTraceAsString())
+            ]
+        ); ?>
+    </div>
+<?php
+}
 
-<?php include 'footer.php'; ?>
+include 'footer.php';

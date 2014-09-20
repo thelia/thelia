@@ -1,0 +1,54 @@
+{loop name="order.invoice" type="order" id=$order_id customer="*"}
+{loop name="currency.order" type="currency" id=$CURRENCY}
+    {assign "orderCurrencySymbol" $SYMBOL}
+{/loop}
+{intl l="Hello"}
+
+{intl l="A new order ref. %ref has been placed on %date. Here are the details :" ref={$REF} date={format_date date=$INVOICE_DATE}}
+
+{intl l="* Billing address"}
+{loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
+{$ZIPCODE} {$CITY}
+{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+{/loop}
+
+{intl l="* Delivery address"}
+{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
+{$ZIPCODE} {$CITY}
+{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+{/loop}
+
+{intl l="* Items ordered:"}
+
+{loop type="order_product" name="order-products" order=$ID}
+{strip}
+    {if $WAS_IN_PROMO == 1}
+        {assign "realPrice" $PROMO_PRICE}
+        {assign "realTax" $PROMO_PRICE_TAX}
+        {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+    {else}
+        {assign "realPrice" $PRICE}
+        {assign "realTax" $PRICE_TAX}
+        {assign "realTaxedPrice" $TAXED_PRICE}
+    {/if}
+{/strip}
+    {intl l="Item : %item" item=$TITLE}
+    {ifloop rel="combinations"}
+        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+        - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+        {/loop}
+    {/ifloop}
+    {intl l="Quantity : %qty" qty=$QUANTITY}
+    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice symbol=$orderCurrencySymbol}}
+{/loop}
+-----------------------------------------
+{intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrencySymbol}}
+{intl l="Shipping    : %amount" amount={format_money number=$POSTAGE symbol=$orderCurrencySymbol}}
+{intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}}
+{/loop}
+
+{intl l="Have a nice day."}

@@ -13,7 +13,7 @@
 namespace Thelia\Install;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use Thelia\Core\Translation\Translator;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class CheckPermission
@@ -117,7 +117,9 @@ class CheckPermission extends BaseInstall
     public function exec()
     {
         if (version_compare(phpversion(), '5.4', '<')) {
-            $this->validationMessages['php_version'] = $this->getI18nPhpVersionText('5.4', phpversion(), false);
+            $this->validationMessages['php_version']['text'] = $this->getI18nPhpVersionText('5.4', phpversion(), false);
+            $this->validationMessages['php_version']['status'] = false;
+            $this->validationMessages['php_version']['hint'] = $this->getI18nPhpVersionHint();
         }
 
         foreach ($this->directoriesToBeWritable as $directory) {
@@ -188,9 +190,9 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your directory %directory% is writable';
+                $sentence = 'The directory %directory% is writable';
             } else {
-                $sentence = 'Your directory %directory% is not writable';
+                $sentence = 'The directory %directory% is not writable';
             }
 
             $translatedText = $this->translator->trans(
@@ -200,7 +202,7 @@ class CheckPermission extends BaseInstall
                 )
             );
         } else {
-            $translatedText = sprintf('Your directory %s needs to be writable', $directory);
+            $translatedText = sprintf('The directory %s should be writable', $directory);
         }
 
         return $translatedText;
@@ -209,9 +211,9 @@ class CheckPermission extends BaseInstall
     protected function getI18nExtensionText($extension, $isValid)
     {
         if ($isValid) {
-            $sentence = '%extension% php extension is loaded';
+            $sentence = '%extension% php extension is loaded.';
         } else {
-            $sentence = '%extension% php extension is not loaded';
+            $sentence = '%extension% php extension is not loaded.';
         }
 
         return $this->translator->trans($sentence, array(
@@ -229,7 +231,7 @@ class CheckPermission extends BaseInstall
     protected function getI18nDirectoryHint($directory)
     {
         if ($this->translator !== null) {
-            $sentence = 'chmod 777 %directory% on your server with admin rights could help';
+            $sentence = 'chmod 777 %directory% on the server with admin rights may solve the problem';
             $translatedText = $this->translator->trans(
                 $sentence,
                 array(
@@ -238,7 +240,7 @@ class CheckPermission extends BaseInstall
                 'install-wizard'
             );
         } else {
-            $translatedText = sprintf('chmod 777 %s on your server with admin rights could help', $directory);
+            $translatedText = sprintf('chmod 777 %s on the server with admin rights may solve the problem', $directory);
         }
 
         return $translatedText;
@@ -258,9 +260,9 @@ class CheckPermission extends BaseInstall
     protected function getI18nConfigText($key, $expectedValue, $currentValue, $isValid)
     {
         if ($isValid) {
-            $sentence = 'Your %key% server configuration (currently %currentValue%) is well enough to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'The PHP "%key%" configuration value (currently %currentValue%) is correct (%expectedValue% required).';
         } else {
-            $sentence = 'Your %key% server configuration (currently %currentValue%) is not sufficient enough in order to run Thelia2 (%expectedValue% needed)';
+            $sentence = 'The PHP "%key%" configuration value (currently %currentValue%) is below minimal requirements to run Thelia2 (%expectedValue% required).';
         }
 
         $translatedText = $this->translator->trans(
@@ -278,7 +280,7 @@ class CheckPermission extends BaseInstall
 
     protected function getI18nExtensionHint()
     {
-        return $this->translator->trans('This extension must be installed and loaded');
+        return $this->translator->trans('This PHP extension should be installed and loaded.');
     }
 
     /**
@@ -288,7 +290,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nConfigHint()
     {
-        $sentence = 'Modifying this value on your server php.ini file with admin rights could help';
+        $sentence = 'Change this value in the php.ini configuration file.';
         $translatedText = $this->translator->trans(
             $sentence
         );
@@ -309,9 +311,9 @@ class CheckPermission extends BaseInstall
     {
         if ($this->translator !== null) {
             if ($isValid) {
-                $sentence = 'Your PHP version %currentValue% is well enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'PHP version %currentValue% matches the minimum required (PHP %expectedValue%).';
             } else {
-                $sentence = 'Your PHP version %currentValue% is not sufficient enough to run Thelia2 (%expectedValue% needed)';
+                $sentence = 'The installer detected PHP version %currentValue%, but Thelia 2 requires PHP %expectedValue% or newer.';
             }
 
             $translatedText = $this->translator->trans(
@@ -322,7 +324,7 @@ class CheckPermission extends BaseInstall
                 )
             );
         } else {
-            $translatedText = sprintf('Thelia needs at least PHP %s (%s currently)', $expectedValue, $currentValue);
+            $translatedText = sprintf('Thelia requires PHP %s or newer (%s currently).', $expectedValue, $currentValue);
         }
 
         return $translatedText;
@@ -335,7 +337,7 @@ class CheckPermission extends BaseInstall
      */
     protected function getI18nPhpVersionHint()
     {
-        $sentence = 'Upgrading your version of PHP with admin rights could help';
+        $sentence = 'You should upgrade the installed PHP version to continue Thelia 2 installation.';
         $translatedText = $this->translator->trans(
             $sentence,
             array()
