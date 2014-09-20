@@ -174,7 +174,7 @@ class Thelia extends Kernel
         }
 
         if (defined("THELIA_INSTALL_MODE") === false) {
-            $modules = ModuleQuery::getActivated();
+            $modules = ModuleQuery::getActivatedAsc();
 
             $translationDirs = array();
 

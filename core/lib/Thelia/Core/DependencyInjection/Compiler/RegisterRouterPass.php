@@ -54,7 +54,7 @@ class RegisterRouterPass implements CompilerPassInterface
 
         }
         if (defined("THELIA_INSTALL_MODE") === false) {
-            $modules = \Thelia\Model\ModuleQuery::getActivated();
+            $modules = \Thelia\Model\ModuleQuery::getActivatedDesc();
 
             foreach ($modules as $module) {
                 $moduleBaseDir = $module->getBaseDir();

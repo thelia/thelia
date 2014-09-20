@@ -61,7 +61,7 @@ class Module extends AbstractSmartyPlugin
 
             $moduleLimit = $this->getParam($params, 'module', null);
 
-            $modules = ModuleQuery::getActivated();
+            $modules = ModuleQuery::getActivatedAsc();
 
             /** @var \Thelia\Model\Module $module */
             foreach ($modules as $module) {
