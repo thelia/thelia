@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ff99a4f33022a81641dd0e96065cd617",
+    "hash": "abe023b2e8772e991be8263fb9b8447c",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -587,15 +587,15 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "3.1.14",
+            "version": "3.1.19",
             "source": {
                 "type": "svn",
                 "url": "http://smarty-php.googlecode.com/svn/",
-                "reference": "tags/Smarty_3_1_14/distribution/"
+                "reference": "tags/Smarty_3_1_19/distribution/"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
+                "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
                 "reference": null,
                 "shasum": null
             },
@@ -2023,7 +2023,7 @@
             "keywords": [
                 "debug"
             ],
-            "time": "2014-08-28 22:03:39"
+            "time": "2013-09-11 13:01:19"
         },
         {
             "name": "phenx/php-font-lib",

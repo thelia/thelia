@@ -79,6 +79,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
+        $this->inheritance_merge_compiled_includes = false;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
