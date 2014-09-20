@@ -164,7 +164,11 @@
 
 <script>
 $(function() {
-
+    // show tab documents
+    $(".alert-warning a[href^='javascript']").on('click', function () {
+        eval(this.href);
+        return false;
+        });
     // Atomatic ajax tab load, if data-href is defined.
     $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
         var $this = $(this);
