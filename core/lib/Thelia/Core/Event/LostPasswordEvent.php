@@ -33,5 +33,4 @@ class LostPasswordEvent extends ActionEvent
     {
         return $this->email;
     }
-
 }

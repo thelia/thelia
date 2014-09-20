@@ -40,7 +40,6 @@ class HookTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-
         $this->locale = LangQuery::create()->findOne()->getLocale();
 
         $this->dispatcher = $this->getMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
@@ -53,7 +52,6 @@ class HookTest extends \PHPUnit_Framework_TestCase
 
     public function testCreate()
     {
-
         $event = new HookCreateEvent();
         $event
             ->setCode('test.hook-' . uniqid())
@@ -80,7 +78,6 @@ class HookTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($event->getTitle(), $createdHook->getTitle());
 
         return $createdHook;
-
     }
 
     public function createAll(HookCreateAllEvent $event)
@@ -126,7 +123,6 @@ class HookTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateDuplicate(HookModel $hook)
     {
-
         $event = new HookCreateEvent();
         $event
             ->setCode($hook->getCode())
@@ -143,7 +139,6 @@ class HookTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($createdHook);
         $this->assertFalse($event->hasHook());
-
     }
 
     /**
@@ -236,5 +231,4 @@ class HookTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Hook', $deletedHook);
         $this->assertTrue($deletedHook->isDeleted());
     }
-
 }

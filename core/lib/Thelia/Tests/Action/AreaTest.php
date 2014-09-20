@@ -28,7 +28,6 @@ use Thelia\Model\CountryQuery;
  */
 class AreaTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreate()
     {
         $event = new AreaCreateEvent();
@@ -70,7 +69,6 @@ class AreaTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(20, $updatedArea->getPostage());
 
         return $updatedArea;
-
     }
 
     /**
@@ -136,5 +134,4 @@ class AreaTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Area', $deletedArea);
         $this->assertTrue($deletedArea->isDeleted());
     }
-
 }

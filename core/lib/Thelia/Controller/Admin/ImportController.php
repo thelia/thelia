@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\ImportExport as ImportExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -126,7 +127,6 @@ class ImportController extends BaseAdminController
                  * If the file isn't an archive
                  */
                 $content = file_get_contents($file->getPathname());
-
             } else {
                 throw new \ErrorException(
                     $this->getTranslator()->trans(
@@ -148,7 +148,6 @@ class ImportController extends BaseAdminController
                 $archiveBuilder,
                 $lang
             );
-
         } catch (FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
         } catch (\Exception $e) {
@@ -244,11 +243,13 @@ class ImportController extends BaseAdminController
 
                 try {
                     $formatter = $formatterManager->get($objectName);
-                } catch (\OutOfBoundsException $e) {}
+                } catch (\OutOfBoundsException $e) {
+                }
 
                 try {
                     $archiveBuilder = $archiveBuilderManager->get($objectName);
-                } catch (\OutOfBoundsException $e) {}
+                } catch (\OutOfBoundsException $e) {
+                }
 
                 break;
             }
@@ -362,7 +363,7 @@ class ImportController extends BaseAdminController
 
         /** @var \Thelia\Core\Template\Element\LoopResultRow $row */
         foreach ($results as $row) {
-            foreach ($row->getVarVal() as $name=>$value) {
+            foreach ($row->getVarVal() as $name => $value) {
                 $parserContext->set($name, $value);
             }
         }

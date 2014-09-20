@@ -190,7 +190,6 @@ class TheliaHttpKernel extends HttpKernel
 
         //check if lang is not defined. If not we have to search the good one.
         if (null === $request->getSession()->getLang(false)) {
-
             if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 //find lang with domain
                 return Model\LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();

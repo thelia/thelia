@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Action\Customer;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
@@ -29,7 +30,6 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var SecurityContext
      */

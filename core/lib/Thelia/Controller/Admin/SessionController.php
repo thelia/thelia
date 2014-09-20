@@ -32,7 +32,6 @@ class SessionController extends BaseAdminController
     {
         // Check if we can authenticate the user with a cookie-based token
         if (null !== $key = $this->getRememberMeKeyFromCookie()) {
-
             // Create the authenticator
             $authenticator = new AdminTokenAuthenticator($key);
 
@@ -51,7 +50,6 @@ class SessionController extends BaseAdminController
 
                 // Render the home page
                 return $this->render("home");
-
             } catch (TokenAuthenticationException $ex) {
                 $this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
 
@@ -95,7 +93,6 @@ class SessionController extends BaseAdminController
         $adminLoginForm = new AdminLogin($request);
 
         try {
-
             $form = $this->validateForm($adminLoginForm, "post");
 
             $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
@@ -123,29 +120,25 @@ class SessionController extends BaseAdminController
 
             // Redirect to the success URL, passing the cookie if one exists.
             return $this->generateSuccessRedirect($adminLoginForm);
-
-         } catch (FormValidationException $ex) {
-
-             // Validation problem
+        } catch (FormValidationException $ex) {
+            // Validation problem
              $message = $this->createStandardFormValidationErrorMessage($ex);
-         } catch (AuthenticationException $ex) {
-
-             // Log authentication failure
+        } catch (AuthenticationException $ex) {
+            // Log authentication failure
              AdminLog::append("admin", "LOGIN", sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
-             $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
-         } catch (\Exception $ex) {
-
-             // Log authentication failure
+            $message =  $this->getTranslator()->trans("Login failed. Please check your username and password.");
+        } catch (\Exception $ex) {
+            // Log authentication failure
              AdminLog::append("admin", "LOGIN", sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
-             $message = $this->getTranslator()->trans(
-                     "Unable to process your request. Please try again (%err).",
-                     array("%err" => $ex->getMessage())
-             );
-         }
+            $message = $this->getTranslator()->trans(
+                "Unable to process your request. Please try again (%err).",
+                array("%err" => $ex->getMessage())
+            );
+        }
 
-         $this->setupFormErrorContext("Login process", $message, $adminLoginForm, $ex);
+        $this->setupFormErrorContext("Login process", $message, $adminLoginForm, $ex);
 
           // Display the login form again
         return $this->render("login");

@@ -44,5 +44,4 @@ class GenerateRewrittenUrlEvent extends ActionEvent
     {
         return $this->url;
     }
-
 }

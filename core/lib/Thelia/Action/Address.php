@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,7 +28,6 @@ use Thelia\Model\Map\AddressTableMap;
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {
-
     public function create(AddressCreateOrUpdateEvent $event)
     {
         $address = new AddressModel();
@@ -85,12 +85,10 @@ class Address extends BaseAction implements EventSubscriberInterface
 
             $event->setAddress($addressModel);
             $con->commit();
-
         } catch (PropelException $e) {
             $con->rollback();
             throw $e;
         }
-
     }
 
     /**

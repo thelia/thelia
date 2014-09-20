@@ -55,7 +55,6 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
         $search->filterByOrderProductId($orderProduct, Criteria::EQUAL);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -73,6 +72,5 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

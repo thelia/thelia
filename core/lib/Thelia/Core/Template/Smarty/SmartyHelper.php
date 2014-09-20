@@ -173,5 +173,4 @@ class SmartyHelper
 
         return $store;
     }
-
 }

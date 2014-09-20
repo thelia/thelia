@@ -117,7 +117,6 @@ class ExportController extends BaseAdminController
                 $boundForm->get("images")->getData(),
                 $boundForm->get("documents")->getData()
             );
-
         } catch (FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
         } catch (\Exception $e) {
@@ -219,7 +218,8 @@ class ExportController extends BaseAdminController
 
 
             $archiveBuilder->addFileFromString(
-                $event->getContent(), $filename
+                $event->getContent(),
+                $filename
             );
 
             return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);
@@ -296,7 +296,7 @@ class ExportController extends BaseAdminController
 
         /** @var \Thelia\Core\Template\Element\LoopResultRow $row */
         foreach ($results as $row) {
-            foreach ($row->getVarVal() as $name=>$value) {
+            foreach ($row->getVarVal() as $name => $value) {
                 $parserContext->set($name, $value);
             }
         }

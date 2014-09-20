@@ -128,7 +128,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
 
-         $exclude = $this->getExclude();
+        $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
@@ -136,14 +136,18 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $product = $this->getProduct();
 
         if ($product != null) {
             $obj = ProductQuery::create()->findPk($product);
 
-            if ($obj != null) $search->filterByProduct($obj, Criteria::IN);
+            if ($obj != null) {
+                $search->filterByProduct($obj, Criteria::IN);
+            }
         }
 
         $exclude_product = $this->getExclude_product();
@@ -151,7 +155,9 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         if ($exclude_product != null) {
             $obj = ProductQuery::create()->findPk($exclude_product);
 
-            if ($obj != null) $search->filterByProduct($obj, Criteria::NOT_IN);
+            if ($obj != null) {
+                $search->filterByProduct($obj, Criteria::NOT_IN);
+            }
         }
 
         $orders  = $this->getOrder();
@@ -191,13 +197,11 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $category) {
-
             /*
              * no cause pagination lost :
              * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
@@ -262,6 +266,5 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         }
 
         return $loopResult;
-
     }
 }

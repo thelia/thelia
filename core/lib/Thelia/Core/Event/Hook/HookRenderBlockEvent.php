@@ -22,7 +22,6 @@ use Thelia\Core\Hook\FragmentBag;
  */
 class HookRenderBlockEvent extends BaseHookRenderEvent
 {
-
     /** @var  FragmentBag $fragmentBag */
     protected $fragmentBag;
 
@@ -67,5 +66,4 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     {
         return $this->fragmentBag;
     }
-
 }

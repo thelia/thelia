@@ -24,8 +24,9 @@ class LanguageController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->render("languages");
     }
-
 }

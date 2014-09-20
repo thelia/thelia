@@ -73,7 +73,8 @@ class ForSomeCustomers extends ConditionAbstract
         // Check that at least one product is selected
         if (empty($values[self::CUSTOMERS_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(), self::CUSTOMERS_LIST
+                get_class(),
+                self::CUSTOMERS_LIST
             );
         }
 
@@ -90,11 +91,11 @@ class ForSomeCustomers extends ConditionAbstract
     {
         $customer = $this->facade->getCustomer();
 
-         return $this->conditionValidator->variableOpComparison(
-             $customer->getId(),
-             $this->operators[self::CUSTOMERS_LIST],
-             $this->values[self::CUSTOMERS_LIST]
-         );
+        return $this->conditionValidator->variableOpComparison(
+            $customer->getId(),
+            $this->operators[self::CUSTOMERS_LIST],
+            $this->values[self::CUSTOMERS_LIST]
+        );
     }
 
     /**
@@ -127,7 +128,8 @@ class ForSomeCustomers extends ConditionAbstract
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::CUSTOMERS_LIST]
+            $this->translator,
+            $this->operators[self::CUSTOMERS_LIST]
         );
 
         $custStrList = '';
@@ -135,7 +137,6 @@ class ForSomeCustomers extends ConditionAbstract
         $custIds = $this->values[self::CUSTOMERS_LIST];
 
         if (null !== $custList = CustomerQuery::create()->findPks($custIds)) {
-
             /** @var Customer $cust */
             foreach ($custList as $cust) {
                 $custStrList .= $cust->getLastname() . ' ' . $cust->getFirstname() . ' ('.$cust->getRef().'), ';
@@ -145,7 +146,8 @@ class ForSomeCustomers extends ConditionAbstract
         }
 
         $toolTip = $this->translator->trans(
-            'Customer is %op% <strong>%customer_list%</strong>', [
+            'Customer is %op% <strong>%customer_list%</strong>',
+            [
                 '%customer_list%' => $custStrList,
                 '%op%' => $i18nOperator
             ]
@@ -173,7 +175,9 @@ class ForSomeCustomers extends ConditionAbstract
      */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/customers-condition.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/customers-condition.html',
+            [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::CUSTOMERS_LIST),
                 'customers_field_name' => self::CUSTOMERS_LIST,
                 'values'               => isset($this->values[self::CUSTOMERS_LIST]) ? $this->values[self::CUSTOMERS_LIST] : array()

@@ -24,7 +24,6 @@ use Thelia\Form\BaseForm;
  */
 class ShippingZoneAddArea extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

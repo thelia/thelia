@@ -68,7 +68,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 'name'
             )
         );
-     }
+    }
 
     public function buildModelCriteria()
     {
@@ -81,21 +81,25 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $this->configureI18nProcessing($search);
 
-        if (! is_null($id))
+        if (! is_null($id)) {
             $search->filterById($id);
+        }
 
-        if (! is_null($name))
+        if (! is_null($name)) {
             $search->filterByName($name);
+        }
 
         if (! is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getHidden() != BooleanOrBothType::ANY)
+        if ($this->getHidden() != BooleanOrBothType::ANY) {
             $search->filterByHidden($this->getHidden() ? 1 : 0);
+        }
 
-        if (! is_null($secured) && $secured != BooleanOrBothType::ANY)
+        if (! is_null($secured) && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
+        }
 
         $orders  = $this->getOrder();
 
@@ -132,7 +136,6 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -158,6 +161,5 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

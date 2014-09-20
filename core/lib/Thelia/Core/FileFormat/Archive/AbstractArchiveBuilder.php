@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
+
 use Thelia\Core\FileFormat\FormatInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
@@ -151,7 +152,6 @@ abstract class AbstractArchiveBuilder implements FormatInterface, ArchiveBuilder
 
     public function throwFileNotFound($file)
     {
-
         throw new FileNotFoundException(
             $this->translator
                 ->trans(

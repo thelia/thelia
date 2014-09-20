@@ -82,7 +82,8 @@ abstract class ConditionAbstract implements ConditionInterface
 
         if (!$isOperator1Legit) {
             throw new InvalidConditionOperatorException(
-                get_class(), $parameterName
+                get_class(),
+                $parameterName
             );
         }
 
@@ -101,7 +102,6 @@ abstract class ConditionAbstract implements ConditionInterface
         $translatedInputs = [];
 
         foreach ($this->validators as $key => $validator) {
-
             $translatedOperators = [];
 
             foreach ($validator['availableOperators'] as $availableOperators) {
@@ -162,7 +162,7 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function isOperatorLegit($operator, array $availableOperators)
     {
-         return in_array($operator, $availableOperators);
+        return in_array($operator, $availableOperators);
     }
 
     /**
@@ -201,7 +201,8 @@ abstract class ConditionAbstract implements ConditionInterface
         }
         if (!$currencyFound) {
             throw new InvalidConditionValueException(
-                get_class(), 'currency'
+                get_class(),
+                'currency'
             );
         }
 
@@ -221,7 +222,8 @@ abstract class ConditionAbstract implements ConditionInterface
         $floatType = new FloatType();
         if (!$floatType->isValid($priceValue) || $priceValue <= 0) {
             throw new InvalidConditionValueException(
-                get_class(), 'price'
+                get_class(),
+                'price'
             );
         }
 
@@ -243,8 +245,9 @@ abstract class ConditionAbstract implements ConditionInterface
         $inputs = $this->getValidators();
 
         if (isset($inputs['inputs'][$inputKey])) {
-
-            $html = $this->facade->getParser()->render('coupon/condition-fragments/condition-selector.html', [
+            $html = $this->facade->getParser()->render(
+                'coupon/condition-fragments/condition-selector.html',
+                [
                     'operators' => $inputs['inputs'][$inputKey]['availableOperators'],
                     'value'     => isset($this->operators[$inputKey]) ? $this->operators[$inputKey] : '',
                     'inputKey'  => $inputKey
@@ -273,7 +276,9 @@ abstract class ConditionAbstract implements ConditionInterface
             $currentValue = $this->values[$inputKey];
         }
 
-        return $this->facade->getParser()->render('coupon/conditions-fragments/base-input-text.html', [
+        return $this->facade->getParser()->render(
+            'coupon/conditions-fragments/base-input-text.html',
+            [
                 'label' => $label,
                 'inputKey' => $inputKey,
                 'currentValue' => $currentValue,
@@ -294,7 +299,9 @@ abstract class ConditionAbstract implements ConditionInterface
      */
     protected function drawBackOfficeInputQuantityValues($inputKey, $max = 10, $min = 0)
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/quantity-selector.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/quantity-selector.html',
+            [
                 'min'      => $min,
                 'max'      => $max,
                 'value'    => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
@@ -322,7 +329,9 @@ abstract class ConditionAbstract implements ConditionInterface
             $cleanedCurrencies[$currency->getCode()] = $currency->getSymbol();
         }
 
-        return $this->facade->getParser()->render('coupon/condition-fragments/currency-selector.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/currency-selector.html',
+            [
                 'currencies' => $cleanedCurrencies,
                 'value'      => isset($this->values[$inputKey]) ? $this->values[$inputKey] : '',
                 'inputKey'   => $inputKey

@@ -40,16 +40,13 @@ use Thelia\Model\Lang;
  */
 class HookController extends AbstractCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'hook',
             'manual',
             'hook_order',
-
             AdminResources::HOOK,
-
             TheliaEvents::HOOK_CREATE,
             TheliaEvents::HOOK_UPDATE,
             TheliaEvents::HOOK_DELETE
@@ -104,13 +101,11 @@ class HookController extends AbstractCrudController
             );
 
             $response = JsonResponse::create($json_data);
-
         } catch (\Exception $e) {
             $response  = JsonResponse::create(array("error" => $e->getMessage()), 500);
         }
 
         return $response;
-
     }
 
     public function discoverSaveAction()
@@ -126,7 +121,6 @@ class HookController extends AbstractCrudController
         // new hooks in the template
         if (null !== $newHooks = $this->getRequest()->request->get("new", null)) {
             foreach ($newHooks as $hook) {
-
                 $event = $this->getDiscoverCreationEvent($hook, $templateType);
 
                 $this->dispatch(TheliaEvents::HOOK_CREATE_ALL, $event);
@@ -140,7 +134,6 @@ class HookController extends AbstractCrudController
         // missing official hooks
         if (null !== $missingHooks = $this->getRequest()->request->get("missing")) {
             foreach ($missingHooks as $hookId) {
-
                 $event = new HookDeactivationEvent($hookId);
 
                 $this->dispatch(TheliaEvents::HOOK_DEACTIVATION, $event);
@@ -221,7 +214,6 @@ class HookController extends AbstractCrudController
         }
 
         return $ret;
-
     }
 
     /**
@@ -474,5 +466,4 @@ class HookController extends AbstractCrudController
 
         return $this->nullResponse(500);
     }
-
 }

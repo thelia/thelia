@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\EventListener;
+
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -85,11 +86,9 @@ class RequestListener implements EventSubscriberInterface
 
         // Set previous URL, if defined
         if (null !== $referrer) {
-
             $session = $request->getSession();
 
             if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
-
                 $components = parse_url($referrer);
                 $lang = LangQuery::create()
                     ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
@@ -98,9 +97,7 @@ class RequestListener implements EventSubscriberInterface
                 if (null !== $lang) {
                     $session->setReturnToUrl($referrer);
                 }
-
             } else {
-
                 if ( false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
                     $session->setReturnToUrl($referrer);
                 }

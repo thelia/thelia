@@ -314,5 +314,4 @@ class Order extends BaseOrder
     {
         return $this->getOrderStatus()->getCode() == $statusCode;
     }
-
 }

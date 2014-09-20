@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
+
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\ZipArchiveException;
 use Thelia\Core\HttpFoundation\Response;

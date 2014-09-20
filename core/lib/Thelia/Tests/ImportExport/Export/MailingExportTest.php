@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Export;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\Core\FileFormat\FormatType;
@@ -39,7 +40,6 @@ class MailingExportTest extends \PHPUnit_Framework_TestCase
     public function testExport()
     {
         $data = $this->handler->buildData(Lang::getDefaultLanguage());
-
     }
 
     public function testType()

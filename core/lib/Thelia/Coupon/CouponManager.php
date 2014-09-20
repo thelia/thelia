@@ -102,15 +102,12 @@ class CouponManager
 
         /** @var CouponInterface $coupon */
         foreach ($couponsKept as $coupon) {
-
             if ($coupon->isRemovingPostage()) {
-
-                 // Check if delivery country is on the list of countries for which delivery is free
+                // Check if delivery country is on the list of countries for which delivery is free
                 // If the list is empty, the shipping is free for all countries.
                 $couponCountries = $coupon->getFreeShippingForCountries();
 
                 if (! $couponCountries->isEmpty()) {
-
                     if (null === $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress())) {
                         continue;
                     }
@@ -137,7 +134,6 @@ class CouponManager
                 $couponModules = $coupon->getFreeShippingForModules();
 
                 if (! $couponModules->isEmpty()) {
-
                     $moduleValid = false;
 
                     $shippingModuleId = $order->getDeliveryModuleId();
@@ -302,14 +298,11 @@ class CouponManager
             $ret = false;
 
             try {
-
                 $usageLeft = $coupon->getUsagesLeft($customerId);
 
                 if ($usageLeft > 0) {
-
                     // If the coupon usage is per user, add an entry to coupon customer usage count table
                     if ($coupon->getPerCustomerUsageCount()) {
-
                         if (null == $customerId) {
                             throw new \LogicException("Customer should not be null at this time.");
                         }

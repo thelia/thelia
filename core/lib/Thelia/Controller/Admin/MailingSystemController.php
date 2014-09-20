@@ -26,7 +26,9 @@ class MailingSystemController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Hydrate the form abd pass it to the parser
         $data = array(
@@ -54,7 +56,9 @@ class MailingSystemController extends BaseAdminController
     public function updateAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -62,7 +66,6 @@ class MailingSystemController extends BaseAdminController
         $form = new MailingSystemModificationForm($this->getRequest());
 
         try {
-
             // Check the form against constraints violations
             $formData = $this->validateForm($form, "POST");
 
@@ -107,9 +110,10 @@ class MailingSystemController extends BaseAdminController
 
     public function testAction()
     {
-
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $contactEmail = ConfigQuery::read('store_email');
         $storeName = ConfigQuery::read('store_name', 'Thelia');
@@ -120,7 +124,6 @@ class MailingSystemController extends BaseAdminController
         );
 
         if ($contactEmail) {
-
             $emailTest = $this->getRequest()->get("email", $contactEmail);
 
             $message = $this->getTranslator()->trans("Email test from : %store%", array("%store%" => $storeName));
@@ -150,5 +153,4 @@ class MailingSystemController extends BaseAdminController
 
         return $response;
     }
-
 }

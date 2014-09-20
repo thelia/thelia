@@ -21,7 +21,6 @@ use Thelia\Form\BaseForm;
  */
 class AssetsFlushForm extends BaseForm
 {
-
     /**
      * @inheritdoc
      */

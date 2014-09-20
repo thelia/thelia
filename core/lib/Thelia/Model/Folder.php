@@ -53,7 +53,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
         }
 
         return $contentsCount;
-
     }
 
     /**
@@ -63,7 +62,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
      */
     public function getRoot($folderId)
     {
-
         $folder = FolderQuery::create()->findPk($folderId);
 
         if (0 !== $folder->getParent()) {
@@ -75,7 +73,6 @@ class Folder extends BaseFolder implements FileModelParentInterface
         }
 
         return $folderId;
-
     }
 
     /**

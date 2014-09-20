@@ -24,7 +24,6 @@ namespace Thelia\Core\FileFormat;
  */
 interface FormatInterface
 {
-
     /**
      * @return string
      *

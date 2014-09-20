@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Export;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
@@ -188,7 +189,6 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
                 $rawData[$i-1]["ref"] === $rawData[$i]["ref"] &&
                 ++$max
             );
-
         }
     }
 }

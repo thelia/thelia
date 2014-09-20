@@ -23,7 +23,6 @@ use Thelia\Core\Event\Cache\CacheEvent;
  */
 class CacheTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $dir;
 
     public function setUp()

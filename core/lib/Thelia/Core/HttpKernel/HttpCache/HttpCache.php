@@ -27,7 +27,6 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
  */
 class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {
-
     public function __construct(HttpKernelInterface $kernel, $options = array())
     {
         parent::__construct(
@@ -57,5 +56,4 @@ class HttpCache extends BaseHttpCache implements HttpKernelInterface
 
         return parent::handle($request, $type, $catch);
     }
-
 }

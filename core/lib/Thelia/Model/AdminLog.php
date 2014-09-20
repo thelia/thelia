@@ -37,6 +37,5 @@ class AdminLog extends BaseAdminLog
         } catch (\Exception $ex) {
             Tlog::getInstance()->err("Failed to insert new entry in AdminLog: {ex}", array('ex' => $ex));
         }
-
     }
 }

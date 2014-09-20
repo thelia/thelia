@@ -86,7 +86,7 @@ class ControllerResolver extends BaseControllerResolver
             $securityContext = $this->container->get('thelia.securityContext');
             $request = $this->container->get('request');
             if (false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
-            throw new AdminAccessDenied();
+                throw new AdminAccessDenied();
             }
         }
 

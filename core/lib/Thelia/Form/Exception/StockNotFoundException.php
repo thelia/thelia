@@ -14,5 +14,4 @@ namespace Thelia\Form\Exception;
 
 class StockNotFoundException extends FormValidationException
 {
-
 }

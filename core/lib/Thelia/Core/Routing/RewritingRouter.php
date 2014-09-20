@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Routing;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -34,7 +35,6 @@ use Thelia\Tools\URL;
  */
 class RewritingRouter implements RouterInterface, RequestMatcherInterface
 {
-
     /**
      * @var RequestContext The context
      */

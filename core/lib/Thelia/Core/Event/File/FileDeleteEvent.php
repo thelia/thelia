@@ -58,5 +58,4 @@ class FileDeleteEvent extends ActionEvent
     {
         return $this->fileToDelete;
     }
-
 }

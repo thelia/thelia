@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Module;
+
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 
 /**

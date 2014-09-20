@@ -38,9 +38,7 @@ class ModuleController extends AbstractCrudController
             'module',
             'manual',
             'module_order',
-
             AdminResources::MODULE,
-
             null,
             TheliaEvents::MODULE_UPDATE,
             null,
@@ -86,9 +84,9 @@ class ModuleController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('module_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('module_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -183,7 +181,9 @@ class ModuleController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         $moduleManagement = new ModuleManagement();
         $moduleManagement->updateModules();
@@ -199,7 +199,9 @@ class ModuleController extends AbstractCrudController
             throw new \InvalidArgumentException(sprintf("Module `%s` does not exists", $module_code));
         }
 
-        if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(array(), $module_code, AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->render(
             "module-configure",
             array(
@@ -210,7 +212,9 @@ class ModuleController extends AbstractCrudController
 
     public function toggleActivationAction($module_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
         $message = null;
         try {
             $event = new ModuleToggleActivationEvent($module_id);
@@ -218,7 +222,8 @@ class ModuleController extends AbstractCrudController
 
             if (null === $event->getModule()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
+                );
             }
         } catch (\Exception $e) {
             $message = $e->getMessage();
@@ -234,7 +239,6 @@ class ModuleController extends AbstractCrudController
             } else {
                 $response = $this->nullResponse();
             }
-
         } else {
             $response = $this->generateRedirectFromRoute('admin.module');
         }
@@ -244,7 +248,9 @@ class ModuleController extends AbstractCrudController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::DELETE)) {
+            return $response;
+        }
 
         $message = false;
 
@@ -263,9 +269,9 @@ class ModuleController extends AbstractCrudController
 
             if ($deleteEvent->hasModule() === false) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module')));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj' => 'Module'))
+                );
             }
-
         } catch (\Exception $e) {
             $message = $e->getMessage();
 

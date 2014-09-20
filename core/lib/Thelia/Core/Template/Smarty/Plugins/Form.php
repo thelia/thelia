@@ -88,7 +88,6 @@ class Form extends AbstractSmartyPlugin
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
-
             $name = $this->getParam($params, 'name');
 
             if (null == $name) {
@@ -140,8 +139,7 @@ class Form extends AbstractSmartyPlugin
         $fieldType,
         $fieldVars,
         $total_value_count = 1
-    )
-    {
+    ) {
         $template->assign("name", $fieldName);
         $template->assign("value", $fieldValue);
         $template->assign("data", $fieldVars['data']);
@@ -196,12 +194,10 @@ class Form extends AbstractSmartyPlugin
         /* access to collections */
         if ($formFieldType instanceof CollectionType) {
             if ( true === $formFieldConfig->getOption('prototype') ) {
-
             } else {
                 /* access to choices */
                 if (isset($formFieldView->vars['choices'])) {
                     $template->assign("choices", $formFieldView->vars['choices']);
-
                 }
             }
         }
@@ -244,9 +240,10 @@ class Form extends AbstractSmartyPlugin
 
         // We (may) have a collection
         if ($key !== null) {
-
             // Force array
-            if (! is_array($value)) $value = array();
+            if (! is_array($value)) {
+                $value = array();
+            }
 
             // If the field is not found, use an empty value
             $name = sprintf("%s[%s]", $formFieldView->vars["full_name"], $key);
@@ -285,10 +282,8 @@ class Form extends AbstractSmartyPlugin
     public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
-
             $this->processFormField($params, $template);
-
-         } else {
+        } else {
             return $content;
         }
     }
@@ -313,7 +308,6 @@ class Form extends AbstractSmartyPlugin
         );
 
         if (false !== $snippet_content = file_get_contents($snippet_path)) {
-
             $this->processFormField($params, $template);
 
             $form              = $this->getParam($params, 'form', false);
@@ -374,7 +368,6 @@ class Form extends AbstractSmartyPlugin
         }
 
         if (isset(self::$taggedFieldsStack[self::$taggedFieldsStackPosition])) {
-
             $field = self::$taggedFieldsStack[self::$taggedFieldsStackPosition];
 
             $this->assignFieldValues(
@@ -417,11 +410,12 @@ class Form extends AbstractSmartyPlugin
 
         /** @var FormView $row */
         foreach ($formView->getIterator() as $row) {
-
             // We have to exclude the fields for which value is defined in the template.
             if ($baseFormInstance->isTemplateDefinedHiddenField($row)
                 ||
-                in_array($row->vars['name'], $exclude)) continue;
+                in_array($row->vars['name'], $exclude)) {
+                continue;
+            }
 
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $attributeList = array();
@@ -488,10 +482,14 @@ class Form extends AbstractSmartyPlugin
 
         $fieldName = $this->getParam($params, 'field');
 
-        if (null == $fieldName) throw new \InvalidArgumentException("'field' parameter is missing");
+        if (null == $fieldName) {
+            throw new \InvalidArgumentException("'field' parameter is missing");
+        }
 
-        if (empty($instance->getView()[$fieldName])) throw new \InvalidArgumentException(
+        if (empty($instance->getView()[$fieldName])) {
+            throw new \InvalidArgumentException(
                 sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
+        }
 
         return $instance->getView()[$fieldName];
     }
@@ -502,8 +500,9 @@ class Form extends AbstractSmartyPlugin
 
         $tag = $this->getParam($params, 'tag');
 
-        if (null == $tag)
+        if (null == $tag) {
             throw new \InvalidArgumentException("'tag' parameter is missing");
+        }
 
         $viewList = array();
         foreach ($instance->getView() as $view) {

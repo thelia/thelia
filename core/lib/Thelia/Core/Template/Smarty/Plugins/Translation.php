@@ -52,7 +52,9 @@ class Translation extends AbstractSmartyPlugin
         $vars = array();
 
         foreach ($params as $name => $value) {
-            if ($name != 'l' && $name != 'd' && $name != 'js') $vars["%$name"] = $value;
+            if ($name != 'l' && $name != 'd' && $name != 'js') {
+                $vars["%$name"] = $value;
+            }
         }
 
         $str = $this->translator->trans(

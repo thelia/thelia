@@ -77,5 +77,4 @@ class ConfigCreationForm extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('A variable with name "%name" already exists.', array('%name' => $value)));
         }
     }
-
 }

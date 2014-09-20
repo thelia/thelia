@@ -33,7 +33,6 @@ use Thelia\Model\HookQuery;
  */
 class Hook extends BaseAction implements EventSubscriberInterface
 {
-
     /**
      * @var string
      */
@@ -60,7 +59,6 @@ class Hook extends BaseAction implements EventSubscriberInterface
         $event->setHook($hook);
 
         $this->cacheClear($event->getDispatcher());
-
     }
 
     public function update(HookUpdateEvent $event)
@@ -112,7 +110,6 @@ class Hook extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setHook($hook);
-
     }
 
     public function deactivation(HookDeactivationEvent $event)
@@ -186,7 +183,5 @@ class Hook extends BaseAction implements EventSubscriberInterface
             TheliaEvents::HOOK_DEACTIVATION      => array('deactivation', 128),
 
         );
-
     }
-
 }

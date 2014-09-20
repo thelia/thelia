@@ -42,7 +42,8 @@ class ModuleRefreshCommand extends ContainerAwareCommand
         }
 
         if (method_exists($output, 'renderBlock')) {
-            $output->renderBlock([
+            $output->renderBlock(
+                [
                     '',
                     'Modules list successfully refreshed',
                     ''

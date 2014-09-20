@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tools\FileDownload;
+
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 use Thelia\Core\Translation\Translator as TheliaTranslator;

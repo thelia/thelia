@@ -172,5 +172,4 @@ class UpdateSeoEvent extends ActionEvent
     {
         return $this->object;
     }
-
 }

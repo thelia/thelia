@@ -78,7 +78,6 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->orderById(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -109,6 +108,5 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

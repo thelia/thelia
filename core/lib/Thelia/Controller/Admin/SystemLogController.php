@@ -17,6 +17,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Form\SystemLogConfigurationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
@@ -24,7 +25,6 @@ use Thelia\Model\ConfigQuery;
  */
 class SystemLogController extends BaseAdminController
 {
-
     protected function renderTemplate()
     {
         $destinations = array();
@@ -37,12 +37,13 @@ class SystemLogController extends BaseAdminController
 
         $active_destinations = explode(";", ConfigQuery::read(Tlog::VAR_DESTINATIONS, Tlog::DEFAUT_DESTINATIONS));
 
-        return $this->render('system-logs',
-                array(
-                    'ip_address' => $this->getRequest()->getClientIp(),
-                    'destinations' => $destinations,
-                    'active_destinations' => $active_destinations
-                )
+        return $this->render(
+            'system-logs',
+            array(
+                'ip_address' => $this->getRequest()->getClientIp(),
+                'destinations' => $destinations,
+                'active_destinations' => $active_destinations
+            )
         );
     }
 
@@ -50,17 +51,16 @@ class SystemLogController extends BaseAdminController
     {
         try {
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
-
-                if ($fileInfo->isDot()) continue;
+                if ($fileInfo->isDot()) {
+                    continue;
+                }
 
                 $matches = array();
 
                 if (preg_match("/([^\.]+)\.php/", $fileInfo->getFilename(), $matches)) {
-
                     $classname = $matches[1];
 
                     if (! isset($destinations[$classname])) {
-
                         $full_class_name = "Thelia\\Log\\Destination\\".$classname;
 
                         $destinations[$classname] = new $full_class_name();
@@ -77,7 +77,9 @@ class SystemLogController extends BaseAdminController
      */
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Hydrate the general configuration form
         $systemLogForm = new SystemLogConfigurationForm($this->getRequest(), 'form', array(
@@ -95,7 +97,9 @@ class SystemLogController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::SYSTEM_LOG, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -106,11 +110,11 @@ class SystemLogController extends BaseAdminController
 
             $data = $form->getData();
 
-            ConfigQuery::write(Tlog::VAR_LEVEL         , $data['level']);
-            ConfigQuery::write(Tlog::VAR_PREFIXE       , $data['format']);
-            ConfigQuery::write(Tlog::VAR_SHOW_REDIRECT , $data['show_redirections']);
-            ConfigQuery::write(Tlog::VAR_FILES         , $data['files']);
-            ConfigQuery::write(Tlog::VAR_IP            , $data['ip_addresses']);
+            ConfigQuery::write(Tlog::VAR_LEVEL, $data['level']);
+            ConfigQuery::write(Tlog::VAR_PREFIXE, $data['format']);
+            ConfigQuery::write(Tlog::VAR_SHOW_REDIRECT, $data['show_redirections']);
+            ConfigQuery::write(Tlog::VAR_FILES, $data['files']);
+            ConfigQuery::write(Tlog::VAR_IP, $data['ip_addresses']);
 
             // Save destination configuration
             $destinations = $this->getRequest()->get('destinations');
@@ -119,13 +123,11 @@ class SystemLogController extends BaseAdminController
             $active_destinations = array();
 
             foreach ($destinations as $classname => $destination) {
-
                 if (isset($destination['active'])) {
                     $active_destinations[] = $destination['classname'];
                 }
 
                 if (isset($configs[$classname])) {
-
                     // Update destinations configuration
                     foreach ($configs[$classname] as $var => $value) {
                         ConfigQuery::write($var, $value, true, true);
@@ -139,7 +141,6 @@ class SystemLogController extends BaseAdminController
             $this->adminLogAppend(AdminResources::SYSTEM_LOG, AccessManager::UPDATE, "System log configuration changed");
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
-
         } catch (\Exception $ex) {
             $error_msg = $ex->getMessage();
         }

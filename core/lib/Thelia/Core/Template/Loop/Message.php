@@ -52,7 +52,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createBooleanOrBothTypeArgument('hidden'),
             Argument::createBooleanOrBothTypeArgument('secured')
         );
-     }
+    }
 
     public function buildModelCriteria()
     {
@@ -71,23 +71,25 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             )
         );
 
-        if (! is_null($id))
+        if (! is_null($id)) {
             $search->filterById($id);
+        }
 
-        if (! is_null($name))
+        if (! is_null($name)) {
             $search->filterByName($name);
+        }
 
         if (! is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if (! is_null($secured) && $secured != BooleanOrBothType::ANY)
+        if (! is_null($secured) && $secured != BooleanOrBothType::ANY) {
             $search->filterBySecured($secured ? 1 : 0);
+        }
 
         $search->orderByName(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -111,6 +113,5 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Sale;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
@@ -188,7 +189,6 @@ class SaleTest extends TestCaseWithURLToolSetup
 
         $this->assertInstanceOf('Thelia\Model\Sale', $deletedSale);
         $this->assertTrue($deletedSale->isDeleted());
-
     }
 
     public function testSaleToggleVisibility()

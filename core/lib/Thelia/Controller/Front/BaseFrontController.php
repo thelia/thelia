@@ -111,7 +111,6 @@ class BaseFrontController extends BaseController
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
-
         // Add the template standard extension
         $templateName .= '.html';
 
@@ -130,6 +129,5 @@ class BaseFrontController extends BaseController
         $data = $this->getParser($templateDir)->render($templateName, $args);
 
         return $data;
-
     }
 }

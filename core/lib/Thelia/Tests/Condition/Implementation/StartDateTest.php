@@ -25,7 +25,6 @@ use Thelia\Model\Lang;
  */
 class StartDateTest extends \PHPUnit_Framework_TestCase
 {
-
     public $startDate;
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -232,7 +231,6 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
         $actual = $serializableRule;
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -315,7 +313,6 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -325,5 +322,4 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-
 }

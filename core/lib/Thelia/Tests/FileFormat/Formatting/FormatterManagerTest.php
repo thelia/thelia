@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Formatting;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterManager;

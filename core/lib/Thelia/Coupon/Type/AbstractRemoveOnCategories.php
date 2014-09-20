@@ -62,8 +62,7 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    )
-    {
+    ) {
         parent::set(
             $facade, $code, $title, $shortDescription, $description, $effects,
             $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
@@ -74,7 +73,9 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
         $this->category_list = isset($effects[self::CATEGORIES_LIST]) ? $effects[self::CATEGORIES_LIST] : array();
 
-        if (! is_array($this->category_list)) $this->category_list = array($this->category_list);
+        if (! is_array($this->category_list)) {
+            $this->category_list = array($this->category_list);
+        }
 
         $this->setFieldsValue($effects);
 
@@ -98,7 +99,6 @@ abstract class AbstractRemoveOnCategories extends CouponAbstract implements Amou
 
                 /** @var Category $category */
                 foreach ($categories as $category) {
-
                     if (in_array($category->getId(), $this->category_list)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 

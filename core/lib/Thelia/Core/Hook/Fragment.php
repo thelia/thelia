@@ -59,5 +59,4 @@ class Fragment
     {
         return array_keys($this->data);
     }
-
 }

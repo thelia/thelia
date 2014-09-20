@@ -16,5 +16,4 @@ use Thelia\Model\Base\ProfileI18nQuery as BaseProfileI18nQuery;
  */
 class ProfileI18nQuery extends BaseProfileI18nQuery
 {
-
 } // ProfileI18nQuery

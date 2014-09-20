@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -26,7 +27,6 @@ use Thelia\Model\Product;
  */
 class RemoveAmountOnProductsTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -125,10 +125,11 @@ class RemoveAmountOnProductsTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if ($count == 1)
+        if ($count == 1) {
             $ret = [$cartItem1Stub];
-        else
+        } else {
             $ret = [$cartItem1Stub, $cartItem2Stub];
+        }
 
         $cartStub
             ->expects($this->any())

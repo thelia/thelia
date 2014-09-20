@@ -28,7 +28,6 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class CategoryTest extends TestCaseWithURLToolSetup
 {
-
     /**
      * @return \Thelia\Model\Category
      */

@@ -188,5 +188,4 @@ class ConditionCollection implements Iterator, Countable, ArrayAccess
 
         return json_encode($arrayToSerialize);
     }
-
 }

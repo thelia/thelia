@@ -123,5 +123,4 @@ class HookUpdateEvent extends HookCreateEvent
     {
         return $this->description;
     }
-
 }

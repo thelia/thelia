@@ -140,7 +140,6 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -163,6 +162,5 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         }
 
         return $loopResult;
-
     }
 }

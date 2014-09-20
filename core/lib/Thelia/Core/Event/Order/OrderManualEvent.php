@@ -268,5 +268,4 @@ class OrderManualEvent extends OrderEvent
 
         return $this;
     }
-
 }

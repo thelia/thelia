@@ -105,7 +105,6 @@ class FolderTest extends TestCaseWithURLToolSetup
      */
     public function testCreateFolder()
     {
-
         $event = new FolderCreateEvent();
         $event->setDispatcher($this->dispatcher);
         $event
@@ -278,7 +277,6 @@ class FolderTest extends TestCaseWithURLToolSetup
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
         $this->assertEquals(1, $updatedFolder->getPosition(),sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
-
     }
 
     /**
@@ -288,9 +286,7 @@ class FolderTest extends TestCaseWithURLToolSetup
      */
     protected function getFolderIdForPositionTest()
     {
-
         if (null === self::$folderIdForPositionTest) {
-
             $folder = new \Thelia\Model\Folder();
 
             $folder->setParent(0);
@@ -302,7 +298,6 @@ class FolderTest extends TestCaseWithURLToolSetup
             $folder->save();
 
             for ($i = 0; $i < 4; $i++) {
-
                 $subFolder = new \Thelia\Model\Folder();
 
                 $subFolder->setParent($folder->getId());

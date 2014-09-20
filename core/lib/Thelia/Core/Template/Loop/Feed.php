@@ -57,13 +57,11 @@ class Feed extends BaseLoop  implements ArraySearchLoopInterface
         $items = $feed->get_items();
 
         return $items;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $item) {
-
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow

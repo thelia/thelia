@@ -85,7 +85,6 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->addAscendingOrderByColumn('i18n_TITLE');
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -110,6 +109,5 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

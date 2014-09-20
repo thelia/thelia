@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon;
+
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Condition\ConditionFactory;
@@ -32,7 +33,6 @@ use Thelia\Model\Customer;
  */
 class CouponFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -327,7 +327,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $expected = false;
 
         $this->assertEquals($expected, $actual, 'CouponFactory->buildCouponFromCode should return false if the given code is unknown');
-
     }
 
     /**
@@ -394,7 +393,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $factory = new CouponFactory($stubContainer);
         $factory->buildCouponFromCode('XMAS');
-
     }
 
     /**
@@ -455,7 +453,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
 
         $factory = new CouponFactory($stubContainer);
         $factory->buildCouponFromCode('XMAS');
-
     }
 
     /**

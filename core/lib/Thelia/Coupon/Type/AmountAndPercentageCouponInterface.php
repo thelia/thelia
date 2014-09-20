@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+
 use Thelia\Model\CartItem;
 
 /**
@@ -22,7 +23,6 @@ use Thelia\Model\CartItem;
  */
 interface AmountAndPercentageCouponInterface
 {
-
     /**
      * Set the value of specific coupon fields.
      * @param Array $effects the Coupon effects params

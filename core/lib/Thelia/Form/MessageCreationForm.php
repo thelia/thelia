@@ -80,5 +80,4 @@ class MessageCreationForm extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('A message with name "%name" already exists.', array('%name' => $value)));
         }
     }
-
 }

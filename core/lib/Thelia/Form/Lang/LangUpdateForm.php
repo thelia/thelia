@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
+
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -21,7 +22,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class LangUpdateForm extends LangCreateForm
 {
-
     public function buildForm()
     {
         parent::buildForm();

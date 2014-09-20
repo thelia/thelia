@@ -6,7 +6,6 @@ use Thelia\Model\Base\MetaData as BaseMetaData;
 
 class MetaData extends BaseMetaData
 {
-
     const CATEGORY_KEY     = 'category';
     const PRODUCT_KEY      = 'product';
     const PSE_KEY          = 'pse';
@@ -56,5 +55,4 @@ class MetaData extends BaseMetaData
 
         return parent::setValue($data);
     }
-
 }

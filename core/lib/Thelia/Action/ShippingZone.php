@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ShippingZone\ShippingZoneAddAreaEvent;
 use Thelia\Core\Event\ShippingZone\ShippingZoneRemoveAreaEvent;
@@ -25,7 +26,6 @@ use Thelia\Model\AreaDeliveryModuleQuery;
  */
 class ShippingZone extends BaseAction implements EventSubscriberInterface
 {
-
     public function addArea(ShippingZoneAddAreaEvent $event)
     {
         $areaDelivery = new AreaDeliveryModule();

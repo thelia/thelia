@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Product;
+
 use Thelia\Model\Product;
 
 class ProductCombinationGenerationEvent extends ProductEvent

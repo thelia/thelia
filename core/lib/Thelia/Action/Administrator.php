@@ -49,7 +49,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public function update(AdministratorEvent $event)
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
-
             $administrator
                 ->setDispatcher($event->getDispatcher())
                 ->setFirstname($event->getFirstname())
@@ -75,7 +74,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
     public function delete(AdministratorEvent $event)
     {
         if (null !== $administrator = AdminQuery::create()->findPk($event->getId())) {
-
             $administrator
                 ->delete()
             ;

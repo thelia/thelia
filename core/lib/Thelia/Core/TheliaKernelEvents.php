@@ -19,7 +19,5 @@ namespace Thelia\Core;
  */
 final class TheliaKernelEvents
 {
-
     const SESSION = "thelia_kernel.session";
-
 }

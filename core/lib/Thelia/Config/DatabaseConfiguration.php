@@ -17,7 +17,6 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class DatabaseConfiguration implements ConfigurationInterface
 {
-
     /**
      * Generates the configuration tree builder.
      *

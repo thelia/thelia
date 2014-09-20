@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests;
+
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -64,12 +65,10 @@ abstract class ContainerAwareTestCase extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-
         Tlog::getNewInstance();
 
         $this->session = $this->getSession();
         $this->container = $this->getContainer();
-
     }
 
     /**

@@ -152,8 +152,9 @@ abstract class BaseForm
         $successUrl = $this->form->get('success_url')->getData();
 
         if (empty($successUrl)) {
-
-            if ($default === null) $default = ConfigQuery::read('base_url', '/');
+            if ($default === null) {
+                $default = ConfigQuery::read('base_url', '/');
+            }
 
             $successUrl = $default;
         }
@@ -174,7 +175,9 @@ abstract class BaseForm
      */
     public function getView()
     {
-        if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
+        if ($this->view === null) {
+            throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
+        }
         return $this->view;
     }
 

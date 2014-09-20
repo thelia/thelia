@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Document;
+
 use Thelia\Core\Event\CachedFileEvent;
 
 /**
@@ -70,5 +71,4 @@ class DocumentEvent extends CachedFileEvent
 
         return $this;
     }
-
 }

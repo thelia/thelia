@@ -28,7 +28,6 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegisterRouterPass implements CompilerPassInterface
 {
-
     /**
      * You can modify the container here before it is dumped to PHP code.
      *
@@ -51,7 +50,6 @@ class RegisterRouterPass implements CompilerPassInterface
             $router->addMethodCall("setOption", array("generator_cache_class", $container::camelize("ProjectUrlGenerator".$id)));
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
-
         }
         if (defined("THELIA_INSTALL_MODE") === false) {
             $modules = \Thelia\Model\ModuleQuery::getActivated();
@@ -82,6 +80,5 @@ class RegisterRouterPass implements CompilerPassInterface
                 }
             }
         }
-
     }
 }

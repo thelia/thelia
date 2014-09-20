@@ -57,7 +57,9 @@ abstract class AbstractSmartyPlugin
     {
         $value = $this->getParam($params, $name, $default);
 
-        if (is_string($value)) $value = strtolower(trim($value));
+        if (is_string($value)) {
+            $value = strtolower(trim($value));
+        }
         return $value;
     }
 

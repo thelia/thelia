@@ -50,5 +50,4 @@ class ModuleQuery extends BaseModuleQuery
             ->filterByActivate(BaseModule::IS_ACTIVATED)
             ->filterById($id);
     }
-
 } // ModuleQuery

@@ -21,7 +21,6 @@ use Iterator;
  */
 class FragmentBag implements Iterator
 {
-
     private $position;
 
     /** @var array $fragments */
@@ -132,5 +131,4 @@ class FragmentBag implements Iterator
     {
         return array_keys($this->fragments);
     }
-
 }

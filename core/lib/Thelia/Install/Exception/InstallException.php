@@ -18,5 +18,4 @@ namespace Thelia\Install\Exception;
  */
 class InstallException extends \RuntimeException
 {
-
 }

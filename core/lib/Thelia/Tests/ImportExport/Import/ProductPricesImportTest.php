@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Import;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter;
@@ -31,7 +32,6 @@ class ProductPricesImportTest extends ControllerTestBase
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-
     }
 
     /**
@@ -47,7 +47,6 @@ class ProductPricesImportTest extends ControllerTestBase
         parent::setUp();
 
         $this->import = new ProductPricesImport($this->container);
-
     }
 
     public function testImport()
@@ -65,7 +64,6 @@ class ProductPricesImportTest extends ControllerTestBase
 
         /** @var \Thelia\Model\ProductSaleElements $pse */
         foreach ($query as $pse) {
-
             $entry = [];
 
             $entry["ref"]   = $pse->getRef();
@@ -108,5 +106,4 @@ class ProductPricesImportTest extends ControllerTestBase
             );
         }
     }
-
 }

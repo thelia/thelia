@@ -39,9 +39,7 @@ class AttributeController extends AbstractCrudController
             'attribute',
             'manual',
             'order',
-
             AdminResources::ATTRIBUTE,
-
             TheliaEvents::ATTRIBUTE_CREATE,
             TheliaEvents::ATTRIBUTE_UPDATE,
             TheliaEvents::ATTRIBUTE_DELETE,
@@ -99,9 +97,7 @@ class AttributeController extends AbstractCrudController
         $attr_values = $this->getRequest()->get('attribute_values', null);
 
         if ($attr_values !== null) {
-
             foreach ($attr_values as $id => $value) {
-
                 $event = new AttributeAvUpdateEvent($id);
 
                 $event->setTitle($value);
@@ -117,9 +113,9 @@ class AttributeController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('attribute_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('attribute_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -135,7 +131,6 @@ class AttributeController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -184,11 +179,11 @@ class AttributeController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render(
-                'attribute-edit',
-                array(
-                        'attribute_id' => $this->getRequest()->get('attribute_id'),
-                        'attributeav_order' => $this->getAttributeAvListOrder()
-                )
+            'attribute-edit',
+            array(
+                'attribute_id' => $this->getRequest()->get('attribute_id'),
+                'attributeav_order' => $this->getAttributeAvListOrder()
+            )
         );
     }
 
@@ -216,9 +211,9 @@ class AttributeController extends AbstractCrudController
     protected function getAttributeAvListOrder()
     {
         return $this->getListOrderFromSession(
-                'attributeav',
-                'attributeav_order',
-                'manual'
+            'attributeav',
+            'attributeav_order',
+            'manual'
         );
     }
 
@@ -228,11 +223,12 @@ class AttributeController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
             if (null !== $object = $this->getExistingObject()) {
-
                 $event = new AttributeEvent($object);
 
                 $this->dispatch($eventType, $event);

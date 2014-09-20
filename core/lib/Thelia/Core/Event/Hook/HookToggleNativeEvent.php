@@ -43,5 +43,4 @@ class HookToggleNativeEvent extends HookEvent
     {
         return $this->hook_id;
     }
-
 }

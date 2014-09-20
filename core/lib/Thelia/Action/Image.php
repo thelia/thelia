@@ -89,7 +89,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     public function processImage(ImageEvent $event)
     {
-
         $subdir      = $event->getCacheSubdirectory();
         $source_file = $event->getSourceFilepath();
 
@@ -103,7 +102,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, true);
 
         if (! file_exists($cacheFilePath)) {
-
             if (! file_exists($source_file)) {
                 throw new ImageException(sprintf("Source image file %s does not exists.", $source_file));
             }
@@ -111,14 +109,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             // Create a chached version of the original image in the web space, if not exists
 
             if (! file_exists($originalImagePathInCache)) {
-
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
                     if (false == symlink($source_file, $originalImagePathInCache)) {
-                         throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
+                        throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
-                } else {// mode = 'copy'
+                } else {
+                    // mode = 'copy'
                     if (false == @copy($source_file, $originalImagePathInCache)) {
                         throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
                     }
@@ -127,14 +125,12 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
             // Process image only if we have some transformations to do.
             if (! $event->isOriginalImage()) {
-
                 // We have to process the image.
                 $imagine = $this->createImagineInstance();
 
                 $image = $imagine->open($source_file);
 
                 if ($image) {
-
                     // Allow image pre-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
                     $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_PREPROCESSING, $event);
@@ -144,8 +140,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     if ($background_color != null) {
                         $bg_color = new Color($background_color);
-                    } else
+                    } else {
                         $bg_color = null;
+                    }
 
                     // Apply resize
                     $image = $this->applyResize($imagine, $image, $event->getWidth(), $event->getHeight(), $event->getResizeMode(), $bg_color);
@@ -153,61 +150,63 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     // Rotate if required
                     $rotation = intval($event->getRotation());
 
-                    if ($rotation != 0)
+                    if ($rotation != 0) {
                         $image->rotate($rotation, $bg_color);
+                    }
 
                     // Flip
                     // Process each effects
                     foreach ($event->getEffects() as $effect) {
-
                         $effect = trim(strtolower($effect));
 
                         $params = explode(':', $effect);
 
                         switch ($params[0]) {
 
-                        case 'greyscale':
-                        case 'grayscale':
-                            $image->effects()->grayscale();
-                            break;
+                            case 'greyscale':
+                            case 'grayscale':
+                                $image->effects()->grayscale();
+                                break;
 
-                        case 'negative':
-                            $image->effects()->negative();
-                            break;
+                            case 'negative':
+                                $image->effects()->negative();
+                                break;
 
-                        case 'horizontal_flip':
-                        case 'hflip':
-                            $image->flipHorizontally();
-                            break;
+                            case 'horizontal_flip':
+                            case 'hflip':
+                                $image->flipHorizontally();
+                                break;
 
-                        case 'vertical_flip':
-                        case 'vflip':
-                            $image->flipVertically();
-                            break;
+                            case 'vertical_flip':
+                            case 'vflip':
+                                $image->flipVertically();
+                                break;
 
-                        case 'gamma':
-                            // Syntax: gamma:value. Exemple: gamma:0.7
-                            if (isset($params[1])) {
-                                $gamma = floatval($params[1]);
+                            case 'gamma':
+                                // Syntax: gamma:value. Exemple: gamma:0.7
+                                if (isset($params[1])) {
+                                    $gamma = floatval($params[1]);
 
-                                $image->effects()->gamma($gamma);
-                            }
-                            break;
+                                    $image->effects()->gamma($gamma);
+                                }
+                                break;
 
-                        case 'colorize':
-                            // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
-                            if (isset($params[1])) {
-                                $the_color = new Color($params[1]);
+                            case 'colorize':
+                                // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
+                                if (isset($params[1])) {
+                                    $the_color = new Color($params[1]);
 
-                                $image->effects()->colorize($the_color);
-                            }
-                            break;
+                                    $image->effects()->colorize($the_color);
+                                }
+                                break;
                         }
                     }
 
                     $quality = $event->getQuality();
 
-                    if (is_null($quality)) $quality = ConfigQuery::read('default_image_quality_percent', 75);
+                    if (is_null($quality)) {
+                        $quality = ConfigQuery::read('default_image_quality_percent', 75);
+                    }
 
                     // Allow image post-processing (watermarging, or other stuff...)
                     $event->setImageObject($image);
@@ -215,9 +214,9 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     $image = $event->getImageObject();
 
                     $image->save(
-                            $cacheFilePath,
-                            array('quality' => $quality)
-                     );
+                        $cacheFilePath,
+                        array('quality' => $quality)
+                    );
                 } else {
                     throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
                 }
@@ -253,18 +252,20 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
     protected function applyResize(ImagineInterface $imagine, ImageInterface $image, $dest_width, $dest_height, $resize_mode, $bg_color)
     {
         if (! (is_null($dest_width) && is_null($dest_height))) {
-
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
 
-            if (is_null($dest_width))
+            if (is_null($dest_width)) {
                 $dest_width = $width_orig;
+            }
 
-            if (is_null($dest_height))
+            if (is_null($dest_height)) {
                 $dest_height = $height_orig;
+            }
 
-            if (is_null($resize_mode))
+            if (is_null($resize_mode)) {
                 $resize_mode = self::KEEP_IMAGE_RATIO;
+            }
 
             $width_diff = $dest_width / $width_orig;
             $height_diff = $dest_height / $height_orig;
@@ -272,7 +273,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
-
                 $next_width = $width_orig;
                 $next_height = $height_orig;
 
@@ -308,7 +308,6 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $image->resize(new Box($next_width, $next_height));
 
             if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
-
                 $border_width = intval(($dest_width - $next_width) / 2);
                 $border_height = intval(($dest_height - $next_height) / 2);
 
@@ -337,17 +336,17 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $driver = ConfigQuery::read("imagine_graphic_driver", "gd");
 
         switch ($driver) {
-        case 'imagik':
-            $image = new \Imagine\Imagick\Imagine();
-            break;
+            case 'imagik':
+                $image = new \Imagine\Imagick\Imagine();
+                break;
 
-        case 'gmagick':
-            $image = new \Imagine\Gmagick\Imagine();
-            break;
+            case 'gmagick':
+                $image = new \Imagine\Gmagick\Imagine();
+                break;
 
-        case 'gd':
-        default:
-            $image = new \Imagine\Gd\Imagine();
+            case 'gd':
+            default:
+                $image = new \Imagine\Gd\Imagine();
         }
 
         return $image;

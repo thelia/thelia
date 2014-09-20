@@ -28,7 +28,6 @@ use Thelia\Model\HookQuery;
  */
 class ModuleHookModificationForm extends BaseForm
 {
-
     protected function buildForm()
     {
         $this->formBuilder
@@ -69,7 +68,6 @@ class ModuleHookModificationForm extends BaseForm
                 )
             ))
         ;
-
     }
 
     protected function getHookChoices()
@@ -99,9 +97,8 @@ class ModuleHookModificationForm extends BaseForm
         return true;
     }
 
-public function getName()
+    public function getName()
     {
         return "thelia_module_hook_modification";
     }
-
 }

@@ -98,7 +98,6 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
-
         $search->_and();
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
@@ -205,13 +204,11 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $customer) {
-
             $loopResultRow = new LoopResultRow($customer);
 
             $loopResultRow
@@ -230,6 +227,5 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
         }
 
         return $loopResult;
-
     }
 }

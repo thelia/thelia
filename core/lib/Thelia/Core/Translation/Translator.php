@@ -45,7 +45,9 @@ class Translator extends BaseTranslator
      */
     public static function getInstance()
     {
-        if (self::$instance == null) throw new \RuntimeException("Translator instance is not initialized.");
+        if (self::$instance == null) {
+            throw new \RuntimeException("Translator instance is not initialized.");
+        }
         return self::$instance;
     }
 
@@ -76,11 +78,11 @@ class Translator extends BaseTranslator
         if ($this->catalogues[$locale]->has((string) $id, $domain)) {
             return parent::trans($id, $parameters, $domain, $locale);
         } else {
-
-            if ($return_default_if_not_available)
+            if ($return_default_if_not_available) {
                 return strtr($id, $parameters);
-            else
+            } else {
                 return '';
+            }
         }
     }
 }

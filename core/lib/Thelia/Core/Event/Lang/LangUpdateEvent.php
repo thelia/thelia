@@ -51,5 +51,4 @@ class LangUpdateEvent extends LangCreateEvent
     {
         return $this->id;
     }
-
 }

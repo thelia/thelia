@@ -50,5 +50,4 @@ class CacheEvent extends ActionEvent
     {
         return $this->dir;
     }
-
 }

@@ -114,7 +114,6 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -144,6 +143,5 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

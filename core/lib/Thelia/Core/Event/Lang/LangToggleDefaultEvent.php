@@ -51,5 +51,4 @@ class LangToggleDefaultEvent extends LangEvent
     {
         return $this->lang_id;
     }
-
 }

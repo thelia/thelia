@@ -27,10 +27,10 @@ use Thelia\Core\Translation\Translator;
 class Tlog implements LoggerInterface
 {
     // Nom des variables de configuration
-    const VAR_LEVEL 		= "tlog_level";
-    const VAR_DESTINATIONS 	= "tlog_destinations";
-    const VAR_PREFIXE 		= "tlog_prefix";
-    const VAR_FILES 		= "tlog_files";
+    const VAR_LEVEL        = "tlog_level";
+    const VAR_DESTINATIONS    = "tlog_destinations";
+    const VAR_PREFIXE        = "tlog_prefix";
+    const VAR_FILES        = "tlog_files";
     const VAR_IP                = "tlog_ip";
     const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
@@ -57,11 +57,11 @@ class Tlog implements LoggerInterface
     );
 
     // default values
-    const DEFAULT_LEVEL     	= self::DEBUG;
+    const DEFAULT_LEVEL         = self::DEBUG;
     const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationRotatingFile";
-    const DEFAUT_PREFIXE 	= "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
-    const DEFAUT_FILES 		= "*";
-    const DEFAUT_IP 		= "";
+    const DEFAUT_PREFIXE    = "#INDEX: #LEVEL [#FILE:#FUNCTION()] {#LINE} #DATE #HOUR: ";
+    const DEFAUT_FILES        = "*";
+    const DEFAUT_IP        = "";
     const DEFAUT_SHOW_REDIRECT  = 0;
 
     /**
@@ -93,7 +93,9 @@ class Tlog implements LoggerInterface
     /**
      *
      */
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     /**
      *
@@ -132,7 +134,6 @@ class Tlog implements LoggerInterface
      */
     protected function init()
     {
-
         $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
         $this->dir_destinations = array(
@@ -160,7 +161,6 @@ class Tlog implements LoggerInterface
     public function setDestinations($destinations)
     {
         if (! empty($destinations)) {
-
             $this->destinations = array();
 
             $classes_destinations = explode(';', $destinations);
@@ -213,7 +213,9 @@ class Tlog implements LoggerInterface
     public function setIp($ips)
     {
         // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
-        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
+        if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) {
+            $this->level = self::MUET;
+        }
         return $this;
     }
 
@@ -228,7 +230,7 @@ class Tlog implements LoggerInterface
     public function setConfig($destination, $param, $valeur)
     {
         if (isset($this->destinations[$destination])) {
-                $this->destinations[$destination]->setConfig($param, $valeur);
+            $this->destinations[$destination]->setConfig($param, $valeur);
         }
 
         return $this;
@@ -238,7 +240,7 @@ class Tlog implements LoggerInterface
     public function getConfig($destination, $param)
     {
         if (isset($this->destinations[$destination])) {
-                return $this->destinations[$destination]->getConfig($param);
+            return $this->destinations[$destination]->getConfig($param);
         }
 
         return false;
@@ -510,9 +512,9 @@ class Tlog implements LoggerInterface
      */
     public function log($level, $message, array $context = array())
     {
-        if($this->level > $level || array_key_exists($level, $this->levels) === false)
-
+        if ($this->level > $level || array_key_exists($level, $this->levels) === false) {
             return;
+        }
 
         $this->out($this->levels[$level], $message, $context);
     }
@@ -529,10 +531,12 @@ class Tlog implements LoggerInterface
         $this->done = true;
 
         // Muet ? On ne fait rien
-        if ($this->level == self::MUET) return;
+        if ($this->level == self::MUET) {
+            return;
+        }
 
         foreach ($this->destinations as $dest) {
-                $dest->write($res);
+            $dest->write($res);
         }
     }
 
@@ -543,19 +547,18 @@ class Tlog implements LoggerInterface
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
         if ($this->done === false) {
+            $res = "";
 
-                $res = "";
+            $this->write($res);
 
-                $this->write($res);
-
-                echo $res;
+            echo $res;
         }
     }
 
     public function showRedirect($url)
     {
         if ($this->level != self::MUET && $this->show_redirect) {
-                echo "
+            echo "
 <html>
 <head><title>".Translator::getInstance()->trans('Redirecting ...')."</title></head>
 <body>
@@ -564,9 +567,9 @@ class Tlog implements LoggerInterface
 </html>
 ";
 
-                return true;
+            return true;
         } else {
-                return false;
+            return false;
         }
     }
 
@@ -580,13 +583,12 @@ class Tlog implements LoggerInterface
     public function isActivated($level)
     {
         if ($this->level <= $level) {
-
             $origin = $this->findOrigin();
 
             $file = basename($origin['file']);
 
             if ($this->isActivedFile($file)) {
-                    return true;
+                return true;
             }
         }
 
@@ -612,7 +614,6 @@ class Tlog implements LoggerInterface
         $origin = array();
 
         if (function_exists('debug_backtrace')) {
-
             $trace = debug_backtrace();
             $prevHop = null;
             // make a downsearch to identify the caller
@@ -624,9 +625,9 @@ class Tlog implements LoggerInterface
                     $className = $hop['class'];
 
                     if (! empty($className) && ($className == ltrim(__CLASS__,'\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
-                            $origin['line'] = $hop['line'];
-                            $origin['file'] = $hop['file'];
-                            break;
+                        $origin['line'] = $hop['line'];
+                        $origin['file'] = $hop['file'];
+                        break;
                     }
                 }
                 $prevHop = $hop;
@@ -635,12 +636,11 @@ class Tlog implements LoggerInterface
 
             $origin['class'] = isset($prevHop['class']) ? $prevHop['class'] : 'main';
 
-            if(isset($prevHop['function']) &&
+            if (isset($prevHop['function']) &&
                 $prevHop['function'] !== 'include' &&
                 $prevHop['function'] !== 'include_once' &&
                 $prevHop['function'] !== 'require' &&
                 $prevHop['function'] !== 'require_once') {
-
                 $origin['function'] = $prevHop['function'];
             } else {
                 $origin['function'] = 'main';
@@ -681,7 +681,6 @@ class Tlog implements LoggerInterface
         $file = basename($origin['file']);
 
         if ($this->isActivedFile($file)) {
-
             $function = $origin['function'];
             $line = $origin['line'];
 

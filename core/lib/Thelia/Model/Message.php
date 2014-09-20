@@ -84,7 +84,6 @@ class Message extends BaseMessage
         // Try to get the body from template file, if a file is defined
         if (! empty($template)) {
             try {
-
                 $body = $parser->render($template, [], $compressOutput);
             } catch (ResourceNotFoundException $ex) {
                 // Ignore this.
@@ -98,7 +97,6 @@ class Message extends BaseMessage
 
         // Do we have a layout ?
         if (! empty($layout)) {
-
             // Populate the message body variable
             $parser->assign('message_body', $body);
 

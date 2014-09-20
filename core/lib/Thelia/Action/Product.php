@@ -74,13 +74,13 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
 
             ->create(
-                    $event->getDefaultCategory(),
-                    $event->getBasePrice(),
-                    $event->getCurrencyId(),
-                    $event->getTaxRuleId(),
-                    $event->getBaseWeight()
+                $event->getDefaultCategory(),
+                $event->getBasePrice(),
+                $event->getCurrencyId(),
+                $event->getTaxRuleId(),
+                $event->getBaseWeight()
             );
-         ;
+        ;
 
         $event->setProduct($product);
     }
@@ -93,7 +93,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function update(ProductUpdateEvent $event)
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-
             $product
                 ->setDispatcher($event->getDispatcher())
                 ->setRef($event->getRef())
@@ -134,7 +133,6 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function delete(ProductDeleteEvent $event)
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-
             $product
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
@@ -151,15 +149,15 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisibility(ProductToggleVisibilityEvent $event)
     {
-         $product = $event->getProduct();
+        $product = $event->getProduct();
 
-         $product
+        $product
             ->setDispatcher($event->getDispatcher())
             ->setVisible($product->getVisible() ? false : true)
             ->save()
             ;
 
-         $event->setProduct($product);
+        $event->setProduct($product);
     }
 
     /**
@@ -177,7 +175,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         if (ProductAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
              ->filterByProduct($event->getProduct())->count() <= 0) {
-
             $content = new ProductAssociatedContent();
 
             $content
@@ -186,7 +183,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setContentId($event->getContentId())
                 ->save()
             ;
-         }
+        }
     }
 
     public function removeContent(ProductDeleteContentEvent $event)
@@ -196,11 +193,12 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProduct($event->getProduct())->findOne()
         ;
 
-        if ($content !== null)
+        if ($content !== null) {
             $content
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
+        }
     }
 
     public function addCategory(ProductAddCategoryEvent $event)
@@ -209,7 +207,6 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProduct($event->getProduct())
             ->filterByCategoryId($event->getCategoryId())
             ->count() <= 0) {
-
             $productCategory = new ProductCategory();
 
             $productCategory
@@ -228,7 +225,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByCategoryId($event->getCategoryId())
             ->findOne();
 
-        if ($productCategory != null) $productCategory->delete();
+        if ($productCategory != null) {
+            $productCategory->delete();
+        }
     }
 
     public function addAccessory(ProductAddAccessoryEvent $event)
@@ -236,7 +235,6 @@ class Product extends BaseAction implements EventSubscriberInterface
         if (AccessoryQuery::create()
             ->filterByAccessory($event->getAccessoryId())
             ->filterByProductId($event->getProduct()->getId())->count() <= 0) {
-
             $accessory = new Accessory();
 
             $accessory
@@ -255,22 +253,21 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($event->getProduct()->getId())->findOne()
         ;
 
-        if ($accessory !== null)
+        if ($accessory !== null) {
             $accessory
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
             ;
+        }
     }
 
     public function setProductTemplate(ProductSetTemplateEvent $event)
     {
-
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
         $con->beginTransaction();
 
         try {
-
             $product = $event->getProduct();
 
             // Delete all product feature relations
@@ -290,7 +287,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             $template_id = $event->getTemplateId();
 
             // Set it to null if it's zero.
-            if ($template_id <= 0) $template_id = NULL;
+            if ($template_id <= 0) {
+                $template_id = null;
+            }
 
             $product->setTemplateId($template_id)->save($con);
 
@@ -303,9 +302,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             // Store all the stuff !
             $con->commit();
-
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;

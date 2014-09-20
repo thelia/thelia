@@ -103,7 +103,6 @@ class Customer extends BaseCustomer implements UserInterface
                     ;
 
                 $this->addAddress($address);
-
             } else {
                 $address = $this->getDefaultAddress();
 
@@ -126,7 +125,6 @@ class Customer extends BaseCustomer implements UserInterface
             $this->save($con);
 
             $con->commit();
-
         } catch (PropelException $e) {
             $con->rollback();
             throw $e;

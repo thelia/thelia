@@ -48,5 +48,4 @@ class ModuleToggleActivationEvent extends ModuleEvent
     {
         return $this->module_id;
     }
-
 }

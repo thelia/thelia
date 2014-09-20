@@ -43,7 +43,6 @@ class AdminUtilities extends AbstractSmartyPlugin
         );
 
         if (false !== $snippet_content = file_get_contents($snippet_path)) {
-
             $smarty->assign($variablesArray);
 
             $data = $smarty->fetch(sprintf('string:%s', $snippet_content));
@@ -93,7 +92,7 @@ class AdminUtilities extends AbstractSmartyPlugin
                     'admin_utilities_current_position'    => $position,
                     'admin_utilities_go_down_url'         => URL::getInstance()->absoluteUrl($path, array('mode' => 'down', $url_parameter => $id))
             ));
-         } else {
+        } else {
             return $position;
         }
     }

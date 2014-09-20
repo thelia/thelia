@@ -16,5 +16,4 @@ use Thelia\Model\Base\ModuleImageI18nQuery as BaseModuleImageI18nQuery;
  */
 class ModuleImageI18nQuery extends BaseModuleImageI18nQuery
 {
-
 } // ModuleImageI18nQuery

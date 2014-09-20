@@ -32,7 +32,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             ->setName("module:generate")
             ->setDescription("generate all needed files for creating a new Module")
             ->addArgument(
-                "name" ,
+                "name",
                 InputArgument::REQUIRED,
                 "name wanted for your Module"
             )
@@ -56,7 +56,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 ''
             ), "bg=green;fg=black");
         }
-
     }
 
     private function createDirectories()
@@ -68,7 +67,6 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         foreach ($this->neededDirectories as $directory) {
             $fs->mkdir($this->moduleDirectory . DIRECTORY_SEPARATOR . $directory);
         }
-
     }
 
     private function createFiles()
@@ -134,5 +132,4 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             throw $ex;
         }
     }
-
 }

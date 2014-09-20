@@ -74,7 +74,6 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
         $originalDocumentPathInCache = $this->getCacheFilePath($subdir, $sourceFile, true);
 
         if (! file_exists($originalDocumentPathInCache)) {
-
             if (! file_exists($sourceFile)) {
                 throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
             }
@@ -83,7 +82,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
 
             if ($mode == 'symlink') {
                 if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
-                     throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
+                    throw new DocumentException(sprintf("Failed to create symbolic link for %s in %s document cache directory", basename($sourceFile), $subdir));
                 }
             } else {
                 // mode = 'copy'

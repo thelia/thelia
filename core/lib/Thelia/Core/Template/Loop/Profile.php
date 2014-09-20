@@ -62,7 +62,6 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->orderById(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)

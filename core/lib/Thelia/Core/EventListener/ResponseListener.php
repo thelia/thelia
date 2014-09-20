@@ -25,7 +25,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ResponseListener implements EventSubscriberInterface
 {
-
     public function beforeResponse(FilterResponseEvent $event)
     {
         $session = $event->getRequest()->getSession();

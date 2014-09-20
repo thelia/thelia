@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Install;
+
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Install\Exception\UpToDateException;
@@ -49,7 +50,6 @@ class Update
 
     public function process()
     {
-
         $logger = Tlog::getInstance();
         $logger->setLevel(Tlog::DEBUG);
 

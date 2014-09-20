@@ -55,7 +55,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
     public function update(ProfileEvent $event)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
-
             $profile
                 ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
@@ -85,10 +84,9 @@ class Profile extends BaseAction implements EventSubscriberInterface
                 $profileResource = new ProfileResource();
                 $profileResource->setProfileId($event->getId())
                     ->setResource(ResourceQuery::create()->findOneByCode($resourceCode))
-                    ->setAccess( $manager->getAccessValue() );
+                    ->setAccess($manager->getAccessValue());
 
                 $profileResource->save();
-
             }
 
             $event->setProfile($profile);
@@ -109,10 +107,9 @@ class Profile extends BaseAction implements EventSubscriberInterface
                 $profileModule = new ProfileModule();
                 $profileModule->setProfileId($event->getId())
                     ->setModule(ModuleQuery::create()->findOneByCode($moduleCode))
-                    ->setAccess( $manager->getAccessValue() );
+                    ->setAccess($manager->getAccessValue());
 
                 $profileModule->save();
-
             }
 
             $event->setProfile($profile);
@@ -125,7 +122,6 @@ class Profile extends BaseAction implements EventSubscriberInterface
     public function delete(ProfileEvent $event)
     {
         if (null !== $profile = ProfileQuery::create()->findPk($event->getId())) {
-
             $profile
                 ->delete()
             ;

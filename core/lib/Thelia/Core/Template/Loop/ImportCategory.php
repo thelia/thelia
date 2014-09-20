@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Model\ImportCategoryQuery;
 
 /**

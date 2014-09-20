@@ -54,7 +54,6 @@ class Module extends AbstractSmartyPlugin
         $content = null;
         $count = 0;
         if (false !== $location = $this->getParam($params, 'location', false)) {
-
             if ($this->debug === true && $this->request->get('SHOW_INCLUDE')) {
                 echo sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $location);
             }
@@ -65,7 +64,6 @@ class Module extends AbstractSmartyPlugin
 
             /** @var \Thelia\Model\Module $module */
             foreach ($modules as $module) {
-
                 if (null !== $moduleLimit && $moduleLimit != $module->getCode()) {
                     continue;
                 }
@@ -73,7 +71,6 @@ class Module extends AbstractSmartyPlugin
                 $file = $module->getAbsoluteAdminIncludesPath() . DS . $location . '.html';
 
                 if (file_exists($file)) {
-
                     $output = trim(file_get_contents($file));
 
                     if (! empty($output)) {

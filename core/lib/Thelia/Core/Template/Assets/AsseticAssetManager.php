@@ -100,8 +100,7 @@ class AsseticAssetManager implements AssetManagerInterface
                 }
             }
             // We don't copy source files
-            else if (! $this->isSourceFile($item)) {
-
+            elseif (! $this->isSourceFile($item)) {
                 $dest_file = $to_directory . DS . $iterator->getSubPathName();
 
                 if ($fs->exists($dest_file)) {
@@ -157,7 +156,6 @@ class AsseticAssetManager implements AssetManagerInterface
         $curr_stamp = $this->getStamp($sourceAssetsDirectory);
 
         if ($prev_stamp !== $curr_stamp) {
-
             $fs = new Filesystem();
 
             $tmp_dir = "$to_directory.tmp";
@@ -168,7 +166,9 @@ class AsseticAssetManager implements AssetManagerInterface
             $this->copyAssets($fs, $sourceAssetsDirectory, $tmp_dir);
 
             // Remove existing directory
-            if ($fs->exists($to_directory)) $fs->remove($to_directory);
+            if ($fs->exists($to_directory)) {
+                $fs->remove($to_directory);
+            }
 
             // Put in place the new directory
             $fs->rename($tmp_dir, $to_directory);
@@ -203,11 +203,9 @@ class AsseticAssetManager implements AssetManagerInterface
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
         if (!empty($filters)) {
-
             $filter_list = explode(',', $filters);
 
             foreach ($filter_list as $filter_name) {
-
                 $filter_name = trim($filter_name);
 
                 switch ($filter_name) {
@@ -307,7 +305,6 @@ class AsseticAssetManager implements AssetManagerInterface
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
         if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true)) ) {
-
             $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
 
             Tlog::getInstance()->addDebug("Writing asset to $outputDirectory" . DS . "$assetFileDirectoryInAssetDirectory");

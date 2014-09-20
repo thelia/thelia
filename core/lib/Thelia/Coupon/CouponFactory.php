@@ -60,7 +60,7 @@ class CouponFactory
         /** @var Coupon $couponModel */
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
-           return false;
+            return false;
         }
 
         // Check coupon expiration date
@@ -70,7 +70,7 @@ class CouponFactory
 
         // Check coupon usage count
         if (! $couponModel->isUsageUnlimited() && $couponModel->getUsagesLeft($this->facade->getCustomer()->getId()) <= 0) {
-             throw new CouponNoUsageLeftException($couponCode);
+            throw new CouponNoUsageLeftException($couponCode);
         }
 
         /** @var CouponInterface $couponInterface */
@@ -131,5 +131,4 @@ class CouponFactory
 
         return clone $couponManager;
     }
-
 }

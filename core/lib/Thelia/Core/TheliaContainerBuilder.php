@@ -23,12 +23,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class TheliaContainerBuilder extends ContainerBuilder
 {
-
-    public function compile() {}
+    public function compile()
+    {
+    }
 
     public function customCompile()
     {
         parent::compile();
     }
-
 }

@@ -9,7 +9,6 @@ use Thelia\Core\Event\FeatureProduct\FeatureProductEvent;
 
 class FeatureProduct extends BaseFeatureProduct
 {
-
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     /**

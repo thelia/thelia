@@ -73,7 +73,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
     public function adminDataAccess($params, &$smarty)
     {
-         return $this->dataAccess("Admin User", $params, $this->securityContext->getAdminUser());
+        return $this->dataAccess("Admin User", $params, $this->securityContext->getAdminUser());
     }
 
      /**
@@ -93,7 +93,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $productId = $this->request->get('product_id');
 
         if ($productId !== null) {
-
             $search = ProductQuery::create()
                 ->filterById($productId);
 
@@ -106,7 +105,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $categoryId = $this->request->get('category_id');
 
         if ($categoryId !== null) {
-
             $search = CategoryQuery::create()
                 ->filterById($categoryId);
 
@@ -119,7 +117,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $contentId = $this->request->get('content_id');
 
         if ($contentId !== null) {
-
             $search = ContentQuery::create()
                 ->filterById($contentId);
 
@@ -132,7 +129,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $folderId = $this->request->get('folder_id');
 
         if ($folderId !== null) {
-
             $search = FolderQuery::create()
                 ->filterById($folderId);
 
@@ -145,7 +141,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $brandId = $this->request->get('brand_id');
 
         if ($brandId !== null) {
-
             $search = BrandQuery::create()
                 ->filterById($brandId);
 
@@ -199,7 +194,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             case "count_item":
                 $count_allitem = 0;
                 foreach ($cart->getCartItems() as $cartItem) {
-                  $count_allitem += $cartItem->getQuantity();
+                    $count_allitem += $cartItem->getQuantity();
                 }
                 $result = $count_allitem;
                 break;
@@ -248,7 +243,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", 'Order', $attribute));
-     }
+    }
 
     /**
      * Lang global data
@@ -267,7 +262,9 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $key = $this->getParam($params, 'key', false);
 
-        if ($key === false) return null;
+        if ($key === false) {
+            return null;
+        }
 
         $default = $this->getParam($params, 'default', '');
 
@@ -472,9 +469,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
         if (!empty($attribute)) {
-
             if (null != $data) {
-
                 $keyAttribute = strtoupper($attribute);
                 if (array_key_exists($keyAttribute, $noGetterData)) {
                     return $noGetterData[$keyAttribute];
@@ -498,7 +493,6 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 }
 
                 throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
-
             }
         }
 

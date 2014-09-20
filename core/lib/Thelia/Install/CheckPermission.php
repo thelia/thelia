@@ -26,7 +26,6 @@ use Symfony\Component\Translation\Translator;
  */
 class CheckPermission extends BaseInstall
 {
-
     const DIR_CONF =            'local/config';
     const DIR_LOG  =            'log';
     const DIR_CACHE =           'cache';
@@ -140,7 +139,8 @@ class CheckPermission extends BaseInstall
             if (!$this->verifyServerMemoryValues($key, $value)) {
                 $this->isValid = false;
                 $this->validationMessages[$key]['status'] = false;
-                $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);;
+                $this->validationMessages[$key]['text'] = $this->getI18nConfigText($key, $this->formatBytes($value), ini_get($key), false);
+                ;
             }
         }
 

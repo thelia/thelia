@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -29,7 +30,6 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class Delivery extends BaseSpecificModule
 {
-
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();
@@ -55,11 +55,12 @@ class Delivery extends BaseSpecificModule
 
         /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
-
             $areaDeliveryModule = AreaDeliveryModuleQuery::create()
                 ->findByCountryAndModule($country, $deliveryModule);
 
-            if (null === $areaDeliveryModule) continue;
+            if (null === $areaDeliveryModule) {
+                continue;
+            }
 
             $loopResultRow = new LoopResultRow($deliveryModule);
 
@@ -75,7 +76,6 @@ class Delivery extends BaseSpecificModule
                 // or catching a DeliveryException.
 
                 if ($moduleInstance->isValidDelivery($country)) {
-
                     $postage = $moduleInstance->getPostage($country);
 
                     $loopResultRow

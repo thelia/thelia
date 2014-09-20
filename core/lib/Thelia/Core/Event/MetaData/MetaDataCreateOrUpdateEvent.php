@@ -19,7 +19,6 @@ namespace Thelia\Core\Event\MetaData;
  */
 class MetaDataCreateOrUpdateEvent extends MetaDataDeleteEvent
 {
-
     protected $value = null;
 
     public function __construct($metaKey = null, $elementKey = null, $elementId = null, $value = null)
@@ -48,5 +47,4 @@ class MetaDataCreateOrUpdateEvent extends MetaDataDeleteEvent
     {
         return $this->value;
     }
-
 }

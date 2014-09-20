@@ -21,7 +21,6 @@ use Thelia\Model\LangQuery;
  */
 trait I18nTestTrait
 {
-
     /** @var array list of available locale */
     protected static $localeList = null;
 
@@ -35,9 +34,7 @@ trait I18nTestTrait
     protected function setI18n(&$object, $fields = array("Title"), $localeList = null)
     {
         if (null === $localeList) {
-
             if (null === self::$localeList) {
-
                 self::$localeList = LangQuery::create()
                     ->select("Locale")
                     ->find()
@@ -52,7 +49,5 @@ trait I18nTestTrait
                 $object->getTranslation($locale)->setByName($name, $locale . ' : ' . $name);
             }
         }
-
     }
-
 }

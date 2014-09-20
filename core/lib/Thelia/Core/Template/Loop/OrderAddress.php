@@ -55,7 +55,6 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
         $search->filterById($id, Criteria::IN);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -81,6 +80,5 @@ class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

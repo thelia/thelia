@@ -76,7 +76,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-
     }
 
     /**
@@ -935,7 +934,6 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -945,5 +943,4 @@ class MatchForTotalAmountTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-
 }

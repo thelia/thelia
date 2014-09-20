@@ -55,7 +55,6 @@ class FeatureFixAmountTaxType extends BaseTaxType
                     TaxEngineException::FEATURE_BAD_EXPECTED_VALUE
                 );
             }
-
         }
 
         return $taxAmount;

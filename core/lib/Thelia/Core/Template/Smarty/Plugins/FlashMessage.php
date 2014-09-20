@@ -35,7 +35,6 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
  */
 class FlashMessage extends AbstractSmartyPlugin
 {
-
     /** @var Request Request service */
     protected $request;
 
@@ -64,9 +63,7 @@ class FlashMessage extends AbstractSmartyPlugin
     public function getFlashMessage($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
-
             if (false !== $key = $this->getParam($params, 'key', false)) {
-
                 $flashBag = $this->request->getSession()->get('flashMessage');
 
                 $template->assign('value', $flashBag[$key]);
@@ -90,5 +87,4 @@ class FlashMessage extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("block", "flashMessage", $this, "getFlashMessage")
         );
     }
-
 }

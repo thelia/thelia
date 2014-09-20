@@ -19,7 +19,6 @@ namespace Thelia\Tests\Rewriting;
  */
 abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
      */

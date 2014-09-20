@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Template\Loop;
+
 use Thelia\Core\Template\Loop\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;

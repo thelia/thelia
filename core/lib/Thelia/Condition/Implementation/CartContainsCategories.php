@@ -75,7 +75,8 @@ class CartContainsCategories extends ConditionAbstract
         // Check that at least one category is selected
         if (empty($values[self::CATEGORIES_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(), self::CATEGORIES_LIST
+                get_class(),
+                self::CATEGORIES_LIST
             );
         }
 
@@ -94,7 +95,6 @@ class CartContainsCategories extends ConditionAbstract
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-
             $categories = $cartItem->getProduct()->getCategories();
 
             /** @var Category $category */
@@ -109,7 +109,7 @@ class CartContainsCategories extends ConditionAbstract
                     return true;
                 }
             }
-         }
+        }
 
         return false;
     }
@@ -144,7 +144,8 @@ class CartContainsCategories extends ConditionAbstract
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::CATEGORIES_LIST]
+            $this->translator,
+            $this->operators[self::CATEGORIES_LIST]
         );
 
         $catStrList = '';
@@ -152,7 +153,6 @@ class CartContainsCategories extends ConditionAbstract
         $catIds = $this->values[self::CATEGORIES_LIST];
 
         if (null !== $catList = CategoryQuery::create()->findPks($catIds)) {
-
             /** @var Category $cat */
             foreach ($catList as $cat) {
                 $catStrList .= $cat->getTitle() . ', ';
@@ -162,7 +162,8 @@ class CartContainsCategories extends ConditionAbstract
         }
 
         $toolTip = $this->translator->trans(
-            'At least one of cart products categories is %op% <strong>%categories_list%</strong>', [
+            'At least one of cart products categories is %op% <strong>%categories_list%</strong>',
+            [
                 '%categories_list%' => $catStrList,
                 '%op%' => $i18nOperator
             ]
@@ -190,7 +191,9 @@ class CartContainsCategories extends ConditionAbstract
      */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/cart-contains-categories-condition.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/cart-contains-categories-condition.html',
+            [
                 'operatorSelectHtml'    => $this->drawBackOfficeInputOperators(self::CATEGORIES_LIST),
                 'categories_field_name' => self::CATEGORIES_LIST,
                 'values'                => isset($this->values[self::CATEGORIES_LIST]) ? $this->values[self::CATEGORIES_LIST] : array()

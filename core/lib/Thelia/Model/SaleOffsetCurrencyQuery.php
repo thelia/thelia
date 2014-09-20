@@ -16,5 +16,4 @@ use Thelia\Model\Base\SaleOffsetCurrencyQuery as BaseSaleOffsetCurrencyQuery;
  */
 class SaleOffsetCurrencyQuery extends BaseSaleOffsetCurrencyQuery
 {
-
 } // SaleOffsetCurrencyQuery

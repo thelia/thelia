@@ -57,5 +57,4 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     {
         return $this->module_id;
     }
-
 }

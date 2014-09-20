@@ -53,5 +53,4 @@ class AttributeCreateEvent extends AttributeEvent
 
         return $this;
     }
-
 }

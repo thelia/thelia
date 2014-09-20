@@ -32,10 +32,10 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
     protected $session;
 
-       public function getDispatcher()
-       {
-           return $this->getMock("Symfony\\Component\\EventDispatcher\\EventDispatcherInterface");
-       }
+    public function getDispatcher()
+    {
+        return $this->getMock("Symfony\\Component\\EventDispatcher\\EventDispatcherInterface");
+    }
 
     public function getContainer()
     {
@@ -97,7 +97,9 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $dir = THELIA_WEB_DIR."/cache/tests";
         if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
-                if ($file == '.' || $file == '..') continue;
+                if ($file == '.' || $file == '..') {
+                    continue;
+                }
 
                 unlink(sprintf("%s/%s", $dir, $file));
             }
@@ -129,7 +131,7 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $image = new Image($this->getFileManager());
 
         $image->processImage($event);
-     }
+    }
 
      /**
       *
@@ -192,7 +194,9 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $image->processImage($event);
 
-         if ($config != null) $config->setValue($oldval)->save();
+         if ($config != null) {
+             $config->setValue($oldval)->save();
+         }
 
          $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
 
@@ -222,7 +226,9 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $image->processImage($event);
 
-         if ($config != null) $config->setValue($oldval)->save();
+         if ($config != null) {
+             $config->setValue($oldval)->save();
+         }
 
          $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
 
@@ -369,27 +375,27 @@ class ImageTest extends \Thelia\Tests\TestCaseWithURLToolSetup
          $image->processImage($event);
      }
 
-     public function testClearTestsCache()
-     {
-         $event = new ImageEvent($this->request);
-         $event->setDispatcher($this->getDispatcher());
+    public function testClearTestsCache()
+    {
+        $event = new ImageEvent($this->request);
+        $event->setDispatcher($this->getDispatcher());
 
-         $event->setCacheSubdirectory('tests');
+        $event->setCacheSubdirectory('tests');
 
-         $image = new Image($this->getFileManager());
+        $image = new Image($this->getFileManager());
 
-         $image->clearCache($event);
-     }
+        $image->clearCache($event);
+    }
 
-     public function testClearWholeCache()
-     {
-         $event = new ImageEvent($this->request);
-         $event->setDispatcher($this->getDispatcher());
+    public function testClearWholeCache()
+    {
+        $event = new ImageEvent($this->request);
+        $event->setDispatcher($this->getDispatcher());
 
-         $image = new Image($this->getFileManager());
+        $image = new Image($this->getFileManager());
 
-         $image->clearCache($event);
-     }
+        $image->clearCache($event);
+    }
 
      /**
       * Try to clear directory ouside of the cache

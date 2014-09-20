@@ -219,7 +219,6 @@ class Calculator
 
             $currentFixTax += $taxType->fixAmountRetriever($this->product);
             $currentTaxFactor += $taxType->pricePercentRetriever();
-
         } while ($taxRule = $this->taxRulesCollection->getPrevious());
 
         $untaxedPrice -= $currentFixTax;

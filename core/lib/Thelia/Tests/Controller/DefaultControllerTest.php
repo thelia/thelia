@@ -22,7 +22,6 @@ use Thelia\Controller\Front\DefaultController;
  */
 class DefaultControllerTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testNoAction()
     {
         $defaultController = new DefaultController();

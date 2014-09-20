@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
@@ -83,5 +84,4 @@ class Import extends BaseAction implements EventSubscriberInterface
             TheliaEvents::IMPORT_CHANGE_POSITION => array("changeImportPosition", 128),
         );
     }
-
 }

@@ -121,7 +121,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function delete(CustomerEvent $event)
     {
         if (null !== $customer = $event->getCustomer()) {
-
             if (true === $customer->hasOrder()) {
                 throw new CustomerException(Translator::getInstance()->trans("Impossible to delete a customer who already have orders"));
             }
@@ -132,7 +131,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
     {
-         $customer->setDispatcher($event->getDispatcher());
+        $customer->setDispatcher($event->getDispatcher());
 
         $customer->createOrUpdate(
             $event->getTitle(),
@@ -183,7 +182,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
     public function lostPassword(LostPasswordEvent $event)
     {
         if (null !== $customer = CustomerQuery::create()->filterByEmail($event->getEmail())->findOne()) {
-
             $password = Password::generateRandom(8);
 
             $customer

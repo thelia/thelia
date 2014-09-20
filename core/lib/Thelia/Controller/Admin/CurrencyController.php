@@ -36,9 +36,7 @@ class CurrencyController extends AbstractCrudController
             'currency',
             'manual',
             'order',
-
             AdminResources::CURRENCY,
-
             TheliaEvents::CURRENCY_CREATE,
             TheliaEvents::CURRENCY_UPDATE,
             TheliaEvents::CURRENCY_DELETE,
@@ -91,9 +89,9 @@ class CurrencyController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('currency_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('currency_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -181,7 +179,9 @@ class CurrencyController extends AbstractCrudController
     public function updateRatesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
@@ -199,7 +199,9 @@ class CurrencyController extends AbstractCrudController
     public function setDefaultAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
 
@@ -215,5 +217,4 @@ class CurrencyController extends AbstractCrudController
 
         return $this->redirectToListTemplate();
     }
-
 }

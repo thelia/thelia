@@ -19,5 +19,4 @@ namespace Thelia\Module\Exception;
  */
 class InvalidXmlDocumentException extends \RuntimeException
 {
-
 }

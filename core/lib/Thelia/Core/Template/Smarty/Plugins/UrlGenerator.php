@@ -62,11 +62,15 @@ class UrlGenerator extends AbstractSmartyPlugin
                 $mode
         );
 
-        if ($noamp == null) $url = str_replace('&', '&amp;', $url);
+        if ($noamp == null) {
+            $url = str_replace('&', '&amp;', $url);
+        }
 
-        if ($target != null) $url .= '#'.$target;
+        if ($target != null) {
+            $url .= '#'.$target;
+        }
         return $url;
-     }
+    }
 
      /**
       * Process view url generator function
@@ -93,27 +97,29 @@ class UrlGenerator extends AbstractSmartyPlugin
      }
 
     public function navigateToUrlFunction($params, &$smarty)
-     {
-         $to = $this->getParam($params, 'to', null);
+    {
+        $to = $this->getParam($params, 'to', null);
 
-         $toMethod = $this->getNavigateToMethod($to);
+        $toMethod = $this->getNavigateToMethod($to);
 
-         return $this->$toMethod();
-     }
+        return $this->$toMethod();
+    }
 
-     protected function generateViewUrlFunction($params, $forAdmin)
-     {
-         // the view name (without .html)
+    protected function generateViewUrlFunction($params, $forAdmin)
+    {
+        // the view name (without .html)
          $view = $this->getParam($params,'view');
 
           // the related action (optionale)
          $action = $this->getParam($params, 'action');
 
-         $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
+        $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
 
-         if (! empty($action)) $args['action'] = $action;
-         return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
-     }
+        if (! empty($action)) {
+            $args['action'] = $action;
+        }
+        return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
+    }
 
      /**
       * Get URL parameters array from parameters.
@@ -125,14 +131,15 @@ class UrlGenerator extends AbstractSmartyPlugin
      {
          $pairs = array();
 
-           foreach ($params as $name => $value) {
+         foreach ($params as $name => $value) {
+             if (in_array($name, $exclude)) {
+                 continue;
+             }
 
-               if (in_array($name, $exclude)) continue;
+             $pairs[$name] = $value;
+         }
 
-               $pairs[$name] = $value;
-           }
-
-           return $pairs;
+         return $pairs;
      }
 
     public function generateUrlWithToken($params, &$smarty)

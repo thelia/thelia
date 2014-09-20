@@ -198,7 +198,5 @@ class MetaDataTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Thelia\Model\MetaData', $deleted);
         $this->assertTrue($deleted->isDeleted());
-
     }
-
 }

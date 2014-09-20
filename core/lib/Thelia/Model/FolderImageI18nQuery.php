@@ -16,5 +16,4 @@ use Thelia\Model\Base\FolderImageI18nQuery as BaseFolderImageI18nQuery;
  */
 class FolderImageI18nQuery extends BaseFolderImageI18nQuery
 {
-
 } // FolderImageI18nQuery

@@ -63,7 +63,6 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function update(CategoryUpdateEvent $event)
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
-
             $category
                 ->setDispatcher($event->getDispatcher())
 
@@ -102,7 +101,6 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function delete(CategoryDeleteEvent $event)
     {
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
-
             $category
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
@@ -119,9 +117,9 @@ class Category extends BaseAction implements EventSubscriberInterface
      */
     public function toggleVisibility(CategoryToggleVisibilityEvent $event)
     {
-         $category = $event->getCategory();
+        $category = $event->getCategory();
 
-         $category
+        $category
             ->setDispatcher($event->getDispatcher())
             ->setVisible($category->getVisible() ? false : true)
             ->save()
@@ -145,7 +143,6 @@ class Category extends BaseAction implements EventSubscriberInterface
         if (CategoryAssociatedContentQuery::create()
             ->filterByContentId($event->getContentId())
              ->filterByCategory($event->getCategory())->count() <= 0) {
-
             $content = new CategoryAssociatedContent();
 
             $content
@@ -154,7 +151,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 ->setContentId($event->getContentId())
                 ->save()
             ;
-         }
+        }
     }
 
     public function removeContent(CategoryDeleteContentEvent $event)

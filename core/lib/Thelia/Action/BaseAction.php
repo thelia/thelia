@@ -33,17 +33,17 @@ class BaseAction
     protected function genericUpdatePosition(ModelCriteria $query, UpdatePositionEvent $event)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-
             $object->setDispatcher($event->getDispatcher());
 
             $mode = $event->getMode();
 
-            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE)
+            if ($mode == UpdatePositionEvent::POSITION_ABSOLUTE) {
                 $object->changeAbsolutePosition($event->getPosition());
-            else if ($mode == UpdatePositionEvent::POSITION_UP)
+            } elseif ($mode == UpdatePositionEvent::POSITION_UP) {
                 $object->movePositionUp();
-            else if ($mode == UpdatePositionEvent::POSITION_DOWN)
+            } elseif ($mode == UpdatePositionEvent::POSITION_DOWN) {
                 $object->movePositionDown();
+            }
         }
     }
 
@@ -59,7 +59,6 @@ class BaseAction
     protected function genericUpdateSeo(ModelCriteria $query, UpdateSeoEvent $event)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-
             $object
                 ->setDispatcher($event->getDispatcher())
 
@@ -78,7 +77,7 @@ class BaseAction
                 throw new FormValidationException($e->getMessage(), $e->getCode());
             }
 
-           $event->setObject($object);
+            $event->setObject($object);
         }
 
         return $object;
@@ -95,7 +94,6 @@ class BaseAction
     public function genericToggleVisibility(ModelCriteria $query, ToggleVisibilityEvent $event)
     {
         if (null !== $object = $query->findPk($event->getObjectId())) {
-
             $newVisibility = !$object->getVisible();
             $object
                 ->setDispatcher($event->getDispatcher())
@@ -110,5 +108,4 @@ class BaseAction
 
         return $object;
     }
-
 }

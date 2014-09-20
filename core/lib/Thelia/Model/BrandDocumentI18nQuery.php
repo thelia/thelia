@@ -16,5 +16,4 @@ use Thelia\Model\Base\BrandDocumentI18nQuery as BaseBrandDocumentI18nQuery;
  */
 class BrandDocumentI18nQuery extends BaseBrandDocumentI18nQuery
 {
-
 } // BrandDocumentI18nQuery

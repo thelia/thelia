@@ -440,5 +440,4 @@ abstract class BaseHook
 
         return $this->lang;
     }
-
 }

@@ -38,7 +38,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
 
     public function __construct(ParserInterface $parser)
     {
-         $this->parser = $parser;
+        $this->parser = $parser;
     }
 
     public function checkHttpException(GetResponseForExceptionEvent $event)
@@ -65,11 +65,12 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $message = $event->getException()->getMessage();
 
         $response = Response::create(
-            $this->parser->render('general_error.html',
+            $this->parser->render(
+                'general_error.html',
                 array(
                     "error_message" => $message
-                )),
-            403
+                ))
+            , 403
         ) ;
 
         $event->setResponse($response);

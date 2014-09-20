@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Export;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\Model\AddressQuery;
@@ -116,6 +117,5 @@ class ExportHandlerTest extends ContainerAwareTestCase
             $this->assertEquals($row["title"], $address["TitleId"]);
             $this->assertEquals($row["zipcode"], $address["Zipcode"]);
         }
-
     }
 }

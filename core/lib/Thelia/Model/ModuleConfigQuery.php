@@ -66,7 +66,6 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
         ;
 
         if (null === $configValue) {
-
             if (true === $createIfNotExists) {
                 $configValue = new ModuleConfig();
 

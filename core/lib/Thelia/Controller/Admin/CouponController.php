@@ -79,11 +79,11 @@ class CouponController extends BaseAdminController
         $eventToDispatch = TheliaEvents::COUPON_CREATE;
 
         if ($this->getRequest()->isMethod('POST')) {
-            if(null !== $response = $this->validateCreateOrUpdateForm(
+            if (null !== $response = $this->validateCreateOrUpdateForm(
                 $eventToDispatch,
                 'created',
                 'creation'
-            )){
+            )) {
                 return $response;
             }
         } else {
@@ -124,7 +124,6 @@ class CouponController extends BaseAdminController
         $coupon = CouponQuery::create()->findPk($couponId);
         if (null === $coupon) {
             return $this->pageNotFound();
-
         }
 
         $coupon->setLocale($this->getCurrentEditionLocale());
@@ -169,8 +168,12 @@ class CouponController extends BaseAdminController
                 $freeShippingForModules[] = $item->getModuleId();
             }
 
-            if (empty($freeShippingForCountries)) $freeShippingForCountries[] = 0;
-            if (empty($freeShippingForModules)) $freeShippingForModules[] = 0;
+            if (empty($freeShippingForCountries)) {
+                $freeShippingForCountries[] = 0;
+            }
+            if (empty($freeShippingForModules)) {
+                $freeShippingForModules[] = 0;
+            }
 
             $data = [
                 'code' => $coupon->getCode(),
@@ -267,7 +270,6 @@ class CouponController extends BaseAdminController
         $this->checkXmlHttpRequest();
 
         if (! empty($conditionId)) {
-
             /** @var ConditionFactory $conditionFactory */
             $conditionFactory = $this->container->get('thelia.condition.factory');
             $inputs = $conditionFactory->getInputsFromServiceId($conditionId);
@@ -347,7 +349,8 @@ class CouponController extends BaseAdminController
         }
 
         return $this->render(
-            'coupon/condition-input-ajax', [
+            'coupon/condition-input-ajax',
+            [
                 'inputsDrawn' => $condition->drawBackOfficeInputs(),
                 'conditionServiceId' => $condition->getServiceId(),
                 'conditionIndex' => $conditionIndex,
@@ -494,7 +497,8 @@ class CouponController extends BaseAdminController
             );
 
             $this->adminLogAppend(
-                AdminResources::COUPON, AccessManager::UPDATE,
+                AdminResources::COUPON,
+                AccessManager::UPDATE,
                 sprintf(
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),
@@ -508,18 +512,15 @@ class CouponController extends BaseAdminController
                     $couponEvent->getCouponModel()->getId(),
                     $couponForm->getSuccessUrl()
                 ));
-
             } else {
                 // Redirect to the success URL
                 $response = RedirectResponse::create(
                     URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
                 );
             }
-
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $message = $this->createStandardFormValidationErrorMessage($ex);
-
         } catch (\Exception $ex) {
             // Any other error
             $message = $this->getTranslator()->trans('Sorry, an error occurred: %err', ['%err' => $ex->getMessage()]);
@@ -667,7 +668,6 @@ class CouponController extends BaseAdminController
         $coupon = CouponQuery::create()->findPk($couponId);
         if (null === $coupon) {
             return $this->pageNotFound();
-
         }
 
         /** @var CouponFactory $couponFactory */
@@ -682,7 +682,6 @@ class CouponController extends BaseAdminController
         $args['conditions'] = $this->cleanConditionForTemplate($couponManager->getConditions());
 
         return $this->render('coupon/conditions', $args);
-
     }
 
     /**
@@ -792,7 +791,8 @@ class CouponController extends BaseAdminController
         );
 
         $this->adminLogAppend(
-            AdminResources::COUPON, AccessManager::UPDATE,
+            AdminResources::COUPON,
+            AccessManager::UPDATE,
             sprintf(
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),

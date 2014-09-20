@@ -35,9 +35,7 @@ class AttributeAvController extends AbstractCrudController
             'attributeav',
             'manual',
             'order',
-
             AdminResources::ATTRIBUTE,
-
             TheliaEvents::ATTRIBUTE_AV_CREATE,
             TheliaEvents::ATTRIBUTE_AV_UPDATE,
             TheliaEvents::ATTRIBUTE_AV_DELETE,
@@ -88,9 +86,9 @@ class AttributeAvController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('attributeav_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('attributeav_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -158,8 +156,8 @@ class AttributeAvController extends AbstractCrudController
     {
         // We always return to the attribute edition form
         return $this->render(
-                'attribute-edit',
-                $this->getViewArguments()
+            'attribute-edit',
+            $this->getViewArguments()
         );
     }
 
@@ -183,5 +181,5 @@ class AttributeAvController extends AbstractCrudController
             "admin.configuration.attributes.update",
             $this->getViewArguments()
         );
-     }
+    }
 }

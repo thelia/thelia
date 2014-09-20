@@ -53,5 +53,4 @@ class CartItemDuplicationItem extends ActionEvent
     {
         return $this->oldItem;
     }
-
 }

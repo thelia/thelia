@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Lang;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Lang;
 
@@ -57,5 +58,4 @@ class LangEvent extends ActionEvent
     {
         return null !== $this->lang;
     }
-
 }

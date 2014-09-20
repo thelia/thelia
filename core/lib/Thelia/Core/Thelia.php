@@ -47,7 +47,6 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-
     const THELIA_VERSION = '2.1.0-alpha1';
 
     public function __construct($environment, $debug)
@@ -133,10 +132,8 @@ class Thelia extends Kernel
 
             /* browse the directory */
             foreach ($templateDirBrowser as $templateDirContent) {
-
                 /* is it a directory which is not . or .. ? */
                 if ($templateDirContent->isDir() && ! $templateDirContent->isDot()) {
-
                     $parser->addMethodCall(
                         'addTemplateDirectory',
                         array(
@@ -149,7 +146,7 @@ class Thelia extends Kernel
                 }
             }
         } catch (\UnexpectedValueException $ex) {
-             // The directory does not exists, ignore it.
+            // The directory does not exists, ignore it.
         }
     }
 
@@ -161,7 +158,6 @@ class Thelia extends Kernel
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
-
         $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
         $finder = Finder::create()
             ->name('*.xml')
@@ -183,7 +179,6 @@ class Thelia extends Kernel
 
             /** @var Module $module */
             foreach ($modules as $module) {
-
                 try {
                     $definition = new Definition();
                     $definition->setClass($module->getFullNamespace());
@@ -242,9 +237,7 @@ class Thelia extends Kernel
                     }
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
-
                 } catch (\InvalidArgumentException $e) {
-
                     Tlog::getInstance()->addError(
                         sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e
                     );
@@ -277,7 +270,6 @@ class Thelia extends Kernel
         $translator = $container->getDefinition('thelia.translator');
 
         foreach ($dirs as $domain => $dir) {
-
             try {
                 $finder = Finder::create()
                     ->files()
@@ -347,7 +339,6 @@ class Thelia extends Kernel
         } else {
             return parent::getCacheDir();
         }
-
     }
 
     /**
@@ -404,7 +395,6 @@ class Thelia extends Kernel
          */
 
         return $bundles;
-
     }
 
     /**

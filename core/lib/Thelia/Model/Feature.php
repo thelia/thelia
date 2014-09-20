@@ -68,5 +68,4 @@ class Feature extends BaseFeature
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFEATURE, new FeatureEvent($this));
     }
-
 }

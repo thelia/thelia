@@ -24,6 +24,10 @@ final class AdminResources
 {
     private static $selfReflection = null;
 
+    /**
+     * @param $name
+     * @return string the constant value
+     */
     public static function retrieve($name)
     {
         $constantName = strtoupper($name);

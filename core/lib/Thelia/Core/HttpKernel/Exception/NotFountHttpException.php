@@ -30,6 +30,5 @@ class NotFountHttpException extends BaseNotFountHttpException
     public function isAdminContext()
     {
         return $this->adminContext === true;
-
     }
 }

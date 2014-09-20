@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Model\Coupon;
@@ -427,5 +428,4 @@ class CouponCreateOrUpdateEvent extends ActionEvent
 
         return $this;
     }
-
 }

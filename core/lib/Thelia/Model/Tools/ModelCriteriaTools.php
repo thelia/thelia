@@ -49,7 +49,6 @@ class ModelCriteriaTools
         $defaultLocaleI18nAlias = $aliasPrefix . 'default_locale_i18n';
 
         if ($defaultLangWithoutTranslation == Lang::STRICTLY_USE_REQUESTED_LANGUAGE) {
-
             $requestedLocaleJoin = new Join();
             $requestedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $requestedLocaleI18nAlias);
             $requestedLocaleJoin->setJoinType($forceReturn === false ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN);

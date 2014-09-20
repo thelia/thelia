@@ -55,9 +55,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(FeatureAvUpdateEvent $event)
     {
-
         if (null !== $feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId())) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
 
@@ -80,9 +78,7 @@ class FeatureAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(FeatureAvDeleteEvent $event)
     {
-
         if (null !== ($feature = FeatureAvQuery::create()->findPk($event->getFeatureAvId()))) {
-
             $feature
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

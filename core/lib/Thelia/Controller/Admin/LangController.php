@@ -38,10 +38,11 @@ use Thelia\Model\LangQuery;
  */
 class LangController extends BaseAdminController
 {
-
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->renderDefault();
     }
 
@@ -62,7 +63,9 @@ class LangController extends BaseAdminController
 
     public function updateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $this->checkXmlHttpRequest();
 
@@ -89,7 +92,9 @@ class LangController extends BaseAdminController
 
     public function processUpdateAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -105,7 +110,8 @@ class LangController extends BaseAdminController
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                );
             }
 
             $changedObject = $event->getLang();
@@ -124,7 +130,7 @@ class LangController extends BaseAdminController
         return $response;
     }
 
-    protected function hydrateEvent($event,Form $form)
+    protected function hydrateEvent($event, Form $form)
     {
         return $event
             ->setTitle($form->get('title')->getData())
@@ -140,7 +146,9 @@ class LangController extends BaseAdminController
 
     public function toggleDefaultAction($lang_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $this->checkXmlHttpRequest();
         $error = false;
@@ -151,12 +159,12 @@ class LangController extends BaseAdminController
 
             if (false === $event->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                );
             }
 
             $changedObject = $event->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
-
         } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
             $error = $e->getMessage();
@@ -171,7 +179,9 @@ class LangController extends BaseAdminController
 
     public function addAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::CREATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::CREATE)) {
+            return $response;
+        }
 
         $createForm = new LangCreateForm($this->getRequest());
 
@@ -187,14 +197,14 @@ class LangController extends BaseAdminController
 
             if (false === $createEvent->hasLang()) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang')));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', 'Lang'))
+                );
             }
 
             $createdObject = $createEvent->getLang();
             $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::CREATE, sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -205,7 +215,11 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $createForm, $ex);
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $error_msg,
+                $createForm,
+                $ex
+            );
 
             // At this point, the form has error, and should be redisplayed.
             $response = $this->renderDefault();
@@ -216,7 +230,9 @@ class LangController extends BaseAdminController
 
     public function deleteAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::DELETE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::DELETE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -246,7 +262,9 @@ class LangController extends BaseAdminController
 
     public function defaultBehaviorAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -260,7 +278,6 @@ class LangController extends BaseAdminController
             $this->dispatch(TheliaEvents::LANG_DEFAULTBEHAVIOR, $event);
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -271,7 +288,11 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $behaviorForm, $ex);
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $error_msg,
+                $behaviorForm,
+                $ex
+            );
 
             // At this point, the form has error, and should be redisplayed.
             $response = $this->renderDefault();
@@ -282,7 +303,9 @@ class LangController extends BaseAdminController
 
     public function domainAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
         $langUrlForm = new LangUrlForm($this->getRequest());
@@ -294,7 +317,7 @@ class LangController extends BaseAdminController
             $event = new LangUrlEvent();
             foreach ($data as $key => $value) {
                 if (false !== strpos($key, LangUrlForm::LANG_PREFIX)) {
-                    $event->addUrl(substr($key,strlen(LangUrlForm::LANG_PREFIX)), $value);
+                    $event->addUrl(substr($key, strlen(LangUrlForm::LANG_PREFIX)), $value);
                 }
             }
 
@@ -311,7 +334,11 @@ class LangController extends BaseAdminController
 
         if (false !== $error_msg) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')), $error_msg, $langUrlForm, $ex);
+                $this->getTranslator()->trans("%obj creation", array('%obj' => 'Lang')),
+                $error_msg,
+                $langUrlForm,
+                $ex
+            );
 
             // At this point, the form has error, and should be redisplayed.
             $response = $this->renderDefault();
@@ -332,7 +359,9 @@ class LangController extends BaseAdminController
 
     private function domainActivation($activate)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         ConfigQuery::create()
             ->filterByName('one_domain_foreach_lang')

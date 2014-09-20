@@ -109,5 +109,4 @@ class ContentUpdateEvent extends ContentCreateEvent
     {
         return $this->postscriptum;
     }
-
 }

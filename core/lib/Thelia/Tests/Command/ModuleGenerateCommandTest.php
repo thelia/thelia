@@ -58,7 +58,6 @@ class ModuleGenerateCommandTest extends BaseCommandTest
 
         $this->command = $application->find("module:generate");
         $this->commandTester = new CommandTester($this->command);
-
     }
 
     public function testGenerateModule()

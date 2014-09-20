@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\LoopResult;
@@ -53,7 +54,9 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
     // changement de rubrique
     protected function buildFolderTree($parent, $visible, $level, $max_level, $exclude, &$resultsList)
     {
-        if ($level > $max_level) return;
+        if ($level > $max_level) {
+            return;
+        }
 
         $search = FolderQuery::create();
 
@@ -63,16 +66,19 @@ class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $search->filterByParent($parent);
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
-        if ($exclude != null) $search->filterById($exclude, Criteria::NOT_IN);
+        if ($exclude != null) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
 
         $search->orderByPosition(Criteria::ASC);
 
         $results = $search->find();
 
         foreach ($results as $result) {
-
             $resultsList[] = array(
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),

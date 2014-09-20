@@ -164,7 +164,6 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         $search->groupById();
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)

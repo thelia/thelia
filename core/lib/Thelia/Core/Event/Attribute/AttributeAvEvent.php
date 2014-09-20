@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Attribute;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\AttributeAv;
 

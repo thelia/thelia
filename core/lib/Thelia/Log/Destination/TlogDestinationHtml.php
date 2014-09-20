@@ -41,7 +41,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function getDescription()
     {
-            return "Display logs in HTML format, on top of generated pages.";
+        return "Display logs in HTML format, on top of generated pages.";
     }
 
     public function getConfigs()

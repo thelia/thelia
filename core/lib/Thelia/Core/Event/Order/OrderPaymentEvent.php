@@ -70,5 +70,4 @@ class OrderPaymentEvent extends ActionEvent
     {
         return null !== $this->response;
     }
-
 }

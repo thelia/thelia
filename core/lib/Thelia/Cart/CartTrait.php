@@ -68,7 +68,6 @@ trait CartTrait
                         $cart = $this->duplicateCart($dispatcher, $cart, $session);
                     }
                 }
-
             } else {
                 $cart = $this->createCart($session);
             }
@@ -132,6 +131,5 @@ trait CartTrait
         }
 
         return $id;
-
     }
 }

@@ -10,6 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 namespace Thelia\Form;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -66,7 +67,6 @@ abstract class FirewallForm extends BaseForm
                     ->setFormName($this->getName())
                 ;
                 $firewallInstance->save();
-
             }
         }
 

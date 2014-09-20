@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Controller;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Controller\Admin\ProductController;
 use Thelia\Model\ProductDocumentQuery;
@@ -26,7 +27,6 @@ use Thelia\Model\ProductSaleElementsQuery;
  */
 class ProductControllerTest extends ControllerTestBase
 {
-
     /**
      * Use this method to build the container with the services that you need.
      */

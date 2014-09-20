@@ -56,7 +56,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 'position'
             )
         );
-     }
+    }
 
     public function buildModelCriteria()
     {
@@ -66,11 +66,13 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
         $search = LangQuery::create();
 
-        if (! is_null($id))
+        if (! is_null($id)) {
             $search->filterById($id);
+        }
 
-        if ($default_only)
+        if ($default_only) {
             $search->filterByByDefault(true);
+        }
 
         if (! is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
@@ -102,7 +104,6 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -126,6 +127,5 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

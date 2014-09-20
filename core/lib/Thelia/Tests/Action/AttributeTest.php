@@ -25,7 +25,6 @@ use Thelia\Core\Event\Attribute\AttributeCreateEvent;
  */
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreateSimple()
     {
         $event = new AttributeCreateEvent();
@@ -45,7 +44,6 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($createdAttribute->getTitle(), 'foo');
 
         return $createdAttribute;
-
     }
 
     /**
@@ -95,5 +93,4 @@ class AttributeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Attribute', $deletedAttribute);
         $this->assertTrue($deletedAttribute->isDeleted());
     }
-
 }

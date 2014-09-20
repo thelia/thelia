@@ -97,7 +97,6 @@ trait UrlRewritingTrait
         }
 
         return $urlFilePart;
-
     }
 
     /**

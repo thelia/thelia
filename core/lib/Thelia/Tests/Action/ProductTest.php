@@ -43,7 +43,6 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
  */
 class ProductTest extends TestCaseWithURLToolSetup
 {
-
     public static function setUpBeforeClass()
     {
         ProductQuery::create()
@@ -106,7 +105,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($currencyId, $productPrice->getCurrencyId());
 
         return $createdProduct;
-
     }
 
     /**
@@ -173,7 +171,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($expectedVisibility, $updatedProduct->getVisible());
 
         return $updatedProduct;
-
     }
 
     /**
@@ -283,7 +280,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals(1, count($product->getProductCategories()));
 
         return $product;
-
     }
 
     /**
@@ -338,7 +334,6 @@ class ProductTest extends TestCaseWithURLToolSetup
      */
     public function testSetProductTemplate(ProductModel $product)
     {
-
         $templateId = TemplateQuery::create()
             ->select('id')
             ->addAscendingOrderByColumn('RAND()')
@@ -373,7 +368,6 @@ class ProductTest extends TestCaseWithURLToolSetup
         $this->assertEquals($currencyId, $productPrice->getCurrencyId());
 
         return $updatedProduct;
-
     }
 
     /**

@@ -95,14 +95,17 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
             // Ignore if the product cannot be found.
             if ($products !== null) {
-
                 // Create template array
-                if ($template == null) $template = array();
+                if ($template == null) {
+                    $template = array();
+                }
 
                 foreach ($products as $product) {
                     $tpl_id = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                    if (! is_null($tpl_id)) {
+                        $template[] = $tpl_id;
+                    }
                 }
             }
 
@@ -114,7 +117,6 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (! empty($template)) {
-
             // Join with feature_template table to get position
             $search
                 ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
@@ -123,7 +125,6 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $this->useAttributePosistion = false;
         } elseif (null !== $exclude_template) {
-
             // Join with attribute_template table to get position
             $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();
 
@@ -153,16 +154,18 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($this->useAttributePosistion)
+                    if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::ASC);
-                     else
+                    } else {
                         $search->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    }
                     break;
                 case "manual_reverse":
-                    if ($this->useAttributePosistion)
+                    if ($this->useAttributePosistion) {
                         $search->orderByPosition(Criteria::DESC);
-                     else
+                    } else {
                         $search->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    }
                     break;
             }
         }
@@ -188,6 +191,5 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

@@ -53,7 +53,6 @@ class CacheClear extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
         $cacheDir = $this->getContainer()->getParameter("kernel.cache_dir");
 
         $this->clearCache($cacheDir, $output);
@@ -65,7 +64,6 @@ class CacheClear extends ContainerAwareCommand
         if ($input->getOption('with-images')) {
             $this->clearCache(THELIA_CACHE_DIR, $output);
         }
-
     }
 
     protected function clearCache($dir, OutputInterface $output)
@@ -92,6 +90,5 @@ class CacheClear extends ContainerAwareCommand
         }
 
         $output->writeln(sprintf("<info>%s cache directory cleared successfully</info>", $dir));
-
     }
 }

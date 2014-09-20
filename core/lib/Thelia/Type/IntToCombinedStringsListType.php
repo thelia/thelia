@@ -29,16 +29,16 @@ class IntToCombinedStringsListType extends BaseType
     {
         foreach (explode(',', $values) as $intToCombinedStrings) {
             $parts = explode(':', $intToCombinedStrings);
-            if(count($parts) != 2)
-
+            if (count($parts) != 2) {
                 return false;
-            if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
-
+            }
+            if (filter_var($parts[0], FILTER_VALIDATE_INT) === false) {
                 return false;
+            }
 
-            if(false === $this->checkLogicalFormat($parts[1]))
-
+            if (false === $this->checkLogicalFormat($parts[1])) {
                 return false;
+            }
         }
 
         return true;
@@ -71,9 +71,9 @@ class IntToCombinedStringsListType extends BaseType
         $noSpaceString = preg_replace('#[\s]#', '', $string);
         $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
 
-        if(!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', $noParentheseString))
-
+        if (!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', $noParentheseString)) {
             return false;
+        }
 
         /* check parenteses use */
         $openingParenthesesCount = 0;

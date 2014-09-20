@@ -53,5 +53,4 @@ class FeatureAvCreateEvent extends FeatureAvEvent
 
         return $this;
     }
-
 }

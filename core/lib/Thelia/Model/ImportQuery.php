@@ -16,5 +16,4 @@ use Thelia\Model\Base\ImportQuery as BaseImportQuery;
  */
 class ImportQuery extends BaseImportQuery
 {
-
 } // ImportQuery

@@ -192,7 +192,6 @@ class TaxController extends AbstractCrudController
     {
         $requirements = array();
         foreach ($formData as $data => $value) {
-
             if (!strstr($data, ':')) {
                 continue;
             }

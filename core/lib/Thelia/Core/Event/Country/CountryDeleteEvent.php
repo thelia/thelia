@@ -44,5 +44,4 @@ class CountryDeleteEvent extends CountryEvent
     {
         return $this->country_id;
     }
-
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -86,7 +87,6 @@ class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
             ;
 
             $loopResult->addRow($loopResultRow);
-
         }
 
         return $loopResult;

@@ -22,7 +22,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-
         self::$logger = Tlog::getInstance();
 
         self::$logger->setDestinations("Thelia\Log\Destination\TlogDestinationText");
@@ -32,7 +31,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugWithDebugLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::DEBUG);
 
@@ -52,7 +50,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugWithInfoLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::INFO);
 
@@ -72,7 +69,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugWithNoticeLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::NOTICE);
 
@@ -92,7 +88,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testWarningWithWarningLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::WARNING);
 
@@ -112,7 +107,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorWithErrorLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::ERROR);
 
@@ -132,7 +126,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorWithCriticalLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::CRITICAL);
 
@@ -152,7 +145,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorWithAlertLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::ALERT);
 
@@ -172,7 +164,6 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorWithEmergencyLevel()
     {
-
         $logger = self::$logger;
         $logger->setLevel(Tlog::EMERGENCY);
 

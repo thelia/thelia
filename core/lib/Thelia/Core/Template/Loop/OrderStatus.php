@@ -67,7 +67,6 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -88,6 +87,5 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

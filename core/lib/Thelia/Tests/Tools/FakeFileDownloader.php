@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Tools;
+
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Tools\FileDownload\FileDownloader;
 

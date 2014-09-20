@@ -25,7 +25,6 @@ use Thelia\Condition\ConditionCollection;
  */
 class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -72,7 +71,6 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
 
         $actual = $conditionEvaluator->variableOpComparison(1, Operators::OUT, array(0, 2, 3));
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -107,7 +105,6 @@ class ConditionEvaluatorTest extends \PHPUnit_Framework_TestCase
 
         $actual = $conditionEvaluator->variableOpComparison(2, Operators::OUT, array(0, 2, 3));
         $this->assertEquals($expected, $actual);
-
     }
 
     /**

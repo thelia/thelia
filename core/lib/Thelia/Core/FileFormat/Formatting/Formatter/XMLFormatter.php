@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting\Formatter;
+
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Thelia\Core\FileFormat\Formatting\Exception\BadFormattedStringException;
 use Thelia\Core\FileFormat\Formatting\AbstractFormatter;

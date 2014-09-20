@@ -23,14 +23,14 @@ use Thelia\Model\Module;
  */
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {
-     protected $module;
-     protected $moduleDirectory;
+    protected $module;
+    protected $moduleDirectory;
 
-     protected $reservedKeyWords = array(
+    protected $reservedKeyWords = array(
          'thelia'
      );
 
-     protected $neededDirectories = array(
+    protected $neededDirectories = array(
          'Config',
          'Model',
          'Loop',
@@ -43,19 +43,19 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
          'Hook',
      );
 
-     protected function verifyExistingModule()
-     {
-         if (file_exists($this->moduleDirectory)) {
-             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-         }
-     }
+    protected function verifyExistingModule()
+    {
+        if (file_exists($this->moduleDirectory)) {
+            throw new \RuntimeException(sprintf("%s module already exists", $this->module));
+        }
+    }
 
-     protected function formatModuleName($name)
-     {
-         if (in_array(strtolower($name), $this->reservedKeyWords)) {
-             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-         }
+    protected function formatModuleName($name)
+    {
+        if (in_array(strtolower($name), $this->reservedKeyWords)) {
+            throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
+        }
 
-         return ucfirst($name);
-     }
+        return ucfirst($name);
+    }
 }

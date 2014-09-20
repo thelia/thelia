@@ -48,5 +48,4 @@ class AreaDeleteEvent extends AreaEvent
     {
         return $this->area_id;
     }
-
 }

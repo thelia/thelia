@@ -70,13 +70,11 @@ class ModuleManagement
                 $con->rollBack();
                 throw $e;
             }
-
         }
     }
 
     private function saveDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
     {
-
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;
 
@@ -99,7 +97,5 @@ class ModuleManagement
         } else {
             return BaseModule::CLASSIC_MODULE_TYPE;
         }
-
     }
-
 }

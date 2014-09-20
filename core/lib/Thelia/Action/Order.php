@@ -148,7 +148,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, LangModel $lang, CartModel $cart, UserInterface $customer)
     {
         $con = Propel::getConnection(
-                OrderTableMap::DATABASE_NAME
+            OrderTableMap::DATABASE_NAME
         );
 
         $con->beginTransaction();
@@ -232,7 +232,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                     && true === ConfigQuery::checkAvailableStock()
                     && 0 === $product->getVirtual()) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
-
             }
 
             if (0 === $product->getVirtual()) {
@@ -446,7 +445,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             [
                 'order_id' => $event->getOrder()->getId(),
                 'order_ref' => $event->getOrder()->getRef()
-            ]);
+            ]
+        );
     }
 
     /**
@@ -459,9 +459,8 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
 
-        if ($status == $canceledStatus || $order->getStatusId() == $canceledStatus ) {
-
-            $this->updateQuantity($event->getOrder(),$status,$canceledStatus);
+        if ($status == $canceledStatus || $order->getStatusId() == $canceledStatus) {
+            $this->updateQuantity($event->getOrder(), $status, $canceledStatus);
         }
 
         $order->setStatusId($status);
@@ -476,23 +475,19 @@ class Order extends BaseAction implements EventSubscriberInterface
      * @param $canceledStatus
      * @throws \Thelia\Exception\TheliaProcessException
      */
-    public function updateQuantity(ModelOrder $order,$status,$canceledStatus)
+    public function updateQuantity(ModelOrder $order, $status, $canceledStatus)
     {
         $orderProductList = $order->getOrderProducts();
 
         /** @var OrderProduct  $orderProduct */
         foreach ($orderProductList as $orderProduct) {
-
             $productSaleElementsId = $orderProduct->getProductSaleElementsId();
 
             /** @var ProductSaleElements $productSaleElements */
             if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-
                 if ($status == $canceledStatus) {
-
                     $productSaleElements->setQuantity($productSaleElements->getQuantity() + $orderProduct->getQuantity());
                 } else {
-
                     /* check still in stock */
                     if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
                         throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock");
@@ -502,7 +497,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                 }
 
                 $productSaleElements->save();
-
             }
         }
     }

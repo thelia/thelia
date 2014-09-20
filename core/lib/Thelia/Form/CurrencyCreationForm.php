@@ -80,5 +80,4 @@ class CurrencyCreationForm extends BaseForm
             $context->addViolation(Translator::getInstance()->trans('A currency with code "%name" already exists.', array('%name' => $value)));
         }
     }
-
 }

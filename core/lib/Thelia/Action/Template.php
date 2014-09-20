@@ -63,9 +63,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      */
     public function update(TemplateUpdateEvent $event)
     {
-
         if (null !== $template = TemplateQuery::create()->findPk($event->getTemplateId())) {
-
             $template
                 ->setDispatcher($event->getDispatcher())
 
@@ -85,7 +83,6 @@ class Template extends BaseAction implements EventSubscriberInterface
     public function delete(TemplateDeleteEvent $event)
     {
         if (null !== ($template = TemplateQuery::create()->findPk($event->getTemplateId()))) {
-
             // Check if template is used by a product
             $product_count = ProductQuery::create()->findByTemplateId($template->getId())->count();
 
@@ -105,7 +102,6 @@ class Template extends BaseAction implements EventSubscriberInterface
     public function addAttribute(TemplateAddAttributeEvent $event)
     {
         if (null === AttributeTemplateQuery::create()->filterByAttributeId($event->getAttributeId())->filterByTemplate($event->getTemplate())->findOne()) {
-
             $attribute_template = new AttributeTemplate();
 
             $attribute_template
@@ -143,13 +139,14 @@ class Template extends BaseAction implements EventSubscriberInterface
             ->filterByTemplate($event->getTemplate())->findOne()
         ;
 
-        if ($attribute_template !== null) $attribute_template->delete();
+        if ($attribute_template !== null) {
+            $attribute_template->delete();
+        }
     }
 
     public function addFeature(TemplateAddFeatureEvent $event)
     {
         if (null === FeatureTemplateQuery::create()->filterByFeatureId($event->getFeatureId())->filterByTemplate($event->getTemplate())->findOne()) {
-
             $feature_template = new FeatureTemplate();
 
             $feature_template
@@ -167,7 +164,9 @@ class Template extends BaseAction implements EventSubscriberInterface
             ->filterByTemplate($event->getTemplate())->findOne()
         ;
 
-        if ($feature_template !== null) $feature_template->delete();
+        if ($feature_template !== null) {
+            $feature_template->delete();
+        }
     }
 
     /**

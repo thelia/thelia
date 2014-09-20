@@ -20,7 +20,6 @@ class CookieTokenProvider
     public function getKeyFromCookie(Request $request, $cookieName)
     {
         if ($request->cookies->has($cookieName)) {
-
             // Create the authenticator
             return $request->cookies->get($cookieName);
         }

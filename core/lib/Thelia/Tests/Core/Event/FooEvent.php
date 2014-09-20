@@ -21,7 +21,6 @@ use Thelia\Core\Event\ActionEvent;
  */
 class FooEvent extends ActionEvent
 {
-
     protected $foo;
     protected $bar;
 
@@ -62,5 +61,4 @@ class FooEvent extends ActionEvent
 
         return $this;
     }
-
 }

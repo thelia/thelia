@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
@@ -30,7 +31,6 @@ use Thelia\Model\Lang as LangModel;
  */
 class Lang extends BaseAction implements EventSubscriberInterface
 {
-
     public function update(LangUpdateEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {

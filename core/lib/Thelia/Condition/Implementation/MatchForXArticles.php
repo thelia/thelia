@@ -63,7 +63,8 @@ class MatchForXArticles extends ConditionAbstract
 
         if (intval($values[self::CART_QUANTITY]) <= 0) {
             throw new InvalidConditionValueException(
-                get_class(), 'quantity'
+                get_class(),
+                'quantity'
             );
         }
 
@@ -126,7 +127,8 @@ class MatchForXArticles extends ConditionAbstract
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::CART_QUANTITY]
+            $this->translator,
+            $this->operators[self::CART_QUANTITY]
         );
 
         $toolTip = $this->translator->trans(
@@ -173,7 +175,9 @@ class MatchForXArticles extends ConditionAbstract
      */
     protected function drawBackOfficeBaseInputsText($label, $inputKey)
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/cart-item-count-condition.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/cart-item-count-condition.html',
+            [
                 'label'              => $label,
                 'operatorSelectHtml' => $this->drawBackOfficeInputOperators($inputKey),
                 'quantitySelectHtml' => $this->drawBackOfficeInputQuantityValues($inputKey, 20, 1)

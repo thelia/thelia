@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Export;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\Type\ContentExport;

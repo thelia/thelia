@@ -103,5 +103,4 @@ class ContentCreateEvent extends ContentEvent
     {
         return $this->title;
     }
-
 }

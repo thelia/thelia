@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Module;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Module;
 
@@ -158,5 +159,4 @@ class ModuleEvent extends ActionEvent
     {
         return null !== $this->module;
     }
-
 }

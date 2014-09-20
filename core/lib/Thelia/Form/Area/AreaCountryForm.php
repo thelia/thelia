@@ -24,7 +24,6 @@ use Thelia\Form\BaseForm;
  */
 class AreaCountryForm extends BaseForm
 {
-
     /**
      * @inheritdoc
      */

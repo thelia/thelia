@@ -16,7 +16,6 @@ use Thelia\Model\Base\MetaDataQuery as BaseMetaDataQuery;
  */
 class MetaDataQuery extends BaseMetaDataQuery
 {
-
     /**
      *
      * @param string $elementKey the element Key : product, category, ...
@@ -50,7 +49,6 @@ class MetaDataQuery extends BaseMetaDataQuery
      */
     public static function getAllVal($elementKey, $elementId)
     {
-
         $out = array();
 
         if (is_int($elementId)) {
@@ -68,5 +66,4 @@ class MetaDataQuery extends BaseMetaDataQuery
 
         return $out;
     }
-
 } // MetaDataQuery

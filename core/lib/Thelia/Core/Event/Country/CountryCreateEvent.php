@@ -137,5 +137,4 @@ class CountryCreateEvent extends CountryEvent
     {
         return $this->area;
     }
-
 }

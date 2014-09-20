@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive\ArchiveBuilder;
+
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\Exception\TarArchiveException;
 use Thelia\Core\HttpFoundation\Response;
@@ -48,7 +49,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
     {
         if ($this->tar instanceof \PharData) {
             if (file_exists($this->cacheFile)) {
-
                 @unlink($this->cacheFile);
             }
         }
@@ -164,7 +164,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
         $directoryInArchive = $this->formatDirectoryPath($directoryPath);
 
         if (!empty($directoryInArchive)) {
-
             try {
                 $this->tar->addEmptyDir($directoryInArchive);
             } catch (\Exception $e) {
@@ -324,7 +323,8 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /**
              * Catch the exception to avoid its displaying.
              */
-        } catch (\BadMethodCallException $e) {}
+        } catch (\BadMethodCallException $e) {
+        }
 
         return $isFile;
     }
@@ -350,7 +350,8 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             /**
              * Catch the exception to avoid its displaying.
              */
-        } catch (\BadMethodCallException $e) {}
+        } catch (\BadMethodCallException $e) {
+        }
 
         return $isDir;
     }
@@ -388,7 +389,6 @@ class TarArchiveBuilder extends AbstractArchiveBuilder
             $this->tar = new \PharData($cacheFile, null, null, static::PHAR_FORMAT);
 
             $this->compressionEntryPoint();
-
         } catch (\BadMethodCallException $e) {
             /**
              * This should not happen

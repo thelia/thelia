@@ -64,7 +64,6 @@ class Format extends AbstractSmartyPlugin
         $date = $this->getParam($params, "date", false);
 
         if ($date === false) {
-
             // Check if we have a timestamp
             $timestamp = $this->getParam($params, "timestamp", false);
 

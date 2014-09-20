@@ -50,8 +50,12 @@ class ConfigQuery extends BaseConfigQuery
             $config->setName($configName);
         }
 
-        if ($secured !== null) $config->setSecured($secured ? 1 : 0);
-        if ($hidden !== null) $config->setHidden($hidden ? 1 : 0);
+        if ($secured !== null) {
+            $config->setSecured($secured ? 1 : 0);
+        }
+        if ($hidden !== null) {
+            $config->setHidden($hidden ? 1 : 0);
+        }
 
         $config->setValue($value);
         $config->save();
@@ -126,7 +130,6 @@ class ConfigQuery extends BaseConfigQuery
     public static function getStoreDescription()
     {
         return self::read('store_description', '');
-
     }
 
     /**

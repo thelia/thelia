@@ -181,5 +181,4 @@ class LangCreateEvent extends LangEvent
     {
         return $this->thousands_separator;
     }
-
 }

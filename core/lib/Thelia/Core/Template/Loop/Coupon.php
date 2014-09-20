@@ -166,7 +166,6 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 
         /** @var MCoupon $coupon */
         foreach ($loopResult->getResultDataCollection() as $coupon) {
-
             $loopResultRow = new LoopResultRow($coupon);
 
             $conditions = $conditionFactory->unserializeConditionCollection(

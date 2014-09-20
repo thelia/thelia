@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Controller;
+
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;

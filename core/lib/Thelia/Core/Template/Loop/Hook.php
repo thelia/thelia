@@ -143,14 +143,12 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Thelia\Model\Hook $hook */
         foreach ($loopResult->getResultDataCollection() as $hook) {
-
             if ($this->getBackendContext()) {
                 $loopResultRow = new LoopResultRow($hook);
 
@@ -175,6 +173,5 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

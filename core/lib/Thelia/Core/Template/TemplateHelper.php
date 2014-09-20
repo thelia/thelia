@@ -28,11 +28,15 @@ class TemplateHelper
      */
     private static $instance = null;
 
-    private function __construct() {}
+    private function __construct()
+    {
+    }
 
     public static function getInstance()
     {
-        if (self::$instance == null) self::$instance = new TemplateHelper();
+        if (self::$instance == null) {
+            self::$instance = new TemplateHelper();
+        }
         return self::$instance;
     }
 
@@ -132,9 +136,7 @@ class TemplateHelper
         $tplIterator = TemplateDefinition::getStandardTemplatesSubdirsIterator();
 
         foreach ($tplIterator as $type => $subdir) {
-
             if ($templateType == $type) {
-
                 $baseDir = rtrim($base, DS).DS.$subdir;
 
                 try {
@@ -144,10 +146,14 @@ class TemplateHelper
                     /** @var \DirectoryIterator $file */
                     foreach ($di as $file) {
                         // Ignore 'dot' elements
-                        if ($file->isDot() || ! $file->isDir()) continue;
+                        if ($file->isDot() || ! $file->isDir()) {
+                            continue;
+                        }
 
                         // Ignore reserved directory names
-                        if (in_array($file->getFilename(), $exclude)) continue;
+                        if (in_array($file->getFilename(), $exclude)) {
+                            continue;
+                        }
 
                         $list[] = new TemplateDefinition($file->getFilename(), $templateType);
                     }
@@ -208,24 +214,23 @@ class TemplateHelper
         }
 
         try {
-
             Tlog::getInstance()->debug("Walking in $directory, in mode $walkMode");
 
             /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
+                if ($fileInfo->isDot()) {
+                    continue;
+                }
 
-                if ($fileInfo->isDot()) continue;
-
-                if ($fileInfo->isDir()) $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $domain, $strings);
+                if ($fileInfo->isDir()) {
+                    $num_texts += $this->walkDir($fileInfo->getPathName(), $walkMode, $translator, $currentLocale, $domain, $strings);
+                }
 
                 if ($fileInfo->isFile()) {
-
                     $ext = $fileInfo->getExtension();
 
                     if (in_array($ext, $allowed_exts)) {
-
                         if ($content = file_get_contents($fileInfo->getPathName())) {
-
                             $short_path = $this->normalizePath($fileInfo->getPathName());
 
                             Tlog::getInstance()->debug("Examining file $short_path\n");
@@ -233,13 +238,11 @@ class TemplateHelper
                             $matches = array();
 
                             if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/ms', $content, $matches)) {
-
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
                                 $idx = 0;
 
                                 foreach ($matches[2] as $match) {
-
                                     $hash = md5($match);
 
                                     if (isset($strings[$hash])) {
@@ -273,7 +276,6 @@ class TemplateHelper
             }
 
             return $num_texts;
-
         } catch (\UnexpectedValueException $ex) {
             // Directory does not exists => ignore/
         }
@@ -285,7 +287,6 @@ class TemplateHelper
         $fs = new Filesystem();
 
         if (! $fs->exists($file) && true === $createIfNotExists) {
-
             $dir = dirname($file);
 
             if (! $fs->exists($file)) {
@@ -294,7 +295,6 @@ class TemplateHelper
         }
 
         if ($fp = @fopen($file, 'w')) {
-
             fwrite($fp, '<' . "?php\n\n");
             fwrite($fp, "return array(\n");
 

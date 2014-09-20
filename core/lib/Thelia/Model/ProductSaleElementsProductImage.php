@@ -6,5 +6,4 @@ use Thelia\Model\Base\ProductSaleElementsProductImage as BaseProductSaleElements
 
 class ProductSaleElementsProductImage extends BaseProductSaleElementsProductImage
 {
-
 }

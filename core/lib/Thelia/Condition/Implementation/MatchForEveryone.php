@@ -114,5 +114,4 @@ class MatchForEveryone extends ConditionAbstract
         // No input
         return '';
     }
-
 }

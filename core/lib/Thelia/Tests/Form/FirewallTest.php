@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Form;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
@@ -85,7 +86,6 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
     public function testBlock()
     {
         for ($i = 1; $i <= 10; ++$i) {
-
             if ($i > 6) {
                 $this->assertFalse(
                     $this->form->isFirewallOk("prod")
@@ -102,7 +102,6 @@ class FirewallTest extends \PHPUnit_Framework_TestCase
             ;
 
             $this->assertEquals($i > 6 ? 6 : $i, $attempts);
-
         }
     }
 

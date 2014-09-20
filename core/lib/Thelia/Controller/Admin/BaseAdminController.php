@@ -101,7 +101,8 @@ class BaseAdminController extends BaseController
             $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
         }
 
-        return $this->render('general_error',
+        return $this->render(
+            'general_error',
             array(
                 "error_message" => $message
             ),
@@ -124,15 +125,15 @@ class BaseAdminController extends BaseController
         $modules = is_array($modules) ? $modules : array($modules);
         $accesses = is_array($accesses) ? $accesses : array($accesses);
 
-         if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
-             // Okay !
+        if ($this->getSecurityContext()->isGranted(array("ADMIN"), $resources, $modules, $accesses)) {
+            // Okay !
              return null;
-         }
+        }
 
          // Log the problem
          $this->adminLogAppend(implode(",", $resources), implode(",", $accesses), "User is not granted for resources %s with accesses %s", implode(", ", $resources), implode(", ", $accesses));
 
-         return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
+        return $this->errorPage($this->getTranslator()->trans("Sorry, you're not allowed to perform this action"), 403);
     }
 
     /*
@@ -146,7 +147,7 @@ class BaseAdminController extends BaseController
                 '%error' => $exception->getMessage()
             )
         );
-     }
+    }
 
     /**
      * Setup the error context when an error occurs in a action method.
@@ -156,10 +157,9 @@ class BaseAdminController extends BaseController
      * @param string     $error_message the error message
      * @param \Exception $exception     the exception or null if no exception
      */
-    protected function setupFormErrorContext($action,  $error_message, BaseForm $form = null, \Exception $exception = null)
+    protected function setupFormErrorContext($action, $error_message, BaseForm $form = null, \Exception $exception = null)
     {
         if ($error_message !== false) {
-
             // Log the error message
             Tlog::getInstance()->error(
                 $this->getTranslator()->trans(
@@ -224,7 +224,6 @@ class BaseAdminController extends BaseController
     {
         // Return the new language if a change is required.
         if (null !== $edit_currency_id = $this->getRequest()->get('edit_currency_id', null)) {
-
             if (null !== $edit_currency = CurrencyQuery::create()->findOneById($edit_currency_id)) {
                 return $edit_currency;
             }
@@ -241,7 +240,6 @@ class BaseAdminController extends BaseController
     {
         // Return the new language if a change is required.
         if (null !== $edit_language_id = $this->getRequest()->get('edit_language_id', null)) {
-
             if (null !== $edit_language = LangQuery::create()->findOneById($edit_language_id)) {
                 return $edit_language;
             }
@@ -268,13 +266,14 @@ class BaseAdminController extends BaseController
     protected function getUrlLanguage($locale = null)
     {
         // Check if the functionality is activated
-        if(!ConfigQuery::read("one_domain_foreach_lang", false))
-
+        if (!ConfigQuery::read("one_domain_foreach_lang", false)) {
             return null;
+        }
 
         // If we don't have a locale value, use the locale value in the session
-        if(!$locale)
+        if (!$locale) {
             $locale = $this->getCurrentEditionLocale();
+        }
 
         return LangQuery::create()->findOneByLocale($locale)->getUrl();
     }
@@ -297,11 +296,13 @@ class BaseAdminController extends BaseController
 
         // Find the current order
         $order = $this->getRequest()->get(
-                $requestParameterName,
-                $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
+            $requestParameterName,
+            $this->getSession()->get($orderSessionIdentifier, $defaultListOrder)
         );
 
-        if ($updateSession) $this->getSession()->set($orderSessionIdentifier, $order);
+        if ($updateSession) {
+            $this->getSession()->set($orderSessionIdentifier, $order);
+        }
         return $order;
     }
 
@@ -325,7 +326,7 @@ class BaseAdminController extends BaseController
      */
     protected function getRememberMeKeyFromCookie()
     {
-       // Check if we can authenticate the user with a cookie-based token
+        // Check if we can authenticate the user with a cookie-based token
         $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
 
         $ctp = new CookieTokenProvider();
@@ -375,7 +376,6 @@ class BaseAdminController extends BaseController
      */
     protected function renderRaw($templateName, $args = array(), $templateDir = null)
     {
-
         // Add the template standard extension
         $templateName .= '.html';
 
@@ -410,7 +410,6 @@ class BaseAdminController extends BaseController
         // Render the template.
         try {
             $content = $this->getParser($templateDir)->render($templateName, $args);
-
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.

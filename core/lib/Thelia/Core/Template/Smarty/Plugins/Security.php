@@ -48,7 +48,6 @@ class Security extends AbstractSmartyPlugin
         $accesses = $this->explode($this->getParam($params, 'access'));
 
         if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
-
             $ex = new AuthenticationException(
                 sprintf("User not granted for roles '%s', to access resources '%s' with %s.",
                     implode(',', $roles), implode(',', $resources), implode(',', $accesses)
@@ -65,7 +64,7 @@ class Security extends AbstractSmartyPlugin
         }
 
         return '';
-     }
+    }
 
     public function checkCartNotEmptyFunction($params, &$smarty)
     {

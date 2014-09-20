@@ -67,7 +67,6 @@ class Category extends BaseCategory implements FileModelParentInterface
      */
     public function getRoot($categoryId)
     {
-
         $category = CategoryQuery::create()->findPk($categoryId);
 
         if (0 !== $category->getParent()) {
@@ -79,7 +78,6 @@ class Category extends BaseCategory implements FileModelParentInterface
         }
 
         return $categoryId;
-
     }
 
     /**

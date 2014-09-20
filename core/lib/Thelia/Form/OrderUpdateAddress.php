@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -138,7 +139,6 @@ class OrderUpdateAddress extends BaseForm
                 )
             ))
         ;
-
     }
 
     /**

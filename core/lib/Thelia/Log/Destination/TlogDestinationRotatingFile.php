@@ -43,10 +43,11 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
         $file_path = $this->getFilePath();
         $mode = $this->getOpenMode();
 
-        if ($this->fh) @fclose($this->fh);
+        if ($this->fh) {
+            @fclose($this->fh);
+        }
 
         if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
-
             $backupFile = $file_path . '.' . strftime('%Y-%m-%d_%H-%M-%S');
 
             @rename($file_path, $backupFile);
@@ -71,7 +72,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
                 foreach ($files as $file) {
                     @unlink($file);
 
-                    if (--$deleteCount <= 0) break;
+                    if (--$deleteCount <= 0) {
+                        break;
+                    }
                 }
             }
         }
@@ -81,12 +84,12 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function getTitle()
     {
-            return Translator::getInstance()->trans('Rotated Text File');
+        return Translator::getInstance()->trans('Rotated Text File');
     }
 
     public function getDescription()
     {
-            return Translator::getInstance()->trans('Store logs into text file, up to a certian size, then a new file is created');
+        return Translator::getInstance()->trans('Store logs into text file, up to a certian size, then a new file is created');
     }
 
     public function getConfigs()

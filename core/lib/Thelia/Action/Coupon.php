@@ -62,10 +62,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
     /** @var ConditionFactory $conditionFactory */
     protected $conditionFactory;
 
-    public function __construct(Request $request,
-        CouponFactory $couponFactory, CouponManager $couponManager,
-        ConditionInterface $noConditionRule, ConditionFactory $conditionFactory)
-    {
+    public function __construct(
+        Request $request,
+        CouponFactory $couponFactory,
+        CouponManager $couponManager,
+        ConditionInterface $noConditionRule,
+        ConditionFactory $conditionFactory
+    ) {
         $this->request = $request;
         $this->couponFactory = $couponFactory;
         $this->couponManager = $couponManager;
@@ -136,7 +139,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $this->couponFactory->buildCouponFromCode($event->getCode());
 
         if ($coupon) {
-
             $isValid = $coupon->isMatching();
 
             if ($isValid) {
@@ -147,7 +149,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                 }
 
                 if (!isset($consumedCoupons[$event->getCode()])) {
-
                     // Prevent accumulation of the same Coupon on a Checkout
                     $consumedCoupons[$event->getCode()] = $event->getCode();
 
@@ -167,7 +168,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
                     ->getOrder()
                     ->setDiscount($totalDiscount)
                 ;
-             }
+            }
         }
 
         $event->setIsValid($isValid);
@@ -265,7 +266,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
 
         if ($this->couponManager->isCouponRemovingPostage($order)) {
-
             $order->setPostage(0);
 
             $event->setOrder($order);
@@ -284,7 +284,6 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $consumedCoupons = $this->request->getSession()->getConsumedCoupons();
 
         if (is_array($consumedCoupons)) {
-
             $con = Propel::getWriteConnection(OrderCouponTableMap::DATABASE_NAME);
             $con->beginTransaction();
 

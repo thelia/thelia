@@ -35,8 +35,9 @@ class TranslationsController extends BaseAdminController
      */
     protected function getModule($item_name)
     {
-        if (null !== $module = ModuleQuery::create()->findPk($item_name))
+        if (null !== $module = ModuleQuery::create()->findPk($item_name)) {
             return $module;
+        }
 
         throw new \InvalidArgumentException(
             $this->getTranslator()->trans("No module found for code '%item'", ['%item' => $item_name])
@@ -53,7 +54,9 @@ class TranslationsController extends BaseAdminController
 
         $names = [];
 
-        foreach($templates as $template) $names[] = $template->getName();
+        foreach ($templates as $template) {
+            $names[] = $template->getName();
+        }
 
         return $names;
     }
@@ -65,10 +68,11 @@ class TranslationsController extends BaseAdminController
 
         $item_name = $this->getRequest()->get('item_name', '');
 
-        if ($item_to_translate == 'mo' && ! empty($item_name))
+        if ($item_to_translate == 'mo' && ! empty($item_name)) {
             $module_part = $this->getRequest()->get('module_part', '');
-        else
+        } else {
             $module_part = false;
+        }
 
         $all_strings = array();
 
@@ -87,7 +91,6 @@ class TranslationsController extends BaseAdminController
         // Find the i18n directory, and the directory to examine.
 
         if (! empty($item_name) || $item_to_translate == 'co') {
-
             switch ($item_to_translate) {
 
                 // Module core
@@ -199,18 +202,14 @@ class TranslationsController extends BaseAdminController
 
             // Load strings to translate
             if ($directory && ! empty($domain)) {
-
                 // Save the string set, if the form was submitted
                 if ($i18n_directory) {
-
                     $save_mode = $this->getRequest()->get('save_mode', false);
 
                     if ($save_mode !== false) {
-
                         $texts = $this->getRequest()->get('text', array());
 
                         if (! empty($texts)) {
-
                             $file = sprintf("%s".DS."%s.php", $i18n_directory, $this->getCurrentEditionLocale());
 
                             $translations = $this->getRequest()->get('translation', array());
@@ -240,9 +239,9 @@ class TranslationsController extends BaseAdminController
                 $stringsCount = $stringsCount * 2 + 6;
 
                 if ($stringsCount > ini_get('max_input_vars')) {
-                   $templateArguments['max_input_vars_warning']  = true;
-                   $templateArguments['required_max_input_vars'] = $stringsCount;
-                   $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
+                    $templateArguments['max_input_vars_warning']  = true;
+                    $templateArguments['required_max_input_vars'] = $stringsCount;
+                    $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
                 } else {
                     $templateArguments['all_strings'] = $all_strings;
                 }
@@ -254,13 +253,17 @@ class TranslationsController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TRANSLATIONS, array(), AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->renderTemplate();
     }
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
         return $this->renderTemplate();
     }
 
@@ -282,5 +285,4 @@ class TranslationsController extends BaseAdminController
             // Ignore missing I18n directories
         }
     }
-
 }

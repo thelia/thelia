@@ -101,5 +101,4 @@ class FolderUpdateEvent extends FolderCreateEvent
     {
         return $this->postscriptum;
     }
-
 }

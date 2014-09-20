@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -69,5 +70,4 @@ class SessionEvent extends ActionEvent
     {
         return $this->session;
     }
-
 }

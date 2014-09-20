@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -34,9 +35,7 @@ class AddressController extends AbstractCrudController
             'registration_date',
             null,
             null,
-
             AdminResources::ADDRESS,
-
             TheliaEvents::ADDRESS_CREATE,
             TheliaEvents::ADDRESS_UPDATE,
             TheliaEvents::ADDRESS_DELETE
@@ -45,7 +44,9 @@ class AddressController extends AbstractCrudController
 
     public function useAddressAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $address_id = $this->getRequest()->request->get('address_id');
 
@@ -169,7 +170,6 @@ class AddressController extends AbstractCrudController
         );
 
         return $event;
-
     }
 
     /**
@@ -264,7 +264,6 @@ class AddressController extends AbstractCrudController
                 "customer_id" => $this->getCustomerId()
             ]
         );
-
     }
 
     /**
@@ -304,9 +303,10 @@ class AddressController extends AbstractCrudController
 
     protected function getCustomerId()
     {
-        if (null !== $address = $this->getExistingObject())
+        if (null !== $address = $this->getExistingObject()) {
             return $address->getCustomerId();
-        else
+        } else {
             return $this->getRequest()->get('customer_id', 0);
+        }
     }
 }

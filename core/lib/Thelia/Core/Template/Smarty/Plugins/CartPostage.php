@@ -74,7 +74,6 @@ class CartPostage extends AbstractSmartyPlugin
      */
     public function postage($params, $content, $template, &$repeat)
     {
-
         if (! $repeat) {
             return (null !== $this->countryId) ? $content : "";
         }
@@ -110,7 +109,6 @@ class CartPostage extends AbstractSmartyPlugin
      */
     protected function getDeliveryCountry(Customer $customer = null)
     {
-
         // get country from customer addresses
         if (null !== $customer) {
             $address = AddressQuery::create()
@@ -148,7 +146,6 @@ class CartPostage extends AbstractSmartyPlugin
         }
 
         return null;
-
     }
 
     /**
@@ -159,7 +156,6 @@ class CartPostage extends AbstractSmartyPlugin
      */
     protected function getCheapestDelivery(Country $country)
     {
-
         $deliveryModules = ModuleQuery::create()
             ->filterByActivate(1)
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE, Criteria::EQUAL)
@@ -167,7 +163,6 @@ class CartPostage extends AbstractSmartyPlugin
         ;
 
         foreach ($deliveryModules as $deliveryModule) {
-
             /** @var DeliveryModuleInterface $moduleInstance */
             $moduleInstance = $deliveryModule->getModuleInstance($this->container);
 
@@ -179,7 +174,6 @@ class CartPostage extends AbstractSmartyPlugin
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
                 if ($moduleInstance->isValidDelivery($country)) {
-
                     $postage = $moduleInstance->getPostage($country);
                     if (null === $this->postage || $this->postage > $postage) {
                         $this->postage = $postage;
@@ -189,9 +183,7 @@ class CartPostage extends AbstractSmartyPlugin
             } catch (DeliveryException $ex) {
                 // Module is not available
             }
-
         }
-
     }
 
     /**

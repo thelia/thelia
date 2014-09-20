@@ -59,8 +59,9 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
     public function getAuthentifiedUser()
     {
         if ($this->request->isMethod($this->options['required_method'])) {
-
-            if (! $this->loginForm->isValid()) throw new ValidatorException("Form is not valid.");
+            if (! $this->loginForm->isValid()) {
+                throw new ValidatorException("Form is not valid.");
+            }
 
             // Retreive user
             $username = $this->getUsername();
@@ -68,12 +69,16 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface
 
             $user = $this->userProvider->getUser($username);
 
-            if ($user === null) throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
+            if ($user === null) {
+                throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
+            }
 
             // Check user password
             $authOk = $user->checkPassword($password) === true;
 
-            if ($authOk !== true) throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
+            if ($authOk !== true) {
+                throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
+            }
             return $user;
         }
 

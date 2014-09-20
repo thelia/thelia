@@ -81,7 +81,6 @@ class Accessory extends Product
         $this->accessoryPosition = $this->accessoryId = array();
 
         foreach ($accessories as $accessory) {
-
             $accessoryProductId = $accessory->getAccessory();
 
             array_push($this->accessoryIdList, $accessoryProductId);
@@ -107,7 +106,6 @@ class Accessory extends Product
         $results = parent::parseResults($results);
 
         foreach ($results as $loopResultRow) {
-
             $accessoryProductId = $loopResultRow->get('ID');
             \Thelia\Log\Tlog::getInstance()->notice($this->accessoryId);
             $loopResultRow

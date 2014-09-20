@@ -16,5 +16,4 @@ use Thelia\Model\Base\TemplateI18nQuery as BaseTemplateI18nQuery;
  */
 class TemplateI18nQuery extends BaseTemplateI18nQuery
 {
-
 } // TemplateI18nQuery

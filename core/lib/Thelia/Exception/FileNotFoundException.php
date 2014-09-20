@@ -19,5 +19,4 @@ namespace Thelia\Exception;
  */
 class FileNotFoundException extends \ErrorException
 {
-
 }

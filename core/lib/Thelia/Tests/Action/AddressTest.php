@@ -28,7 +28,6 @@ use Thelia\Model\CustomerQuery;
  */
 class AddressTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreatedAddress()
     {
         $customer = CustomerQuery::create()->findOne();
@@ -77,7 +76,6 @@ class AddressTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdatedAddress()
     {
-
         $customer = CustomerQuery::create()->findOne();
         $address = $customer->getAddresses()->getFirst();
 
@@ -120,7 +118,6 @@ class AddressTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($addressEvent->getPhone(), $updatedAddress->getPhone());
         $this->assertEquals($addressEvent->getCellphone(), $updatedAddress->getCellphone());
         $this->assertEquals($addressEvent->getCompany(), $updatedAddress->getCompany());
-
     }
 
     /**
@@ -189,5 +186,4 @@ class AddressTest extends \PHPUnit_Framework_TestCase
          */
         Propel::enableInstancePooling();
     }
-
 }

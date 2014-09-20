@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -148,12 +149,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         $source = $this->getSource();
 
         if (! is_null($source)) {
-
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
             if (is_null($source_id) && is_null($id)) {
-                            throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -163,11 +163,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-
                 $argValue = intval($this->getArgValue($source));
 
                 if ($argValue > 0) {
-
                     $search = $this->createSearchQuery($source, $argValue);
 
                     $object_type = $source;
@@ -178,8 +176,9 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($search == null)
+        if ($search == null) {
             throw new \InvalidArgumentException(sprintf("Unable to find document source. Valid sources are %s", implode(',', $this->possible_sources)));
+        }
 
         return $search;
     }
@@ -211,7 +210,6 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -261,6 +259,5 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

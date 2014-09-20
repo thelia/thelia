@@ -77,5 +77,4 @@ class FeatureAv extends BaseFeatureAv
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEFEATURE_AV, new FeatureAvEvent($this));
     }
-
 }

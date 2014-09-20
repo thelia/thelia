@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Area;
+
 use Thelia\Core\Translation\Translator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
@@ -22,7 +23,6 @@ use Thelia\Form\BaseForm;
  */
 class AreaCreateForm extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

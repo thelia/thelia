@@ -23,7 +23,7 @@ use Thelia\Model\CartItem;
  */
 abstract class AbstractRemove extends CouponAbstract implements AmountAndPercentageCouponInterface
 {
-     /**
+    /**
      * Set the value of specific coupon fields.
      *
      * @param Array $effects the Coupon effects params
@@ -57,8 +57,7 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    )
-    {
+    ) {
         parent::set(
             $facade, $code, $title, $shortDescription, $description, $effects,
             $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
@@ -89,7 +88,6 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
 
                 /** @var Category $category */
                 foreach ($categories as $category) {
-
                     if (in_array($category->getId(), $this->category_list)) {
                         $discount += $this->getCartItemDiscount($cartItem);
 

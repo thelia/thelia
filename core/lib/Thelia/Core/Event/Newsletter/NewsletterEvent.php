@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Newsletter;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
@@ -171,5 +172,4 @@ class NewsletterEvent extends ActionEvent
     {
         return $this->id;
     }
-
 }

@@ -31,7 +31,6 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
         $module = ModuleQuery::create()->findOne();
 
         if (null !== $module) {
-
             $prev_activation_status = $module->getActivate();
 
             $application = new Application($this->getKernel());

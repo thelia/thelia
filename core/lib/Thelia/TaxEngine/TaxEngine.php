@@ -69,18 +69,14 @@ class TaxEngine
     public function getTaxTypeList()
     {
         if ($this->typeList === null) {
-
             $this->typeList = array();
 
             foreach ($this->taxTypesDirectories as $namespace => $directory) {
-
                 try {
                     $directoryIterator = new \DirectoryIterator($directory);
 
                     foreach ($directoryIterator as $fileinfo) {
-
                         if ($fileinfo->isFile()) {
-
                             $fileName  = $fileinfo->getFilename();
                             $className = substr($fileName, 0, (1+strlen($fileinfo->getExtension())) * -1);
 
@@ -117,7 +113,6 @@ class TaxEngine
     public function getDeliveryCountry()
     {
         if (null === $this->taxCountry) {
-
             /* is there a logged in customer ? */
             if (null !== $customer = $this->session->getCustomerUser()) {
                 if (null !== $this->session->getOrder()

@@ -34,7 +34,7 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             ->setName("module:deactivate")
             ->setDescription("Deactivate a module")
             ->addArgument(
-                "module" ,
+                "module",
                 InputArgument::REQUIRED,
                 "module to deactivate"
             )

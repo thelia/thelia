@@ -87,5 +87,4 @@ class ModuleConfig  extends BaseLoop implements ArraySearchLoopInterface
         // Return an array containing one element, so that parseResults() will be called one time.
         return [ 'dummy-element' ];
     }
-
 }

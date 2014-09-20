@@ -64,7 +64,6 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-
         $parser = $this->container->get('thelia.parser');
         $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
         $request = $this->container->get('request');
@@ -77,11 +76,9 @@ class ViewListener implements EventSubscriberInterface
             } else {
                 $response = new Response($content, $parser->getStatus() ?: 200);
             }
-
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
         } catch (AuthenticationException $ex) {
-
             // Redirect to the login template
             $response = RedirectResponse::create($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         } catch (OrderException $e) {
@@ -110,7 +107,6 @@ class ViewListener implements EventSubscriberInterface
         if (null === $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
         }
-
     }
 
     public function findView(Request $request)

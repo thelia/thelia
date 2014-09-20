@@ -46,7 +46,6 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 "with this option generate sql file at the same time"
             )
         ;
-
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -80,7 +79,6 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
     protected function generateSql(OutputInterface $output)
     {
-
         $command = $this->getApplication()->find("module:generate:sql");
 
         $command->run(
@@ -117,7 +115,5 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
                 $fs->remove($directory);
             }
         }
-
     }
-
 }

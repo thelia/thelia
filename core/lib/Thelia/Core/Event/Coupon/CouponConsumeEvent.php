@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Coupon;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
@@ -141,5 +142,4 @@ class CouponConsumeEvent extends ActionEvent
     {
         return $this->isValid;
     }
-
 }

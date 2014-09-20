@@ -56,5 +56,4 @@ class ProductPriceTools
     {
         return $this->promoPrice;
     }
-
 }

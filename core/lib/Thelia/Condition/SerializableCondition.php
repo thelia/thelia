@@ -29,5 +29,4 @@ class SerializableCondition
 
     /** @var array Values set by Admin for this Condition */
     public $values = [];
-
 }

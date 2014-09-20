@@ -104,7 +104,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function buildModelCriteria()
     {
-
         $search = ContentQuery::create();
 
         /* manage translations */
@@ -120,7 +119,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $folderDefault = $this->getFolderDefault();
 
         if (!is_null($folder) || !is_null($folderDefault)) {
-
             $foldersIds = array();
             if (!is_array($folder)) {
                 $folder = array();
@@ -160,9 +158,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $current = ContentQuery::create()->findPk($this->request->get("content_id"));
 
             $search->filterByFolder($current->getFolders(), Criteria::IN);
-
         } elseif ($current_folder === false) {
-
             $current = ContentQuery::create()->findPk($this->request->get("content_id"));
 
             $search->filterByFolder($current->getFolders(), Criteria::NOT_IN);
@@ -170,7 +166,9 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $title = $this->getTitle();
 
@@ -189,18 +187,21 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if(null === $foldersIds || count($foldersIds) != 1)
+                    if (null === $foldersIds || count($foldersIds) != 1) {
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
+                    }
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $foldersIds || count($foldersIds) != 1)
+                    if (null === $foldersIds || count($foldersIds) != 1) {
                         throw new \InvalidArgumentException('Manual order cannot be set without single folder argument');
+                    }
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "given_id":
-                    if(null === $id)
+                    if (null === $id) {
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                    }
                     foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_' . $singleId;
                         $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
@@ -248,7 +249,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -278,7 +278,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         return $loopResult;
-
     }
 
     /**
@@ -290,7 +289,6 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     private function findNextPrev(LoopResultRow $loopResultRow, \Thelia\Model\Content $content, $defaultFolderId)
     {
         if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
-
             // Find previous and next category
             $previous = ContentQuery::create()
                 ->joinContentFolder()
@@ -318,5 +316,4 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         return $loopResultRow;
     }
-
 }
