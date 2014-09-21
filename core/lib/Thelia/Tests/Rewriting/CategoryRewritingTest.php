@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
+
 use Thelia\Model\Category;
 
 /**
@@ -20,7 +21,6 @@ use Thelia\Model\Category;
  */
 class CategoryRewritingTest extends BaseRewritingObject
 {
-
     /**
      * @return \Thelia\Model\Category
      */

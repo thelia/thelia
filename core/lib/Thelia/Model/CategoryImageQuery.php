@@ -16,5 +16,4 @@ use Thelia\Model\Base\CategoryImageQuery as BaseCategoryImageQuery;
  */
 class CategoryImageQuery extends BaseCategoryImageQuery
 {
-
 } // CategoryImageQuery

@@ -121,7 +121,6 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     public function updateModuleHook(ModuleHookUpdateEvent $event)
     {
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
-
             // todo: test if classname and method exists
             $moduleHook
                 ->setHookId($event->getHookId())

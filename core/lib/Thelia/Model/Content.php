@@ -44,7 +44,9 @@ class Content extends BaseContent implements FileModelParentInterface
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($contents != null) $query->filterById($contents, Criteria::IN);
+        if ($contents != null) {
+            $query->filterById($contents, Criteria::IN);
+        }
     }
 
     public function getDefaultFolderId()
@@ -83,7 +85,7 @@ class Content extends BaseContent implements FileModelParentInterface
     {
         // Allow uncategorized content (NULL instead of 0, to bypass delete cascade constraint)
         if ($defaultFolderId <= 0) {
-            $defaultFolderId = NULL;
+            $defaultFolderId = null;
         }
 
         if ($defaultFolderId == $this->getDefaultFolderId()) {
@@ -108,7 +110,6 @@ class Content extends BaseContent implements FileModelParentInterface
 
         $contentFolder->setDefaultFolder(true)
             ->save();
-
     }
 
     /**
@@ -142,7 +143,6 @@ class Content extends BaseContent implements FileModelParentInterface
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT,new ContentEvent($this));
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;

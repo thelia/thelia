@@ -26,7 +26,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class Application extends BaseApplication
 {
-
     public $kernel;
 
     public function __construct(KernelInterface $kernel)
@@ -69,6 +68,5 @@ class Application extends BaseApplication
                 $this->add($r->newInstance());
             }
         }
-
     }
 }

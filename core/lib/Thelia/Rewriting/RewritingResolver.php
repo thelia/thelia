@@ -78,5 +78,4 @@ class RewritingResolver
 
         return $otherParameters;
     }
-
 }

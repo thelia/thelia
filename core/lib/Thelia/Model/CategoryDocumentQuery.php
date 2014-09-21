@@ -16,5 +16,4 @@ use Thelia\Model\Base\CategoryDocumentQuery as BaseCategoryDocumentQuery;
  */
 class CategoryDocumentQuery extends BaseCategoryDocumentQuery
 {
-
 } // CategoryDocumentQuery

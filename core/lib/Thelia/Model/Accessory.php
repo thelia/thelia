@@ -76,5 +76,4 @@ class Accessory extends BaseAccessory
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEACCESSORY, new AccessoryEvent($this));
     }
-
 }

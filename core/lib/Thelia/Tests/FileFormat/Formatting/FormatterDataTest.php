@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Formatting;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
@@ -26,7 +27,6 @@ use Thelia\Model\Map\ProductTableMap;
  */
 class FormatterDataTest extends \PHPUnit_Framework_TestCase
 {
-
     public function setUp()
     {
         new Translator(new Container());

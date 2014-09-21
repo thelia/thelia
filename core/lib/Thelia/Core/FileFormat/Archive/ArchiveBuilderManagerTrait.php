@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

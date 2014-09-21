@@ -149,7 +149,6 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
         /* perform search */
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -172,6 +171,5 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

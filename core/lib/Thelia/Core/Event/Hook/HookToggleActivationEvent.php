@@ -43,5 +43,4 @@ class HookToggleActivationEvent extends HookEvent
     {
         return $this->hook_id;
     }
-
 }

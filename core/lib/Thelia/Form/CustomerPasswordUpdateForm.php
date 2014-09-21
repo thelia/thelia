@@ -25,7 +25,6 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerPasswordUpdateForm extends BaseForm
 {
-
     protected function buildForm()
     {
         $this->formBuilder

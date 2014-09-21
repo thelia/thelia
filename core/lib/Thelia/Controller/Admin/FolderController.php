@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
@@ -30,16 +31,13 @@ use Thelia\Model\FolderQuery;
  */
 class FolderController extends AbstractSeoCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'folder',
             'manual',
             'folder_order',
-
             AdminResources::FOLDER,
-
             TheliaEvents::FOLDER_CREATE,
             TheliaEvents::FOLDER_UPDATE,
             TheliaEvents::FOLDER_DELETE,
@@ -228,12 +226,14 @@ class FolderController extends AbstractSeoCrudController
         // Get content order
         $content_order = $this->getListOrderFromSession('content', 'content_order', 'manual');
 
-        return $this->render('folders',
+        return $this->render(
+            'folders',
             array(
                 'folder_order' => $currentOrder,
                 'content_order' => $content_order,
                 'parent' => $this->getRequest()->get('parent', 0)
-            ));
+            )
+        );
     }
 
     /**
@@ -292,7 +292,6 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
-
         $folder = FolderQuery::create()->findPk($event->getObjectId());
 
         if ($folder != null) {

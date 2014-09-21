@@ -50,5 +50,4 @@ class TaxRuleTest extends BaseLoopTestor
 
         $this->baseTestSearchById($tr->getId(), array('force_return' => true));
     }
-
 }

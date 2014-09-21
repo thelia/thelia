@@ -57,5 +57,4 @@ class ContentDeleteEvent extends ContentEvent
     {
         return $this->folder_id;
     }
-
 }

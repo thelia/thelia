@@ -16,5 +16,4 @@ use Thelia\Model\Base\ModuleHookQuery as BaseModuleHookQuery;
  */
 class ModuleHookQuery extends BaseModuleHookQuery
 {
-
 } // ModuleHookQuery

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -98,5 +99,4 @@ class ImportForm extends BaseForm
             );
         }
     }
-
 }

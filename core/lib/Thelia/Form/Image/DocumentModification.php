@@ -68,6 +68,5 @@ abstract class DocumentModification extends BaseForm
 
         // Add standard description fields
         $this->addStandardDescFields();
-
     }
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
@@ -30,16 +31,13 @@ use Thelia\Model\CountryQuery;
  */
 class CountryController extends AbstractCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'country',
             'manual',
             'country_order',
-
             AdminResources::COUNTRY,
-
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,
             TheliaEvents::COUNTRY_DELETE
@@ -231,7 +229,9 @@ class CountryController extends AbstractCrudController
 
     public function toggleDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         if (null !== $country_id = $this->getRequest()->get('country_id')) {
             $toogleDefaultEvent = new CountryToggleDefaultEvent($country_id);
@@ -244,7 +244,6 @@ class CountryController extends AbstractCrudController
             } catch (\Exception $ex) {
                 Tlog::getInstance()->error($ex->getMessage());
             }
-
         }
 
         return $this->nullResponse(500);

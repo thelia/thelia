@@ -97,7 +97,6 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
      */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
-
         $search->_and();
         foreach ($searchIn as $index => $searchInElement) {
             if ($index > 0) {
@@ -268,6 +267,5 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         }
 
         return $loopResult;
-
     }
 }

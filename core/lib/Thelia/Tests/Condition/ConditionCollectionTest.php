@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Condition;
+
 use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Model\CurrencyQuery;
 
@@ -161,9 +162,9 @@ class ConditionCollectionTest extends \PHPUnit_Framework_TestCase
         $collection[] = $condition2;
 
         $expected = '[{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":">","currency":"=="},"values":{"price":400,"currency":"EUR"}},{"conditionServiceId":"thelia.condition.match_for_total_amount","operators":{"price":"<","currency":"=="},"values":{"price":600,"currency":"EUR"}}]';
-        $actual = $collection->__toString();;
+        $actual = $collection->__toString();
+        ;
 
         $this->assertEquals($expected, $actual);
-
     }
 }

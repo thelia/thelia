@@ -100,7 +100,6 @@ class TemplateController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-
         $data = array(
             'id'      => $object->getId(),
             'locale'  => $object->getLocale(),
@@ -172,7 +171,6 @@ class TemplateController extends AbstractCrudController
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         if ($deleteEvent->getProductCount() > 0) {
-
             $this->getParserContext()->setGeneralError(
                 $this->getTranslator()->trans(
                         "This template is in use in some of your products, and cannot be deleted. Delete it from all your products and try again."
@@ -205,7 +203,9 @@ class TemplateController extends AbstractCrudController
     public function addAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $attribute_id = intval($this->getRequest()->get('attribute_id'));
 
@@ -229,7 +229,9 @@ class TemplateController extends AbstractCrudController
     public function deleteAttributeAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $event = new TemplateDeleteAttributeEvent(
                 $this->getExistingObject(),
@@ -264,7 +266,9 @@ class TemplateController extends AbstractCrudController
     public function addFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $feature_id = intval($this->getRequest()->get('feature_id'));
 
@@ -288,7 +292,9 @@ class TemplateController extends AbstractCrudController
     public function deleteFeatureAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::TEMPLATE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $event = new TemplateDeleteFeatureEvent(
                 $this->getExistingObject(),

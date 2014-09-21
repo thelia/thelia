@@ -30,7 +30,7 @@ use Thelia\Model\CouponModule;
  */
 abstract class CouponAbstract implements CouponInterface
 {
-     /**
+    /**
      * The dataset name for all coupon specific input fields, that do not appear in the CouPonCreationForm form.
       *
      * In the input form, these fields have to be created like:
@@ -154,8 +154,7 @@ abstract class CouponAbstract implements CouponInterface
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    )
-    {
+    ) {
         $this->code = $code;
         $this->title = $title;
         $this->shortDescription = $shortDescription;

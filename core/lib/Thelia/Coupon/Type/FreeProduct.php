@@ -67,7 +67,7 @@ class FreeProduct extends AbstractRemoveOnProducts
     protected function getSessionVarName()
     {
         return "coupon.free_product.cart_items." . $this->getCode();
-   }
+    }
     /**
      * Return the cart item id which contains the free product related to a given product
      *
@@ -83,7 +83,6 @@ class FreeProduct extends AbstractRemoveOnProducts
         );
 
         if (isset($cartItemIdList[$product->getId()])) {
-
             $cartItemId = $cartItemIdList[$product->getId()];
 
             if ($cartItemId == self::ADD_TO_CART_IN_PROCESS) {
@@ -98,14 +97,12 @@ class FreeProduct extends AbstractRemoveOnProducts
             /** @var CartItem $cartItem */
             foreach ($cartItems as $cartItem) {
                 if ($cartItem->getProduct()->getId() == $this->offeredProductId) {
-
                     // We found the product. Store its cart item as the free product container.
                     $this->setRelatedCartItem($product, $cartItem->getId());
 
                     return $cartItem;
                 }
             }
-
         }
 
         return false;
@@ -124,7 +121,9 @@ class FreeProduct extends AbstractRemoveOnProducts
             array()
         );
 
-        if (! is_array($cartItemIdList)) $cartItemIdList = array();
+        if (! is_array($cartItemIdList)) {
+            $cartItemIdList = array();
+        }
 
         $cartItemIdList[$product->getId()] = $cartItemId;
 
@@ -196,15 +195,12 @@ class FreeProduct extends AbstractRemoveOnProducts
         }
 
         if ($eligibleProduct !== null) {
-
             // Get the cart item for the eligible product
             $freeProductCartItem = $this->getRelatedCartItem($eligibleProduct);
 
             // We add the free product it only if it not yet in the cart.
             if ($freeProductCartItem === false) {
-
                 if (null !== $freeProduct = ProductQuery::create()->findPk($this->offeredProductId)) {
-
                     // Store in the session that the free product is added to the cart,
                     // so that we don't enter the following infinite loop :
                     //
@@ -264,7 +260,6 @@ class FreeProduct extends AbstractRemoveOnProducts
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === self::OFFERED_PRODUCT_ID) {
-
             if (floatval($fieldValue) < 0) {
                 throw new \InvalidArgumentException(
                     Translator::getInstance()->trans(

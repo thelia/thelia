@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Archive\ArchiveBuilder;
+
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder;
 
 /**

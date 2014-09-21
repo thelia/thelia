@@ -28,7 +28,6 @@ use Thelia\Core\Translation\Translator;
  */
 class CartAdd extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

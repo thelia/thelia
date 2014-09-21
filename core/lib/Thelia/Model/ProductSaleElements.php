@@ -103,5 +103,4 @@ class ProductSaleElements extends BaseProductSaleElements
 
         return $productPriceTools;
     }
-
 }

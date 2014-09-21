@@ -27,9 +27,9 @@ class FloatToFloatArrayType extends BaseType
 
     public function isValid($value)
     {
-        if(!is_array($value))
-
+        if (!is_array($value)) {
             return false;
+        }
 
         foreach ($value as $key => $val) {
             if ( filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($val, FILTER_VALIDATE_FLOAT) === false ) {

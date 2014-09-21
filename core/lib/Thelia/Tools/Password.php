@@ -19,7 +19,6 @@ namespace Thelia\Tools;
  */
 class Password
 {
-
     private static function randgen($letter, $length)
     {
         return substr(str_shuffle($letter), 0, $length);

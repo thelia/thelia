@@ -63,7 +63,6 @@ class Lang extends BaseLang
             $con->rollBack();
             throw $e;
         }
-
     }
 
     protected function fixMissingFlag()

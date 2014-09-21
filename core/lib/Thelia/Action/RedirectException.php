@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -23,7 +24,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
-
     public function checkRedirectException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();

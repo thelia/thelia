@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\EventListener;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
@@ -28,7 +29,6 @@ use Thelia\Model\ConfigQuery;
  */
 class SessionListener implements EventSubscriberInterface
 {
-
     public function prodSession(SessionEvent $event)
     {
         $storage = new NativeSessionStorage();

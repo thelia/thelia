@@ -116,7 +116,9 @@ class Product extends BaseProduct implements FileModelParentInterface
     public function updateDefaultCategory($defaultCategoryId)
     {
         // Allow uncategorized products (NULL instead of 0, to bypass delete cascade constraint)
-        if ($defaultCategoryId <= 0) $defaultCategoryId = NULL;
+        if ($defaultCategoryId <= 0) {
+            $defaultCategoryId = null;
+        }
 
         // Update the default category
         $productCategory = ProductCategoryQuery::create()
@@ -126,9 +128,10 @@ class Product extends BaseProduct implements FileModelParentInterface
         ;
 
         if ($productCategory == null || $productCategory->getCategoryId() != $defaultCategoryId) {
-
             // Delete the old default category
-            if ($productCategory !== null) $productCategory->delete();
+            if ($productCategory !== null) {
+                $productCategory->delete();
+            }
 
             // Add the new default category
             $productCategory = new ProductCategory();
@@ -161,7 +164,6 @@ class Product extends BaseProduct implements FileModelParentInterface
         $this->dispatchEvent(TheliaEvents::BEFORE_CREATEPRODUCT, new ProductEvent($this));
 
         try {
-
             // Create the product
             $this->save($con);
 
@@ -181,7 +183,6 @@ class Product extends BaseProduct implements FileModelParentInterface
 
             $this->dispatchEvent(TheliaEvents::AFTER_CREATEPRODUCT, new ProductEvent($this));
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -236,7 +237,9 @@ class Product extends BaseProduct implements FileModelParentInterface
             ->find();
 
         // Filtrer la requete sur ces produits
-        if ($produits != null) $query->filterById($produits, Criteria::IN);
+        if ($produits != null) {
+            $query->filterById($produits, Criteria::IN);
+        }
     }
 
     public function preUpdate(ConnectionInterface $con = null)

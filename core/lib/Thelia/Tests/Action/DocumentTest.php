@@ -113,7 +113,9 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $dir = THELIA_WEB_DIR."/cache/tests";
         if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
-                if ($file == '.' || $file == '..') continue;
+                if ($file == '.' || $file == '..') {
+                    continue;
+                }
 
                 unlink(sprintf("%s/%s", $dir, $file));
             }
@@ -145,7 +147,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $document = new Document($this->getFileManager());
 
         $document->processDocument($event);
-     }
+    }
 
      /**
       *
@@ -205,7 +207,9 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $document->processDocument($event);
 
-         if ($config != null) $config->setValue($oldval)->save();
+         if ($config != null) {
+             $config->setValue($oldval)->save();
+         }
 
          $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
 
@@ -234,32 +238,34 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
          $document->processDocument($event);
 
-         if ($config != null) $config->setValue($oldval)->save();
+         if ($config != null) {
+             $config->setValue($oldval)->save();
+         }
 
          $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
 
          $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-2.txt");
      }
 
-     public function testClearTestsCache()
-     {
-         $event = new DocumentEvent($this->request);
+    public function testClearTestsCache()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $event->setCacheSubdirectory('tests');
+        $event->setCacheSubdirectory('tests');
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         $document->clearCache($event);
-     }
+        $document->clearCache($event);
+    }
 
-     public function testClearWholeCache()
-     {
-         $event = new DocumentEvent($this->request);
+    public function testClearWholeCache()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         $document->clearCache($event);
-     }
+        $document->clearCache($event);
+    }
 
      /**
       * Try to clear directory ouside of the cache

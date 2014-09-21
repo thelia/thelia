@@ -26,7 +26,6 @@ use Thelia\Core\Translation\Translator;
  */
 class CustomerCreateForm extends AddressCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();
@@ -87,7 +86,6 @@ class CustomerCreateForm extends AddressCreateForm
                 ),
                 "required" => false
             ));
-
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)

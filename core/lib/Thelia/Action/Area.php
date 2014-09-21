@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
@@ -30,7 +31,6 @@ use Thelia\Model\Area as AreaModel;
  */
 class Area extends BaseAction implements EventSubscriberInterface
 {
-
     public function addCountry(AreaAddCountryEvent $event)
     {
         $countryIds = $event->getCountryId();

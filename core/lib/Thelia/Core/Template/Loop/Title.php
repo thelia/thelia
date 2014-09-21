@@ -62,7 +62,6 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
         $search->orderByPosition();
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -81,6 +80,5 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

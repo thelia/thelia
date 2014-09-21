@@ -243,7 +243,9 @@ class SaleModificationForm extends SaleCreationForm
 
         $ids = [];
 
-        foreach($categories as $category) $ids[] = $category->getId();
+        foreach ($categories as $category) {
+            $ids[] = $category->getId();
+        }
 
         return $ids;
     }

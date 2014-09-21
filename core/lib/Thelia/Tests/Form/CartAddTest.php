@@ -13,9 +13,7 @@ namespace Thelia\Tests\Form;
 
 class CartAddTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testSimpleAddingToCart()
     {
-
     }
 }

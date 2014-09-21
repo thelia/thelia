@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -62,7 +63,6 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
                     }
                 }
             }
-
         } else {
             $formatters = $rawFormatters;
         }
@@ -139,5 +139,4 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
             )
         );
     }
-
 }

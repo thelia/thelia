@@ -48,5 +48,4 @@ class ProductSaleElementDeleteEvent extends ProductSaleElementEvent
 
         return $this;
     }
-
 }

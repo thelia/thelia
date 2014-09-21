@@ -19,7 +19,6 @@ use Thelia\Form\Image\ImageModification;
  */
 class BrandImageModification extends ImageModification
 {
-
     /**
      * @inheritdoc
      */

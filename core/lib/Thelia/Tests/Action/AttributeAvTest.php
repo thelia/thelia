@@ -26,7 +26,6 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
  */
 class AttributeAvTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreate()
     {
         $attribute = AttributeQuery::create()->findOne();
@@ -104,5 +103,4 @@ class AttributeAvTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\AttributeAv', $deletedAttributeAv);
         $this->assertTrue($deletedAttributeAv->isDeleted());
     }
-
 }

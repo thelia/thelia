@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Template\Smarty;
+
 use Thelia\Core\Template\Smarty\SmartyHelper;
 
 /**
@@ -20,10 +21,8 @@ use Thelia\Core\Template\Smarty\SmartyHelper;
  */
 class SmartyHelperTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testFunctionsDefinition()
     {
-
         $content = <<<EOT
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -41,12 +40,10 @@ EOT;
         $this->assertArrayHasKey("attributes", $functions[0]);
         $this->assertArrayHasKey("name", $functions[0]["attributes"]);
         $this->assertEquals("test", $functions[0]["attributes"]["name"]);
-
     }
 
     public function testfunctionsDefinitionVar()
     {
-
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -71,12 +68,10 @@ EOT;
         $this->assertArrayHasKey("attributes", $functions[1]);
         $this->assertArrayHasKey("name", $functions[1]["attributes"]);
         $this->assertEquals("{\$test}", $functions[1]["attributes"]["name"]);
-
     }
 
     public function testfunctionsDefinitionInnerFunction()
     {
-
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -101,7 +96,6 @@ EOT;
 
     public function testfunctionsDefinitionSpecificFunction()
     {
-
         $content = <<<'EOT'
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
 tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
@@ -120,7 +114,5 @@ EOT;
         $this->assertArrayHasKey("attributes", $functions[0]);
         $this->assertArrayHasKey("name", $functions[0]["attributes"]);
         $this->assertEquals("hello world", $functions[0]["attributes"]["name"]);
-
     }
-
 }

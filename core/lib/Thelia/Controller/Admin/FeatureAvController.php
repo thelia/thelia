@@ -35,9 +35,7 @@ class FeatureAvController extends AbstractCrudController
             'featureav',
             'manual',
             'order',
-
             AdminResources::FEATURE,
-
             TheliaEvents::FEATURE_AV_CREATE,
             TheliaEvents::FEATURE_AV_UPDATE,
             TheliaEvents::FEATURE_AV_DELETE,
@@ -88,9 +86,9 @@ class FeatureAvController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('featureav_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('featureav_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -158,8 +156,8 @@ class FeatureAvController extends AbstractCrudController
     {
         // We always return to the feature edition form
         return $this->render(
-                'feature-edit',
-                $this->getViewArguments()
+            'feature-edit',
+            $this->getViewArguments()
         );
     }
 
@@ -184,5 +182,5 @@ class FeatureAvController extends AbstractCrudController
             "admin.configuration.features.update",
             $this->getViewArguments()
         );
-     }
+    }
 }

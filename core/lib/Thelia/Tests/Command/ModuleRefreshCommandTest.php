@@ -71,7 +71,6 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
             $actual
                 ->setActivate($expected->getActivate())
                 ->save();
-
         } else {
             $this->markTestIncomplete(
                 'This test cannot be complete without at least one standard module.'

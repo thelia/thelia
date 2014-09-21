@@ -27,7 +27,6 @@ use Thelia\Model\Customer;
  */
 class CartTraitTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $session;
 
     protected $request;
@@ -79,7 +78,6 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($cart->getAddressDeliveryId());
         $this->assertNull($cart->getAddressInvoiceId());
         $this->assertEquals($this->uniqid, $cart->getToken());
-
     }
 
     /**
@@ -109,7 +107,6 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($cart->getAddressDeliveryId());
         $this->assertNull($cart->getAddressInvoiceId());
         $this->assertEquals($this->uniqid, $cart->getToken());
-
     }
 
     /**
@@ -235,7 +232,6 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($cart->getToken(), $getCart->getToken(), "token must be different");
         $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
-
 }
 
 /**
@@ -266,5 +262,4 @@ class MockCartTrait
     {
         return $this->container->get("event_dispatcher");
     }
-
 }

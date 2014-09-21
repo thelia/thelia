@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Hook;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Hook;
 
@@ -44,5 +45,4 @@ class HookEvent extends ActionEvent
 
         return $this;
     }
-
 }

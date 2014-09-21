@@ -16,5 +16,4 @@ use Thelia\Model\Base\NewsletterQuery as BaseNewsletterQuery;
  */
 class NewsletterQuery extends BaseNewsletterQuery
 {
-
 } // NewsletterQuery

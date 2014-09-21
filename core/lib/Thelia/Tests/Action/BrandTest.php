@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Action\Brand;
@@ -129,7 +130,6 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $this->assertInstanceOf('Thelia\Model\Brand', $deletedBrand);
         $this->assertTrue($deletedBrand->isDeleted());
-
     }
 
     public function testBrandToggleVisibility()

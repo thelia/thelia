@@ -68,7 +68,9 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $results = array();
 
@@ -78,7 +80,6 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
             $category = $search->findOne();
 
             if ($category != null) {
-
                 $results[] = array(
                     "ID" => $category->getId(),
                     "TITLE" => $category->getVirtualColumn('i18n_TITLE'),
@@ -89,7 +90,6 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
                 $parent = $category->getParent();
 
                 if ($parent > 0) {
-
                     // Prevent circular refererences
                     if (in_array($parent, $ids)) {
                         throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
@@ -102,7 +102,9 @@ class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
                     $this->configureI18nProcessing($search, array('TITLE'));
 
                     $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) {
+                        $search->filterByVisible($visible);
+                    }
                 }
             }
         } while ($category != null && $parent > 0);

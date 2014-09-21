@@ -138,5 +138,4 @@ class ProfileTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($accessManager->can(AccessManager::CREATE));
     }
-
 }

@@ -26,7 +26,6 @@ use Thelia\Model\CurrencyQuery;
  */
 class CurrencyTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $dispatcher;
 
     public function setUp()

@@ -66,5 +66,4 @@ class AreaUpdatePostageEvent extends AreaEvent
     {
         return $this->postage;
     }
-
 }

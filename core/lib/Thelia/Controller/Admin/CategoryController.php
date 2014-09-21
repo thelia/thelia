@@ -43,9 +43,7 @@ class CategoryController extends AbstractSeoCrudController
             'category',
             'manual',
             'category_order',
-
             AdminResources::CATEGORY,
-
             TheliaEvents::CATEGORY_CREATE,
             TheliaEvents::CATEGORY_UPDATE,
             TheliaEvents::CATEGORY_DELETE,
@@ -100,9 +98,9 @@ class CategoryController extends AbstractSeoCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('category_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('category_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -179,13 +177,15 @@ class CategoryController extends AbstractSeoCrudController
         // Get product order
         $product_order = $this->getListOrderFromSession('product', 'product_order', 'manual');
 
-        return $this->render('categories',
-                array(
-                    'category_order' => $currentOrder,
-                    'product_order' => $product_order,
-                    'category_id' => $this->getRequest()->get('category_id', 0),
-                    'page' => $this->getRequest()->get('page', 1)
-        ));
+        return $this->render(
+            'categories',
+            array(
+                'category_order' => $currentOrder,
+                'product_order' => $product_order,
+                'category_id' => $this->getRequest()->get('category_id', 0),
+                'page' => $this->getRequest()->get('page', 1)
+            )
+        );
     }
 
     protected function redirectToListTemplate()
@@ -203,7 +203,8 @@ class CategoryController extends AbstractSeoCrudController
     {
         $response = null;
         if ($category_id > 0) {
-            $response = $this->generateRedirectFromRoute('admin.categories.default',
+            $response = $this->generateRedirectFromRoute(
+                'admin.categories.default',
                 ['category_id' => $category_id]
             );
         } else {
@@ -232,7 +233,9 @@ class CategoryController extends AbstractSeoCrudController
     public function setToggleVisibilityAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $event = new CategoryToggleVisibilityEvent($this->getExistingObject());
 
@@ -269,7 +272,6 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function performAdditionalUpdatePositionAction($event)
     {
-
         $category = CategoryQuery::create()->findPk($event->getObjectId());
         $response = null;
         if ($category != null) {
@@ -288,13 +290,12 @@ class CategoryController extends AbstractSeoCrudController
         $folders = FolderQuery::create()->filterById($folderId)->find();
 
         if ($folders !== null) {
-
             $list = ContentQuery::create()
                 ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByFolder($folders, Criteria::IN)
                 ->filterById(CategoryAssociatedContentQuery::create()->select('content_id')->findByCategoryId($categoryId), Criteria::NOT_IN)
                 ->find();
-                ;
+            ;
 
             if ($list !== null) {
                 foreach ($list as $item) {
@@ -309,15 +310,16 @@ class CategoryController extends AbstractSeoCrudController
     public function addRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
         if ($content_id > 0) {
-
             $event = new CategoryAddContentEvent(
-                    $this->getExistingObject(),
-                    $content_id
+                $this->getExistingObject(),
+                $content_id
             );
 
             try {
@@ -349,15 +351,16 @@ class CategoryController extends AbstractSeoCrudController
     public function deleteRelatedContentAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $content_id = intval($this->getRequest()->get('content_id'));
 
         if ($content_id > 0) {
-
             $event = new CategoryDeleteContentEvent(
-                    $this->getExistingObject(),
-                    $content_id
+                $this->getExistingObject(),
+                $content_id
             );
 
             try {
@@ -370,5 +373,4 @@ class CategoryController extends AbstractSeoCrudController
 
         return $this->redirectToEditionTemplate();
     }
-
 }

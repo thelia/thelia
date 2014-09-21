@@ -33,7 +33,6 @@ use Thelia\Model\Tools\ProductPriceTools;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
-
     /**
      *
      * add an article in the current cart
@@ -41,7 +40,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function addItem(CartEvent $event)
     {
-
         $cart = $event->getCart();
         $newness = $event->getNewness();
         $append = $event->getAppend();
@@ -60,7 +58,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
         if ($cartItem === null || $newness) {
-
             $productSaleElements = ProductSaleElementsQuery::create()
                 ->findPk($productSaleElementsId);
 
@@ -96,7 +93,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
                 ->delete();
-
         }
     }
 
@@ -155,7 +151,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function updateCartPrices(\Thelia\Model\Cart $cart, \Thelia\Model\Currency $currency)
     {
-
         $customer = $cart->getCustomer();
         $discount = 0;
 
@@ -179,7 +174,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         // update the currency cart
         $cart->setCurrencyId($currency->getId());
         $cart->save();
-
     }
 
 
@@ -278,5 +272,4 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
     }
-
 }

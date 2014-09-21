@@ -31,7 +31,6 @@ class HookHelper
 
     public function __construct()
     {
-
     }
 
     public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
@@ -98,37 +97,31 @@ class HookHelper
      */
     public function walkDir($directory, &$hooks)
     {
-
         $allowed_exts = array('html', 'tpl', 'xml');
 
         try {
-
             /** @var \DirectoryIterator $fileInfo */
             foreach (new \DirectoryIterator($directory) as $fileInfo) {
-
-                if ($fileInfo->isDot()) continue;
+                if ($fileInfo->isDot()) {
+                    continue;
+                }
 
                 if ($fileInfo->isDir()) {
                     $this->walkDir($fileInfo->getPathName(), $hooks);
                 }
 
                 if ($fileInfo->isFile()) {
-
                     $ext = $fileInfo->getExtension();
 
                     if (in_array($ext, $allowed_exts)) {
-
                         if ($content = file_get_contents($fileInfo->getPathName())) {
-
                             foreach (SmartyHelper::getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
                                 $hooks[] = $hook;
                             }
-
                         }
                     }
                 }
             }
-
         } catch (\UnexpectedValueException $ex) {
             // Directory does not exists => ignore/
         }
@@ -164,7 +157,6 @@ class HookHelper
             $contextTitle = $this->trans("context", $ret['context']) ? : $ret['context'];
             $typeTitle    = $this->trans("type", $ret['type']) ? : $ret['type'];
             $ret['title'] = sprintf("%s - %s", $contextTitle, $typeTitle);
-
         } else {
             throw new \UnexpectedValueException("The hook should have a name attribute.");
         }
@@ -212,7 +204,6 @@ class HookHelper
                 $this->loadEmailTrans($locale);
                 break;
         }
-
     }
 
     protected function loadFrontOfficeTrans($locale)
@@ -287,12 +278,10 @@ class HookHelper
         $this->messages["type"]["stylesheet"]                      = $t->trans("CSS stylesheet", array(), "core", $locale);
         $this->messages["type"]["success"]                         = $t->trans("if successful response", array(), "core", $locale);
         $this->messages["type"]["top"]                             = $t->trans("at the top", array(), "core", $locale);
-
     }
 
     protected function loadBackOfficeTrans($locale)
     {
-
         $t = Translator::getInstance();
 
         $this->messages["context"]["admin-logs"]             = $t->trans("Logs", array(), "core", $locale);
@@ -468,12 +457,11 @@ class HookHelper
         $this->messages["type"]["value-create-form"]         = $t->trans("Value create form", array(), "core", $locale);
         $this->messages["type"]["value-table-header"]        = $t->trans("value table header", array(), "core", $locale);
         $this->messages["type"]["value-table-row"]           = $t->trans("value table row", array(), "core", $locale);
-
     }
 
     protected function loadPdfOfficeTrans($locale)
     {
-       $t = Translator::getInstance();
+        $t = Translator::getInstance();
 
         $this->messages["context"]["delivery"]       = $t->trans("Delivery", array(), "core", $locale);
         $this->messages["context"]["invoice"]        = $t->trans("Invoice", array(), "core", $locale);
@@ -488,7 +476,6 @@ class HookHelper
         $this->messages["type"]["header"]            = $t->trans("in the header", array(), "core", $locale);
         $this->messages["type"]["imprint"]           = $t->trans("imprint", array(), "core", $locale);
         $this->messages["type"]["information"]       = $t->trans("at the bottom of information area", array(), "core", $locale);
-
     }
 
     /**
@@ -498,6 +485,5 @@ class HookHelper
      */
     protected function loadEmailTrans($locale)
     {
-
     }
 }

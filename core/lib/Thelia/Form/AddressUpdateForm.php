@@ -19,11 +19,9 @@ namespace Thelia\Form;
  */
 class AddressUpdateForm extends AddressCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();
-
     }
 
     /**

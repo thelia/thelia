@@ -50,7 +50,6 @@ class TaxCreationForm extends BaseForm
         $requirementList = array();
 
         foreach ($types as $classname) {
-
             $instance = new $classname();
 
             $typeList[Tax::escapeTypeName($classname)] = $instance->getTitle();

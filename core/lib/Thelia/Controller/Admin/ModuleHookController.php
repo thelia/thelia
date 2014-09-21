@@ -39,9 +39,7 @@ class ModuleHookController extends AbstractCrudController
             'hook',
             'manual',
             'hook_order',
-
             AdminResources::MODULE_HOOK,
-
             TheliaEvents::MODULE_HOOK_CREATE,
             TheliaEvents::MODULE_HOOK_UPDATE,
             TheliaEvents::MODULE_HOOK_DELETE,

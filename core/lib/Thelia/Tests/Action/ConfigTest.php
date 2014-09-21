@@ -157,5 +157,4 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Config', $deletedConfig);
         $this->assertTrue($deletedConfig->isDeleted());
     }
-
 }

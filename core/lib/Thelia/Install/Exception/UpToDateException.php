@@ -19,5 +19,4 @@ namespace Thelia\Install\Exception;
  */
 class UpToDateException extends InstallException
 {
-
 }

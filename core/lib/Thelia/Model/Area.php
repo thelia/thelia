@@ -46,5 +46,4 @@ class Area extends BaseArea
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEAREA, new AreaEvent($this));
     }
-
 }

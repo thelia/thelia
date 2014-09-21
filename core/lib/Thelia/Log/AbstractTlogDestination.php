@@ -37,7 +37,9 @@ abstract class AbstractTlogDestination
                 $config->setValue($value);
 
                 // Appliquer les changements
-                if ($apply_changes) $this->configure();
+                if ($apply_changes) {
+                    $this->configure();
+                }
                 return true;
             }
         }
@@ -73,7 +75,7 @@ abstract class AbstractTlogDestination
         $match = array();
 
         if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
-                $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
+            $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
         }
     }
 

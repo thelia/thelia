@@ -125,6 +125,5 @@ class ModuleConfigTest extends \PHPUnit_Framework_TestCase
             null,
             false
         );
-
     }
 }

@@ -95,7 +95,6 @@ class OrderQuery extends BaseOrderQuery
      */
     public static function getSaleStats(\DateTime $startDate, \DateTime $endDate, $includeShipping)
     {
-
         $orderTaxJoin = new Join();
         $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
         $orderTaxJoin->setJoinType(Criteria::INNER_JOIN);
@@ -137,5 +136,4 @@ class OrderQuery extends BaseOrderQuery
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
     }
-
 } // OrderQuery

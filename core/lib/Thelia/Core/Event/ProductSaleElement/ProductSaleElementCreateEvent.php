@@ -58,14 +58,13 @@ class ProductSaleElementCreateEvent extends ProductSaleElementEvent
      */
     public function getProduct()
     {
-      return $this->product;
+        return $this->product;
     }
 
     public function setProduct($product)
     {
-      $this->product = $product;
+        $this->product = $product;
 
-      return $this;
+        return $this;
     }
-
 }

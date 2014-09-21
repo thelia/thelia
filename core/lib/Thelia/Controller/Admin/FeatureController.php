@@ -39,9 +39,7 @@ class FeatureController extends AbstractCrudController
             'feature',
             'manual',
             'order',
-
             AdminResources::FEATURE,
-
             TheliaEvents::FEATURE_CREATE,
             TheliaEvents::FEATURE_UPDATE,
             TheliaEvents::FEATURE_DELETE,
@@ -99,9 +97,7 @@ class FeatureController extends AbstractCrudController
         $attr_values = $this->getRequest()->get('feature_values', null);
 
         if ($attr_values !== null) {
-
             foreach ($attr_values as $id => $value) {
-
                 $event = new FeatureAvUpdateEvent($id);
 
                 $event->setTitle($value);
@@ -117,9 +113,9 @@ class FeatureController extends AbstractCrudController
     protected function createUpdatePositionEvent($positionChangeMode, $positionValue)
     {
         return new UpdatePositionEvent(
-                $this->getRequest()->get('feature_id', null),
-                $positionChangeMode,
-                $positionValue
+            $this->getRequest()->get('feature_id', null),
+            $positionChangeMode,
+            $positionValue
         );
     }
 
@@ -135,7 +131,6 @@ class FeatureController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-
         $data = array(
             'id'           => $object->getId(),
             'locale'       => $object->getLocale(),
@@ -184,11 +179,11 @@ class FeatureController extends AbstractCrudController
     protected function renderEditionTemplate()
     {
         return $this->render(
-                'feature-edit',
-                array(
-                        'feature_id' => $this->getRequest()->get('feature_id'),
-                        'featureav_order' => $this->getFeatureAvListOrder()
-                )
+            'feature-edit',
+            array(
+                    'feature_id' => $this->getRequest()->get('feature_id'),
+                    'featureav_order' => $this->getFeatureAvListOrder()
+            )
         );
     }
 
@@ -216,9 +211,9 @@ class FeatureController extends AbstractCrudController
     protected function getFeatureAvListOrder()
     {
         return $this->getListOrderFromSession(
-                'featureav',
-                'featureav_order',
-                'manual'
+            'featureav',
+            'featureav_order',
+            'manual'
         );
     }
 
@@ -228,11 +223,12 @@ class FeatureController extends AbstractCrudController
     protected function addRemoveFromAllTemplates($eventType)
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         try {
             if (null !== $object = $this->getExistingObject()) {
-
                 $event = new FeatureEvent($object);
 
                 $this->dispatch($eventType, $event);

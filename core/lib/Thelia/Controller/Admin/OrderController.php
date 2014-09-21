@@ -32,7 +32,9 @@ class OrderController extends BaseAdminController
 {
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::VIEW)) {
+            return $response;
+        }
         return $this->render("orders", array(
                 "display_order" => 20,
                 "orders_order"   => $this->getListOrderFromSession("orders", "orders_order", "create-date-reverse")
@@ -48,13 +50,15 @@ class OrderController extends BaseAdminController
 
     public function updateStatus($order_id = null)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $message = null;
 
         try {
             if ($order_id === null) {
-               $order_id = $this->getRequest()->get("order_id");
+                $order_id = $this->getRequest()->get("order_id");
             }
 
             $order = OrderQuery::create()->findPk($order_id);
@@ -91,7 +95,7 @@ class OrderController extends BaseAdminController
         } else {
             $params["tab"] = $this->getRequest()->get("tab", 'cart');
 
-            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params, [ 'order_id' => $order_id ] );
+            $response = $this->generateRedirectFromRoute("admin.order.update.view", $params, [ 'order_id' => $order_id ]);
         }
 
         return $response;
@@ -99,7 +103,9 @@ class OrderController extends BaseAdminController
 
     public function updateDeliveryRef($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $message = null;
 
@@ -129,13 +135,17 @@ class OrderController extends BaseAdminController
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", $params, [ 'order_id' => $order_id ]
+            "admin.order.update.view",
+            $params,
+            [ 'order_id' => $order_id ]
         );
     }
 
     public function updateAddress($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $message = null;
 
@@ -186,20 +196,25 @@ class OrderController extends BaseAdminController
         $params["tab"] = $this->getRequest()->get("tab", 'bill');
 
         return $this->generateRedirectFromRoute(
-            "admin.order.update.view", $params, [ 'order_id' => $order_id ]
+            "admin.order.update.view",
+            $params,
+            [ 'order_id' => $order_id ]
         );
-
     }
 
     public function generateInvoicePdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_invoice_file', 'invoice'));
     }
 
     public function generateDeliveryPdf($order_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ORDER, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
         return $this->generateBackOfficeOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
@@ -207,11 +222,12 @@ class OrderController extends BaseAdminController
     {
         if (null === $response = $this->generateOrderPdf($order_id, $fileName)) {
             return $this->generateRedirectFromRoute(
-                "admin.order.update.view", [], ['order_id' => $order_id ]
+                "admin.order.update.view",
+                [],
+                ['order_id' => $order_id ]
             );
         }
 
         return $response;
     }
-
 }

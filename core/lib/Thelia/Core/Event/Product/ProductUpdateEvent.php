@@ -113,5 +113,4 @@ class ProductUpdateEvent extends ProductCreateEvent
     {
         return $this->virtual_document_id;
     }
-
 }

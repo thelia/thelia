@@ -63,9 +63,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeUpdateEvent $event)
     {
-
         if (null !== $attribute = AttributeQuery::create()->findPk($event->getAttributeId())) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
 
@@ -88,9 +86,7 @@ class Attribute extends BaseAction implements EventSubscriberInterface
      */
     public function delete(AttributeDeleteEvent $event)
     {
-
         if (null !== ($attribute = AttributeQuery::create()->findPk($event->getAttributeId()))) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
@@ -115,7 +111,6 @@ class Attribute extends BaseAction implements EventSubscriberInterface
         $templates = TemplateQuery::create()->find();
 
         foreach ($templates as $template) {
-
             $attribute_template = new AttributeTemplate();
 
             if (null === AttributeTemplateQuery::create()->filterByAttribute($attribute)->filterByTemplate($template)->findOne()) {

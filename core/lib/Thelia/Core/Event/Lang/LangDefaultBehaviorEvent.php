@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Lang;
+
 use Thelia\Core\Event\ActionEvent;
 
 /**
@@ -45,5 +46,4 @@ class LangDefaultBehaviorEvent extends ActionEvent
     {
         return $this->defaultBehavior;
     }
-
 }

@@ -45,7 +45,6 @@ class ProductTest extends BaseLoopTestor
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
         if (null === $product) {
-
             $product = new \Thelia\Model\Product();
             $product->setDefaultCategory(0);
             $product->setVisible(1);
@@ -65,7 +64,6 @@ class ProductTest extends BaseLoopTestor
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
         if (null === $product) {
-
             $product = new \Thelia\Model\Product();
             $product->setDefaultCategory(0);
             $product->setVisible(1);

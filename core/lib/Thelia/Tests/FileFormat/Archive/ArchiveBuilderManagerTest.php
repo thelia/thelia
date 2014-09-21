@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Archive;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
@@ -125,5 +126,4 @@ class ArchiveBuilderManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->manager->delete("foo");
     }
-
 }

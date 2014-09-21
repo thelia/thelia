@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Controller;
+
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder;
@@ -29,7 +30,6 @@ use Thelia\Core\FileFormat\Formatting\FormatterManager;
  */
 trait ImportExportControllerTrait
 {
-
     /**
      * @return mixed
      */
@@ -74,5 +74,4 @@ trait ImportExportControllerTrait
 
         $container->set("thelia.manager.formatter_manager", $formatterManager);
     }
-
 }

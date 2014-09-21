@@ -55,9 +55,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function update(AttributeAvUpdateEvent $event)
     {
-
         if (null !== $attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId())) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
 
@@ -80,9 +78,7 @@ class AttributeAv extends BaseAction implements EventSubscriberInterface
      */
     public function delete(AttributeAvDeleteEvent $event)
     {
-
         if (null !== ($attribute = AttributeAvQuery::create()->findPk($event->getAttributeAvId()))) {
-
             $attribute
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

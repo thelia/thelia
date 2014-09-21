@@ -26,7 +26,6 @@ use Thelia\Model\NewsletterQuery;
  */
 class NewsletterForm extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

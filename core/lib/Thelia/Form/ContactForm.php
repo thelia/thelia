@@ -23,7 +23,6 @@ use Thelia\Core\Translation\Translator;
  */
 class ContactForm extends FirewallForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

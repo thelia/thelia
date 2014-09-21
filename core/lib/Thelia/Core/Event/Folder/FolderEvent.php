@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Folder;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Folder;
 
@@ -58,5 +59,4 @@ class FolderEvent extends ActionEvent
     {
         return null !== $this->folder;
     }
-
 }

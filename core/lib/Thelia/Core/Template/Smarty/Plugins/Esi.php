@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Smarty\Plugins;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Fragment\EsiFragmentRenderer;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -24,7 +25,6 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
  */
 class Esi extends AbstractSmartyPlugin
 {
-
     protected $esiFragmentRender;
     protected $request;
 

@@ -50,7 +50,6 @@ class CartItem extends BaseCartItem
         }
 
         if (ConfigQuery::checkAvailableStock()) {
-
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 
@@ -72,7 +71,6 @@ class CartItem extends BaseCartItem
         $newQuantity = $currentQuantity + $value;
 
         if (ConfigQuery::checkAvailableStock()) {
-
             $productSaleElements = $this->getProductSaleElements();
             $product = $productSaleElements->getProduct();
 

@@ -93,5 +93,4 @@ class ImageDeleteEvent extends FileDeleteEvent
     {
         return parent::getFileToDelete();
     }
-
 }

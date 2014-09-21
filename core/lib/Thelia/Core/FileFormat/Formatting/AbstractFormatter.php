@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting;
+
 use Thelia\Core\FileFormat\FormatInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;

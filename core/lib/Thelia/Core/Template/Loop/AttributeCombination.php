@@ -92,14 +92,12 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Thelia\Model\AttributeCombination $attributeCombination */
         foreach ($loopResult->getResultDataCollection() as $attributeCombination) {
-
             $loopResultRow = new LoopResultRow($attributeCombination);
 
             $loopResultRow
@@ -121,6 +119,5 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
         }
 
         return $loopResult;
-
     }
 }

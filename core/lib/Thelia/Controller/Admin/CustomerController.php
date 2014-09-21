@@ -31,17 +31,14 @@ class CustomerController extends AbstractCrudController
 {
     public function __construct()
     {
-
         parent::__construct(
-                'customer',
-                'lastname',
-                'customer_order',
-
-                AdminResources::CUSTOMER,
-
-                TheliaEvents::CUSTOMER_CREATEACCOUNT,
-                TheliaEvents::CUSTOMER_UPDATEACCOUNT,
-                TheliaEvents::CUSTOMER_DELETEACCOUNT
+            'customer',
+            'lastname',
+            'customer_order',
+            AdminResources::CUSTOMER,
+            TheliaEvents::CUSTOMER_CREATEACCOUNT,
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT,
+            TheliaEvents::CUSTOMER_DELETEACCOUNT
         );
     }
 
@@ -107,15 +104,15 @@ class CustomerController extends AbstractCrudController
         );
 
         if ($address !== null) {
-                $data['company']   = $address->getCompany();
-                $data['address1']  = $address->getAddress1();
-                $data['address2']  = $address->getAddress2();
-                $data['address3']  = $address->getAddress3();
-                $data['phone']     = $address->getPhone();
-                $data['cellphone'] = $address->getCellphone();
-                $data['zipcode']   = $address->getZipcode();
-                $data['city']      = $address->getCity();
-                $data['country']   = $address->getCountryId();
+            $data['company']   = $address->getCompany();
+            $data['address1']  = $address->getAddress1();
+            $data['address2']  = $address->getAddress2();
+            $data['address3']  = $address->getAddress3();
+            $data['phone']     = $address->getPhone();
+            $data['cellphone'] = $address->getCellphone();
+            $data['zipcode']   = $address->getZipcode();
+            $data['city']      = $address->getCity();
+            $data['country']   = $address->getCountryId();
         }
 
         // A loop is used in the template
@@ -134,25 +131,25 @@ class CustomerController extends AbstractCrudController
     private function createEventInstance($data)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-                $data["title"],
-                $data["firstname"],
-                $data["lastname"],
-                $data["address1"],
-                $data["address2"],
-                $data["address3"],
-                $data["phone"],
-                $data["cellphone"],
-                $data["zipcode"],
-                $data["city"],
-                $data["country"],
-                isset($data["email"])?$data["email"]:null,
-                isset($data["password"]) && ! empty($data["password"]) ? $data["password"]:null,
-                $this->getRequest()->getSession()->getLang()->getId(),
-                isset($data["reseller"])?$data["reseller"]:null,
-                isset($data["sponsor"])?$data["sponsor"]:null,
-                isset($data["discount"])?$data["discount"]:null,
-                isset($data["company"])?$data["company"]:null,
-                null
+            $data["title"],
+            $data["firstname"],
+            $data["lastname"],
+            $data["address1"],
+            $data["address2"],
+            $data["address3"],
+            $data["phone"],
+            $data["cellphone"],
+            $data["zipcode"],
+            $data["city"],
+            $data["country"],
+            isset($data["email"])?$data["email"]:null,
+            isset($data["password"]) && ! empty($data["password"]) ? $data["password"]:null,
+            $this->getRequest()->getSession()->getLang()->getId(),
+            isset($data["reseller"])?$data["reseller"]:null,
+            isset($data["sponsor"])?$data["sponsor"]:null,
+            isset($data["discount"])?$data["discount"]:null,
+            isset($data["company"])?$data["company"]:null,
+            null
         );
 
         return $customerCreateEvent;
@@ -183,7 +180,9 @@ class CustomerController extends AbstractCrudController
 
     protected function renderListTemplate($currentOrder, $customParams = array())
     {
-        return $this->render('customers', array_merge(array(
+        return $this->render(
+            'customers',
+            array_merge(array(
                 'customer_order'   => $currentOrder,
                 'page'             => $this->getRequest()->get('page', 1)
             ), $customParams)

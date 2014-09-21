@@ -70,7 +70,8 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         // Check that at least one category is selected
         if (empty($values[self::COUNTRIES_LIST])) {
             throw new InvalidConditionValueException(
-                get_class(), self::COUNTRIES_LIST
+                get_class(),
+                self::COUNTRIES_LIST
             );
         }
 
@@ -102,7 +103,8 @@ abstract class AbstractMatchCountries extends ConditionAbstract
     public function getSummary()
     {
         $i18nOperator = Operators::getI18n(
-            $this->translator, $this->operators[self::COUNTRIES_LIST]
+            $this->translator,
+            $this->operators[self::COUNTRIES_LIST]
         );
 
         $cntryStrList = '';
@@ -110,7 +112,6 @@ abstract class AbstractMatchCountries extends ConditionAbstract
         $cntryIds = $this->values[self::COUNTRIES_LIST];
 
         if (null !== $cntryList = CountryQuery::create()->findPks($cntryIds)) {
-
             /** @var Country $cntry */
             foreach ($cntryList as $cntry) {
                 $cntryStrList .= $cntry->getTitle() . ', ';
@@ -141,7 +142,9 @@ abstract class AbstractMatchCountries extends ConditionAbstract
      */
     public function drawBackOfficeInputs()
     {
-        return $this->facade->getParser()->render('coupon/condition-fragments/countries-condition.html', [
+        return $this->facade->getParser()->render(
+            'coupon/condition-fragments/countries-condition.html',
+            [
                 'operatorSelectHtml'   => $this->drawBackOfficeInputOperators(self::COUNTRIES_LIST),
                 'countries_field_name' => self::COUNTRIES_LIST,
                 'values'               => isset($this->values[self::COUNTRIES_LIST]) ? $this->values[self::COUNTRIES_LIST] : array(),

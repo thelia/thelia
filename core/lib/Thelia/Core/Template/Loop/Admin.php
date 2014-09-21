@@ -66,7 +66,6 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
         $search->orderByFirstname(Criteria::ASC);
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -85,6 +84,5 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

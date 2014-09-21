@@ -19,7 +19,6 @@ class Currency extends BaseCurrency
     public static function getDefaultCurrency()
     {
         if (null === self::$defaultCurrency) {
-
             self::$defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
 
             if (null === self::$defaultCurrency) {

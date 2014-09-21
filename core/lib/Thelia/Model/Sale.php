@@ -80,7 +80,6 @@ class Sale extends BaseSale
 
         /** @var SaleProduct $saleProduct */
         foreach ($saleProducts as $saleProduct) {
-
             if ($currentProduct != $saleProduct->getProductId()) {
                 $currentProduct = $saleProduct->getProductId();
 

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Tax;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Tax;
 

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Administrator;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Admin;
 
@@ -21,7 +22,6 @@ use Thelia\Model\Admin;
  */
 class AdministratorUpdatePasswordEvent extends ActionEvent
 {
-
     /**
      * @var \Thelia\Model\Admin
      */
@@ -72,5 +72,4 @@ class AdministratorUpdatePasswordEvent extends ActionEvent
     {
         return $this->admin;
     }
-
 }

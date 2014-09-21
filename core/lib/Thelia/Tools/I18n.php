@@ -66,8 +66,10 @@ class I18n
                     Lang::getDefaultLanguage()->getLocale()
                 )->findOne();
         }
-        if (null === $i18n) { // @todo something else ?
-            $i18n = new $i18nClass();;
+        if (null === $i18n) {
+            // @todo something else ?
+            $i18n = new $i18nClass();
+            ;
             $i18n->setId($id);
             foreach ($needed as $need) {
                 $method = sprintf('set%s', $need);

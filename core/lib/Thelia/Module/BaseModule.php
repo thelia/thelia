@@ -102,7 +102,6 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $con->rollBack();
                 throw $e;
             }
-
         }
     }
 
@@ -261,13 +260,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         foreach ($directoryBrowser as $directoryContent) {
             /* is it a file ? */
             if ($directoryContent->isFile()) {
-
                 $fileName = $directoryContent->getFilename();
                 $filePath = $directoryContent->getPathName();
 
                 /* is it a picture ? */
                 if ( Image::isImage($filePath) ) {
-
                     $con->beginTransaction();
 
                     $image = new ModuleImage();
@@ -616,7 +613,6 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $event = new HookUpdateEvent($hookModel->getId());
 
                 foreach ($updateData as $locale => $data) {
-
                     $event
                         ->setCode($hookModel->getCode())
                         ->setNative($hookModel->getNative())

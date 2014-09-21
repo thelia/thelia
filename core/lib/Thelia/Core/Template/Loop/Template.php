@@ -58,14 +58,15 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     {
         $type = $this->getArg('template-type')->getValue();
 
-        if ($type == 'front-office')
+        if ($type == 'front-office') {
             $templateType = TemplateDefinition::FRONT_OFFICE;
-        else if ($type == 'back-office')
+        } elseif ($type == 'back-office') {
             $templateType = TemplateDefinition::BACK_OFFICE;
-        else if ($type == 'pdf')
+        } elseif ($type == 'pdf') {
             $templateType = TemplateDefinition::PDF;
-        else if ($type == 'email')
+        } elseif ($type == 'email') {
             $templateType = TemplateDefinition::EMAIL;
+        }
 
         return TemplateHelper::getInstance()->getList($templateType);
     }
@@ -73,7 +74,6 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $template) {
-
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow

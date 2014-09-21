@@ -64,8 +64,7 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    )
-    {
+    ) {
         parent::set(
             $facade, $code, $title, $shortDescription, $description, $effects,
             $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
@@ -76,7 +75,9 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
         $this->attributeAvList = isset($effects[self::ATTRIBUTES_AV_LIST]) ? $effects[self::ATTRIBUTES_AV_LIST] : array();
 
-        if (! is_array($this->attributeAvList)) $this->attributeAvList = array($this->attributeAvList);
+        if (! is_array($this->attributeAvList)) {
+            $this->attributeAvList = array($this->attributeAvList);
+        }
 
         $this->attribute = isset($effects[self::ATTRIBUTE]) ? $effects[self::ATTRIBUTE] : 0;
 
@@ -98,7 +99,6 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
         /** @var CartItem $cartItem */
         foreach ($cartItems as $cartItem) {
-
             if (! $cartItem->getPromo() || $this->isAvailableOnSpecialOffers()) {
                 $productSaleElements = $cartItem->getProductSaleElements();
 
@@ -106,7 +106,6 @@ abstract class AbstractRemoveOnAttributeValues extends CouponAbstract implements
 
                 /** @var AttributeCombination $combination */
                 foreach ($combinations as $combination) {
-
                     $attrValue = $combination->getAttributeAvId();
 
                     if (in_array($attrValue, $this->attributeAvList)) {

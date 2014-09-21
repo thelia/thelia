@@ -45,15 +45,12 @@ class Cart extends BaseCart
 
         $cart->save();
         foreach ($cartItems as $cartItem) {
-
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
             if ($product &&
                 $productSaleElements &&
                 $product->getVisible() == 1 &&
-                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock()))
-            {
-
+                ($productSaleElements->getQuantity() >= $cartItem->getQuantity() || $product->getVirtual() === 1 || ! ConfigQuery::checkAvailableStock())) {
                 $item = new CartItem();
                 $item->setCart($cart);
                 $item->setProductId($cartItem->getProductId());
@@ -68,7 +65,6 @@ class Cart extends BaseCart
                 $item->save();
                 $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
-
         }
         $this->delete();
 
@@ -184,5 +180,4 @@ class Cart extends BaseCart
 
         return true;
     }
-
 }

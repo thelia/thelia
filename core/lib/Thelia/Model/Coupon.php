@@ -40,7 +40,6 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
  */
 class Coupon extends BaseCoupon
 {
-
     // Define the value of an unlimited coupon usage.
     const UNLIMITED_COUPON_USE = -1;
 
@@ -109,8 +108,9 @@ class Coupon extends BaseCoupon
             CouponModuleQuery::create()->filterByCouponId($this->id)->delete();
 
             foreach ($freeShippingForCountries as $countryId) {
-
-                if ($countryId <= 0) continue;
+                if ($countryId <= 0) {
+                    continue;
+                }
 
                 $couponCountry = new CouponCountry();
 
@@ -122,8 +122,9 @@ class Coupon extends BaseCoupon
             }
 
             foreach ($freeShippingForMethods as $moduleId) {
-
-                if ($moduleId <= 0) continue;
+                if ($moduleId <= 0) {
+                    continue;
+                }
 
                 $couponModule = new CouponModule();
 
@@ -135,9 +136,7 @@ class Coupon extends BaseCoupon
             }
 
             $con->commit();
-
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -284,14 +283,12 @@ class Coupon extends BaseCoupon
         $usageLeft = $this->getMaxUsage();
 
         if ($this->getPerCustomerUsageCount()) {
-
-             // Get usage left for current customer. If the record is not found,
+            // Get usage left for current customer. If the record is not found,
             // it means that the customer has not yes used this coupon.
             if (null !== $couponCustomerCount = CouponCustomerCountQuery::create()
                     ->filterByCouponId($this->getId())
                     ->filterByCustomerId($customerId)
                     ->findOne()) {
-
                 // The coupon has already been used -> remove this customer's usage count
                 $usageLeft -= $couponCustomerCount->getCount();
             }

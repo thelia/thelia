@@ -6,5 +6,4 @@ use Thelia\Model\Base\ProductSaleElementsProductDocument as BaseProductSaleEleme
 
 class ProductSaleElementsProductDocument extends BaseProductSaleElementsProductDocument
 {
-
 }

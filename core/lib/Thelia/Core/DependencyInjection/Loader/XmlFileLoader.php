@@ -50,7 +50,6 @@ use Thelia\Model\Map\ImportTableMap;
  */
 class XmlFileLoader extends FileLoader
 {
-
     /**
      * Loads an XML file.
      *
@@ -297,7 +296,6 @@ class XmlFileLoader extends FileLoader
      */
     protected function parseService($id, $service, $file)
     {
-
         if ((string) $service['alias']) {
             $public = true;
             if (isset($service['public'])) {
@@ -417,7 +415,6 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-
             /** @var SimpleXMLElement $export */
             foreach ($exports as $export) {
                 $id = (string) $export->getAttributeAsPhp("id");
@@ -498,7 +495,6 @@ class XmlFileLoader extends FileLoader
         $con->beginTransaction();
 
         try {
-
             /** @var SimpleXMLElement $importCategory */
             foreach ($importCategories as $importCategory) {
                 $id = (string) $importCategory->getAttributeAsPhp("id");
@@ -524,7 +520,6 @@ class XmlFileLoader extends FileLoader
                         ->save($con);
                     ;
                 }
-
             }
 
             $con->commit();

@@ -163,14 +163,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Thelia\Model\Module $module */
         foreach ($loopResult->getResultDataCollection() as $module) {
-
             try {
                 new \ReflectionClass($module->getFullNamespace());
 
@@ -273,6 +271,5 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

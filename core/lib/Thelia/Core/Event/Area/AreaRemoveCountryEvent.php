@@ -19,5 +19,4 @@ namespace Thelia\Core\Event\Area;
  */
 class AreaRemoveCountryEvent extends AreaAddCountryEvent
 {
-
 }

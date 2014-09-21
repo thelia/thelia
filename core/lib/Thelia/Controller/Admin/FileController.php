@@ -78,7 +78,6 @@ class FileController extends BaseAdminController
         $this->checkXmlHttpRequest();
 
         if ($this->getRequest()->isMethod('POST')) {
-
             /** @var UploadedFile $fileBeingUploaded */
             $fileBeingUploaded = $this->getRequest()->files->get('file');
 
@@ -335,10 +334,10 @@ class FileController extends BaseAdminController
             'redirectUrl' => $redirectUrl,
             'formId' => $imageModel->getUpdateFormId(),
             'breadcrumb' => $image->getBreadcrumb(
-                    $this->getRouter($this->getCurrentRouter()),
-                    $this->container,
-                    'images',
-                    $this->getCurrentEditionLocale()
+                $this->getRouter($this->getCurrentRouter()),
+                $this->container,
+                'images',
+                $this->getCurrentEditionLocale()
             )
         ));
     }
@@ -370,10 +369,10 @@ class FileController extends BaseAdminController
             'redirectUrl' => $redirectUrl,
             'formId' => $documentModel->getUpdateFormId(),
             'breadcrumb' => $document->getBreadcrumb(
-                    $this->getRouter($this->getCurrentRouter()),
-                    $this->container,
-                    'documents',
-                    $this->getCurrentEditionLocale()
+                $this->getRouter($this->getCurrentRouter()),
+                $this->container,
+                'documents',
+                $this->getCurrentEditionLocale()
             )
         ));
     }
@@ -450,16 +449,18 @@ class FileController extends BaseAdminController
 
             $fileUpdated = $event->getModel();
 
-            $this->adminLogAppend(AdminResources::retrieve($parentType), AccessManager::UPDATE,
+            $this->adminLogAppend(
+                AdminResources::retrieve($parentType),
+                AccessManager::UPDATE,
                 sprintf('%s with Ref %s (ID %d) modified', ucfirst($objectType), $fileUpdated->getTitle(), $fileUpdated->getId())
             );
 
             if ($this->getRequest()->get('save_mode') == 'close') {
-
-                if ($objectType == 'document')
+                if ($objectType == 'document') {
                     $tab = 'documents';
-                else
+                } else {
                     $tab = 'images';
+                }
 
                 return $this->generateRedirect(
                     URL::getInstance()->absoluteUrl($file->getRedirectionUrl(), ['current_tab' => $tab])
@@ -467,7 +468,6 @@ class FileController extends BaseAdminController
             } else {
                 return $this->generateSuccessRedirect($fileUpdateForm);
             }
-
         } catch (FormValidationException $e) {
             $message = sprintf('Please check your input: %s', $e->getMessage());
         } catch (PropelException $e) {
@@ -543,7 +543,6 @@ class FileController extends BaseAdminController
                 'formId' => $documentInstance->getUpdateFormId()
             ));
         }
-
     }
 
     /**
@@ -673,13 +672,12 @@ class FileController extends BaseAdminController
 
         // Dispatch Event to the Action
         try {
-            $this->dispatch($eventName,$event);
+            $this->dispatch($eventName, $event);
         } catch (\Exception $e) {
-
             $message = $this->getTranslator()->trans(
-                    'Fail to update %type% position: %err%',
-                    [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
-             );
+                'Fail to update %type% position: %err%',
+                [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
+            );
         }
 
         if (null === $message) {
@@ -734,7 +732,6 @@ class FileController extends BaseAdminController
         try {
             $this->dispatch($eventName, $event);
         } catch (\Exception $e) {
-
             $message = $this->getTranslator()->trans(
                 'Fail to update %type% visibility: %err%',
                 [ '%type%' => $objectType, '%err%' => $e->getMessage() ]
@@ -760,5 +757,4 @@ class FileController extends BaseAdminController
     {
         return $this->toggleVisibilityFileAction($documentId, $parentType, 'image', TheliaEvents::IMAGE_TOGGLE_VISIBILITY);
     }
-
 }

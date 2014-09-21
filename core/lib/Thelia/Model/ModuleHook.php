@@ -19,5 +19,4 @@ class ModuleHook extends BaseModuleHook
     {
         $query->filterByHookId($this->getHookId());
     }
-
 }

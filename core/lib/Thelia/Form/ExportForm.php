@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form;
+
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\HttpFoundation\Request;
@@ -94,5 +95,4 @@ class ExportForm extends BaseForm
             );
         }
     }
-
 }

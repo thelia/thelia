@@ -101,7 +101,6 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -121,6 +120,5 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         }
 
         return $loopResult;
-
     }
 }

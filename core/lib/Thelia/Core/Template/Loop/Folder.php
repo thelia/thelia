@@ -107,7 +107,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
         }
 
-         $exclude = $this->getExclude();
+        $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
@@ -131,7 +131,9 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $orders  = $this->getOrder();
 
@@ -158,7 +160,6 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -190,6 +191,5 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         }
 
         return $loopResult;
-
     }
 }

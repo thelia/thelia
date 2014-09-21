@@ -67,13 +67,11 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
     {
         foreach ($loopResult->getResultDataCollection() as $template) {
-
             $loopResultRow = new LoopResultRow($template);
 
             $loopResultRow

@@ -65,7 +65,6 @@ class ModuleConfigTest extends BaseLoopTestor
 
     public function testGetVariableWithDefault()
     {
-
         $this->instance->initializeArgs([
                 "type" => "module-config",
                 "name" => "testGetVariable",

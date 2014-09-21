@@ -27,7 +27,6 @@ use Thelia\Form\Image\DocumentModification;
  */
 class ProductDocumentModification extends DocumentModification
 {
-
     /**
      * Get form name
      * This name must be unique

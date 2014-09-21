@@ -93,5 +93,4 @@ class DocumentDeleteEvent extends FileDeleteEvent
     {
         return parent::getFileToDelete();
     }
-
 }

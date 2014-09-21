@@ -54,7 +54,6 @@ class AccessManager
         }
 
         return $this->accessGranted[$type];
-
     }
 
     public static function getMaxAccessValue()

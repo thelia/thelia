@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
+
 use Thelia\Model\Content;
 
 /**
@@ -20,7 +21,6 @@ use Thelia\Model\Content;
  */
 class ContentRewritingTest extends BaseRewritingObject
 {
-
     /**
      * @return \Thelia\Model\Content
      */

@@ -25,7 +25,6 @@ use Thelia\Core\Event\Feature\FeatureCreateEvent;
  */
 class FeatureTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $dispatcher;
 
     public function setUp()
@@ -54,7 +53,6 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("test feature", $createdFeature->getTitle());
 
         return $createdFeature;
-
     }
 
     /**
@@ -106,7 +104,5 @@ class FeatureTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\Feature', $deletedFeature);
 
         $this->assertTrue($deletedFeature->isDeleted());
-
     }
-
 }

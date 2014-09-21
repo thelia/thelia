@@ -24,8 +24,9 @@ class EnumType extends BaseType
 
     public function __construct($values = array())
     {
-        if(is_array($values))
+        if (is_array($values)) {
             $this->values = $values;
+        }
     }
 
     public function getType()

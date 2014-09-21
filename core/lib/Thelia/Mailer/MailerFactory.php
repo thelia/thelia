@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Mailer;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\MailTransporterEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -39,7 +40,6 @@ class MailerFactory
 
     public function __construct(EventDispatcherInterface $dispatcher, ParserInterface $parser)
     {
-
         $this->dispatcher = $dispatcher;
         $this->parser    = $parser;
 
@@ -114,7 +114,7 @@ class MailerFactory
             $messageParameters,
             $customer->getCustomerLang()->getLocale()
         );
-     }
+    }
 
     /**
      * Send a message to the shop managers.
@@ -141,7 +141,7 @@ class MailerFactory
             $to,
             $messageParameters
         );
-     }
+    }
 
     /**
      * Send a message to the customer.
@@ -157,7 +157,6 @@ class MailerFactory
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
-
             $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale);
 
             $sentCount = $this->send($instance, $failedRecipients);
@@ -205,12 +204,14 @@ class MailerFactory
         $instance = \Swift_Message::newInstance();
 
         // Add from addresses
-        foreach($from as $address => $name)
+        foreach ($from as $address => $name) {
             $instance->addFrom($address, $name);
+        }
 
         // Add to addresses
-        foreach($to as $address => $name)
+        foreach ($to as $address => $name) {
             $instance->addTo($address, $name);
+        }
 
         $message->buildMessage($this->parser, $instance);
 

@@ -32,7 +32,6 @@ use Thelia\Tools\Password;
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {
-
     /**
      * Configures the current command.
      */
@@ -80,7 +79,5 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
             sprintf('<info>new password is : %s</info>', $password),
             ''
         ));
-
     }
-
 }

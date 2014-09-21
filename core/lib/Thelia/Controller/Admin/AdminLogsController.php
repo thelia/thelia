@@ -20,7 +20,9 @@ class AdminLogsController extends BaseAdminController
 {
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::ADMIN_LOG, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Render the edition template.
         return $this->render('admin-logs');
@@ -30,14 +32,13 @@ class AdminLogsController extends BaseAdminController
     {
         $entries = array();
 
-        foreach( AdminLogQuery::getEntries(
-                    $this->getRequest()->request->get('admins', array()),
-                    $this->getRequest()->request->get('fromDate', null),
-                    $this->getRequest()->request->get('toDate', null),
-                    array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array())),
-                    null
-                ) as $entry) {
-
+        foreach (AdminLogQuery::getEntries(
+            $this->getRequest()->request->get('admins', array()),
+            $this->getRequest()->request->get('fromDate', null),
+            $this->getRequest()->request->get('toDate', null),
+            array_merge($this->getRequest()->request->get('resources', array()), $this->getRequest()->request->get('modules', array())),
+            null
+        ) as $entry) {
             $entries[] = array(
                 "head" => sprintf(
                     "[%s][%s][%s:%s]",

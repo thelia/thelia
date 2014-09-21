@@ -57,9 +57,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function modify(MessageUpdateEvent $event)
     {
-
         if (null !== $message = MessageQuery::create()->findPk($event->getMessageId())) {
-
             $message
                 ->setDispatcher($event->getDispatcher())
 
@@ -92,9 +90,7 @@ class Message extends BaseAction implements EventSubscriberInterface
      */
     public function delete(MessageDeleteEvent $event)
     {
-
         if (null !== ($message = MessageQuery::create()->findPk($event->getMessageId()))) {
-
             $message
                 ->setDispatcher($event->getDispatcher())
                 ->delete()

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Archive\ArchiveBuilder;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\ZipArchiveBuilder;
 use Thelia\Core\Translation\Translator;
@@ -405,5 +406,4 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
             $this, "bar"
         );
     }
-
 }

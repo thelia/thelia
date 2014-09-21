@@ -93,7 +93,6 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
     public function buildModelCriteria()
     {
-
         $search = BrandQuery::create();
 
         /* manage translations */
@@ -113,7 +112,9 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
 
         $visible = $this->getVisible();
 
-        if ($visible !== BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
+        if ($visible !== BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible ? 1 : 0);
+        }
 
         $title = $this->getTitle();
 
@@ -177,7 +178,6 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)

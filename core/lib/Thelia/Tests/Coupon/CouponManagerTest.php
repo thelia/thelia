@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon;
+
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -32,7 +33,6 @@ use Thelia\Model\Order;
  */
 class CouponManagerTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.

@@ -47,7 +47,9 @@ class FolderQuery extends BaseFolderQuery
         } else {
             $currentPosition++;
 
-            if($depth == $currentPosition && $depth != 0) return;
+            if ($depth == $currentPosition && $depth != 0) {
+                return;
+            }
 
             $categories = self::create()
                 ->filterByParent($folderId)

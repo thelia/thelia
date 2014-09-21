@@ -46,12 +46,9 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
     */
     public function __construct(
         $objectName,
-
         $defaultListOrder = null,
         $orderRequestParameterName = null,
-
         $resourceCode,
-
         $createEventIdentifier,
         $updateEventIdentifier,
         $deleteEventIdentifier,
@@ -59,8 +56,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $changePositionEventIdentifier = null,
         $updateSeoEventIdentifier = null,
         $moduleCode = null
-    )
-    {
+    ) {
         parent::__construct(
             $objectName,
             $defaultListOrder,
@@ -75,7 +71,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         );
 
         $this->updateSeoEventIdentifier = $updateSeoEventIdentifier;
-
     }
 
     /**
@@ -105,7 +100,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      */
     protected function getUpdateSeoEvent($formData)
     {
-
         $updateSeoEvent = new UpdateSeoEvent($formData['id']);
 
         $updateSeoEvent
@@ -167,7 +161,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
         $this->getRequest()->attributes->set($this->objectName . '_id', $this->getRequest()->get('current_id'));
 
         try {
-
             // Check the form against constraints violations
             $form = $this->validateForm($updateSeoForm, "POST");
 
@@ -205,7 +198,6 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
 
         // Load object if exist
         if (null !== $object = $this->getExistingObject()) {
-
             // Hydrate the form abd pass it to the parser
             $changeForm = $this->hydrateObjectForm($object);
 

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Form\Lang;
+
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Translation\Translator;
@@ -22,7 +23,6 @@ use Thelia\Core\Translation\Translator;
  */
 class LangCreateForm extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

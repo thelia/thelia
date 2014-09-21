@@ -35,9 +35,7 @@ class ConfigController extends AbstractCrudController
             'variable',
             'name',
             'order',
-
             AdminResources::CONFIG,
-
             TheliaEvents::CONFIG_CREATE,
             TheliaEvents::CONFIG_UPDATE,
             TheliaEvents::CONFIG_DELETE,
@@ -175,12 +173,14 @@ class ConfigController extends AbstractCrudController
     /**
      * Change values modified directly from the variable list
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function changeValuesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $variables = $this->getRequest()->get('variable', array());
 

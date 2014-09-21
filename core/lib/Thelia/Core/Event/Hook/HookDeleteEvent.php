@@ -43,5 +43,4 @@ class HookDeleteEvent extends HookEvent
     {
         return $this->hook_id;
     }
-
 }

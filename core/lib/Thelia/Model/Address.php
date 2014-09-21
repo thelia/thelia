@@ -17,7 +17,6 @@ class Address extends BaseAddress
      */
     public function makeItDefault()
     {
-
         AddressQuery::create()->filterByCustomerId($this->getCustomerId())
             ->update(array('IsDefault' => '0'));
 
@@ -91,5 +90,4 @@ class Address extends BaseAddress
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETEADDRESS, new AddressEvent($this));
     }
-
 }

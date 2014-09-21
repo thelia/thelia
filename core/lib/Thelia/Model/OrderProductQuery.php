@@ -16,5 +16,4 @@ use Thelia\Model\Base\OrderProductQuery as BaseOrderProductQuery;
  */
 class OrderProductQuery extends BaseOrderProductQuery
 {
-
 } // OrderProductQuery

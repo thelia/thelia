@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -86,7 +87,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-
         $session = new Session(new MockArraySessionStorage());
 
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
@@ -125,7 +125,6 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* fill cart */
         $this->cart = $this->fillCart();
-
     }
 
     public function loadCustomer()

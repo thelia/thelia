@@ -48,7 +48,9 @@ class CategoryQuery extends BaseCategoryQuery
         } else {
             $currentPos++;
 
-            if($depth == $currentPos && $depth != 0) return;
+            if ($depth == $currentPos && $depth != 0) {
+                return;
+            }
 
             $categories = self::create()
                 ->filterByParent($categoryId)

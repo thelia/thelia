@@ -104,5 +104,4 @@ class FolderCreateEvent extends FolderEvent
     {
         return $this->visible;
     }
-
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Controller;
+
 use Thelia\Controller\BaseController;
 use Thelia\Tests\ContainerAwareTestCase;
 
@@ -30,12 +31,10 @@ abstract class ControllerTestBase extends ContainerAwareTestCase
 
         $this->controller = $this->getController();
         $this->controller->setContainer($this->container);
-
     }
 
     /**
      * @return \Thelia\Controller\BaseController The controller you want to test
      */
     abstract protected function getController();
-
 }

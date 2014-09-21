@@ -78,8 +78,9 @@ abstract class BaseCachedFile extends BaseAction
 
         /** @var \DirectoryIterator $fileinfo */
         foreach ($iterator as $fileinfo) {
-
-            if ($fileinfo->isDot()) continue;
+            if ($fileinfo->isDot()) {
+                continue;
+            }
 
             if ($fileinfo->isFile() || $fileinfo->isLink()) {
                 @unlink($fileinfo->getPathname());
@@ -92,7 +93,7 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the absolute URL to the cached file
      *
-     * @param  string $subdir        the subdirectory related to cache base
+     * @param  string $subdir the subdirectory related to cache base
      * @param  string $safe_filename the safe filename, as returned by getCacheFilePath()
      * @return string the absolute URL to the cached file
      */
@@ -106,10 +107,10 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the full path of the cached file
      *
-     * @param  string  $subdir            the subdirectory related to cache base
-     * @param  string  $filename          the filename
+     * @param  string $subdir the subdirectory related to cache base
+     * @param  string $filename the filename
      * @param  boolean $forceOriginalFile if true, the original file path in the cache dir is returned.
-     * @param  string  $hashed_options    a hash of transformation options, or null if no transformations have been applied
+     * @param  string $hashed_options a hash of transformation options, or null if no transformations have been applied
      * @return string  the cache directory path relative to Web Root
      */
     protected function getCacheFilePath($subdir, $filename, $forceOriginalFile = false, $hashed_options = null)
@@ -118,11 +119,12 @@ abstract class BaseCachedFile extends BaseAction
 
         $safe_filename = preg_replace("[^:alnum:\-\._]", "-", strtolower(basename($filename)));
 
-       // Keep original safe name if no tranformations are applied
-       if ($forceOriginalFile || $hashed_options == null)
+        // Keep original safe name if no tranformations are applied
+        if ($forceOriginalFile || $hashed_options == null) {
             return sprintf("%s/%s", $path, $safe_filename);
-        else
+        } else {
             return sprintf("%s/%s-%s", $path, $hashed_options, $safe_filename);
+        }
     }
 
     /**
@@ -139,8 +141,9 @@ abstract class BaseCachedFile extends BaseAction
             $safe_subdir = basename($subdir);
 
             $path = sprintf("%s/%s", $cache_dir_from_web_root, $safe_subdir);
-        } else
+        } else {
             $path = $cache_dir_from_web_root;
+        }
 
         // Check if path is valid, e.g. in the cache dir
         return $path;
@@ -149,8 +152,8 @@ abstract class BaseCachedFile extends BaseAction
     /**
      * Return the absolute cache directory path
      *
-     * @param string $subdir               the subdirectory related to cache base, or null to get the cache base directory.
-     * @param bool   $create_if_not_exists create the directory if it is not found
+     * @param string $subdir the subdirectory related to cache base, or null to get the cache base directory.
+     * @param bool $create_if_not_exists create the directory if it is not found
      *
      * @throws \RuntimeException         if cache directory cannot be created
      * @throws \InvalidArgumentException ii path is invalid, e.g. not in the cache dir
@@ -168,7 +171,7 @@ abstract class BaseCachedFile extends BaseAction
         // Create directory (recursively) if it does not exists.
         if ($create_if_not_exists && !is_dir($path)) {
             if (!@mkdir($path, 0777, true)) {
-                throw new \RuntimeException(sprintf("Failed to create %s file in cache directory",  $path));
+                throw new \RuntimeException(sprintf("Failed to create %s file in cache directory", $path));
             }
         }
 
@@ -257,5 +260,4 @@ abstract class BaseCachedFile extends BaseAction
     {
         $this->genericToggleVisibility($event->getQuery(), $event);
     }
-
 }

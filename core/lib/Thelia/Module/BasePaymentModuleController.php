@@ -72,7 +72,6 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $order_id = intval($order_id);
 
             if (null !== $order = $this->getOrder($order_id)) {
-
                 $this->getLog()->addInfo(
                     $this->getTranslator()->trans("Processing confirmation of order ref. %ref, ID %id",
                     array('%ref' => $order->getRef(), '%id' => $order->getId()))

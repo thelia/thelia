@@ -63,7 +63,6 @@ class Install extends ContainerAwareCommand
                 "database name"
             )
         ;
-
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -88,7 +87,7 @@ class Install extends ContainerAwareCommand
         );
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
-                $connectionInfo = $this->getConnectionInfo($input, $output);
+            $connectionInfo = $this->getConnectionInfo($input, $output);
         }
 
         $database = new Database($connection);
@@ -134,21 +133,24 @@ class Install extends ContainerAwareCommand
 
         foreach ($permissions->getValidationMessages() as $item => $data) {
             if ($data['status']) {
-                $output->writeln(array(
-                    sprintf("<info>%s ...</info> %s",
-                        $data['text'],
-                        "<info>Ok</info>")
+                $output->writeln(
+                    array(
+                        sprintf(
+                            "<info>%s ...</info> %s",
+                            $data['text'],
+                            "<info>Ok</info>"
+                        )
                     )
                 );
             } else {
                 $output->writeln(array(
-                    sprintf("<error>%s </error>%s",
+                    sprintf(
+                        "<error>%s </error>%s",
                         $data['text'],
                         sprintf("<error>%s</error>", $data["hint"])
                     )
                 ));
             }
-
         }
 
         if (false === $isValid) {
@@ -184,7 +186,6 @@ class Install extends ContainerAwareCommand
         file_put_contents($configFile, $configContent);
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
-
     }
 
     /**
@@ -196,7 +197,6 @@ class Install extends ContainerAwareCommand
      */
     protected function tryConnection($connectionInfo, OutputInterface $output)
     {
-
         if (is_null($connectionInfo["dbName"])) {
             return false;
         }
@@ -287,5 +287,4 @@ class Install extends ContainerAwareCommand
     {
         return sprintf("<info>%s</info>", $text);
     }
-
 }

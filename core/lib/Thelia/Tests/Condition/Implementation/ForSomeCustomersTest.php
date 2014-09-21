@@ -24,14 +24,12 @@ use Thelia\Model\Customer;
  */
 class ForSomeCustomersTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp()
     {
-
     }
 
     /**
@@ -206,7 +204,6 @@ class ForSomeCustomersTest extends \PHPUnit_Framework_TestCase
         $actual = $serializableRule;
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -290,7 +287,6 @@ class ForSomeCustomersTest extends \PHPUnit_Framework_TestCase
         $expected = $validators;
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -300,5 +296,4 @@ class ForSomeCustomersTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
     }
-
 }

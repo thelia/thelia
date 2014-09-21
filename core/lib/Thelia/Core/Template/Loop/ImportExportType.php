@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Exception\ClassNotFoundException;
@@ -60,8 +61,8 @@ abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoop
                     ->set("CATEGORY_ID", $type->getByName($this->getCategoryName()))
                 ;
             } catch (ClassNotFoundException $e) {
-
-            } catch (\ErrorException $e) {}
+            } catch (\ErrorException $e) {
+            }
 
             $loopResult->addRow($loopResultRow);
         }

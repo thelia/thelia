@@ -97,7 +97,9 @@ abstract class BaseController extends ContainerAware
      */
     protected function dispatch($eventName, ActionEvent $event = null)
     {
-        if ($event == null) $event = new DefaultActionEvent();
+        if ($event == null) {
+            $event = new DefaultActionEvent();
+        }
 
         $this->getDispatcher()->dispatch($eventName, $event);
     }
@@ -190,9 +192,7 @@ abstract class BaseController extends ContainerAware
         }
 
         foreach ($form->all() as $child) {
-
             if (!$child->isValid()) {
-
                 $fieldName = $child->getConfig()->getOption('label', $child->getName());
 
                 $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
@@ -215,7 +215,6 @@ abstract class BaseController extends ContainerAware
         $form = $aBaseForm->getForm();
 
         if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
-
             $form->bind($aBaseForm->getRequest());
 
             if ($form->isValid()) {
@@ -248,6 +247,11 @@ abstract class BaseController extends ContainerAware
         }
     }
 
+    /**
+     * @param $order_id
+     * @param $fileName
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     protected function generateOrderPdf($order_id, $fileName)
     {
         $order = OrderQuery::create()->findPk($order_id);
@@ -275,12 +279,9 @@ abstract class BaseController extends ContainerAware
             if ($pdfEvent->hasPdf()) {
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef());
             }
-
         } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
-
         }
-
     }
 
     /**
@@ -549,6 +550,8 @@ abstract class BaseController extends ContainerAware
             $url = $this->getRequest()->get("success_url");
         }
 
-        if (null !== $url) $this->redirect($url);
+        if (null !== $url) {
+            $this->redirect($url);
+        }
     }
 }

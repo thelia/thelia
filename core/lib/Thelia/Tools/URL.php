@@ -47,8 +47,9 @@ class URL
         // in TheliaHttpKernel, by calling $this->container->get('thelia.url.manager');
         self::$instance = $this;
 
-        if ($container !== null)
+        if ($container !== null) {
             $this->requestContext = $container->get('router.admin')->getContext();
+        }
 
         $this->retriever = new RewritingRetriever();
         $this->resolver = new RewritingResolver();
@@ -62,7 +63,9 @@ class URL
      */
     public static function getInstance()
     {
-        if (self::$instance == null) throw new \RuntimeException("URL instance is not initialized.");
+        if (self::$instance == null) {
+            throw new \RuntimeException("URL instance is not initialized.");
+        }
         return self::$instance;
     }
 
@@ -77,12 +80,10 @@ class URL
     public function getBaseUrl($scheme_only = false)
     {
         if (null === $this->baseUrlScheme) {
-
             $scheme = "http";
             $port = 80;
 
             if ($host = $this->requestContext->getHost()) {
-
                 $scheme = $this->requestContext->getScheme();
 
                 $port = '';
@@ -122,9 +123,8 @@ class URL
      */
     public function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE)
     {
-         // Already absolute ?
+        // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
-
             // Prevent duplication of the subdirectory name when Thelia is installed in a subdirectory.
             // This happens when $path was calculated with Router::generate(), which returns an absolute URL,
             // starting at web server root. For example, if Thelia is installed in /thelia2, we got something like /thelia2/my/path
@@ -146,20 +146,22 @@ class URL
 
             // If only a path is requested, be sure to remove the script name (index.php or index_dev.php), if any.
             if ($path_only == self::PATH_TO_FILE) {
-                if (substr($base_url, -3) == 'php') $base_url = dirname($base_url);
+                if (substr($base_url, -3) == 'php') {
+                    $base_url = dirname($base_url);
+                }
             }
 
             // Normalize the given path
             $base = rtrim($base_url, '/') . '/' . ltrim($path, '/');
-        } else
+        } else {
             $base = $path;
+        }
 
         $queryString = '';
         $anchor      = '';
 
         if (! is_null($parameters)) {
             foreach ($parameters as $name => $value) {
-
                 // Remove this parameter from base URL to prevent duplicate parameters
                 $base = preg_replace('/([?&])'.$name.'=([^&])*(&|$)/', '$1', $base);
 
@@ -168,7 +170,6 @@ class URL
         }
 
         if ('' !== $queryString = rtrim($queryString, "&")) {
-
             // url could contain anchor
             $pos = strrpos($base, '#');
             if ($pos !== false) {
@@ -295,24 +296,24 @@ class URL
          return $this->resolver;
      }
 
-     protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
-     {
-         static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+    protected function sanitize($string, $force_lowercase = true, $alphabetic_only = false)
+    {
+        static $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
                  "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
                  "â€”", "â€“", ",", "<", ".", ">", "/", "?");
 
-         $clean = trim(str_replace($strip, "", strip_tags($string)));
+        $clean = trim(str_replace($strip, "", strip_tags($string)));
 
-         $clean = preg_replace('/\s+/', "-", $clean);
+        $clean = preg_replace('/\s+/', "-", $clean);
 
-         $clean = ($alphabetic_only) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
+        $clean = ($alphabetic_only) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean ;
 
-         return ($force_lowercase) ?
+        return ($force_lowercase) ?
              (function_exists('mb_strtolower')) ?
                  mb_strtolower($clean, 'UTF-8') :
              strtolower($clean) :
              $clean;
-     }
+    }
 
     public static function checkUrl($url, array $protocols = ["http", "https"])
     {

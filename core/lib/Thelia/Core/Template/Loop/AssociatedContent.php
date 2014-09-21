@@ -120,7 +120,6 @@ class AssociatedContent extends Content
         $this->contentPosition = $this->contentId = array();
 
         foreach ($associatedContents as $associatedContent) {
-
             $associatedContentId = $associatedContent->getContentId();
 
             array_push($associatedContentIdList, $associatedContentId);
@@ -145,7 +144,6 @@ class AssociatedContent extends Content
         $results = parent::parseResults($results);
 
         foreach ($results as $loopResultRow) {
-
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow

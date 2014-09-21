@@ -21,7 +21,6 @@ namespace Thelia\Tests\Core\HttpFoundation;
  */
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGetUriAddingParameters()
     {
         $request = $this->getMock(
@@ -50,7 +49,5 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $result = $request->getUriAddingParameters(array("foo" => "bar"));
 
         $this->assertEquals("http://localhost/?test=fu&foo=bar", $result);
-
     }
-
 }

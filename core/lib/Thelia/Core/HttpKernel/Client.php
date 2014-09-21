@@ -23,7 +23,6 @@ use Symfony\Component\BrowserKit\Request as DomRequest;
  */
 class Client extends BaseClient
 {
-
     /**
      * Converts the BrowserKit request to a HttpKernel request.
      *
@@ -39,5 +38,4 @@ class Client extends BaseClient
 
         return $httpRequest;
     }
-
 }

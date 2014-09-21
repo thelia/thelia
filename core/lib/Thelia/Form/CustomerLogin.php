@@ -83,7 +83,6 @@ class CustomerLogin extends BruteforceForm
         if ($value == 1) {
             $data = $context->getRoot()->getData();
             if (false === $data['password'] || (empty($data['password']) && '0' != $data['password'])) {
-
                 $context->getViolations()->add(new ConstraintViolation(
                     Translator::getInstance()->trans('This value should not be blank.'),
                     'account_password',
@@ -92,7 +91,6 @@ class CustomerLogin extends BruteforceForm
                     'children[password].data',
                     'propertyPath'
                 ));
-
             }
         }
     }
@@ -115,5 +113,4 @@ class CustomerLogin extends BruteforceForm
     {
         return "thelia_customer_login";
     }
-
 }

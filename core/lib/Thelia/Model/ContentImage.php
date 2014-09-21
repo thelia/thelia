@@ -135,5 +135,4 @@ class ContentImage extends BaseContentImage implements BreadcrumbInterface, File
     {
         return ContentImageQuery::create();
     }
-
 }

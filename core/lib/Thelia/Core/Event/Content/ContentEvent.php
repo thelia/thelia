@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Content;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Content;
 

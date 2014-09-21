@@ -192,7 +192,6 @@ class URLTest extends \PHPUnit_Framework_TestCase
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->absoluteUrl('/path/to/action', array("p1" => "v1", "p2" => "v2"), URL::PATH_TO_FILE);
         $this->assertEquals('http://localhost/path/to/action?p1=v1&p2=v2', $url);
-
     }
 
     public function testAbsoluteUrlFromIndexWithParameters()
@@ -208,7 +207,6 @@ class URLTest extends \PHPUnit_Framework_TestCase
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->absoluteUrl('/', array("p1" => "v1", "p2" => "v2"));
         $this->assertEquals('http://localhost/?p1=v1&p2=v2', $url);
-
     }
 
     public function testAbsoluteUrlPathOnlyFromIndexWithParameters()
@@ -224,7 +222,6 @@ class URLTest extends \PHPUnit_Framework_TestCase
         $this->context->setBaseUrl('/');
         $url = URL::getInstance()->absoluteUrl('/', array("p1" => "v1", "p2" => "v2"), URL::PATH_TO_FILE);
         $this->assertEquals('http://localhost/?p1=v1&p2=v2', $url);
-
     }
 
     public function testAbsoluteUrlPathWithParameterReplacement()
@@ -261,6 +258,5 @@ class URLTest extends \PHPUnit_Framework_TestCase
 
     public function testRetrieve()
     {
-
     }
 }

@@ -49,7 +49,6 @@ class Country extends BaseCountry
             $con->rollBack();
             throw $e;
         }
-
     }
 
     public function preInsert(ConnectionInterface $con = null)
@@ -119,8 +118,9 @@ class Country extends BaseCountry
     {
         $dc = CountryQuery::create()->findOneByShopCountry(true);
 
-        if ($dc == null)
+        if ($dc == null) {
             throw new \LogicException(Translator::getInstance()->trans("Cannot find the shop country. Please select a shop country."));
+        }
 
         return $dc;
     }

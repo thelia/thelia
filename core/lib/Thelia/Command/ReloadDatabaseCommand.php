@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Command;
+
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
 

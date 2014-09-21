@@ -42,7 +42,6 @@ class ConditionEvaluator
         }
 
         return $isMatching;
-
     }
 
     /**
@@ -62,7 +61,7 @@ class ConditionEvaluator
         }
 
         switch ($o) {
-            case Operators::SUPERIOR :
+            case Operators::SUPERIOR:
                 // >
                 if ($v1 > $v2) {
                     return true;
@@ -70,7 +69,7 @@ class ConditionEvaluator
                     continue;
                 }
                 break;
-            case Operators::SUPERIOR_OR_EQUAL :
+            case Operators::SUPERIOR_OR_EQUAL:
                 // >=
                 if ($v1 >= $v2) {
                     return true;
@@ -78,7 +77,7 @@ class ConditionEvaluator
                     continue;
                 }
                 break;
-            case Operators::INFERIOR :
+            case Operators::INFERIOR:
                 // <
                 if ($v1 < $v2) {
                     return true;
@@ -86,7 +85,7 @@ class ConditionEvaluator
                     continue;
                 }
                 break;
-            case Operators::INFERIOR_OR_EQUAL :
+            case Operators::INFERIOR_OR_EQUAL:
                 // <=
                 if ($v1 <= $v2) {
                     return true;
@@ -94,7 +93,7 @@ class ConditionEvaluator
                     continue;
                 }
                 break;
-            case Operators::EQUAL :
+            case Operators::EQUAL:
                 // ==
                 if ($v1 == $v2) {
                     return true;

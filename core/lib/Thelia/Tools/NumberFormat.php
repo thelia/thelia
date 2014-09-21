@@ -39,7 +39,9 @@ class NumberFormat
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals == null) $decimals = $lang->getDecimals();
+        if ($decimals == null) {
+            $decimals = $lang->getDecimals();
+        }
         return number_format($number, $decimals, '.', '');
     }
 
@@ -47,9 +49,15 @@ class NumberFormat
     {
         $lang = $this->request->getSession()->getLang();
 
-        if ($decimals == null) $decimals = $lang->getDecimals();
-        if ($decPoint == null) $decPoint = $lang->getDecimalSeparator();
-        if ($thousandsSep == null) $thousandsSep = $lang->getThousandsSeparator();
+        if ($decimals == null) {
+            $decimals = $lang->getDecimals();
+        }
+        if ($decPoint == null) {
+            $decPoint = $lang->getDecimalSeparator();
+        }
+        if ($thousandsSep == null) {
+            $thousandsSep = $lang->getThousandsSeparator();
+        }
         return number_format($number, $decimals, $decPoint, $thousandsSep);
     }
 }

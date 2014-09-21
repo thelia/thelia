@@ -141,5 +141,4 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Thelia\Model\ModuleHook', $deletedModuleHook);
         $this->assertTrue($deletedModuleHook->isDeleted());
     }
-
 }

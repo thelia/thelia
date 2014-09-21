@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -168,10 +169,11 @@ class RemovePercentageOnAttributeValuesTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        if ($count == 1)
+        if ($count == 1) {
             $ret = [$cartItem1Stub];
-        else
+        } else {
             $ret = [$cartItem1Stub, $cartItem2Stub];
+        }
 
         $cartStub
             ->expects($this->any())

@@ -48,5 +48,4 @@ class CurrencyChangeEvent extends CurrencyEvent
     {
         return $this->request;
     }
-
 }

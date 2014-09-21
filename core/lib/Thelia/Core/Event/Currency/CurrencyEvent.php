@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Currency;
+
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Currency;
 

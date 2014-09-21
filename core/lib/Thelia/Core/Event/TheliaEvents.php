@@ -21,7 +21,6 @@ namespace Thelia\Core\Event;
 
 final class TheliaEvents
 {
-
     /**
      * sent at the beginning
      */
@@ -82,7 +81,7 @@ final class TheliaEvents
     /**
      * Sent just after a successful insert of a new customer in the database.
      */
-    const AFTER_CREATECUSTOMER 	= "action.after_createcustomer";
+    const AFTER_CREATECUSTOMER    = "action.after_createcustomer";
 
     /**
      * Sent once the customer change form has been successfully validated, and before customer update in the database.
@@ -91,7 +90,7 @@ final class TheliaEvents
     /**
      * Sent just after a successful update of a customer in the database.
      */
-    const AFTER_UPDATECUSTOMER 	= "action.after_updateCustomer";
+    const AFTER_UPDATECUSTOMER    = "action.after_updateCustomer";
 
     /**
      * sent just before customer removal
@@ -155,13 +154,13 @@ final class TheliaEvents
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
-    const AFTER_CREATECATEGORY 	= "action.after_createcategory";
+    const AFTER_CREATECATEGORY    = "action.after_createcategory";
 
     const BEFORE_DELETECATEGORY = "action.before_deletecategory";
-    const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
+    const AFTER_DELETECATEGORY    = "action.after_deletecategory";
 
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
-    const AFTER_UPDATECATEGORY 	= "action.after_updateCategory";
+    const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
 
     // -- folder management -----------------------------------------------
 
@@ -173,13 +172,13 @@ final class TheliaEvents
     const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
 
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
-    const AFTER_CREATEFOLDER 	= "action.after_createFolder";
+    const AFTER_CREATEFOLDER    = "action.after_createFolder";
 
     const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
-    const AFTER_DELETEFOLDER 	= "action.after_deleteFolder";
+    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
 
     const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
-    const AFTER_UPDATEFOLDER 	= "action.after_updateFolder";
+    const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
 
     // -- content management -----------------------------------------------
 
@@ -194,13 +193,13 @@ final class TheliaEvents
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
 
     const BEFORE_CREATECONTENT = "action.before_createContent";
-    const AFTER_CREATECONTENT	= "action.after_createContent";
+    const AFTER_CREATECONTENT    = "action.after_createContent";
 
     const BEFORE_DELETECONTENT = "action.before_deleteContent";
-    const AFTER_DELETECONTENT 	= "action.after_deleteContent";
+    const AFTER_DELETECONTENT    = "action.after_deleteContent";
 
     const BEFORE_UPDATECONTENT = "action.before_updateContent";
-    const AFTER_UPDATECONTENT 	= "action.after_updateContent";
+    const AFTER_UPDATECONTENT    = "action.after_updateContent";
 
     // -- country management -----------------------------------------------
 
@@ -210,13 +209,13 @@ final class TheliaEvents
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
 
     const BEFORE_CREATECOUNTRY = "action.before_createCountry";
-    const AFTER_CREATECOUNTRY 	= "action.after_createCountry";
+    const AFTER_CREATECOUNTRY    = "action.after_createCountry";
 
     const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
-    const AFTER_DELETECOUNTRY 	= "action.after_deleteCountry";
+    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
 
     const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
-    const AFTER_UPDATECOUNTRY 	= "action.after_updateCountry";
+    const AFTER_UPDATECOUNTRY    = "action.after_updateCountry";
 
     // -- AREA CONFIGURATION MANAGEMENT
 
@@ -307,13 +306,13 @@ final class TheliaEvents
     // -- Product Associated Content -------------------------------------------
 
     const BEFORE_CREATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_createProductAssociatedContent";
-    const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_createProductAssociatedContent";
+    const AFTER_CREATEPRODUCT_ASSOCIATED_CONTENT    = "action.after_createProductAssociatedContent";
 
     const BEFORE_DELETEPRODUCT_ASSOCIATED_CONTENT   = "action.before_deleteProductAssociatedContent";
-    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_deleteProductAssociatedContent";
+    const AFTER_DELETEPRODUCT_ASSOCIATED_CONTENT    = "action.after_deleteProductAssociatedContent";
 
     const BEFORE_UPDATEPRODUCT_ASSOCIATED_CONTENT   = "action.before_updateProductAssociatedContent";
-    const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT 	= "action.after_updateProductAssociatedContent";
+    const AFTER_UPDATEPRODUCT_ASSOCIATED_CONTENT    = "action.after_updateProductAssociatedContent";
 
     // -- Feature product ------------------------------------------------------
 
@@ -455,12 +454,12 @@ final class TheliaEvents
     /**
      * Sent just before a successful insert of a new Coupon in the database.
      */
-    const BEFORE_CREATE_COUPON 	= "action.before_create_coupon";
+    const BEFORE_CREATE_COUPON    = "action.before_create_coupon";
 
     /**
      * Sent just after a successful insert of a new Coupon in the database.
      */
-    const AFTER_CREATE_COUPON 	= "action.after_create_coupon";
+    const AFTER_CREATE_COUPON    = "action.after_create_coupon";
 
     /**
      * Sent when editing a Coupon
@@ -470,47 +469,47 @@ final class TheliaEvents
     /**
      * Sent just before a successful update of a new Coupon in the database.
      */
-    const BEFORE_UPDATE_COUPON 	= "action.before_update_coupon";
+    const BEFORE_UPDATE_COUPON    = "action.before_update_coupon";
 
     /**
      * Sent just after a successful update of a new Coupon in the database.
      */
-    const AFTER_UPDATE_COUPON 	= "action.after_update_coupon";
+    const AFTER_UPDATE_COUPON    = "action.after_update_coupon";
 
     /**
      * Sent when attempting to use a Coupon
      */
-    const COUPON_CONSUME 	= "action.consume_coupon";
+    const COUPON_CONSUME    = "action.consume_coupon";
 
     /**
      * Sent when all coupons in the current session should be cleared
      */
-    const COUPON_CLEAR_ALL 	= "action.clear_all_coupon";
+    const COUPON_CLEAR_ALL    = "action.clear_all_coupon";
 
     /**
      * Sent just before an attempt to use a Coupon
      */
-    const BEFORE_CONSUME_COUPON 	= "action.before_consume_coupon";
+    const BEFORE_CONSUME_COUPON    = "action.before_consume_coupon";
 
     /**
      * Sent just after an attempt to use a Coupon
      */
-    const AFTER_CONSUME_COUPON 	= "action.after_consume_coupon";
+    const AFTER_CONSUME_COUPON    = "action.after_consume_coupon";
 
     /**
      * Sent when attempting to update Coupon Condition
      */
-    const COUPON_CONDITION_UPDATE 	= "action.update_coupon_condition";
+    const COUPON_CONDITION_UPDATE    = "action.update_coupon_condition";
 
     /**
      * Sent just before an attempt to update a Coupon Condition
      */
-    const BEFORE_COUPON_CONDITION_UPDATE 	= "action.before_update_coupon_condition";
+    const BEFORE_COUPON_CONDITION_UPDATE    = "action.before_update_coupon_condition";
 
     /**
      * Sent just after an attempt to update a Coupon Condition
      */
-    const AFTER_COUPON_CONDITION_UPDATE 	= "action.after_update_coupon_condition";
+    const AFTER_COUPON_CONDITION_UPDATE    = "action.after_update_coupon_condition";
 
     // -- Configuration management ---------------------------------------------
 
@@ -788,7 +787,7 @@ final class TheliaEvents
     const BRAND_UPDATE_SEO = "action.updateBrandSeo";
 
     const BEFORE_CREATEBRAND = "action.before_createBrand";
-    const AFTER_CREATEBRAND	 = "action.after_createBrand";
+    const AFTER_CREATEBRAND     = "action.after_createBrand";
 
     const BEFORE_DELETEBRAND = "action.before_deleteBrand";
     const AFTER_DELETEBRAND  = "action.after_deleteBrand";
@@ -825,7 +824,7 @@ final class TheliaEvents
     const CHECK_SALE_ACTIVATION_EVENT = "action.checkSaleActivationEvent";
 
     const BEFORE_CREATESALE = "action.before_createSale";
-    const AFTER_CREATESALE	= "action.after_createSale";
+    const AFTER_CREATESALE    = "action.after_createSale";
 
     const BEFORE_DELETESALE = "action.before_deleteSale";
     const AFTER_DELETESALE  = "action.after_deleteSale";
@@ -838,5 +837,4 @@ final class TheliaEvents
     const META_DATA_CREATE = "thelia.metadata.create";
     const META_DATA_UPDATE = "thelia.metadata.update";
     const META_DATA_DELETE = "thelia.metadata.delete";
-
 }

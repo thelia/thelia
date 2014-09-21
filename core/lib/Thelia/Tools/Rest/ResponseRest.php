@@ -95,5 +95,4 @@ class ResponseRest extends Response
 
         return new Serializer($normalizers, $encoders);
     }
-
 }

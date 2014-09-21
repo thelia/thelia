@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Hook;
+
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Module;
 use Thelia\Tests\WebTestCase;
@@ -99,7 +100,6 @@ class HookTest extends WebTestCase
 
         $this->assertStringContains($content, "::main.footer-body ifhook::");
         $this->assertStringNotContains($content, "::main.footer-body elsehook::");
-
     }
 
     /**
@@ -248,11 +248,19 @@ class HookTest extends WebTestCase
 
     public static function deleteDirectory($dir)
     {
-        if (!file_exists($dir)) return true;
-        if (!is_dir($dir)) return unlink($dir);
+        if (!file_exists($dir)) {
+            return true;
+        }
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
         foreach (scandir($dir) as $item) {
-            if ($item == '.' || $item == '..') continue;
-            if (!self::deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) return false;
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            if (!self::deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) {
+                return false;
+            }
         }
 
         return rmdir($dir);
@@ -260,12 +268,22 @@ class HookTest extends WebTestCase
 
     public static function copyDirectory($sourceDir, $targetDir)
     {
-        if (!file_exists($sourceDir)) return false;
-        if (!is_dir($sourceDir)) return copy($sourceDir, $targetDir);
-        if (!mkdir($targetDir)) return false;
+        if (!file_exists($sourceDir)) {
+            return false;
+        }
+        if (!is_dir($sourceDir)) {
+            return copy($sourceDir, $targetDir);
+        }
+        if (!mkdir($targetDir)) {
+            return false;
+        }
         foreach (scandir($sourceDir) as $item) {
-            if ($item == '.' || $item == '..') continue;
-            if (!self::copyDirectory($sourceDir.DIRECTORY_SEPARATOR.$item, $targetDir.DIRECTORY_SEPARATOR.$item)) return false;
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+            if (!self::copyDirectory($sourceDir.DIRECTORY_SEPARATOR.$item, $targetDir.DIRECTORY_SEPARATOR.$item)) {
+                return false;
+            }
         }
 
         return true;

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -115,7 +116,6 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -133,7 +133,5 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
-
 }

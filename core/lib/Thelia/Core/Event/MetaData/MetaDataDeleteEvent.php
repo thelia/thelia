@@ -19,7 +19,6 @@ namespace Thelia\Core\Event\MetaData;
  */
 class MetaDataDeleteEvent extends MetaDataEvent
 {
-
     protected $metaKey = null;
     protected $elementKey = null;
     protected $elementId = null;
@@ -92,5 +91,4 @@ class MetaDataDeleteEvent extends MetaDataEvent
     {
         return $this->elementId;
     }
-
 }

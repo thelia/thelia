@@ -228,12 +228,13 @@ class TaxRuleController extends AbstractCrudController
 
     public function updateAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $object = $this->getExistingObject();
 
         if ($object != null) {
-
             // Hydrate the form abd pass it to the parser
             $changeTaxesForm = $this->hydrateTaxUpdateForm($object);
 
@@ -246,7 +247,9 @@ class TaxRuleController extends AbstractCrudController
 
     public function setDefaultAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $setDefaultEvent = new TaxRuleEvent();
 
@@ -264,7 +267,9 @@ class TaxRuleController extends AbstractCrudController
     public function processUpdateTaxesAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
 
@@ -282,9 +287,10 @@ class TaxRuleController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::TAX_RULE_TAXES_UPDATE, $changeEvent);
 
-            if (! $this->eventContainsObject($changeEvent))
+            if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
                     $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+            }
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {

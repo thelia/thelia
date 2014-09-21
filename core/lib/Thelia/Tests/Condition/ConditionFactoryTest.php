@@ -30,7 +30,6 @@ use Thelia\Model\CurrencyQuery;
  */
 class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -306,7 +305,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.match_for_x_articles');
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**
@@ -371,7 +369,6 @@ class ConditionFactoryTest extends \PHPUnit_Framework_TestCase
         $actual = $conditionFactory->getInputsFromServiceId('thelia.condition.unknown');
 
         $this->assertEquals($expected, $actual);
-
     }
 
     /**

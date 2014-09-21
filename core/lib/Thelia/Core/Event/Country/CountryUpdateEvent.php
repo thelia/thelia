@@ -101,5 +101,4 @@ class CountryUpdateEvent extends CountryCreateEvent
     {
         return $this->country_id;
     }
-
 }

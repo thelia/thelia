@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\Sale\SaleClearStatusEvent;
 use Thelia\Core\Event\Sale\SaleCreateEvent;
@@ -35,16 +36,13 @@ use Thelia\Model\SaleQuery;
  */
 class SaleController extends AbstractCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'sale',
             'start-date',
             'order',
-
             AdminResources::SALES,
-
             TheliaEvents::SALE_CREATE,
             TheliaEvents::SALE_UPDATE,
             TheliaEvents::SALE_DELETE
@@ -153,8 +151,9 @@ class SaleController extends AbstractCrudController
         $productAttributes = [];
 
         foreach ($formData['product_attributes'] as $productId => $attributeAvIdList) {
-            if (! empty($attributeAvIdList))
+            if (! empty($attributeAvIdList)) {
                 $productAttributes[$productId] = explode(',', $attributeAvIdList);
+            }
         }
 
         $saleUpdateEvent = new SaleUpdateEvent($formData['id']);
@@ -307,8 +306,9 @@ class SaleController extends AbstractCrudController
      */
     public function toggleActivity()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
             return $response;
+        }
 
         try {
             $this->dispatch(
@@ -327,8 +327,9 @@ class SaleController extends AbstractCrudController
 
     public function updateProductList()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
             return $response;
+        }
 
         // Build the list of categories
         $categories = '';
@@ -337,33 +338,41 @@ class SaleController extends AbstractCrudController
             $categories .=  $category_id . ',';
         }
 
-        return $this->render('ajax/sale-edit-products',[
+        return $this->render(
+            'ajax/sale-edit-products',
+            [
                 'sale_id'       => $this->getRequest()->get('sale_id'),
                 'category_list' => rtrim($categories, ','),
                 'product_list'  => $this->getRequest()->get('products', [])
-            ]);
+            ]
+        );
     }
 
     public function updateProductAttributes()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
             return $response;
+        }
 
         $selectedAttributesAvId = explode(',', $this->getRequest()->get('selected_attributes_av_id', []));
 
         $productId = $this->getRequest()->get('product_id');
 
-        return $this->render('ajax/sale-edit-product-attributes',[
+        return $this->render(
+            'ajax/sale-edit-product-attributes',
+            [
             'product_id'                => $productId,
             'selected_attributes_av_id' => $selectedAttributesAvId
-        ]);
+            ]
+        );
     }
 
     public function resetSaleStatus()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE))
+        if (null !== $response = $this->checkAuth(AdminResources::SALES, [], AccessManager::UPDATE)) {
             return $response;
+        }
 
         try {
             $this->dispatch(

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Coupon\Type;
+
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CartItem;
 
@@ -76,7 +77,6 @@ trait PercentageCouponTrait
         $this->checkBaseCouponFieldValue($fieldName, $fieldValue);
 
         if ($fieldName === $this->getPercentageFieldName()) {
-
             $pcent = floatval($fieldValue);
 
             if ($pcent <= 0 || $pcent > 100) {

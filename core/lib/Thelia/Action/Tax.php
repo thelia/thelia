@@ -47,7 +47,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
     public function update(TaxEvent $event)
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
-
             $tax
                 ->setDispatcher($event->getDispatcher())
                 ->setRequirements($event->getRequirements())
@@ -69,7 +68,6 @@ class Tax extends BaseAction implements EventSubscriberInterface
     public function delete(TaxEvent $event)
     {
         if (null !== $tax = TaxQuery::create()->findPk($event->getId())) {
-
             $tax
                 ->delete()
             ;

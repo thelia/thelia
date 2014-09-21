@@ -265,5 +265,4 @@ class AddressCreateOrUpdateEvent extends ActionEvent
     {
         return $this->address;
     }
-
 }

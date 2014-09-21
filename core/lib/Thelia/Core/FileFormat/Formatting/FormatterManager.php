@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting;
+
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -20,7 +21,6 @@ use Thelia\Core\Translation\Translator;
  */
 class FormatterManager
 {
-
     protected $formatters = array();
 
     /**

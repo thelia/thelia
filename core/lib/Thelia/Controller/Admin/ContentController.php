@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
@@ -34,16 +35,13 @@ use Thelia\Model\ContentQuery;
  */
 class ContentController extends AbstractSeoCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'content',
             'manual',
             'content_order',
-
             AdminResources::CONTENT,
-
             TheliaEvents::CONTENT_CREATE,
             TheliaEvents::CONTENT_UPDATE,
             TheliaEvents::CONTENT_DELETE,
@@ -61,7 +59,9 @@ class ContentController extends AbstractSeoCrudController
     public function addAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 
@@ -89,7 +89,9 @@ class ContentController extends AbstractSeoCrudController
     public function removeAdditionalFolderAction()
     {
         // Check current user authorization
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $folder_id = intval($this->getRequest()->request->get('additional_folder_id'));
 
@@ -291,11 +293,13 @@ class ContentController extends AbstractSeoCrudController
     {
         $this->getListOrderFromSession('content', 'content_order', 'manual');
 
-        return $this->render('folders',
+        return $this->render(
+            'folders',
             array(
                 'content_order' => $currentOrder,
                 'parent' => $this->getFolderId()
-            ));
+            )
+        );
     }
 
     protected function getEditionArguments()
@@ -374,7 +378,6 @@ class ContentController extends AbstractSeoCrudController
      */
     protected function performAdditionalUpdatePositionAction($event)
     {
-
         if (null !== $content = ContentQuery::create()->findPk($event->getObjectId())) {
             // Redirect to parent category list
             return $this->generateRedirectFromRoute(

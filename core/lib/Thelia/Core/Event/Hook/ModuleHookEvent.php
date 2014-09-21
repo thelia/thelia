@@ -45,5 +45,4 @@ class ModuleHookEvent extends ActionEvent
 
         return $this;
     }
-
 }

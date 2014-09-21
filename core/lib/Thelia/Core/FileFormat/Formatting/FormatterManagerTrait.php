@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Formatting;
+
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

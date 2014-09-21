@@ -32,7 +32,6 @@ class Assets extends AbstractSmartyPlugin
     public function declareAssets($params, \Smarty_Internal_Template $template)
     {
         if (false !== $asset_dir = $this->getParam($params, 'directory', false)) {
-
             $this->assetManager->prepareAssets($asset_dir, $template);
 
             return '';

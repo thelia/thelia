@@ -19,7 +19,6 @@ class TemplateAddFeatureEvent extends TemplateEvent
 
     public function __construct(Template $template, $feature_id)
     {
-
         parent::__construct($template);
 
         $this->feature_id = $feature_id;
@@ -36,5 +35,4 @@ class TemplateAddFeatureEvent extends TemplateEvent
 
         return $this;
     }
-
 }

@@ -25,7 +25,6 @@ use Thelia\Core\Translation\Translator;
 
 class TheliaLoop extends AbstractSmartyPlugin
 {
-
     /** @var PropelModelPager[] */
     protected static $pagination = null;
 
@@ -149,8 +148,9 @@ class TheliaLoop extends AbstractSmartyPlugin
             $this->loopstack[$name] = $loopResults;
 
             // No results ? The loop is terminated, do not evaluate loop text.
-            if ($loopResults->isEmpty()) $repeat = false;
-
+            if ($loopResults->isEmpty()) {
+                $repeat = false;
+            }
         } else {
             $loopResults = $this->loopstack[$name];
 
@@ -158,12 +158,10 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         if ($loopResults->valid()) {
-
             $loopResultRow = $loopResults->current();
 
             // On first iteration, save variables that may be overwritten by this loop
             if (! isset($this->varstack[$name])) {
-
                 $saved_vars = array();
 
                 $varlist = $loopResultRow->getVars();
@@ -261,8 +259,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $loopName = $this->getParam($params, 'rel');
 
-        if (null == $loopName)
+        if (null == $loopName) {
             throw new \InvalidArgumentException($this->translator->trans("Missing 'rel' parameter in page loop"));
+        }
 
         // Find pagination
         $pagination = self::getPagination($loopName);
@@ -275,12 +274,13 @@ class TheliaLoop extends AbstractSmartyPlugin
         $startPage          = intval($this->getParam($params, 'start-page', 1));
         $displayedPageCount = intval($this->getParam($params, 'limit', 10));
 
-        if (intval($displayedPageCount) == 0) $displayedPageCount = PHP_INT_MAX;
+        if (intval($displayedPageCount) == 0) {
+            $displayedPageCount = PHP_INT_MAX;
+        }
 
         $totalPageCount = $pagination->getLastPage();
 
         if ($content === null) {
-
             // The current page
             $currentPage = $pagination->getPage();
 
@@ -288,7 +288,9 @@ class TheliaLoop extends AbstractSmartyPlugin
             if ($totalPageCount > $displayedPageCount) {
                 $startPage = $currentPage - round($displayedPageCount / 2);
 
-                if ($startPage < 0) $startPage = 1;
+                if ($startPage < 0) {
+                    $startPage = 1;
+                }
             }
 
             // This is the iterative page number, the one we're going to increment in this loop
@@ -311,7 +313,6 @@ class TheliaLoop extends AbstractSmartyPlugin
             $template->assign('END'    , $endPage);
             // The overall last page
             $template->assign('LAST'   , $totalPageCount);
-
         } else {
             $iterationPage = $template->getTemplateVars('PAGE');
 
@@ -319,7 +320,6 @@ class TheliaLoop extends AbstractSmartyPlugin
         }
 
         if ($iterationPage <= $template->getTemplateVars('END')) {
-
             // The iterative page number
             $template->assign('PAGE', $iterationPage);
 
@@ -349,15 +349,17 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $loopName = $this->getParam($params, 'rel');
 
-        if (null == $loopName)
+        if (null == $loopName) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("Missing 'rel' parameter in ifloop/elseloop arguments")
             );
+        }
 
-        if (! isset($this->loopstack[$loopName]))
+        if (! isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("Related loop name '%name'' is not defined.", ['%name' => $loopName])
             );
+        }
 
         return $this->loopstack[$loopName]->isEmpty();
     }

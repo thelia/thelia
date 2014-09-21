@@ -48,7 +48,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function update(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxRule
                 ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
@@ -67,7 +66,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function updateTaxes(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxList = json_decode($event->getTaxList(), true);
 
             /* clean the current tax rule for the countries */
@@ -112,7 +110,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function delete(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             $taxRule
                 ->delete()
             ;
@@ -127,7 +124,6 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function setDefault(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-
             TaxRuleQuery::create()->update(array(
                 "IsDefault" => 0
             ));

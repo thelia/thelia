@@ -33,7 +33,6 @@ use Thelia\Model\ModuleQuery;
  */
 class Hook extends AbstractSmartyPlugin
 {
-
     private $dispatcher;
 
     /** @var Translator */
@@ -180,7 +179,6 @@ class Hook extends AbstractSmartyPlugin
      */
     public function processHookBlock($params, $content, $smarty, &$repeat)
     {
-
         $hookName = $this->getParam($params, 'name');
         $module   = intval($this->getParam($params, 'module', 0));
 
@@ -210,7 +208,6 @@ class Hook extends AbstractSmartyPlugin
 
         // save results so we can use it in forHook block
         $this->hookResults[$hookName] = $event->get();
-
     }
 
     /**
@@ -237,7 +234,6 @@ class Hook extends AbstractSmartyPlugin
      */
     public function processForHookBlock($params, $content, $smarty, &$repeat)
     {
-
         $rel = $this->getParam($params, 'rel');
         if (null == $rel) {
             throw new \InvalidArgumentException(
@@ -262,20 +258,17 @@ class Hook extends AbstractSmartyPlugin
             if ($fragments->isEmpty()) {
                 $repeat = false;
             }
-
         } else {
             $fragments = $this->hookResults[$rel];
             $fragments->next();
         }
 
         if ($fragments->valid()) {
-
             /** @var Fragment $fragment */
             $fragment = $fragments->current();
 
             // On first iteration, save variables that may be overwritten by this hook
             if (!isset($this->varstack[$rel])) {
-
                 $saved_vars = array();
 
                 $varlist = $fragment->getVars();
@@ -315,7 +308,6 @@ class Hook extends AbstractSmartyPlugin
         }
 
         return '';
-
     }
 
     /**
@@ -373,15 +365,17 @@ class Hook extends AbstractSmartyPlugin
     {
         $hookName = $this->getParam($params, 'rel');
 
-        if (null == $hookName)
+        if (null == $hookName) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("Missing 'rel' parameter in ifhook/elsehook arguments")
             );
+        }
 
-        if (!isset($this->hookResults[$hookName]))
+        if (!isset($this->hookResults[$hookName])) {
             throw new \InvalidArgumentException(
                 $this->translator->trans("Related hook name '%name' is not defined.", ['%name' => $hookName])
             );
+        }
 
         return (is_string($this->hookResults[$hookName]) && '' === $this->hookResults[$hookName]
             || !is_string($this->hookResults[$hookName]) && $this->hookResults[$hookName]->isEmpty()
@@ -437,5 +431,4 @@ class Hook extends AbstractSmartyPlugin
     {
         return $this->dispatcher;
     }
-
 }

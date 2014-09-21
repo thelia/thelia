@@ -84,7 +84,6 @@ class ConditionFactory
         $collection = new ConditionCollection();
 
         if (!empty($unserializedConditions)) {
-
             /** @var SerializableCondition $condition */
             foreach ($unserializedConditions as $condition) {
                 if ($this->container->has($condition->conditionServiceId)) {

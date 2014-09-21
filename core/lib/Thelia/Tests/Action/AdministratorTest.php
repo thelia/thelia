@@ -25,7 +25,6 @@ use Thelia\Model\LangQuery;
  */
 class AdministratorTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testCreate()
     {
         $login = 'thelia'.uniqid();
@@ -126,5 +125,4 @@ class AdministratorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf("Thelia\Model\Admin", $updatedAdmin);
         $this->assertTrue(password_verify($adminEvent->getPassword(), $updatedAdmin->getPassword()));
     }
-
 }

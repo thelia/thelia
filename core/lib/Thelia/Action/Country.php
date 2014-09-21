@@ -28,7 +28,6 @@ use Thelia\Model\CountryQuery;
  */
 class Country extends BaseAction implements EventSubscriberInterface
 {
-
     public function create(CountryCreateEvent $event)
     {
         $country = new CountryModel();
@@ -42,7 +41,6 @@ class Country extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setCountry($country);
-
     }
 
     public function update(CountryUpdateEvent $event)

@@ -41,13 +41,15 @@ class ClearImageCache extends ContainerAwareCommand
 
             $subdir = $input->getArgument('subdir');
 
-            if (! is_null($subdir)) $event->setCacheSubdirectory($subdir);
+            if (! is_null($subdir)) {
+                $event->setCacheSubdirectory($subdir);
+            }
 
             $dispatcher->dispatch(TheliaEvents::IMAGE_CLEAR_CACHE, $event);
 
             $output->writeln(sprintf('%s image cache successfully cleared.', is_null($subdir) ? 'Entire' : ucfirst($subdir)));
         } catch (\Exception $ex) {
-             $output->writeln(sprintf("Failed to clear image cache: %s", $ex->getMessage()));
+            $output->writeln(sprintf("Failed to clear image cache: %s", $ex->getMessage()));
         }
     }
 }

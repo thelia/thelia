@@ -16,5 +16,4 @@ use Thelia\Model\Base\CouponCustomerCountQuery as BaseCouponCustomerCountQuery;
  */
 class CouponCustomerCountQuery extends BaseCouponCustomerCountQuery
 {
-
 } // CouponCustomerCountQuery

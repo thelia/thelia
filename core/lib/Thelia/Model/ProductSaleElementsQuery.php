@@ -16,5 +16,4 @@ use Thelia\Model\Base\ProductSaleElementsQuery as BaseProductSaleElementsQuery;
  */
 class ProductSaleElementsQuery extends BaseProductSaleElementsQuery
 {
-
 } // ProductSaleElementsQuery

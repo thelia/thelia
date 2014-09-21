@@ -60,7 +60,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public function update(CurrencyUpdateEvent $event)
     {
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
-
             $currency
                 ->setDispatcher($event->getDispatcher())
 
@@ -83,7 +82,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function setDefault(CurrencyUpdateEvent $event)
     {
-
         if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
             // Reset default status
             CurrencyQuery::create()->filterByByDefault(true)->update(array('ByDefault' => false));
@@ -105,9 +103,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
      */
     public function delete(CurrencyDeleteEvent $event)
     {
-
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
-
             $currency
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
@@ -124,7 +120,6 @@ class Currency extends BaseAction implements EventSubscriberInterface
         $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
-
             foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
                 $code = strtoupper($last["currency"]);
                 $rate = floatval($last['rate']);

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Command;
+
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,7 +25,6 @@ use Thelia\Install\Update;
  */
 class UpdateCommand extends ContainerAwareCommand
 {
-
     protected function configure()
     {
         $this

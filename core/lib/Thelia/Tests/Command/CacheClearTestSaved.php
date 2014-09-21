@@ -27,7 +27,6 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
 {
-
     public $cache_dir;
 
     public function setUp()
@@ -111,5 +110,4 @@ class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
 
         return $container;
     }
-
 }

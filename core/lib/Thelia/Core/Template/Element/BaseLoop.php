@@ -103,7 +103,6 @@ abstract class BaseLoop
         }
 
         if ($this instanceof SearchLoopInterface) {
-
             $defaultArgs = array_merge($defaultArgs, [
                     Argument::createAnyTypeArgument('search_term'),
                     new Argument(
@@ -141,7 +140,6 @@ abstract class BaseLoop
     public function __call($name, $arguments)
     {
         if (substr($name, 0, 3) == 'get') {
-
             // camelCase to underscore: getNotEmpty -> not_empty
             $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
 
@@ -237,10 +235,11 @@ abstract class BaseLoop
     {
         $arg = $this->args->get($argumentName);
 
-        if ($arg === null)
+        if ($arg === null) {
             throw new \InvalidArgumentException(
                 $this->translator->trans('Undefined loop argument "%name"', ['%name' => $argumentName])
             );
+        }
 
         return $arg;
     }
@@ -272,13 +271,11 @@ abstract class BaseLoop
         }
 
         if ($this instanceof SearchLoopInterface) {
-
             $searchTerm = $this->getArgValue('search_term');
             $searchIn   = $this->getArgValue('search_in');
             $searchMode = $this->getArgValue('search_mode');
 
             if (null !== $searchTerm && null !== $searchIn) {
-
                 switch ($searchMode) {
                     case SearchLoopInterface::MODE_ANY_WORD:
                         $searchCriteria = Criteria::IN;
@@ -318,7 +315,6 @@ abstract class BaseLoop
         $offset = intval($this->getArgValue('offset'));
 
         if ($this->getArgValue('page') !== null) {
-
             $pageNum = intval($this->getArgValue('page'));
 
             $totalPageCount = ceil(count($search) / $limit);
@@ -330,10 +326,8 @@ abstract class BaseLoop
             $firstItem = ($pageNum - 1) * $limit + 1;
 
             return array_slice($search, $firstItem, $firstItem + $limit, false);
-
         } else {
             return array_slice($search, $offset, $limit, false);
-
         }
     }
 
@@ -410,7 +404,6 @@ abstract class BaseLoop
     {
         $hash = $this->args->getHash();
         if (false === isset(self::$cacheLoopResult[$hash])) {
-
             $results = [];
 
             if ($this instanceof PropelSearchLoopInterface) {
@@ -446,7 +439,6 @@ abstract class BaseLoop
         }
 
         return self::$cacheLoopResult[$hash];
-
     }
 
     protected function checkInterface()
@@ -535,5 +527,4 @@ abstract class BaseLoop
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     abstract protected function getArgDefinitions();
-
 }

@@ -34,8 +34,9 @@ class SecurityContext
     {
         $session = $this->request->getSession();
 
-        if ($session === null)
+        if ($session === null) {
             throw new \LogicException("No session found.");
+        }
 
         return $session;
     }
@@ -219,6 +220,6 @@ class SecurityContext
      */
     public function clearAdminUser()
     {
-       $this->getSession()->clearAdminUser();
+        $this->getSession()->clearAdminUser();
     }
 }

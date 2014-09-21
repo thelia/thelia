@@ -23,7 +23,6 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerProfileUpdateForm extends CustomerCreateForm
 {
-
     protected function buildForm()
     {
         parent::buildForm();

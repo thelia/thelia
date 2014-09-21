@@ -26,7 +26,6 @@ use Thelia\Model\Customer;
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
-
     protected $session;
 
     public function setUp()
@@ -58,7 +57,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
         $this->assertEquals($testCart->getToken(), $cart->getToken());
-
     }
 
     public function testGetCartWithExistingCustomerButNoCart()
@@ -128,5 +126,4 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
-
 }

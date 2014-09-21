@@ -24,14 +24,16 @@ class EnumListType extends BaseType
 
     public function __construct($values = array())
     {
-        if(is_array($values))
+        if (is_array($values)) {
             $this->values = $values;
+        }
     }
 
     public function addValue($value)
     {
-        if(!in_array($value, $this->values))
+        if (!in_array($value, $this->values)) {
             $this->values[] = $value;
+        }
     }
 
     public function getType()
@@ -42,9 +44,9 @@ class EnumListType extends BaseType
     public function isValid($values)
     {
         foreach (explode(',', $values) as $value) {
-            if(!$this->isSingleValueValid($value))
-
+            if (!$this->isSingleValueValid($value)) {
                 return false;
+            }
         }
 
         return true;

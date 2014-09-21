@@ -21,7 +21,6 @@ namespace Thelia\Core\Event\Hook;
  */
 class HookRenderEvent extends BaseHookRenderEvent
 {
-
     /** @var  array $fragments an array of fragments collected during the event dispatch */
     protected $fragments;
 

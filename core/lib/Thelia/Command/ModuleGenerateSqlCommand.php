@@ -74,6 +74,5 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
             'File available in your module config directory',
             ''
         ), 'bg=green;fg=black');
-
     }
 }

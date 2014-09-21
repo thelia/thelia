@@ -14,5 +14,4 @@ namespace Thelia\Exception;
 
 class MemberAccessException extends \LogicException
 {
-
 }

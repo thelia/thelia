@@ -108,7 +108,9 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
 
         $active = $this->getActive();
 
-        if ($active !== BooleanOrBothType::ANY) $search->filterByActive($active ? 1 : 0);
+        if ($active !== BooleanOrBothType::ANY) {
+            $search->filterByActive($active ? 1 : 0);
+        }
 
         $exclude = $this->getExclude();
 

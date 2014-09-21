@@ -19,5 +19,4 @@ namespace Thelia\Core\Event\Content;
  */
 class ContentToggleVisibilityEvent  extends ContentEvent
 {
-
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Rewriting;
+
 use Thelia\Model\Product;
 
 /**
@@ -20,7 +21,6 @@ use Thelia\Model\Product;
  */
 class ProductRewriteTest extends BaseRewritingObject
 {
-
     /**
      * @return mixed an instance of Product, Folder, Content or Category Model
      */

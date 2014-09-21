@@ -31,7 +31,6 @@ use Thelia\Model\BrandQuery;
  */
 class Brand extends BaseAction implements EventSubscriberInterface
 {
-
     public function create(BrandCreateEvent $event)
     {
         $brand = new BrandModel();
@@ -103,7 +102,6 @@ class Brand extends BaseAction implements EventSubscriberInterface
     public function delete(BrandDeleteEvent $event)
     {
         if (null !== $brand = BrandQuery::create()->findPk($event->getBrandId())) {
-
             $brand->setDispatcher($event->getDispatcher())->delete();
 
             $event->setBrand($brand);

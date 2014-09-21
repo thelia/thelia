@@ -27,9 +27,7 @@ class AdministratorController extends AbstractCrudController
             'administrator',
             'manual',
             'order',
-
             AdminResources::ADMINISTRATOR,
-
             TheliaEvents::ADMINISTRATOR_CREATE,
             TheliaEvents::ADMINISTRATOR_UPDATE,
             TheliaEvents::ADMINISTRATOR_DELETE

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Action;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\Collection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -101,7 +102,6 @@ class ContentTest extends TestCaseWithURLToolSetup
         $this->assertEquals(1, $createdContent->getVisible());
         $this->assertEquals('test create content', $createdContent->getTitle());
         $this->assertEquals($folder->getId(), $createdContent->getDefaultFolderId());
-
     }
 
     public function testUpdateContent()
@@ -149,7 +149,6 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $this->assertInstanceOf('Thelia\Model\Content', $deletedContent);
         $this->assertTrue($deletedContent->isDeleted());
-
     }
 
     public function testContentToggleVisibility()
@@ -313,9 +312,7 @@ class ContentTest extends TestCaseWithURLToolSetup
      */
     protected function getFolderForPositionTest()
     {
-
         if (null === self::$folderForPositionTest) {
-
             $folder = new Folder();
 
             $folder->setParent(0);
@@ -327,7 +324,6 @@ class ContentTest extends TestCaseWithURLToolSetup
             $folder->save();
 
             for ($i = 0; $i < 4; $i++) {
-
                 $content = new \Thelia\Model\Content();
 
                 $content->addFolder($folder);
@@ -342,7 +338,6 @@ class ContentTest extends TestCaseWithURLToolSetup
                 $content->setContentFolders($collection);
 
                 $content->save();
-
             }
 
             self::$folderForPositionTest = $folder;

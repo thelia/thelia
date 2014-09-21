@@ -36,5 +36,4 @@ class ProductDeleteCategoryEvent extends ProductEvent
 
         return $this;
     }
-
 }

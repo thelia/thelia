@@ -64,5 +64,4 @@ class CategoryAssociatedContent extends BaseCategoryAssociatedContent
     {
         $this->dispatchEvent(TheliaEvents::AFTER_DELETECATEGORY_ASSOCIATED_CONTENT, new CategoryAssociatedContentEvent($this));
     }
-
 }

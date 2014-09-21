@@ -83,7 +83,6 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
-
             $class = $container->getDefinition($id)->getClass();
 
             // the class must extends BaseHook
@@ -105,12 +104,10 @@ class RegisterListenersPass implements CompilerPassInterface
             foreach ($events as $event) {
                 $this->registerHook($class, $module, $id, $event);
             }
-
         }
 
         // now we can add listeners for active hooks and active module
         $this->addHooksMethodCall($definition);
-
     }
 
     /**
@@ -125,7 +122,6 @@ class RegisterListenersPass implements CompilerPassInterface
      */
     protected function registerHook($class, $module, $id, $event)
     {
-
         $active = isset($event['active']) ? intval($event['active']) : 1;
         $active = (1 === $active);
 
@@ -185,7 +181,6 @@ class RegisterListenersPass implements CompilerPassInterface
                 ->setPosition(ModuleHook::MAX_POSITION)
                 ->save();
         }
-
     }
 
 
@@ -208,7 +203,6 @@ class RegisterListenersPass implements CompilerPassInterface
         $hookId = 0;
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
-
             // manage module hook position for new hook
             if ($hookId !== $moduleHook->getHookId()) {
                 $hookId = $moduleHook->getHookId();
@@ -226,7 +220,6 @@ class RegisterListenersPass implements CompilerPassInterface
 
             // Add the the new listener for active hooks, we have to reverse the priority and the position
             if ($moduleHook->getActive() && $moduleHook->getModuleActive() && $moduleHook->getHookActive()) {
-
                 $hook = $moduleHook->getHook();
                 $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
 
@@ -311,5 +304,4 @@ class RegisterListenersPass implements CompilerPassInterface
 
         return true;
     }
-
 }

@@ -28,7 +28,7 @@ class ParserContext implements \IteratorAggregate
     public function __construct(Request $request)
     {
         // Setup basic variables
-        $this->set('THELIA_VERSION'	, Thelia::THELIA_VERSION)
+        $this->set('THELIA_VERSION'    , Thelia::THELIA_VERSION)
         ;
     }
 

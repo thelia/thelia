@@ -72,13 +72,18 @@ class SmartyParser extends Smarty implements ParserInterface
         // Configure basic Smarty parameters
 
         $compile_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'compile';
-        if (! is_dir($compile_dir)) @mkdir($compile_dir, 0777, true);
+        if (! is_dir($compile_dir)) {
+            @mkdir($compile_dir, 0777, true);
+        }
 
         $cache_dir = THELIA_ROOT . 'cache'. DS . $env . DS . 'smarty'.DS.'cache';
-        if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
+        if (! is_dir($cache_dir)) {
+            @mkdir($cache_dir, 0777, true);
+        }
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
+        $this->inheritance_merge_compiled_includes = false;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
@@ -216,7 +221,6 @@ class SmartyParser extends Smarty implements ParserInterface
         Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName");
 
         if (true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
-
             $this->templateDirectories[$templateType][$templateName] = array_merge(
                 array(
                     $key => $templateDirectory,
@@ -301,7 +305,6 @@ class SmartyParser extends Smarty implements ParserInterface
             $customPath = str_replace($ret->getName(), $webAssetTemplate, $ret->getPath());
             $ret->setName($webAssetTemplate);
             $ret->setPath($customPath);
-
         }
 
         return $ret;

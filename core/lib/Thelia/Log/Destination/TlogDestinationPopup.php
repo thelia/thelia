@@ -68,7 +68,8 @@ class TlogDestinationPopup extends AbstractTlogDestination
 
     public function write(&$res)
     {
-        $content = ""; $count = 1;
+        $content = "";
+        $count = 1;
 
         foreach ($this->_logs as $line) {
             $content .= "<div class=\"".($count++ % 2 ? "paire" : "impaire")."\">".htmlspecialchars($line)."</div>";
@@ -94,9 +95,10 @@ class TlogDestinationPopup extends AbstractTlogDestination
                 str_replace('"', '\\"', $tpl)
         );
 
-        if (preg_match("|</body>|i", $res))
+        if (preg_match("|</body>|i", $res)) {
             $res = preg_replace("|</body>|i", "$wop\n</body>", $res);
-        else
+        } else {
             $res .= $wop;
-   }
+        }
+    }
 }

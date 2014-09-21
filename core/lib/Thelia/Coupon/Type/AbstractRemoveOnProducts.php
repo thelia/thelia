@@ -64,8 +64,7 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         $freeShippingForCountries,
         $freeShippingForModules,
         $perCustomerUsageCount
-    )
-    {
+    ) {
         parent::set(
             $facade, $code, $title, $shortDescription, $description, $effects,
             $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
@@ -76,7 +75,9 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
 
         $this->product_list = isset($effects[self::PRODUCTS_LIST]) ? $effects[self::PRODUCTS_LIST] : array();
 
-        if (! is_array($this->product_list)) $this->product_list = array($this->product_list);
+        if (! is_array($this->product_list)) {
+            $this->product_list = array($this->product_list);
+        }
 
         $this->category_id = isset($effects[self::CATEGORY_ID]) ? $effects[self::CATEGORY_ID] : 0;
 

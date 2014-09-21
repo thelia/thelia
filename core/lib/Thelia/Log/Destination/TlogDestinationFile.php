@@ -61,7 +61,9 @@ class TlogDestinationFile extends AbstractTlogDestination
                 chmod($file_path, 0666);
             }
 
-            if ($this->fh) @fclose($this->fh);
+            if ($this->fh) {
+                @fclose($this->fh);
+            }
 
             $this->fh = fopen($file_path, $mode);
         }
@@ -69,12 +71,12 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function getTitle()
     {
-            return Translator::getInstance()->trans('Text File');
+        return Translator::getInstance()->trans('Text File');
     }
 
     public function getDescription()
     {
-            return Translator::getInstance()->trans('Store logs into text file');
+        return Translator::getInstance()->trans('Store logs into text file');
     }
 
     public function getConfigs()
@@ -106,7 +108,9 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function write(&$res)
     {
-        if ($this->fh) @fclose($this->fh);
+        if ($this->fh) {
+            @fclose($this->fh);
+        }
 
         $this->fh = false;
     }

@@ -25,7 +25,6 @@ use Thelia\Core\Translation\Translator;
  */
 class AreaPostageForm extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

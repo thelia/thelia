@@ -47,5 +47,4 @@ class FolderDeleteEvent extends FolderEvent
     {
         return $this->folder_id;
     }
-
 }

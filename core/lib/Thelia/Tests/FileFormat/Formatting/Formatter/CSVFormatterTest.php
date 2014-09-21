@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Formatting\Formatter;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
@@ -130,5 +131,4 @@ class CSVFormatterTest extends \PHPUnit_Framework_TestCase
             $this->formatter->decode($data)->getData()
         );
     }
-
 }

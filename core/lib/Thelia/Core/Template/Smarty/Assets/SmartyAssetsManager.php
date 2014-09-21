@@ -56,16 +56,13 @@ class SmartyAssetsManager
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
         if (isset($templateDirectories[$templateDefinition->getName()])) {
-
             /* create assets foreach registered directory : main @ modules */
             foreach ($templateDirectories[$templateDefinition->getName()] as $key => $directory) {
-
                 $tpl_path = $directory . DS . self::$assetsDirectory;
 
                 $asset_dir_absolute_path = realpath($tpl_path);
 
                 if (false !== $asset_dir_absolute_path) {
-
                     $this->assetsManager->prepareAssets(
                         $asset_dir_absolute_path,
                         $this->web_root . $this->path_relative_to_web_root,
@@ -132,7 +129,6 @@ class SmartyAssetsManager
 
         foreach ($paths as $path) {
             if ($this->filesExist($path, $file)) {
-
                 $assetSource = $path;
                 break;
             }
@@ -175,21 +171,21 @@ class SmartyAssetsManager
         $paths = [];
 
         if ("0" !== $source) {
-
             if (isset($directories[$template]["0"])) {
                 $paths[] = $directories[$template]["0"] . DS
                     . TemplateDefinition::HOOK_OVERRIDE_SUBDIR . DS
                     .$source;
             }
 
-            if (isset($directories[$template][$source])) $paths[] = $directories[$template][$source];
+            if (isset($directories[$template][$source])) {
+                $paths[] = $directories[$template][$source];
+            }
 
-            if (isset($directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source])) $paths[] = $directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source];
-
+            if (isset($directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source])) {
+                $paths[] = $directories[TemplateDefinition::HOOK_DEFAULT_THEME][$source];
+            }
         } else {
-
             $paths[] = $directories[$template]["0"];
-
         }
 
         return $paths;
@@ -204,7 +200,9 @@ class SmartyAssetsManager
      */
     protected function filesExist($dir, $file)
     {
-        if (!file_exists($dir)) return false;
+        if (!file_exists($dir)) {
+            return false;
+        }
 
         $full_path = rtrim($dir, DS) . DS . ltrim($file, DS);
 
@@ -232,7 +230,6 @@ class SmartyAssetsManager
                 Tlog::getInstance()->addWarning("Failed to get real path of " . $params['file']);
             }
             $template->assign('asset_url', $url);
-
         } elseif (isset($content)) {
             return $content;
         }

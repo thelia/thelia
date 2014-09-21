@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\Core\Event;
+
 use Symfony\Component\Form\Forms;
 
 /**
@@ -20,7 +21,6 @@ use Symfony\Component\Form\Forms;
  */
 class ActionEventTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var \Symfony\Component\Form\Form $form
      */
@@ -60,6 +60,5 @@ class ActionEventTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('fooValue', $event->getFoo());
         $this->assertEquals('barValue', $event->getBar());
-
     }
 }

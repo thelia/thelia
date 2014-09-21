@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -78,7 +79,9 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $results = array();
 
@@ -88,7 +91,6 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
             $folder = $search->findOne();
 
             if ($folder != null) {
-
                 $results[] = array(
                     "ID" => $folder->getId(),
                     "TITLE" => $folder->getVirtualColumn('i18n_TITLE'),
@@ -99,7 +101,6 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                 $parent = $folder->getParent();
 
                 if ($parent > 0) {
-
                     // Prevent circular refererences
                     if (in_array($parent, $ids)) {
                         throw new \LogicException(sprintf("Circular reference detected in folder ID=%d hierarchy (folder ID=%d appears more than one times in path)", $id, $parent));
@@ -112,7 +113,9 @@ class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
                     $this->configureI18nProcessing($search, array('TITLE'));
 
                     $search->filterById($parent);
-                    if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+                    if ($visible != BooleanOrBothType::ANY) {
+                        $search->filterByVisible($visible);
+                    }
                 }
             }
         } while ($folder != null && $parent > 0);

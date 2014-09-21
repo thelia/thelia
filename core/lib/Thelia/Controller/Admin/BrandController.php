@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Controller\Admin;
+
 use Thelia\Core\Event\Brand\BrandCreateEvent;
 use Thelia\Core\Event\Brand\BrandDeleteEvent;
 use Thelia\Core\Event\Brand\BrandEvent;
@@ -32,16 +33,13 @@ use Thelia\Model\BrandQuery;
  */
 class BrandController extends AbstractSeoCrudController
 {
-
     public function __construct()
     {
         parent::__construct(
             'brand',
             'manual',
             'order',
-
             AdminResources::BRAND,
-
             TheliaEvents::BRAND_CREATE,
             TheliaEvents::BRAND_UPDATE,
             TheliaEvents::BRAND_DELETE,
@@ -281,5 +279,4 @@ class BrandController extends AbstractSeoCrudController
             $positionValue
         );
     }
-
 }

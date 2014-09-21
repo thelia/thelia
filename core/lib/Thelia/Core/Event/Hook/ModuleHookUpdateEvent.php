@@ -114,5 +114,4 @@ class ModuleHookUpdateEvent extends ModuleHookEvent
     {
         return $this->method;
     }
-
 }

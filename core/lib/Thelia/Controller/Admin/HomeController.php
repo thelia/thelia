@@ -23,7 +23,9 @@ class HomeController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // Render the edition template.
         return $this->render('home');
@@ -36,22 +38,27 @@ class HomeController extends BaseAdminController
      */
     public function getLatestTheliaVersion()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // get the latest version
         $version = @file_get_contents("http://thelia.net/version.php");
 
-        if ($version === false)
+        if ($version === false) {
             $version = $this->getTranslator()->trans("Not found");
-        else if (! preg_match("/^[0-9.]*$/", $version))
+        } elseif (! preg_match("/^[0-9.]*$/", $version)) {
             $version = $this->getTranslator()->trans("Unavailable");
+        }
 
         return Response::create($version);
     }
 
     public function loadStatsAjaxAction()
     {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         $data = new \stdClass();
 

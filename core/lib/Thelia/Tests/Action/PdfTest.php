@@ -22,7 +22,6 @@ use Thelia\Core\Event\PdfEvent;
  */
 class PdfTest extends \PHPUnit_Framework_TestCase
 {
-
     public function testGeneratePdf()
     {
         $event = new PdfEvent("test content");
@@ -34,5 +33,4 @@ class PdfTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNotNull($generatedPdf);
     }
-
 }

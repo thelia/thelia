@@ -66,9 +66,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $combinationAttributes = $event->getAttributeAvList();
 
             if (count($combinationAttributes) > 0) {
-
                 foreach ($combinationAttributes as $attributeAvId) {
-
                     $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 
                     if ($attributeAv !== null) {
@@ -88,7 +86,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -110,7 +107,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-
             // Update the product's tax rule
             $event->getProduct()->setTaxRuleId($event->getTaxRuleId())->save($con);
 
@@ -151,7 +147,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // If price is not defined, create it.
             if ($productPrice == null) {
-
                 $productPrice = new ProductPrice();
 
                 $productPrice
@@ -182,7 +177,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -198,7 +192,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     public function delete(ProductSaleElementDeleteEvent $event)
     {
         if (null !== $pse = ProductSaleElementsQuery::create()->findPk($event->getProductSaleElementId())) {
-
             $product = $pse->getProduct();
 
             $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
@@ -206,14 +199,12 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-
                 $pse->delete($con);
 
                 if ($product->countSaleElements($con) <= 0) {
                     // If we just deleted the last PSE, create a default one
                     $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
                 } elseif ($pse->getIsDefault()) {
-
                     // If we deleted the default PSE, make the last created one the default
                     $newDefaultPse = ProductSaleElementsQuery::create()
                         ->filterByProductId($product->getId())
@@ -229,9 +220,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 // Store all the stuff !
                 $con->commit();
-
             } catch (\Exception $ex) {
-
                 $con->rollback();
 
                 throw $ex;
@@ -252,7 +241,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         try {
-
             // Delete all product's productSaleElement
             ProductSaleElementsQuery::create()->filterByProductId($event->product->getId())->delete();
 
@@ -260,20 +248,19 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             // Create all combinations
             foreach ($event->getCombinations() as $combinationAttributesAvIds) {
-
                 // Create the PSE
                 $saleElement = $event->getProduct()->createProductSaleElement(
-                        $con,
-                        $event->getWeight(),
-                        $event->getPrice(),
-                        $event->getSalePrice(),
-                        $event->getCurrencyId(),
-                        $isDefault,
-                        $event->getOnsale(),
-                        $event->getIsnew(),
-                        $event->getQuantity(),
-                        $event->getEanCode(),
-                        $event->getReference()
+                    $con,
+                    $event->getWeight(),
+                    $event->getPrice(),
+                    $event->getSalePrice(),
+                    $event->getCurrencyId(),
+                    $isDefault,
+                    $event->getOnsale(),
+                    $event->getIsnew(),
+                    $event->getQuantity(),
+                    $event->getEanCode(),
+                    $event->getReference()
                 );
 
                 $isDefault = false;
@@ -284,7 +271,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             // Store all the stuff !
             $con->commit();
         } catch (\Exception $ex) {
-
             $con->rollback();
 
             throw $ex;
@@ -301,7 +287,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     protected function createCombination(ConnectionInterface $con, ProductSaleElements $salesElement, $combinationAttributes)
     {
         foreach ($combinationAttributes as $attributeAvId) {
-
             $attributeAv = AttributeAvQuery::create()->findPk($attributeAvId);
 
             if ($attributeAv !== null) {

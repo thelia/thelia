@@ -16,6 +16,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\ConfigStoreForm;
 use Thelia\Model\ConfigQuery;
+
 /**
  * Class ConfigStoreController
  * @package Thelia\Controller\Admin
@@ -23,7 +24,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigStoreController extends BaseAdminController
 {
-
     protected function renderTemplate()
     {
         return $this->render('config-store');
@@ -31,7 +31,9 @@ class ConfigStoreController extends BaseAdminController
 
     public function defaultAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::VIEW)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
 
         // The form is self-hydrated
         $configStoreForm = new ConfigStoreForm($this->getRequest(), 'form');
@@ -43,7 +45,9 @@ class ConfigStoreController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::UPDATE)) return $response;
+        if (null !== $response = $this->checkAuth(AdminResources::STORE, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
 
         $error_msg = false;
         $response = null;
@@ -56,8 +60,9 @@ class ConfigStoreController extends BaseAdminController
 
             // Update store
             foreach ($data as $name => $value) {
-                if(! in_array($name , array('success_url', 'error_message')))
+                if (! in_array($name, array('success_url', 'error_message'))) {
                     ConfigQuery::write($name, $value, false);
+                }
             }
 
             $this->adminLogAppend(AdminResources::STORE, AccessManager::UPDATE, "Store configuration changed");

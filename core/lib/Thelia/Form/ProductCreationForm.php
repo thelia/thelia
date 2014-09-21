@@ -22,7 +22,6 @@ class ProductCreationForm extends BaseForm
 {
     protected function buildForm($change_mode = false)
     {
-
         $this->formBuilder
             ->add("ref", "text", array(
                 "constraints" => array(
@@ -57,8 +56,8 @@ class ProductCreationForm extends BaseForm
             ))
             ;
 
-       if (! $change_mode) {
-           $this->formBuilder
+        if (! $change_mode) {
+            $this->formBuilder
                 ->add("price", "number", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),

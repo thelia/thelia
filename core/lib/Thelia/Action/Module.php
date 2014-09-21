@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Propel\Runtime\Propel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,10 +51,9 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function toggleActivation(ModuleToggleActivationEvent $event)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-
             $moduleInstance = $module->createInstance();
 
-            if ( method_exists($moduleInstance, 'setContainer')) {
+            if (method_exists($moduleInstance, 'setContainer')) {
                 $moduleInstance->setContainer($this->container);
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     $moduleInstance->deActivate($module);
@@ -78,9 +78,10 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
                         Translator::getInstance()->trans(
-                                'Cannot instanciante module "%name%": the namespace is null. Maybe the model is not loaded ?',
-                                array('%name%' => $module->getCode())
-                          ));
+                            'Cannot instanciante module "%name%": the namespace is null. Maybe the model is not loaded ?',
+                            array('%name%' => $module->getCode())
+                        )
+                    );
                 }
 
                 try {
@@ -99,8 +100,10 @@ class Module extends BaseAction implements EventSubscriberInterface
                     // Log a warning, and delete the database entry.
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
-                            'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted', array('%name%' => $module->getCode())
-                    ));
+                            'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
+                            array('%name%' => $module->getCode())
+                        )
+                    );
                 }
 
                 $module->delete($con);
@@ -109,7 +112,6 @@ class Module extends BaseAction implements EventSubscriberInterface
 
                 $event->setModule($module);
                 $this->cacheClear($event->getDispatcher());
-
             } catch (\Exception $e) {
                 $con->rollBack();
                 throw $e;
@@ -123,7 +125,6 @@ class Module extends BaseAction implements EventSubscriberInterface
     public function update(ModuleEvent $event)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getId())) {
-
             $module
                 ->setDispatcher($event->getDispatcher())
                 ->setLocale($event->getLocale())
@@ -157,7 +158,8 @@ class Module extends BaseAction implements EventSubscriberInterface
                     array(
                         "%mid" => $order->getPaymentModuleId(),
                         "%oid" => $order->getId()
-                ))
+                    )
+                )
             );
         }
 

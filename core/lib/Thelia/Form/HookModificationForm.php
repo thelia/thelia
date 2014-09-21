@@ -53,5 +53,4 @@ class HookModificationForm extends HookCreationForm
     {
         return "thelia_hook_modification";
     }
-
 }

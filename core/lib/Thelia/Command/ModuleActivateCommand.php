@@ -34,7 +34,7 @@ class ModuleActivateCommand extends BaseModuleGenerate
             ->setName("module:activate")
             ->setDescription("Activates a module")
             ->addArgument(
-                "module" ,
+                "module",
                 InputArgument::REQUIRED,
                 "module to activate"
             )

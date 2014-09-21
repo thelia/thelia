@@ -67,5 +67,4 @@ class AreaAddCountryEvent extends AreaEvent
     {
         return $this->country_id;
     }
-
 }

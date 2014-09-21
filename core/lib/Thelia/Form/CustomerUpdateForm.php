@@ -44,7 +44,6 @@ class CustomerUpdateForm extends BaseForm
      */
     protected function buildForm()
     {
-
         $this->formBuilder
             ->add('update_logged_in_user', 'integer') // In a front office context, update the in-memory logged-in user data
             ->add("company", "text", array(

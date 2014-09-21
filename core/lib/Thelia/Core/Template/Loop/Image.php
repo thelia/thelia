@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -161,7 +162,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $source = $this->getSource();
 
         if (! is_null($source)) {
-
             $source_id = $this->getSourceId();
             $id = $this->getId();
 
@@ -176,11 +176,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
-
                 $argValue = $this->getArgValue($source);
 
                 if (! empty($argValue)) {
-
                     $argValue = intval($argValue);
 
                     $search = $this->createSearchQuery($source, $argValue);
@@ -193,15 +191,15 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        if ($search == null)
+        if ($search == null) {
             throw new \InvalidArgumentException(sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources)));
+        }
 
         return $search;
     }
 
     public function buildModelCriteria()
     {
-
         // Select the proper query to use, and get the object type
         $this->objectType = $this->objectId = null;
 
@@ -227,7 +225,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -263,15 +260,26 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         foreach ($loopResult->getResultDataCollection() as $result) {
-
             // Setup required transformations
-            if (! is_null($width)) $event->setWidth($width);
-            if (! is_null($height)) $event->setHeight($height);
+            if (! is_null($width)) {
+                $event->setWidth($width);
+            }
+            if (! is_null($height)) {
+                $event->setHeight($height);
+            }
             $event->setResizeMode($resize_mode);
-            if (! is_null($rotation)) $event->setRotation($rotation);
-            if (! is_null($background_color)) $event->setBackgroundColor($background_color);
-            if (! is_null($quality)) $event->setQuality($quality);
-            if (! is_null($effects)) $event->setEffects($effects);
+            if (! is_null($rotation)) {
+                $event->setRotation($rotation);
+            }
+            if (! is_null($background_color)) {
+                $event->setBackgroundColor($background_color);
+            }
+            if (! is_null($quality)) {
+                $event->setQuality($quality);
+            }
+            if (! is_null($effects)) {
+                $event->setEffects($effects);
+            }
 
             // Put source image file path
             $source_filepath = sprintf("%s%s/%s/%s",
@@ -315,6 +323,5 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

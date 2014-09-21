@@ -38,5 +38,4 @@ class AreaCreateEvent extends AreaEvent
     {
         return $this->name;
     }
-
 }

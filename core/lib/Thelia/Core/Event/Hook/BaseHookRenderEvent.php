@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Event\Hook;
+
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -113,5 +114,4 @@ class BaseHookRenderEvent extends Event
     {
         return array_key_exists($key, $this->arguments);
     }
-
 }

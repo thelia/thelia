@@ -63,13 +63,13 @@ class StartDate extends ConditionAbstract
 
         // Parse the entered date to get a timestamp, if we don't already have one
         if (! is_int($values[self::START_DATE])) {
-
             $date = \DateTime::createFromFormat($this->getDateFormat(), $values[self::START_DATE]);
 
             // Check that the date is valid
             if (false === $date) {
                 throw new InvalidConditionValueException(
-                    get_class(), self::START_DATE
+                    get_class(),
+                    self::START_DATE
                 );
             }
 
@@ -130,9 +130,11 @@ class StartDate extends ConditionAbstract
         $strDate = $date->format($this->getDateFormat());
 
         $toolTip = $this->translator->trans(
-            'Valid only from %date% to the coupon expiration date', [
+            'Valid only from %date% to the coupon expiration date',
+            [
                 '%date%' => $strDate,
-            ], 'condition'
+            ],
+            'condition'
         );
 
         return $toolTip;
@@ -163,7 +165,6 @@ class StartDate extends ConditionAbstract
     public function drawBackOfficeInputs()
     {
         if (isset($this->values[self::START_DATE])) {
-
             $date = new \DateTime();
 
             $date->setTimestamp($this->values[self::START_DATE]);

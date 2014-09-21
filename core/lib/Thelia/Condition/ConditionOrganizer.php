@@ -32,5 +32,4 @@ class ConditionOrganizer implements ConditionOrganizerInterface
     {
         // @todo: Implement organize() method.
     }
-
 }

@@ -30,7 +30,6 @@ use Thelia\Model\Coupon;
  */
 interface FacadeInterface
 {
-
     /**
      * Constructor
      *
@@ -180,5 +179,4 @@ interface FacadeInterface
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher();
-
 }

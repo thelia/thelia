@@ -141,5 +141,4 @@ class Argument
             $empty
         );
     }
-
 }

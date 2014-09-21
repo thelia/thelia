@@ -53,7 +53,6 @@ abstract class ActionEvent extends Event
             } else {
                 $this->{$field->getName()} = $field->getData();
             }
-
         }
     }
 }

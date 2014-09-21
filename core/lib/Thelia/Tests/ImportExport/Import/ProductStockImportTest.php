@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport\Import;
+
 use Thelia\Controller\Admin\ImportController;
 use Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter;
 use Thelia\ImportExport\Import\Type\ProductStockImport;
@@ -55,7 +56,6 @@ class ProductStockImportTest extends ControllerTestBase
 
         /** @var \Thelia\Model\ProductSaleElements $pse */
         foreach ($query as $pse) {
-
             $entry = [];
 
             $entry["ref"]   = $pse->getRef();

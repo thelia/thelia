@@ -16,7 +16,6 @@ use Thelia\Model\Base\OrderStatusQuery as BaseOrderStatusQuery;
  */
 class OrderStatusQuery extends BaseOrderStatusQuery
 {
-
     public static function getNotPaidStatus()
     {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_NOT_PAID);
@@ -41,5 +40,4 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED);
     }
-
 } // OrderStatusQuery

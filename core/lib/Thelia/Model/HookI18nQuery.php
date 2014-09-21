@@ -16,5 +16,4 @@ use Thelia\Model\Base\HookI18nQuery as BaseHookI18nQuery;
  */
 class HookI18nQuery extends BaseHookI18nQuery
 {
-
 } // HookI18nQuery

@@ -34,7 +34,6 @@ use Thelia\Model\Content as ContentModel;
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {
-
     public function create(ContentCreateEvent $event)
     {
         $content = new ContentModel();
@@ -102,7 +101,6 @@ class Content extends BaseAction implements EventSubscriberInterface
             ->save();
 
         $event->setContent($content);
-
     }
 
     public function delete(ContentDeleteEvent $event)
@@ -126,7 +124,7 @@ class Content extends BaseAction implements EventSubscriberInterface
      */
     public function addFolder(ContentAddFolderEvent $event)
     {
-        if(ContentFolderQuery::create()
+        if (ContentFolderQuery::create()
             ->filterByContent($event->getContent())
             ->filterByFolderId($event->getFolderId())
             ->count() <= 0
@@ -188,5 +186,4 @@ class Content extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CONTENT_REMOVE_FOLDER     => array('removeFolder', 128),
         );
     }
-
 }

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Action;
+
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -25,7 +26,6 @@ use Thelia\Model\Newsletter as NewsletterModel;
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {
-
     public function subscribe(NewsletterEvent $event)
     {
         $newsletter = new NewsletterModel();

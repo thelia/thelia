@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\FileFormat\Archive\ArchiveBuilder;
+
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder;
 use Thelia\Core\Translation\Translator;
@@ -97,7 +98,6 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->tar->hasFile("bar/baz"));
 
         $this->assertTrue($this->tar->hasDirectory("bar"));
-
     }
 
     public function testAddValidFileFromString()

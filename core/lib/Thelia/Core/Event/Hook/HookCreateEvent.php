@@ -133,5 +133,4 @@ class HookCreateEvent extends HookEvent
     {
         return $this->code;
     }
-
 }

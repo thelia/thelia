@@ -43,5 +43,4 @@ class ModuleHookDeleteEvent extends ModuleHookEvent
     {
         return $this->module_hook_id;
     }
-
 }

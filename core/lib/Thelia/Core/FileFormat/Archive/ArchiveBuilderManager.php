@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\FileFormat\Archive;
+
 use Thelia\Core\Translation\Translator;
 
 /**

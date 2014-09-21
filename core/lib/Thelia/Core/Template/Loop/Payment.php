@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
@@ -24,7 +25,6 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
-
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();

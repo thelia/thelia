@@ -198,7 +198,6 @@ class ConfigStoreForm extends BaseForm
         $emailValidator = new Constraints\Email();
 
         foreach ($list as $email) {
-
             $email = trim($email);
 
             $context->validateValue($email, $emailValidator);

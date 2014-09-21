@@ -90,7 +90,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $visible = $this->getVisible();
 
-        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) {
+            $search->filterByVisible($visible);
+        }
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
@@ -99,20 +101,22 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         $this->useFeaturePosition = true;
 
         if (null !== $product) {
-
             // Find all template assigned to the products.
             $products = ProductQuery::create()->findById($product);
 
             // Ignore if the product cannot be found.
             if ($products !== null) {
-
                 // Create template array
-                if ($template == null) $template = array();
+                if ($template == null) {
+                    $template = array();
+                }
 
                 foreach ($products as $product) {
                     $tpl_id = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) $template[] = $tpl_id;
+                    if (! is_null($tpl_id)) {
+                        $template[] = $tpl_id;
+                    }
                 }
             }
 
@@ -124,7 +128,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if (! empty($template)) {
-
             // Join with feature_template table to get position
             $search
                 ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
@@ -180,23 +183,23 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
-                    if ($this->useFeaturePosition)
+                    if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::ASC);
-                     else
+                    } else {
                         $search->addAscendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                    }
                     break;
                 case "manual_reverse":
-                    if ($this->useFeaturePosition)
+                    if ($this->useFeaturePosition) {
                         $search->orderByPosition(Criteria::DESC);
-                     else
+                    } else {
                         $search->addDescendingOrderByColumn(FeatureTemplateTableMap::POSITION);
+                    }
                     break;
             }
-
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -217,6 +220,5 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
-
     }
 }

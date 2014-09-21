@@ -19,5 +19,4 @@ namespace Thelia\Core\FileFormat\Formatting\Exception;
  */
 class BadFormattedStringException extends \ErrorException
 {
-
 }

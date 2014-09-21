@@ -108,7 +108,6 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)

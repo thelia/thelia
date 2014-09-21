@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Template\Loop;
+
 use Thelia\Model\ExportCategoryQuery;
 
 /**
@@ -24,5 +25,4 @@ class ExportCategory extends ImportExportCategory
     {
         return ExportCategoryQuery::create();
     }
-
 }

@@ -16,5 +16,4 @@ use Thelia\Model\Base\OrderVersionQuery as BaseOrderVersionQuery;
  */
 class OrderVersionQuery extends BaseOrderVersionQuery
 {
-
 } // OrderVersionQuery

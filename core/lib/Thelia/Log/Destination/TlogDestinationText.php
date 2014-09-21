@@ -18,26 +18,26 @@ class TlogDestinationText extends AbstractTlogDestination
 {
     public function __construct()
     {
-            parent::__construct();
+        parent::__construct();
     }
 
     public function getTitle()
     {
-            return "Direct text display";
+        return "Direct text display";
     }
 
     public function getDescription()
     {
-            return "Display logs in raw text format, on top of generated pages.";
+        return "Display logs in raw text format, on top of generated pages.";
     }
 
     public function add($texte)
     {
-            echo trim($texte)."\n";
+        echo trim($texte)."\n";
     }
 
     public function write(&$res)
     {
-                    // Rien
+        // Rien
     }
 }
