@@ -16,4 +16,5 @@ use Thelia\Model\Base\FormFirewallQuery as BaseFormFirewallQuery;
  */
 class FormFirewallQuery extends BaseFormFirewallQuery
 {
-} // FormFirewallQuery
+}
+// FormFirewallQuery

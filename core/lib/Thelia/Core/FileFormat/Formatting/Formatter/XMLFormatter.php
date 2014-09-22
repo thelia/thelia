@@ -83,7 +83,7 @@ class XMLFormatter extends AbstractFormatter
         $domDocument = new \DOMDocument("1.0");
         $container = $domDocument->appendChild(new \DOMElement($this->root));
 
-        foreach ($arrayData as $key=>$entry) {
+        foreach ($arrayData as $key => $entry) {
             if (is_array($entry)) {
                 $node = $container->appendChild(new \DOMElement($this->rowName));
                 $this->recursiveBuild($entry, $node);
@@ -93,7 +93,7 @@ class XMLFormatter extends AbstractFormatter
 
                 /** @var \DOMElement $lastChild */
                 $lastChild = $container->lastChild;
-                $lastChild->setAttribute("name",$key);
+                $lastChild->setAttribute("name", $key);
                 $lastChild->setAttribute("value", $entry);
             }
         }
@@ -106,7 +106,7 @@ class XMLFormatter extends AbstractFormatter
 
     protected function recursiveBuild(array $data, \DOMNode $node)
     {
-        foreach ($data as $key=>$entry) {
+        foreach ($data as $key => $entry) {
             if (is_array($entry)) {
                 $newNode = $node->appendChild(new \DOMElement($key));
                 $this->recursiveBuild($entry, $newNode);
@@ -116,7 +116,7 @@ class XMLFormatter extends AbstractFormatter
 
                 /** @var \DOMElement $lastChild */
                 $lastChild = $node->lastChild;
-                $lastChild->setAttribute("name",$key);
+                $lastChild->setAttribute("name", $key);
                 $lastChild->setAttribute("value", $entry);
             }
         }

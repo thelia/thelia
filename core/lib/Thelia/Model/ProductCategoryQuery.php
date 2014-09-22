@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductCategoryQuery as BaseProductCategoryQuery;
  */
 class ProductCategoryQuery extends BaseProductCategoryQuery
 {
-} // ProductCategoryQuery
+}
+// ProductCategoryQuery

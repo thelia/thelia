@@ -16,4 +16,5 @@ use Thelia\Model\Base\TaxI18nQuery as BaseTaxI18nQuery;
  */
 class TaxI18nQuery extends BaseTaxI18nQuery
 {
-} // TaxI18nQuery
+}
+// TaxI18nQuery

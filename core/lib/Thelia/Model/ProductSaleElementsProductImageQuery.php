@@ -14,4 +14,5 @@ use Thelia\Model\Base\ProductSaleElementsProductImageQuery as BaseProductSaleEle
  */
 class ProductSaleElementsProductImageQuery extends BaseProductSaleElementsProductImageQuery
 {
-} // ProductSaleElementsProductImageQuery
+}
+// ProductSaleElementsProductImageQuery

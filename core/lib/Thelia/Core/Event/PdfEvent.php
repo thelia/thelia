@@ -39,7 +39,7 @@ class PdfEvent extends ActionEvent
      * @param string $encoding    charset encoding; default is UTF-8
      * @param array  $marges      Default marges (left, top, right, bottom)
      */
-    public function __construct($content, $orientation = 'P', $format = 'A4', $lang='fr', $unicode=true, $encoding='UTF-8',array $marges = array(0, 0, 0, 0))
+    public function __construct($content, $orientation = 'P', $format = 'A4', $lang ='fr', $unicode = true, $encoding = 'UTF-8', array $marges = array(0, 0, 0, 0))
     {
         $this->content = $content;
         $this->orientation = $orientation;

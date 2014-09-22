@@ -44,7 +44,7 @@ use Thelia\Type\BooleanOrBothType;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseI18nLoop  implements ArraySearchLoopInterface
+class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
     /**
      * @return ArgumentCollection

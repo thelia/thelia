@@ -105,9 +105,18 @@ class RemoveXPercentTest extends \PHPUnit_Framework_TestCase
     Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesuada tortor vel erat volutpat tincidunt. In vehicula diam est, a convallis eros scelerisque ut. Donec aliquet venenatis iaculis. Ut a arcu gravida, placerat dui eu, iaculis nisl. Quisque adipiscing orci sit amet dui dignissim lacinia. Sed vulputate lorem non dolor adipiscing ornare. Morbi ornare id nisl id aliquam. Ut fringilla elit ante, nec lacinia enim fermentum sit amet. Aenean rutrum lorem eu convallis pharetra. Cras malesuada varius metus, vitae gravida velit. Nam a varius ipsum, ac commodo dolor. Phasellus nec elementum elit. Etiam vel adipiscing leo.';
 
         $coupon->set(
-            $stubFacade, 'XMAS', 'XMAS Coupon', 'Coupon for Springbreak removing 10% if you have a cart between 40.00€ and 400.00€ (excluded)',
-            $description, array('amount' => 0.00, 'percentage' => 10.00), true, true, true, true,
-            254, $date->setTimestamp(strtotime("today + 3 months")),
+            $stubFacade,
+            'XMAS',
+            'XMAS Coupon',
+            'Coupon for Springbreak removing 10% if you have a cart between 40.00€ and 400.00€ (excluded)',
+            $description,
+            array('amount' => 0.00, 'percentage' => 10.00),
+            true,
+            true,
+            true,
+            true,
+            254,
+            $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
             new ObjectCollection(),
             false

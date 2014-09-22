@@ -21,7 +21,10 @@ class TemplateCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("name"   , "text"  , array(
+            ->add(
+                "name",
+                "text",
+                array(
                 "constraints" => array(
                     new NotBlank()
                 ),
@@ -30,7 +33,10 @@ class TemplateCreationForm extends BaseForm
                     "for" => "name"
                 ))
             )
-            ->add("locale" , "text"  , array(
+            ->add(
+                "locale",
+                "text",
+                array(
                 "constraints" => array(
                     new NotBlank()
                 ))

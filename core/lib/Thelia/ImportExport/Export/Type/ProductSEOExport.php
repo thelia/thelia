@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export\Type;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\FormatType;
@@ -81,7 +82,8 @@ class ProductSEOExport extends ExportHandler
             ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
             ->addJoinCondition(
                 "rewriting_url_join",
-                RewritingUrlTableMap::VIEW . " = ?",(new Product())->getRewrittenUrlViewName(),
+                RewritingUrlTableMap::VIEW . " = ?",
+                (new Product())->getRewrittenUrlViewName(),
                 null,
                 \PDO::PARAM_STR
             )
@@ -126,5 +128,4 @@ class ProductSEOExport extends ExportHandler
             "product_seo_META_KEYWORDS" => "meta_keywords",
         ];
     }
-
 }

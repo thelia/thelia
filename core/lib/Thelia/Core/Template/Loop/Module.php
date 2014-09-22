@@ -159,7 +159,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 case "enabled_reverse":
                     $search->orderByActivate(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         return $search;
@@ -181,19 +181,19 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($module);
 
                 $loopResultRow
-                    ->set("ID"           , $module->getId())
+                    ->set("ID", $module->getId())
                     ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE"       , $this->locale)
-                    ->set("TITLE"        , $module->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"        , $module->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"  , $module->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM" , $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("CODE"         , $module->getCode())
-                    ->set("TYPE"         , $module->getType())
-                    ->set("ACTIVE"       , $module->getActivate())
-                    ->set("CLASS"        , $module->getFullNamespace())
-                    ->set("POSITION"     , $module->getPosition())
-                    ->set("EXISTS"       , $exists)
+                    ->set("LOCALE", $this->locale)
+                    ->set("TITLE", $module->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("CODE", $module->getCode())
+                    ->set("TYPE", $module->getType())
+                    ->set("ACTIVE", $module->getActivate())
+                    ->set("CLASS", $module->getFullNamespace())
+                    ->set("POSITION", $module->getPosition())
+                    ->set("EXISTS", $exists)
                 ;
 
                 $hasConfigurationInterface = false;
@@ -236,7 +236,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     // Make a quick and dirty test on the module's config.xml file
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
-                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/',$configContent) !== false) {
+                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false) {
                         $hasConfigurationInterface = true;
                     }
 

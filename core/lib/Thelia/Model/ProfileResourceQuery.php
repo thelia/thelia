@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProfileResourceQuery as BaseProfileResourceQuery;
  */
 class ProfileResourceQuery extends BaseProfileResourceQuery
 {
-} // ProfileResourceQuery
+}
+// ProfileResourceQuery

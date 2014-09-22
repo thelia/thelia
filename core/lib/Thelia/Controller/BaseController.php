@@ -82,11 +82,14 @@ abstract class BaseController extends ContainerAware
      */
     protected function pdfResponse($pdf, $fileName, $status = 200)
     {
-        return Response::create($pdf, $status,
+        return Response::create(
+            $pdf,
+            $status,
             array(
                 'Content-type' => "application/pdf",
                 'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $fileName),
-            ));
+            )
+        );
     }
 
     /**

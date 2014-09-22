@@ -21,6 +21,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Tools\URL;
+
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
@@ -94,7 +95,7 @@ class TranslationsController extends BaseAdminController
             switch ($item_to_translate) {
 
                 // Module core
-                case 'mo' :
+                case 'mo':
                     $module = $this->getModule($item_name);
 
                     if ($module_part == 'core') {
@@ -158,32 +159,32 @@ class TranslationsController extends BaseAdminController
                     break;
 
                 // Thelia Core
-                case 'co' :
+                case 'co':
                     $directory = THELIA_ROOT . 'core/lib/Thelia';
                     $domain = 'core';
                     $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
                     $walkMode = TemplateHelper::WALK_MODE_PHP;
-                break;
+                    break;
 
                 // Front-office template
-                case 'fo' :
+                case 'fo':
                     $template = new TemplateDefinition($item_name, TemplateDefinition::FRONT_OFFICE);
-                break;
+                    break;
 
                 // Back-office template
-                case 'bo' :
+                case 'bo':
                     $template = new TemplateDefinition($item_name, TemplateDefinition::BACK_OFFICE);
-                break;
+                    break;
 
                 // PDF templates
-                case 'pf' :
+                case 'pf':
                     $template = new TemplateDefinition($item_name, TemplateDefinition::PDF);
-                break;
+                    break;
 
                 // Email templates
-                case 'ma' :
+                case 'ma':
                     $template = new TemplateDefinition($item_name, TemplateDefinition::EMAIL);
-                break;
+                    break;
             }
 
             if ($template) {
@@ -227,12 +228,12 @@ class TranslationsController extends BaseAdminController
 
                 // Load strings
                 $stringsCount = TemplateHelper::getInstance()->walkDir(
-                        $directory,
-                        $walkMode,
-                        $this->getTranslator(),
-                        $this->getCurrentEditionLocale(),
-                        $domain,
-                        $all_strings
+                    $directory,
+                    $walkMode,
+                    $this->getTranslator(),
+                    $this->getCurrentEditionLocale(),
+                    $domain,
+                    $all_strings
                 );
 
                 // Estimate number of fields, and compare to php ini max_input_vars

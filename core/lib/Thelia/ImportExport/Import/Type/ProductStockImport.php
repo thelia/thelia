@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Import\Type;
+
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Import\ImportHandler;
@@ -90,5 +91,4 @@ class ProductStockImport extends ImportHandler
             FormatType::UNBOUNDED,
         );
     }
-
 }

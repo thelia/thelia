@@ -35,7 +35,8 @@ class ExportHandlerTest extends ContainerAwareTestCase
     protected function buildContainer(ContainerBuilder $container)
     {
         $container->setParameter(
-            "Thelia.parser.loops", [
+            "Thelia.parser.loops",
+            [
                 "address" => "Thelia\\Core\\Template\\Loop\\Address",
             ]
         );

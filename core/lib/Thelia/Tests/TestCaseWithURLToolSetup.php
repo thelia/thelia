@@ -39,13 +39,13 @@ class TestCaseWithURLToolSetup extends \PHPUnit_Framework_TestCase
     protected function setupURLTool()
     {
         $context = new RequestContext(
-                '/thelia/index.php',
-                'GET',
-                'localhost',
-                'http',
-                80,
-                443,
-                '/path/to/action'
+            '/thelia/index.php',
+            'GET',
+            'localhost',
+            'http',
+            80,
+            443,
+            '/path/to/action'
         );
 
         $router = $this->getMockBuilder("Symfony\Component\Routing\Router")

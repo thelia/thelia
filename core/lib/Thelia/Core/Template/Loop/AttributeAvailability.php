@@ -147,15 +147,15 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
         foreach ($loopResult->getResultDataCollection() as $attributeAv) {
             $loopResultRow = new LoopResultRow($attributeAv);
             $loopResultRow
-                ->set("ID"           , $attributeAv->getId())
-                ->set("ATTRIBUTE_ID" , $attributeAv->getAttributeId())
+                ->set("ID", $attributeAv->getId())
+                ->set("ATTRIBUTE_ID", $attributeAv->getAttributeId())
                 ->set("IS_TRANSLATED", $attributeAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $this->locale)
-                ->set("TITLE"        , $attributeAv->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"        , $attributeAv->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"  , $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM" , $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("POSITION"     , $attributeAv->getPosition())
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $attributeAv->getPosition())
             ;
 
             $loopResult->addRow($loopResultRow);

@@ -109,4 +109,5 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
 
         return $this;
     }
-} // ModuleConfigQuery
+}
+// ModuleConfigQuery

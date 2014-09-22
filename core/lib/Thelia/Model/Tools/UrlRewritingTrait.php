@@ -21,6 +21,7 @@ use Thelia\Model\RewritingUrl;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 use Thelia\Model\ConfigQuery;
+
 /**
  * A trait for managing Rewritten URLs from model classes
  */
@@ -84,7 +85,7 @@ trait UrlRewritingTrait
             $i=0;
             while (URL::getInstance()->resolve($urlFilePart)) {
                 $i++;
-                $urlFilePart = sprintf("%s-%d.html",$cleanString, $i);
+                $urlFilePart = sprintf("%s-%d.html", $cleanString, $i);
             }
         } catch (UrlRewritingException $e) {
             $rewritingUrl = new RewritingUrl();

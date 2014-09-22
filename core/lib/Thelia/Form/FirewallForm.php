@@ -38,7 +38,7 @@ abstract class FirewallForm extends BaseForm
             /**
              * Empty the firewall
              */
-            $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60 );
+            $deleteTime = date("Y-m-d G:i:s", time() - $this->getConfigTime() * 60);
             $collection = FormFirewallQuery::create()
                 ->filterByFormName($this->getName())
                 ->filterByUpdatedAt($deleteTime, Criteria::LESS_THAN)

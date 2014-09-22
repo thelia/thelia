@@ -60,7 +60,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                             'is_default', 'is_default_reverse',
                             'manual', 'manual_reverse')
                     )
-                    ),
+                ),
                 'manual'
             )
         );
@@ -143,7 +143,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'manual_reverse':
                     $search->orderByPosition(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         /* perform search */
@@ -156,15 +156,15 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $currency) {
             $loopResultRow = new LoopResultRow($currency);
             $loopResultRow
-                ->set("ID"            , $currency->getId())
-                ->set("IS_TRANSLATED" , $currency->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $this->locale)
-                ->set("NAME"          , $currency->getVirtualColumn('i18n_NAME'))
-                ->set("ISOCODE"       , $currency->getCode())
-                ->set("SYMBOL"        , $currency->getSymbol())
-                ->set("RATE"          , $currency->getRate())
-                ->set("POSITION"      , $currency->getPosition())
-                ->set("IS_DEFAULT"    , $currency->getByDefault())
+                ->set("ID", $currency->getId())
+                ->set("IS_TRANSLATED", $currency->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("NAME", $currency->getVirtualColumn('i18n_NAME'))
+                ->set("ISOCODE", $currency->getCode())
+                ->set("SYMBOL", $currency->getSymbol())
+                ->set("RATE", $currency->getRate())
+                ->set("POSITION", $currency->getPosition())
+                ->set("IS_DEFAULT", $currency->getByDefault())
             ;
 
             $loopResult->addRow($loopResultRow);

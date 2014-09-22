@@ -74,8 +74,8 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $orderStatus) {
             $loopResultRow = new LoopResultRow($orderStatus);
             $loopResultRow->set("ID", $orderStatus->getId())
-                ->set("IS_TRANSLATED",$orderStatus->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
+                ->set("IS_TRANSLATED", $orderStatus->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
                 ->set("CODE", $orderStatus->getCode())
                 ->set("TITLE", $orderStatus->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $orderStatus->getVirtualColumn('i18n_CHAPO'))

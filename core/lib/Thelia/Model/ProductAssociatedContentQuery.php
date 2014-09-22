@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductAssociatedContentQuery as BaseProductAssociatedCont
  */
 class ProductAssociatedContentQuery extends BaseProductAssociatedContentQuery
 {
-} // ProductAssociatedContentQuery
+}
+// ProductAssociatedContentQuery

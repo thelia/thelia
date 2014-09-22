@@ -145,7 +145,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      * test formatDate without mandatory parameters
      *
      * @covers ::formatDate
-     * @expectedException Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
      */
     public function testFormatDateWithoutDate()
     {
@@ -233,7 +233,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
             "number" => $number
         ));
 
-        $this->assertEquals( $render, number_format($number, 2, ",", " "));
+        $this->assertEquals($render, number_format($number, 2, ",", " "));
     }
 
     /**

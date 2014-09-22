@@ -105,11 +105,23 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param boolean   $perCustomerUsageCount      Usage count is per customer
      */
     public function __construct(
-        $code, $serviceId, $title, array $effects, $shortDescription, $description,
-        $isEnabled, \DateTime $expirationDate, $isAvailableOnSpecialOffers, $isCumulative,
-        $isRemovingPostage, $maxUsage, $locale, $freeShippingForCountries, $freeShippingForMethods,
-        $perCustomerUsageCount)
-    {
+        $code,
+        $serviceId,
+        $title,
+        array $effects,
+        $shortDescription,
+        $description,
+        $isEnabled,
+        \DateTime $expirationDate,
+        $isAvailableOnSpecialOffers,
+        $isCumulative,
+        $isRemovingPostage,
+        $maxUsage,
+        $locale,
+        $freeShippingForCountries,
+        $freeShippingForMethods,
+        $perCustomerUsageCount
+    ) {
         $this->code = $code;
         $this->description = $description;
         $this->expirationDate = $expirationDate;

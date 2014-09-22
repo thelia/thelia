@@ -31,4 +31,5 @@ class MessageQuery extends BaseMessageQuery
 
         return $message;
     }
-} // MessageQuery
+}
+// MessageQuery

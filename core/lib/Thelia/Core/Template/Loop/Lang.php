@@ -113,7 +113,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
             $loopResultRow
                 ->set("ID", $result->getId())
-                ->set("TITLE",$result->getTitle())
+                ->set("TITLE", $result->getTitle())
                 ->set("CODE", $result->getCode())
                 ->set("LOCALE", $result->getLocale())
                 ->set("URL", $result->getUrl())

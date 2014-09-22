@@ -38,8 +38,13 @@ trait FolderBreadcrumbTrait
         $results = $folderPath->buildArray();
 
         foreach ($results as $result) {
-            $breadcrumb[$result['TITLE']] = sprintf("%s?folder_id=%d",
-                $router->generate('admin.folders.default',[], Router::ABSOLUTE_URL),
+            $breadcrumb[$result['TITLE']] = sprintf(
+                "%s?folder_id=%d",
+                $router->generate(
+                    'admin.folders.default',
+                    [],
+                    Router::ABSOLUTE_URL
+                ),
                 $result['ID']
             );
         }
@@ -55,8 +60,13 @@ trait FolderBreadcrumbTrait
 
         $folder->setLocale($locale);
 
-        $breadcrumb[$folder->getTitle()] = sprintf("%s?current_tab=%s",
-            $router->generate('admin.folders.update',['folder_id' => $folder->getId()], Router::ABSOLUTE_URL),
+        $breadcrumb[$folder->getTitle()] = sprintf(
+            "%s?current_tab=%s",
+            $router->generate(
+                'admin.folders.update',
+                ['folder_id' => $folder->getId()],
+                Router::ABSOLUTE_URL
+            ),
             $tab
         );
 
@@ -72,8 +82,13 @@ trait FolderBreadcrumbTrait
 
         $content->setLocale($locale);
 
-        $breadcrumb[$content->getTitle()] = sprintf("%s?current_tab=%s",
-            $router->generate('admin.content.update', ['content_id' => $content->getId()], Router::ABSOLUTE_URL),
+        $breadcrumb[$content->getTitle()] = sprintf(
+            "%s?current_tab=%s",
+            $router->generate(
+                'admin.content.update',
+                ['content_id' => $content->getId()],
+                Router::ABSOLUTE_URL
+            ),
             $tab
         );
 

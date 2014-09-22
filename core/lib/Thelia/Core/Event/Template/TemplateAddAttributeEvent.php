@@ -13,6 +13,7 @@
 namespace Thelia\Core\Event\Template;
 
 use Thelia\Model\Template;
+
 class TemplateAddAttributeEvent extends TemplateEvent
 {
     protected $attribute_id;

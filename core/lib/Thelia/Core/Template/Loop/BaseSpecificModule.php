@@ -70,7 +70,8 @@ abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLo
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumType([
+                    new EnumType(
+                        [
                         'id',
                         'id_reverse',
                         'alpha',

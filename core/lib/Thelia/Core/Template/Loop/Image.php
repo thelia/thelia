@@ -51,40 +51,36 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         $collection = new ArgumentCollection(
-
-                Argument::createIntListTypeArgument('id'),
-                Argument::createIntListTypeArgument('exclude'),
-                Argument::createBooleanOrBothTypeArgument('visible', 1),
-                new Argument(
-                        'order',
-                        new TypeCollection(
-                                new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
-                        ),
-                        'manual'
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
                 ),
-                Argument::createIntTypeArgument('width'),
-                Argument::createIntTypeArgument('height'),
-                Argument::createIntTypeArgument('rotation', 0),
-                Argument::createAnyTypeArgument('background_color'),
-                Argument::createIntTypeArgument('quality'),
-                new Argument(
-                        'resize_mode',
-                        new TypeCollection(
-                                new EnumType(array('crop', 'borders', 'none'))
-                        ),
-                        'none'
+                'manual'
+            ),
+            Argument::createIntTypeArgument('width'),
+            Argument::createIntTypeArgument('height'),
+            Argument::createIntTypeArgument('rotation', 0),
+            Argument::createAnyTypeArgument('background_color'),
+            Argument::createIntTypeArgument('quality'),
+            new Argument(
+                'resize_mode',
+                new TypeCollection(
+                    new EnumType(array('crop', 'borders', 'none'))
                 ),
-                Argument::createAnyTypeArgument('effects'),
-
-                Argument::createIntTypeArgument('category'),
-                Argument::createIntTypeArgument('product'),
-                Argument::createIntTypeArgument('folder'),
-                Argument::createIntTypeArgument('content'),
-
-                Argument::createAnyTypeArgument('source'),
-
-                Argument::createIntTypeArgument('source_id'),
-                Argument::createBooleanTypeArgument('force_return', true)
+                'none'
+            ),
+            Argument::createAnyTypeArgument('effects'),
+            Argument::createIntTypeArgument('category'),
+            Argument::createIntTypeArgument('product'),
+            Argument::createIntTypeArgument('folder'),
+            Argument::createIntTypeArgument('content'),
+            Argument::createAnyTypeArgument('source'),
+            Argument::createIntTypeArgument('source_id'),
+            Argument::createBooleanTypeArgument('force_return', true)
         );
 
         // Add possible image sources
@@ -245,15 +241,15 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         switch ($this->getResizeMode()) {
-            case 'crop' :
+            case 'crop':
                 $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                 break;
 
-            case 'borders' :
+            case 'borders':
                 $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
                 break;
 
-            case 'none' :
+            case 'none':
             default:
                 $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
 
@@ -282,7 +278,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
 
             // Put source image file path
-            $source_filepath = sprintf("%s%s/%s/%s",
+            $source_filepath = sprintf(
+                "%s%s/%s/%s",
                 THELIA_ROOT,
                 ConfigQuery::read('images_library_path', 'local/media/images'),
                 $this->objectType,
@@ -299,20 +296,20 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
-                    ->set("ID"                  , $result->getId())
-                    ->set("LOCALE"              ,$this->locale)
-                    ->set("IMAGE_URL"           , $event->getFileUrl())
-                    ->set("ORIGINAL_IMAGE_URL"  , $event->getOriginalFileUrl())
-                    ->set("IMAGE_PATH"          , $event->getCacheFilepath())
-                    ->set("ORIGINAL_IMAGE_PATH" , $source_filepath)
-                    ->set("TITLE"               , $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"               , $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"         , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM"        , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("VISIBLE"             , $result->getVisible())
-                    ->set("POSITION"            , $result->getPosition())
-                    ->set("OBJECT_TYPE"         , $this->objectType)
-                    ->set("OBJECT_ID"           , $this->objectId)
+                    ->set("ID", $result->getId())
+                    ->set("LOCALE", $this->locale)
+                    ->set("IMAGE_URL", $event->getFileUrl())
+                    ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
+                    ->set("IMAGE_PATH", $event->getCacheFilepath())
+                    ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
+                    ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("VISIBLE", $result->getVisible())
+                    ->set("POSITION", $result->getPosition())
+                    ->set("OBJECT_TYPE", $this->objectType)
+                    ->set("OBJECT_ID", $this->objectId)
                 ;
 
                 $loopResult->addRow($loopResultRow);

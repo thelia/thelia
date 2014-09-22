@@ -16,4 +16,5 @@ use Thelia\Model\Base\RewritingArgumentQuery as BaseRewritingArgumentQuery;
  */
 class RewritingArgumentQuery extends BaseRewritingArgumentQuery
 {
-} // RewritingArgumentQuery
+}
+// RewritingArgumentQuery

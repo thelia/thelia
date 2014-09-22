@@ -12,6 +12,7 @@
 namespace Thelia\Core\HttpKernel\Exception;
 
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as BaseNotFountHttpException;
+
 /**
  * Class NotFountHttpException
  * @author Manuel Raynaud <mraynaud@openstudio.fr>

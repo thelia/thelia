@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductVersionQuery as BaseProductVersionQuery;
  */
 class ProductVersionQuery extends BaseProductVersionQuery
 {
-} // ProductVersionQuery
+}
+// ProductVersionQuery

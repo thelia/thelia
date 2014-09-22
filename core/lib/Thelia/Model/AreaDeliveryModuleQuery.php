@@ -28,4 +28,5 @@ class AreaDeliveryModuleQuery extends BaseAreaDeliveryModuleQuery
 
         return $response;
     }
-} // AreaDeliveryModuleQuery
+}
+// AreaDeliveryModuleQuery

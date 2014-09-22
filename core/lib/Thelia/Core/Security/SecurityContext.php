@@ -130,7 +130,7 @@ class SecurityContext
             return true;
         }
 
-        if ( !method_exists($user, 'getPermissions') ) {
+        if (!method_exists($user, 'getPermissions')) {
             return false;
         }
 

@@ -63,4 +63,5 @@ class FolderQuery extends BaseFolderQuery
 
         return $result;
     }
-} // FolderQuery
+}
+// FolderQuery

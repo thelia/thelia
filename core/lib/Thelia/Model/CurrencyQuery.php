@@ -16,4 +16,5 @@ use Thelia\Model\Base\CurrencyQuery as BaseCurrencyQuery;
  */
 class CurrencyQuery extends BaseCurrencyQuery
 {
-} // CurrencyQuery
+}
+// CurrencyQuery

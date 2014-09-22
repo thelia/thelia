@@ -16,4 +16,5 @@ use Thelia\Model\Base\AdminQuery as BaseAdminQuery;
  */
 class AdminQuery extends BaseAdminQuery
 {
-} // AdminQuery
+}
+// AdminQuery

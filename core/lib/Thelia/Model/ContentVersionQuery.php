@@ -16,4 +16,5 @@ use Thelia\Model\Base\ContentVersionQuery as BaseContentVersionQuery;
  */
 class ContentVersionQuery extends BaseContentVersionQuery
 {
-} // ContentVersionQuery
+}
+// ContentVersionQuery

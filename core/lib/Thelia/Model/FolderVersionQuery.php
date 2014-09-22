@@ -16,4 +16,5 @@ use Thelia\Model\Base\FolderVersionQuery as BaseFolderVersionQuery;
  */
 class FolderVersionQuery extends BaseFolderVersionQuery
 {
-} // FolderVersionQuery
+}
+// FolderVersionQuery

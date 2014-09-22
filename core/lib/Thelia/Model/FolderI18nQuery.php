@@ -16,4 +16,5 @@ use Thelia\Model\Base\FolderI18nQuery as BaseFolderI18nQuery;
  */
 class FolderI18nQuery extends BaseFolderI18nQuery
 {
-} // FolderI18nQuery
+}
+// FolderI18nQuery

@@ -181,9 +181,9 @@ class Order extends BaseOrder
         $country = $countryQuery->findOneByByDefault(true);
         // get calculator for this tax / country
         $calculator = new \Thelia\TaxEngine\Calculator();
-        $calculator->loadTaxRuleWithoutProduct($taxRule,$country);
+        $calculator->loadTaxRuleWithoutProduct($taxRule, $country);
         // return untaxed price
-        return round($calculator->getUntaxedPrice($this->getPostage()),2);
+        return round($calculator->getUntaxedPrice($this->getPostage()), 2);
     }
 
     /**

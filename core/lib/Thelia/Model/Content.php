@@ -141,7 +141,7 @@ class Content extends BaseContent implements FileModelParentInterface
 
             $con->commit();
 
-            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT,new ContentEvent($this));
+            $this->dispatchEvent(TheliaEvents::AFTER_CREATECONTENT, new ContentEvent($this));
         } catch (\Exception $ex) {
             $con->rollback();
 

@@ -99,7 +99,7 @@ class BaseHookRenderEvent extends Event
      * @param  string|null $default
      * @return mixed|null  the value of the argument or `$default` if it not exists
      */
-    public function getArgument($key, $default=null)
+    public function getArgument($key, $default = null)
     {
         return array_key_exists($key, $this->arguments) ? $this->arguments[$key] : $default;
     }

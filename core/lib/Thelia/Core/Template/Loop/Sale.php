@@ -204,34 +204,34 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 case \Thelia\Model\Sale::OFFSET_TYPE_AMOUNT:
                     $priceOffsetType = 'A';
                     $priceOffsetSymbol = $this->request->getSession()->getCurrency()->getSymbol();
-                break;
+                    break;
 
                 case \Thelia\Model\Sale::OFFSET_TYPE_PERCENTAGE:
                     $priceOffsetType = 'P';
                     $priceOffsetSymbol = '%';
-                break;
+                    break;
 
                 default:
                     $priceOffsetType = $priceOffsetSymbol = '?';
             }
 
-            $loopResultRow->set("ID"            , $sale->getId())
-                ->set("IS_TRANSLATED"           , $sale->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $sale->getVirtualColumn('i18n_TITLE'))
-                ->set("SALE_LABEL"              , $sale->getVirtualColumn('i18n_SALE_LABEL'))
-                ->set("DESCRIPTION"             , $sale->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("CHAPO"                   , $sale->getVirtualColumn('i18n_CHAPO'))
-                ->set("POSTSCRIPTUM"            , $sale->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ACTIVE"                  , $sale->getActive())
-                ->set("DISPLAY_INITIAL_PRICE"   , $sale->getDisplayInitialPrice())
-                ->set("START_DATE"              , $sale->getStartDate())
-                ->set("HAS_START_DATE"          , $sale->hasStartDate() ? 1 : 0)
-                ->set("END_DATE"                , $sale->getEndDate())
-                ->set("HAS_END_DATE"            , $sale->hasEndDate() ? 1 : 0)
-                ->set("PRICE_OFFSET_TYPE"       , $priceOffsetType)
-                ->set("PRICE_OFFSET_SYMBOL"     , $priceOffsetSymbol)
-                ->set("PRICE_OFFSET_VALUE"      , $sale->getVirtualColumn('price_offset_value'))
+            $loopResultRow->set("ID", $sale->getId())
+                ->set("IS_TRANSLATED", $sale->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $sale->getVirtualColumn('i18n_TITLE'))
+                ->set("SALE_LABEL", $sale->getVirtualColumn('i18n_SALE_LABEL'))
+                ->set("DESCRIPTION", $sale->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("CHAPO", $sale->getVirtualColumn('i18n_CHAPO'))
+                ->set("POSTSCRIPTUM", $sale->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("ACTIVE", $sale->getActive())
+                ->set("DISPLAY_INITIAL_PRICE", $sale->getDisplayInitialPrice())
+                ->set("START_DATE", $sale->getStartDate())
+                ->set("HAS_START_DATE", $sale->hasStartDate() ? 1 : 0)
+                ->set("END_DATE", $sale->getEndDate())
+                ->set("HAS_END_DATE", $sale->hasEndDate() ? 1 : 0)
+                ->set("PRICE_OFFSET_TYPE", $priceOffsetType)
+                ->set("PRICE_OFFSET_SYMBOL", $priceOffsetSymbol)
+                ->set("PRICE_OFFSET_VALUE", $sale->getVirtualColumn('price_offset_value'))
             ;
 
             $loopResult->addRow($loopResultRow);

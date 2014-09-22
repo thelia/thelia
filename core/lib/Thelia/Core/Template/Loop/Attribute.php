@@ -178,9 +178,9 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $attribute) {
             $loopResultRow = new LoopResultRow($attribute);
             $loopResultRow->set("ID", $attribute->getId())
-                ->set("IS_TRANSLATED",$attribute->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$attribute->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $attribute->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $attribute->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $attribute->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $attribute->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))

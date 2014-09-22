@@ -16,4 +16,5 @@ use Thelia\Model\Base\FeatureProductQuery as BaseFeatureProductQuery;
  */
 class FeatureProductQuery extends BaseFeatureProductQuery
 {
-} // FeatureProductQuery
+}
+// FeatureProductQuery

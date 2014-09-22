@@ -21,8 +21,7 @@ class TokenProvider
         // Always set a new token in the user environment
         $user->setToken(uniqid());
 
-        return base64_encode(serialize(
-                array($user->getUsername(), $user->getToken(), $user->getSerial())));
+        return base64_encode(serialize(array($user->getUsername(), $user->getToken(), $user->getSerial())));
     }
 
     public function decodeKey($key)

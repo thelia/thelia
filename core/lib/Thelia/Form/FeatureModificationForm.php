@@ -29,7 +29,7 @@ class FeatureModificationForm extends FeatureCreationForm
                         )
                     )
             ))
-     ;
+        ;
 
         // Add standard description fields
         $this->addStandardDescFields();

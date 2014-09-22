@@ -16,4 +16,5 @@ use Thelia\Model\Base\AttributeTemplateQuery as BaseAttributeTemplateQuery;
  */
 class AttributeTemplateQuery extends BaseAttributeTemplateQuery
 {
-} // AttributeTemplateQuery
+}
+// AttributeTemplateQuery

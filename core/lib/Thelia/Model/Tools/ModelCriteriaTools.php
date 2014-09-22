@@ -54,7 +54,7 @@ class ModelCriteriaTools
             $requestedLocaleJoin->setJoinType($forceReturn === false ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN);
 
             $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
-                ->addJoinCondition($requestedLocaleI18nAlias ,'`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
+                ->addJoinCondition($requestedLocaleI18nAlias, '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
 
             $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
@@ -69,14 +69,14 @@ class ModelCriteriaTools
             $defaultLocaleJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $search->addJoinObject($defaultLocaleJoin, $defaultLocaleI18nAlias)
-                ->addJoinCondition($defaultLocaleI18nAlias ,'`' . $defaultLocaleI18nAlias . '`.LOCALE = ?', $defaultLocale, null, \PDO::PARAM_STR);
+                ->addJoinCondition($defaultLocaleI18nAlias, '`' . $defaultLocaleI18nAlias . '`.LOCALE = ?', $defaultLocale, null, \PDO::PARAM_STR);
 
             $requestedLocaleJoin = new Join();
             $requestedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $requestedLocaleI18nAlias);
             $requestedLocaleJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
-                ->addJoinCondition($requestedLocaleI18nAlias ,'`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
+                ->addJoinCondition($requestedLocaleI18nAlias, '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
 
             $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 
@@ -106,7 +106,7 @@ class ModelCriteriaTools
         $requestedLocaleJoin->setJoinType(Criteria::LEFT_JOIN);
 
         $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
-            ->addJoinCondition($requestedLocaleI18nAlias ,'`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
+            ->addJoinCondition($requestedLocaleI18nAlias, '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
 
         $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 

@@ -79,7 +79,7 @@ class AreaTest extends \PHPUnit_Framework_TestCase
     {
         $country = CountryQuery::create()->findOne();
 
-        $event = new AreaAddCountryEvent($area->getId(), [ $country->getId() ] );
+        $event = new AreaAddCountryEvent($area->getId(), [ $country->getId() ]);
         $event->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
 
         $areaAction = new Area();

@@ -63,7 +63,9 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $search = MessageQuery::create();
 
-        $this->configureI18nProcessing($search, array(
+        $this->configureI18nProcessing(
+            $search,
+            array(
                 'TITLE',
                 'SUBJECT',
                 'TEXT_MESSAGE',
@@ -98,15 +100,15 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID"           , $result->getId())
-                ->set("NAME"         , $result->getName())
+                ->set("ID", $result->getId())
+                ->set("NAME", $result->getName())
                 ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $this->locale)
-                ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
-                ->set("SUBJECT"      , $result->getVirtualColumn('i18n_SUBJECT'))
-                ->set("TEXT_MESSAGE" , $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
-                ->set("HTML_MESSAGE" , $result->getVirtualColumn('i18n_HTML_MESSAGE'))
-                ->set("SECURED"      , $result->getSecured())
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("SUBJECT", $result->getVirtualColumn('i18n_SUBJECT'))
+                ->set("TEXT_MESSAGE", $result->getVirtualColumn('i18n_TEXT_MESSAGE'))
+                ->set("HTML_MESSAGE", $result->getVirtualColumn('i18n_HTML_MESSAGE'))
+                ->set("SECURED", $result->getSecured())
             ;
 
             $loopResult->addRow($loopResultRow);

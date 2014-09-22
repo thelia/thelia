@@ -59,7 +59,7 @@ abstract class BaseForm
      */
     private $error_message = '';
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
+    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
     {
         $this->request = $request;
 

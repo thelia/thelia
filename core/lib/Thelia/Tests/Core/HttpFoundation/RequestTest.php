@@ -29,15 +29,15 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         );
 
         $request->expects($this->any())
-                ->method("getUri")
-                ->will($this->onConsecutiveCalls(
+            ->method("getUri")
+            ->will($this->onConsecutiveCalls(
                 "http://localhost/",
                 "http://localhost/?test=fu"
             ));
 
         $request->expects($this->any())
-                ->method("getQueryString")
-                ->will($this->onConsecutiveCalls(
+            ->method("getQueryString")
+            ->will($this->onConsecutiveCalls(
                 "",
                 "test=fu"
             ));

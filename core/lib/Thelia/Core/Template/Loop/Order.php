@@ -191,14 +191,14 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     $search->orderByStatusId(Criteria::DESC);
                     break;
 
-                case 'company' :
+                case 'company':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
                         ->orderBy('company', Criteria::ASC)
                     ;
                     break;
-                case 'company-reverse' :
+                case 'company-reverse':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
@@ -206,7 +206,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     ;
                     break;
 
-                case 'customer-name' :
+                case 'customer-name':
                     $search
                         ->joinCustomer()
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
@@ -215,7 +215,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                         ->orderBy('firstname', Criteria::ASC)
                         ;
                     break;
-                case 'customer-name-reverse' :
+                case 'customer-name-reverse':
                     $search
                         ->joinCustomer()
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')

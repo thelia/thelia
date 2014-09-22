@@ -132,7 +132,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
                 case 'value_reverse':
                     $search->orderByValue(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         return $search;
@@ -144,17 +144,17 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($result);
 
             $loopResultRow
-                ->set("ID"           , $result->getId())
-                ->set("NAME"         , $result->getName())
-                ->set("VALUE"        , $result->getValue())
+                ->set("ID", $result->getId())
+                ->set("NAME", $result->getName())
+                ->set("VALUE", $result->getValue())
                 ->set("IS_TRANSLATED", $result->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"       , $this->locale)
-                ->set("TITLE"        , $result->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"        , $result->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"  , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM" , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("HIDDEN"       , $result->getHidden())
-                ->set("SECURED"      , $result->getSecured())
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("HIDDEN", $result->getHidden())
+                ->set("SECURED", $result->getSecured())
             ;
 
             $loopResult->addRow($loopResultRow);

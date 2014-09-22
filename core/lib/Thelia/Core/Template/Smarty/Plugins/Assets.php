@@ -68,11 +68,11 @@ class Assets extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('block'   , 'stylesheets'    , $this, 'blockStylesheets'),
-            new SmartyPluginDescriptor('block'   , 'javascripts'    , $this, 'blockJavascripts'),
-            new SmartyPluginDescriptor('block'   , 'images'         , $this, 'blockImages'),
-            new SmartyPluginDescriptor('function', 'image'          , $this, 'functionImage'),
-            new SmartyPluginDescriptor('function', 'declare_assets' , $this, 'declareAssets')
+            new SmartyPluginDescriptor('block', 'stylesheets', $this, 'blockStylesheets'),
+            new SmartyPluginDescriptor('block', 'javascripts', $this, 'blockJavascripts'),
+            new SmartyPluginDescriptor('block', 'images', $this, 'blockImages'),
+            new SmartyPluginDescriptor('function', 'image', $this, 'functionImage'),
+            new SmartyPluginDescriptor('function', 'declare_assets', $this, 'declareAssets')
         );
     }
 }

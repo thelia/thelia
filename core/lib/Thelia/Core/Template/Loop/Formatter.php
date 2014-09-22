@@ -57,7 +57,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
                 }
 
                 /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-                foreach ($rawFormatters as $key=>$formatter) {
+                foreach ($rawFormatters as $key => $formatter) {
                     if (in_array($formatter->getHandledType(), $types)) {
                         $formatters[$key] = $formatter;
                     }

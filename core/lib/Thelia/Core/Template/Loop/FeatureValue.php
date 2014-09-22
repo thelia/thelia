@@ -122,21 +122,18 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($featureValue);
 
             $loopResultRow
-                ->set("ID"               , $featureValue->getId())
-                ->set("PRODUCT"          , $featureValue->getProductId())
-                ->set("FEATURE_AV_ID"    , $featureValue->getFeatureAvId())
-                ->set("FREE_TEXT_VALUE"  , $featureValue->getFreeTextValue())
-
-                ->set("IS_FREE_TEXT"     , is_null($featureValue->getFeatureAvId()) ? 1 : 0)
-                ->set("IS_FEATURE_AV"    , is_null($featureValue->getFeatureAvId()) ? 0 : 1)
-
-                ->set("LOCALE"           , $this->locale)
-                ->set("TITLE"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
-                ->set("CHAPO"            , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
-                ->set("DESCRIPTION"      , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"     , $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
-
-                ->set("POSITION"         , $featureValue->getPosition())
+                ->set("ID", $featureValue->getId())
+                ->set("PRODUCT", $featureValue->getProductId())
+                ->set("FEATURE_AV_ID", $featureValue->getFeatureAvId())
+                ->set("FREE_TEXT_VALUE", $featureValue->getFreeTextValue())
+                ->set("IS_FREE_TEXT", is_null($featureValue->getFeatureAvId()) ? 1 : 0)
+                ->set("IS_FEATURE_AV", is_null($featureValue->getFeatureAvId()) ? 0 : 1)
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set("POSITION", $featureValue->getPosition())
             ;
 
             $loopResult->addRow($loopResultRow);

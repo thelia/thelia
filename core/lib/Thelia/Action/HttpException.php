@@ -69,9 +69,10 @@ class HttpException extends BaseAction implements EventSubscriberInterface
                 'general_error.html',
                 array(
                     "error_message" => $message
-                ))
-            , 403
-        ) ;
+                )
+            ),
+            403
+        );
 
         $event->setResponse($response);
     }

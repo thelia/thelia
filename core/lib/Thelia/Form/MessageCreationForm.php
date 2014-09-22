@@ -50,9 +50,9 @@ class MessageCreationForm extends BaseForm
                 "label_attr" => array(
                     "for" => "purpose",
                     'help' => Translator::getInstance()->trans(
-                            "Enter here the mail template purpose in the default language (%title%)",
-                            [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
-                        )
+                        "Enter here the mail template purpose in the default language (%title%)",
+                        [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
+                    )
                 ),
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans("Mail template purpose")

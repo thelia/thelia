@@ -43,25 +43,25 @@ class TlogDestinationPopup extends AbstractTlogDestination
     {
         return array(
             new TlogDestinationConfig(
-                    self::VAR_POPUP_TPL,
-                    "Popup windows template",
-                    "Put #LOGTEXT in the template text where you want to display logs..",
-                    file_get_contents(__DIR__.DS. self::VALEUR_POPUP_TPL_DEFAUT),
-                    TlogDestinationConfig::TYPE_TEXTAREA
+                self::VAR_POPUP_TPL,
+                "Popup windows template",
+                "Put #LOGTEXT in the template text where you want to display logs..",
+                file_get_contents(__DIR__.DS. self::VALEUR_POPUP_TPL_DEFAUT),
+                TlogDestinationConfig::TYPE_TEXTAREA
             ),
             new TlogDestinationConfig(
-                    self::VAR_POPUP_HEIGHT,
-                    "Height of the popup window",
-                    "In pixels",
-                    self::VALEUR_POPUP_HEIGHT_DEFAUT,
-                    TlogDestinationConfig::TYPE_TEXTFIELD
+                self::VAR_POPUP_HEIGHT,
+                "Height of the popup window",
+                "In pixels",
+                self::VALEUR_POPUP_HEIGHT_DEFAUT,
+                TlogDestinationConfig::TYPE_TEXTFIELD
             ),
             new TlogDestinationConfig(
-                    self::VAR_POPUP_WIDTH,
-                    "Width of the popup window",
-                    "In pixels",
-                    self::VALEUR_POPUP_WIDTH_DEFAUT,
-                    TlogDestinationConfig::TYPE_TEXTFIELD
+                self::VAR_POPUP_WIDTH,
+                "Width of the popup window",
+                "In pixels",
+                self::VALEUR_POPUP_WIDTH_DEFAUT,
+                TlogDestinationConfig::TYPE_TEXTFIELD
             )
         );
     }
@@ -80,19 +80,19 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $tpl = str_replace('#LOGTEXT', $content, $tpl);
         $tpl = str_replace(array("\r\n", "\r", "\n"), '\\n', $tpl);
 
-        $wop = sprintf('
-                <script>
-                    _thelia_console = window.open("","thelia_console","width=%s,height=%s,resizable,scrollbars=yes");
-                    if (_thelia_console == null) {
-                       alert("The log popup window could not be opened. Please disable your popup blocker for this site.");
-                    } else {
-                        _thelia_console.document.write("%s");
-                        _thelia_console.document.close();
-                    }
-                </script>',
-                $this->getConfig(self::VAR_POPUP_WIDTH),
-                $this->getConfig(self::VAR_POPUP_HEIGHT),
-                str_replace('"', '\\"', $tpl)
+        $wop = sprintf(
+            '<script>
+                _thelia_console = window.open("","thelia_console","width=%s,height=%s,resizable,scrollbars=yes");
+                if (_thelia_console == null) {
+                   alert("The log popup window could not be opened. Please disable your popup blocker for this site.");
+                } else {
+                    _thelia_console.document.write("%s");
+                    _thelia_console.document.close();
+                }
+            </script>',
+            $this->getConfig(self::VAR_POPUP_WIDTH),
+            $this->getConfig(self::VAR_POPUP_HEIGHT),
+            str_replace('"', '\\"', $tpl)
         );
 
         if (preg_match("|</body>|i", $res)) {

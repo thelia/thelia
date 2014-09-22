@@ -107,11 +107,11 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
         $arr[] =
             new TlogDestinationConfig(
-                 self::VAR_MAX_FILE_COUNT,
-                 'Maximum number of files to keep',
-                 'When this number if exeeded, the oldest files are deleted.',
-                 self::MAX_FILE_COUNT_DEFAULT,
-                 TlogDestinationConfig::TYPE_TEXTFIELD
+                self::VAR_MAX_FILE_COUNT,
+                'Maximum number of files to keep',
+                'When this number if exeeded, the oldest files are deleted.',
+                self::MAX_FILE_COUNT_DEFAULT,
+                TlogDestinationConfig::TYPE_TEXTFIELD
             );
 
         return $arr;

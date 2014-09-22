@@ -31,7 +31,7 @@ class UpdateSeoEvent extends ActionEvent
      * @param null $meta_description
      * @param null $meta_keywords
      */
-    public function __construct($object_id, $locale = null,  $url = null, $meta_title = null, $meta_description = null, $meta_keywords = null)
+    public function __construct($object_id, $locale = null, $url = null, $meta_title = null, $meta_description = null, $meta_keywords = null)
     {
         $this->object_id = $object_id;
         $this->locale = $locale;

@@ -16,4 +16,5 @@ use Thelia\Model\Base\MessageI18nQuery as BaseMessageI18nQuery;
  */
 class MessageI18nQuery extends BaseMessageI18nQuery
 {
-} // MessageI18nQuery
+}
+// MessageI18nQuery

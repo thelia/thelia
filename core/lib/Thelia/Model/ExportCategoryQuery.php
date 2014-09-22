@@ -16,4 +16,5 @@ use Thelia\Model\Base\ExportCategoryQuery as BaseExportCategoryQuery;
  */
 class ExportCategoryQuery extends BaseExportCategoryQuery
 {
-} // ExportCategoryQuery
+}
+// ExportCategoryQuery

@@ -28,4 +28,5 @@ class ProfileQuery extends BaseProfileQuery
 
         return $profileList;
     }
-} // ProfileQuery
+}
+// ProfileQuery

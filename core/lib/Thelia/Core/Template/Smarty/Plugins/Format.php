@@ -90,7 +90,7 @@ class Format extends AbstractSmartyPlugin
             $format = DateTimeFormat::getInstance($this->request)->getFormat($this->getParam($params, "output", null));
         }
 
-        $locale = $this->getParam($params,'locale', false);
+        $locale = $this->getParam($params, 'locale', false);
 
         if (false === $locale) {
             $value = $date->format($format);
@@ -148,10 +148,10 @@ class Format extends AbstractSmartyPlugin
         }
 
         return NumberFormat::getInstance($this->request)->format(
-                $number,
-                $this->getParam($params, "decimals", null),
-                $this->getParam($params, "dec_point", null),
-                $this->getParam($params, "thousands_sep", null)
+            $number,
+            $this->getParam($params, "decimals", null),
+            $this->getParam($params, "dec_point", null),
+            $this->getParam($params, "thousands_sep", null)
         );
     }
     /**
@@ -198,6 +198,6 @@ class Format extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
             new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
             new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney")
-       );
+        );
     }
 }

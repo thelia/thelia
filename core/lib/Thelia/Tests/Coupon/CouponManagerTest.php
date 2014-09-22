@@ -398,8 +398,18 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
         $coupon->set(
-            $stubFacade, 'XMAS', '', '', '', array('amount' => 21.00),
-            true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
+            $stubFacade,
+            'XMAS',
+            '',
+            '',
+            '',
+            array('amount' => 21.00),
+            true,
+            true,
+            true,
+            true,
+            254,
+            $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
             new ObjectCollection(),
             false
@@ -469,8 +479,18 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
         $coupon = new RemoveXAmount($stubFacade);
         $date = new \DateTime();
         $coupon->set(
-            $stubFacade, 'XMAS', '', '', '', array('amount' => 21.00),
-            true, true, true, true, 254, $date->setTimestamp(strtotime("today + 3 months")),
+            $stubFacade,
+            'XMAS',
+            '',
+            '',
+            '',
+            array('amount' => 21.00),
+            true,
+            true,
+            true,
+            true,
+            254,
+            $date->setTimestamp(strtotime("today + 3 months")),
             new ObjectCollection(),
             new ObjectCollection(),
             false

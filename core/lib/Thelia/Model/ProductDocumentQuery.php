@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductDocumentQuery as BaseProductDocumentQuery;
  */
 class ProductDocumentQuery extends BaseProductDocumentQuery
 {
-} // ProductDocumentQuery
+}
+// ProductDocumentQuery

@@ -76,9 +76,9 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $loopResultRow
                 ->set("ID", $template->getId())
-                ->set("IS_TRANSLATED" , $template->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE" , $this->locale)
-                ->set("NAME" , $template->getVirtualColumn('i18n_NAME'))
+                ->set("IS_TRANSLATED", $template->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("NAME", $template->getVirtualColumn('i18n_NAME'))
             ;
 
             $loopResult->addRow($loopResultRow);

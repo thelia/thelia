@@ -106,7 +106,6 @@ class I18n
                 "(SELECT DISTINCT ".$i18nIdColumn." ".
                 "FROM `".$i18nTableName."` ".
                 "WHERE locale=$locale) ".
-
                 "THEN ".$localeColumn." = $locale ".
                 "ELSE ".$localeColumn." = $defaultLocale ".
                 "END"

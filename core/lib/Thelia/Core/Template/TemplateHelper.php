@@ -46,8 +46,8 @@ class TemplateHelper
     public function getActiveMailTemplate()
     {
         return new TemplateDefinition(
-                ConfigQuery::read('active-mail-template', 'default'),
-                TemplateDefinition::EMAIL
+            ConfigQuery::read('active-mail-template', 'default'),
+            TemplateDefinition::EMAIL
         );
     }
 

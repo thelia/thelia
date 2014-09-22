@@ -234,9 +234,8 @@ class FreeProduct extends AbstractRemoveOnProducts
                 $discount = $freeProductCartItem->getPromo() ?
                     $freeProductCartItem->getPromoPrice() : $freeProductCartItem->getPrice();
             }
-        }
-        // No eligible product was found !
-        else {
+            // No eligible product was found !
+        } else {
             // Remove all free products for this coupon, but no not remove the product from the cart.
             $this->clearFreeProductsCartItemIds();
         }

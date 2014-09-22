@@ -60,7 +60,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($formattedResult,$formattedData);
+        $this->assertEquals($formattedResult, $formattedData);
     }
 
     public function testFormatSimpleQueryWithAliases()
@@ -102,7 +102,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->assertEquals($formattedResult,$formattedData);
+        $this->assertEquals($formattedResult, $formattedData);
     }
 
     public function testFormatComplexQuery()
@@ -195,7 +195,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($data,$formattedData);
+        $this->assertEquals($data, $formattedData);
     }
 
     public function testSetRawDataDepth1WithAliases()
@@ -222,7 +222,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($expectedData,$formattedData);
+        $this->assertEquals($expectedData, $formattedData);
     }
 
     public function testSetRawDataDepth2()
@@ -245,7 +245,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($data,$formattedData);
+        $this->assertEquals($data, $formattedData);
     }
 
     public function testSetRawDataDepth2WithAliases()
@@ -284,7 +284,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($expectedData,$formattedData);
+        $this->assertEquals($expectedData, $formattedData);
     }
 
     public function testSetRawDataMultipleDepth()
@@ -307,7 +307,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($data,$formattedData);
+        $this->assertEquals($data, $formattedData);
     }
 
     public function testSetRawDataMultipleDepthWithAliases()
@@ -362,7 +362,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getData()
         ;
 
-        $this->assertEquals($expectedData,$formattedData);
+        $this->assertEquals($expectedData, $formattedData);
     }
 
     public function testSetRawDataMultipleDepthWithReverseAliases()
@@ -398,7 +398,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getDataReverseAliases()
         ;
 
-        $this->assertEquals($data,$formattedData);
+        $this->assertEquals($data, $formattedData);
     }
 
     /**
@@ -437,7 +437,7 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
             ->getDataReverseAliases()
         ;
 
-        $this->assertNotEquals($data,$formattedData);
+        $this->assertNotEquals($data, $formattedData);
     }
 
     public function testAddRow()

@@ -16,4 +16,5 @@ use Thelia\Model\Base\CustomerVersionQuery as BaseCustomerVersionQuery;
  */
 class CustomerVersionQuery extends BaseCustomerVersionQuery
 {
-} // CustomerVersionQuery
+}
+// CustomerVersionQuery

@@ -66,8 +66,18 @@ abstract class AbstractRemoveOnProducts extends CouponAbstract implements Amount
         $perCustomerUsageCount
     ) {
         parent::set(
-            $facade, $code, $title, $shortDescription, $description, $effects,
-            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
+            $facade,
+            $code,
+            $title,
+            $shortDescription,
+            $description,
+            $effects,
+            $isCumulative,
+            $isRemovingPostage,
+            $isAvailableOnSpecialOffers,
+            $isEnabled,
+            $maxUsage,
+            $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
             $perCustomerUsageCount

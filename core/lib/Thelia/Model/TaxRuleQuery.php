@@ -42,4 +42,5 @@ class TaxRuleQuery extends BaseTaxRuleQuery
 
         return $search->find();
     }
-} // TaxRuleQuery
+}
+// TaxRuleQuery

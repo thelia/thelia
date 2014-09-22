@@ -16,4 +16,5 @@ use Thelia\Model\Base\CouponQuery as BaseCouponQuery;
  */
 class CouponQuery extends BaseCouponQuery
 {
-} // CouponQuery
+}
+// CouponQuery

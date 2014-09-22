@@ -176,7 +176,8 @@ abstract class BaseLoop
             if ($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
-                    '"%param" parameter is missing in loop type: %type, name: %name', [
+                    '"%param" parameter is missing in loop type: %type, name: %name',
+                    [
                         '%param' => $argument->name,
                         '%type' => $loopType,
                         '%name' => $loopName
@@ -187,7 +188,8 @@ abstract class BaseLoop
                     /* check if empty */
                     $faultActor[] = $argument->name;
                     $faultDetails[] = $this->translator->trans(
-                        '"%param" parameter cannot be empty in loop type: %type, name: %name', [
+                        '"%param" parameter cannot be empty in loop type: %type, name: %name',
+                        [
                             '%param' => $argument->name,
                             '%type' => $loopType,
                             '%name' => $loopName
@@ -198,7 +200,8 @@ abstract class BaseLoop
                 /* check type */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = $this->translator->trans(
-                    'Invalid value "%value" for "%param" parameter in loop type: %type, name: %name', [
+                    'Invalid value "%value" for "%param" parameter in loop type: %type, name: %name',
+                    [
                         '%value' => $value,
                         '%param' => $argument->name,
                         '%type' => $loopType,
@@ -455,7 +458,8 @@ abstract class BaseLoop
                     $this->translator->trans(
                         'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                     ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE);
+                    LoopException::MULTIPLE_SEARCH_INTERFACE
+                );
             }
             $searchInterface = true;
         }
@@ -466,7 +470,8 @@ abstract class BaseLoop
                     $this->translator->trans(
                         'Loop cannot implements multiple Search Interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                     ),
-                    LoopException::MULTIPLE_SEARCH_INTERFACE);
+                    LoopException::MULTIPLE_SEARCH_INTERFACE
+                );
             }
             $searchInterface = true;
         }
@@ -476,7 +481,8 @@ abstract class BaseLoop
                 $this->translator->trans(
                     'Loop must implements one of the following interfaces : `PropelSearchLoopInterface`, `ArraySearchLoopInterface`'
                 ),
-                LoopException::SEARCH_INTERFACE_NOT_FOUND);
+                LoopException::SEARCH_INTERFACE_NOT_FOUND
+            );
         }
 
         /* Only PropelSearch allows timestamp and version */
@@ -484,13 +490,15 @@ abstract class BaseLoop
             if (true === $this->timestampable) {
                 throw new LoopException(
                     $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be timestampable"),
-                    LoopException::NOT_TIMESTAMPED);
+                    LoopException::NOT_TIMESTAMPED
+                );
             }
 
             if (true === $this->versionable) {
                 throw new LoopException(
                     $this->translator->trans("Loop must implements 'PropelSearchLoopInterface' to be versionable"),
-                    LoopException::NOT_VERSIONED);
+                    LoopException::NOT_VERSIONED
+                );
             }
         }
     }

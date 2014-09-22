@@ -246,4 +246,5 @@ class ConfigQuery extends BaseConfigQuery
         self::write('smtp.sourceip', $value, 1, 1);
     }
     /* end smtp config */
-} // ConfigQuery
+}
+// ConfigQuery

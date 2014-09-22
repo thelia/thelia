@@ -16,4 +16,5 @@ use Thelia\Model\Base\SaleQuery as BaseSaleQuery;
  */
 class SaleQuery extends BaseSaleQuery
 {
-} // SaleQuery
+}
+// SaleQuery

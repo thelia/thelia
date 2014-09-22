@@ -98,7 +98,7 @@ class RequestListener implements EventSubscriberInterface
                     $session->setReturnToUrl($referrer);
                 }
             } else {
-                if ( false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
+                if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
                     $session->setReturnToUrl($referrer);
                 }
             }

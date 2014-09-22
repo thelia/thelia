@@ -16,4 +16,5 @@ use Thelia\Model\Base\FeatureTemplateQuery as BaseFeatureTemplateQuery;
  */
 class FeatureTemplateQuery extends BaseFeatureTemplateQuery
 {
-} // FeatureTemplateQuery
+}
+// FeatureTemplateQuery

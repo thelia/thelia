@@ -353,7 +353,8 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddValidFileFromString()
     {
         $this->loadedZip->addFileFromString(
-            "foo", "bar"
+            "foo",
+            "bar"
         );
 
         $this->assertTrue(
@@ -366,7 +367,9 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->loadedZip->addFileFromString(
-            "foo", "bar", "baz"
+            "foo",
+            "bar",
+            "baz"
         );
 
         $this->assertTrue(
@@ -393,7 +396,8 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddNotValidFileFromString()
     {
         $this->loadedZip->addFileFromString(
-            "foo", $this
+            "foo",
+            $this
         );
     }
 
@@ -403,7 +407,8 @@ class ZipArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddNotValidFileValueFromString()
     {
         $this->loadedZip->addFileFromString(
-            $this, "bar"
+            $this,
+            "bar"
         );
     }
 }

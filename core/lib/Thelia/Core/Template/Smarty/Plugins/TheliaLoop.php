@@ -216,7 +216,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         //Block the smarty interpretation in the elseloop
         if ($content === null) {
-            if ( ! $this->checkEmptyLoop($params)) {
+            if (! $this->checkEmptyLoop($params)) {
                 $repeat = false;
 
                 return '';
@@ -304,15 +304,15 @@ class TheliaLoop extends AbstractSmartyPlugin
             }
 
             // The first displayed page number
-            $template->assign('START'  , $startPage);
+            $template->assign('START', $startPage);
             // The previous page number
-            $template->assign('PREV'   , $currentPage > 1 ? $currentPage-1 : $currentPage);
+            $template->assign('PREV', $currentPage > 1 ? $currentPage-1 : $currentPage);
             // The next page number
-            $template->assign('NEXT'   , $currentPage < $totalPageCount ? $currentPage+1 : $totalPageCount);
+            $template->assign('NEXT', $currentPage < $totalPageCount ? $currentPage+1 : $totalPageCount);
             // The last displayed page number
-            $template->assign('END'    , $endPage);
+            $template->assign('END', $endPage);
             // The overall last page
-            $template->assign('LAST'   , $totalPageCount);
+            $template->assign('LAST', $totalPageCount);
         } else {
             $iterationPage = $template->getTemplateVars('PAGE');
 
@@ -377,7 +377,8 @@ class TheliaLoop extends AbstractSmartyPlugin
 
         if (! isset($this->loopDefinition[$type])) {
             throw new ElementNotFoundException(
-                $this->translator->trans("Loop type '%type' is not defined.", ['%type' => $type]));
+                $this->translator->trans("Loop type '%type' is not defined.", ['%type' => $type])
+            );
         }
 
         $class = new \ReflectionClass($this->loopDefinition[$type]);
@@ -440,11 +441,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         return array(
 
-            new SmartyPluginDescriptor('function', 'count'    , $this, 'theliaCount'),
-            new SmartyPluginDescriptor('block'   , 'loop'     , $this, 'theliaLoop'),
-            new SmartyPluginDescriptor('block'   , 'elseloop' , $this, 'theliaElseloop'),
-            new SmartyPluginDescriptor('block'   , 'ifloop'   , $this, 'theliaIfLoop'),
-            new SmartyPluginDescriptor('block'   , 'pageloop' , $this, 'theliaPageLoop'),
+            new SmartyPluginDescriptor('function', 'count', $this, 'theliaCount'),
+            new SmartyPluginDescriptor('block', 'loop', $this, 'theliaLoop'),
+            new SmartyPluginDescriptor('block', 'elseloop', $this, 'theliaElseloop'),
+            new SmartyPluginDescriptor('block', 'ifloop', $this, 'theliaIfLoop'),
+            new SmartyPluginDescriptor('block', 'pageloop', $this, 'theliaPageLoop'),
         );
     }
 }

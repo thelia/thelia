@@ -85,10 +85,10 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $resource) {
             $loopResultRow = new LoopResultRow($resource);
             $loopResultRow->set("ID", $resource->getId())
-                ->set("IS_TRANSLATED",$resource->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("CODE",$resource->getCode())
-                ->set("TITLE",$resource->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $resource->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("CODE", $resource->getCode())
+                ->set("TITLE", $resource->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $resource->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $resource->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $resource->getVirtualColumn('i18n_POSTSCRIPTUM'))

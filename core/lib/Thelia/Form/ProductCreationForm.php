@@ -91,10 +91,11 @@ class ProductCreationForm extends BaseForm
 
         if ($count > 0) {
             $context->addViolation(
-                    Translator::getInstance()->trans(
-                            "A product with reference %ref already exists. Please choose another reference.",
-                            array('%ref' => $value)
-            ));
+                Translator::getInstance()->trans(
+                    "A product with reference %ref already exists. Please choose another reference.",
+                    array('%ref' => $value)
+                )
+            );
         }
     }
 

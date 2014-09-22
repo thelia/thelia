@@ -83,10 +83,10 @@ class DataAccessFunctions extends AbstractSmartyPlugin
       * @param  unknown $smarty
       * @return string the value of the requested attribute
       */
-     public function customerDataAccess($params, &$smarty)
-     {
-         return $this->dataAccess("Customer User", $params, $this->securityContext->getCustomerUser());
-     }
+    public function customerDataAccess($params, &$smarty)
+    {
+        return $this->dataAccess("Customer User", $params, $this->securityContext->getCustomerUser());
+    }
 
     public function productDataAccess($params, &$smarty)
     {
@@ -96,7 +96,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $search = ProductQuery::create()
                 ->filterById($productId);
 
-            return $this->dataAccessWithI18n("Product",  $params, $search);
+            return $this->dataAccessWithI18n("Product", $params, $search);
         }
     }
 
@@ -108,7 +108,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $search = CategoryQuery::create()
                 ->filterById($categoryId);
 
-            return $this->dataAccessWithI18n("Category",  $params, $search);
+            return $this->dataAccessWithI18n("Category", $params, $search);
         }
     }
 
@@ -120,7 +120,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $search = ContentQuery::create()
                 ->filterById($contentId);
 
-            return $this->dataAccessWithI18n("Content",  $params, $search);
+            return $this->dataAccessWithI18n("Content", $params, $search);
         }
     }
 
@@ -132,7 +132,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $search = FolderQuery::create()
                 ->filterById($folderId);
 
-            return $this->dataAccessWithI18n("Folder",  $params, $search);
+            return $this->dataAccessWithI18n("Folder", $params, $search);
         }
     }
 
@@ -144,7 +144,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             $search = BrandQuery::create()
                 ->filterById($brandId);
 
-            return $this->dataAccessWithI18n("Brand",  $params, $search);
+            return $this->dataAccessWithI18n("Brand", $params, $search);
         }
     }
 
@@ -352,11 +352,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         switch ($params['key']) {
-            case 'sales' :
+            case 'sales':
                 return OrderQuery::getSaleStats($startDate, $endDate, $includeShipping);
-            case 'orders' :
+                break;
+            case 'orders':
                 return OrderQuery::getOrderStats($startDate, $endDate, array(1,2,3,4));
-
+                break;
         }
 
         throw new \InvalidArgumentException(sprintf("invalid key attribute '%s' in stats access function", $params['key']));

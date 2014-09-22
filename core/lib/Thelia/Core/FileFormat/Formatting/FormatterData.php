@@ -142,7 +142,7 @@ class FormatterData
     {
         $formattedData = [];
 
-        foreach ($data as $key=>$entry) {
+        foreach ($data as $key => $entry) {
             $key = strtolower($key);
 
             if (is_array($entry)) {

@@ -53,7 +53,8 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(array(
+                    new EnumListType(
+                        array(
                         'id', 'id-reverse',
                         'code', 'code-reverse',
                         'title', 'title-reverse',

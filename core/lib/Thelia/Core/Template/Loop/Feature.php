@@ -207,9 +207,9 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $feature) {
             $loopResultRow = new LoopResultRow($feature);
             $loopResultRow->set("ID", $feature->getId())
-                ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $feature->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))

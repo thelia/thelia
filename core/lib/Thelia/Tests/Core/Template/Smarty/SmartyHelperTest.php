@@ -85,7 +85,7 @@ EOT;
 
         $this->assertCount(2, $functions);
 
-        for ($i = 0 ; $i <= 1 ; $i++) {
+        for ($i = 0; $i <= 1; $i++) {
             $this->assertArrayHasKey("name", $functions[$i]);
             $this->assertEquals("hook", $functions[$i]["name"]);
             $this->assertArrayHasKey("attributes", $functions[$i]);

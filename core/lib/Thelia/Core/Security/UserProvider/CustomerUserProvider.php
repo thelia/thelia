@@ -13,6 +13,7 @@
 namespace Thelia\Core\Security\UserProvider;
 
 use Thelia\Model\CustomerQuery;
+
 class CustomerUserProvider implements UserProviderInterface
 {
     public function getUser($key)
