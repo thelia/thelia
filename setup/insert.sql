@@ -707,7 +707,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
-(2023, 'wysywyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
+(2023, 'wysiwyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
 ;
 
 
