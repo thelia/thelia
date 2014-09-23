@@ -130,7 +130,7 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
         }
 
         $search
-            ->joinSaleOffsetCurrency('SaleOffsetCurrency')
+            ->leftJoinSaleOffsetCurrency('SaleOffsetCurrency')
             ->addJoinCondition('SaleOffsetCurrency', '`SaleOffsetCurrency`.`currency_id` = ?', $this->getCurrency(), null, \PDO::PARAM_INT)
         ;
 
