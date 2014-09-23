@@ -223,7 +223,7 @@ return array(
     'Try again' => 'Ré-essayer le paiement',
     'Twitter' => 'Twitter',
     'Unit Price' => 'Prix unitaire',
-    'Unit Price incl. taxes' => 'Prix unitaire HT',
+    'Unit Price incl. taxes' => 'Prix unitaire TTC',
     'Unit Taxed Price' => 'Prix unitaire TTC',
     'Update' => 'Mettre à jour',
     'Update Profile' => 'Mettre à jour votre profil',
