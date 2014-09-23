@@ -2103,6 +2103,53 @@ UPDATE `customer_title_i18n`
 
 
 # ======================================================================================================================
+# Adding missing resources
+# ======================================================================================================================
+
+SELECT @max_id := MAX(`id`) FROM `resource`;
+
+INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
+(@max_id+1, 'admin.hook', NOW(), NOW()),
+(@max_id+2, 'admin.module-hook', NOW(), NOW()),
+(@max_id+3, 'admin.sales', NOW(), NOW()),
+(@max_id+4, 'admin.administrator', NOW(), NOW()),
+(@max_id+5, 'admin.configuration.category', NOW(), NOW()),
+(@max_id+6, 'admin.configuration.shipping-configuration', NOW(), NOW()),
+(@max_id+7, 'admin.configuration.tax-rule', NOW(), NOW()),
+(@max_id+8, 'admin.hooks', NOW(), NOW()),
+(@max_id+9, 'admin.import', NOW(), NOW()),
+(@max_id+10, 'admin.modules', NOW(), NOW()),
+(@max_id+11, 'admin.profile', NOW(), NOW()),
+(@max_id+12, 'admin.search', NOW(), NOW())
+;
+
+INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+  (@max_id+1, 'en_US', 'Hooks'),
+  (@max_id+1, 'fr_FR', 'Hooks'),
+  (@max_id+2, 'en_US', 'Hook positions'),
+  (@max_id+2, 'fr_FR', 'Position des hooks'),
+  (@max_id+3, 'en_US', 'Sales management'),
+  (@max_id+3, 'fr_FR', 'Gestion des promotions'),
+  (@max_id+4, 'en_US', 'Administators list'),
+  (@max_id+4, 'fr_FR', 'Liste des administrateurs'),
+  (@max_id+5, 'en_US', 'Category configuration'),
+  (@max_id+5, 'fr_FR', 'Configuration d''une catégorie'),
+  (@max_id+6, 'en_US', 'Shipping configuration'),
+  (@max_id+6, 'fr_FR', 'Configuration des transports'),
+  (@max_id+7, 'en_US', 'Tax rules configuration'),
+  (@max_id+7, 'fr_FR', 'Configuration des règles de taxes'),
+  (@max_id+8, 'en_US', 'Hooks management'),
+  (@max_id+8, 'fr_FR', 'Gestion des hooks'),
+  (@max_id+9, 'en_US', 'Data import / export'),
+  (@max_id+9, 'fr_FR', 'Importation / exportation de données'),
+  (@max_id+10, 'en_US', 'Modules maagement'),
+  (@max_id+10, 'fr_FR', 'Gestion des modules'),
+  (@max_id+11, 'en_US', 'Administration profiles management'),
+  (@max_id+11, 'fr_FR', 'Gestion des profils d''administration'),
+  (@max_id+12, 'en_US', 'Back-office search function'),
+  (@max_id+12, 'fr_FR', 'Fonction de recherche dans l''administration')
+;
+# ======================================================================================================================
 # End of changes
 # ======================================================================================================================
 
