@@ -71,7 +71,7 @@ class ShippingZoneController extends BaseAdminController
             $this->dispatch(TheliaEvents::SHIPPING_ZONE_ADD_AREA, $event);
 
             // Redirect to the success URL
-            $this->redirect($shippingAreaForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($shippingAreaForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -110,7 +110,7 @@ class ShippingZoneController extends BaseAdminController
             $this->dispatch(TheliaEvents::SHIPPING_ZONE_REMOVE_AREA, $event);
 
             // Redirect to the success URL
-            $this->redirect($shippingAreaForm->getSuccessUrl());
+            return $this->generateSuccessRedirect($shippingAreaForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);

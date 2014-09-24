@@ -288,7 +288,7 @@ class SaleController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        $this->redirect($this->getRoute('admin.sale.update', $this->getEditionArguments()));
+        return $this->generateRedirectFromRoute('admin.sale.update', $this->getEditionArguments());
     }
 
     /**
@@ -296,7 +296,7 @@ class SaleController extends AbstractCrudController
      */
     protected function redirectToListTemplate()
     {
-        $this->redirectToRoute('admin.sale.default');
+        return $this->generateRedirectFromRoute('admin.sale.default');
     }
 
     /**
@@ -384,7 +384,7 @@ class SaleController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 
     public function checkSalesActivationStatus()
@@ -400,6 +400,6 @@ class SaleController extends AbstractCrudController
             return $this->errorPage($ex);
         }
 
-        $this->redirectToListTemplate();
+        return $this->redirectToListTemplate();
     }
 }
