@@ -16,4 +16,5 @@ use Thelia\Model\Base\BrandImageQuery as BaseBrandImageQuery;
  */
 class BrandImageQuery extends BaseBrandImageQuery
 {
-} // BrandImageQuery
+}
+// BrandImageQuery

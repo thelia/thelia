@@ -257,21 +257,20 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         foreach ($loopResult->getResultDataCollection() as $content) {
             $loopResultRow = new LoopResultRow($content);
             $defaultFolderId = $content->getDefaultFolderId();
-            $loopResultRow->set("ID"            , $content->getId())
-                ->set("IS_TRANSLATED"           , $content->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $content->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $content->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $content->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $content->getUrl($this->locale))
-                ->set("META_TITLE"              , $content->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $content->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $content->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("POSITION"                , $content->getPosition())
-                ->set("DEFAULT_FOLDER"          , $defaultFolderId)
-
-                ->set("VISIBLE"                 , $content->getVisible())
+            $loopResultRow->set("ID", $content->getId())
+                ->set("IS_TRANSLATED", $content->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $content->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL", $content->getUrl($this->locale))
+                ->set("META_TITLE", $content->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION", $content->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS", $content->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("POSITION", $content->getPosition())
+                ->set("DEFAULT_FOLDER", $defaultFolderId)
+                ->set("VISIBLE", $content->getVisible())
             ;
 
             $loopResult->addRow($this->findNextPrev($loopResultRow, $content, $defaultFolderId));
@@ -307,10 +306,10 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             $loopResultRow
-                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
-                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                ->set("HAS_NEXT", $next != null ? 1 : 0)
+                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                ->set("NEXT", $next != null ? $next->getId() : -1)
             ;
         }
 

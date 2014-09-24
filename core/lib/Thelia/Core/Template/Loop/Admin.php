@@ -73,11 +73,11 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $admin) {
             $loopResultRow = new LoopResultRow($admin);
             $loopResultRow->set("ID", $admin->getId())
-                ->set("PROFILE",$admin->getProfileId())
-                ->set("FIRSTNAME",$admin->getFirstname())
-                ->set("LASTNAME",$admin->getLastname())
-                ->set("LOGIN",$admin->getLogin())
-                ->set("LOCALE",$admin->getLocale())
+                ->set("PROFILE", $admin->getProfileId())
+                ->set("FIRSTNAME", $admin->getFirstname())
+                ->set("LASTNAME", $admin->getLastname())
+                ->set("LOGIN", $admin->getLogin())
+                ->set("LOCALE", $admin->getLocale())
             ;
 
             $loopResult->addRow($loopResultRow);

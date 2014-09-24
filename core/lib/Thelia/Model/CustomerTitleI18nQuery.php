@@ -16,4 +16,5 @@ use Thelia\Model\Base\CustomerTitleI18nQuery as BaseCustomerTitleI18nQuery;
  */
 class CustomerTitleI18nQuery extends BaseCustomerTitleI18nQuery
 {
-} // CustomerTitleI18nQuery
+}
+// CustomerTitleI18nQuery

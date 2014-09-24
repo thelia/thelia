@@ -96,7 +96,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $this->container->set('request', $request);
         $this->container->set('event_dispatcher', new EventDispatcher());
-        $this->container->set('thelia.translator',new Translator($this->container));
+        $this->container->set('thelia.translator', new Translator($this->container));
         $this->container->set('thelia.securityContext', new SecurityContext($request));
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));

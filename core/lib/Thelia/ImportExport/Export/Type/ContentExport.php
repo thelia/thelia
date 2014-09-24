@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export\Type;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Propel\Runtime\ActiveQuery\ModelCriteria;

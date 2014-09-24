@@ -82,7 +82,9 @@ class ProductControllerTest extends ControllerTestBase
 
         $this->controller
             ->getAssociationResponseData(
-                $pse->getId(), "image", $productImage->getId()
+                $pse->getId(),
+                "image",
+                $productImage->getId()
             );
 
         $newAssociation = ProductSaleElementsProductImageQuery::create()
@@ -127,7 +129,9 @@ class ProductControllerTest extends ControllerTestBase
 
         $this->controller
             ->getAssociationResponseData(
-                $pse->getId(), "document", $productDocument->getId()
+                $pse->getId(),
+                "document",
+                $productDocument->getId()
             );
 
         $newAssociation = ProductSaleElementsProductDocumentQuery::create()

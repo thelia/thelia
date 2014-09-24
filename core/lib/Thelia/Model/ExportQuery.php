@@ -16,4 +16,5 @@ use Thelia\Model\Base\ExportQuery as BaseExportQuery;
  */
 class ExportQuery extends BaseExportQuery
 {
-} // ExportQuery
+}
+// ExportQuery

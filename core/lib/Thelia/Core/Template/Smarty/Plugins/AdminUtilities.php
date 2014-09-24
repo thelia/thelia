@@ -36,10 +36,11 @@ class AdminUtilities extends AbstractSmartyPlugin
     {
         $data = '';
 
-        $snippet_path = sprintf('%s/%s/%s.html',
-                THELIA_TEMPLATE_DIR,
-                TemplateHelper::getInstance()->getActiveAdminTemplate()->getPath(),
-                $templateName
+        $snippet_path = sprintf(
+            '%s/%s/%s.html',
+            THELIA_TEMPLATE_DIR,
+            TemplateHelper::getInstance()->getActiveAdminTemplate()->getPath(),
+            $templateName
         );
 
         if (false !== $snippet_content = file_get_contents($snippet_path)) {
@@ -80,10 +81,11 @@ class AdminUtilities extends AbstractSmartyPlugin
         */
 
         if ($this->securityContext->isGranted(
-                array("ADMIN"),
-                $resource === null ? array() : array($resource),
-                $module === null ? array() : array($module),
-                array($access))
+            array("ADMIN"),
+            $resource === null ? array() : array($resource),
+            $module === null ? array() : array($module),
+            array($access)
+        )
         ) {
             return $this->fetchSnippet($smarty, 'includes/admin-utilities-position-block', array(
                     'admin_utilities_go_up_url'           => URL::getInstance()->absoluteUrl($path, array('mode' => 'up', $url_parameter => $id)),
@@ -149,8 +151,8 @@ class AdminUtilities extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'admin_sortable_header'  , $this, 'generateSortableColumnHeader'),
-            new SmartyPluginDescriptor('function', 'admin_position_block'   , $this, 'generatePositionChangeBlock'),
+            new SmartyPluginDescriptor('function', 'admin_sortable_header', $this, 'generateSortableColumnHeader'),
+            new SmartyPluginDescriptor('function', 'admin_position_block', $this, 'generatePositionChangeBlock'),
         );
     }
 }

@@ -103,7 +103,8 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddValidFileFromString()
     {
         $this->tar->addFileFromString(
-            "foo", "bar"
+            "foo",
+            "bar"
         );
 
         $this->assertTrue(
@@ -116,7 +117,9 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->tar->addFileFromString(
-            "foo", "bar", "baz"
+            "foo",
+            "bar",
+            "baz"
         );
 
         $this->assertTrue(
@@ -135,7 +138,8 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddNotValidFileFromString()
     {
         $this->tar->addFileFromString(
-            "foo", $this
+            "foo",
+            $this
         );
     }
 
@@ -145,14 +149,16 @@ class TarArchiveBuilderTest extends \PHPUnit_Framework_TestCase
     public function testAddNotValidFileValueFromString()
     {
         $this->tar->addFileFromString(
-            $this, "foo"
+            $this,
+            "foo"
         );
     }
 
     public function testDeleteFile()
     {
         $this->tar->addFileFromString(
-            "foo", "bar"
+            "foo",
+            "bar"
         );
 
         $this->assertTrue(

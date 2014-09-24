@@ -73,8 +73,11 @@ class FileManager
 
         if (! $instance instanceof FileModelInterface) {
             throw new FileException(
-                sprintf("Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
-                    $fileType, $parentType, $className
+                sprintf(
+                    "Wrong class type for file type '%s', parent type '%s'. Class '%s' should implements FileModelInterface",
+                    $fileType,
+                    $parentType,
+                    $className
                 )
             );
         }

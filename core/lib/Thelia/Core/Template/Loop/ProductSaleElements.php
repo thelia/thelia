@@ -204,21 +204,21 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             }
 
             $loopResultRow
-                ->set("ID"                , $PSEValue->getId())
-                ->set("QUANTITY"          , $PSEValue->getQuantity())
-                ->set("IS_PROMO"          , $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set("IS_NEW"            , $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("IS_DEFAULT"        , $PSEValue->getIsDefault() === 1 ? 1 : 0)
-                ->set("WEIGHT"            , $PSEValue->getWeight())
-                ->set("REF"               , $PSEValue->getRef())
-                ->set("EAN_CODE"          , $PSEValue->getEanCode())
-                ->set("PRODUCT_ID"        , $PSEValue->getProductId())
-                ->set("PRICE"             , $price)
-                ->set("PRICE_TAX"         , $taxedPrice - $price)
-                ->set("TAXED_PRICE"       , $taxedPrice)
-                ->set("PROMO_PRICE"       , $promoPrice)
-                ->set("PROMO_PRICE_TAX"   , $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE" , $taxedPromoPrice);
+                ->set("ID", $PSEValue->getId())
+                ->set("QUANTITY", $PSEValue->getQuantity())
+                ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
+                ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set("IS_DEFAULT", $PSEValue->getIsDefault() === 1 ? 1 : 0)
+                ->set("WEIGHT", $PSEValue->getWeight())
+                ->set("REF", $PSEValue->getRef())
+                ->set("EAN_CODE", $PSEValue->getEanCode())
+                ->set("PRODUCT_ID", $PSEValue->getProductId())
+                ->set("PRICE", $price)
+                ->set("PRICE_TAX", $taxedPrice - $price)
+                ->set("TAXED_PRICE", $taxedPrice)
+                ->set("PROMO_PRICE", $promoPrice)
+                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
 
             $loopResult->addRow($loopResultRow);
         }

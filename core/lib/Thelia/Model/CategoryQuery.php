@@ -64,4 +64,5 @@ class CategoryQuery extends BaseCategoryQuery
 
         return $result;
     }
-} // CategoryQuery
+}
+// CategoryQuery

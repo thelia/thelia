@@ -16,4 +16,5 @@ use Thelia\Model\Base\ImportCategoryQuery as BaseImportCategoryQuery;
  */
 class ImportCategoryQuery extends BaseImportCategoryQuery
 {
-} // ImportCategoryQuery
+}
+// ImportCategoryQuery

@@ -16,4 +16,5 @@ use Thelia\Model\Base\ContentI18nQuery as BaseContentI18nQuery;
  */
 class ContentI18nQuery extends BaseContentI18nQuery
 {
-} // ContentI18nQuery
+}
+// ContentI18nQuery

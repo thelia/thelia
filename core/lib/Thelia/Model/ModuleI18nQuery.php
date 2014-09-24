@@ -16,4 +16,5 @@ use Thelia\Model\Base\ModuleI18nQuery as BaseModuleI18nQuery;
  */
 class ModuleI18nQuery extends BaseModuleI18nQuery
 {
-} // ModuleI18nQuery
+}
+// ModuleI18nQuery

@@ -58,11 +58,27 @@ class Customer extends BaseCustomer implements UserInterface
      * @throws \Propel\Runtime\Exception\PropelException
      */
     public function createOrUpdate(
-        $titleId, $firstname, $lastname, $address1, $address2, $address3,
-        $phone, $cellphone, $zipcode, $city, $countryId, $email = null,
-        $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null,
-        $discount = 0, $company = null, $ref = null, $forceEmailUpdate = false)
-    {
+        $titleId,
+        $firstname,
+        $lastname,
+        $address1,
+        $address2,
+        $address3,
+        $phone,
+        $cellphone,
+        $zipcode,
+        $city,
+        $countryId,
+        $email = null,
+        $plainPassword = null,
+        $lang = null,
+        $reseller = 0,
+        $sponsor = null,
+        $discount = 0,
+        $company = null,
+        $ref = null,
+        $forceEmailUpdate = false
+    ) {
         $this
             ->setTitleId($titleId)
             ->setFirstname($firstname)

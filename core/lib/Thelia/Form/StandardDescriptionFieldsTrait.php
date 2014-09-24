@@ -38,7 +38,7 @@ trait StandardDescriptionFieldsTrait
                     'constraints' => [ new NotBlank() ],
                     'required'    => true,
                 ]
-             );
+            );
         }
 
         if (! in_array('title', $exclude)) {

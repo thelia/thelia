@@ -66,4 +66,5 @@ class MetaDataQuery extends BaseMetaDataQuery
 
         return $out;
     }
-} // MetaDataQuery
+}
+// MetaDataQuery

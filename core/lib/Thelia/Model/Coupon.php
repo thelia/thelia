@@ -69,11 +69,24 @@ class Coupon extends BaseCoupon
      * @throws \Exception
      */
     public function createOrUpdate(
-        $code, $title, array $effects, $type, $isRemovingPostage, $shortDescription, $description,
-        $isEnabled, $expirationDate, $isAvailableOnSpecialOffers, $isCumulative, $maxUsage, $defaultSerializedRule,
-        $locale, $freeShippingForCountries, $freeShippingForMethods,
-        $perCustomerUsageCount)
-    {
+        $code,
+        $title,
+        array $effects,
+        $type,
+        $isRemovingPostage,
+        $shortDescription,
+        $description,
+        $isEnabled,
+        $expirationDate,
+        $isAvailableOnSpecialOffers,
+        $isCumulative,
+        $maxUsage,
+        $defaultSerializedRule,
+        $locale,
+        $freeShippingForCountries,
+        $freeShippingForMethods,
+        $perCustomerUsageCount
+    ) {
         $con = Propel::getWriteConnection(CouponTableMap::DATABASE_NAME);
 
         $con->beginTransaction();

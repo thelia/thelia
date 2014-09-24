@@ -139,7 +139,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 case "enabled_reverse":
                     $search->orderByActivate(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         return $search;
@@ -153,19 +153,19 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($hook);
 
                 $loopResultRow
-                    ->set("ID"           , $hook->getId())
+                    ->set("ID", $hook->getId())
                     ->set("IS_TRANSLATED", $hook->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE"       , $this->locale)
-                    ->set("TITLE"        , $hook->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"        , $hook->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"  , $hook->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("CODE"         , $hook->getCode())
-                    ->set("TYPE"         , $hook->getType())
-                    ->set("NATIVE"       , $hook->getNative())
-                    ->set("ACTIVE"       , $hook->getActivate())
-                    ->set("BY_MODULE"    , $hook->getByModule())
-                    ->set("BLOCK"        , $hook->getBlock())
-                    ->set("POSITION"     , $hook->getPosition())
+                    ->set("LOCALE", $this->locale)
+                    ->set("TITLE", $hook->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $hook->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $hook->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("CODE", $hook->getCode())
+                    ->set("TYPE", $hook->getType())
+                    ->set("NATIVE", $hook->getNative())
+                    ->set("ACTIVE", $hook->getActivate())
+                    ->set("BY_MODULE", $hook->getByModule())
+                    ->set("BLOCK", $hook->getBlock())
+                    ->set("POSITION", $hook->getPosition())
                 ;
 
                 $loopResult->addRow($loopResultRow);

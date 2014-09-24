@@ -16,4 +16,5 @@ use Thelia\Model\Base\AttributeCombinationQuery as BaseAttributeCombinationQuery
  */
 class AttributeCombinationQuery extends BaseAttributeCombinationQuery
 {
-} // AttributeCombinationQuery
+}
+// AttributeCombinationQuery

@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export\Type;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\FormatType;
@@ -95,7 +96,10 @@ class ProductPricesExport extends ExportHandler
                 ->addJoinObject($attributeAvJoin, "attribute_av_join")
                 ->addJoinCondition(
                     "attribute_av_join",
-                    AttributeAvI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR
+                    AttributeAvI18nTableMap::LOCALE . " = ?",
+                    $locale,
+                    null,
+                    \PDO::PARAM_STR
                 )
                 ->addAsColumn(
                     "attribute_av_i18n_ATTRIBUTES",
@@ -146,5 +150,4 @@ class ProductPricesExport extends ExportHandler
             "product_sale_elements_PROMO" => "promo",
         ];
     }
-
 }

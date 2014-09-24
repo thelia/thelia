@@ -73,7 +73,7 @@ class ModuleManagement
         }
     }
 
-    private function saveDescription(Module $module,\SimpleXMLElement $content, ConnectionInterface $con)
+    private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)
     {
         foreach ($content->descriptive as $description) {
             $locale = (string) $description->attributes()->locale;

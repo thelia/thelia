@@ -60,8 +60,8 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             ;
 
             $this->assertNotNull($pse);
-            $this->assertEquals($pse->getEanCode(),$row["ean"]);
-            $this->assertEquals($pse->getPromo(),$row["promo"]);
+            $this->assertEquals($pse->getEanCode(), $row["ean"]);
+            $this->assertEquals($pse->getPromo(), $row["promo"]);
 
             $currency = CurrencyQuery::create()->findOneByCode($row["currency"]);
             $this->assertNotNull($currency);

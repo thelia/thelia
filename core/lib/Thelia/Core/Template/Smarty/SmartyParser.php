@@ -60,9 +60,12 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool                     $debug
      */
     public function __construct(
-        Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-        $env = "prod", $debug = false)
-    {
+        Request $request,
+        EventDispatcherInterface $dispatcher,
+        ParserContext $parserContext,
+        $env = "prod",
+        $debug = false
+    ) {
         parent::__construct();
 
         $this->request = $request;
@@ -156,7 +159,7 @@ class SmartyParser extends Smarty implements ParserInterface
 
             // Strip all HTML-Comments
             // yes, even the ones in <script> - see http://stackoverflow.com/a/808850/515124
-            $source = preg_replace( '#<!--.*?-->#ms', '', $source );
+            $source = preg_replace('#<!--.*?-->#ms', '', $source);
 
             $expressions = array(
                 // replace multiple spaces between tags by a single space
@@ -188,7 +191,7 @@ class SmartyParser extends Smarty implements ParserInterface
             }
         }
 
-        $source = preg_replace( array_keys($expressions), array_values($expressions), $source );
+        $source = preg_replace(array_keys($expressions), array_values($expressions), $source);
 
         // capture html elements not to be messed with
         $_offset = 0;

@@ -58,7 +58,7 @@ class AccessManager
 
     public static function getMaxAccessValue()
     {
-        return pow(2, current(array_slice( self::$accessPows, -1, 1, true ))) - 1;
+        return pow(2, current(array_slice(self::$accessPows, -1, 1, true))) - 1;
     }
 
     public function build($accesses)

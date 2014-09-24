@@ -71,7 +71,7 @@ class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
         // Fails on windows - mock this test on windows
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             $fs = new Filesystem();
-            $fs->chmod($this->cache_dir,0100);
+            $fs->chmod($this->cache_dir, 0100);
 
             $application = new Application($this->getKernel());
 

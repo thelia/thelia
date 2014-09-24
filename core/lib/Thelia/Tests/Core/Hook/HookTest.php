@@ -217,17 +217,17 @@ class HookTest extends WebTestCase
         ConfigQuery::write('active-front-template', self::$templateBackupPath);
     }
 
-    protected function assertStringContains($data, $needle, $message="")
+    protected function assertStringContains($data, $needle, $message = "")
     {
         $this->assertTrue((false !== strpos($data, $needle)), $message);
     }
 
-    protected function assertStringNotContains($data, $needle, $message="")
+    protected function assertStringNotContains($data, $needle, $message = "")
     {
         $this->assertTrue((false === strpos($data, $needle)), $message);
     }
 
-    protected function assertStringBefore($data, $string1, $string2, $message="")
+    protected function assertStringBefore($data, $string1, $string2, $message = "")
     {
         $this->assertTrue((strpos($data, $string1) < strpos($data, $string2)), $message);
     }

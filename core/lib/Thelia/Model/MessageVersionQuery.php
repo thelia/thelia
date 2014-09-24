@@ -16,4 +16,5 @@ use Thelia\Model\Base\MessageVersionQuery as BaseMessageVersionQuery;
  */
 class MessageVersionQuery extends BaseMessageVersionQuery
 {
-} // MessageVersionQuery
+}
+// MessageVersionQuery

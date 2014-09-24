@@ -49,7 +49,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::LEAVES_ONLY);
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
 
         foreach ($iterator as $file) {
             $stamp .= $file->getMTime();
@@ -85,7 +86,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($from_directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST);
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
 
         foreach ($iterator as $item) {
             if ($item->isDir()) {

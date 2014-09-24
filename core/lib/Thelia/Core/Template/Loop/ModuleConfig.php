@@ -30,7 +30,7 @@ use Thelia\Model\ModuleQuery;
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class ModuleConfig  extends BaseLoop implements ArraySearchLoopInterface
+class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
 {
     /**
      * @return ArgumentCollection

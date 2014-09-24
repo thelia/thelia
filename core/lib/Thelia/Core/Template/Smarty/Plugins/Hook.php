@@ -320,9 +320,12 @@ class Hook extends AbstractSmartyPlugin
      *
      * @return string the hook output
      */
-    public function elseHook($params, $content, /** @noinspection PhpUnusedParameterInspection */
-                             $template, &$repeat)
-    {
+    public function elseHook(
+        $params,
+        $content,
+        /** @noinspection PhpUnusedParameterInspection */ $template,
+        &$repeat
+    ) {
         // When encountering close tag, check if hook has results.
         if ($repeat === false) {
             return $this->checkEmptyHook($params) ? $content : '';

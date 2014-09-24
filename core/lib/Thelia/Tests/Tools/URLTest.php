@@ -33,13 +33,13 @@ class URLTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = new \Symfony\Component\Routing\RequestContext(
-                '/thelia/index.php',
-                'GET',
-                'localhost',
-                'http',
-                80,
-                443,
-                '/path/to/action'
+            '/thelia/index.php',
+            'GET',
+            'localhost',
+            'http',
+            80,
+            443,
+            '/path/to/action'
         );
 
         $router->expects($this->any())
@@ -232,28 +232,40 @@ class URLTest extends \PHPUnit_Framework_TestCase
             array("category_id" => "2", "edit_language_id" => "1", "current_tab" => "general"),
             URL::PATH_TO_FILE
         );
-        $this->assertEquals('http://localhost/index_dev.php/admin/categories/update?folder_id=0&category_id=2&edit_language_id=1&current_tab=general', $url);
+        $this->assertEquals(
+            'http://localhost/index_dev.php/admin/categories/update?folder_id=0&category_id=2&edit_language_id=1&current_tab=general',
+            $url
+        );
 
         $url = URL::getInstance()->absoluteUrl(
             'http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0',
             array("edit_language_id" => "1"),
             URL::PATH_TO_FILE
         );
-        $this->assertEquals('http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0&edit_language_id=1', $url);
+        $this->assertEquals(
+            'http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0&edit_language_id=1',
+            $url
+        );
 
         $url = URL::getInstance()->absoluteUrl(
             'http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0',
             array(),
             URL::PATH_TO_FILE
         );
-        $this->assertEquals('http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0', $url);
+        $this->assertEquals(
+            'http://localhost/index_dev.php/admin/categories/update?category_id=1&current_tab=general&folder_id=0',
+            $url
+        );
 
         $url = URL::getInstance()->absoluteUrl(
             'http://localhost/index_dev.php/admin/categories/update?category_id=1',
             array("category_id" => "2", "edit_language_id" => "1", "current_tab" => "general"),
             URL::PATH_TO_FILE
         );
-        $this->assertEquals('http://localhost/index_dev.php/admin/categories/update?category_id=2&edit_language_id=1&current_tab=general', $url);
+        $this->assertEquals(
+            'http://localhost/index_dev.php/admin/categories/update?category_id=2&edit_language_id=1&current_tab=general',
+            $url
+        );
     }
 
     public function testRetrieve()

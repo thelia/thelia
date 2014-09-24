@@ -32,10 +32,10 @@ class ResponseListener implements EventSubscriberInterface
         if (null !== $id = $session->get("cart_use_cookie")) {
             $response = $event->getResponse();
             $response->headers->setCookie(new Cookie(
-                    "thelia_cart",
-                    $id,
-                    time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
-                    '/'
+                "thelia_cart",
+                $id,
+                time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365),
+                '/'
             ));
 
             $session->set("cart_use_cookie", null);

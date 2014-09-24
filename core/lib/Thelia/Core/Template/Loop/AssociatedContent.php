@@ -82,8 +82,8 @@ class AssociatedContent extends Content
         if (null !== $exclude_product) {
             // Exclude all contents related to the given product
             $search->filterById(
-                    ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
-                    Criteria::NOT_IN
+                ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
+                Criteria::NOT_IN
             );
         }
 
@@ -93,8 +93,8 @@ class AssociatedContent extends Content
         if (null !== $exclude_category) {
             // Exclure tous les attribut qui sont attachés aux templates indiqués
             $search->filterById(
-                    CategoryAssociatedContentQuery::create()->filterByProductId($exclude_category)->select('category_id')->find(),
-                    Criteria::NOT_IN
+                CategoryAssociatedContentQuery::create()->filterByProductId($exclude_category)->select('category_id')->find(),
+                Criteria::NOT_IN
             );
         }
 
@@ -105,12 +105,12 @@ class AssociatedContent extends Content
         if ($orderByAssociatedContent !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAssociatedContent] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
         if ($orderByAssociatedContentReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAssociatedContentReverse] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
 
         $associatedContents = $this->search($search);
@@ -131,9 +131,9 @@ class AssociatedContent extends Content
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue( implode(',', $associatedContentIdList) );
+            $this->args->get('id')->setValue(implode(',', $associatedContentIdList));
         } else {
-            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $associatedContentIdList)) );
+            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $associatedContentIdList)));
         }
 
         return parent::buildModelCriteria();
@@ -147,9 +147,9 @@ class AssociatedContent extends Content
             $relatedContentId = $loopResultRow->get('ID');
 
             $loopResultRow
-                ->set("ID"        , $this->contentId[$relatedContentId])
+                ->set("ID", $this->contentId[$relatedContentId])
                 ->set("CONTENT_ID", $relatedContentId)
-                ->set("POSITION"  , $this->contentPosition[$relatedContentId])
+                ->set("POSITION", $this->contentPosition[$relatedContentId])
 
             ;
         }

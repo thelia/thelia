@@ -92,7 +92,7 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
         $this->action->toggleModuleHookActivation($event);
         $updatedModuleHook = $event->getModuleHook();
 
-        $this->assertEquals( !$activated, $updatedModuleHook->getActive());
+        $this->assertEquals(!$activated, $updatedModuleHook->getActive());
 
         return $updatedModuleHook;
     }

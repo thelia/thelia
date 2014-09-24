@@ -16,4 +16,5 @@ use Thelia\Model\Base\FeatureAvI18nQuery as BaseFeatureAvI18nQuery;
  */
 class FeatureAvI18nQuery extends BaseFeatureAvI18nQuery
 {
-} // FeatureAvI18nQuery
+}
+// FeatureAvI18nQuery

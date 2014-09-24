@@ -43,16 +43,12 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $fileManager = new FileManager([
             "document.product" => "Thelia\\Model\\ProductDocument",
             "image.product" => "Thelia\\Model\\ProductImage",
-
             "document.category" => "Thelia\\Model\\CategoryDocument",
             "image.category" => "Thelia\\Model\\CategoryImage",
-
             "document.content" => "Thelia\\Model\\ContentDocument",
             "image.content" => "Thelia\\Model\\ContentImage",
-
             "document.folder" => "Thelia\\Model\\FolderDocument",
             "image.folder" => "Thelia\\Model\\FolderImage",
-
             "document.brand" => "Thelia\\Model\\BrandDocument",
             "image.brand" => "Thelia\\Model\\BrandImage",
         ]);
@@ -72,16 +68,12 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $fileManager = new FileManager([
             "document.product" => "Thelia\\Model\\ProductDocument",
             "image.product" => "Thelia\\Model\\ProductImage",
-
             "document.category" => "Thelia\\Model\\CategoryDocument",
             "image.category" => "Thelia\\Model\\CategoryImage",
-
             "document.content" => "Thelia\\Model\\ContentDocument",
             "image.content" => "Thelia\\Model\\ContentImage",
-
             "document.folder" => "Thelia\\Model\\FolderDocument",
             "image.folder" => "Thelia\\Model\\FolderImage",
-
             "document.brand" => "Thelia\\Model\\BrandDocument",
             "image.brand" => "Thelia\\Model\\BrandImage",
         ]);
@@ -102,7 +94,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         if ($config != null) {
             $this->cache_dir_from_web_root = $config->getValue();
 
-            $config->setValue(__DIR__."/assets/documents/cache");
+            $config->setValue(__DIR__ . "/assets/documents/cache");
 
             $config->setValue($this->cache_dir_from_web_root)->save();
         }
@@ -110,7 +102,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
 
     public static function setUpBeforeClass()
     {
-        $dir = THELIA_WEB_DIR."/cache/tests";
+        $dir = THELIA_WEB_DIR . "/cache/tests";
         if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
                 if ($file == '.' || $file == '..') {
@@ -149,103 +141,103 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $document->processDocument($event);
     }
 
-     /**
-      *
-      * Try to process a non-existent file
-      *
-      * @expectedException \InvalidArgumentException
-      */
-     public function testProcessNonExistentDocument()
-     {
-         $event = new DocumentEvent($this->request);
+    /**
+     *
+     * Try to process a non-existent file
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testProcessNonExistentDocument()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         $event->setCacheFilepath("blablabla.txt");
-         $event->setCacheSubdirectory("tests");
+        $event->setCacheFilepath("blablabla.txt");
+        $event->setCacheSubdirectory("tests");
 
-         $document->processDocument($event);
-     }
+        $document->processDocument($event);
+    }
 
-     /**
-      *
-      * Try to process a file outside of the cache
-      *
-      * @expectedException \InvalidArgumentException
-      */
-     public function testProcessDocumentOutsideValidPath()
-     {
-         $event = new DocumentEvent($this->request);
+    /**
+     *
+     * Try to process a file outside of the cache
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testProcessDocumentOutsideValidPath()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         $event->setCacheFilepath("blablabla.pdf");
-         $event->setCacheSubdirectory("../../../");
+        $event->setCacheFilepath("blablabla.pdf");
+        $event->setCacheSubdirectory("../../../");
 
-         $document->processDocument($event);
-     }
+        $document->processDocument($event);
+    }
 
-     /**
-      * No operation done on source file -> copie !
-      */
-     public function testProcessDocumentCopy()
-     {
-         $event = new DocumentEvent($this->request);
+    /**
+     * No operation done on source file -> copie !
+     */
+    public function testProcessDocumentCopy()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $event->setSourceFilepath(__DIR__."/assets/documents/sources/test-document-1.txt");
-         $event->setCacheSubdirectory("tests");
+        $event->setSourceFilepath(__DIR__ . "/assets/documents/sources/test-document-1.txt");
+        $event->setCacheSubdirectory("tests");
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         // mock cache configuration.
-         $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
+        // mock cache configuration.
+        $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
 
-         if ($config != null) {
-             $oldval = $config->getValue();
-             $config->setValue('copy')->save();
-         }
+        if ($config != null) {
+            $oldval = $config->getValue();
+            $config->setValue('copy')->save();
+        }
 
-         $document->processDocument($event);
+        $document->processDocument($event);
 
-         if ($config != null) {
-             $config->setValue($oldval)->save();
-         }
+        if ($config != null) {
+            $config->setValue($oldval)->save();
+        }
 
-         $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
+        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
 
-         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-1.txt");
-     }
+        $this->assertFileExists(THELIA_WEB_DIR . "/$imgdir/tests/test-document-1.txt");
+    }
 
-     /**
-      * No operation done on source file -> link !
-      */
-     public function testProcessDocumentSymlink()
-     {
-         $event = new DocumentEvent($this->request);
+    /**
+     * No operation done on source file -> link !
+     */
+    public function testProcessDocumentSymlink()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $event->setSourceFilepath(__DIR__."/assets/documents/sources/test-document-2.txt");
-         $event->setCacheSubdirectory("tests");
+        $event->setSourceFilepath(__DIR__ . "/assets/documents/sources/test-document-2.txt");
+        $event->setCacheSubdirectory("tests");
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         // mock cache configuration.
-         $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
+        // mock cache configuration.
+        $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
 
-         if ($config != null) {
-             $oldval = $config->getValue();
-             $config->setValue('symlink')->save();
-         }
+        if ($config != null) {
+            $oldval = $config->getValue();
+            $config->setValue('symlink')->save();
+        }
 
-         $document->processDocument($event);
+        $document->processDocument($event);
 
-         if ($config != null) {
-             $config->setValue($oldval)->save();
-         }
+        if ($config != null) {
+            $config->setValue($oldval)->save();
+        }
 
-         $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
+        $imgdir = ConfigQuery::read('document_cache_dir_from_web_root');
 
-         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-document-2.txt");
-     }
+        $this->assertFileExists(THELIA_WEB_DIR . "/$imgdir/tests/test-document-2.txt");
+    }
 
     public function testClearTestsCache()
     {
@@ -267,19 +259,19 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $document->clearCache($event);
     }
 
-     /**
-      * Try to clear directory ouside of the cache
-      *
-      * @expectedException \InvalidArgumentException
-      */
-     public function testClearUnallowedPathCache()
-     {
-         $event = new DocumentEvent($this->request);
+    /**
+     * Try to clear directory ouside of the cache
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testClearUnallowedPathCache()
+    {
+        $event = new DocumentEvent($this->request);
 
-         $event->setCacheSubdirectory('../../../..');
+        $event->setCacheSubdirectory('../../../..');
 
-         $document = new Document($this->getFileManager());
+        $document = new Document($this->getFileManager());
 
-         $document->clearCache($event);
-     }
+        $document->clearCache($event);
+    }
 }

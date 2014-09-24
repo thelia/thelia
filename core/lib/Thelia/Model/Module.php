@@ -35,7 +35,8 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
             $subdir
@@ -44,7 +45,8 @@ class Module extends BaseModule
 
     public function getAbsoluteBackOfficeI18nTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::BACK_OFFICE_SUBDIR,
             $subdir
@@ -58,7 +60,8 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteTemplateBasePath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
             $subdir
@@ -67,7 +70,8 @@ class Module extends BaseModule
 
     public function getAbsoluteFrontOfficeI18nTemplatePath($subdir)
     {
-        return sprintf("%s".DS."%s".DS."%s",
+        return sprintf(
+            "%s".DS."%s".DS."%s",
             $this->getAbsoluteI18nPath(),
             TemplateDefinition::FRONT_OFFICE_SUBDIR,
             $subdir

@@ -61,11 +61,13 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
             $order = $orders->get($current);
 
             $this->assertEquals(
-                $ref = $order->getRef(), $row["ref"]
+                $ref = $order->getRef(),
+                $row["ref"]
             );
 
             $this->assertEquals(
-                $order->getCustomer()->getRef(), $row["customer_ref"]
+                $order->getCustomer()->getRef(),
+                $row["customer_ref"]
             );
 
             $coupons = OrderCouponQuery::create()
@@ -77,9 +79,7 @@ class OrderExportTest extends \PHPUnit_Framework_TestCase
             $coupons = implode(",", $coupons);
 
             $this->assertTrue(
-                empty($coupons) ?
-                    empty($row["coupons"]):
-                    $coupons === $row["coupons"]
+                empty($coupons) ? empty($row["coupons"]): $coupons === $row["coupons"]
             );
 
             $this->assertEquals(

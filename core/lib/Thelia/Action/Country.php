@@ -71,7 +71,7 @@ class Country extends BaseAction implements EventSubscriberInterface
 
     public function toggleDefault(CountryToggleDefaultEvent $event)
     {
-        if ( null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
+        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
             $country->toggleDefault();
 
             $event->setCountry($country);

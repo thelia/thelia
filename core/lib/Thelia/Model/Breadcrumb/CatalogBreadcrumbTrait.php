@@ -38,7 +38,7 @@ trait CatalogBreadcrumbTrait
         $results = $categoryPath->buildArray();
 
         foreach ($results as $result) {
-            $breadcrumb[$result['TITLE']] =  sprintf("%s?category_id=%d",$catalogUrl, $result['ID']);
+            $breadcrumb[$result['TITLE']] =  sprintf("%s?category_id=%d", $catalogUrl, $result['ID']);
         }
 
         return $breadcrumb;
@@ -53,7 +53,8 @@ trait CatalogBreadcrumbTrait
 
         $product->setLocale($locale);
 
-        $breadcrumb[$product->getTitle()] = sprintf("%s?product_id=%d&current_tab=%s",
+        $breadcrumb[$product->getTitle()] =  sprintf(
+            "%s?product_id=%d&current_tab=%s",
             $router->generate('admin.products.update', [], Router::ABSOLUTE_URL),
             $product->getId(),
             $tab
@@ -70,8 +71,13 @@ trait CatalogBreadcrumbTrait
 
         $category->setLocale($locale);
 
-        $breadcrumb[$category->getTitle()] = sprintf("%s?category_id=%d&current_tab=%s",
-            $router->generate('admin.categories.update',[], Router::ABSOLUTE_URL),
+        $breadcrumb[$category->getTitle()] = sprintf(
+            "%s?category_id=%d&current_tab=%s",
+            $router->generate(
+                'admin.categories.update',
+                [],
+                Router::ABSOLUTE_URL
+            ),
             $category->getId(),
             $tab
         );

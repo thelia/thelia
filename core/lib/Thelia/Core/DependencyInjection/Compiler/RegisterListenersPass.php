@@ -228,7 +228,8 @@ class RegisterListenersPass implements CompilerPassInterface
                     $eventName .= '.' . $moduleHook->getModuleId();
                 }
 
-                $definition->addMethodCall('addListenerService',
+                $definition->addMethodCall(
+                    'addListenerService',
                     array(
                         $eventName,
                         array($moduleHook->getClassname(), $moduleHook->getMethod()),

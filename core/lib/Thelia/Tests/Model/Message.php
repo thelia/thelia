@@ -33,7 +33,8 @@ class Message extends \PHPUnit_Framework_TestCase
     /**
      * @var ContainerBuilder $container
      */
-    protected $container, $parser;
+    protected $container;
+    protected $parser;
 
     private $backup_mail_template = 'undefined';
 
@@ -268,7 +269,7 @@ class Message extends \PHPUnit_Framework_TestCase
         file_put_contents($path.DS.'layout5.text.tpl', 'TEXT Layout 5: {block name="message-body"}{$message_body nofilter}{/block}');
 
         file_put_contents($path.DS.'template5-html.html', '{extends file="layout5.html.tpl"}{block name="message-body"}HTML <template> & content v={$myvar}{/block}');
-        file_put_contents($path.DS.'template5-text.txt' , '{extends file="layout5.text.tpl"}{block name="message-body"}TEXT <template> & content v={$myvar}{/block}');
+        file_put_contents($path.DS.'template5-text.txt', '{extends file="layout5.text.tpl"}{block name="message-body"}TEXT <template> & content v={$myvar}{/block}');
 
         $instance = \Swift_Message::newInstance();
 

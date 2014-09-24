@@ -86,7 +86,7 @@ class Update
         return $updatedVersions;
     }
 
-    protected function updateToVersion($version, Database $database,Tlog $logger)
+    protected function updateToVersion($version, Database $database, Tlog $logger)
     {
         if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
             $logger->debug(sprintf('inserting file %s', $version.'$sql'));

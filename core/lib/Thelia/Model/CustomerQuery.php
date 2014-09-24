@@ -37,4 +37,5 @@ class CustomerQuery extends BaseCustomerQuery
 
         return $stats;
     }
-} // CustomerQuery
+}
+// CustomerQuery

@@ -624,7 +624,7 @@ class Tlog implements LoggerInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (! empty($className) && ($className == ltrim(__CLASS__,'\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
+                    if (! empty($className) && ($className == ltrim(__CLASS__, '\\') || strtolower(get_parent_class($className)) == ltrim(__CLASS__, '\\'))) {
                         $origin['line'] = $hop['line'];
                         $origin['file'] = $hop['file'];
                         break;

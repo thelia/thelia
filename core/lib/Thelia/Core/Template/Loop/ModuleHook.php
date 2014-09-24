@@ -125,7 +125,7 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                 case "enabled_reverse":
                     $search->orderByActive(Criteria::DESC);
                     break;
-             }
+            }
         }
 
         return $search;
@@ -139,15 +139,15 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($moduleHook);
 
                 $loopResultRow
-                    ->set("ID"           , $moduleHook->getId())
-                    ->set("HOOK_ID"      , $moduleHook->getHookId())
-                    ->set("MODULE_ID"    , $moduleHook->getModuleId())
-                    ->set("MODULE_TITLE" , $moduleHook->getModule()->getTitle())
-                    ->set("CLASSNAME"    , $moduleHook->getClassname())
-                    ->set("ACTIVE"       , $moduleHook->getActive())
-                    ->set("HOOK_ACTIVE"  , $moduleHook->getHookActive())
+                    ->set("ID", $moduleHook->getId())
+                    ->set("HOOK_ID", $moduleHook->getHookId())
+                    ->set("MODULE_ID", $moduleHook->getModuleId())
+                    ->set("MODULE_TITLE", $moduleHook->getModule()->getTitle())
+                    ->set("CLASSNAME", $moduleHook->getClassname())
+                    ->set("ACTIVE", $moduleHook->getActive())
+                    ->set("HOOK_ACTIVE", $moduleHook->getHookActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())
-                    ->set("POSITION"     , $moduleHook->getPosition())
+                    ->set("POSITION", $moduleHook->getPosition())
                 ;
 
                 $loopResult->addRow($loopResultRow);

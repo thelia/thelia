@@ -92,8 +92,9 @@ class ImageEvent extends CachedFileEvent
     public function getOptionsHash()
     {
         return md5(
-                $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
-                        . $this->rotation);
+            $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
+            . $this->rotation
+        );
     }
 
     public function getCategory()

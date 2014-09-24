@@ -136,4 +136,5 @@ class OrderQuery extends BaseOrderQuery
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
             ->count();
     }
-} // OrderQuery
+}
+// OrderQuery

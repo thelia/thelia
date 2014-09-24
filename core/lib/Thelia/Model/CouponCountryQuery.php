@@ -16,4 +16,5 @@ use Thelia\Model\Base\CouponCountryQuery as BaseCouponCountryQuery;
  */
 class CouponCountryQuery extends BaseCouponCountryQuery
 {
-} // CouponCountryQuery
+}
+// CouponCountryQuery

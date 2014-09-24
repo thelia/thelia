@@ -69,8 +69,8 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $title) {
             $loopResultRow = new LoopResultRow($title);
             $loopResultRow->set("ID", $title->getId())
-                ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
+                ->set("IS_TRANSLATED", $title->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'))

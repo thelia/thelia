@@ -78,7 +78,8 @@ class Form extends AbstractSmartyPlugin
         foreach ($formDefinition as $name => $className) {
             if (array_key_exists($name, $this->formDefinition)) {
                 throw new \InvalidArgumentException(
-                        sprintf("%s form name already exists for %s class", $name, $className));
+                    sprintf("%s form name already exists for %s class", $name, $className)
+                );
             }
 
             $this->formDefinition[$name] = $className;
@@ -193,7 +194,7 @@ class Form extends AbstractSmartyPlugin
 
         /* access to collections */
         if ($formFieldType instanceof CollectionType) {
-            if ( true === $formFieldConfig->getOption('prototype') ) {
+            if (true === $formFieldConfig->getOption('prototype')) {
             } else {
                 /* access to choices */
                 if (isset($formFieldView->vars['choices'])) {
@@ -301,7 +302,8 @@ class Form extends AbstractSmartyPlugin
 
         $templateStyle = $this->getParam($params, 'template', 'standard');
 
-        $snippet_path = sprintf('%s'.DS.'forms'.DS.'%s'.DS.'%s.html',
+        $snippet_path = sprintf(
+            '%s'.DS.'forms'.DS.'%s'.DS.'%s.html',
             $this->parser->getTemplateDefinition()->getAbsolutePath(),
             $templateStyle,
             $templateFile
@@ -488,7 +490,8 @@ class Form extends AbstractSmartyPlugin
 
         if (empty($instance->getView()[$fieldName])) {
             throw new \InvalidArgumentException(
-                sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
+                sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName())
+            );
         }
 
         return $instance->getView()[$fieldName];
@@ -557,9 +560,11 @@ class Form extends AbstractSmartyPlugin
 
         if (!$instance instanceof \Thelia\Form\BaseForm) {
             throw new \InvalidArgumentException(
-                    sprintf(
-                            "form parameter in form_field block must be an instance of
-                \Thelia\Form\BaseForm, instance of %s found", get_class($instance)));
+                sprintf(
+                    "form parameter in form_field block must be an instance of \Thelia\Form\BaseForm, instance of %s found",
+                    get_class($instance)
+                )
+            );
         }
 
         return $instance;
@@ -577,10 +582,9 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
             new SmartyPluginDescriptor("block", "form_error", $this, "formError"),
-
-            new SmartyPluginDescriptor("function", "form_field_attributes"   , $this, "standardFormFieldAttributes"),
-            new SmartyPluginDescriptor("function", "render_form_field"       , $this, "standardFormFieldRendering"),
-            new SmartyPluginDescriptor("block"   , "custom_render_form_field", $this, "customFormFieldRendering"),
+            new SmartyPluginDescriptor("function", "form_field_attributes", $this, "standardFormFieldAttributes"),
+            new SmartyPluginDescriptor("function", "render_form_field", $this, "standardFormFieldRendering"),
+            new SmartyPluginDescriptor("block", "custom_render_form_field", $this, "customFormFieldRendering"),
         );
     }
 }

@@ -32,7 +32,7 @@ class FloatToFloatArrayType extends BaseType
         }
 
         foreach ($value as $key => $val) {
-            if ( filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($val, FILTER_VALIDATE_FLOAT) === false ) {
+            if (filter_var($key, FILTER_VALIDATE_FLOAT) === false || filter_var($val, FILTER_VALIDATE_FLOAT) === false) {
                 return false;
             }
         }

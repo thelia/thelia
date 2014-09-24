@@ -169,7 +169,8 @@ class MailerFactory
                             '%code'       => $messageCode,
                             '%failed_addresses' => is_array($failedRecipients) ? implode(',', $failedRecipients) : 'none'
                         ]
-                    ));
+                    )
+                );
             }
         } else {
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");

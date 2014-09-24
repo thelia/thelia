@@ -34,7 +34,7 @@ class HomeController extends BaseAdminController
     /**
      * Get the latest available Thelia version from the Thelia web site.
      *
-     * @return Thelia\Core\HttpFoundation\Response the response
+     * @return \Thelia\Core\HttpFoundation\Response the response
      */
     public function getLatestTheliaVersion()
     {

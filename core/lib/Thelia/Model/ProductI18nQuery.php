@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductI18nQuery as BaseProductI18nQuery;
  */
 class ProductI18nQuery extends BaseProductI18nQuery
 {
-} // ProductI18nQuery
+}
+// ProductI18nQuery

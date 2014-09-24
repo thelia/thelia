@@ -159,7 +159,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 $rewrittenUrlData = URL::getInstance()->resolve($request->getPathInfo());
             } catch (UrlRewritingException $e) {
                 switch ($e->getCode()) {
-                    case UrlRewritingException::URL_NOT_FOUND :
+                    case UrlRewritingException::URL_NOT_FOUND:
                         throw new ResourceNotFoundException();
                         break;
                     default:

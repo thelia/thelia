@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export\Type;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\FileFormat\FormatType;
@@ -76,8 +77,8 @@ class OrderExport extends ExportHandler
                     ->addAsColumn(
                         "product_TAX",
                         "IF(".OrderProductTableMap::WAS_IN_PROMO.",".
-                            "SUM(".OrderProductTaxTableMap::PROMO_AMOUNT."),".
-                            "SUM(".OrderProductTaxTableMap::AMOUNT.")".
+                        "SUM(".OrderProductTaxTableMap::PROMO_AMOUNT."),".
+                        "SUM(".OrderProductTaxTableMap::AMOUNT.")".
                         ")"
                     )
                     ->addAsColumn("tax_TITLE", OrderProductTableMap::TAX_RULE_TITLE)
@@ -86,8 +87,8 @@ class OrderExport extends ExportHandler
                 ->addAsColumn(
                     "product_PRICE",
                     "IF(".OrderProductTableMap::WAS_IN_PROMO.",".
-                        OrderProductTableMap::PROMO_PRICE .",".
-                        OrderProductTableMap::PRICE .
+                    OrderProductTableMap::PROMO_PRICE .",".
+                    OrderProductTableMap::PRICE .
                     ")"
                 )
                 ->addAsColumn("product_QUANTITY", OrderProductTableMap::QUANTITY)

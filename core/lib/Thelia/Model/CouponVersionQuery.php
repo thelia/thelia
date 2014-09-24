@@ -16,4 +16,5 @@ use Thelia\Model\Base\CouponVersionQuery as BaseCouponVersionQuery;
  */
 class CouponVersionQuery extends BaseCouponVersionQuery
 {
-} // CouponVersionQuery
+}
+// CouponVersionQuery

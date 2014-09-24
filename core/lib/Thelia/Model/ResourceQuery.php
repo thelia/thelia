@@ -16,4 +16,5 @@ use Thelia\Model\Base\ResourceQuery as BaseResourceQuery;
  */
 class ResourceQuery extends BaseResourceQuery
 {
-} // ResourceQuery
+}
+// ResourceQuery

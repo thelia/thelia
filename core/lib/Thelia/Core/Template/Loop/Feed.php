@@ -26,7 +26,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class Feed extends BaseLoop  implements ArraySearchLoopInterface
+class Feed extends BaseLoop implements ArraySearchLoopInterface
 {
     public function getArgDefinitions()
     {
@@ -65,11 +65,11 @@ class Feed extends BaseLoop  implements ArraySearchLoopInterface
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-                ->set("URL"         , $item->get_permalink())
-                ->set("TITLE"       , $item->get_title())
-                ->set("AUTHOR"      , $item->get_author())
-                ->set("DESCRIPTION" , $item->get_description())
-                ->set("DATE"        , $item->get_date('U'))
+                ->set("URL", $item->get_permalink())
+                ->set("TITLE", $item->get_title())
+                ->set("AUTHOR", $item->get_author())
+                ->set("DESCRIPTION", $item->get_description())
+                ->set("DATE", $item->get_date('U'))
             ;
 
             $loopResult->addRow($loopResultRow);

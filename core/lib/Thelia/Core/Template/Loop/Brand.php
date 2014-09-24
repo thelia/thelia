@@ -186,20 +186,20 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         foreach ($loopResult->getResultDataCollection() as $brand) {
             $loopResultRow = new LoopResultRow($brand);
 
-            $loopResultRow->set("ID"            , $brand->getId())
-                ->set("IS_TRANSLATED"           , $brand->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $brand->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $brand->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $brand->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL"                     , $brand->getUrl($this->locale))
-                ->set("META_TITLE"              , $brand->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $brand->getVirtualColumn('i18n_META_KEYWORDS'))
-                ->set("POSITION"                , $brand->getPosition())
-                ->set("VISIBLE"                 , $brand->getVisible())
-                ->set("LOGO_IMAGE_ID"           , $brand->getLogoImageId() ?: 0)
+            $loopResultRow->set("ID", $brand->getId())
+                ->set("IS_TRANSLATED", $brand->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $brand->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $brand->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $brand->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $brand->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("URL", $brand->getUrl($this->locale))
+                ->set("META_TITLE", $brand->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION", $brand->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS", $brand->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("POSITION", $brand->getPosition())
+                ->set("VISIBLE", $brand->getVisible())
+                ->set("LOGO_IMAGE_ID", $brand->getLogoImageId() ?: 0)
             ;
 
             $loopResult->addRow($loopResultRow);

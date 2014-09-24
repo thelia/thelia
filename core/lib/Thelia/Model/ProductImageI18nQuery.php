@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProductImageI18nQuery as BaseProductImageI18nQuery;
  */
 class ProductImageI18nQuery extends BaseProductImageI18nQuery
 {
-} // ProductImageI18nQuery
+}
+// ProductImageI18nQuery

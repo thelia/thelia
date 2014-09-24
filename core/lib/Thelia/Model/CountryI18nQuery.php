@@ -16,4 +16,5 @@ use Thelia\Model\Base\CountryI18nQuery as BaseCountryI18nQuery;
  */
 class CountryI18nQuery extends BaseCountryI18nQuery
 {
-} // CountryI18nQuery
+}
+// CountryI18nQuery

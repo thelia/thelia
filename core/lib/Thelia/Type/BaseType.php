@@ -29,7 +29,7 @@ abstract class BaseType implements TypeInterface
 
     public function verifyForm($value, ExecutionContextInterface $context)
     {
-        if ( ! $this->isValid($value) ) {
+        if (!$this->isValid($value)) {
             $context->addViolation(sprintf("received value `%s` does not match `%s` type", $value, $this->getType()));
         }
     }

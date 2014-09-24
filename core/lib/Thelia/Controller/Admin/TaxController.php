@@ -28,9 +28,7 @@ class TaxController extends AbstractCrudController
             'tax',
             'manual',
             'order',
-
             AdminResources::TAX,
-
             TheliaEvents::TAX_CREATE,
             TheliaEvents::TAX_UPDATE,
             TheliaEvents::TAX_DELETE

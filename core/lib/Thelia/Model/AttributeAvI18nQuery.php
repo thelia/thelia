@@ -16,4 +16,5 @@ use Thelia\Model\Base\AttributeAvI18nQuery as BaseAttributeAvI18nQuery;
  */
 class AttributeAvI18nQuery extends BaseAttributeAvI18nQuery
 {
-} // AttributeAvI18nQuery
+}
+// AttributeAvI18nQuery

@@ -73,8 +73,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
             if (null !== $order = $this->getOrder($order_id)) {
                 $this->getLog()->addInfo(
-                    $this->getTranslator()->trans("Processing confirmation of order ref. %ref, ID %id",
-                    array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                    $this->getTranslator()->trans(
+                        "Processing confirmation of order ref. %ref, ID %id",
+                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                    )
                 );
 
                 $event = new OrderEvent($order);
@@ -84,13 +86,16 @@ abstract class BasePaymentModuleController extends BaseFrontController
                 $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
 
                 $this->getLog()->addInfo(
-                    $this->getTranslator()->trans("Order ref. %ref, ID %id has been successfully paid.",
-                        array('%ref' => $order->getRef(), '%id' => $order->getId()))
+                    $this->getTranslator()->trans(
+                        "Order ref. %ref, ID %id has been successfully paid.",
+                        array('%ref' => $order->getRef(), '%id' => $order->getId())
+                    )
                 );
             }
         } catch (\Exception $ex) {
             $this->getLog()->addError(
-                $this->getTranslator()->trans("Error occured while processing order ref. %ref, ID %id: %err",
+                $this->getTranslator()->trans(
+                    "Error occured while processing order ref. %ref, ID %id: %err",
                     array(
                         '%err' => $ex->getMessage(),
                         '%ref' => ! isset($order) ? "?" : $order->getRef(),
@@ -115,8 +120,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
 
         if (null !== $order = $this->getOrder($order_id)) {
             $this->getLog()->addInfo(
-                $this->getTranslator()->trans("Processing cancelation of payment for order ref. %ref",
-                    array('%ref' => $order->getRef()))
+                $this->getTranslator()->trans(
+                    "Processing cancelation of payment for order ref. %ref",
+                    array('%ref' => $order->getRef())
+                )
             );
 
             $event = new OrderEvent($order);
@@ -124,8 +131,10 @@ abstract class BasePaymentModuleController extends BaseFrontController
             $event->setStatus(OrderStatus::CODE_NOT_PAID);
 
             $this->getLog()->addInfo(
-                $this->getTranslator()->trans("Order ref. %ref is now unpaid.",
-                    array('%ref' => $order->getRef()))
+                $this->getTranslator()->trans(
+                    "Order ref. %ref is now unpaid.",
+                    array('%ref' => $order->getRef())
+                )
             );
 
             $this->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);

@@ -71,8 +71,10 @@ class Thelia extends Kernel
             return ;
         }
 
-        $definePropel = new DefinePropel(new DatabaseConfiguration(),
-            Yaml::parse(THELIA_CONF_DIR . 'database.yml'));
+        $definePropel = new DefinePropel(
+            new DatabaseConfiguration(),
+            Yaml::parse(THELIA_CONF_DIR . 'database.yml')
+        );
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
         $manager = new ConnectionManagerSingle();
@@ -239,7 +241,8 @@ class Thelia extends Kernel
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\InvalidArgumentException $e) {
                     Tlog::getInstance()->addError(
-                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()), $e
+                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),
+                        $e
                     );
 
                     throw $e;

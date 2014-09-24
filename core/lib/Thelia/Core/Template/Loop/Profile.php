@@ -69,10 +69,10 @@ class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
         foreach ($loopResult->getResultDataCollection() as $profile) {
             $loopResultRow = new LoopResultRow($profile);
             $loopResultRow->set("ID", $profile->getId())
-                ->set("IS_TRANSLATED",$profile->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("CODE",$profile->getCode())
-                ->set("TITLE",$profile->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $profile->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("CODE", $profile->getCode())
+                ->set("TITLE", $profile->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $profile->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $profile->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $profile->getVirtualColumn('i18n_POSTSCRIPTUM'))

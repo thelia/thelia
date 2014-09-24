@@ -120,8 +120,8 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
         $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
         $orange = $baz->appendChild(new \DOMElement("orange"));
         $node = $orange->appendChild(new \DOMElement($this->formatter->nodeName));
-        $node->setAttribute("name","type");
-        $node->setAttribute("value","fruit");
+        $node->setAttribute("name", "type");
+        $node->setAttribute("value", "fruit");
         $banana = $baz->appendChild(new \DOMElement("banana"));
         $node = $banana->appendChild(new \DOMElement($this->formatter->nodeName));
         $node->setAttribute("name", "like");
@@ -205,8 +205,8 @@ class XMLFormatterTest extends \PHPUnit_Framework_TestCase
         $baz = $base->appendChild(new \DOMElement($this->formatter->rowName));
         $orange = $baz->appendChild(new \DOMElement("orange"));
         $node = $orange->appendChild(new \DOMElement($this->formatter->nodeName));
-        $node->setAttribute("name","type");
-        $node->setAttribute("value","fruit");
+        $node->setAttribute("name", "type");
+        $node->setAttribute("value", "fruit");
         $banana = $baz->appendChild(new \DOMElement("banana"));
         $node = $banana->appendChild(new \DOMElement($this->formatter->nodeName));
         $node->setAttribute("name", "like");

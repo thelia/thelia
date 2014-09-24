@@ -50,28 +50,24 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         $collection = new ArgumentCollection(
-
-                Argument::createIntListTypeArgument('id'),
-                Argument::createIntListTypeArgument('exclude'),
-                Argument::createBooleanOrBothTypeArgument('visible', 1),
-                new Argument(
-                        'order',
-                        new TypeCollection(
-                                new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
-                        ),
-                        'manual'
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
                 ),
-                Argument::createIntTypeArgument('lang'),
-
-                Argument::createIntTypeArgument('category'),
-                Argument::createIntTypeArgument('product'),
-                Argument::createIntTypeArgument('folder'),
-                Argument::createIntTypeArgument('content'),
-
-                Argument::createAnyTypeArgument('source'),
-
-                Argument::createIntTypeArgument('source_id'),
-                Argument::createBooleanTypeArgument('force_return', true)
+                'manual'
+            ),
+            Argument::createIntTypeArgument('lang'),
+            Argument::createIntTypeArgument('category'),
+            Argument::createIntTypeArgument('product'),
+            Argument::createIntTypeArgument('folder'),
+            Argument::createIntTypeArgument('content'),
+            Argument::createAnyTypeArgument('source'),
+            Argument::createIntTypeArgument('source_id'),
+            Argument::createBooleanTypeArgument('force_return', true)
         );
 
         // Add possible document sources
@@ -219,7 +215,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $event = new DocumentEvent($this->request);
 
             // Put source document file path
-            $source_filepath = sprintf("%s%s/%s/%s",
+            $source_filepath = sprintf(
+                "%s%s/%s/%s",
                 THELIA_ROOT,
                 ConfigQuery::read('documents_library_path', 'local/media/documents'),
                 $this->objectType,
@@ -236,19 +233,19 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow = new LoopResultRow($result);
 
                 $loopResultRow
-                    ->set("ID"                    , $result->getId())
-                    ->set("LOCALE"                , $this->locale)
-                    ->set("DOCUMENT_URL"          , $event->getDocumentUrl())
-                    ->set("DOCUMENT_PATH"         , $event->getDocumentPath())
+                    ->set("ID", $result->getId())
+                    ->set("LOCALE", $this->locale)
+                    ->set("DOCUMENT_URL", $event->getDocumentUrl())
+                    ->set("DOCUMENT_PATH", $event->getDocumentPath())
                     ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
-                    ->set("TITLE"                 , $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"                 , $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"           , $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM"          , $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("VISIBLE"               , $result->getVisible())
-                    ->set("POSITION"              , $result->getPosition())
-                    ->set("OBJECT_TYPE"           , $this->objectType)
-                    ->set("OBJECT_ID"             , $this->objectId)
+                    ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("VISIBLE", $result->getVisible())
+                    ->set("POSITION", $result->getPosition())
+                    ->set("OBJECT_TYPE", $this->objectType)
+                    ->set("OBJECT_ID", $this->objectId)
                 ;
 
                 $loopResult->addRow($loopResultRow);

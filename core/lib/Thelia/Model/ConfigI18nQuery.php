@@ -16,4 +16,5 @@ use Thelia\Model\Base\ConfigI18nQuery as BaseConfigI18nQuery;
  */
 class ConfigI18nQuery extends BaseConfigI18nQuery
 {
-} // ConfigI18nQuery
+}
+// ConfigI18nQuery

@@ -16,4 +16,5 @@ use Thelia\Model\Base\AttributeQuery as BaseAttributeQuery;
  */
 class AttributeQuery extends BaseAttributeQuery
 {
-} // AttributeQuery
+}
+// AttributeQuery

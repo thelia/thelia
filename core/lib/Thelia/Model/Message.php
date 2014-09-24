@@ -113,10 +113,10 @@ class Message extends BaseMessage
     public function getHtmlMessageBody(ParserInterface $parser)
     {
         return $this->getMessageBody(
-                $parser,
-                $this->getHtmlMessage(),
-                $this->getHtmlLayoutFileName(),
-                $this->getHtmlTemplateFileName()
+            $parser,
+            $this->getHtmlMessage(),
+            $this->getHtmlLayoutFileName(),
+            $this->getHtmlTemplateFileName()
         );
     }
 
@@ -126,11 +126,11 @@ class Message extends BaseMessage
     public function getTextMessageBody(ParserInterface $parser)
     {
         return $this->getMessageBody(
-                $parser,
-                $this->getTextMessage(),
-                $this->getTextLayoutFileName(),
-                $this->getTextTemplateFileName(),
-                true // Do not compress the output, and keep empty lines.
+            $parser,
+            $this->getTextMessage(),
+            $this->getTextLayoutFileName(),
+            $this->getTextTemplateFileName(),
+            true // Do not compress the output, and keep empty lines.
         );
     }
 

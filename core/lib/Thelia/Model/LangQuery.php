@@ -16,4 +16,5 @@ use Thelia\Model\Base\LangQuery as BaseLangQuery;
  */
 class LangQuery extends BaseLangQuery
 {
-} // LangQuery
+}
+// LangQuery

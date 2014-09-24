@@ -67,12 +67,12 @@ class Accessory extends Product
         if ($orderByAccessory !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAccessory] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
         if ($orderByAccessoryReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAccessoryReverse] = 'given_id';
-            $this->args->get('order')->setValue( implode(',', $order) );
+            $this->args->get('order')->setValue(implode(',', $order));
         }
 
         $accessories = $this->search($search);
@@ -93,9 +93,9 @@ class Accessory extends Product
 
         /* if an Id list is receive, loop will only match accessories from this list */
         if ($receivedIdList === null) {
-            $this->args->get('id')->setValue( implode(',', $this->accessoryIdList) );
+            $this->args->get('id')->setValue(implode(',', $this->accessoryIdList));
         } else {
-            $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $this->accessoryIdList)) );
+            $this->args->get('id')->setValue(implode(',', array_intersect($receivedIdList, $this->accessoryIdList)));
         }
 
         return parent::buildModelCriteria();
@@ -109,7 +109,7 @@ class Accessory extends Product
             $accessoryProductId = $loopResultRow->get('ID');
             \Thelia\Log\Tlog::getInstance()->notice($this->accessoryId);
             $loopResultRow
-                ->set("ID"      , $this->accessoryId[$accessoryProductId])
+                ->set("ID", $this->accessoryId[$accessoryProductId])
                 ->set("POSITION", $this->accessoryPosition[$accessoryProductId])
                 ->set("ACCESSORY_ID", $accessoryProductId)
                 ;

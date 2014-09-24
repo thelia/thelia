@@ -221,7 +221,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals($newPosition, $updatedFolder->getPosition(),sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     public function testUpdatePositionDown()

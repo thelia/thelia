@@ -338,7 +338,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new ProductDocument(),
             ProductQuery::create()->findOne(),
-            'documents', 'product'
+            'documents',
+            'product'
         );
     }
 
@@ -347,7 +348,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new ProductImage(),
             ProductQuery::create()->findOne(),
-            'images', 'product'
+            'images',
+            'product'
         );
     }
 
@@ -356,7 +358,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new CategoryDocument(),
             CategoryQuery::create()->findOne(),
-            'documents', 'category'
+            'documents',
+            'category'
         );
     }
 
@@ -365,7 +368,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new CategoryImage(),
             CategoryQuery::create()->findOne(),
-            'images', 'category'
+            'images',
+            'category'
         );
     }
     public function testDeleteFileFolderDocument()
@@ -373,7 +377,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new FolderDocument(),
             FolderQuery::create()->findOne(),
-            'documents', 'folder'
+            'documents',
+            'folder'
         );
     }
 
@@ -382,7 +387,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new FolderImage(),
             FolderQuery::create()->findOne(),
-            'images', 'folder'
+            'images',
+            'folder'
         );
     }
 
@@ -391,7 +397,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new ContentDocument(),
             ContentQuery::create()->findOne(),
-            'documents', 'content'
+            'documents',
+            'content'
         );
     }
 
@@ -400,7 +407,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new ContentImage(),
             ContentQuery::create()->findOne(),
-            'images', 'content'
+            'images',
+            'content'
         );
     }
     public function testDeleteFileBrandDocument()
@@ -408,7 +416,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new BrandDocument(),
             BrandQuery::create()->findOne(),
-            'documents', 'brand'
+            'documents',
+            'brand'
         );
     }
 
@@ -417,7 +426,8 @@ class FileManagerTest extends \PHPUnit_Framework_TestCase
         $this->doTestDeleteFile(
             new BrandImage(),
             BrandQuery::create()->findOne(),
-            'images', 'brand'
+            'images',
+            'brand'
         );
     }
 }

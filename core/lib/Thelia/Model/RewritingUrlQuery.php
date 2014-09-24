@@ -109,4 +109,5 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
         return $urlQuery->findOne();
     }
-} // RewritingUrlQuery
+}
+// RewritingUrlQuery

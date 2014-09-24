@@ -15,6 +15,7 @@ namespace Thelia\Core\Template;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
+
 /**
  * The parser context is an application-wide context, which stores var-value pairs.
  * Theses pairs are injected in the parser and becomes available to the templates.
@@ -28,8 +29,7 @@ class ParserContext implements \IteratorAggregate
     public function __construct(Request $request)
     {
         // Setup basic variables
-        $this->set('THELIA_VERSION'    , Thelia::THELIA_VERSION)
-        ;
+        $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
     }
 
     // -- Error form -----------------------------------------------------------
@@ -79,6 +79,6 @@ class ParserContext implements \IteratorAggregate
 
     public function getIterator()
     {
-        return new \ArrayIterator( $this->store );
+        return new \ArrayIterator($this->store);
     }
 }

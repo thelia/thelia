@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\ImportExport\Export;
+
 use Propel\Runtime\ActiveQuery\Criterion\Exception\InvalidValueException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
@@ -104,7 +105,7 @@ abstract class ExportHandler extends AbstractHandler
             $pagination = null;
             $results = $query->exec($pagination);
 
-            for ($results->rewind(); $results->valid(); $results->next() ) {
+            for ($results->rewind(); $results->valid(); $results->next()) {
                 $current = $results->current();
 
                 $data->addRow($current->getVarVal());

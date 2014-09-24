@@ -57,9 +57,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         $target = $this->getParam($params, 'target', null);
 
         $url = URL::getInstance()->absoluteUrl(
-                $path,
-                $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
-                $mode
+            $path,
+            $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
+            $mode
         );
 
         if ($noamp == null) {
@@ -79,10 +79,10 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param  unknown $smarty
       * @return string no text is returned.
       */
-     public function generateFrontViewUrlFunction($params, &$smarty)
-     {
-         return $this->generateViewUrlFunction($params, false);
-     }
+    public function generateFrontViewUrlFunction($params, &$smarty)
+    {
+        return $this->generateViewUrlFunction($params, false);
+    }
 
      /**
       * Process administration view url generator function
@@ -91,10 +91,10 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param  unknown $smarty
       * @return string no text is returned.
       */
-     public function generateAdminViewUrlFunction($params, &$smarty)
-     {
-         return $this->generateViewUrlFunction($params, true);
-     }
+    public function generateAdminViewUrlFunction($params, &$smarty)
+    {
+        return $this->generateViewUrlFunction($params, true);
+    }
 
     public function navigateToUrlFunction($params, &$smarty)
     {
@@ -108,7 +108,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function generateViewUrlFunction($params, $forAdmin)
     {
         // the view name (without .html)
-         $view = $this->getParam($params,'view');
+         $view = $this->getParam($params, 'view');
 
           // the related action (optionale)
          $action = $this->getParam($params, 'action');
@@ -127,20 +127,20 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param array $params Smarty function params
       * @return array the parameters array (either emply, of valued)
       */
-     private function getArgsFromParam($params, $exclude = array())
-     {
-         $pairs = array();
+    private function getArgsFromParam($params, $exclude = array())
+    {
+        $pairs = array();
 
-         foreach ($params as $name => $value) {
-             if (in_array($name, $exclude)) {
-                 continue;
-             }
+        foreach ($params as $name => $value) {
+            if (in_array($name, $exclude)) {
+                continue;
+            }
 
-             $pairs[$name] = $value;
-         }
+            $pairs[$name] = $value;
+        }
 
-         return $pairs;
-     }
+        return $pairs;
+    }
 
     public function generateUrlWithToken($params, &$smarty)
     {

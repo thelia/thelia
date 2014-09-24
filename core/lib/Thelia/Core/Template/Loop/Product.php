@@ -98,14 +98,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 )
             ),
             /*
-             * promo, new, quantity, weight or price may differ depending on the different attributes
-             * by default, product loop will look for at least 1 attribute which matches all the loop criteria : attribute_non_strict_match="none"
-             * you can also provide a list of non-strict attributes.
-             *      ie : attribute_non_strict_match="promo,new"
-             *      loop will return the product if he has at least an attribute in promo and at least an attribute as new ; even if it's not the same attribute.
-             * you can set all the attributes as non strict : attribute_non_strict_match="*"
-             *
-             * In order to allow such a process, we will have to make a LEFT JOIN foreach of the following case.
+            * promo, new, quantity, weight or price may differ depending on the different attributes
+            * by default, product loop will look for at least 1 attribute which matches all the loop criteria : attribute_non_strict_match="none"
+            * you can also provide a list of non-strict attributes.
+            * ie : attribute_non_strict_match="promo,new"
+            * loop will return the product if he has at least an attribute in promo and at least an attribute as new ; even if it's not the same attribute.
+            * you can set all the attributes as non strict : attribute_non_strict_match="*"
+            *
+            * In order to allow such a process, we will have to make a LEFT JOIN foreach of the following case.
             */
             new Argument(
                 'attribute_non_strict_match',
@@ -203,22 +203,22 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $default_category_id = $product->getDefaultCategoryId();
 
             $loopResultRow
-                ->set("WEIGHT"                  , $product->getVirtualColumn('weight'))
-                ->set("QUANTITY"                , $product->getVirtualColumn('quantity'))
-                ->set("EAN_CODE"                , $product->getVirtualColumn('ean_code'))
-                ->set("BEST_PRICE"              , $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
-                ->set("BEST_PRICE_TAX"          , $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE"        , $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
-                ->set("PRICE"                   , $price)
-                ->set("PRICE_TAX"               , $taxedPrice - $price)
-                ->set("TAXED_PRICE"             , $taxedPrice)
-                ->set("PROMO_PRICE"             , $promoPrice)
-                ->set("PROMO_PRICE_TAX"         , $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE"       , $taxedPromoPrice)
-                ->set("IS_PROMO"                , $product->getVirtualColumn('is_promo'))
-                ->set("IS_NEW"                  , $product->getVirtualColumn('is_new'))
-                ->set("PRODUCT_SALE_ELEMENT"    , $product->getVirtualColumn('pse_id'))
-                ->set("PSE_COUNT"               , $product->getVirtualColumn('pse_count'))
+                ->set("WEIGHT", $product->getVirtualColumn('weight'))
+                ->set("QUANTITY", $product->getVirtualColumn('quantity'))
+                ->set("EAN_CODE", $product->getVirtualColumn('ean_code'))
+                ->set("BEST_PRICE", $product->getVirtualColumn('is_promo') ? $promoPrice : $price)
+                ->set("BEST_PRICE_TAX", $taxedPrice - $product->getVirtualColumn('is_promo') ? $taxedPromoPrice - $promoPrice : $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE", $product->getVirtualColumn('is_promo') ? $taxedPromoPrice : $taxedPrice)
+                ->set("PRICE", $price)
+                ->set("PRICE_TAX", $taxedPrice - $price)
+                ->set("TAXED_PRICE", $taxedPrice)
+                ->set("PROMO_PRICE", $promoPrice)
+                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
+                ->set("IS_PROMO", $product->getVirtualColumn('is_promo'))
+                ->set("IS_NEW", $product->getVirtualColumn('is_new'))
+                ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
+                ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'))
             ;
 
 
@@ -258,11 +258,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $default_category_id = $product->getDefaultCategoryId();
 
             $loopResultRow
-                ->set("BEST_PRICE"       , $price)
-                ->set("BEST_PRICE_TAX"   , $taxedPrice - $price)
-                ->set("BEST_TAXED_PRICE" , $taxedPrice)
-                ->set("IS_PROMO"         , $product->getVirtualColumn('main_product_is_promo'))
-                ->set("IS_NEW"           , $product->getVirtualColumn('main_product_is_new'))
+                ->set("BEST_PRICE", $price)
+                ->set("BEST_PRICE_TAX", $taxedPrice - $price)
+                ->set("BEST_TAXED_PRICE", $taxedPrice)
+                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
             ;
 
             $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));

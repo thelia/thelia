@@ -46,7 +46,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
-                new Argument(
+            new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
@@ -103,12 +103,12 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($taxRule);
 
             $loopResultRow
-                ->set("ID"            , $taxRule->getId())
-                ->set("IS_TRANSLATED" , $taxRule->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"        , $this->locale)
-                ->set("TITLE"         , $taxRule->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION"   , $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("IS_DEFAULT"    , $taxRule->getIsDefault() ? '1' : '0')
+                ->set("ID", $taxRule->getId())
+                ->set("IS_TRANSLATED", $taxRule->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $taxRule->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION", $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("IS_DEFAULT", $taxRule->getIsDefault() ? '1' : '0')
             ;
 
             $loopResult->addRow($loopResultRow);

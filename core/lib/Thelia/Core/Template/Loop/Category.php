@@ -210,22 +210,21 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             $loopResultRow = new LoopResultRow($category);
 
             $loopResultRow
-                ->set("ID"                      , $category->getId())
-                ->set("IS_TRANSLATED"           ,$category->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  ,$this->locale)
-                ->set("TITLE"                   , $category->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO"                   , $category->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION"             , $category->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM"            , $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("PARENT"                  , $category->getParent())
-                ->set("ROOT"                    , $category->getRoot($category->getId()))
-                ->set("URL"                     , $category->getUrl($this->locale))
-                ->set("META_TITLE"              , $category->getVirtualColumn('i18n_META_TITLE'))
-                ->set("META_DESCRIPTION"        , $category->getVirtualColumn('i18n_META_DESCRIPTION'))
-                ->set("META_KEYWORDS"            , $category->getVirtualColumn('i18n_META_KEYWORDS'))
-
-                ->set("VISIBLE"                 , $category->getVisible() ? "1" : "0")
-                ->set("POSITION"                , $category->getPosition())
+                ->set("ID", $category->getId())
+                ->set("IS_TRANSLATED", $category->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $category->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("PARENT", $category->getParent())
+                ->set("ROOT", $category->getRoot($category->getId()))
+                ->set("URL", $category->getUrl($this->locale))
+                ->set("META_TITLE", $category->getVirtualColumn('i18n_META_TITLE'))
+                ->set("META_DESCRIPTION", $category->getVirtualColumn('i18n_META_DESCRIPTION'))
+                ->set("META_KEYWORDS", $category->getVirtualColumn('i18n_META_KEYWORDS'))
+                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+                ->set("POSITION", $category->getPosition())
 
             ;
 
@@ -254,11 +253,10 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ;
 
                 $loopResultRow
-                    ->set("HAS_PREVIOUS"            , $previous != null ? 1 : 0)
-                    ->set("HAS_NEXT"                , $next != null ? 1 : 0)
-
-                    ->set("PREVIOUS"                , $previous != null ? $previous->getId() : -1)
-                    ->set("NEXT"                    , $next != null ? $next->getId() : -1)
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1)
                 ;
             }
 

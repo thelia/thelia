@@ -172,7 +172,7 @@ class BrandTest extends TestCaseWithURLToolSetup
 
         $updatedBrand = BrandQuery::create()->findPk($brand->getId());
 
-        $this->assertEquals($newPosition, $updatedBrand->getPosition(),sprintf("new position is %d, new position expected is %d for brand %d", $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
+        $this->assertEquals($newPosition, $updatedBrand->getPosition(), sprintf("new position is %d, new position expected is %d for brand %d", $newPosition, $updatedBrand->getPosition(), $updatedBrand->getId()));
     }
 
     public function testUpdatePositionDown()

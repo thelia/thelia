@@ -16,4 +16,5 @@ use Thelia\Model\Base\AreaQuery as BaseAreaQuery;
  */
 class AreaQuery extends BaseAreaQuery
 {
-} // AreaQuery
+}
+// AreaQuery

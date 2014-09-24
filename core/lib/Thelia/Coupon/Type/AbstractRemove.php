@@ -59,8 +59,18 @@ abstract class AbstractRemove extends CouponAbstract implements AmountAndPercent
         $perCustomerUsageCount
     ) {
         parent::set(
-            $facade, $code, $title, $shortDescription, $description, $effects,
-            $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, $expirationDate,
+            $facade,
+            $code,
+            $title,
+            $shortDescription,
+            $description,
+            $effects,
+            $isCumulative,
+            $isRemovingPostage,
+            $isAvailableOnSpecialOffers,
+            $isEnabled,
+            $maxUsage,
+            $expirationDate,
             $freeShippingForCountries,
             $freeShippingForModules,
             $perCustomerUsageCount

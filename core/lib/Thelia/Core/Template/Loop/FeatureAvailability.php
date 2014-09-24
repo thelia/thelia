@@ -108,9 +108,9 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
         foreach ($loopResult->getResultDataCollection() as $featureAv) {
             $loopResultRow = new LoopResultRow($featureAv);
             $loopResultRow->set("ID", $featureAv->getId())
-                ->set("IS_TRANSLATED",$featureAv->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE",$this->locale)
-                ->set("TITLE",$featureAv->getVirtualColumn('i18n_TITLE'))
+                ->set("IS_TRANSLATED", $featureAv->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $featureAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))

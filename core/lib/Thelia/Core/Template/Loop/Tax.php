@@ -50,7 +50,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('tax_rule'),
             Argument::createIntListTypeArgument('exclude_tax_rule'),
             Argument::createIntTypeArgument('country'),
-                new Argument(
+            new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse'))
@@ -136,14 +136,14 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow = new LoopResultRow($tax);
 
             $loopResultRow
-                ->set("ID"                      , $tax->getId())
-                ->set("TYPE"                    , $tax->getType())
-                ->set("ESCAPED_TYPE"            , \Thelia\Model\Tax::escapeTypeName($tax->getType()))
-                ->set("REQUIREMENTS"            , $tax->getRequirements())
-                ->set("IS_TRANSLATED"           , $tax->getVirtualColumn('IS_TRANSLATED'))
-                ->set("LOCALE"                  , $this->locale)
-                ->set("TITLE"                   , $tax->getVirtualColumn('i18n_TITLE'))
-                ->set("DESCRIPTION"             , $tax->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("ID", $tax->getId())
+                ->set("TYPE", $tax->getType())
+                ->set("ESCAPED_TYPE", \Thelia\Model\Tax::escapeTypeName($tax->getType()))
+                ->set("REQUIREMENTS", $tax->getRequirements())
+                ->set("IS_TRANSLATED", $tax->getVirtualColumn('IS_TRANSLATED'))
+                ->set("LOCALE", $this->locale)
+                ->set("TITLE", $tax->getVirtualColumn('i18n_TITLE'))
+                ->set("DESCRIPTION", $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
 
             $loopResult->addRow($loopResultRow);

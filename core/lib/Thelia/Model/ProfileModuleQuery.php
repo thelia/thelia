@@ -16,4 +16,5 @@ use Thelia\Model\Base\ProfileModuleQuery as BaseProfileModuleQuery;
  */
 class ProfileModuleQuery extends BaseProfileModuleQuery
 {
-} // ProfileModuleQuery
+}
+// ProfileModuleQuery
