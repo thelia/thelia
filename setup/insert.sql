@@ -707,7 +707,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
-(2023, 'wysywyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
+(2023, 'wysiwyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
 ;
 
 
@@ -2922,7 +2922,16 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (35, 'admin.brand', NOW(), NOW()),
 (36, 'admin.hook', NOW(), NOW()),
 (37, 'admin.module-hook', NOW(), NOW()),
-(38, 'admin.sales', NOW(), NOW())
+(38, 'admin.sales', NOW(), NOW()),
+(39, 'admin.administrator', NOW(), NOW()),
+(40, 'admin.configuration.category', NOW(), NOW()),
+(41, 'admin.configuration.shipping-configuration', NOW(), NOW()),
+(42, 'admin.configuration.tax-rule', NOW(), NOW()),
+(43, 'admin.hooks', NOW(), NOW()),
+(44, 'admin.import', NOW(), NOW()),
+(45, 'admin.modules', NOW(), NOW()),
+(46, 'admin.profile', NOW(), NOW()),
+(47, 'admin.search', NOW(), NOW())
 ;
 
 
@@ -3005,7 +3014,25 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (37, 'en_US', 'Hook positions'),
 (37, 'fr_FR', 'Position des hooks'),
 (38, 'en_US', 'Sales management'),
-(38, 'fr_FR', 'Gestion des promotions')
+(38, 'fr_FR', 'Gestion des promotions'),
+(39, 'en_US', 'Administatros list'),
+(39, 'fr_FR', 'Liste des administrateurs'),
+(40, 'en_US', 'Category configuration'),
+(40, 'fr_FR', 'Configuration d''une catégorie'),
+(41, 'en_US', 'Shipping configuration'),
+(41, 'fr_FR', 'Configuration des transports'),
+(42, 'en_US', 'Tax rules configuration'),
+(42, 'fr_FR', 'Configuration des règles de taxes'),
+(43, 'en_US', 'Hooks management'),
+(43, 'fr_FR', 'Gestion des hooks'),
+(44, 'en_US', 'Data import / export'),
+(44, 'fr_FR', 'Importation / exportation de données'),
+(45, 'en_US', 'Modules maagement'),
+(45, 'fr_FR', 'Gestion des modules'),
+(46, 'en_US', 'Administration profiles management'),
+(46, 'fr_FR', 'Gestion des profils d''administration'),
+(47, 'en_US', 'Back-office search function'),
+(47, 'fr_FR', 'Fonction de recherche dans l''administration')
 ;
 
 INSERT INTO `message` (`id`, `name`, `secured`, `text_layout_file_name`, `text_template_file_name`, `html_layout_file_name`, `html_template_file_name`, `created_at`, `updated_at`) VALUES
