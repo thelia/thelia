@@ -370,15 +370,20 @@
             }
 
         }
-        {form_field form=$form field="products"}
-            // This is the products IDs as hydrated in the controller.
-            var selected_product_ids_at_page_load = [ {$value|implode:','} ];
-        {/form_field}
 
-        {form_field form=$form field="product_attributes"}
-            // This is the products IDs as hydrated in the controller.
-            var selected_attributes_avs_ids_at_page_load = {$value|@json_encode nofilter};
-        {/form_field}
+        {form name="thelia.admin.sale.modification"}
+
+            {form_field form=$form field="products"}
+                // This is the products IDs as hydrated in the controller.
+                var selected_product_ids_at_page_load = [ {$value|implode:','} ];
+            {/form_field}
+
+            {form_field form=$form field="product_attributes"}
+                // This is the products IDs as hydrated in the controller.
+                var selected_attributes_avs_ids_at_page_load = {$value|@json_encode nofilter};
+            {/form_field}
+
+        {/form}
 
         function update_product_list() {
 
