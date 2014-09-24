@@ -182,7 +182,7 @@
             </td>
         </tr>
         <tr>
-            <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE}</span></h3></td>
+            <td><h3>{intl l="Invoice date"} : <span>{format_date date=$INVOICE_DATE output="date"}</span></h3></td>
         </tr>
         <tr>
             <td><h3>{intl l="Invoice REF"} : <span>{$REF}</span></h3></td>
@@ -214,7 +214,7 @@
                 {elsehook rel="invoice.delivery-address"}                
 				<p>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
                     {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
@@ -226,7 +226,7 @@
                 <h3>{intl l="Invoice address"}</h3>
                 <p>
                     {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
-                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                    {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
                     {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
