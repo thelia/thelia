@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 use Thelia\Core\Template\TemplateHelper;
@@ -81,6 +82,12 @@ class ViewListener implements EventSubscriberInterface
         } catch (AuthenticationException $ex) {
             // Redirect to the login template
             $response = RedirectResponse::create($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
+
+        } catch (RedirectException $ex) {
+
+            // Redirection
+            $response = RedirectResponse::create($ex->getUrl(), $ex->getStatusCode());
+
         } catch (OrderException $e) {
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
