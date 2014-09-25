@@ -42,33 +42,17 @@ class RequestListener implements EventSubscriberInterface
 
     /**
      *
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     * @var \Thelia\Core\Translation\Translator
      */
-    private $container;
+    private $translator;
 
     /**
      *
      * @param \Symfony\Component\DependencyInjection\ContainerInterfac $container
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(Translator $translator)
     {
-        $this->container = $container;
-    }
-
-    /**
-     * @return SecurityContext
-     */
-    public function getSecurityContext()
-    {
-        return $this->container->get('thelia.securityContext');
-    }
-
-    /**
-     * @return Translator
-     */
-    public function getTranslator()
-    {
-        return $this->container->get('thelia.translator');
+        $this->translator = $translator;
     }
 
     public function registerValidatorTranslator(GetResponseEvent $event)
@@ -81,14 +65,13 @@ class RequestListener implements EventSubscriberInterface
         $vendorValidatorDir =
             $vendorDir.DS.'symfony'.DS.'validator'.DS.'Symfony'.DS.'Component'.DS.'Validator';
 
-        $translator = $this->getTranslator();
-        $translator->addResource(
+        $this->translator->addResource(
             'xlf',
             sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
-        $translator->addResource(
+        $this->translator->addResource(
             'xlf',
             sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
             $lang->getLocale(),
@@ -103,7 +86,7 @@ class RequestListener implements EventSubscriberInterface
         /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
         $session = $request->getSession();
 
-        // Check customer remenber me token
+        // Check customer remember me token
         if (null === $customer = $session->getCustomerUser()) {
             // try to get the remember me cookie
             $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
@@ -120,8 +103,7 @@ class RequestListener implements EventSubscriberInterface
                     // If have found a user, store it in the security context
                     $user = $authenticator->getAuthentifiedUser();
 
-                    $this->getSecurityContext()->setCustomerUser($user);
-
+                    $session->setCustomerUser($user);
                 } catch (TokenAuthenticationException $ex) {
                     //$this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
 
@@ -151,7 +133,7 @@ class RequestListener implements EventSubscriberInterface
                     // If have found a user, store it in the security context
                     $user = $authenticator->getAuthentifiedUser();
 
-                    $this->getSecurityContext()->setAdminUser($user);
+                    $session->setAdminUser($user);
 
                     $this->applyUserLocale($user, $session);
 
@@ -169,7 +151,10 @@ class RequestListener implements EventSubscriberInterface
     }
 
     /**
-     * Get the rememberme key from the cookie.
+     * Get the remember me key from the cookie.
+     *
+     * @param $request
+     * @param $cookieName
      *
      * @return string hte key found, or null if no key was found.
      */
@@ -218,7 +203,7 @@ class RequestListener implements EventSubscriberInterface
      *
      * If the value of _previous_url is "dont-save", the current referrer is not saved.
      *
-     * @param FilterResponseEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
      */
     public function registerPreviousUrl(PostResponseEvent  $event)
     {

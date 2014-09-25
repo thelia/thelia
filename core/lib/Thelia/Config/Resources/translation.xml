@@ -59,9 +59,11 @@
         </service>
 
         <service id="validators.translator" class="Thelia\Core\EventListener\RequestListener">
-            <argument type="service" id="service_container"/>
+            <argument type="service" id="thelia.translator"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>
 
 </config>
+
+
