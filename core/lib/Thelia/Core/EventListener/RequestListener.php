@@ -13,9 +13,7 @@
 namespace Thelia\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -23,7 +21,6 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
-use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
