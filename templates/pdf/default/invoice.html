@@ -319,7 +319,7 @@
                         <td class="table-3-1 align-right"><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
                     </tr>
                     {strip}
-                        {capture name="Tax"}
+                        {capture name="tax"}
                             {foreach $taxes as $name=>$prices}
                                 {assign var="_price_taxe_" value="0"}
                                 {foreach $prices as $price}
@@ -339,7 +339,7 @@
                         <td class="table-3-1"><p>{intl l="Tax"}</p></td>
                         <td class="table-3-1 align-right"><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
                     </tr>
-                    {$smarty.capture.tax}
+                    {$smarty.capture.tax nofilter}
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
