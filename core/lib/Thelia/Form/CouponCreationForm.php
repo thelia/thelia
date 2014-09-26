@@ -77,7 +77,8 @@ class CouponCreationForm extends BaseForm
                 array(
                     'constraints' => array(
                         new NotBlank(),
-                        new Callback(array(
+                        new Callback(
+                            array(
                                 "methods" => array(
                                     array($this, "checkDuplicateCouponCode"),
                                 ),
@@ -130,11 +131,13 @@ class CouponCreationForm extends BaseForm
                 array(
                     'constraints' => array(
                         new NotBlank(),
-                        new Callback(array(
-                            "methods" => array(
-                                array($this, "checkLocalizedDate"),
-                            ),
-                        ))
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "checkLocalizedDate"),
+                                ),
+                            )
+                        )
                     )
                 )
             )
@@ -228,7 +231,7 @@ class CouponCreationForm extends BaseForm
     }
 
     /**
-     * Validate a date entered with the default Language date format.
+     * Check coupon code unicity
      *
      * @param string                    $value
      * @param ExecutionContextInterface $context
