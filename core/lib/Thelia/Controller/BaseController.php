@@ -24,15 +24,10 @@ use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
 
-use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Security\Token\CookieTokenProvider;
-use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\FirewallForm;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\Lang;
-use Thelia\Model\LangQuery;
 use Thelia\Model\OrderQuery;
 
 use Thelia\Tools\Redirect;
@@ -183,19 +178,6 @@ abstract class BaseController extends ContainerAware
         }
 
         return $this->tokenProvider;
-    }
-
-
-    protected function applyUserLocale(UserInterface $user)
-    {
-        // Set the current language according to locale preference
-        $locale = $user->getLocale();
-
-        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
-            $lang = Lang::getDefaultLanguage();
-        }
-
-        $this->getSession()->setLang($lang);
     }
 
     /**

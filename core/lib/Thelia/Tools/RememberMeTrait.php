@@ -17,8 +17,13 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 
-
-trait RememberMeTrait {
+/**
+ * Trait RememberMeTrait
+ * @package Thelia\Tools
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ */
+trait RememberMeTrait
+{
 
     /**
      * Get the remember me key from the cookie.
@@ -55,5 +60,4 @@ trait RememberMeTrait {
 
         $ctp->clearCookie($cookieName);
     }
-
-} 
+}

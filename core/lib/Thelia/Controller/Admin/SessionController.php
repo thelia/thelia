@@ -12,15 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
 
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 
 class SessionController extends BaseAdminController
 {
@@ -114,6 +116,23 @@ class SessionController extends BaseAdminController
         return $this->render("login");
     }
 
+    /**
+     * Save user locale preference in session.
+     *
+     * @param UserInterface $user
+     */
+    protected function applyUserLocale(UserInterface $user)
+    {
+        // Set the current language according to locale preference
+        $locale = $user->getLocale();
+
+        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+            $lang = Lang::getDefaultLanguage();
+        }
+
+        $this->getSession()->setLang($lang);
+    }
+
     protected function getRememberMeCookieName()
     {
         return ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
@@ -123,5 +142,4 @@ class SessionController extends BaseAdminController
     {
         return ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
     }
-
 }

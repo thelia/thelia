@@ -21,7 +21,6 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
 use Thelia\Core\Security\Exception\TokenAuthenticationException;
-use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminLog;
