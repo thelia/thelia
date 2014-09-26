@@ -131,6 +131,4 @@ class BaseFrontController extends BaseController
 
         return $data;
     }
-
-
 }

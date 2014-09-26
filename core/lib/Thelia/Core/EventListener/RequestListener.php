@@ -17,6 +17,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
 use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
@@ -46,7 +47,8 @@ class RequestListener implements EventSubscriberInterface
 
     /**
      *
-     * @param \Symfony\Component\DependencyInjection\ContainerInterfac $container
+     * @param Translator $translator
+     *
      */
     public function __construct(Translator $translator)
     {
@@ -81,73 +83,88 @@ class RequestListener implements EventSubscriberInterface
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
+
         /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
         $session = $request->getSession();
 
-        // Check customer remember me token
-        if (null === $customer = $session->getCustomerUser()) {
-            // try to get the remember me cookie
-            $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
-            $cookie = $this->getRememberMeKeyFromCookie(
-                $request,
-                $cookieCustomerName
-            );
-
-            if (null !== $cookie) {
-                // try to log
-                $authenticator = new CustomerTokenAuthenticator($cookie);
-
-                try {
-                    // If have found a user, store it in the security context
-                    $user = $authenticator->getAuthentifiedUser();
-
-                    $session->setCustomerUser($user);
-                } catch (TokenAuthenticationException $ex) {
-                    //$this->adminLogAppend("admin", "LOGIN", "Token based authentication failed.");
-
-                    // Clear the cookie
-                    $this->clearRememberMeCookie($cookieCustomerName);
-                }
-            }
-
+        if (null === $session->getCustomerUser()) {
+            // Check customer remember me token
+            $this->getRememberMeCustomer($request, $session);
         }
 
         // Check admin remember me token
-        if (null === $admin = $session->getAdminUser()) {
-
-            // try to get the remember me cookie
-            $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-            $cookie = $this->getRememberMeKeyFromCookie(
-                $request,
-                $cookieAdminName
-            );
-
-            if (null !== $cookie) {
-
-                // try to log
-                $authenticator = new AdminTokenAuthenticator($cookie);
-
-                try {
-                    // If have found a user, store it in the security context
-                    $user = $authenticator->getAuthentifiedUser();
-
-                    $session->setAdminUser($user);
-
-                    $this->applyUserLocale($user, $session);
-
-                    AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
-                } catch (TokenAuthenticationException $ex) {
-                    AdminLog::append("admin", "LOGIN", "Token based authentication failed.", $request);
-
-                    // Clear the cookie
-                    $this->clearRememberMeCookie($cookieAdminName);
-                }
-            }
-
+        if (null === $session->getAdminUser()) {
+            $this->getRememberMeAdmin($request, $session);
         }
-
     }
 
+    /**
+     * @param $request
+     * @param $session
+     *
+     * @return array
+     */
+    protected function getRememberMeCustomer(Request $request, Session $session)
+    {
+        // try to get the remember me cookie
+        $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
+        $cookie             = $this->getRememberMeKeyFromCookie(
+            $request,
+            $cookieCustomerName
+        );
+
+        if (null !== $cookie) {
+            // try to log
+            $authenticator = new CustomerTokenAuthenticator($cookie);
+
+            try {
+                // If have found a user, store it in the security context
+                $user = $authenticator->getAuthentifiedUser();
+                return array($cookie, $authenticator, $user);
+
+                $session->setCustomerUser($user);
+            } catch (TokenAuthenticationException $ex) {
+                // Clear the cookie
+                $this->clearRememberMeCookie($cookieCustomerName);
+            }
+        }
+    }
+
+    /**
+     * @param $request
+     * @param $session
+     */
+    protected function getRememberMeAdmin(Request $request, Session $session)
+    {
+        // try to get the remember me cookie
+        $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+        $cookie          = $this->getRememberMeKeyFromCookie(
+            $request,
+            $cookieAdminName
+        );
+
+        if (null !== $cookie) {
+
+            // try to log
+            $authenticator = new AdminTokenAuthenticator($cookie);
+
+            try {
+                // If have found a user, store it in the security context
+                $user = $authenticator->getAuthentifiedUser();
+
+                $session->setAdminUser($user);
+
+                $this->applyUserLocale($user, $session);
+
+                AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+            } catch (TokenAuthenticationException $ex) {
+                AdminLog::append("admin", "LOGIN", "Token based authentication failed.", $request);
+
+                // Clear the cookie
+                $this->clearRememberMeCookie($cookieAdminName);
+            }
+        }
+    }
 
     protected function applyUserLocale(UserInterface $user, Session $session)
     {
