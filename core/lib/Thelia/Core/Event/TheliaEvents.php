@@ -27,8 +27,7 @@ final class TheliaEvents
      */
     const BOOT = "thelia.boot";
     // -- END CORE EVENTS ---------------------------------------------------------
-    
-    // -- ADDRESS MANAGEMENT EVENTS ---------------------------------------------------------
+    // -- ADDRESS EVENTS ---------------------------------------------------------
     /**
      * sent once the address creation form has been successfully validated, and before address insertion in the database.
      */
@@ -41,7 +40,6 @@ final class TheliaEvents
      * Sent just after a successful insert of a new address in the database.
      */
     const AFTER_CREATEADDRESS  = "action.after_createAddress";
-    
     const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
     /**
      * sent for address modification
@@ -77,18 +75,18 @@ final class TheliaEvents
     // -- AREA EVENTS ---------------------------------------------------------
     const BEFORE_CREATEAREA = 'action.before_createArea';
     const AREA_CREATE = 'action.createArea';
-    const AFTER_CREATEAREA = 'action.after_createArea';    
+    const AFTER_CREATEAREA = 'action.after_createArea';
 
     const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
 
-    const BEFORE_UPDATEAREA = 'action.before_updateArea';    
+    const BEFORE_UPDATEAREA = 'action.before_updateArea';
     const AREA_UPDATE = 'action.updateArea';
-    const AFTER_UPDATEAREA = 'action.after_updateArea';    
+    const AFTER_UPDATEAREA = 'action.after_updateArea';
 
     const AREA_ADD_COUNTRY = 'action.area.addCountry';
     const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
 
-    const BEFORE_DELETEAREA = 'action.before_deleteArea';    
+    const BEFORE_DELETEAREA = 'action.before_deleteArea';
     const AREA_DELETE = 'action.deleteArea';
     const AFTER_DELETEAREA = 'action.after_deleteArea';
     // -- END AREA EVENTS ---------------------------------------------------------
@@ -97,15 +95,15 @@ final class TheliaEvents
     // -- CATEGORIES EVENTS -----------------------------------------------
     const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const CATEGORY_CREATE            = "action.createCategory";
-    const AFTER_CREATECATEGORY    = "action.after_createcategory";    
+    const AFTER_CREATECATEGORY    = "action.after_createcategory";
 
-    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";    
+    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const CATEGORY_UPDATE            = "action.updateCategory";
     const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
     
-    const BEFORE_DELETECATEGORY = "action.before_deletecategory";    
+    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const CATEGORY_DELETE            = "action.deleteCategory";
-    const AFTER_DELETECATEGORY    = "action.after_deletecategory";    
+    const AFTER_DELETECATEGORY    = "action.after_deletecategory";
     
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
@@ -120,15 +118,15 @@ final class TheliaEvents
     // -- CONTENT EVENTS -----------------------------------------------
     const BEFORE_CREATECONTENT = "action.before_createContent";
     const CONTENT_CREATE            = "action.createContent";
-    const AFTER_CREATECONTENT    = "action.after_createContent";    
+    const AFTER_CREATECONTENT    = "action.after_createContent";
 
-    const BEFORE_UPDATECONTENT = "action.before_updateContent";    
+    const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const CONTENT_UPDATE            = "action.updateContent";
     const AFTER_UPDATECONTENT    = "action.after_updateContent";
     
-    const BEFORE_DELETECONTENT = "action.before_deleteContent";    
+    const BEFORE_DELETECONTENT = "action.before_deleteContent";
     const CONTENT_DELETE            = "action.deleteContent";
-    const AFTER_DELETECONTENT    = "action.after_deleteContent";    
+    const AFTER_DELETECONTENT    = "action.after_deleteContent";
     
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
@@ -142,15 +140,15 @@ final class TheliaEvents
     // -- COUNTRY EVENTS -----------------------------------------------
     const BEFORE_CREATECOUNTRY = "action.before_createCountry";
     const COUNTRY_CREATE            = "action.createCountry";
-    const AFTER_CREATECOUNTRY    = "action.after_createCountry";    
+    const AFTER_CREATECOUNTRY    = "action.after_createCountry";
 
-    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";    
+    const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
     const COUNTRY_UPDATE            = "action.updateCountry";
     const AFTER_UPDATECOUNTRY    = "action.after_updateCountry";
     
-    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";    
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
     const COUNTRY_DELETE            = "action.deleteCountry";
-    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";    
+    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
     
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
@@ -219,15 +217,15 @@ final class TheliaEvents
     // -- FOLDER EVENTS -----------------------------------------------
     const BEFORE_CREATEFOLDER = "action.before_createFolder";
     const FOLDER_CREATE            = "action.createFolder";
-    const AFTER_CREATEFOLDER    = "action.after_createFolder";    
+    const AFTER_CREATEFOLDER    = "action.after_createFolder";
 
-    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";    
+    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
     const FOLDER_UPDATE            = "action.updateFolder";
     const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
         
-    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";    
+    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
     const FOLDER_DELETE            = "action.deleteFolder";
-    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";    
+    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
     
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
@@ -239,15 +237,15 @@ final class TheliaEvents
 
     const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const PRODUCT_CREATE            = "action.createProduct";
-    const AFTER_CREATEPRODUCT  = "action.after_createproduct";    
+    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
 
-    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";    
+    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
     const PRODUCT_UPDATE            = "action.updateProduct";
-    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct"
+    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
         
-    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";    
+    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
     const PRODUCT_DELETE            = "action.deleteProduct";
-    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";    
+    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
     
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
@@ -274,7 +272,7 @@ final class TheliaEvents
 
     const PRODUCT_ADD_CATEGORY    = "action.addProductCategory";
     const PRODUCT_REMOVE_CATEGORY = "action.deleteProductCategory";
-    // -- END PRODUCT EVENTS ---------------------------------------------------------    
+    // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
     // -- SHIPPING ZONE MANAGEMENT
