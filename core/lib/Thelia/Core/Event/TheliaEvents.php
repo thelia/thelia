@@ -21,49 +21,46 @@ namespace Thelia\Core\Event;
 
 final class TheliaEvents
 {
+    // -- CORE EVENTS ---------------------------------------------------------
     /**
      * sent at the beginning
      */
     const BOOT = "thelia.boot";
+    // -- END CORE EVENTS ---------------------------------------------------------
+    // -- ADDRESS EVENTS ---------------------------------------------------------
+    /**
+     * sent once the address creation form has been successfully validated, and before address insertion in the database.
+     */
+    const BEFORE_CREATEADDRESS = "action.before_createAddress";
+    /**
+     * sent for address creation
+     */
+    const ADDRESS_CREATE = "action.createAddress";
+    /**
+     * Sent just after a successful insert of a new address in the database.
+     */
+    const AFTER_CREATEADDRESS  = "action.after_createAddress";
+    const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
+    /**
+     * sent for address modification
+     */
+    const ADDRESS_UPDATE = "action.updateAddress";
+    const AFTER_UPDATEADDRESS = "action.after_updateAddress";
 
+    const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
     /**
-     * Sent before the logout of the customer.
+     * sent on address removal
      */
-    const CUSTOMER_LOGOUT = "action.customer_logout";
+    const ADDRESS_DELETE = "action.deleteAddress";
+    const AFTER_DELETEADDRESS = "action.after_deleteAddress";
     /**
-     * Sent once the customer is successfully logged in.
+     * sent when an address is tag as default
      */
-    const CUSTOMER_LOGIN  = "action.customer_login";
+    const ADDRESS_DEFAULT = "action.defaultAddress";
+    // -- END ADDRESS EVENTS ---------------------------------------------------------
 
-    /**
-     * sent on customer account creation
-     */
-    const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
 
-    /**
-     * sent on customer account update
-     */
-    const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
-
-    /**
-     * sent on customer account update profile
-     */
-    const CUSTOMER_UPDATEPROFILE = "action.updateProfileCustomer";
-
-    /**
-     * sent on customer removal
-     */
-    const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
-
-    /**
-     * sent on customer address removal
-     */
-    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
-
-    /**
-     * sent when a customer need a new password
-     */
-    const LOST_PASSWORD = "action.lostPassword";
+    // -- ADMIN EVENTS ---------------------------------------------------------
     /**
      * Sent before the logout of the administrator.
      */
@@ -72,191 +69,184 @@ final class TheliaEvents
      * Sent once the administrator is successfully logged in.
      */
     const ADMIN_LOGIN  = "action.admin_login";
+    // -- END ADMIN EVENTS --------------------------------------------------------
 
-    /**
-     * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
-     */
-    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
 
-    /**
-     * Sent just after a successful insert of a new customer in the database.
-     */
-    const AFTER_CREATECUSTOMER    = "action.after_createcustomer";
+    // -- AREA EVENTS ---------------------------------------------------------
+    const BEFORE_CREATEAREA = 'action.before_createArea';
+    const AREA_CREATE = 'action.createArea';
+    const AFTER_CREATEAREA = 'action.after_createArea';
 
-    /**
-     * Sent once the customer change form has been successfully validated, and before customer update in the database.
-     */
-    const BEFORE_UPDATECUSTOMER = "action.before_updateCustomer";
-    /**
-     * Sent just after a successful update of a customer in the database.
-     */
-    const AFTER_UPDATECUSTOMER    = "action.after_updateCustomer";
+    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
 
-    /**
-     * sent just before customer removal
-     */
-    const BEFORE_DELETECUSTOMER = "action.before_deleteCustomer";
+    const BEFORE_UPDATEAREA = 'action.before_updateArea';
+    const AREA_UPDATE = 'action.updateArea';
+    const AFTER_UPDATEAREA = 'action.after_updateArea';
 
-    /**
-     * sent just after customer removal
-     */
-    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
+    const AREA_ADD_COUNTRY = 'action.area.addCountry';
+    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
 
-    // -- ADDRESS MANAGEMENT ---------------------------------------------------------
-    /**
-     * sent for address creation
-     */
-    const ADDRESS_CREATE = "action.createAddress";
+    const BEFORE_DELETEAREA = 'action.before_deleteArea';
+    const AREA_DELETE = 'action.deleteArea';
+    const AFTER_DELETEAREA = 'action.after_deleteArea';
+    // -- END AREA EVENTS ---------------------------------------------------------
 
-    /**
-     * sent for address modification
-     */
-    const ADDRESS_UPDATE = "action.updateAddress";
 
-    /**
-     * sent on address removal
-     */
-    const ADDRESS_DELETE = "action.deleteAddress";
-
-    /**
-     * sent when an address is tag as default
-     */
-    const ADDRESS_DEFAULT = "action.defaultAddress";
-
-    /**
-     * sent once the address creation form has been successfully validated, and before address insertion in the database.
-     */
-    const BEFORE_CREATEADDRESS = "action.before_createAddress";
-
-    /**
-     * Sent just after a successful insert of a new address in the database.
-     */
-    const AFTER_CREATEADDRESS  = "action.after_createAddress";
-
-    const BEFORE_UPDATEADDRESS = "action.before_updateAddress";
-    const AFTER_UPDATEADDRESS = "action.after_updateAddress";
-
-    const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
-    const AFTER_DELETEADDRESS = "action.after_deleteAddress";
-
-    // -- END ADDRESS MANAGEMENT ---------------------------------------------------------
-
-    // -- Categories management -----------------------------------------------
-
+    // -- CATEGORIES EVENTS -----------------------------------------------
+    const BEFORE_CREATECATEGORY = "action.before_createcategory";
     const CATEGORY_CREATE            = "action.createCategory";
+    const AFTER_CREATECATEGORY    = "action.after_createcategory";
+
+    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const CATEGORY_UPDATE            = "action.updateCategory";
+    const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
+
+    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const CATEGORY_DELETE            = "action.deleteCategory";
+    const AFTER_DELETECATEGORY    = "action.after_deletecategory";
+
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
-    const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
 
     const CATEGORY_ADD_CONTENT      = "action.categoryAddContent";
     const CATEGORY_REMOVE_CONTENT   = "action.categoryRemoveContent";
 
-    const BEFORE_CREATECATEGORY = "action.before_createcategory";
-    const AFTER_CREATECATEGORY    = "action.after_createcategory";
+    const CATEGORY_UPDATE_SEO        = "action.updateCategorySeo";
+    // -- END CATEGORIES EVENTS -----------------------------------------------
 
-    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
-    const AFTER_DELETECATEGORY    = "action.after_deletecategory";
 
-    const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
-    const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
-
-    // -- folder management -----------------------------------------------
-
-    const FOLDER_CREATE            = "action.createFolder";
-    const FOLDER_UPDATE            = "action.updateFolder";
-    const FOLDER_DELETE            = "action.deleteFolder";
-    const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
-    const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
-    const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
-
-    const BEFORE_CREATEFOLDER = "action.before_createFolder";
-    const AFTER_CREATEFOLDER    = "action.after_createFolder";
-
-    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
-    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
-
-    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
-    const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
-
-    // -- content management -----------------------------------------------
-
+    // -- CONTENT EVENTS -----------------------------------------------
+    const BEFORE_CREATECONTENT = "action.before_createContent";
     const CONTENT_CREATE            = "action.createContent";
+    const AFTER_CREATECONTENT    = "action.after_createContent";
+
+    const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const CONTENT_UPDATE            = "action.updateContent";
+    const AFTER_UPDATECONTENT    = "action.after_updateContent";
+
+    const BEFORE_DELETECONTENT = "action.before_deleteContent";
     const CONTENT_DELETE            = "action.deleteContent";
+    const AFTER_DELETECONTENT    = "action.after_deleteContent";
+
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
     const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
 
     const CONTENT_ADD_FOLDER      = "action.contentAddFolder";
     const CONTENT_REMOVE_FOLDER   = "action.contentRemoveFolder";
+    // -- END CONTENT EVENTS ---------------------------------------------------------
 
-    const BEFORE_CREATECONTENT = "action.before_createContent";
-    const AFTER_CREATECONTENT    = "action.after_createContent";
 
-    const BEFORE_DELETECONTENT = "action.before_deleteContent";
-    const AFTER_DELETECONTENT    = "action.after_deleteContent";
-
-    const BEFORE_UPDATECONTENT = "action.before_updateContent";
-    const AFTER_UPDATECONTENT    = "action.after_updateContent";
-
-    // -- country management -----------------------------------------------
-
-    const COUNTRY_CREATE            = "action.createCountry";
-    const COUNTRY_UPDATE            = "action.updateCountry";
-    const COUNTRY_DELETE            = "action.deleteCountry";
-    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
-
+    // -- COUNTRY EVENTS -----------------------------------------------
     const BEFORE_CREATECOUNTRY = "action.before_createCountry";
+    const COUNTRY_CREATE            = "action.createCountry";
     const AFTER_CREATECOUNTRY    = "action.after_createCountry";
 
-    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
-    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
-
     const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
+    const COUNTRY_UPDATE            = "action.updateCountry";
     const AFTER_UPDATECOUNTRY    = "action.after_updateCountry";
 
-    // -- AREA CONFIGURATION MANAGEMENT
+    const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
+    const COUNTRY_DELETE            = "action.deleteCountry";
+    const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
 
-    const AREA_CREATE = 'action.createArea';
-    const AREA_UPDATE = 'action.updateArea';
-    const AREA_DELETE = 'action.deleteArea';
+    const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    // -- END COUNTRY EVENTS ---------------------------------------------------------
 
-    const AREA_ADD_COUNTRY = 'action.area.addCountry';
-    const AREA_REMOVE_COUNTRY = 'action.area.removeCountry';
-    const AREA_POSTAGE_UPDATE = 'action.area.postageUpdate';
 
-    const BEFORE_CREATEAREA = 'action.before_createArea';
-    const AFTER_CREATEAREA = 'action.after_createArea';
+    // -- CUSTOMER EVENTS ---------------------------------------------------------
+    /**
+     * Sent before the logout of the customer.
+     */
+    const CUSTOMER_LOGOUT = "action.customer_logout";
+    /**
+     * Sent once the customer is successfully logged in.
+     */
+    const CUSTOMER_LOGIN  = "action.customer_login";
+    /**
+     * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
+     */
+    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
+    /**
+     * sent on customer account creation
+     */
+    const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
+    /**
+     * Sent just after a successful insert of a new customer in the database.
+     */
+    const AFTER_CREATECUSTOMER    = "action.after_createcustomer";
+    /**
+     * sent on customer account update
+     */
+    const CUSTOMER_UPDATEACCOUNT = "action.updateCustomer";
+    /**
+     * Sent once the customer change form has been successfully validated, and before customer update in the database.
+     */
+    const BEFORE_UPDATECUSTOMER = "action.before_updateCustomer";
+    /**
+     * sent on customer account update profile
+     */
+    const CUSTOMER_UPDATEPROFILE = "action.updateProfileCustomer";
+    /**
+     * Sent just after a successful update of a customer in the database.
+     */
+    const AFTER_UPDATECUSTOMER    = "action.after_updateCustomer";
+    /**
+     * sent just before customer removal
+     */
+    const BEFORE_DELETECUSTOMER = "action.before_deleteCustomer";
+    /**
+     * sent on customer removal
+     */
+    const CUSTOMER_DELETEACCOUNT = "action.deleteCustomer";
+    /**
+     * sent on customer address removal
+     */
+    const CUSTOMER_ADDRESS_DELETE = "action.customer.deleteAddress";
+    /**
+     * sent just after customer removal
+     */
+    const AFTER_DELETECUSTOMER = "action.after_deleteCustomer";
+    /**
+     * sent when a customer need a new password
+     */
+    const LOST_PASSWORD = "action.lostPassword";
+    // -- END CUSTOMER EVENTS ---------------------------------------------------------
 
-    const BEFORE_UPDATEAREA = 'action.before_updateArea';
-    const AFTER_UPDATEAREA = 'action.after_updateArea';
 
-    const BEFORE_DELETEAREA = 'action.before_deleteArea';
-    const AFTER_DELETEAREA = 'action.after_deleteArea';
+    // -- FOLDER EVENTS -----------------------------------------------
+    const BEFORE_CREATEFOLDER = "action.before_createFolder";
+    const FOLDER_CREATE            = "action.createFolder";
+    const AFTER_CREATEFOLDER    = "action.after_createFolder";
 
-    // -- SHIPPING ZONE MANAGEMENT
+    const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
+    const FOLDER_UPDATE            = "action.updateFolder";
+    const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
 
-    const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
-    const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
+    const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
+    const FOLDER_DELETE            = "action.deleteFolder";
+    const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
 
-    // -- Categories Associated Content ----------------------------------------
+    const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
+    const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
+    const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
+    // -- END FOLDER EVENTS ---------------------------------------------------------
 
-    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT = "action.before_createCategoryAssociatedContent";
-    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT  = "action.after_createCategoryAssociatedContent";
 
-    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT = "action.before_deleteCategoryAssociatedContent";
-    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT  = "action.after_deleteCategoryAssociatedContent";
+    // -- PRODUCT EVENTS -----------------------------------------------
 
-    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT = "action.before_updateCategoryAssociatedContent";
-    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT  = "action.after_updateCategoryAssociatedContent";
-
-    // -- Product management -----------------------------------------------
-
+    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
     const PRODUCT_CREATE            = "action.createProduct";
+    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
+
+    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
     const PRODUCT_UPDATE            = "action.updateProduct";
+    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
+
+    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
     const PRODUCT_DELETE            = "action.deleteProduct";
+    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
+
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
     const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
@@ -282,15 +272,28 @@ final class TheliaEvents
 
     const PRODUCT_ADD_CATEGORY    = "action.addProductCategory";
     const PRODUCT_REMOVE_CATEGORY = "action.deleteProductCategory";
+    // -- END PRODUCT EVENTS ---------------------------------------------------------
 
-    const BEFORE_CREATEPRODUCT = "action.before_createproduct";
-    const AFTER_CREATEPRODUCT  = "action.after_createproduct";
 
-    const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
-    const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
+    // -- SHIPPING ZONE MANAGEMENT
 
-    const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
-    const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
+    const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
+    const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
+    // -- END SHIPPING ZONE MANAGEMENT
+
+
+
+    // -- Categories Associated Content ----------------------------------------
+
+    const BEFORE_CREATECATEGORY_ASSOCIATED_CONTENT = "action.before_createCategoryAssociatedContent";
+    const AFTER_CREATECATEGORY_ASSOCIATED_CONTENT  = "action.after_createCategoryAssociatedContent";
+
+    const BEFORE_DELETECATEGORY_ASSOCIATED_CONTENT = "action.before_deleteCategoryAssociatedContent";
+    const AFTER_DELETECATEGORY_ASSOCIATED_CONTENT  = "action.after_deleteCategoryAssociatedContent";
+
+    const BEFORE_UPDATECATEGORY_ASSOCIATED_CONTENT = "action.before_updateCategoryAssociatedContent";
+    const AFTER_UPDATECATEGORY_ASSOCIATED_CONTENT  = "action.after_updateCategoryAssociatedContent";
+
 
     // -- Product Accessories --------------------------------------------------
 
