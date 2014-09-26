@@ -12,7 +12,6 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
@@ -186,33 +185,6 @@ class UrlGenerator extends AbstractSmartyPlugin
     }
 
     /**
-     * Redirect to an URL
-     *
-     * @param array                     $params
-     * @param \Smarty_Internal_Template $smarty
-     *
-     * @throws \InvalidArgumentException
-     * @throws \Thelia\Core\HttpKernel\Exception\RedirectException
-     */
-    public function redirectFunction($params, &$smarty)
-    {
-
-        $url = $this->getParam($params, 'url', false);
-
-        $status = intval($this->getParam($params, 'status'));
-        if ($status === 0) {
-            $status = 302;
-        }
-
-        if ($url === false) {
-            throw new \InvalidArgumentException(Translator::getInstance()->trans("Please specify 'url' parameter in {redirect} function."));
-        } else {
-            throw new RedirectException($url, $status);
-        }
-
-    }
-
-    /**
      * Define the various smarty plugins handled by this class
      *
      * @return an array of smarty plugin descriptors
@@ -226,7 +198,6 @@ class UrlGenerator extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
             new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction'),
-            new SmartyPluginDescriptor('function', 'redirect', $this, 'redirectFunction'),
         );
     }
 
