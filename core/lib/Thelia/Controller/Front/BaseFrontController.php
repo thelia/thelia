@@ -132,14 +132,5 @@ class BaseFrontController extends BaseController
         return $data;
     }
 
-    protected function getRememberMeCookieName()
-    {
-        return ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
-    }
-
-    protected function getRememberMeCookieExpiration()
-    {
-        return ConfigQuery::read('customer_remember_me_cookie_expiration', 2592000 /* 1 month */);
-    }
 
 }

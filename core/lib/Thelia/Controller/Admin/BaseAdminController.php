@@ -24,7 +24,6 @@ use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
@@ -304,17 +303,6 @@ class BaseAdminController extends BaseController
         }
         return $order;
     }
-
-    protected function getRememberMeCookieName()
-    {
-        return ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-    }
-
-    protected function getRememberMeCookieExpiration()
-    {
-        return ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
-    }
-
 
     /**
      * Render the given template, and returns the result as an Http Response.

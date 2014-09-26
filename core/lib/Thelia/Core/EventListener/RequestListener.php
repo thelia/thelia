@@ -37,6 +37,8 @@ use Thelia\Model\LangQuery;
 class RequestListener implements EventSubscriberInterface
 {
 
+    use \Thelia\Tools\RememberMeTrait;
+
     /**
      *
      * @var \Thelia\Core\Translation\Translator
@@ -147,40 +149,6 @@ class RequestListener implements EventSubscriberInterface
 
     }
 
-    /**
-     * Get the remember me key from the cookie.
-     *
-     * @param $request
-     * @param $cookieName
-     *
-     * @return string hte key found, or null if no key was found.
-     */
-    protected function getRememberMeKeyFromCookie($request, $cookieName)
-    {
-        $ctp = new CookieTokenProvider();
-
-        return $ctp->getKeyFromCookie($request, $cookieName);
-    }
-
-    /**
-     * Create the remember me cookie for the given user.
-     */
-    protected function createRememberMeCookie(UserInterface $user, $cookieName, $cookieExpiration)
-    {
-        $ctp = new CookieTokenProvider();
-
-        $ctp->createCookie($user, $cookieName, $cookieExpiration);
-    }
-
-    /**
-     * Clear the remember me cookie.
-     */
-    protected function clearRememberMeCookie($cookieName)
-    {
-        $ctp = new CookieTokenProvider();
-
-        $ctp->clearCookie($cookieName);
-    }
 
     protected function applyUserLocale(UserInterface $user, Session $session)
     {

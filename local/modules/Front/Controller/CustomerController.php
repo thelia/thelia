@@ -23,7 +23,6 @@
 namespace Front\Controller;
 
 use Front\Front;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
@@ -39,6 +38,7 @@ use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerPasswordUpdateForm;
 use Thelia\Form\CustomerProfileUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\NewsletterQuery;
@@ -54,6 +54,8 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
 class CustomerController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
+
+    use \Thelia\Tools\RememberMeTrait;
 
     public function newPasswordAction()
     {
@@ -330,7 +332,11 @@ class CustomerController extends BaseFrontController
                         if (intval($form->get('remember_me')->getData()) > 0) {
                             // If a remember me field if present and set in the form, create
                             // the cookie thant store "remember me" information
-                            $this->createRememberMeCookie($customer);
+                            $this->createRememberMeCookie(
+                                $customer,
+                                $this->getRememberMeCookieName(),
+                                $this->getRememberMeCookieExpiration()
+                            );
                         }
 
                         return $this->generateSuccessRedirect($customerLoginForm);
@@ -370,7 +376,7 @@ class CustomerController extends BaseFrontController
             $this->dispatch(TheliaEvents::CUSTOMER_LOGOUT);
         }
 
-        $this->clearRememberMeCookie();
+        $this->clearRememberMeCookie($this->getRememberMeCookieName());
 
         // Redirect to home page
         return $this->generateRedirect(URL::getInstance()->getIndexPage());
@@ -416,4 +422,16 @@ class CustomerController extends BaseFrontController
 
         return $customerCreateEvent;
     }
+
+
+    protected function getRememberMeCookieName()
+    {
+        return ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
+    }
+
+    protected function getRememberMeCookieExpiration()
+    {
+        return ConfigQuery::read('customer_remember_me_cookie_expiration', 2592000 /* 1 month */);
+    }
+
 }

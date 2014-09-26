@@ -20,9 +20,14 @@ use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
 
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 
 class SessionController extends BaseAdminController
 {
+
+    use \Thelia\Tools\RememberMeTrait;
+
+
     public function showLoginAction()
     {
         // Check if user is already authanticate
@@ -41,7 +46,7 @@ class SessionController extends BaseAdminController
         $this->getSecurityContext()->clearAdminUser();
 
         // Clear the remember me cookie, if any
-        $this->clearRememberMeCookie();
+        $this->clearRememberMeCookie($this->getRememberMeCookieName());
 
         // Go back to login page.
         return $this->generateRedirectFromRoute('admin.login');
@@ -74,7 +79,11 @@ class SessionController extends BaseAdminController
             if (intval($form->get('remember_me')->getData()) > 0) {
                 // If a remember me field if present and set in the form, create
                 // the cookie thant store "remember me" information
-                $this->createRememberMeCookie($user);
+                $this->createRememberMeCookie(
+                    $user,
+                    $this->getRememberMeCookieName(),
+                    $this->getRememberMeCookieExpiration()
+                );
             }
 
             $this->dispatch(TheliaEvents::ADMIN_LOGIN);
@@ -104,4 +113,15 @@ class SessionController extends BaseAdminController
           // Display the login form again
         return $this->render("login");
     }
+
+    protected function getRememberMeCookieName()
+    {
+        return ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+    }
+
+    protected function getRememberMeCookieExpiration()
+    {
+        return ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
+    }
+
 }
