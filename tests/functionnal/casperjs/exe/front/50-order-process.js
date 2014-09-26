@@ -16,6 +16,12 @@ casper.test.begin('Order process', 4, function suite(test) {
 
     casper.thenOpen(thelia2_base_url + "order/delivery", function() {
 
+        this.echo(
+            "======================================\n" +
+            this.getHTML() +
+            "\n======================================"
+        );
+
         test.assertTitle("Billing and delivery - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
         this.capture(screenshot_dir + 'front/50_delivery_list.png');
 
