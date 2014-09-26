@@ -46,7 +46,7 @@ final class TheliaEvents
      */
     const ADDRESS_UPDATE = "action.updateAddress";
     const AFTER_UPDATEADDRESS = "action.after_updateAddress";
-    
+
     const BEFORE_DELETEADDRESS = "action.before_deleteAddress";
     /**
      * sent on address removal
@@ -100,11 +100,11 @@ final class TheliaEvents
     const BEFORE_UPDATECATEGORY = "action.before_updateCategory";
     const CATEGORY_UPDATE            = "action.updateCategory";
     const AFTER_UPDATECATEGORY    = "action.after_updateCategory";
-    
+
     const BEFORE_DELETECATEGORY = "action.before_deletecategory";
     const CATEGORY_DELETE            = "action.deleteCategory";
     const AFTER_DELETECATEGORY    = "action.after_deletecategory";
-    
+
     const CATEGORY_TOGGLE_VISIBILITY = "action.toggleCategoryVisibility";
     const CATEGORY_UPDATE_POSITION   = "action.updateCategoryPosition";
 
@@ -123,11 +123,11 @@ final class TheliaEvents
     const BEFORE_UPDATECONTENT = "action.before_updateContent";
     const CONTENT_UPDATE            = "action.updateContent";
     const AFTER_UPDATECONTENT    = "action.after_updateContent";
-    
+
     const BEFORE_DELETECONTENT = "action.before_deleteContent";
     const CONTENT_DELETE            = "action.deleteContent";
     const AFTER_DELETECONTENT    = "action.after_deleteContent";
-    
+
     const CONTENT_TOGGLE_VISIBILITY = "action.toggleContentVisibility";
     const CONTENT_UPDATE_POSITION   = "action.updateContentPosition";
     const CONTENT_UPDATE_SEO        = "action.updateContentSeo";
@@ -145,11 +145,11 @@ final class TheliaEvents
     const BEFORE_UPDATECOUNTRY = "action.before_updateCountry";
     const COUNTRY_UPDATE            = "action.updateCountry";
     const AFTER_UPDATECOUNTRY    = "action.after_updateCountry";
-    
+
     const BEFORE_DELETECOUNTRY = "action.before_deleteCountry";
     const COUNTRY_DELETE            = "action.deleteCountry";
     const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
-    
+
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
 
@@ -222,11 +222,11 @@ final class TheliaEvents
     const BEFORE_UPDATEFOLDER = "action.before_updateFolder";
     const FOLDER_UPDATE            = "action.updateFolder";
     const AFTER_UPDATEFOLDER    = "action.after_updateFolder";
-        
+
     const BEFORE_DELETEFOLDER = "action.before_deleteFolder";
     const FOLDER_DELETE            = "action.deleteFolder";
     const AFTER_DELETEFOLDER    = "action.after_deleteFolder";
-    
+
     const FOLDER_TOGGLE_VISIBILITY = "action.toggleFolderVisibility";
     const FOLDER_UPDATE_POSITION   = "action.updateFolderPosition";
     const FOLDER_UPDATE_SEO        = "action.updateFolderSeo";
@@ -242,11 +242,11 @@ final class TheliaEvents
     const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
     const PRODUCT_UPDATE            = "action.updateProduct";
     const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
-        
+
     const BEFORE_DELETEPRODUCT = "action.before_deleteproduct";
     const PRODUCT_DELETE            = "action.deleteProduct";
     const AFTER_DELETEPRODUCT  = "action.after_deleteproduct";
-    
+
     const PRODUCT_TOGGLE_VISIBILITY = "action.toggleProductVisibility";
     const PRODUCT_UPDATE_POSITION   = "action.updateProductPosition";
     const PRODUCT_UPDATE_SEO        = "action.updateProductSeo";
