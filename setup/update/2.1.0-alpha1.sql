@@ -801,7 +801,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
   (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
-  (2023, 'wysywyg.js', 2, 0, 0, 1, 0, 1, NOW(), NOW())
+  (2023, 'wysiwyg.js', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -2130,7 +2130,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+2, 'fr_FR', 'Position des hooks'),
   (@max_id+3, 'en_US', 'Sales management'),
   (@max_id+3, 'fr_FR', 'Gestion des promotions'),
-  (@max_id+4, 'en_US', 'Administators list'),
+  (@max_id+4, 'en_US', 'Administats list'),
   (@max_id+4, 'fr_FR', 'Liste des administrateurs'),
   (@max_id+5, 'en_US', 'Category configuration'),
   (@max_id+5, 'fr_FR', 'Configuration d''une catégorie'),
