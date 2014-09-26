@@ -1,11 +1,5 @@
 {extends file="layout.tpl"}
 
-{block name="init"}
-{loop type="auth" name="customer_logged" role="CUSTOMER"}
-{redirect url="{navigate to='index'}"}
-{/loop}
-{/block}
-
 {* Body Class *}
 {block name="body-class"}page-register{/block}
 
