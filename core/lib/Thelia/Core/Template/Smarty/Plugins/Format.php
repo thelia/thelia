@@ -139,11 +139,7 @@ class Format extends AbstractSmartyPlugin
     {
         $number = $this->getParam($params, "number", false);
 
-        if ($number ===  false) {
-            return "";
-        }
-
-        if ($number == '') {
+        if ($number ===  false || $number === '') {
             return "";
         }
 
@@ -176,7 +172,7 @@ class Format extends AbstractSmartyPlugin
     {
         $number = $this->getParam($params, "number", false);
 
-        if ($number ===  false || $number == '') {
+        if ($number ===  false || $number === '') {
             return "";
         }
 
