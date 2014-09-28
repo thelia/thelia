@@ -52,6 +52,10 @@ class SmartyParser extends Smarty implements ParserInterface
 
     protected $status = 200;
 
+    // A key to identify assets defined in a template. This will be the name of the directory in which the template
+    // assets will be copied and generated in the web cache.
+    const TEMPLATE_ASSETS_KEY = 'template-assets';
+
     /**
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
@@ -215,28 +219,27 @@ class SmartyParser extends Smarty implements ParserInterface
      *
      * @param int     $templateType      the template type (a TemplateDefinition type constant)
      * @param string  $templateName      the template name
-     * @param string  $templateDirectory path to the template dirtectory
+     * @param string  $templateDirectory path to the template directory
      * @param string  $key               ???
-     * @param boolean $unshift           ??? Etienne ?
+     * @param boolean $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
      */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $unshift = false)
+    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false)
     {
-        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName");
+        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
 
-        if (true === $unshift && isset($this->templateDirectories[$templateType][$templateName])) {
-            $this->templateDirectories[$templateType][$templateName] = array_merge(
-                array(
-                    $key => $templateDirectory,
-                ),
-                $this->templateDirectories[$templateType][$templateName]
-            );
+        if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
+
+            // When using array_merge, the key was set to 0. Use + instead.
+            $this->templateDirectories[$templateType][$templateName] =
+                [ $key => $templateDirectory ] + $this->templateDirectories[$templateType][$templateName]
+            ;
         } else {
             $this->templateDirectories[$templateType][$templateName][$key] = $templateDirectory;
         }
     }
 
     /**
-     * Return the registeted template directories for a givent template type
+     * Return the registered template directories for a given template type
      *
      * @param  int                      $templateType
      * @throws InvalidArgumentException
@@ -271,15 +274,15 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->setTemplateDir(array());
 
         /* define config directory */
-        $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplate() . '/configs';
-        $this->addConfigDir($configDirectory, 0);
+        $configDirectory = THELIA_TEMPLATE_DIR . $this->getTemplatePath() . DS . 'configs';
+        $this->addConfigDir($configDirectory, self::TEMPLATE_ASSETS_KEY);
 
         /* add modules template directories */
         $this->addTemplateDirectory(
             $templateDefinition->getType(),
             $templateDefinition->getName(),
-            THELIA_TEMPLATE_DIR . $this->getTemplate(),
-            '0',
+            THELIA_TEMPLATE_DIR . $this->getTemplatePath(),
+            self::TEMPLATE_ASSETS_KEY,
             true
         );
 
@@ -287,7 +290,7 @@ class SmartyParser extends Smarty implements ParserInterface
         if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
             foreach ($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
                 $this->addTemplateDir($directory, $key);
-                $this->addConfigDir($directory . "/configs", $key);
+                $this->addConfigDir($directory . DS . 'configs', $key);
             }
         }
     }
@@ -313,13 +316,16 @@ class SmartyParser extends Smarty implements ParserInterface
         return $ret;
     }
 
-    public function getTemplate()
+    /**
+     * @return string the template path
+     */
+    public function getTemplatePath()
     {
         return $this->templateDefinition->getPath();
     }
 
     /**
-     * Return a rendered template, either from file or ftom a string
+     * Return a rendered template, either from file or from a string
      *
      * @param string $resourceType    either 'string' (rendering from a string) or 'file' (rendering a file)
      * @param string $resourceContent the resource content (a text, or a template file name)
