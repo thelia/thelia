@@ -24,7 +24,6 @@ use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
 
-
 /**
  * The base class for hook. If you provide hooks in your module you have to extends
  * this class.
