@@ -139,11 +139,11 @@ abstract class BaseHook
 
         if ("" !== $url) {
             $tags   = array();
-            $tags[] = "<link rel='stylesheet' type='text/css' ";
-            $tags[] = " href='" . $url . "' ";
+            $tags[] = '<link rel="stylesheet" type="text/css" ';
+            $tags[] = ' href="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, array("href", "rel", "type"))) {
-                    $tags[] = $name . "='" . $val . "' ";
+                if (is_string($name) && !in_array($name, [ "href", "rel", "type" ])) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
             $tags[] = "/>";
@@ -170,11 +170,11 @@ abstract class BaseHook
 
         if ("" !== $url) {
             $tags   = array();
-            $tags[] = "<script type='text/javascript' ";
-            $tags[] = " src='" . $url . "' ";
+            $tags[] = '<script type="text/javascript" ';
+            $tags[] = ' src="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, array("src", "type"))) {
-                    $tags[] = $name . "='" . $val . "' ";
+                if (is_string($name) && !in_array($name, [ "src", "type" ])) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
             $tags[] = "></script>";
