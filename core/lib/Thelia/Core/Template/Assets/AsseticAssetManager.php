@@ -118,12 +118,12 @@ class AsseticAssetManager implements AssetManagerInterface
      * Compute the destination directory path, from the source directory and the
      * base directory of the web assets
      *
-     * @param string $webAssetsDirectoryBase base directory of the web assets
-     * @param        $webAssetsTemplate
-     * @param string $webAssetsKey           the assests key : module name or 0 for base template
+     * @param string $webAssetsDirectoryBase Base base directory of the web assets
+     * @param string $webAssetsTemplate      The template directory, relative to '<thelia_root>/templates'
+     * @param string $webAssetsKey           the assets key : module name or 0 for template assets
      *
      * @internal param string $source_assets_directory the source directory
-     * @return the full path of the destination directory
+     * @return string the full path of the destination directory
      */
     protected function getDestinationDirectory($webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey)
     {
@@ -136,7 +136,7 @@ class AsseticAssetManager implements AssetManagerInterface
      * the source directory. If any change is detected, the whole asset directory
      * is copied in the web space.
      *
-     * @param string $sourceAssetsDirectory  the full path to the source asstes directory
+     * @param string $sourceAssetsDirectory  the full path to the source assets directory
      * @param string $webAssetsDirectoryBase the base directory of the web based asset directory
      * @param        $webAssetsTemplate
      * @param string $webAssetsKey           the assets key : module name or 0 for base template
@@ -200,7 +200,7 @@ class AsseticAssetManager implements AssetManagerInterface
      * @param  FilterManager             $filterManager the Assetic filter manager
      * @param  string                    $filters       a comma separated list of filter names
      * @throws \InvalidArgumentException if a wrong filter is passed
-     * @return an                        array of filter names
+     * @return array                     an array of filter names
      */
     protected function decodeAsseticFilters(FilterManager $filterManager, $filters)
     {
@@ -267,6 +267,10 @@ class AsseticAssetManager implements AssetManagerInterface
      */
     public function processAsset($assetSource, $assetDirectoryBase, $webAssetsDirectoryBase, $webAssetsTemplate, $webAssetsKey, $outputUrl, $assetType, $filters, $debug)
     {
+        Tlog::getInstance()->addDebug(
+            "Processing asset: assetSource=$assetSource, assetDirectoryBase=$assetDirectoryBase, webAssetsDirectoryBase=$webAssetsDirectoryBase, webAssetsTemplate=$webAssetsTemplate, webAssetsKey=$webAssetsKey, outputUrl=$outputUrl"
+        );
+
         $assetName = basename($assetSource);
         $inputDirectory = realpath(dirname($assetSource));
 
