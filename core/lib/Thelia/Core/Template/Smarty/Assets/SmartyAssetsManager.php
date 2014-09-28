@@ -77,8 +77,8 @@ class SmartyAssetsManager
      * @param string $assets_directory the assets directory in the template
      * @param SmartyParser $smartyParser the current parser.
      */
-    protected function prepareTemplateAssets(TemplateDefinition $templateDefinition, $assets_directory, SmartyParser $smartyParser) {
-
+    protected function prepareTemplateAssets(TemplateDefinition $templateDefinition, $assets_directory, SmartyParser $smartyParser)
+    {
         // Get the registered template directories for the current template path
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
@@ -96,8 +96,7 @@ class SmartyAssetsManager
                     // If we're processing template assets (not module assets), we will use the $assets_directory as the assets parent dir.
                     if (SmartyParser::TEMPLATE_ASSETS_KEY == $key && ! null !== $assets_directory) {
                         $assetsWebDir = SmartyParser::TEMPLATE_ASSETS_KEY . DS . $assets_directory;
-                    }
-                    else {
+                    } else {
                         $assetsWebDir = $key;
                     }
 

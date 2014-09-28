@@ -76,8 +76,7 @@ class SmartyAssetsResolver implements AssetResolverInterface
                 $filters,
                 $debug
             );
-        }
-        else {
+        } else {
             Tlog::getInstance()->addError("Asset $file (type $type) was not found.");
         }
 
@@ -144,7 +143,8 @@ class SmartyAssetsResolver implements AssetResolverInterface
      * @param string $path the iput path
      * @return string the fixed path
      */
-    protected function fixPathSeparator($path) {
+    protected function fixPathSeparator($path)
+    {
         if (DS != '/') {
             $path = str_replace('/', DS, $path);
         }
