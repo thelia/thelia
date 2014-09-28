@@ -212,7 +212,7 @@ class CouponCreationForm extends BaseForm
 
 
     /**
-     * Validate a date entered with the default Language date format.
+     * Check coupon code unicity
      *
      * @param string                    $value
      * @param ExecutionContextInterface $context
@@ -231,7 +231,7 @@ class CouponCreationForm extends BaseForm
     }
 
     /**
-     * Check coupon code unicity
+     * Validate a date entered with the default Language date format.
      *
      * @param string                    $value
      * @param ExecutionContextInterface $context
