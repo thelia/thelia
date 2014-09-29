@@ -57,6 +57,32 @@ class CustomerController extends BaseFrontController
 
     use \Thelia\Tools\RememberMeTrait;
 
+    /**
+     * Display the register template if no customer logged
+     */
+    public function viewLoginAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            // Redirect to home page
+            return $this->generateRedirect(URL::getInstance()->getIndexPage());
+        }
+
+        return $this->render("login");
+    }
+
+    /**
+     * Display the register template if no customer logged
+     */
+    public function viewRegisterAction()
+    {
+        if ($this->getSecurityContext()->hasCustomerUser()) {
+            // Redirect to home page
+            return $this->generateRedirect(URL::getInstance()->getIndexPage());
+        }
+
+        return $this->render("register");
+    }
+
     public function newPasswordAction()
     {
         $message = false;
