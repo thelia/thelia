@@ -120,8 +120,7 @@ class RequestListener implements EventSubscriberInterface
             try {
                 // If have found a user, store it in the security context
                 $user = $authenticator->getAuthentifiedUser();
-                return array($cookie, $authenticator, $user);
-
+                
                 $session->setCustomerUser($user);
             } catch (TokenAuthenticationException $ex) {
                 // Clear the cookie
