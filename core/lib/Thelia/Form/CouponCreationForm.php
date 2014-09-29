@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Module;
@@ -75,7 +76,14 @@ class CouponCreationForm extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
+                        new NotBlank(),
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "checkDuplicateCouponCode"),
+                                ),
+                            )
+                        )
                     )
                 )
             )
@@ -123,11 +131,13 @@ class CouponCreationForm extends BaseForm
                 array(
                     'constraints' => array(
                         new NotBlank(),
-                        new Callback(array(
-                            "methods" => array(
-                                array($this, "checkLocalizedDate"),
-                            ),
-                        ))
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "checkLocalizedDate"),
+                                ),
+                            )
+                        )
                     )
                 )
             )
@@ -198,6 +208,26 @@ class CouponCreationForm extends BaseForm
                     'allow_delete' => true,
             ))
         ;
+    }
+
+
+    /**
+     * Check coupon code unicity
+     *
+     * @param string                    $value
+     * @param ExecutionContextInterface $context
+     */
+    public function checkDuplicateCouponCode($value, ExecutionContextInterface $context)
+    {
+        $exists = CouponQuery::create()->filterByCode($value)->count() > 0;
+
+        if ($exists) {
+            $context->addViolation(
+                Translator::getInstance()->trans("The coupon code '%code' already exists. Please choose another coupon code", [
+                        '%code' => $value,
+                    ])
+            );
+        }
     }
 
     /**
