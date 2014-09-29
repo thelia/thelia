@@ -18,14 +18,12 @@ use Thelia\Controller\BaseController;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
-use Thelia\Core\Security\Token\CookieTokenProvider;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
-use Thelia\Model\Admin;
 use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
@@ -304,46 +302,6 @@ class BaseAdminController extends BaseController
             $this->getSession()->set($orderSessionIdentifier, $order);
         }
         return $order;
-    }
-
-    /**
-     * Create the remember me cookie for the given user.
-     */
-    protected function createAdminRememberMeCookie(Admin $user)
-    {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-        $cookieExpiration = ConfigQuery::read('admin_remember_me_cookie_expiration', 2592000 /* 1 month */);
-
-        $ctp->createCookie($user, $cookieName, $cookieExpiration);
-    }
-
-    /**
-     * Get the rememberme key from the cookie.
-     *
-     * @return string hte key found, or null if no key was found.
-     */
-    protected function getRememberMeKeyFromCookie()
-    {
-        // Check if we can authenticate the user with a cookie-based token
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp = new CookieTokenProvider();
-
-        return $ctp->getKeyFromCookie($this->getRequest(), $cookieName);
-    }
-
-    /** Clear the remember me cookie.
-     *
-     */
-    protected function clearRememberMeCookie()
-    {
-        $ctp = new CookieTokenProvider();
-
-        $cookieName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
-
-        $ctp->clearCookie($cookieName);
     }
 
     /**

@@ -14,12 +14,19 @@ namespace Thelia\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
+use Thelia\Core\Security\Authentication\CustomerTokenAuthenticator;
+use Thelia\Core\Security\Exception\TokenAuthenticationException;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
 
 /**
@@ -29,8 +36,20 @@ use Thelia\Model\LangQuery;
  */
 class RequestListener implements EventSubscriberInterface
 {
-    protected $translator;
 
+    use \Thelia\Tools\RememberMeTrait;
+
+    /**
+     *
+     * @var \Thelia\Core\Translation\Translator
+     */
+    private $translator;
+
+    /**
+     *
+     * @param Translator $translator
+     *
+     */
     public function __construct(Translator $translator)
     {
         $this->translator = $translator;
@@ -38,6 +57,7 @@ class RequestListener implements EventSubscriberInterface
 
     public function registerValidatorTranslator(GetResponseEvent $event)
     {
+        /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
         $lang = $request->getSession()->getLang();
         $vendorDir = THELIA_ROOT.'core'.DS.'vendor';
@@ -59,13 +79,112 @@ class RequestListener implements EventSubscriberInterface
         );
     }
 
+    public function rememberMeLoader(GetResponseEvent $event)
+    {
+        /** @var \Thelia\Core\HttpFoundation\Request $request */
+        $request = $event->getRequest();
+
+        /** @var \Thelia\Core\HttpFoundation\Session\Session $session */
+        $session = $request->getSession();
+
+        if (null === $session->getCustomerUser()) {
+            // Check customer remember me token
+            $this->getRememberMeCustomer($request, $session);
+        }
+
+        // Check admin remember me token
+        if (null === $session->getAdminUser()) {
+            $this->getRememberMeAdmin($request, $session);
+        }
+    }
+
+    /**
+     * @param $request
+     * @param $session
+     *
+     * @return array
+     */
+    protected function getRememberMeCustomer(Request $request, Session $session)
+    {
+        // try to get the remember me cookie
+        $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
+        $cookie             = $this->getRememberMeKeyFromCookie(
+            $request,
+            $cookieCustomerName
+        );
+
+        if (null !== $cookie) {
+            // try to log
+            $authenticator = new CustomerTokenAuthenticator($cookie);
+
+            try {
+                // If have found a user, store it in the security context
+                $user = $authenticator->getAuthentifiedUser();
+                return array($cookie, $authenticator, $user);
+
+                $session->setCustomerUser($user);
+            } catch (TokenAuthenticationException $ex) {
+                // Clear the cookie
+                $this->clearRememberMeCookie($cookieCustomerName);
+            }
+        }
+    }
+
+    /**
+     * @param $request
+     * @param $session
+     */
+    protected function getRememberMeAdmin(Request $request, Session $session)
+    {
+        // try to get the remember me cookie
+        $cookieAdminName = ConfigQuery::read('admin_remember_me_cookie_name', 'armcn');
+        $cookie          = $this->getRememberMeKeyFromCookie(
+            $request,
+            $cookieAdminName
+        );
+
+        if (null !== $cookie) {
+
+            // try to log
+            $authenticator = new AdminTokenAuthenticator($cookie);
+
+            try {
+                // If have found a user, store it in the security context
+                $user = $authenticator->getAuthentifiedUser();
+
+                $session->setAdminUser($user);
+
+                $this->applyUserLocale($user, $session);
+
+                AdminLog::append("admin", "LOGIN", "Authentication successful", $request, $user, false);
+            } catch (TokenAuthenticationException $ex) {
+                AdminLog::append("admin", "LOGIN", "Token based authentication failed.", $request);
+
+                // Clear the cookie
+                $this->clearRememberMeCookie($cookieAdminName);
+            }
+        }
+    }
+
+    protected function applyUserLocale(UserInterface $user, Session $session)
+    {
+        // Set the current language according to locale preference
+        $locale = $user->getLocale();
+
+        if (null === $lang = LangQuery::create()->findOneByLocale($locale)) {
+            $lang = Lang::getDefaultLanguage();
+        }
+
+        $session->setLang($lang);
+    }
+
     /**
      * Save the previous URL in session which is based on the referer header or the request, or
      * the _previous_url request attribute, if defined.
      *
      * If the value of _previous_url is "dont-save", the current referrer is not saved.
      *
-     * @param FilterResponseEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
      */
     public function registerPreviousUrl(PostResponseEvent  $event)
     {
@@ -112,7 +231,8 @@ class RequestListener implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ["registerValidatorTranslator", 128]
+                ["registerValidatorTranslator", 128],
+                ["rememberMeLoader", 128]
             ],
             KernelEvents::TERMINATE => [
                 ["registerPreviousUrl", 128]
