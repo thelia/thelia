@@ -153,8 +153,8 @@ class HookTest extends WebTestCase
      */
     public function testBaseHookAddCSS($content)
     {
-        $this->assertRegExp("/<link\\s+rel='stylesheet'\\s+type='text\\/css'\\s+href='http:\\/\\/localhost\\/assets\\/assets\\/css\\/HookTest\\/assets\\/css\\/.*\\.css'\\s*\\/>/", $content);
-        $this->assertRegExp("/<link\\s+rel='stylesheet'\\s+type='text\\/css'\\s+href='http:\\/\\/localhost\\/assets\\/assets\\/css\\/HookTest\\/assets\\/css\\/.*\\.css'\\s+media='print'\\s*\\/>/", $content);
+        $this->assertRegExp('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s*\\/>/', $content);
+        $this->assertRegExp('/<link\\s+rel="stylesheet"\\s+type="text\\/css"\\s+href="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/css\\/.*\\.css"\\s+media="print"\\s*\\/>/', $content);
     }
 
     /**
@@ -163,7 +163,7 @@ class HookTest extends WebTestCase
      */
     public function testBaseHookAddJS($content)
     {
-        $this->assertRegExp("/<script\\s+type='text\\/javascript'\\s+src='http:\\/\\/localhost\\/assets\\/assets\\/js\\/HookTest\\/assets\\/js\\/.*\\.js'\\s*>/", $content);
+        $this->assertRegExp('/<script\\s+type="text\\/javascript"\\s+src="http:\\/\\/localhost\\/assets\\/frontOffice\\/hooktest\\/HookTest\\/assets\\/js\\/.*\\.js"\\s*>/', $content);
     }
 
     /**

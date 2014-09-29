@@ -15,17 +15,14 @@ namespace Thelia\Core\Hook;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Template\Assets\AssetManagerInterface;
+use Thelia\Core\Template\Assets\AssetResolverInterface;
 use Thelia\Core\Template\Smarty\SmartyParser;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\Cart;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
 use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Module\BaseModule;
-use Thelia\Tools\URL;
 
 /**
  * The base class for hook. If you provide hooks in your module you have to extends
@@ -55,8 +52,8 @@ abstract class BaseHook
     /** @var TranslatorInterface $translator */
     public $translator = null;
 
-    /** @var AssetManagerInterface $assetManager */
-    public $assetsManager = null;
+    /** @var AssetResolverInterface $assetsResolver */
+    public $assetsResolver = null;
 
     /** @var Request $request */
     protected $request = null;
@@ -89,9 +86,8 @@ abstract class BaseHook
      */
     public function render($templateName, array $parameters = array())
     {
-        $templateDir = $this->resolveSourcePath($templateName);
+        $templateDir = $this->assetsResolver->resolveAssetSourcePath($this->module->getCode(), false, $templateName, $this->parser);
 
-        $content = "";
         if (null !== $templateDir) {
             // retrieve the template
             $smartyParser = $this->parser;
@@ -112,9 +108,8 @@ abstract class BaseHook
      */
     public function dump($fileName)
     {
-        $fileDir = $this->resolveSourcePath($fileName);
+        $fileDir = $this->assetsResolver->resolveAssetSourcePath($this->module->getCode(), false, $fileName, $this->parser);
 
-        $content = "";
         if (null !== $fileDir) {
             $content = file_get_contents($fileDir . DS . $fileName);
             if (false === $content) {
@@ -132,21 +127,23 @@ abstract class BaseHook
      *
      * @param string $fileName   the path to the css file
      * @param array  $attributes the attributes of the tag
+     * @param array  $filters an array of assets processing filters (less, sass, etc.)
      *
      * @return string the link tag
      */
-    public function addCSS($fileName, $attributes = array())
+    public function addCSS($fileName, $attributes = [], $filters = [])
     {
         $tag = "";
 
-        $url = $this->resolveURL($fileName, "css");
+        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, "css", $this->parser, $filters);
+
         if ("" !== $url) {
             $tags   = array();
-            $tags[] = "<link rel='stylesheet' type='text/css' ";
-            $tags[] = " href='" . $url . "' ";
+            $tags[] = '<link rel="stylesheet" type="text/css" ';
+            $tags[] = ' href="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, array("href", "rel", "type"))) {
-                    $tags[] = $name . "='" . $val . "' ";
+                if (is_string($name) && !in_array($name, [ "href", "rel", "type" ])) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
             $tags[] = "/>";
@@ -161,21 +158,23 @@ abstract class BaseHook
      *
      * @param string $fileName   the path to the js file
      * @param array  $attributes the attributes of the tag
+     * @param array  $filters an array of assets processing filters (cofeescript, compress, etc.)
      *
      * @return string the script tag
      */
-    public function addJS($fileName, $attributes = array())
+    public function addJS($fileName, $attributes = array(), $filters = [])
     {
         $tag = "";
 
-        $url = $this->resolveURL($fileName, "js");
+        $url = $this->assetsResolver->resolveAssetURL($this->module->getCode(), $fileName, "js", $this->parser, $filters);
+
         if ("" !== $url) {
             $tags   = array();
-            $tags[] = "<script type='text/javascript' ";
-            $tags[] = " src='" . $url . "' ";
+            $tags[] = '<script type="text/javascript" ';
+            $tags[] = ' src="' . $url . '" ';
             foreach ($attributes as $name => $val) {
-                if (is_string($name) && !in_array($name, array("src", "type"))) {
-                    $tags[] = $name . "='" . $val . "' ";
+                if (is_string($name) && !in_array($name, [ "src", "type" ])) {
+                    $tags[] = $name . '="' . $val . '" ';
                 }
             }
             $tags[] = "></script>";
@@ -183,96 +182,6 @@ abstract class BaseHook
         }
 
         return $tag;
-    }
-
-    protected function resolveURL($fileName, $type)
-    {
-        $url = "";
-
-        $fileRoot = $this->resolveSourcePath($fileName);
-        $fileDir  = dirname($fileName);
-        if ("." == $fileDir) {
-            $fileDir = "";
-        }
-
-        $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
-
-        if (null !== $fileDir) {
-            $url = $this->assetsManager->processAsset(
-                $fileRoot . DS . $fileName,
-                $fileRoot,
-                THELIA_WEB_DIR . $asset_dir_from_web_root,
-                $fileDir,
-                $this->module->getCode(),
-                URL::getInstance()->absoluteUrl($asset_dir_from_web_root, null, URL::PATH_TO_FILE /* path only */),
-                $type,
-                array(),
-                false
-            );
-        }
-
-        return $url;
-    }
-
-    /**
-     * Resolve the file path.
-     *
-     * A system of fallback enables file overriding. It will look for the template :
-     *      - in the current template in directory /modules/{module code}/
-     *      - in the module in the current template if it exists
-     *      - in the module in the default template
-     *
-     * @param  $fileName    the filename
-     *
-     * @return mixed the path to directory containing the file if exists
-     */
-    protected function resolveSourcePath($fileName)
-    {
-        $fileDir = null;
-        $found   = false;
-
-        // retrieve the template
-        $smartyParser = $this->parser;
-
-        // First look into the current template in the right scope : frontOffice, backOffice, ...
-        // template should be overrided in : {template_path}/modules/{module_code}/{template_name}
-        /** @var \Thelia\Core\Template\Smarty\SmartyParser $templateDefinition */
-        $templateDefinition  = $smartyParser->getTemplateDefinition(false);
-        $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
-
-        if (isset($templateDirectories[$templateDefinition->getName()]["0"])) {
-            $fileDir = $templateDirectories[$templateDefinition->getName()]["0"]
-                . DS . TemplateDefinition::HOOK_OVERRIDE_SUBDIR
-                . DS . $this->module->getCode();
-            if (file_exists($fileDir . DS . $fileName)) {
-                $found = true;
-            }
-        }
-
-        // If the smarty template doesn't exist, we try to see if there is an
-        // implementation for the template used in the module directory
-        if (!$found) {
-            if (isset($templateDirectories[$templateDefinition->getName()][$this->module->getCode()])) {
-                $fileDir = $templateDirectories[$templateDefinition->getName()][$this->module->getCode()];
-                if (file_exists($fileDir . DS . $fileName)) {
-                    $found = true;
-                }
-            }
-        }
-
-        // Not here, we finally try to fallback on the default theme in the module
-        if (!$found && $templateDefinition->getName() !== TemplateDefinition::HOOK_DEFAULT_THEME) {
-            if ($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME]
-                && isset($templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()])
-            ) {
-                $fileDir = $templateDirectories[TemplateDefinition::HOOK_DEFAULT_THEME][$this->module->getCode()];
-                if (file_exists($fileDir . DS . $fileName)) {
-                    $found = true;
-                }
-            }
-        }
-
-        return $fileDir;
     }
 
     /**

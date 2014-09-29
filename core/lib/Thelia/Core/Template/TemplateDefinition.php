@@ -23,8 +23,6 @@ class TemplateDefinition
     const BACK_OFFICE_SUBDIR = 'backOffice';
     const PDF_SUBDIR = 'pdf';
     const EMAIL_SUBDIR = 'email';
-    const HOOK_OVERRIDE_SUBDIR = 'modules';
-    const HOOK_DEFAULT_THEME = 'default';
 
     protected static $standardTemplatesSubdirs = array(
         self::FRONT_OFFICE => self::FRONT_OFFICE_SUBDIR,
@@ -34,17 +32,17 @@ class TemplateDefinition
     );
 
     /**
-     * @var the template directory name (e.g. 'default')
+     * @var string the template directory name (e.g. 'default')
      */
     protected $name;
 
     /**
-     * @var the template directory full path
+     * @var string the template directory full path
      */
     protected $path;
 
     /**
-     * @var the template type (front, back, pdf)
+     * @var int the template type (front, back, pdf)
      */
     protected $type;
 
