@@ -31,6 +31,7 @@ class CheckPermission extends BaseInstall
     const DIR_CACHE =           'cache';
     const DIR_WEB =             'web';
     const DIR_SESSION =         'local/session';
+    const DIR_MEDIA =           'local/media';
 
     /** @var array Directory needed to be writable */
     protected $directoriesToBeWritable = array(
@@ -39,6 +40,7 @@ class CheckPermission extends BaseInstall
         self::DIR_CACHE,
         self::DIR_WEB,
         self::DIR_SESSION,
+        self::DIR_MEDIA
     );
 
     /** @var array Minimum server configuration necessary */
