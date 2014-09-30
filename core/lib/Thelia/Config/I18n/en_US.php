@@ -177,6 +177,7 @@ return array(
     'Failed to create new hook %s' => 'Failed to create new hook %s',
     'Failed to deactivate hook with id %s' => 'Failed to deactivate hook with id %s',
     'Failed to find a payment Module with ID=%mid for order ID=%oid' => 'Failed to find a payment Module with ID=%mid for order ID=%oid',
+    'Failed to load message with code \'%code%\', propably because it does\'nt exists.' => 'Failed to load message with code \'%code%\', propably because it does\'nt exists.',
     'Failed to open a writing stream on the file: %file' => 'Failed to open a writing stream on the file: %file',
     'Failed to open translation file %file. Please be sure that this file is writable by your Web server' => 'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
     'Failed to send message %code. Failed recipients: %failed_addresses' => 'Failed to send message %code. Failed recipients: %failed_addresses',
