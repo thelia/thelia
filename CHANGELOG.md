@@ -25,6 +25,8 @@
 - Added the wysywig.js hook to official hooks, so that any page which needs a WYSYWIG editor will only have to put this hook in the JS section to get one.
 - Refactored Tynimce module according to wysywig.js hook
 - Moved cart and order flush in the Order action, triggered by the ORDER_CART_CLEAR event. Payment modules which redirects to a non-strandard route (e.g., not /order/placed/{order_id}) should fire this event.
+- Refactored assets generation.
+- `file` parameter of asset related smarty functions (`stylesheets`, `javascripts`, ìmages`, ...) should not contains ../
 
 ##DEPRECATED
 Redirect methods are deprecated. You have now two ways for generating a redirect response :
