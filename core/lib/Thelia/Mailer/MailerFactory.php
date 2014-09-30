@@ -176,8 +176,7 @@ class MailerFactory
                         )
                     );
                 }
-            }
-            else {
+            } else {
                 Tlog::getInstance()->addWarning("Message $messageCode not sent: recipient list is empty.");
             }
         } else {
