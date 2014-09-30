@@ -137,7 +137,7 @@ class MailerFactory
 
         $this->sendEmailMessage(
             $messageCode,
-            [ $storeName => ConfigQuery::getStoreEmail() ],
+            [ConfigQuery::getStoreEmail() => $storeName],
             $to,
             $messageParameters
         );
@@ -157,20 +157,28 @@ class MailerFactory
         $store_email = ConfigQuery::getStoreEmail();
 
         if (! empty($store_email)) {
-            $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale);
+            if (! empty($to)) {
+                $instance = $this->createEmailMessage($messageCode, $from, $to, $messageParameters, $locale);
 
-            $sentCount = $this->send($instance, $failedRecipients);
+                $sentCount = $this->send($instance, $failedRecipients);
 
-            if ($sentCount == 0) {
-                Tlog::getInstance()->addError(
-                    Translator::getInstance()->trans(
-                        "Failed to send message %code. Failed recipients: %failed_addresses",
-                        [
-                            '%code'       => $messageCode,
-                            '%failed_addresses' => is_array($failedRecipients) ? implode(',', $failedRecipients) : 'none'
-                        ]
-                    )
-                );
+                if ($sentCount == 0) {
+                    Tlog::getInstance()->addError(
+                        Translator::getInstance()->trans(
+                            "Failed to send message %code. Failed recipients: %failed_addresses",
+                            [
+                                '%code' => $messageCode,
+                                '%failed_addresses' => is_array($failedRecipients) ? implode(
+                                    ',',
+                                    $failedRecipients
+                                ) : 'none'
+                            ]
+                        )
+                    );
+                }
+            }
+            else {
+                Tlog::getInstance()->addWarning("Message $messageCode not sent: recipient list is empty.");
             }
         } else {
             Tlog::getInstance()->addError("Can't send email message $messageCode: store email address is not defined.");
@@ -180,11 +188,12 @@ class MailerFactory
     /**
      * Create a SwiftMessage instance from a given message code.
      *
-     * @param  string         $messageCode
-     * @param  array          $from              From addresses. An array of (name => email-address)
-     * @param  array          $to                To addresses. An array of (name => email-address)
-     * @param  array          $messageParameters an array of (name => value) parameters that will be available in the message.
-     * @param string locale. If null, the default store locale is used.
+     * @param  string $messageCode
+     * @param  array  $from              From addresses. An array of (name => email-address)
+     * @param  array  $to                To addresses. An array of (name => email-address)
+     * @param  array  $messageParameters an array of (name => value) parameters that will be available in the message.
+     * @param string  $locale. If null, the default store locale is used.
+     * 
      * @return \Swift_Message the generated and built message.
      */
     public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
