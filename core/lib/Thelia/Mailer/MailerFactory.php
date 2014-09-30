@@ -193,38 +193,46 @@ class MailerFactory
      * @param  array  $to                To addresses. An array of (name => email-address)
      * @param  array  $messageParameters an array of (name => value) parameters that will be available in the message.
      * @param string  $locale. If null, the default store locale is used.
-     * 
+     *
      * @return \Swift_Message the generated and built message.
      */
     public function createEmailMessage($messageCode, $from, $to, $messageParameters = [], $locale = null)
     {
-        $message = MessageQuery::getFromName($messageCode);
+        if (null !== $message = MessageQuery::getFromName($messageCode)) {
 
-        if ($locale == null) {
-            $locale = Lang::getDefaultLanguage()->getLocale();
+            if ($locale == null) {
+                $locale = Lang::getDefaultLanguage()->getLocale();
+            }
+
+            $message->setLocale($locale);
+
+            // Assign parameters
+            foreach ($messageParameters as $name => $value) {
+                $this->parser->assign($name, $value);
+            }
+
+            $instance = \Swift_Message::newInstance();
+
+            // Add from addresses
+            foreach ($from as $address => $name) {
+                $instance->addFrom($address, $name);
+            }
+
+            // Add to addresses
+            foreach ($to as $address => $name) {
+                $instance->addTo($address, $name);
+            }
+
+            $message->buildMessage($this->parser, $instance);
+
+            return $instance;
         }
 
-        $message->setLocale($locale);
-
-        // Assign parameters
-        foreach ($messageParameters as $name => $value) {
-            $this->parser->assign($name, $value);
-        }
-
-        $instance = \Swift_Message::newInstance();
-
-        // Add from addresses
-        foreach ($from as $address => $name) {
-            $instance->addFrom($address, $name);
-        }
-
-        // Add to addresses
-        foreach ($to as $address => $name) {
-            $instance->addTo($address, $name);
-        }
-
-        $message->buildMessage($this->parser, $instance);
-
-        return $instance;
+        throw new \RuntimeException(
+            Translator::getInstance()->trans(
+                "Failed to load message with code '%code%', propably because it does'nt exists.",
+                [ '%code%' => $messageCode ]
+            )
+        );
     }
 }
