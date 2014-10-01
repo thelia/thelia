@@ -31,8 +31,8 @@ $page_url : the URL of the page. The parameter page=x is appended to this URL.
 
             {if $PAGE == $START}
                 {if $has_prev}
-                    <li><a title="{intl l="Go to first page"}" href="{$page_url}page=1">&laquo;</a></li>
-                    <li><a title="{intl l="Go to previous page"}" href="{$page_url}page={$prev_page}">&lsaquo;</a></li>
+                    <li><a title="{intl l="Go to first page"}" href="{$page_url nofilter}page=1">&laquo;</a></li>
+                    <li><a title="{intl l="Go to previous page"}" href="{$page_url nofilter}page={$prev_page}">&lsaquo;</a></li>
 
                     {if $has_pages_before}
                         <li title="{intl l="More pages before"}" class="disabled"><a href="#">&hellip;</a></li>
@@ -45,7 +45,7 @@ $page_url : the URL of the page. The parameter page=x is appended to this URL.
             {/if}
 
             {if $PAGE != $CURRENT}
-                <li><a href="{$page_url}page={$PAGE}">{$PAGE}</a></li>
+                <li><a href="{$page_url nofilter}page={$PAGE}">{$PAGE}</a></li>
             {else}
                 <li class="active"><a href="#">{$PAGE}</a></li>
             {/if}
@@ -56,8 +56,8 @@ $page_url : the URL of the page. The parameter page=x is appended to this URL.
                         <li title="{intl l="More pages after"}" class="disabled"><a href="#">&hellip;</a></li>
                     {/if}
 
-                    <li><a title="{intl l="Go to next page"}" href="{$page_url}page={$next_page}">&rsaquo;</a></li>
-                    <li><a title="{intl l="Go to last page"}" href="{$page_url}page={$last_page}">&raquo;</a></li>
+                    <li><a title="{intl l="Go to next page"}" href="{$page_url nofilter}page={$next_page}">&rsaquo;</a></li>
+                    <li><a title="{intl l="Go to last page"}" href="{$page_url nofilter}page={$last_page}">&raquo;</a></li>
 
                 {else}
                     <li class="disabled"><a href="#">&rsaquo;</a></li>
