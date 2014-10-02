@@ -24,7 +24,7 @@ $step=6;
 include "header.php";
 
 try {
-    if($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']))) {
+    if ($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']) || strlen($_POST['admin_login']) < 3)) {
         header('location: config.php?err=1');
     }
 
