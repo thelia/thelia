@@ -19,6 +19,7 @@ use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
@@ -83,6 +84,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function delete(LangDeleteEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
+
+            if ($lang->getByDefault()) {
+                throw new \RuntimeException(
+                    Translator::getInstance()->trans('It is not allowed to delete the default language')
+                );
+            }
+
             $lang->setDispatcher($event->getDispatcher())
                 ->delete();
 
