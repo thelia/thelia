@@ -239,13 +239,11 @@ class Thelia extends Kernel
                     }
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
-                } catch (\InvalidArgumentException $e) {
+                } catch (\Exception $e) {
                     Tlog::getInstance()->addError(
                         sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),
                         $e
                     );
-
-                    throw $e;
                 }
             }
 
