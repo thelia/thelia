@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Thelia;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
 
@@ -38,8 +39,21 @@ class HomeController extends BaseAdminController
     {
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) return $response;
 
+        $context = [
+            'http' => [
+                'method' => 'GET',
+                'header' => "User-Agent: Thelia version ".Thelia::THELIA_VERSION."\r\n".
+                    "Referer: ".$this->getRequest()->getHttpHost()."\r\n".
+                    "Accept-Language: ".$this->getRequest()->getSession()->getLang()->getCode()."\r\n"
+            ]
+        ];
+
         // get the latest version
-        $version = @file_get_contents("http://thelia.net/version.php");
+        $version = @file_get_contents(
+            "http://thelia.net/version.php",
+            false,
+            stream_context_create($context)
+        );
 
         if ($version === false)
             $version = $this->getTranslator()->trans("Not found");
