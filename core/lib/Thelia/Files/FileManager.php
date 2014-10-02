@@ -12,6 +12,7 @@
 
 namespace Thelia\Files;
 
+use Propel\Runtime\Connection\ConnectionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Exception\FileException;
@@ -102,11 +103,12 @@ class FileManager
      *
      * @param FileModelInterface $model        Model saved
      * @param UploadedFile       $uploadedFile Ready to be uploaded file
+     * @param ConnectionInterface $con         current transaction with database
      *
      * @throws \Thelia\Exception\ImageException
      * @return UploadedFile
      */
-    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile)
+    public function copyUploadedFile(FileModelInterface $model, UploadedFile $uploadedFile, ConnectionInterface $con = null)
     {
         $newUploadedFile = null;
 
@@ -119,7 +121,7 @@ class FileManager
             $newUploadedFile = $uploadedFile->move($directory, $fileName);
             $model->setFile($fileName);
 
-            if (!$model->save()) {
+            if (!$model->save($con)) {
                 throw new ImageException(
                     sprintf(
                         'Failed to update model after copy of uploaded file %s to %s',

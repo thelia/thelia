@@ -11,6 +11,7 @@
 /*************************************************************************************/
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Thelia\Core\Event\CachedFileEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -18,6 +19,7 @@ use Thelia\Core\Event\File\FileToggleVisibilityEvent;
 use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Exception\FileException;
 use Thelia\Files\FileManager;
+use Thelia\Model\Map\ProductImageTableMap;
 use Thelia\Tools\URL;
 
 /**
@@ -197,23 +199,33 @@ abstract class BaseCachedFile extends BaseAction
     {
         $model = $event->getModel();
         $model->setFile(sprintf("tmp/%s", $event->getUploadedFile()->getFilename()));
-        $nbModifiedLines = $model->save();
-        $event->setModel($model);
+        $con = Propel::getWriteConnection(ProductImageTableMap::DATABASE_NAME);
+        $con->beginTransaction();
 
-        if (!$nbModifiedLines) {
-            throw new FileException(
-                sprintf(
-                    'File "%s" (type %s) with parent id %s failed to be saved',
-                    $event->getParentName(),
-                    get_class($model),
-                    $event->getParentId()
-                )
-            );
+        try {
+            $nbModifiedLines = $model->save($con);
+            $event->setModel($model);
+
+            if (!$nbModifiedLines) {
+                throw new FileException(
+                    sprintf(
+                        'File "%s" (type %s) with parent id %s failed to be saved',
+                        $event->getParentName(),
+                        get_class($model),
+                        $event->getParentId()
+                    )
+                );
+            }
+
+            $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
+
+            $event->setUploadedFile($newUploadedFile);
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            throw $e;
         }
-
-        $newUploadedFile = $this->fileManager->copyUploadedFile($event->getModel(), $event->getUploadedFile());
-
-        $event->setUploadedFile($newUploadedFile);
     }
 
     /**
