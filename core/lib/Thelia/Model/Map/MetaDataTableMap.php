@@ -58,7 +58,7 @@ class MetaDataTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class MetaDataTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
@@ -101,6 +101,16 @@ class MetaDataTableMap extends TableMap
     const VALUE = 'meta_data.VALUE';
 
     /**
+     * the column name for the CREATED_AT field
+     */
+    const CREATED_AT = 'meta_data.CREATED_AT';
+
+    /**
+     * the column name for the UPDATED_AT field
+     */
+    const UPDATED_AT = 'meta_data.UPDATED_AT';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -112,12 +122,12 @@ class MetaDataTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'MetaKey', 'ElementKey', 'ElementId', 'IsSerialized', 'Value', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'metaKey', 'elementKey', 'elementId', 'isSerialized', 'value', ),
-        self::TYPE_COLNAME       => array(MetaDataTableMap::ID, MetaDataTableMap::META_KEY, MetaDataTableMap::ELEMENT_KEY, MetaDataTableMap::ELEMENT_ID, MetaDataTableMap::IS_SERIALIZED, MetaDataTableMap::VALUE, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'META_KEY', 'ELEMENT_KEY', 'ELEMENT_ID', 'IS_SERIALIZED', 'VALUE', ),
-        self::TYPE_FIELDNAME     => array('id', 'meta_key', 'element_key', 'element_id', 'is_serialized', 'value', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'MetaKey', 'ElementKey', 'ElementId', 'IsSerialized', 'Value', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'metaKey', 'elementKey', 'elementId', 'isSerialized', 'value', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(MetaDataTableMap::ID, MetaDataTableMap::META_KEY, MetaDataTableMap::ELEMENT_KEY, MetaDataTableMap::ELEMENT_ID, MetaDataTableMap::IS_SERIALIZED, MetaDataTableMap::VALUE, MetaDataTableMap::CREATED_AT, MetaDataTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'META_KEY', 'ELEMENT_KEY', 'ELEMENT_ID', 'IS_SERIALIZED', 'VALUE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'meta_key', 'element_key', 'element_id', 'is_serialized', 'value', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -127,12 +137,12 @@ class MetaDataTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'MetaKey' => 1, 'ElementKey' => 2, 'ElementId' => 3, 'IsSerialized' => 4, 'Value' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'metaKey' => 1, 'elementKey' => 2, 'elementId' => 3, 'isSerialized' => 4, 'value' => 5, ),
-        self::TYPE_COLNAME       => array(MetaDataTableMap::ID => 0, MetaDataTableMap::META_KEY => 1, MetaDataTableMap::ELEMENT_KEY => 2, MetaDataTableMap::ELEMENT_ID => 3, MetaDataTableMap::IS_SERIALIZED => 4, MetaDataTableMap::VALUE => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'META_KEY' => 1, 'ELEMENT_KEY' => 2, 'ELEMENT_ID' => 3, 'IS_SERIALIZED' => 4, 'VALUE' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'meta_key' => 1, 'element_key' => 2, 'element_id' => 3, 'is_serialized' => 4, 'value' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'MetaKey' => 1, 'ElementKey' => 2, 'ElementId' => 3, 'IsSerialized' => 4, 'Value' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'metaKey' => 1, 'elementKey' => 2, 'elementId' => 3, 'isSerialized' => 4, 'value' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(MetaDataTableMap::ID => 0, MetaDataTableMap::META_KEY => 1, MetaDataTableMap::ELEMENT_KEY => 2, MetaDataTableMap::ELEMENT_ID => 3, MetaDataTableMap::IS_SERIALIZED => 4, MetaDataTableMap::VALUE => 5, MetaDataTableMap::CREATED_AT => 6, MetaDataTableMap::UPDATED_AT => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'META_KEY' => 1, 'ELEMENT_KEY' => 2, 'ELEMENT_ID' => 3, 'IS_SERIALIZED' => 4, 'VALUE' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'meta_key' => 1, 'element_key' => 2, 'element_id' => 3, 'is_serialized' => 4, 'value' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -157,6 +167,8 @@ class MetaDataTableMap extends TableMap
         $this->addColumn('ELEMENT_ID', 'ElementId', 'INTEGER', true, null, null);
         $this->addColumn('IS_SERIALIZED', 'IsSerialized', 'BOOLEAN', true, 1, null);
         $this->addColumn('VALUE', 'Value', 'CLOB', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
 
     /**
@@ -165,6 +177,19 @@ class MetaDataTableMap extends TableMap
     public function buildRelations()
     {
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+        );
+    } // getBehaviors()
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -310,6 +335,8 @@ class MetaDataTableMap extends TableMap
             $criteria->addSelectColumn(MetaDataTableMap::ELEMENT_ID);
             $criteria->addSelectColumn(MetaDataTableMap::IS_SERIALIZED);
             $criteria->addSelectColumn(MetaDataTableMap::VALUE);
+            $criteria->addSelectColumn(MetaDataTableMap::CREATED_AT);
+            $criteria->addSelectColumn(MetaDataTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.META_KEY');
@@ -317,6 +344,8 @@ class MetaDataTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ELEMENT_ID');
             $criteria->addSelectColumn($alias . '.IS_SERIALIZED');
             $criteria->addSelectColumn($alias . '.VALUE');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

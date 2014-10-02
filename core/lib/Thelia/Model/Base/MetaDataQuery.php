@@ -24,6 +24,8 @@ use Thelia\Model\Map\MetaDataTableMap;
  * @method     ChildMetaDataQuery orderByElementId($order = Criteria::ASC) Order by the element_id column
  * @method     ChildMetaDataQuery orderByIsSerialized($order = Criteria::ASC) Order by the is_serialized column
  * @method     ChildMetaDataQuery orderByValue($order = Criteria::ASC) Order by the value column
+ * @method     ChildMetaDataQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildMetaDataQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildMetaDataQuery groupById() Group by the id column
  * @method     ChildMetaDataQuery groupByMetaKey() Group by the meta_key column
@@ -31,6 +33,8 @@ use Thelia\Model\Map\MetaDataTableMap;
  * @method     ChildMetaDataQuery groupByElementId() Group by the element_id column
  * @method     ChildMetaDataQuery groupByIsSerialized() Group by the is_serialized column
  * @method     ChildMetaDataQuery groupByValue() Group by the value column
+ * @method     ChildMetaDataQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildMetaDataQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildMetaDataQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildMetaDataQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -45,6 +49,8 @@ use Thelia\Model\Map\MetaDataTableMap;
  * @method     ChildMetaData findOneByElementId(int $element_id) Return the first ChildMetaData filtered by the element_id column
  * @method     ChildMetaData findOneByIsSerialized(boolean $is_serialized) Return the first ChildMetaData filtered by the is_serialized column
  * @method     ChildMetaData findOneByValue(string $value) Return the first ChildMetaData filtered by the value column
+ * @method     ChildMetaData findOneByCreatedAt(string $created_at) Return the first ChildMetaData filtered by the created_at column
+ * @method     ChildMetaData findOneByUpdatedAt(string $updated_at) Return the first ChildMetaData filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildMetaData objects filtered by the id column
  * @method     array findByMetaKey(string $meta_key) Return ChildMetaData objects filtered by the meta_key column
@@ -52,6 +58,8 @@ use Thelia\Model\Map\MetaDataTableMap;
  * @method     array findByElementId(int $element_id) Return ChildMetaData objects filtered by the element_id column
  * @method     array findByIsSerialized(boolean $is_serialized) Return ChildMetaData objects filtered by the is_serialized column
  * @method     array findByValue(string $value) Return ChildMetaData objects filtered by the value column
+ * @method     array findByCreatedAt(string $created_at) Return ChildMetaData objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildMetaData objects filtered by the updated_at column
  *
  */
 abstract class MetaDataQuery extends ModelCriteria
@@ -140,7 +148,7 @@ abstract class MetaDataQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `META_KEY`, `ELEMENT_KEY`, `ELEMENT_ID`, `IS_SERIALIZED`, `VALUE` FROM `meta_data` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `META_KEY`, `ELEMENT_KEY`, `ELEMENT_ID`, `IS_SERIALIZED`, `VALUE`, `CREATED_AT`, `UPDATED_AT` FROM `meta_data` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -426,6 +434,92 @@ abstract class MetaDataQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(MetaDataTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(MetaDataTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MetaDataTableMap::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(MetaDataTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(MetaDataTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MetaDataTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildMetaData $metaData Object to remove from the list of results
@@ -514,6 +608,72 @@ abstract class MetaDataQuery extends ModelCriteria
             $con->rollBack();
             throw $e;
         }
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MetaDataTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MetaDataTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MetaDataTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MetaDataTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MetaDataTableMap::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ChildMetaDataQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MetaDataTableMap::CREATED_AT);
     }
 
 } // MetaDataQuery
