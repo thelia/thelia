@@ -19,6 +19,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 
 class BaseFrontController extends BaseController

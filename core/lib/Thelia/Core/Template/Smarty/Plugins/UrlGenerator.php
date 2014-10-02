@@ -197,7 +197,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction'),
             new SmartyPluginDescriptor('function', 'navigate', $this, 'navigateToUrlFunction'),
-            new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction'),
+            new SmartyPluginDescriptor('function', 'set_previous_url', $this, 'setPreviousUrlFunction')
         );
     }
 

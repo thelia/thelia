@@ -2172,6 +2172,8 @@ CREATE TABLE `meta_data`
     `element_id` INTEGER NOT NULL,
     `is_serialized` TINYINT(1) NOT NULL,
     `value` LONGTEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `meta_data_key_element_idx` (`meta_key`, `element_key`, `element_id`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
