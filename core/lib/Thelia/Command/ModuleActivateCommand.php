@@ -54,6 +54,10 @@ class ModuleActivateCommand extends BaseModuleGenerate
         try {
             $moduleInstance = $module->createInstance();
 
+            if (method_exists($moduleInstance, 'setContainer')) {
+                $moduleInstance->setContainer($this->getContainer());
+            }
+
             $moduleInstance->activate();
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));

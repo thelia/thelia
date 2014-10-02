@@ -54,6 +54,10 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
         try {
             $moduleInstance = $module->createInstance();
 
+            if (method_exists($moduleInstance, 'setContainer')) {
+                $moduleInstance->setContainer($this->getContainer());
+            }
+
             $moduleInstance->deActivate();
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Deactivation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
