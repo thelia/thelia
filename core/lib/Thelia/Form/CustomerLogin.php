@@ -72,7 +72,15 @@ class CustomerLogin extends BruteforceForm
                     "for" => "password"
                 ),
                 "required"    => false
-            ));
+            ))
+            ->add("remember_me", "checkbox", array(
+                'value' => 'yes',
+                "label" => Translator::getInstance()->trans("Remember me ?"),
+                "label_attr" => array(
+                    "for" => "remember_me"
+                )
+            ))
+        ;
     }
 
     /**

@@ -1777,6 +1777,7 @@
       <index-column name="element_key" />
       <index-column name="element_id" />
     </index>
+    <behavior name="timestampable" />
   </table>
   <table name="module_config" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />

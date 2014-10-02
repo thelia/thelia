@@ -15,12 +15,20 @@
     </route>
 
     <!-- Register -->
+    <route id="customer.create.view" path="/register" methods="get">
+        <default key="_controller">Front\Controller\CustomerController::viewRegisterAction</default>
+    </route>
+
     <route id="customer.create.process" path="/register" methods="post">
         <default key="_controller">Front\Controller\CustomerController::createAction</default>
         <default key="_view">register</default>
     </route>
 
     <!-- Login -->
+    <route id="customer.login.view" path="/login" methods="get">
+        <default key="_controller">Front\Controller\CustomerController::viewLoginAction</default>
+    </route>
+
     <route id="customer.login.process" path="/login" methods="post">
         <default key="_controller">Front\Controller\CustomerController::loginAction</default>
         <default key="_view">login</default>
