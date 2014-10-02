@@ -167,12 +167,13 @@
                                                                 <span class="glyphicon glyphicon-edit"></span>
                                                             </a>
                                                         {/loop}
-
+                                                        {if !$IS_DEFAULT}
                                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.currency" access="DELETE"}
                                                             <a class="btn btn-default btn-xs currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                                 <span class="glyphicon glyphicon-trash"></span>
                                                             </a>
                                                         {/loop}
+                                                        {/if}
                                                     </div>
                                                 </td>
                                             </tr>

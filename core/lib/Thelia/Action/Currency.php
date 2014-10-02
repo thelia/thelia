@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Currency as CurrencyModel;
 
@@ -104,6 +105,13 @@ class Currency extends BaseAction implements EventSubscriberInterface
     public function delete(CurrencyDeleteEvent $event)
     {
         if (null !== ($currency = CurrencyQuery::create()->findPk($event->getCurrencyId()))) {
+
+            if ($currency->getByDefault()) {
+                throw new \RuntimeException(
+                    Translator::getInstance()->trans('It is not allowed to delete the default currency')
+                );
+            }
+
             $currency
                 ->setDispatcher($event->getDispatcher())
                 ->delete()
