@@ -682,7 +682,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             ->setType($hook["type"])
             ->setCode($hook["code"])
             ->setNative(false)
-            ->setByModule(true)
+            ->setByModule(isset($hook["module"]) && (bool) $hook["module"])
             ->setActive(isset($hook["active"]) && (bool) $hook["active"])
         ;
 
