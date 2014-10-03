@@ -70,7 +70,7 @@ class OrderController extends BaseFrontController
         // check if the cart contains only virtual products
         $cart = $this->getSession()->getCart();
 
-        if ( $cart->isVirtual()){
+        if ($cart->isVirtual()) {
             // get the virtual product module
             $customer = $this->getSecurityContext()->getCustomerUser();
 
@@ -98,7 +98,7 @@ class OrderController extends BaseFrontController
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
 
-                    $this->generateRedirectFromRoute("order.invoice");
+                    return $this->generateRedirectFromRoute("order.invoice");
                 }
             }
         }
