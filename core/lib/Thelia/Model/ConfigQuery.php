@@ -246,5 +246,15 @@ class ConfigQuery extends BaseConfigQuery
         self::write('smtp.sourceip', $value, 1, 1);
     }
     /* end smtp config */
+
+    /* Thelia version */
+    public static function getTheliaSimpleVersion()
+    {
+        $majorVersion = self::read('thelia_major_version');
+        $minorVersion = self::read('thelia_minus_version');
+        $releaseVersion = self::read('thelia_release_version');
+
+        return $majorVersion.'.'.$minorVersion.'.'.$releaseVersion;
+    }
 }
 // ConfigQuery

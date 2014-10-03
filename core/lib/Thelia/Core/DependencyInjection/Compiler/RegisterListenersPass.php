@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleHook;
@@ -85,6 +86,13 @@ class RegisterListenersPass implements CompilerPassInterface
             return;
         }
 
+        if (true === version_compare(ConfigQuery::getTheliaSimpleVersion(), '2.1.0', ">=")) {
+            $this->processHook($container, $definition);
+        }
+    }
+
+    protected function processHook(ContainerBuilder $container, $definition)
+    {
         foreach ($container->findTaggedServiceIds('hook.event_listener') as $id => $events) {
             $class = $container->getDefinition($id)->getClass();
 
