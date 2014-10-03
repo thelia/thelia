@@ -12,6 +12,8 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Content\ContentAddFolderEvent;
 use Thelia\Core\Event\Content\ContentCreateEvent;
@@ -26,6 +28,7 @@ use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Content as ContentModel;
+use Thelia\Model\Map\ContentTableMap;
 
 /**
  * Class Content
@@ -56,21 +59,29 @@ class Content extends BaseAction implements EventSubscriberInterface
     public function update(ContentUpdateEvent $event)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
+            $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+
             $content->setDispatcher($event->getDispatcher());
+            try {
+                $content
+                    ->setVisible($event->getVisible())
+                    ->setLocale($event->getLocale())
+                    ->setTitle($event->getTitle())
+                    ->setDescription($event->getDescription())
+                    ->setChapo($event->getChapo())
+                    ->setPostscriptum($event->getPostscriptum())
+                    ->save($con)
+                ;
 
-            $content
-                ->setVisible($event->getVisible())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-                ->save()
-            ;
+                $content->updateDefaultFolder($event->getDefaultFolder());
 
-            $content->updateDefaultFolder($event->getDefaultFolder());
-
-            $event->setContent($content);
+                $event->setContent($content);
+                $con->commit();
+            } catch (PropelException $e) {
+                $con->rollBack();
+                throw $e;
+            }
         }
     }
 

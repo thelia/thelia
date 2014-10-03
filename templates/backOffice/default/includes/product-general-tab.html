@@ -58,7 +58,7 @@
                         </label>
 
                         <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                              <option value="0">{intl l="Top level"}</option>
+                              <option value="0" disabled>{intl l="Top level"}</option>
 
                               {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
                                    <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>

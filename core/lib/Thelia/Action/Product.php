@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Thelia\Core\Event\File\FileDeleteEvent;
@@ -93,25 +94,35 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function update(ProductUpdateEvent $event)
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-            $product
-                ->setDispatcher($event->getDispatcher())
-                ->setRef($event->getRef())
-                ->setLocale($event->getLocale())
-                ->setTitle($event->getTitle())
-                ->setDescription($event->getDescription())
-                ->setChapo($event->getChapo())
-                ->setPostscriptum($event->getPostscriptum())
-                ->setVisible($event->getVisible() ? 1 : 0)
-                ->setVirtual($event->getVirtual() ? 1 : 0)
-                ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
+            $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-                ->save()
-            ;
+            try {
+                $product
+                    ->setDispatcher($event->getDispatcher())
+                    ->setRef($event->getRef())
+                    ->setLocale($event->getLocale())
+                    ->setTitle($event->getTitle())
+                    ->setDescription($event->getDescription())
+                    ->setChapo($event->getChapo())
+                    ->setPostscriptum($event->getPostscriptum())
+                    ->setVisible($event->getVisible() ? 1 : 0)
+                    ->setVirtual($event->getVirtual() ? 1 : 0)
+                    ->setBrandId($event->getBrandId() <= 0 ? null : $event->getBrandId())
 
-            // Update default category (ifd required)
-            $product->updateDefaultCategory($event->getDefaultCategory());
+                    ->save($con)
+                ;
 
-            $event->setProduct($product);
+                // Update default category (ifd required)
+                $product->updateDefaultCategory($event->getDefaultCategory());
+
+                $event->setProduct($product);
+                $con->commit();
+            } catch (PropelException $e) {
+                $con->rollBack();
+                throw $e;
+            }
+
         }
     }
 
