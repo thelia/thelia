@@ -56,6 +56,8 @@ abstract class BaseController extends ContainerAware
 
     protected $currentRouter;
 
+    protected $translator;
+
     /**
      * Return an empty response (after an ajax request, for example)
      * @param  int                                  $status
@@ -118,14 +120,16 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     *
      * return the Translator
      *
      * @return Translator
      */
     public function getTranslator()
     {
-        return $this->container->get('thelia.translator');
+        if (null === $this->translator){
+            $this->translator = $this->container->get('thelia.translator');
+        }
+        return $this->translator;
     }
 
     /**
