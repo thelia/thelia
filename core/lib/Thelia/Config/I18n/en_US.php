@@ -237,6 +237,8 @@ return array(
     'Invoice' => 'Invoice',
     'Invoice choice' => 'Invoice choice',
     'Is it the default product sale element ?' => 'Is it the default product sale element ?',
+    'It is not allowed to delete the default currency' => 'It is not allowed to delete the default currency',
+    'It is not allowed to delete the default language' => 'It is not allowed to delete the default language',
     'JavaScript' => 'JavaScript',
     'Keep the most important part of your description in the first 150-160 characters.' => 'Keep the most important part of your description in the first 150-160 characters.',
     'Language' => 'Language',

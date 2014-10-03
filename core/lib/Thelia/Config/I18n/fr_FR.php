@@ -237,6 +237,8 @@ return array(
     'Invoice' => 'Facture',
     'Invoice choice' => 'Choix du mode de paiement',
     'Is it the default product sale element ?' => 'Product Sale Element par défaut ?',
+    'It is not allowed to delete the default currency' => 'Il n\'est pas possible de supprimer la devise par défaut',
+    'It is not allowed to delete the default language' => 'Il n\'est pas possible de supprimer la langue par défaut',
     'JavaScript' => 'JavaScript',
     'Keep the most important part of your description in the first 150-160 characters.' => 'Votre description ne devrait pas dépasser 150 à 160 caractères',
     'Language' => 'Langage',
