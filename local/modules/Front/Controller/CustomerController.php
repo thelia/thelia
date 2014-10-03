@@ -102,9 +102,9 @@ class CustomerController extends BaseFrontController
                 return $this->generateSuccessRedirect($passwordLost);
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -112,7 +112,7 @@ class CustomerController extends BaseFrontController
             }
         }
         else {
-            $message = $this->getTranslator()->trans("You're currently logged in. Please log out before requesting a new password.");
+            $message = $this->getTranslator()->trans("You're currently logged in. Please log out before requesting a new password.",[], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -179,9 +179,9 @@ class CustomerController extends BaseFrontController
                 return $response;
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -240,9 +240,9 @@ class CustomerController extends BaseFrontController
                 return $this->generateSuccessRedirect($customerPasswordUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -305,9 +305,9 @@ class CustomerController extends BaseFrontController
                 return $this->generateSuccessRedirect($customerProfileUpdateForm);
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {
@@ -368,19 +368,19 @@ class CustomerController extends BaseFrontController
                         return $this->generateSuccessRedirect($customerLoginForm);
 
                     } catch (UsernameNotFoundException $e) {
-                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
+                        $message = $this->getTranslator()->trans("Wrong email or password. Please try again", [], Front::MESSAGE_DOMAIN);
                     } catch (WrongPasswordException $e) {
-                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
+                        $message = $this->getTranslator()->trans("Wrong email or password. Please try again", [], Front::MESSAGE_DOMAIN);
                     } catch (AuthenticationException $e) {
-                        $message = Translator::getInstance()->trans("Wrong email or password. Please try again");
+                        $message = $this->getTranslator()->trans("Wrong email or password. Please try again", [], Front::MESSAGE_DOMAIN);
                     }
 
                 }
 
             } catch (FormValidationException $e) {
-                $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             } catch (\Exception $e) {
-                $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+                $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
             }
 
             if ($message !== false) {

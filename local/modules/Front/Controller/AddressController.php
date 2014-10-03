@@ -79,9 +79,9 @@ class AddressController extends BaseFrontController
 
             return $this->generateSuccessRedirect($addressCreate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -139,9 +139,9 @@ class AddressController extends BaseFrontController
 
             return $this->generateSuccessRedirect($addressUpdate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
@@ -167,10 +167,18 @@ class AddressController extends BaseFrontController
         if (!$address || $customer->getId() != $address->getCustomerId()) {
             // If Ajax Request
             if ($this->getRequest()->isXmlHttpRequest()) {
-                return $this->jsonResponse(json_encode(array(
-                                "success" => false,
-                                "message" => "Error during address deletion process"
-                            )));
+                return $this->jsonResponse(
+                    json_encode(
+                        array(
+                            "success" => false,
+                            "message" => $this->getTranslator()->trans(
+                                "Error during address deletion process",
+                                [],
+                                Front::MESSAGE_DOMAIN
+                            )
+                        )
+                    )
+                );
             } else {
                 return $this->generateRedirectFromRoute('default');
             }
