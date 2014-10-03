@@ -13,10 +13,14 @@
 namespace Thelia\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Action\Cache;
 use Thelia\Core\Application;
 use Thelia\Command\CacheClear;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Tests\ContainerAwareTestCase;
 
 /**
  * test the cache:clear command
@@ -25,13 +29,13 @@ use Symfony\Component\Filesystem\Filesystem;
  * @package Thelia\Tests\Command
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
+class CacheClearTest extends ContainerAwareTestCase
 {
     public $cache_dir;
 
     public function setUp()
     {
-        $this->cache_dir = THELIA_ROOT . "cache/test";
+        $this->cache_dir = THELIA_CACHE_DIR . 'test_cache';
 
         $fs = new Filesystem();
 
@@ -98,16 +102,16 @@ class CacheClearTestSaved extends \PHPUnit_Framework_TestCase
         return $kernel;
     }
 
-    public function getContainer()
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    protected function buildContainer(ContainerBuilder $container)
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new Cache());
+
+        $container->set("event_dispatcher", $eventDispatcher);
 
         $container->setParameter("kernel.cache_dir", $this->cache_dir);
-
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
-        $container->set("event_dispatcher", $dispatcher);
-
-        return $container;
     }
 }

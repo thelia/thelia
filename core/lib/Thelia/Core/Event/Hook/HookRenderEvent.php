@@ -61,7 +61,7 @@ class HookRenderEvent extends BaseHookRenderEvent
      * @param  string $after  the text after the concatenated string
      * @return string the concatenate string
      */
-    public function dump($glue='', $before='', $after='')
+    public function dump($glue = '', $before = '', $after = '')
     {
         $ret = '';
         if (0 !== count($this->fragments)) {

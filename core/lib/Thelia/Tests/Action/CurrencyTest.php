@@ -12,24 +12,27 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Action\Currency;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Tests\ContainerAwareTestCase;
 
 /**
  * Class CurrencyTest
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CurrencyTest extends \PHPUnit_Framework_TestCase
+class CurrencyTest extends ContainerAwareTestCase
 {
     protected $dispatcher;
 
     public function setUp()
     {
+        parent::setUp();
         $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
@@ -124,6 +127,9 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
      */
     public function testDelete(CurrencyModel $currency)
     {
+        $currency->setByDefault(0)
+            ->save();
+
         $event = new CurrencyDeleteEvent($currency->getId());
         $event->setDispatcher($this->dispatcher);
 
@@ -137,11 +143,40 @@ class CurrencyTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deletedCurrency->isDeleted());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage It is not allowed to delete the default currency
+     */
+    public function testDeleteDefault()
+    {
+        CurrencyQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->limit(1)
+            ->update(array('ByDefault' => true));
+
+        $currency = CurrencyQuery::create()->findOneByByDefault(1);
+
+        $event = new CurrencyDeleteEvent($currency->getId());
+        $event->setDispatcher($this->dispatcher);
+
+        $action = new Currency();
+        $action->delete($event);
+
+    }
+
     public static function tearDownAfterClass()
     {
         CurrencyQuery::create()
             ->addAscendingOrderByColumn('RAND()')
             ->limit(1)
             ->update(array('ByDefault' => true));
+    }
+
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    protected function buildContainer(ContainerBuilder $container)
+    {
+        // TODO: Implement buildContainer() method.
     }
 }

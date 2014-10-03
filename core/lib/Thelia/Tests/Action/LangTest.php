@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Action;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Action\Lang;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
@@ -19,13 +20,14 @@ use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Core\Event\Lang\LangCreateEvent;
+use Thelia\Tests\ContainerAwareTestCase;
 
 /**
  * Class LangTest
  * @package Thelia\Tests\Action
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class LangTest extends \PHPUnit_Framework_TestCase
+class LangTest extends ContainerAwareTestCase
 {
     protected $dispatcher;
 
@@ -42,6 +44,7 @@ class LangTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
     }
 
@@ -152,6 +155,9 @@ class LangTest extends \PHPUnit_Framework_TestCase
      */
     public function testDelete(LangModel $lang)
     {
+        $lang->setByDefault(0)
+            ->save();
+
         $event = new LangDeleteEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
@@ -165,6 +171,22 @@ class LangTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($deletedLang->isDeleted());
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage It is not allowed to delete the default language
+     */
+    public function testDeleteDefault()
+    {
+        self::tearDownAfterClass();
+        $lang = LangQuery::create()->findOneByByDefault(1);
+
+        $event = new LangDeleteEvent($lang->getId());
+        $event->setDispatcher($this->dispatcher);
+
+        $action = new Lang();
+        $action->delete($event);
+    }
+
     public static function tearDownAfterClass()
     {
         LangQuery::create()
@@ -176,5 +198,13 @@ class LangTest extends \PHPUnit_Framework_TestCase
     {
         @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TEST.png");
         @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TES.png");
+    }
+
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    protected function buildContainer(ContainerBuilder $container)
+    {
+        // TODO: Implement buildContainer() method.
     }
 }

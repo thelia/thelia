@@ -47,7 +47,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
         return true;
     }
 
-    public function install(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null)
     {
         $database = new Database($con->getWrappedConnection());
 

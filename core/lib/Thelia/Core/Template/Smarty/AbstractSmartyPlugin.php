@@ -35,9 +35,12 @@ abstract class AbstractSmartyPlugin
 
         $array = explode(',', $commaSeparatedValues);
 
-        if (array_walk($array, function (&$item) {
+        if (array_walk(
+            $array,
+            function (&$item) {
             $item = strtoupper(trim($item));
-        })) {
+            }
+        )) {
             return $array;
         }
 

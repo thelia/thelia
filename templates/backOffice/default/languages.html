@@ -76,11 +76,13 @@
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                 </a>
                                             {/loop}
+                                            {if !$IS_DEFAULT}
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="DELETE"}
                                                 <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="btn btn-default btn-xs lang-delete" title="{intl l="Delete this language"}">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             {/loop}
+                                            {/if}
                                         </div>
                                     </td>
                                 </tr>

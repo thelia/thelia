@@ -17,6 +17,6 @@ namespace Thelia\Core\Event\Content;
  * @package Thelia\Core\Event\Content
  * @author manuel raynaud <mraynaud@openstudio.fr>
  */
-class ContentToggleVisibilityEvent  extends ContentEvent
+class ContentToggleVisibilityEvent extends ContentEvent
 {
 }

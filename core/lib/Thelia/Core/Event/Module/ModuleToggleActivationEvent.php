@@ -24,6 +24,9 @@ class ModuleToggleActivationEvent extends ModuleEvent
      */
     protected $module_id;
 
+    /**
+     * @param int $module_id
+     */
     public function __construct($module_id)
     {
         $this->module_id = $module_id;

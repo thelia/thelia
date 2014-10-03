@@ -16,7 +16,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
+use Thelia\Module\BaseModule;
 
 /**
  * activates a module
@@ -51,14 +54,15 @@ class ModuleActivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(sprintf("module %s not found", $moduleCode));
         }
 
+        if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+            throw new \RuntimeException(sprintf("module %s is already actived", $moduleCode));
+        }
+
         try {
-            $moduleInstance = $module->createInstance();
+            $event = new ModuleToggleActivationEvent($module->getId());
+            $dispatcher = $this->getContainer()->get('event_dispatcher');
+            $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
 
-            if (method_exists($moduleInstance, 'setContainer')) {
-                $moduleInstance->setContainer($this->getContainer());
-            }
-
-            $moduleInstance->activate();
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
         }

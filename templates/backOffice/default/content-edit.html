@@ -98,7 +98,7 @@
                                                                     </label>
 
                                                                     <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                                                        <option value="0">{intl l="Top level"}</option>
+                                                                        <option value="0" disabled>{intl l="Top level"}</option>
 
                                                                         {$myparent=$DEFAULT_FOLDER}
                                                                         {loop name="fold-parent" type="folder-tree" visible="*" folder="0"}

@@ -125,7 +125,7 @@ class CSVFormatter extends AbstractFormatter
                 }
             }
 
-            $string = substr($string,0, -$delimiterLength) . $this->lineReturn;
+            $string = substr($string, 0, -$delimiterLength) . $this->lineReturn;
         }
 
         return substr($string, 0, -$lineReturnLength);
@@ -164,7 +164,7 @@ class CSVFormatter extends AbstractFormatter
                 $key = trim($key, $this->stringDelimiter);
             }
 
-            $columns = count ($keys);
+            $columns = count($keys);
 
             while (null !== $row = array_shift($raw)) {
                 $newRow = [];
