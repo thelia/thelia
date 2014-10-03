@@ -13,10 +13,14 @@
 namespace Thelia\Tests\Command;
 
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Action\Module;
 use Thelia\Command\ModuleActivateCommand;
 use Thelia\Core\Application;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
+use Thelia\Tests\ContainerAwareTestCase;
 
 /**
  * Class ModuleActivateCommandTest
@@ -24,7 +28,7 @@ use Thelia\Module\BaseModule;
  * @package Thelia\Tests\Command
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
+class ModuleActivateCommandTest extends ContainerAwareTestCase
 {
     public function testModuleActivateCommand()
     {
@@ -93,10 +97,16 @@ class ModuleActivateCommandTest extends \PHPUnit_Framework_TestCase
         return $kernel;
     }
 
-    public function getContainer()
+    /**
+     * Use this method to build the container with the services that you need.
+     */
+    protected function buildContainer(ContainerBuilder $container)
     {
-        $container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber(new Module($container));
 
-        return $container;
+        $container->set("event_dispatcher", $eventDispatcher);
+
+        $container->setParameter('kernel.cache_dir', THELIA_CACHE_DIR . 'dev');
     }
 }
