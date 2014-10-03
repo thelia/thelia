@@ -22,6 +22,7 @@
 /*************************************************************************************/
 
 namespace Front\Controller;
+
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Form\ContactForm;
 use Thelia\Form\Exception\FormValidationException;

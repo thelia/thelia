@@ -17,7 +17,6 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
 

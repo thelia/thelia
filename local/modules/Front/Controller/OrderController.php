@@ -30,7 +30,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -46,8 +45,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\TaxEngine\TaxEngine;
-use Thelia\Tools\URL;
+
 
 /**
  * Class OrderController

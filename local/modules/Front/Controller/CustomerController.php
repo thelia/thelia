@@ -31,7 +31,6 @@ use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
