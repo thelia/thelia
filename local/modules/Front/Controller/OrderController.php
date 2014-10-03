@@ -30,7 +30,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -46,8 +45,7 @@ use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
-use Thelia\TaxEngine\TaxEngine;
-use Thelia\Tools\URL;
+
 
 /**
  * Class OrderController
@@ -129,7 +127,13 @@ class OrderController extends BaseFrontController
 
             /* check that the delivery address belongs to the current customer */
             if ($deliveryAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
-                throw new \Exception("Delivery address does not belong to the current customer");
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "Delivery address does not belong to the current customer",
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    )
+                );
             }
 
             /* check that the delivery module fetches the delivery address area */
@@ -137,7 +141,13 @@ class OrderController extends BaseFrontController
                 ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
                 ->filterByDeliveryModuleId($deliveryModuleId)
                 ->count() == 0) {
-                throw new \Exception("Delivery module cannot be use with selected delivery address");
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "Delivery module cannot be use with selected delivery address",
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    )
+                );
             }
 
             /* get postage amount */
@@ -157,11 +167,11 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -200,7 +210,13 @@ class OrderController extends BaseFrontController
             /* check that the invoice address belongs to the current customer */
             $invoiceAddress = AddressQuery::create()->findPk($invoiceAddressId);
             if ($invoiceAddress->getCustomerId() !== $this->getSecurityContext()->getCustomerUser()->getId()) {
-                throw new \Exception("Invoice address does not belong to the current customer");
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        "Invoice address does not belong to the current customer",
+                        [],
+                        Front::MESSAGE_DOMAIN
+                    )
+                );
             }
 
             $orderEvent = $this->getOrderEvent();
@@ -213,11 +229,11 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -275,13 +291,29 @@ class OrderController extends BaseFrontController
         );
 
         if (null === $placedOrder) {
-            throw new TheliaProcessException("No placed order", TheliaProcessException::NO_PLACED_ORDER, $placedOrder);
+            throw new TheliaProcessException(
+                $this->getTranslator()->trans(
+                    "No placed order",
+                    [],
+                    Front::MESSAGE_DOMAIN
+                ),
+                TheliaProcessException::NO_PLACED_ORDER,
+                $placedOrder
+            );
         }
 
         $customer = $this->getSecurityContext()->getCustomerUser();
 
         if (null === $customer || $placedOrder->getCustomerId() !== $customer->getId()) {
-            throw new TheliaProcessException("Received placed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $placedOrder);
+            throw new TheliaProcessException(
+                $this->getTranslator()->trans(
+                    "Received placed order id does not belong to the current customer",
+                    [],
+                    Front::MESSAGE_DOMAIN
+                ),
+                TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
+                $placedOrder
+            );
         }
 
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_CART_CLEAR, $this->getOrderEvent());
@@ -303,7 +335,15 @@ class OrderController extends BaseFrontController
         $customer = $this->getSecurityContext()->getCustomerUser();
 
         if (null === $customer || $failedOrder->getCustomerId() !== $customer->getId()) {
-            throw new TheliaProcessException("Received failed order id does not belong to the current customer", TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER, $failedOrder);
+            throw new TheliaProcessException(
+                $this->getTranslator()->trans(
+                    "Received failed order id does not belong to the current customer",
+                    [],
+                    Front::MESSAGE_DOMAIN
+                )
+                , TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
+                $failedOrder
+            );
         }
 
         $this->getParserContext()
@@ -372,7 +412,7 @@ class OrderController extends BaseFrontController
 
                     if (!is_file($path) || !is_readable($path)) {
                         throw new \ErrorException(
-                            Translator::getInstance()->trans(
+                            $this->getTranslator()->trans(
                                 "The file [%file] does not exist",
                                 [
                                     "%file" => $order_product_id

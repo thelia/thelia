@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
@@ -66,7 +67,11 @@ class CouponController extends BaseFrontController
 
             if (null === $couponCode || empty($couponCode)) {
                 $message = true;
-                throw new \Exception('Coupon code can\'t be empty');
+                throw new \Exception(
+                    $this->getTranslator()->trans(
+                        'Coupon code can\'t be empty', [], Front::MESSAGE_DOMAIN
+                    )
+                );
             }
 
             $couponConsumeEvent = new CouponConsumeEvent($couponCode);
@@ -107,11 +112,19 @@ class CouponController extends BaseFrontController
             return $this->generateSuccessRedirect($couponCodeForm);
 
         } catch (FormValidationException $e) {
-            $message = sprintf('Please check your coupon code: %s', $e->getMessage());
+            $message = $this->getTranslator()->trans(
+                'Please check your coupon code: %message',
+                ["%message" => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = sprintf('Sorry, an error occurred: %s', $e->getMessage());
+            $message = $this->getTranslator()->trans(
+                'Sorry, an error occurred: %message',
+                ["%message" => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         }
 
         if ($message !== false) {

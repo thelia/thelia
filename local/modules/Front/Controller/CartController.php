@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Front\Controller;
 
+use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -66,7 +67,11 @@ class CartController extends BaseFrontController
 
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
-            $message = "Failed to add this article to your cart, please try again";
+            $message = $this->getTranslator()->trans(
+                "Failed to add this article to your cart, please try again",
+                [],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         }

@@ -22,17 +22,16 @@
 /*************************************************************************************/
 
 namespace Front\Controller;
+
 use Front\Front;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AddressQuery;
-use Thelia\Model\Customer;
 
 /**
  * Class AddressController
@@ -79,9 +78,9 @@ class AddressController extends BaseFrontController
 
             return $this->generateSuccessRedirect($addressCreate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
 
         if ($message !== false) {
@@ -94,6 +93,26 @@ class AddressController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
+    }
+
+    protected function createAddressEvent($form)
+    {
+        return new AddressCreateOrUpdateEvent(
+            $form->get("label")->getData(),
+            $form->get("title")->getData(),
+            $form->get("firstname")->getData(),
+            $form->get("lastname")->getData(),
+            $form->get("address1")->getData(),
+            $form->get("address2")->getData(),
+            $form->get("address3")->getData(),
+            $form->get("zipcode")->getData(),
+            $form->get("city")->getData(),
+            $form->get("country")->getData(),
+            $form->get("cellphone")->getData(),
+            $form->get("phone")->getData(),
+            $form->get("company")->getData(),
+            $form->get("is_default")->getData()
+        );
     }
 
     public function updateViewAction($address_id)
@@ -139,9 +158,9 @@ class AddressController extends BaseFrontController
 
             return $this->generateSuccessRedirect($addressUpdate);
         } catch (FormValidationException $e) {
-            $message = Translator::getInstance()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         } catch (\Exception $e) {
-            $message = Translator::getInstance()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
         }
         $this->getParserContext()->set("address_id", $address_id);
         if ($message !== false) {
@@ -167,10 +186,18 @@ class AddressController extends BaseFrontController
         if (!$address || $customer->getId() != $address->getCustomerId()) {
             // If Ajax Request
             if ($this->getRequest()->isXmlHttpRequest()) {
-                return $this->jsonResponse(json_encode(array(
-                                "success" => false,
-                                "message" => "Error during address deletion process"
-                            )));
+                return $this->jsonResponse(
+                    json_encode(
+                        array(
+                            "success" => false,
+                            "message" => $this->getTranslator()->trans(
+                                "Error during address deletion process",
+                                [],
+                                Front::MESSAGE_DOMAIN
+                            )
+                        )
+                    )
+                );
             } else {
                 return $this->generateRedirectFromRoute('default');
             }
@@ -203,25 +230,5 @@ class AddressController extends BaseFrontController
         } else {
             return $this->generateRedirectFromRoute('default', array('view'=>'account'));
         }
-    }
-
-    protected function createAddressEvent($form)
-    {
-        return new AddressCreateOrUpdateEvent(
-            $form->get("label")->getData(),
-            $form->get("title")->getData(),
-            $form->get("firstname")->getData(),
-            $form->get("lastname")->getData(),
-            $form->get("address1")->getData(),
-            $form->get("address2")->getData(),
-            $form->get("address3")->getData(),
-            $form->get("zipcode")->getData(),
-            $form->get("city")->getData(),
-            $form->get("country")->getData(),
-            $form->get("cellphone")->getData(),
-            $form->get("phone")->getData(),
-            $form->get("company")->getData(),
-            $form->get("is_default")->getData()
-        );
     }
 }
