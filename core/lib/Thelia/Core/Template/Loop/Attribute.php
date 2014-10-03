@@ -28,6 +28,7 @@ use Thelia\Model\ProductQuery;
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\AttributeTemplateQuery;
 use Thelia\Model\Map\AttributeTemplateTableMap;
+
 /**
  *
  * Attribute loop

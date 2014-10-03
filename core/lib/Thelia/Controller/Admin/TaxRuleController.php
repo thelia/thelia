@@ -32,9 +32,7 @@ class TaxRuleController extends AbstractCrudController
             'taxrule',
             'manual',
             'order',
-
             AdminResources::TAX,
-
             TheliaEvents::TAX_RULE_CREATE,
             TheliaEvents::TAX_RULE_UPDATE,
             TheliaEvents::TAX_RULE_DELETE
@@ -289,7 +287,8 @@ class TaxRuleController extends AbstractCrudController
 
             if (! $this->eventContainsObject($changeEvent)) {
                 throw new \LogicException(
-                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName)));
+                    $this->getTranslator()->trans("No %obj was updated.", array('%obj', $this->objectName))
+                );
             }
 
             // Log object modification

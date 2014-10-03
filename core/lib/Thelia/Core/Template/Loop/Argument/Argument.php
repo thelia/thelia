@@ -90,7 +90,7 @@ class Argument
         );
     }
 
-    public static function createFloatTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createFloatTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,
@@ -103,7 +103,7 @@ class Argument
         );
     }
 
-    public static function createBooleanTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    public static function createBooleanTypeArgument($name, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
             $name,

@@ -286,26 +286,26 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         $loopResultRow
-            ->set("ID"                      , $product->getId())
-            ->set("REF"                     , $product->getRef())
-            ->set("IS_TRANSLATED"           , $product->getVirtualColumn('IS_TRANSLATED'))
-            ->set("LOCALE"                  , $this->locale)
-            ->set("TITLE"                   , $product->getVirtualColumn('i18n_TITLE'))
-            ->set("CHAPO"                   , $product->getVirtualColumn('i18n_CHAPO'))
-            ->set("DESCRIPTION"             , $product->getVirtualColumn('i18n_DESCRIPTION'))
-            ->set("POSTSCRIPTUM"            , $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
-            ->set("URL"                     , $product->getUrl($this->locale))
-            ->set("META_TITLE"              , $product->getVirtualColumn('i18n_META_TITLE'))
-            ->set("META_DESCRIPTION"        , $product->getVirtualColumn('i18n_META_DESCRIPTION'))
-            ->set("META_KEYWORDS"           , $product->getVirtualColumn('i18n_META_KEYWORDS'))
-            ->set("POSITION"                , $product->getPosition())
-            ->set("VIRTUAL"                 , $product->getVirtual() ? "1" : "0")
-            ->set("VISIBLE"                 , $product->getVisible() ? "1" : "0")
-            ->set("TEMPLATE"                , $product->getTemplateId())
-            ->set("DEFAULT_CATEGORY"        , $default_category_id)
-            ->set("TAX_RULE_ID"             , $product->getTaxRuleId())
-            ->set("BRAND_ID"                , $product->getBrandId() ?: 0)
-            ->set("SHOW_ORIGINAL_PRICE"     , $display_initial_price)
+            ->set("ID", $product->getId())
+            ->set("REF", $product->getRef())
+            ->set("IS_TRANSLATED", $product->getVirtualColumn('IS_TRANSLATED'))
+            ->set("LOCALE", $this->locale)
+            ->set("TITLE", $product->getVirtualColumn('i18n_TITLE'))
+            ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
+            ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
+            ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+            ->set("URL", $product->getUrl($this->locale))
+            ->set("META_TITLE", $product->getVirtualColumn('i18n_META_TITLE'))
+            ->set("META_DESCRIPTION", $product->getVirtualColumn('i18n_META_DESCRIPTION'))
+            ->set("META_KEYWORDS", $product->getVirtualColumn('i18n_META_KEYWORDS'))
+            ->set("POSITION", $product->getPosition())
+            ->set("VIRTUAL", $product->getVirtual() ? "1" : "0")
+            ->set("VISIBLE", $product->getVisible() ? "1" : "0")
+            ->set("TEMPLATE", $product->getTemplateId())
+            ->set("DEFAULT_CATEGORY", $default_category_id)
+            ->set("TAX_RULE_ID", $product->getTaxRuleId())
+            ->set("BRAND_ID", $product->getBrandId() ?: 0)
+            ->set("SHOW_ORIGINAL_PRICE", $display_initial_price)
         ;
 
         if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
@@ -327,10 +327,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
 
             $loopResultRow
-                ->set("HAS_PREVIOUS"     , $previous != null ? 1 : 0)
-                ->set("HAS_NEXT"         , $next != null ? 1 : 0)
-                ->set("PREVIOUS"         , $previous != null ? $previous->getId() : -1)
-                ->set("NEXT"             , $next != null ? $next->getId() : -1)
+                ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                ->set("HAS_NEXT", $next != null ? 1 : 0)
+                ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                ->set("NEXT", $next != null ? $next->getId() : -1)
             ;
         }
 
@@ -864,9 +864,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         // ... then the sale table...
         $salesJoin = new Join();
         $salesJoin->addExplicitCondition(
-            'SaleProductPriceDisplay', 'SALE_ID',
+            'SaleProductPriceDisplay',
+            'SALE_ID',
             null,
-            SaleTableMap::TABLE_NAME, 'ID',
+            SaleTableMap::TABLE_NAME,
+            'ID',
             'SalePriceDisplay'
         );
         $salesJoin->setJoinType(Criteria::LEFT_JOIN);

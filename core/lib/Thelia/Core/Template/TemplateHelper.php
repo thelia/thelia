@@ -63,12 +63,12 @@ class TemplateHelper
             case TemplateDefinition::FRONT_OFFICE:
                 $tplVar = 'active-front-template';
                 break;
-             case TemplateDefinition::BACK_OFFICE:
-                 $tplVar = 'active-admin-template';
-                 break;
+            case TemplateDefinition::BACK_OFFICE:
+                $tplVar = 'active-admin-template';
+                break;
             case TemplateDefinition::PDF:
-                 $tplVar = 'active-pdf-template';
-                 break;
+                $tplVar = 'active-pdf-template';
+                break;
             case TemplateDefinition::EMAIL:
                 $tplVar = 'active-mail-template';
                 break;
@@ -82,8 +82,8 @@ class TemplateHelper
     public function getActivePdfTemplate()
     {
         return new TemplateDefinition(
-                ConfigQuery::read('active-pdf-template', 'default'),
-                TemplateDefinition::PDF
+            ConfigQuery::read('active-pdf-template', 'default'),
+            TemplateDefinition::PDF
         );
     }
 
@@ -93,8 +93,8 @@ class TemplateHelper
     public function getActiveAdminTemplate()
     {
         return new TemplateDefinition(
-                ConfigQuery::read('active-admin-template', 'default'),
-                TemplateDefinition::BACK_OFFICE
+            ConfigQuery::read('active-admin-template', 'default'),
+            TemplateDefinition::BACK_OFFICE
         );
     }
 
@@ -104,8 +104,8 @@ class TemplateHelper
     public function getActiveFrontTemplate()
     {
         return new TemplateDefinition(
-                ConfigQuery::read('active-front-template', 'default'),
-                TemplateDefinition::FRONT_OFFICE
+            ConfigQuery::read('active-front-template', 'default'),
+            TemplateDefinition::FRONT_OFFICE
         );
     }
 
@@ -209,7 +209,7 @@ class TemplateHelper
             $allowed_exts = array('html', 'tpl', 'xml', 'txt');
         } else {
             throw new \InvalidArgumentException(
-                    Translator::getInstance()->trans('Invalid value for walkMode parameter: %value', array('%value' => $walkMode))
+                Translator::getInstance()->trans('Invalid value for walkMode parameter: %value', array('%value' => $walkMode))
             );
         }
 

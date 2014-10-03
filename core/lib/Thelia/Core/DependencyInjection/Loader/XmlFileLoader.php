@@ -431,7 +431,7 @@ class XmlFileLoader extends FileLoader
 
                 if (null === $category) {
                     throw new \ErrorException(
-                            "The export category \"$categoryRef\" doesn't exist"
+                        "The export category \"$categoryRef\" doesn't exist"
                     );
                 }
 
@@ -548,7 +548,7 @@ class XmlFileLoader extends FileLoader
 
                 if (!class_exists($class)) {
                     throw new \ErrorException(
-                            "The class \"$class\" doesn't exist"
+                        "The class \"$class\" doesn't exist"
                     );
                 }
 
@@ -641,7 +641,7 @@ class XmlFileLoader extends FileLoader
      */
     public function validateSchema(\DOMDocument $dom)
     {
-        $schemaLocations = array('http://thelia.net/schema/dic/config' => str_replace('\\', '/',__DIR__.'/schema/dic/config/thelia-1.0.xsd'));
+        $schemaLocations = array('http://thelia.net/schema/dic/config' => str_replace('\\', '/', __DIR__.'/schema/dic/config/thelia-1.0.xsd'));
 
         $tmpfiles = array();
         $imports = '';

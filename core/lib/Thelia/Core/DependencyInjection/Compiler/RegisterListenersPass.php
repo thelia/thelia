@@ -52,10 +52,13 @@ class RegisterListenersPass implements CompilerPassInterface
                 }
 
                 if (!isset($event['method'])) {
+                    $callback = function ($matches) {
+                        return strtoupper($matches[0]);
+                    };
                     $event['method'] = 'on'.preg_replace_callback(array(
                             '/(?<=\b)[a-z]/i',
                             '/[^a-z0-9]/i',
-                        ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
+                        ), $callback, $event['event']);
                     $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
                 }
 
@@ -149,10 +152,13 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         if (!isset($event['method'])) {
+            $callback = function ($matches) {
+                return strtoupper($matches[0]);
+            };
             $event['method'] = 'on'.preg_replace_callback(array(
                     '/(?<=\b)[a-z]/i',
                     '/[^a-z0-9]/i',
-                ), function ($matches) { return strtoupper($matches[0]); }, $event['event']);
+                ), $callback, $event['event']);
             $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
         }
 

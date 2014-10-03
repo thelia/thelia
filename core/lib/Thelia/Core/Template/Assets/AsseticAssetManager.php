@@ -100,9 +100,9 @@ class AsseticAssetManager implements AssetManagerInterface
 
                     $fs->mkdir($dest_dir, 0777);
                 }
-            }
-            // We don't copy source files
-            elseif (! $this->isSourceFile($item)) {
+            } elseif (! $this->isSourceFile($item)) {
+                // We don't copy source files
+
                 $dest_file = $to_directory . DS . $iterator->getSubPathName();
 
                 if ($fs->exists($dest_file)) {
@@ -185,7 +185,8 @@ class AsseticAssetManager implements AssetManagerInterface
             */
             if (false === @file_put_contents($stamp_file_path, $curr_stamp)) {
                 throw new \RuntimeException(
-                    "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that.");
+                    "Failed to create asset stamp file $stamp_file_path. Please check that your web server has the proper access rights to do that."
+                );
             }
             /*            } else {
                             @fclose($fp);
@@ -310,7 +311,7 @@ class AsseticAssetManager implements AssetManagerInterface
         Tlog::getInstance()->addDebug("Asset destination full path: $assetDestinationPath");
 
         // We generate an asset only if it does not exists, or if the asset processing is forced in development mode
-        if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true)) ) {
+        if (! file_exists($assetDestinationPath) || ($this->debugMode && ConfigQuery::read('process_assets', true))) {
             $writer = new AssetWriter($outputDirectory . DS . $assetFileDirectoryInAssetDirectory);
 
             Tlog::getInstance()->addDebug("Writing asset to $outputDirectory" . DS . "$assetFileDirectoryInAssetDirectory");
