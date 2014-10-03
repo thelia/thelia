@@ -13,10 +13,13 @@
 namespace Thelia\Core\EventListener;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\Event\Customer\CustomerLoginEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
@@ -40,7 +43,6 @@ class RequestListener implements EventSubscriberInterface
     use \Thelia\Tools\RememberMeTrait;
 
     /**
-     *
      * @var \Thelia\Core\Translation\Translator
      */
     private $translator;
@@ -89,7 +91,7 @@ class RequestListener implements EventSubscriberInterface
 
         if (null === $session->getCustomerUser()) {
             // Check customer remember me token
-            $this->getRememberMeCustomer($request, $session);
+            $this->getRememberMeCustomer($request, $session, $event->getDispatcher());
         }
 
         // Check admin remember me token
@@ -104,7 +106,7 @@ class RequestListener implements EventSubscriberInterface
      *
      * @return array
      */
-    protected function getRememberMeCustomer(Request $request, Session $session)
+    protected function getRememberMeCustomer(Request $request, Session $session, EventDispatcher $dispatcher)
     {
         // try to get the remember me cookie
         $cookieCustomerName = ConfigQuery::read('customer_remember_me_cookie_name', 'crmcn');
@@ -122,6 +124,12 @@ class RequestListener implements EventSubscriberInterface
                 $user = $authenticator->getAuthentifiedUser();
 
                 $session->setCustomerUser($user);
+
+                $dispatcher->dispatch(
+                    TheliaEvents::CUSTOMER_LOGIN,
+                    new CustomerLoginEvent($user)
+                );
+
             } catch (TokenAuthenticationException $ex) {
                 // Clear the cookie
                 $this->clearRememberMeCookie($cookieCustomerName);
