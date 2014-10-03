@@ -126,7 +126,7 @@ abstract class BaseController extends ContainerAware
      */
     public function getTranslator()
     {
-        if (null === $this->translator){
+        if (null === $this->translator) {
             $this->translator = $this->container->get('thelia.translator');
         }
         return $this->translator;
