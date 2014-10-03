@@ -1820,28 +1820,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (2023, 'fr_FR', 'Partout ou l''éditeur WYSIWYG est nécessaire', '', ''),
   (2023, 'en_US', 'Where the WYSIWYG editor is required', '', '');
 
-
-# ======================================================================================================================
-# Admin resources
-# ======================================================================================================================
-
-SELECT @max_id := MAX(`id`) FROM `resource`;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max_id+1, 'admin.hook', NOW(), NOW()),
-(@max_id+2, 'admin.module-hook', NOW(), NOW()),
-(@max_id+3, 'admin.sales', NOW(), NOW())
-;
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max_id+1, 'en_US', 'Hooks'),
-  (@max_id+1, 'fr_FR', 'Hooks'),
-  (@max_id+2, 'en_US', 'Hook positions'),
-  (@max_id+2, 'fr_FR', 'Position des hooks'),
-  (@max_id+3, 'en_US', 'Sales management'),
-  (@max_id+3, 'fr_FR', 'Gestion des promotions')
-;
-
 # ======================================================================================================================
 # Image / Document visible
 # ======================================================================================================================
