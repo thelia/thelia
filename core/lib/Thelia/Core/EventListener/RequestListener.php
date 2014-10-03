@@ -35,7 +35,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class RequestListener
  * @package Thelia\Core\EventListener
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author  manuel raynaud <mraynaud@openstudio.fr>
  */
 class RequestListener implements EventSubscriberInterface
 {
@@ -43,7 +43,6 @@ class RequestListener implements EventSubscriberInterface
     use \Thelia\Tools\RememberMeTrait;
 
     /**
-     *
      * @var \Thelia\Core\Translation\Translator
      */
     private $translator;
@@ -61,22 +60,24 @@ class RequestListener implements EventSubscriberInterface
     public function registerValidatorTranslator(GetResponseEvent $event)
     {
         /** @var \Thelia\Core\HttpFoundation\Request $request */
-        $request = $event->getRequest();
-        $lang = $request->getSession()->getLang();
-        $vendorDir = THELIA_ROOT.'core'.DS.'vendor';
-        $vendorFormDir = $vendorDir.DS.'symfony'.DS.'form'.DS.'Symfony'.DS.'Component'.DS.'Form';
+        $request            = $event->getRequest();
+        $lang               = $request->getSession()->getLang();
+        $vendorDir          = THELIA_ROOT . 'core' . DS . 'vendor';
+        $vendorFormDir      = $vendorDir . DS . 'symfony' . DS . 'form' . DS . 'Symfony' . DS . 'Component' . DS . 'Form';
         $vendorValidatorDir =
-            $vendorDir.DS.'symfony'.DS.'validator'.DS.'Symfony'.DS.'Component'.DS.'Validator';
+            $vendorDir . DS . 'symfony' . DS . 'validator' . DS . 'Symfony' . DS . 'Component' . DS . 'Validator';
 
         $this->translator->addResource(
             'xlf',
-            sprintf($vendorFormDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            sprintf($vendorFormDir . DS . 'Resources' . DS . 'translations' . DS . 'validators.%s.xlf',
+                $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
         $this->translator->addResource(
             'xlf',
-            sprintf($vendorValidatorDir.DS.'Resources'.DS.'translations'.DS.'validators.%s.xlf', $lang->getCode()),
+            sprintf($vendorValidatorDir . DS . 'Resources' . DS . 'translations' . DS . 'validators.%s.xlf',
+                $lang->getCode()),
             $lang->getLocale(),
             'validators'
         );
@@ -138,7 +139,6 @@ class RequestListener implements EventSubscriberInterface
         }
     }
 
-
     /**
      * @param $request
      * @param $session
@@ -195,7 +195,7 @@ class RequestListener implements EventSubscriberInterface
      *
      * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
      */
-    public function registerPreviousUrl(PostResponseEvent  $event)
+    public function registerPreviousUrl(PostResponseEvent $event)
     {
         $request = $event->getRequest();
 
@@ -218,7 +218,7 @@ class RequestListener implements EventSubscriberInterface
 
             if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
                 $components = parse_url($referrer);
-                $lang = LangQuery::create()
+                $lang       = LangQuery::create()
                     ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
                     ->findOne();
 
@@ -239,7 +239,7 @@ class RequestListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            KernelEvents::REQUEST => [
+            KernelEvents::REQUEST   => [
                 ["registerValidatorTranslator", 128],
                 ["rememberMeLoader", 128]
             ],
