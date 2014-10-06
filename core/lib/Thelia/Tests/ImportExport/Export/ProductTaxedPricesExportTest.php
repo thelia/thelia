@@ -47,4 +47,4 @@ class ProductTaxedPricesExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($prices->getPromoPrice(), $line["promo_price"]);
         }
     }
-} 
+}

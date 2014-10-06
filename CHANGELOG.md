@@ -1,5 +1,7 @@
 #2.0.4
--Updating stock when changing order : canceled status
+- Updating stock when changing order : canceled status
+- order table is versionnable now.
+- product_sale_elements_id is added to order_product table.
 
 #2.0.3
 - Fix js syntax in order-delivery template

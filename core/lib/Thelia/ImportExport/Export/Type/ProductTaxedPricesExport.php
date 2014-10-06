@@ -95,4 +95,4 @@ class ProductTaxedPricesExport extends ProductPricesExport
 
         return $dataSet;
     }
-} 
+}

@@ -37,6 +37,6 @@ abstract class ControllerTestBase extends ContainerAwareTestCase
     /**
      * @return \Thelia\Controller\BaseController The controller you want to test
      */
-    abstract protected  function getController();
+    abstract protected function getController();
 
-} 
+}

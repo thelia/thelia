@@ -181,7 +181,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData, $formattedData);
     }
 
-    public function testSetRawDataDepth1() {
+    public function testSetRawDataDepth1()
+    {
         $formatterData = new FormatterData();
 
         $data = [
@@ -197,7 +198,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data,$formattedData);
     }
 
-    public function testSetRawDataDepth1WithAliases() {
+    public function testSetRawDataDepth1WithAliases()
+    {
         $aliases = [
             "FoO" => "orange",
             "Baz" => "banana",
@@ -223,7 +225,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData,$formattedData);
     }
 
-    public function testSetRawDataDepth2() {
+    public function testSetRawDataDepth2()
+    {
         $formatterData = new FormatterData();
 
         $data = [
@@ -245,7 +248,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data,$formattedData);
     }
 
-    public function testSetRawDataDepth2WithAliases() {
+    public function testSetRawDataDepth2WithAliases()
+    {
         $aliases = [
             "orange" => "cherry",
             "blackberry" => "banana",
@@ -283,7 +287,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData,$formattedData);
     }
 
-    public function testSetRawDataMultipleDepth() {
+    public function testSetRawDataMultipleDepth()
+    {
         $formatterData = new FormatterData();
 
         $data = [
@@ -305,7 +310,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data,$formattedData);
     }
 
-    public function testSetRawDataMultipleDepthWithAliases() {
+    public function testSetRawDataMultipleDepthWithAliases()
+    {
         $aliases = [
             "orange" => "cherry",
             "blackberry" => "banana",
@@ -359,7 +365,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedData,$formattedData);
     }
 
-    public function testSetRawDataMultipleDepthWithReverseAliases() {
+    public function testSetRawDataMultipleDepthWithReverseAliases()
+    {
         $aliases = [
             "orange" => "foo",
             "blackberry" => "banana",
@@ -397,7 +404,8 @@ class FormatterDataTest extends \PHPUnit_Framework_TestCase
     /**
      * That's why an alias MUST not be the same as a present value
      */
-    public function testSetRawDataMultipleDepthWithReverseAliasesFail() {
+    public function testSetRawDataMultipleDepthWithReverseAliasesFail()
+    {
         $aliases = [
             "orange" => "cherry",
             "blackberry" => "banana",

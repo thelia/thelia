@@ -67,7 +67,7 @@ class MatchBillingCountriesTest extends \PHPUnit_Framework_TestCase
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
-        
+
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();

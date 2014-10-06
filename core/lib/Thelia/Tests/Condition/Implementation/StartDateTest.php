@@ -26,7 +26,7 @@ use Thelia\Model\Lang;
 class StartDateTest extends \PHPUnit_Framework_TestCase
 {
 
-    var $startDate;
+    public $startDate;
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
@@ -61,7 +61,7 @@ class StartDateTest extends \PHPUnit_Framework_TestCase
         $stubFacade->expects($this->any())
             ->method('getConditionEvaluator')
             ->will($this->returnValue(new ConditionEvaluator()));
-        
+
         $stubTranslator = $this->getMockBuilder('\Thelia\Core\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();

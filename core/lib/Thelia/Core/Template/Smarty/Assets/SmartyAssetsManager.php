@@ -145,7 +145,7 @@ class SmartyAssetsManager
         if (! isset($templateDirectories[$templateDefinition->getName()][$assetOrigin])) {
             throw new \Exception("Failed to get real path of '/" . dirname($file) . "'");
         }
-        
+
         $assetSource = $templateDirectories[$templateDefinition->getName()][$assetOrigin];
 
         if (DS != '/') {

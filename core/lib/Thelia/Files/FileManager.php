@@ -34,8 +34,8 @@ class FileManager
      *
      * @param array $supportedFileModels The key should have form type.parent, where type is the file type (document or image) and parent is the parent object of the file, form example product, brand, folder, etc.
      */
-    public function __construct($supportedFileModels) {
-
+    public function __construct($supportedFileModels)
+    {
         $this->supportedFileModels = $supportedFileModels;
     }
 
@@ -46,7 +46,8 @@ class FileManager
      * @param string $parentType the parent object type, e.g. product, folder, brand, etc.
      * @return string
      */
-    protected function getFileTypeIdentifier($fileType, $parentType) {
+    protected function getFileTypeIdentifier($fileType, $parentType)
+    {
         return strtolower("$fileType.$parentType");
     }
     /**
@@ -59,8 +60,8 @@ class FileManager
      *
      * @throws FileException if the file type is not supported, or if the class does not implements FileModelInterface
      */
-    public function getModelInstance($fileType, $parentType) {
-
+    public function getModelInstance($fileType, $parentType)
+    {
         if (! isset($this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)])) {
             throw new FileException(
                 sprintf("Unsupported file type '%s' for parent type '%s'", $fileType, $parentType)
@@ -89,7 +90,8 @@ class FileManager
      * @param string $parentType the parent type, such as Product, Category, etc.
      * @param string $fullyQualifiedClassName the fully qualified class name
      */
-    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName) {
+    public function addFileModel($fileType, $parentType, $fullyQualifiedClassName)
+    {
         $this->supportedFileModels[$this->getFileTypeIdentifier($fileType, $parentType)] = $fullyQualifiedClassName;
     }
 

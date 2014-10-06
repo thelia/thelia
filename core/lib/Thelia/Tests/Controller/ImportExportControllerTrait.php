@@ -75,4 +75,4 @@ trait ImportExportControllerTrait
         $container->set("thelia.manager.formatter_manager", $formatterManager);
     }
 
-} 
+}
