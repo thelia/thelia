@@ -289,6 +289,8 @@ function createCustomer($faker, $con){
             ->save($con)
         ;
     }
+
+    echo "End creating customer\n";
 }
 
 function createMaterials($con)

@@ -1955,15 +1955,6 @@ INSERT INTO `message_i18n` (`id`, `locale`, `title`, `subject`, `text_message`, 
 
 
 # ======================================================================================================================
-# Add product_sale_elements_id IN order_product
-# ======================================================================================================================
-
-ALTER TABLE  `order_product`
-  ADD  `product_sale_elements_id` INT NOT NULL
-  AFTER  `product_sale_elements_ref`;
-
-
-# ======================================================================================================================
 # Add Virtual product
 # ======================================================================================================================
 
@@ -2119,13 +2110,23 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+8, 'fr_FR', 'Gestion des hooks'),
   (@max_id+9, 'en_US', 'Data import / export'),
   (@max_id+9, 'fr_FR', 'Importation / exportation de données'),
-  (@max_id+10, 'en_US', 'Modules maagement'),
+  (@max_id+10, 'en_US', 'Modules management'),
   (@max_id+10, 'fr_FR', 'Gestion des modules'),
   (@max_id+11, 'en_US', 'Administration profiles management'),
   (@max_id+11, 'fr_FR', 'Gestion des profils d''administration'),
   (@max_id+12, 'en_US', 'Back-office search function'),
   (@max_id+12, 'fr_FR', 'Fonction de recherche dans l''administration')
 ;
+
+# ======================================================================================================================
+# Adding cart id in order table
+# ======================================================================================================================
+
+ALTER TABLE  `order_version`
+  ADD  `customer_id_version` INTEGER DEFAULT 0
+  AFTER  `version_created_by`;
+
+
 # ======================================================================================================================
 # End of changes
 # ======================================================================================================================
