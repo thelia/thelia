@@ -119,11 +119,23 @@
             <argument>%file_model.classes%</argument>
         </service>
 
-        <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
+        <service id="base_http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
         </service>
+
+        <service id="stack_factory" class="Stack\Builder" />
+
+        <service
+                id="http_kernel"
+                class="Thelia\Core\TheliaHttpKernel"
+                factory-service="stack_factory"
+                factory-method="resolve">
+
+            <argument id="base_http_kernel" type="service"/>
+        </service>
+
 
         <service id="request" scope="request" synthetic="true" />
 
