@@ -307,4 +307,4 @@ class ContentExport extends ExportHandler implements
 
         return $imagePaths;
     }
-} 
+}

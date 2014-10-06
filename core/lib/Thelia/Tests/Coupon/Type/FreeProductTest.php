@@ -30,9 +30,9 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
 {
 
     /** @var  Product $freeProduct */
-    var $freeProduct;
-    var $originalPrice;
-    var $originalPromo;
+    public $freeProduct;
+    public $originalPrice;
+    public $originalPromo;
 
     /**
      * Sets up the fixture, for example, opens a network connection.
@@ -101,7 +101,7 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
 
         $stubDispatcher->expects($this->any())
             ->method('dispatch')
-            ->will($this->returnCallback(function($dummy, $cartEvent) {
+            ->will($this->returnCallback(function ($dummy, $cartEvent) {
                 $ci = new CartItem();
                 $ci->setId(3)->setPrice(123)->setPromo(0);
 
@@ -135,8 +135,8 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
         return $stubFacade;
     }
 
-    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count) {
-
+    public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
+    {
         $product1 = new Product();
         $product1->setId(10);
 
@@ -203,8 +203,8 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($cartStub));
     }
 
-    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade) {
-
+    public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
+    {
         $product2 = new Product();
         $product2->setId(30);
 

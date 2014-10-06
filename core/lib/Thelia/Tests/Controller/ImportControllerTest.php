@@ -23,7 +23,7 @@ use Thelia\Core\FileFormat\FormatType;
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class ImportControllerTrait extends ControllerTestBase
+class ImportControllerTest extends ControllerTestBase
 {
     use FormatterManagerTrait;
     use ArchiveBuilderManagerTrait;
@@ -236,4 +236,4 @@ class ImportControllerTrait extends ControllerTestBase
             $this->getArchiveBuilderManager($this->container)
         );
     }
-} 
+}
