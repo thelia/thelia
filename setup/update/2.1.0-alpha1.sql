@@ -2131,14 +2131,6 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 # Adding cart id in order table
 # ======================================================================================================================
 
-ALTER TABLE  `order`
-  ADD  `cart_id` INTEGER
-  AFTER  `lang_id`;
-
-ALTER TABLE  `order_version`
-  ADD  `cart_id` INTEGER
-  AFTER  `lang_id`;
-
 ALTER TABLE  `order_version`
   ADD  `customer_id_version` INTEGER DEFAULT 0
   AFTER  `version_created_by`;
