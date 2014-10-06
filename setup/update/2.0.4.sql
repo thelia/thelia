@@ -8,6 +8,11 @@ ALTER TABLE `order`
   AFTER `lang_id`
 ;
 
+ALTER TABLE `order_version`
+  ADD COLUMN `cart_id` INTEGER NOT NULL
+  AFTER `lang_id`
+;
+
 ALTER TABLE `order`
   ADD CONSTRAINT `fk_order_cart_id`
     FOREIGN KEY (`cart_id`) REFERENCES `cart`(`id`)
