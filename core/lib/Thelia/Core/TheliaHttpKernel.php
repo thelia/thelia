@@ -198,21 +198,4 @@ class TheliaHttpKernel extends HttpKernel
             return Model\Lang::getDefaultLanguage();
         }
     }
-
-    public function initSession(Request $request)
-    {
-        if (null === $session = self::$session) {
-            $container = $this->getContainer();
-            $event = new SessionEvent($this->container);
-            $dispatcher = $container->get('event_dispatcher');
-            $dispatcher->dispatch(TheliaKernelEvents::SESSION, $event);
-
-            self::$session = $session = $event->getSession();
-        }
-
-        $session->start();
-        $request->setSession($session);
-
-        return $request;
-    }
 }
