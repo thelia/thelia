@@ -14,6 +14,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * Class StackPass
@@ -36,27 +37,35 @@ class StackPass implements CompilerPassInterface
         }
 
         $stackFactory = $container->getDefinition('stack_factory');
-
         $stackPriority = [];
 
         foreach ($container->findTaggedServiceIds('stack_middleware') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-
-            $definition = $container->getDefinition($id);
-            $arguments = $definition->getArguments();
-            array_unshift($arguments, $definition->getClass());
-
-            $stackPriority[$priority][] = $arguments;
+            $stackPriority[$priority][] = $this->retrieveArguments($container, $id);
         }
 
         if (false === empty($stackPriority)) {
-            krsort($stackPriority);
+            $this->addMiddlewares($stackFactory, $stackPriority);
+        }
+    }
 
-            foreach ($stackPriority as $priority => $stacks) {
-                foreach ($stacks as $arguments) {
-                    $stackFactory->addMethodCall('push', $arguments);
-                }
+    protected function addMiddlewares(Definition $stackFactory, $stackMiddlewares)
+    {
+        krsort($stackMiddlewares);
+
+        foreach ($stackMiddlewares as $priority => $stacks) {
+            foreach ($stacks as $arguments) {
+                $stackFactory->addMethodCall('push', $arguments);
             }
         }
+    }
+
+    protected function retrieveArguments(ContainerBuilder $container, $id)
+    {
+        $definition = $container->getDefinition($id);
+        $arguments = $definition->getArguments();
+        array_unshift($arguments, $definition->getClass());
+
+        return $arguments;
     }
 }
