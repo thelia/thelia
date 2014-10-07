@@ -26,7 +26,6 @@ use Thelia\Model\LangQuery;
 
 class SessionController extends BaseAdminController
 {
-
     use \Thelia\Tools\RememberMeTrait;
 
 

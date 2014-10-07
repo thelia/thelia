@@ -84,7 +84,6 @@ class Lang extends BaseAction implements EventSubscriberInterface
     public function delete(LangDeleteEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getLangId())) {
-
             if ($lang->getByDefault()) {
                 throw new \RuntimeException(
                     Translator::getInstance()->trans('It is not allowed to delete the default language')

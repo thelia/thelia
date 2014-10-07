@@ -85,14 +85,12 @@ class SmartyAssetsManager
         if (isset($templateDirectories[$templateDefinition->getName()])) {
             /* create assets foreach registered directory : main @ modules */
             foreach ($templateDirectories[$templateDefinition->getName()] as $key => $directory) {
-
                 // This is the assets directory in the template's tree
                 $tpl_path = $directory . DS . $assets_directory;
 
                 $asset_dir_absolute_path = realpath($tpl_path);
 
                 if (false !== $asset_dir_absolute_path) {
-
                     // If we're processing template assets (not module assets), we will use the $assets_directory as the assets parent dir.
                     if (SmartyParser::TEMPLATE_ASSETS_KEY == $key && ! null !== $assets_directory) {
                         $assetsWebDir = SmartyParser::TEMPLATE_ASSETS_KEY . DS . $assets_directory;
@@ -149,7 +147,6 @@ class SmartyAssetsManager
         $smartyParser = $template->smarty;
 
         if (false !==  $templateName) {
-
             // We have to be sure that this external template assets have been properly prepared.
             // We will assume the following:
             //   1) this template have the same type as the current template,

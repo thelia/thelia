@@ -27,7 +27,6 @@ use Thelia\Core\TheliaKernelEvents;
  */
 class SessionMiddleware implements HttpKernelInterface
 {
-
     /**
      * @var HttpKernelInterface
      */
@@ -66,7 +65,6 @@ class SessionMiddleware implements HttpKernelInterface
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
         if ($type == HttpKernelInterface::MASTER_REQUEST) {
-
             if (null === $session = self::$session) {
                 $event = new SessionEvent($this->cacheDir, $this->debug, $this->env);
 

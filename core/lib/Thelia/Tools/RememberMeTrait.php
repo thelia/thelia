@@ -24,7 +24,6 @@ use Thelia\Core\Security\User\UserInterface;
  */
 trait RememberMeTrait
 {
-
     /**
      * Get the remember me key from the cookie.
      *
