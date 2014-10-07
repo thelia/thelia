@@ -70,7 +70,6 @@ class TheliaHttpKernel extends HttpKernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         if ($type == HttpKernelInterface::MASTER_REQUEST) {
-            $request = $this->initSession($request);
             $this->initParam($request);
         }
 

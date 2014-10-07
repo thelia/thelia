@@ -39,7 +39,7 @@ class SessionListener implements EventSubscriberInterface
     public function testSession(SessionEvent $event)
     {
         if ($event->getEnv() == 'test') {
-            $storage = new MockFileSessionStorage($event->getContainer()->getParameter('kernel.cache_dir') . DS . 'sessions');
+            $storage = new MockFileSessionStorage($event->getCacheDir() . DS . 'sessions');
             $event->setSession($this->getSession($storage));
             $event->stopPropagation();
         }
