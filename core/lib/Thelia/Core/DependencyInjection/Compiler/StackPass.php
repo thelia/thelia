@@ -15,7 +15,6 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-
 /**
  * Class StackPass
  * @package Thelia\Core\DependencyInjection\Compiler
