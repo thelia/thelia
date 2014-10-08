@@ -443,7 +443,7 @@ var pseManager = (function($){
             if (doAjax) {
                 var url_action  = $(this).attr("action"),
                     product_id  = $("input[name$='product_id']",this).val(),
-                    pse_id  = $("input#pse-id",this).val();
+                    pse_id  = $("input.pse-id",this).val();
 
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
