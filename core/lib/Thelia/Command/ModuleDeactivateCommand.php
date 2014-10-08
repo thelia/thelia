@@ -63,7 +63,6 @@ class ModuleDeactivateCommand extends BaseModuleGenerate
             $event = new ModuleToggleActivationEvent($module->getId());
             $dispatcher = $this->getContainer()->get('event_dispatcher');
             $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
-
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf("Deactivation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
         }

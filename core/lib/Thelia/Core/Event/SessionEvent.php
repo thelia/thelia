@@ -22,37 +22,48 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class SessionEvent extends ActionEvent
 {
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
+    protected $cacheDir;
+
+    protected $env;
+
+    protected $debug;
 
     protected $session;
 
     /**
-     * @param ContainerInterface $container
+     * @param string $cacheDir the cache directory for the current request
+     * @param boolean $debug debug for the current request
+     * @param string $env environment for the current request
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct($cacheDir, $debug, $env)
     {
-        $this->container = $container;
+        $this->cacheDir = $cacheDir;
+        $this->debug = $debug;
+        $this->env = $env;
     }
 
     /**
-     * @return ContainerInterface
+     * @return string the current environment
      */
-    public function getContainer()
-    {
-        return $this->container;
-    }
-
     public function getEnv()
     {
-        return $this->container->getParameter('kernel.environment');
+        return $this->env;
     }
 
+    /**
+     * @return bool the current debug mode
+     */
     public function getDebug()
     {
-        return $this->container->getParameter('kernel.debug');
+        return $this->debug;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCacheDir()
+    {
+        return $this->cacheDir;
     }
 
     /**

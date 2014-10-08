@@ -122,7 +122,6 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $con->rollBack();
                 throw $e;
             }
-
         }
     }
 

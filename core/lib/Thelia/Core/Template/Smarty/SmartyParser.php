@@ -228,7 +228,6 @@ class SmartyParser extends Smarty implements ParserInterface
         Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
 
         if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
-
             // When using array_merge, the key was set to 0. Use + instead.
             $this->templateDirectories[$templateType][$templateName] =
                 [ $key => $templateDirectory ] + $this->templateDirectories[$templateType][$templateName]

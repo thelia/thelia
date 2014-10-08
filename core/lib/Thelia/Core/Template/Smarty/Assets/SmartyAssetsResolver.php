@@ -62,7 +62,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
         $fileRoot = $this->resolveAssetSourcePath($source, $sourceTemplateName, $file, $parserInterface);
 
         if (null !== $fileRoot) {
-
             $templateDefinition = $parserInterface->getTemplateDefinition($sourceTemplateName);
 
             $url = $this->assetsManager->processAsset(
@@ -194,7 +193,6 @@ class SmartyAssetsResolver implements AssetResolverInterface
         $paths = [];
 
         if (SmartyParser::TEMPLATE_ASSETS_KEY !== $source) {
-
             // We're in a module.
 
             // First look into the current template in the right scope : frontOffice, backOffice, ...

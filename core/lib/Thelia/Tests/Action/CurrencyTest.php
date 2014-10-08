@@ -161,7 +161,6 @@ class CurrencyTest extends ContainerAwareTestCase
 
         $action = new Currency();
         $action->delete($event);
-
     }
 
     public static function tearDownAfterClass()

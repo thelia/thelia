@@ -39,7 +39,6 @@ use Thelia\Model\LangQuery;
  */
 class RequestListener implements EventSubscriberInterface
 {
-
     use \Thelia\Tools\RememberMeTrait;
 
     /**
@@ -129,7 +128,6 @@ class RequestListener implements EventSubscriberInterface
                     TheliaEvents::CUSTOMER_LOGIN,
                     new CustomerLoginEvent($user)
                 );
-
             } catch (TokenAuthenticationException $ex) {
                 // Clear the cookie
                 $this->clearRememberMeCookie($cookieCustomerName);
@@ -151,7 +149,6 @@ class RequestListener implements EventSubscriberInterface
         );
 
         if (null !== $cookie) {
-
             // try to log
             $authenticator = new AdminTokenAuthenticator($cookie);
 
