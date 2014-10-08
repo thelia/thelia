@@ -32,6 +32,7 @@ ALTER TABLE  `order_product`
   AFTER  `product_sale_elements_ref`;
 
 UPDATE `config` SET `value`='2.0.4' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='4' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 
 # ======================================================================================================================
