@@ -66,7 +66,7 @@
                         {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
                         {form_field form=$form field='product_sale_elements_id'}
-                            <input type="hidden" name="{$name}" value="{$PRODUCT_SALE_ELEMENT}" {$attr}>
+                            <input type="hidden" class="pse-id" name="{$name}" value="{$PRODUCT_SALE_ELEMENT}" {$attr}>
                         {/form_field}
                         {form_field form=$form field="product"}
                             <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$product_id}" {$attr} >
