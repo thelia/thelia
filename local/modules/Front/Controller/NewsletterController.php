@@ -53,6 +53,9 @@ class NewsletterController extends BaseFrontController
             if (null !== $customer = $this->getSecurityContext()->getCustomerUser()) {
                 $event->setFirstname($customer->getFirstname());
                 $event->setLastname($customer->getLastname());
+            } else {
+                $event->setFirstname($form->get('firstname')->getData());
+                $event->setLastname($form->get('lastname')->getData());
             }
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
@@ -73,8 +76,8 @@ class NewsletterController extends BaseFrontController
             } else {
                 $response = $this->jsonResponse(json_encode(array(
                             "success" => true,
-                            "message" => "Thanks for signing up! We'll keep you posted whenever we have any new updates."
-                        )));;
+                            "message" => $this->getTranslator()->trans("Thanks for signing up! We'll keep you posted whenever we have any new updates.")
+                        )));
             }
 
             return $response;

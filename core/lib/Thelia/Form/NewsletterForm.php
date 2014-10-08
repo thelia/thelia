@@ -64,6 +64,18 @@ class NewsletterForm extends BaseForm
                 'label_attr' => array(
                     'for' => 'email_newsletter'
                 )
+            ))
+            ->add('firstname', 'text', array(
+                'label' => Translator::getInstance()->trans('Firstname'),
+                'label_attr' => array(
+                    'for' => 'firstname_newsletter'
+                )
+            ))
+            ->add('lastname', 'text', array(
+                'label' => Translator::getInstance()->trans('Lastname'),
+                'label_attr' => array(
+                    'for' => 'lastname_newsletter'
+                )
             ));
     }
 
