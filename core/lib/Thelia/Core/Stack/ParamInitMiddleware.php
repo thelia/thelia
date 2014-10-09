@@ -31,7 +31,7 @@ use Thelia\Tools\URL;
 /**
  * Class ParamInitMiddleware
  * @package Thelia\Core\Stack
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class ParamInitMiddleware implements HttpKernelInterface
 {

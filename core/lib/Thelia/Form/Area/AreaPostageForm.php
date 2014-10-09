@@ -21,7 +21,7 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class AreaPostageForm
  * @package Thelia\Form\Area
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AreaPostageForm extends BaseForm
 {

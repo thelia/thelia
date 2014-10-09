@@ -23,7 +23,7 @@ use Thelia\Model\ModuleQuery;
 /**
  * Class ModuleManagement
  * @package Thelia\Module
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleManagement
 {

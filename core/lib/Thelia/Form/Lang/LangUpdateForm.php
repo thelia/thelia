@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * Class LangUpdateForm
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LangUpdateForm extends LangCreateForm
 {

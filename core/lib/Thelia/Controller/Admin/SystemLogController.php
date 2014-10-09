@@ -21,7 +21,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class SystemLogController extends BaseAdminController
 {

@@ -27,7 +27,7 @@ use Thelia\Core\Event\Cart\CartEvent;
  *
  * Trait CartTrait
  * @package Thelia\Cart
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 trait CartTrait
 {

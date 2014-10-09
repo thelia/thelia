@@ -21,7 +21,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class AdministratorTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AdministratorTest extends \PHPUnit_Framework_TestCase
 {

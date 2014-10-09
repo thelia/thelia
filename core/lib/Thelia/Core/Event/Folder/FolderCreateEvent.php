@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Folder;
 /**
  * Class FolderCreateEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class FolderCreateEvent extends FolderEvent
 {

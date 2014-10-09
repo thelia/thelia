@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 /**
  * Class ContentModificationForm
  * @package Thelia\Form
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class ContentModificationForm extends ContentCreationForm
 {

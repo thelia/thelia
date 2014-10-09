@@ -25,7 +25,7 @@ use Thelia\Tools\URL;
 /**
  * Class LangController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class TranslationsController extends BaseAdminController
 {

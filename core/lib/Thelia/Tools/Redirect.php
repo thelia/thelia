@@ -19,7 +19,7 @@ use Thelia\Log\Tlog;
 /**
  * Class Redirect
  * @package Thelia\Tools
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  *
  * @deprecated deprecated since version 2.1 and will be removed in 2.3. A response can not be send before the end of the script. Please use RedirectResponse directly
  */

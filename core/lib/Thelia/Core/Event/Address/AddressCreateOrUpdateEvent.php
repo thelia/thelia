@@ -19,7 +19,7 @@ use Thelia\Model\Customer;
 /**
  * Class AddressCreateOrUpdateEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressCreateOrUpdateEvent extends ActionEvent
 {

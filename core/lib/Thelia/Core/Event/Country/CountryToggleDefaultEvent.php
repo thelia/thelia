@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Country;
 /**
  * Class CountryToggleDefaultEvent
  * @package Thelia\Core\Event\Country
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class CountryToggleDefaultEvent extends CountryEvent
 {

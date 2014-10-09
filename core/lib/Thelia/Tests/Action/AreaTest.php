@@ -24,7 +24,7 @@ use Thelia\Model\CountryQuery;
 /**
  * Class AreaTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AreaTest extends \PHPUnit_Framework_TestCase
 {

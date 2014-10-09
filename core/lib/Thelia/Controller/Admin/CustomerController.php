@@ -25,7 +25,7 @@ use Thelia\Tools\Password;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CustomerController extends AbstractCrudController
 {

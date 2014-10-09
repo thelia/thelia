@@ -22,7 +22,7 @@ use Thelia\Model\Customer;
  *
  * Class SessionTest
  * @package Thelia\Tests\Core\HttpFoundation\Session
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {

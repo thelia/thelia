@@ -29,7 +29,7 @@ use Thelia\Tools\URL;
  *
  * Class BaseForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 abstract class BaseForm
 {

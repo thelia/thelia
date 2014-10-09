@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Lang;
 /**
  * Class LangCreateEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LangCreateEvent extends LangEvent
 {

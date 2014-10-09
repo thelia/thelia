@@ -33,7 +33,7 @@ use Thelia\Model\Map\ContentTableMap;
 /**
  * Class Content
  * @package Thelia\Action
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class Content extends BaseAction implements EventSubscriberInterface
 {

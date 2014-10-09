@@ -29,7 +29,7 @@ use Thelia\Model\Tools\ProductPriceTools;
  *
  * Class Cart
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {

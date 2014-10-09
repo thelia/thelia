@@ -21,7 +21,7 @@ use Thelia\Core\Event\Feature\FeatureCreateEvent;
 /**
  * Class FeatureTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class FeatureTest extends \PHPUnit_Framework_TestCase
 {

@@ -15,7 +15,7 @@ namespace Thelia\Core\HttpKernel\Exception;
 /**
  * Class RedirectException
  * @package Thelia\Core\HttpKernel\Exception
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class RedirectException extends \RuntimeException
 {

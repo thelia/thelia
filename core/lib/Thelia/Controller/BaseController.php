@@ -47,7 +47,7 @@ use Thelia\Tools\URL;
  * user is not yet logged in, or back-office home page if the user is logged in.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 
 abstract class BaseController extends ContainerAware

@@ -22,7 +22,7 @@ use Thelia\Model\MessageQuery;
 /**
  * Class MessageTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class MessageTest extends \PHPUnit_Framework_TestCase
 {

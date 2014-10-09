@@ -15,7 +15,7 @@ namespace Thelia\Tools;
 /**
  * Class Password
  * @package Thelia\Tools
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Password
 {

@@ -17,7 +17,7 @@ use Thelia\Module\Exception\InvalidXmlDocumentException;
 /**
  * Class ModuleDescriptorValidator
  * @package Thelia\Module
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleDescriptorValidator
 {

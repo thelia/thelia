@@ -33,7 +33,7 @@ use Thelia\Tools\Password;
  *
  * Class Customer
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Customer extends BaseAction implements EventSubscriberInterface
 {

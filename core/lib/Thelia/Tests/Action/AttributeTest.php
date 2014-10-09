@@ -21,7 +21,7 @@ use Thelia\Core\Event\Attribute\AttributeCreateEvent;
 /**
  * Class AttributeTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AttributeTest extends \PHPUnit_Framework_TestCase
 {

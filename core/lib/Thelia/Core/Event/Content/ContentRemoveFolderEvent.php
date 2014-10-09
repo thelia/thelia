@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Content;
 /**
  * Class ContentRemoveFolderEvent
  * @package Thelia\Core\Event\Content
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ContentRemoveFolderEvent extends ContentAddFolderEvent
 {

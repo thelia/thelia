@@ -20,7 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 /**
  * Class Cache
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Cache extends BaseAction implements EventSubscriberInterface
 {

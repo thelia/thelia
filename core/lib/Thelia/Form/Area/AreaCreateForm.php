@@ -19,7 +19,7 @@ use Thelia\Form\BaseForm;
 /**
  * Class AreaCreateForm
  * @package Thelia\Form\Shipping
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AreaCreateForm extends BaseForm
 {

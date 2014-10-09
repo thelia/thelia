@@ -21,7 +21,7 @@ use Thelia\Install\Update;
 /**
  * Class UpdateCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class UpdateCommand extends ContainerAwareCommand
 {

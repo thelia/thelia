@@ -18,7 +18,7 @@ use Thelia\Core\Security\Resource\AdminResources;
 /**
  * Class ConfigurationController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ConfigurationController extends BaseAdminController
 {

@@ -25,7 +25,7 @@ use Thelia\Core\Event\TheliaEvents;
 /**
  * Class DebugBarListeners
  * @package TheliaDebugBar\Listeners
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class DebugBarListeners extends BaseAction implements EventSubscriberInterface {
 

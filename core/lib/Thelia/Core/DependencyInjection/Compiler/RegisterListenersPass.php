@@ -32,7 +32,7 @@ use Thelia\Model\ModuleQuery;
  * @package Thelia\Core\DependencyInjection\Compiler
  *
  * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class RegisterListenersPass implements CompilerPassInterface
 {

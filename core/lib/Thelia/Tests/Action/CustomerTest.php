@@ -26,7 +26,7 @@ use Thelia\Model\CustomerQuery;
 /**
  * Class CustomerTest
  * @package Thelia\Tests\Action\ImageTest
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CustomerTest extends \PHPUnit_Framework_TestCase
 {

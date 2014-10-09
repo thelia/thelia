@@ -23,7 +23,7 @@ use Thelia\Type\TypeCollection;
 
 /**
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLoopInterface
 {

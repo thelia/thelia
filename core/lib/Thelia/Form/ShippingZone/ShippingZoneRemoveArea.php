@@ -15,7 +15,7 @@ namespace Thelia\Form\ShippingZone;
 /**
  * Class ShippingZoneRemoveArea
  * @package Thelia\Form\ShippingZone
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ShippingZoneRemoveArea extends ShippingZoneAddArea
 {

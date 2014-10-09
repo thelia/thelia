@@ -18,7 +18,7 @@ use Thelia\Controller\Front\DefaultController;
 /**
  * Class DefaultControllerTest
  * @package Thelia\Tests\Controller
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class DefaultControllerTest extends \PHPUnit_Framework_TestCase
 {

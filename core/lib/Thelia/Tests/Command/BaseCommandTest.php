@@ -17,7 +17,7 @@ namespace Thelia\Tests\Command;
  *
  * Class BaseCommandTest
  * @package Thelia\Tests\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
 {

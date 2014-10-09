@@ -22,7 +22,7 @@ use Thelia\Model\CustomerQuery;
 /**
  * Class CustomerLogin
  * @package Thelia\Form
- * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <manu@thelia.net>
  */
 class CustomerLogin extends BruteforceForm
 {

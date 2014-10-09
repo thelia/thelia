@@ -25,7 +25,7 @@ use Thelia\Model\CustomerQuery;
 /**
  * Class AddressController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressController extends AbstractCrudController
 {

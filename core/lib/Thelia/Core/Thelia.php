@@ -18,7 +18,7 @@ namespace Thelia\Core;
  * It extends Symfony\Component\HttpKernel\Kernel for changing some features
  *
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 
 use Propel\Runtime\Connection\ConnectionManagerSingle;

@@ -17,7 +17,7 @@ use Thelia\Core\Thelia;
 /**
  * Class WebTestCase
  * @package Thelia\Tests
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class WebTestCase extends \PHPUnit_Framework_TestCase
 {

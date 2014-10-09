@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * Class RegisterRouterPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class RegisterRouterPass implements CompilerPassInterface
 {

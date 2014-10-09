@@ -27,7 +27,7 @@ use Thelia\Model\Area as AreaModel;
 /**
  * Class Area
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Area extends BaseAction implements EventSubscriberInterface
 {

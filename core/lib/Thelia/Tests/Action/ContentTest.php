@@ -33,7 +33,7 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
 /**
  * Class ContentTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ContentTest extends TestCaseWithURLToolSetup
 {

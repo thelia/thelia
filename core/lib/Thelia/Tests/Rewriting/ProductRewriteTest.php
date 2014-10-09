@@ -17,7 +17,7 @@ use Thelia\Model\Product;
 /**
  * Class ProductRewriteTest
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ProductRewriteTest extends BaseRewritingObject
 {

@@ -19,7 +19,7 @@ use Thelia\Tools\URL;
 
 /**
  * Class DebugBar
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class DebugBar extends AbstractSmartyPlugin
 {

@@ -25,7 +25,7 @@ use Thelia\Install\Database;
  *
  * Class Install
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Install extends ContainerAwareCommand
 {

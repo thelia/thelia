@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Class SessionEvent
  * @package Thelia\Core\Event
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class SessionEvent extends ActionEvent
 {

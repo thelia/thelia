@@ -26,7 +26,7 @@ use Thelia\Model\MessageQuery;
 /**
  * Class MailerFactory
  * @package Thelia\Mailer
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class MailerFactory
 {

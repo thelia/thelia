@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleGenerateCommand extends BaseModuleGenerate
 {

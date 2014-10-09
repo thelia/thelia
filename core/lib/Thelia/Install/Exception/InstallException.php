@@ -14,7 +14,7 @@ namespace Thelia\Install\Exception;
 
 /**
  * Class InstallException
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class InstallException extends \RuntimeException
 {

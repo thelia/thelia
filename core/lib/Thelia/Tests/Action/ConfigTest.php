@@ -22,7 +22,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class ConfigTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {

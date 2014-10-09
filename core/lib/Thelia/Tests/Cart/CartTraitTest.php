@@ -23,7 +23,7 @@ use Thelia\Model\Customer;
  *
  * Class CartTraitTest
  * @package Thelia\Tests\Cart\CartTraitTest
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CartTraitTest extends \PHPUnit_Framework_TestCase
 {

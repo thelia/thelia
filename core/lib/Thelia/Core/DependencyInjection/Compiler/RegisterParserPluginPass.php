@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * Register parser plugins. These plugins shouild be tagged thelia.parser.register_plugin
  * in the configuration.
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class RegisterParserPluginPass implements CompilerPassInterface
 {

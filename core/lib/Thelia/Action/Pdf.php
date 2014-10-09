@@ -19,7 +19,7 @@ use Thelia\Core\Event\TheliaEvents;
 /**
  * Class Pdf
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Pdf extends BaseAction implements EventSubscriberInterface
 {
