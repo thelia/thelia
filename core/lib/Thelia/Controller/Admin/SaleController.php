@@ -288,7 +288,7 @@ class SaleController extends AbstractCrudController
      */
     protected function redirectToEditionTemplate()
     {
-        return $this->generateRedirectFromRoute('admin.sale.update', $this->getEditionArguments());
+        return $this->generateRedirectFromRoute('admin.sale.update', [], $this->getEditionArguments());
     }
 
     /**
