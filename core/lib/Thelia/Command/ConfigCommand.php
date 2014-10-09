@@ -23,6 +23,17 @@ use Thelia\Model\ConfigQuery;
 
 
 /**
+ * command line for managing configuration variables
+ *
+ * php Thelia thelia:config COMMAND [name] [value] [--secured] [--visible]
+ *
+ * Where COMMAND is list, get, set or delete.
+ *
+ * For command get and delete, you should also set the name attribute.
+ *
+ * For command set, you should set the name and value attributes and optionally add
+ * --secured and/or --visible arguments.
+ *
  * Class ConfigCommand
  * @package Thelia\Command
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
