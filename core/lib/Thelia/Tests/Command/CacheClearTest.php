@@ -27,7 +27,7 @@ use Thelia\Tests\ContainerAwareTestCase;
  *
  * Class CacheClearTest
  * @package Thelia\Tests\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CacheClearTest extends ContainerAwareTestCase
 {

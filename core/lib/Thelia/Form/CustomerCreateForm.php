@@ -22,7 +22,7 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class CustomerCreateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CustomerCreateForm extends AddressCreateForm
 {

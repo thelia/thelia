@@ -37,7 +37,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class ExportController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ExportController extends BaseAdminController
 {

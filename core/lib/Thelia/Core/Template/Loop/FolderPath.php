@@ -24,7 +24,7 @@ use Thelia\Type\BooleanOrBothType;
 /**
  * Class FolderPath
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {

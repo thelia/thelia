@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Country;
 /**
  * Class CountryCreateEvent
  * @package Thelia\Core\Event\Country
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CountryCreateEvent extends CountryEvent
 {

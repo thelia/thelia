@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Class PropelCollector
  * @package TheliaDebugBar\DataCollector
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class PropelCollector extends DataCollector implements Renderable, LoggerInterface
 {

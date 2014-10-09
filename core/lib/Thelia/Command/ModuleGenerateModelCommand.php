@@ -25,7 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateModelCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleGenerateModelCommand extends BaseModuleGenerate
 {

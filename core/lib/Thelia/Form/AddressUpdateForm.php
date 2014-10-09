@@ -15,7 +15,7 @@ namespace Thelia\Form;
 /**
  * Class AddressUpdateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressUpdateForm extends AddressCreateForm
 {

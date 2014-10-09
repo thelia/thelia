@@ -28,7 +28,7 @@ use Thelia\Model\Lang as LangModel;
 /**
  * Class Lang
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Lang extends BaseAction implements EventSubscriberInterface
 {

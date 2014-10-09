@@ -18,7 +18,7 @@ use Thelia\Model\Module;
 /**
  * Class ModuleEvent
  * @package Thelia\Core\Event\Module
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleEvent extends ActionEvent
 {

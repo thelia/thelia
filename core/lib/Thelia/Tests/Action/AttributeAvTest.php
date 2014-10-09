@@ -22,7 +22,7 @@ use Thelia\Model\AttributeAv as AttributeAvModel;
 /**
  * Class AttributeAvTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AttributeAvTest extends \PHPUnit_Framework_TestCase
 {

@@ -30,7 +30,7 @@ use Thelia\Tools\URL;
 /**
  * Class RewritingRouter
  * @package Thelia\Core\Routing
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class RewritingRouter implements RouterInterface, RequestMatcherInterface

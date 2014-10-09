@@ -25,7 +25,7 @@ use Thelia\Tests\ContainerAwareTestCase;
 /**
  * Class LangTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LangTest extends ContainerAwareTestCase
 {

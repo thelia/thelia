@@ -25,7 +25,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class CacheController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AdvancedConfigurationController extends BaseAdminController
 {

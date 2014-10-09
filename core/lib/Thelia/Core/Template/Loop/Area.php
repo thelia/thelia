@@ -24,7 +24,7 @@ use Thelia\Model\AreaQuery;
 /**
  * Class Area
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Area extends BaseLoop implements PropelSearchLoopInterface
 {

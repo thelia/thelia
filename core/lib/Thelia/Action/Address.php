@@ -24,7 +24,7 @@ use Thelia\Model\Map\AddressTableMap;
 /**
  * Class Address
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Address extends BaseAction implements EventSubscriberInterface
 {

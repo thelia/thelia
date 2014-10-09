@@ -17,7 +17,7 @@ use Thelia\Install\Exception\AlreadyInstallException;
 /**
  * Class BaseInstall
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 abstract class BaseInstall
 {

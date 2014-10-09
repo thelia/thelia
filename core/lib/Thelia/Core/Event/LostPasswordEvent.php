@@ -15,7 +15,7 @@ namespace Thelia\Core\Event;
 /**
  * Class LostPasswordEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LostPasswordEvent extends ActionEvent
 {

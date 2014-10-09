@@ -20,7 +20,7 @@ use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
 /**
  * Class Database
  * @package Thelia\Install
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Database
 {

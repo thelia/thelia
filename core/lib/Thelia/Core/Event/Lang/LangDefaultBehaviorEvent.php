@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class LangDefaultBehaviorEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LangDefaultBehaviorEvent extends ActionEvent
 {

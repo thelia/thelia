@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
  *
  * Class Request
  * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Request extends BaseRequest
 {

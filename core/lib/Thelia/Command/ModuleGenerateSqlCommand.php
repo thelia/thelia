@@ -24,7 +24,7 @@ use Symfony\Component\Filesystem\Filesystem;
  *
  * Class ModuleGenerateSqlCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ModuleGenerateSqlCommand extends BaseModuleGenerate
 {

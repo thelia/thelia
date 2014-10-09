@@ -21,7 +21,7 @@ use Thelia\Install\Database;
 /**
  * Class ReloadDatabasesCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ReloadDatabaseCommand extends BaseModuleGenerate
 {

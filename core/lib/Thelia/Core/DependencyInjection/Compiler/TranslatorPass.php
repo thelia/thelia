@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Class TranslatorPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class TranslatorPass implements CompilerPassInterface
 {

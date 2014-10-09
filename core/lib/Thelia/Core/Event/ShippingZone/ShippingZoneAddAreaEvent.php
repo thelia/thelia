@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class ShippingZoneAddAreaEvent
  * @package Thelia\Core\Event\ShippingZone
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ShippingZoneAddAreaEvent extends ActionEvent
 {

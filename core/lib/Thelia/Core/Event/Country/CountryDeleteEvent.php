@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Country;
 /**
  * Class CountryDeleteEvent
  * @package Thelia\Core\Event\Country
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CountryDeleteEvent extends CountryEvent
 {

@@ -34,7 +34,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
  *
  * @TODO Look if it's possible to block this definition in dependency-injection
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 
 class ViewListener implements EventSubscriberInterface

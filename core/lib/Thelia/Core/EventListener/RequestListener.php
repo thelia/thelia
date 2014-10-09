@@ -35,7 +35,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class RequestListener
  * @package Thelia\Core\EventListener
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class RequestListener implements EventSubscriberInterface
 {

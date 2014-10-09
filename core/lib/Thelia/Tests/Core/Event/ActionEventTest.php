@@ -17,7 +17,7 @@ use Symfony\Component\Form\Forms;
 /**
  * Class ActionEventTest
  * @package Thelia\Tests\Core\Event
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class ActionEventTest extends \PHPUnit_Framework_TestCase
 {

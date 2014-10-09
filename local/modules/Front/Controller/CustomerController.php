@@ -48,7 +48,7 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CustomerController extends BaseFrontController
 {

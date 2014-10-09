@@ -36,7 +36,7 @@ use Thelia\Model\AddressQuery;
 /**
  * Class AddressController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressController extends BaseFrontController
 {

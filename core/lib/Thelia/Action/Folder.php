@@ -26,7 +26,7 @@ use Thelia\Model\Folder as FolderModel;
 /**
  * Class Folder
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {

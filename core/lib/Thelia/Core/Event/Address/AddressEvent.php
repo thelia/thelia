@@ -18,7 +18,7 @@ use Thelia\Model\Address;
 /**
  * Class AddressEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressEvent extends ActionEvent
 {

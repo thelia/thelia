@@ -18,7 +18,7 @@ use Thelia\Core\Event\PdfEvent;
 /**
  * Class PdfTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class PdfTest extends \PHPUnit_Framework_TestCase
 {

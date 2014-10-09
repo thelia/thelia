@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 /**
  * Class RedirectException
  * @package Thelia\Action
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {

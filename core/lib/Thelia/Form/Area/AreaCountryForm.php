@@ -20,7 +20,7 @@ use Thelia\Form\BaseForm;
 /**
  * Class AreaCountryForm
  * @package Thelia\Form\Area
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AreaCountryForm extends BaseForm
 {

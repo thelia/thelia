@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class LangCreateForm
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class LangCreateForm extends BaseForm
 {

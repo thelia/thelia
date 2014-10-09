@@ -28,7 +28,7 @@ use Thelia\Tools\Password;
  *
  * Class AdminUpdatePasswordCommand
  * @package Thelia\Command
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AdminUpdatePasswordCommand extends ContainerAwareCommand
 {

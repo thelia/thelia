@@ -31,7 +31,7 @@ use Thelia\Model\ContentQuery;
 /**
  * Class ContentController
  * @package Thelia\Controller\Admin
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class ContentController extends AbstractSeoCrudController
 {

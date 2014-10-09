@@ -22,7 +22,7 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 /**
  * Class ShippingZone
  * @package Thelia\Action
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ShippingZone extends BaseAction implements EventSubscriberInterface
 {

@@ -22,7 +22,7 @@ use Thelia\Core\Translation\Translator;
  * Allow to define different level and output.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Tlog implements LoggerInterface
 {

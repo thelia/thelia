@@ -22,7 +22,7 @@ use Thelia\Model\Map\ProductTableMap;
 /**
  * Class Update
  * @package Thelia\Install
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Update
 {

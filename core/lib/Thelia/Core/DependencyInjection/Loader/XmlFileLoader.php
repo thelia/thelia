@@ -46,7 +46,7 @@ use Thelia\Model\Map\ImportTableMap;
  *
  * Class XmlFileLoader
  * @package Thelia\Core\DependencyInjection\Loader
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class XmlFileLoader extends FileLoader
 {

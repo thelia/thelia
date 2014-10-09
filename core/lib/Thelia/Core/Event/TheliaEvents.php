@@ -16,7 +16,7 @@ namespace Thelia\Core\Event;
  *
  * This class contains all Thelia events identifiers used by Thelia Core
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 
 final class TheliaEvents

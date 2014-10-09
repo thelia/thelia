@@ -26,7 +26,7 @@ use Thelia\Tools\NumberFormat;
  *
  * Class Format
  * @package Thelia\Core\Template\Smarty\Plugins
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Format extends AbstractSmartyPlugin
 {

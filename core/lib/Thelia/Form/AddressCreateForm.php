@@ -19,7 +19,7 @@ use Thelia\Core\Translation\Translator;
 /**
  * Class AddressCreateForm
  * @package Thelia\Form
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class AddressCreateForm extends FirewallForm
 {

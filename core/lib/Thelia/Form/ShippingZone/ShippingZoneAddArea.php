@@ -20,7 +20,7 @@ use Thelia\Form\BaseForm;
 /**
  * Class ShippingZoneAddArea
  * @package Thelia\Form\ShippingZone
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ShippingZoneAddArea extends BaseForm
 {

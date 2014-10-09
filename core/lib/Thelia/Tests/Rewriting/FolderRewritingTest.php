@@ -17,7 +17,7 @@ use Thelia\Model\Folder;
 /**
  * Class FolderRewritingTest
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class FolderRewritingTest extends BaseRewritingObject
 {

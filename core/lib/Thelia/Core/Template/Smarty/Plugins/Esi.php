@@ -21,7 +21,7 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 /**
  * Class Esi
  * @package Thelia\Core\Template\Smarty\Plugins
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class Esi extends AbstractSmartyPlugin
 {

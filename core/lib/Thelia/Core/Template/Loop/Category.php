@@ -49,7 +49,7 @@ use Thelia\Model\ProductQuery;
  *
  * Class Category
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
