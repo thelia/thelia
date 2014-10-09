@@ -37,7 +37,7 @@ class SaleModificationForm extends SaleCreationForm
 
     protected function buildForm()
     {
-        $this->doBuilForm(
+        $this->doBuildForm(
             Translator::getInstance()->trans('The sale name or title')
         );
 
@@ -92,7 +92,7 @@ class SaleModificationForm extends SaleCreationForm
                 'label'       => Translator::getInstance()->trans('Start date of sales'),
                 'label_attr'  => [
                     'for'         => 'start_date',
-                    'help'        => Translator::getInstance()->trans('The date from which sales are active. Please use %fmt format.', [ '%fmt' => self::MOMENT_JS_DATE_FORMAT] ),
+                    'help'        => Translator::getInstance()->trans('The date from which sales are active. Please use %fmt format.', [ '%fmt' => self::MOMENT_JS_DATE_FORMAT]),
                 ],
                 'attr' => [
                     'data-date-format' => self::MOMENT_JS_DATE_FORMAT
@@ -239,12 +239,16 @@ class SaleModificationForm extends SaleCreationForm
 
     private function getCategoriesIdArray()
     {
-        $categories = CategoryQuery::create()->find();
+        $categories = CategoryQuery::create()
+            ->select("id")
+            ->find()
+            ->toArray()
+        ;
 
         $ids = [];
 
         foreach ($categories as $category) {
-            $ids[] = $category->getId();
+            $ids[$category] = $category;
         }
 
         return $ids;

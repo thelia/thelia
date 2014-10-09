@@ -24,7 +24,7 @@ use Thelia\Model\Lang;
  */
 class SaleCreationForm extends BaseForm
 {
-    protected function doBuilForm($titleFieldHelpLabel)
+    protected function doBuildForm($titleFieldHelpLabel)
     {
         $this->formBuilder->add(
             'title',
@@ -70,7 +70,7 @@ class SaleCreationForm extends BaseForm
 
     protected function buildForm()
     {
-        $this->doBuilForm(
+        $this->doBuildForm(
             Translator::getInstance()->trans(
                 'Enter here the sale name in the default language (%title%)',
                 [ '%title%' => Lang::getDefaultLanguage()->getTitle()]
