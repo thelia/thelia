@@ -155,7 +155,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         if (null === $var){
             $out[] = sprintf(
-                "<error>No variable with name '%s' </error>",
+                "<error>Unknown variable '%s'</error>",
                 $varName
             );
         } else {
@@ -186,22 +186,12 @@ class ConfigCommand extends ContainerAwareCommand
             return;
         }
 
-        $varSecured = $input->getOption("secured") ? 1 : 0;
-        $varHidden = $input->getOption("visible") ? 0 : 1;
-
-        $var = ConfigQuery::create()->findOneByName($varName);
-
-        if (null === $var){
-            $var = new Config();
-            $var->setName($varName);
-        }
-
-        $var
-            ->setValue($varValue)
-            ->setSecured($varSecured)
-            ->setHidden($varHidden)
-            ->save()
-        ;
+        ConfigQuery::write(
+            $varName,
+            $varValue,
+            $input->getOption("secured"),
+            !$input->getOption("visible")
+        );
 
         $output->writeln("<info>Variable has been set</info>");
     }
@@ -220,8 +210,21 @@ class ConfigCommand extends ContainerAwareCommand
 
         $var = ConfigQuery::create()->findOneByName($varName);
 
-        $var->delete();
-
-        $output->writeln("<info>Variable has been deleted</info>");
+        if (null === $var) {
+            $output->writeln(
+                sprintf(
+                    "<error>Unknown variable '%s'</error>",
+                    $varName
+                )
+            );
+        } else {
+            $var->delete();
+            $output->writeln(
+                sprintf(
+                    "<info>Variable '%s' has been deleted</info>",
+                    $varName
+                )
+            );
+        }
     }
 }
