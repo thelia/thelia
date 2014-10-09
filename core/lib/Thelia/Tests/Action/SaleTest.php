@@ -224,15 +224,6 @@ class SaleTest extends TestCaseWithURLToolSetup
         ProductSaleElementsQuery::create()->filterById($promoList)->update(['Promo' => true]);
     }
 
-    public function testCheckSaleActivation()
-    {
-        $event = new SaleActiveStatusCheckEvent();
-        $event->setDispatcher($this->dispatcher);
-
-        $saleAction = new Sale($this->getContainer());
-        $saleAction->checkSaleActivation($event);
-    }
-
     /**
      * @return \Thelia\Model\Sale
      */

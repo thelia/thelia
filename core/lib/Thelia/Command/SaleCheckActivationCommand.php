@@ -17,7 +17,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\Sale\SaleActiveStatusCheckEvent;
 use Thelia\Core\Event\TheliaEvents;
 
-
 /**
  * Class SaleCheckActivationCommand
  * @package Thelia\Command
@@ -25,7 +24,6 @@ use Thelia\Core\Event\TheliaEvents;
  */
 class SaleCheckActivationCommand extends ContainerAwareCommand
 {
-
     public function configure()
     {
         $this
