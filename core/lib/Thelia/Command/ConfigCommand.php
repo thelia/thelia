@@ -21,7 +21,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * command line for managing configuration variables
  *
@@ -105,11 +104,11 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function listConfig(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(array(
+        $output->writeln([
             "",
             "<error>Variables list</error>",
             ""
-        ));
+        ]);
 
         $vars = ConfigQuery::create()
             ->orderByName()
@@ -119,7 +118,7 @@ class ConfigCommand extends ContainerAwareCommand
         $rows = [];
 
         /** @var Config $var */
-        foreach ($vars as $var){
+        foreach ($vars as $var) {
             $rows[] = [
                 $var->getName(),
                 $var->getValue(),
@@ -130,7 +129,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $table = new TableHelper();
         $table
-            ->setHeaders(array('Name', 'Value', 'secured', 'hidden'))
+            ->setHeaders(['Name', 'Value', 'secured', 'hidden'])
             ->setRows($rows)
         ;
         $table->render($output);
@@ -153,7 +152,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $out = [];
 
-        if (null === $var){
+        if (null === $var) {
             $out[] = sprintf(
                 "<error>Unknown variable '%s'</error>",
                 $varName

@@ -20,7 +20,6 @@ use Thelia\Core\Thelia;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class ConfigCommandTest
  * @package Command
@@ -37,7 +36,7 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
     /** @var  CommandTester */
     protected $commandTester;
 
-    const PREFIXE_NAME = "config_command_test_";
+    const PREFIX_NAME = "config_command_test_";
 
 
     protected static function getApplication()
@@ -55,7 +54,7 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
     public static function clearTest()
     {
         $vars = ConfigQuery::create()
-            ->filterByName(self::PREFIXE_NAME . '%', Criteria::LIKE)
+            ->filterByName(self::PREFIX_NAME . '%', Criteria::LIKE)
         ;
 
         if (null !== $vars) {
@@ -112,10 +111,10 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
     {
         $tester = $this->commandTester;
 
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND"    => "list"
-        ));
+        ]);
 
         $out = $tester->getDisplay();
 
@@ -138,11 +137,11 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         $varName = $this->getRandomVariableName();
 
         // Get
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND" => "get",
             "name"    => $varName
-        ));
+        ]);
 
         $expected = sprintf("Unknown variable '%s'", $varName);
 
@@ -153,42 +152,42 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         );
 
         // Set
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND" => "set",
             "name"    => $varName,
             "value"   => "Thelia"
-        ));
+        ]);
 
         $this->assertVariableEqual($varName, "Thelia");
 
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND" => "set",
             "name"    => $varName,
             "value"   => "Thelia",
             "--secured" => true,
             "--visible" => true,
-        ));
+        ]);
 
         $this->assertVariableEqual($varName, "Thelia", 1, 0);
 
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND" => "set",
             "name"    => $varName,
             "value"   => "THELIA",
             "--visible" => true
-        ));
+        ]);
 
         $this->assertVariableEqual($varName, "THELIA", 0, 0);
 
         // DELETE
-        $tester->execute(array(
+        $tester->execute([
             "command" => $this->command->getName(),
             "COMMAND" => "delete",
             "name"    => $varName
-        ));
+        ]);
 
         $this->assertNull(
             ConfigQuery::read($varName),
@@ -200,7 +199,7 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
     {
         return sprintf(
             "%s%s",
-            self::PREFIXE_NAME,
+            self::PREFIX_NAME,
             substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyz"), 0, 10)
         );
     }
