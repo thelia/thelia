@@ -438,12 +438,12 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             // Enable sales that should be enabled.
-            if (null !== $salesToDisable = SaleQuery::create()
+            if (null !== $salesToEnable = SaleQuery::create()
                     ->filterByActive(false)
                     ->filterByStartDate($now, Criteria::LESS_EQUAL)
                     ->filterByEndDate($now, Criteria::GREATER_EQUAL)) {
                 /** @var SaleModel $sale */
-                foreach ($salesToDisable as $sale) {
+                foreach ($salesToEnable as $sale) {
                     $sale->setActive(true)->save();
 
                     // Update related products sale status
