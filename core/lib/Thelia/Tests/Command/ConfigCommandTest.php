@@ -16,7 +16,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Tester\CommandTester;
 use Thelia\Command\ConfigCommand;
 use Thelia\Core\Application;
-use Thelia\Core\Thelia;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigQuery;
 
@@ -27,9 +26,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigCommandTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  Application */
-    protected static $application;
-
     /** @var ConfigCommand */
     protected $command;
 
@@ -38,33 +34,8 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
 
     const PREFIX_NAME = "config_command_test_";
 
-
-    protected static function getApplication()
-    {
-        if (null === self::$application) {
-            $kernel = new Thelia('test', true);
-            $kernel->boot();
-
-            self::$application = new Application($kernel);
-        }
-
-        return self::$application;
-    }
-
-    public static function clearTest()
-    {
-        $vars = ConfigQuery::create()
-            ->filterByName(self::PREFIX_NAME . '%', Criteria::LIKE)
-        ;
-
-        if (null !== $vars) {
-            $vars->delete();
-        }
-    }
-
     public static function setUpBeforeClass()
     {
-        self::getApplication();
         self::clearTest();
     }
 
@@ -75,13 +46,15 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $application = self::$application;
-        $configCommand = new ConfigCommand();
+        if (null === $this->commandTester) {
+            $application   = new Application($this->getKernel());
+            $configCommand = new ConfigCommand();
 
-        $application->add($configCommand);
+            $application->add($configCommand);
 
-        $this->command       = $application->find("thelia:config");
-        $this->commandTester = new CommandTester($this->command);
+            $this->command       = $application->find("thelia:config");
+            $this->commandTester = new CommandTester($this->command);
+        }
     }
 
     public function testArguments()
@@ -113,7 +86,7 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
 
         $tester->execute([
             "command" => $this->command->getName(),
-            "COMMAND"    => "list"
+            "COMMAND" => "list"
         ]);
 
         $out = $tester->getDisplay();
@@ -162,10 +135,10 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertVariableEqual($varName, "Thelia");
 
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "set",
-            "name"    => $varName,
-            "value"   => "Thelia",
+            "command"   => $this->command->getName(),
+            "COMMAND"   => "set",
+            "name"      => $varName,
+            "value"     => "Thelia",
             "--secured" => true,
             "--visible" => true,
         ]);
@@ -173,10 +146,10 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         $this->assertVariableEqual($varName, "Thelia", 1, 0);
 
         $tester->execute([
-            "command" => $this->command->getName(),
-            "COMMAND" => "set",
-            "name"    => $varName,
-            "value"   => "THELIA",
+            "command"   => $this->command->getName(),
+            "COMMAND"   => "set",
+            "name"      => $varName,
+            "value"     => "THELIA",
             "--visible" => true
         ]);
 
@@ -193,6 +166,20 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
             ConfigQuery::read($varName),
             sprintf("Variable '%s' should not exist", $varName)
         );
+    }
+
+    public static function clearTest()
+    {
+        ConfigQuery::create()
+            ->filterByName(self::PREFIX_NAME . '%', Criteria::LIKE)
+            ->delete();
+    }
+
+    public function getKernel()
+    {
+        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+
+        return $kernel;
     }
 
     protected function getRandomVariableName()
