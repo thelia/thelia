@@ -34,11 +34,22 @@ class ArrayDriver extends BaseCacheDriver
         $this->cache = new ArrayCache();
     }
 
+    /**
+     * No reference needed for ArrayDriver
+     *
+     * @param string $ref the reference key
+     * @param string $key the cache key
+     *
+     * @return boolean false
+     */
     protected function addRef($ref, $key)
     {
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function deleteRef($ref)
     {
         return 0;

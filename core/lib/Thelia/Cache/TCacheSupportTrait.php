@@ -23,7 +23,7 @@ trait TCacheSupportTrait
     protected function getCacheManager()
     {
         if (null === $this->cache) {
-            $this->cache = TCache::getInstance();
+            $this->cache = CacheFactory::getInstance();
             //$this->cache->sleep();
         }
 

@@ -13,7 +13,7 @@
 
 namespace Thelia\Tests\Cache;
 
-use Thelia\Cache\TCache;
+use Thelia\Cache\CacheFactory;
 use Thelia\Model\ConfigQuery;
 
 class TCacheTest extends \PHPUnit_Framework_TestCase {
@@ -27,9 +27,9 @@ class TCacheTest extends \PHPUnit_Framework_TestCase {
     public function testInit()
     {
 
-        ConfigQuery::write(TCache::CONFIG_CACHE_DRIVER, self::NS_FILE_DRIVER);
+        ConfigQuery::write(CacheFactory::CONFIG_CACHE_DRIVER, self::NS_FILE_DRIVER);
 
-        $cache = TCache::getInstance();
+        $cache = CacheFactory::getInstance();
 
         assertInstanceOf(self::NS_FILE_DRIVER, $cache);
 

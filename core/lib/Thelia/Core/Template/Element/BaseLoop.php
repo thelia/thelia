@@ -47,14 +47,13 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop
 {
-
     /** @var String|null The loop name  */
     protected $loopName = null;
 
     /** @var array|null array of loop definitions (class => id) */
     protected static $loopDefinitions = null;
 
-    /* Use of TCache */
+    /* Use of CacheFactory */
     use \Thelia\Core\Template\Element\LoopCacheTrait;
 
     /**
