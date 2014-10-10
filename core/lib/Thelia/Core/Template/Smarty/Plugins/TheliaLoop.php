@@ -15,7 +15,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Doctrine\Common\Cache\FilesystemCache;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Cache\TCache;
+use Thelia\Cache\CacheFactory;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;

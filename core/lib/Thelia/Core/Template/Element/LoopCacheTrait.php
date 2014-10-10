@@ -26,7 +26,7 @@ use Thelia\Type\TypeCollection;
  */
 trait LoopCacheTrait {
 
-    /** @var bool Use the TCache feature */
+    /** @var bool Use the CacheFactory feature */
     protected $isCacheable = false;
 
     /** @var string The cache is dependant of the currency */

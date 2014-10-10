@@ -14,7 +14,7 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Thelia\Cache\TCache;
+use Thelia\Cache\CacheFactory;
 use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -43,8 +43,8 @@ class CacheConfigurationController extends BaseAdminController
 
         // Hydrate the store configuration form
         $cacheConfigForm = new CacheConfigurationForm($this->getRequest(), 'form', array(
-            'enabled' => (bool)ConfigQuery::read(TCache::CONFIG_CACHE_ENABLED, false),
-            'driver'  => ConfigQuery::read(TCache::CONFIG_CACHE_DRIVER, TCache::DEFAULT_CACHE_DRIVER),
+            'enabled' => (bool)ConfigQuery::read(CacheFactory::CONFIG_CACHE_ENABLED, false),
+            'driver'  => ConfigQuery::read(CacheFactory::CONFIG_CACHE_DRIVER, CacheFactory::DEFAULT_CACHE_DRIVER),
         ));
         $this->getParserContext()->addForm($cacheConfigForm);
 
@@ -87,7 +87,7 @@ class CacheConfigurationController extends BaseAdminController
     {
         $message = null;
         try {
-            $cache = TCache::getNewInstance($config);
+            $cache = CacheFactory::getNewInstance($config);
             $cache->save("test", "test");
             $test = $cache->fetch("test");
             if ("test" !== $test) {
@@ -160,7 +160,7 @@ class CacheConfigurationController extends BaseAdminController
             return $response;
         }
 
-        $stats = TCache::getInstance()->getStats();
+        $stats = CacheFactory::getInstance()->getStats();
 
         return $this->render("includes/config-cache-stats", array("stats" => $stats));
     }
@@ -172,7 +172,7 @@ class CacheConfigurationController extends BaseAdminController
             return $response;
         }
 
-        $ret = TCache::getInstance()->deleteAll();
+        $ret = CacheFactory::getInstance()->deleteAll();
 
         return $this->jsonResponse(json_encode(array(
             "success" => $ret,

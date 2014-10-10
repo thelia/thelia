@@ -33,7 +33,7 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop
 {
-    /* Use of TCache */
+    /* Use of CacheFactory */
     use \Thelia\Core\Template\Element\LoopCacheTrait;
 
     /**

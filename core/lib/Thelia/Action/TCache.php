@@ -21,12 +21,12 @@ use Thelia\Core\Event\Cache\TCacheDiscardRefEvent;
 use Thelia\Core\Event\Cache\TCacheFlushEvent;
 use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use \Thelia\Cache\TCache as TCacheManager;
+use \Thelia\Cache\CacheFactory as TCacheManager;
 use Thelia\Model\ConfigQuery;
 
 
 /**
- * Class TCache
+ * Class CacheFactory
  * @package Thelia\Action
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */

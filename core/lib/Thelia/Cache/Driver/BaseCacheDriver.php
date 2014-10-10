@@ -22,7 +22,7 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Cache\Driver
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-abstract class BaseCacheDriver
+abstract class BaseCacheDriver implements CacheDriverInterface
 {
 
     const CONFIG_LIFE_TIME = 'tcache_life_time';
@@ -41,7 +41,7 @@ abstract class BaseCacheDriver
 
 
     /**
-     * Init the cache.
+     * @inheritdoc
      */
     public abstract function init(array $params = null);
 
@@ -52,27 +52,12 @@ abstract class BaseCacheDriver
             $params,
             "lifetime",
             self::CONFIG_LIFE_TIME,
-            self::DEFAULT_LIFE_TIME);
+            self::DEFAULT_LIFE_TIME
+        );
     }
 
     /**
-     * Fetches an entry from the cache.
-     *
-     * @param string $id The id of the cache entry to fetch.
-     *
-     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
-     */
-    public function fetch($id)
-    {
-        return !$this->sleep ? $this->cache->fetch($id) : null;
-    }
-
-    /**
-     * Tests if an entry exists in the cache.
-     *
-     * @param string $id The cache id of the entry to check for.
-     *
-     * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
+     * @inheritdoc
      */
     public function contains($id)
     {
@@ -80,16 +65,9 @@ abstract class BaseCacheDriver
     }
 
     /**
-     * Puts data into the cache.
-     *
-     * @param string $id       The cache id.
-     * @param mixed  $data     The cache entry/data.
-     * @param int    $lifeTime The cache lifetime.
-     *                         If != 0, sets a specific lifetime for this cache entry (0 => infinite lifeTime).
-     *
-     * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
+     * @inheritdoc
      */
-    public function save($id, $data, $refs = array(), $lifeTime = null)
+    public function save($id, $data, $refs = [], $lifeTime = null)
     {
         if ($this->sleep) {
             return false;
@@ -108,15 +86,18 @@ abstract class BaseCacheDriver
         } elseif (is_string($refs)) {
             $this->addRef($refs, $id);
         }
-
     }
 
     /**
-     * Deletes a cache entry.
-     *
-     * @param string $id The cache id.
-     *
-     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
+     * @inheritdoc
+     */
+    public function fetch($id)
+    {
+        return !$this->sleep ? $this->cache->fetch($id) : null;
+    }
+
+    /**
+     * @inheritdoc
      */
     public function delete($id)
     {
@@ -124,78 +105,7 @@ abstract class BaseCacheDriver
     }
 
     /**
-     * Deletes a cache entry.
-     *
-     * @param string $id The cache id.
-     *
-     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
-     */
-    public function deleteAll()
-    {
-        $this->cache->deleteAll();
-    }
-
-    /**
-     * Retrieves cached information from the data store.
-     *
-     * The server's statistics array has the following values:
-     *
-     * - <b>hits</b>
-     * Number of keys that have been requested and found present.
-     *
-     * - <b>misses</b>
-     * Number of items that have been requested and not found.
-     *
-     * - <b>uptime</b>
-     * Time that the server is running.
-     *
-     * - <b>memory_usage</b>
-     * Memory used by this server to store items.
-     *
-     * - <b>memory_available</b>
-     * Memory allowed to use for storage.
-     *
-     * @since 2.2
-     *
-     * @return array|null An associative array with server's statistics if available, NULL otherwise.
-     */
-    public function getStats()
-    {
-        $this->cache->getStats();
-    }
-
-    protected function addRef($ref, $key)
-    {
-        $content = $this->cache->fetch($ref);
-        if (!is_array($content)) {
-            $content = [];
-        }
-        $content[] = $key;
-
-        return $this->cache->save($ref, $content, 0);
-    }
-
-    protected function getParam($params, $key, $configKey, $default)
-    {
-        $ret = null;
-
-        if (is_array($params) && array_key_exists($key, $params) && "" !== $params[$key]) {
-            $ret = $params[$key];
-        } else {
-            $ret = ConfigQuery::read($configKey, $default);
-            if ("" === $ret) {
-                $ret = $default;
-            }
-        }
-
-        return $ret;
-    }
-
-    /**
-     * @param $ref
-     * @param $key
-     *
-     * @return int
+     * @inheritdoc
      */
     public function deleteRef($ref)
     {
@@ -212,15 +122,89 @@ abstract class BaseCacheDriver
         return $deleted;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function deleteAll()
+    {
+        $this->cache->deleteAll();
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function getStats()
+    {
+        $this->cache->getStats();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function sleep()
     {
         $this->sleep = true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function wakeUp()
     {
         $this->sleep = false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function isSleeping()
+    {
+        return $this->sleep;
+    }
+
+    /**
+     * Add a reference to the cache with key $key
+     *
+     * @param string $ref the reference key
+     * @param string $key the cache key
+     *
+     * @return boolean true if the ref hs been added, false otherwise
+     */
+    protected function addRef($ref, $key)
+    {
+        $content = $this->cache->fetch($ref);
+        if (!is_array($content)) {
+            $content = [];
+        }
+        $content[] = $key;
+
+        return $this->cache->save($ref, $content, 0);
+    }
+
+    /**
+     * Extract a param from the params array
+     *
+     * @param array $params array of parameters
+     * @param string $key the param key
+     * @param string $configKey the config key to search if key is not found in params
+     * @param mixed $default a default value
+     *
+     * @return mixed|null
+     */
+    protected function getParam($params, $key, $configKey, $default)
+    {
+        $ret = null;
+
+        if (is_array($params) && array_key_exists($key, $params) && "" !== $params[$key]) {
+            $ret = $params[$key];
+        } else {
+            $ret = ConfigQuery::read($configKey, $default);
+            if ("" === $ret) {
+                $ret = $default;
+            }
+        }
+
+        return $ret;
     }
 
 

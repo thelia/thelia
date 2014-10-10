@@ -41,7 +41,7 @@ class NullDriver extends BaseCacheDriver
         return false;
     }
 
-    public function save($id, $data, $refs = array(), $lifeTime = null)
+    public function save($id, $data, $refs = [], $lifeTime = null)
     {
         return false;
     }

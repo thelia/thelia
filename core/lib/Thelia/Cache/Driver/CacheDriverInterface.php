@@ -19,25 +19,6 @@ namespace Thelia\Cache\Driver;
  */
 interface CacheDriverInterface
 {
-    /**
-     * Deletes a cache entry.
-     *
-     * @param string $id The cache id.
-     *
-     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
-     */
-    public function deleteAll();
-
-    public function sleep();
-
-    /**
-     * Tests if an entry exists in the cache.
-     *
-     * @param string $id The cache id of the entry to check for.
-     *
-     * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
-     */
-    public function contains($id);
 
     /**
      * Retrieves cached information from the data store.
@@ -59,8 +40,6 @@ interface CacheDriverInterface
      * - <b>memory_available</b>
      * Memory allowed to use for storage.
      *
-     * @since 2.2
-     *
      * @return array|null An associative array with server's statistics if available, NULL otherwise.
      */
     public function getStats();
@@ -71,23 +50,22 @@ interface CacheDriverInterface
     public function init(array $params = null);
 
     /**
-     * @param $ref
-     * @param $key
+     * Tests if an entry exists in the cache.
      *
-     * @return int
+     * @param string $id The cache id of the entry to check for.
+     *
+     * @return boolean TRUE if a cache entry exists for the given cache id, FALSE otherwise.
      */
-    public function deleteRef($ref);
+    public function contains($id);
 
     /**
-     * Deletes a cache entry.
+     * Fetches an entry from the cache.
      *
-     * @param string $id The cache id.
+     * @param string $id The id of the cache entry to fetch.
      *
-     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
+     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
      */
-    public function delete($id);
-
-    public function wakeUp();
+    public function fetch($id);
 
     /**
      * Puts data into the cache.
@@ -99,14 +77,46 @@ interface CacheDriverInterface
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
      */
-    public function save($id, $data, $refs = array(), $lifeTime = null);
+    public function save($id, $data, $refs = [], $lifeTime = null);
 
     /**
-     * Fetches an entry from the cache.
+     * Deletes a cache entry.
      *
-     * @param string $id The id of the cache entry to fetch.
+     * @param string $id The cache id.
      *
-     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
+     * @return boolean TRUE if the cache entry was successfully deleted, FALSE otherwise.
      */
-    public function fetch($id);
+    public function delete($id);
+
+    /**
+     * Deletes cache entries related to this ref
+     * .
+     * @param $ref
+     *
+     * @return int
+     */
+    public function deleteRef($ref);
+
+    /**
+     * Deletes all cache entries.
+     */
+    public function deleteAll();
+
+    /**
+     * Temporary deactivate the cache.
+     */
+    public function sleep();
+
+    /**
+     * Reactivate the cache.
+     */
+    public function wakeUp();
+
+    /**
+     * Get the status of the sleep param
+     *
+     * @return boolean true if sleep is active, false otherwise
+     */
+    public function isSleeping();
+
 }
