@@ -20,6 +20,7 @@
         <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
         <command class="Thelia\Command\UpdateCommand"/>
         <command class="Thelia\Command\ConfigCommand"/>
+        <command class="Thelia\Command\SaleCheckActivationCommand"/>
     </commands>
 
 </config>

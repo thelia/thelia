@@ -424,7 +424,8 @@ class Sale extends BaseAction implements EventSubscriberInterface
             // Disable expired sales
             if (null !== $salesToDisable = SaleQuery::create()
                     ->filterByActive(true)
-                    ->filterByEndDate($now, Criteria::GREATER_THAN)) {
+                    ->filterByEndDate($now, Criteria::LESS_THAN)
+                    ->find()) {
                 /** @var SaleModel $sale */
                 foreach ($salesToDisable as $sale) {
                     $sale->setActive(false)->save();
@@ -438,12 +439,13 @@ class Sale extends BaseAction implements EventSubscriberInterface
             }
 
             // Enable sales that should be enabled.
-            if (null !== $salesToDisable = SaleQuery::create()
+            if (null !== $salesToEnable = SaleQuery::create()
                     ->filterByActive(false)
                     ->filterByStartDate($now, Criteria::LESS_EQUAL)
-                    ->filterByEndDate($now, Criteria::GREATER_EQUAL)) {
+                    ->filterByEndDate($now, Criteria::GREATER_EQUAL)
+                    ->find()) {
                 /** @var SaleModel $sale */
-                foreach ($salesToDisable as $sale) {
+                foreach ($salesToEnable as $sale) {
                     $sale->setActive(true)->save();
 
                     // Update related products sale status
