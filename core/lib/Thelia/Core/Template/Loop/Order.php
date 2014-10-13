@@ -82,6 +82,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
     {
         return array(
             'ref',
+            'invoice_ref',
             'customer_ref',
             'customer_firstname',
             'customer_lastname',
@@ -105,6 +106,9 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             switch ($searchInElement) {
                 case 'ref':
                     $search->filterByRef($searchTerm, $searchCriteria);
+                    break;
+                case 'invoice_ref':
+                    $search->filterByInvoiceRef($searchTerm, $searchCriteria);
                     break;
                 case 'customer_ref':
                     $search->filterByCustomer(

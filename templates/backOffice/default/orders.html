@@ -106,7 +106,7 @@
 
                             <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' }
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
 
                                     {loop type="currency" name="order-currency" id=$CURRENCY}
                                         {$orderCurrency=$SYMBOL}
@@ -159,7 +159,7 @@
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order}"
+                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}"
                                         }
 
                                     </td>
