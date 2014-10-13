@@ -140,7 +140,6 @@
         </service>
 
         <service id="smarty.plugin.cache" class="Thelia\Core\Template\Smarty\Plugins\TheliaCache" scope="request">
-            <argument>%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request" />
             <argument type="service" id="thelia.cache" />

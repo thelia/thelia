@@ -73,6 +73,45 @@
                                                 </div>
                                             {/form_field}
 
+                                            {form_field form=$form field='namespace'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                                <input id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" />
+                                            </div>
+                                            {/form_field}
+
+                                            {form_field form=$form field='lifetime'}
+                                            <div class="form-group {if $error}has-error{/if}">
+                                                <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                                <input id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" />
+                                            </div>
+                                            {/form_field}
+
+                                            <div class=" form-driver form-file hidden">
+                                                {form_field form=$form field='file_directory'}
+                                                <div class="form-group {if $error}has-error{/if}">
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                                    <input id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" />
+                                                </div>
+                                                {/form_field}
+                                            </div>
+
+                                            <div class="form-driver form-memcached hidden">
+                                                {form_field form=$form field='memcached_server'}
+                                                <div class="form-group {if $error}has-error{/if}">
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                                    <input id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" />
+                                                </div>
+                                                {/form_field}
+
+                                                {form_field form=$form field='memcached_port'}
+                                                <div class="form-group {if $error}has-error{/if}">
+                                                    <label for="{$label_attr.for}" class="control-label">{$label}:{if $required} <span class="required">*</span>{/if}</label>
+                                                    <input id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" />
+                                                </div>
+                                                {/form_field}
+                                            </div>
+
                                             <div id="return-test"></div>
 
                                             <div class="form-group {if $error}has-error{/if}">
@@ -132,24 +171,25 @@
     $(function() {
 
         var urls = {
-            save: "{url path="/admin/configuration/cache/save"}",
-            test: "{url path="/admin/configuration/cache/test"}",
-            stats: "{url path="/admin/configuration/cache/stats"}",
-            flush: "{url path="/admin/configuration/cache/flush"}"
+            save: '{url path="/admin/configuration/cache/save"}',
+            test: '{url path="/admin/configuration/cache/test"}',
+            stats: '{url path="/admin/configuration/cache/stats"}',
+            flush: '{url path="/admin/configuration/cache/flush"}'
         };
 
         {literal}
 
         var fieldsDefinition = {
-            "\\Thelia\\Cache\\Driver\\FileDriver": {
+            "array": {},
+            "file": {
                 "directory": "file_directory",
-                "extension": "file_extension"
+                //"extension": "file_extension"
             },
-            "\\Thelia\\Cache\\Driver\\MemcachedDriver": {
+            "memcached": {
                 "server": "memcached_server",
                 "port": "memcached_port"
             }
-        }
+        };
 
         var getFormData = function getFormData(){
 
@@ -160,7 +200,8 @@
 
             data['driver'] = $("#driver").val();
             data['enabled'] = $("#enabled").prop("checked");
-            // data['lifeTime'] = $("#lifeTime").val();
+            data['namespace'] = $("#namespace").val();
+            data['lifeTime'] = $("#lifeTime").val();
 
             fields = fieldsDefinition[$("#driver").val()] || [];
 
@@ -180,6 +221,27 @@
         });
         $( "#cache-stats" ).click();
 
+        var currentDriver = null;
+
+        var refreshForm = function(e){
+
+            var driver = $("#driver").val();
+
+            // no change
+            if (driver != currentDriver){
+
+                currentDriver = driver;
+
+                $('.form-driver').addClass("hidden");
+                $('.form-' + driver).removeClass("hidden");
+            }
+
+        };
+
+        refreshForm();
+
+        //
+        $("#driver").on('change', refreshForm);
 
         // save
         $('#cache-form').on('submit', function(ev){
