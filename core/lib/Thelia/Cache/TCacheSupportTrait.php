@@ -14,25 +14,56 @@
 namespace Thelia\Cache;
 
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Cache\Driver\CacheDriverInterface;
+
+
 trait TCacheSupportTrait
 {
 
     /** @var \Thelia\Cache\Driver\BaseCacheDriver $cache */
     protected $cache = null;
 
+    public function setCacheManager(CacheDriverInterface $cache)
+    {
+        $this->cache = $cache;
+    }
+
     protected function getCacheManager()
     {
         if (null === $this->cache) {
-            $this->cache = CacheFactory::getInstance();
-            //$this->cache->sleep();
+            // try to load the default cache manager from the container
+            if (parent instanceof ContainerAwareInterface) {
+                /** @var ContainerInterface $container */
+                $container = $this->getContainer();
+                if (null !== $container) {
+                    $this->cache = $container->get('thelia.cache');
+                }
+            }
         }
 
         return $this->cache;
     }
 
+    protected function hasCacheManager()
+    {
+        return (null !== $this->cache);
+    }
+
+    protected function hasCache($key)
+    {
+        $cache   = $this->getCacheManager();
+
+        if (null !== $cache && null !== $key) {
+            return $this->cache->contains($key);
+        }
+
+        return false;
+    }
+
     protected function getCache($key)
     {
-
         $cache   = $this->getCacheManager();
         $content = null;
         if (null !== $cache && null !== $key) {
@@ -45,15 +76,14 @@ trait TCacheSupportTrait
         return $content;
     }
 
-    protected function setCache($key, $content, $refs = array())
+    protected function setCache($key, $content, $refs = [], $ttl = null)
     {
-
         $cached = false;
+
         if (null !== $cache = $this->getCacheManager()) {
-            $cached = $cache->save($key, $content, $refs);
+            $cached = $cache->save($key, $content, $refs, $ttl);
         }
 
         return $cached;
     }
-
-} 
+}

@@ -14,6 +14,7 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Cache\Driver\CacheDriverInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\Cache\TCacheDiscardKeyEvent;
@@ -21,18 +22,18 @@ use Thelia\Core\Event\Cache\TCacheDiscardRefEvent;
 use Thelia\Core\Event\Cache\TCacheFlushEvent;
 use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use \Thelia\Cache\CacheFactory as TCacheManager;
 use Thelia\Model\ConfigQuery;
 
 
 /**
- * Class CacheFactory
+ * Class TCache
  * @package Thelia\Action
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class TCache extends BaseAction implements EventSubscriberInterface
 {
-
+    /** @var CacheDriverInterface */
+    protected $cache;
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -56,25 +57,31 @@ class TCache extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             // cache
-            TheliaEvents::TCACHE_UPDATE      => array('update', 128),
-            TheliaEvents::TCACHE_DISCARD_REF => array('discardByRef', 128),
-            TheliaEvents::TCACHE_DISCARD_KEY => array('discardByKey', 128),
-            TheliaEvents::TCACHE_FLUSH       => array('flush', 128),
+            TheliaEvents::TCACHE_UPDATE      => ['update', 128],
+            TheliaEvents::TCACHE_DISCARD_REF => ['discardByRef', 128],
+            TheliaEvents::TCACHE_DISCARD_KEY => ['discardByKey', 128],
+            TheliaEvents::TCACHE_FLUSH       => ['flush', 128],
 
             // dependencies
             // cache
-            TheliaEvents::CACHE_CLEAR        => array('flushCache', 128),
+            TheliaEvents::CACHE_CLEAR        => ['flushCache', 128],
 
             // product
-            TheliaEvents::PRODUCT_UPDATE     => array('discardProduct', 128),
-            TheliaEvents::PRODUCT_DELETE     => array('discardProduct', 128)
+            TheliaEvents::PRODUCT_UPDATE     => ['discardProduct', 128],
+            TheliaEvents::PRODUCT_DELETE     => ['discardProduct', 128]
 
             // sale element
 
-        );
+        ];
 
+    }
+
+
+    function __construct(CacheDriverInterface $cache)
+    {
+        $this->cache = $cache;
     }
 
     public function update(TCacheUpdateEvent $event)
@@ -85,7 +92,7 @@ class TCache extends BaseAction implements EventSubscriberInterface
 
         $dispatcher->dispatch(TheliaEvents::TCACHE_FLUSH, $flushEvent);
 
-        foreach ( $event->all() as $key => $value ) {
+        foreach ($event->all() as $key => $value) {
             ConfigQuery::write($key, $value);
         }
 
@@ -93,8 +100,7 @@ class TCache extends BaseAction implements EventSubscriberInterface
 
     public function discardByKey(TCacheDiscardKeyEvent $event)
     {
-        $cache = TCacheManager::getInstance();
-        $event->setResponse($cache->delete($event->getKey()));
+        $event->setResponse($this->cache->delete($event->getKey()));
     }
 
     public function discardByRef(TCacheDiscardRefEvent $event)
@@ -112,8 +118,7 @@ class TCache extends BaseAction implements EventSubscriberInterface
 
     public function flush(TCacheFlushEvent $event)
     {
-        $cache = TCacheManager::getInstance();
-        $event->setResponse($cache->deleteAll());
+        $event->setResponse($this->cache->deleteAll());
     }
 
     public function discardProduct(ActionEvent $ev)
