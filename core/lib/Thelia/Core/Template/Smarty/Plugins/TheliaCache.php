@@ -31,14 +31,11 @@ class TheliaCache extends AbstractSmartyPlugin
 {
     use TCacheSupportTrait;
 
-    /** @var bool application debug mode */
-    protected $debug;
-
     /** @var Request $request */
     protected $request;
 
-    /** @var CacheDriverInterface $cache */
-    protected $cache;
+    /** @var CacheDriverInterface $cache
+    protected $cache; */
 
     /** @var  Translator $translator */
     protected $translator;
@@ -47,12 +44,10 @@ class TheliaCache extends AbstractSmartyPlugin
     protected $cacheKey = null;
 
     public function __construct(
-        $debug,
         Request $request,
         CacheDriverInterface $cache,
         Translator $translator
     ) {
-        $this->debug      = $debug;
         $this->request    = $request;
         $this->cache      = $cache;
         $this->translator = $translator;
@@ -115,8 +110,8 @@ class TheliaCache extends AbstractSmartyPlugin
 
         ksort($keyParams);
 
-        foreach ($keyParams as $key => $value) {
-            $key[] = $key . $value;
+        foreach ($keyParams as $k => $v) {
+            $key[] = $k . $v;
         }
 
         return md5(implode('.', $key));
@@ -139,7 +134,7 @@ class TheliaCache extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return [
-            new SmartyPluginDescriptor('block', 'cache', $this, 'cache'),
+            new SmartyPluginDescriptor('block', 'cache', $this, 'cacheBlock'),
         ];
     }
 

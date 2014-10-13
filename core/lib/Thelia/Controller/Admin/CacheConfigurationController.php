@@ -13,16 +13,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Cache\CacheFactory;
+use Thelia\Cache\Driver\CacheDriverInterface;
 use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
-use Thelia\Exception\NotImplementedException;
 use Thelia\Form\CacheConfigurationForm;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 
@@ -34,18 +32,23 @@ use Thelia\Model\ConfigQuery;
 class CacheConfigurationController extends BaseAdminController
 {
 
+    /** @var  CacheFactory */
+    protected $cacheFactory;
+
+    /** @var  CacheDriverInterface */
+    protected $cache;
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::VIEW)) {
             return $response;
         }
 
         // Hydrate the store configuration form
-        $cacheConfigForm = new CacheConfigurationForm($this->getRequest(), 'form', array(
-            'enabled' => (bool)ConfigQuery::read(CacheFactory::CONFIG_CACHE_ENABLED, false),
-            'driver'  => ConfigQuery::read(CacheFactory::CONFIG_CACHE_DRIVER, CacheFactory::DEFAULT_CACHE_DRIVER),
-        ));
+        $cacheConfigForm = new CacheConfigurationForm(
+            $this->getRequest(),
+            'form'
+        );
         $this->getParserContext()->addForm($cacheConfigForm);
 
         return $this->renderTemplate();
@@ -58,7 +61,7 @@ class CacheConfigurationController extends BaseAdminController
 
     public function testAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -66,35 +69,36 @@ class CacheConfigurationController extends BaseAdminController
 
         //Tlog::getInstance()->debug(" GU " . print_r($config, true));
 
-        if (null !== $config) {
-            $message = $this->testConfig($config);
+        if (is_array($config) && array_key_exists('driver', $config)) {
+            $message = $this->testConfig($config['driver'], $config);
         } else {
-            $message = Translator::getInstance()->trans("The configuration is not valid.");
+            $message = $this->getTranslator()->trans("The configuration is not valid.");
         }
 
-        return $this->jsonResponse(json_encode(array(
-                "success" => (null === $message),
-                "message" => (null !== $message)
+        return $this->jsonResponse(
+            json_encode(
+                [
+                    "success" => (null === $message),
+                    "message" => (null !== $message)
                         ? $message
-                        : Translator::getInstance()->trans("The configuration is valid.")
+                        : $this->getTranslator()->trans("The configuration is valid.")
+                ]
             )
-        ));
+        );
 
     }
 
-
-    protected function testConfig(array $config)
+    protected function testConfig($driver, array $config)
     {
         $message = null;
         try {
-            $cache = CacheFactory::getNewInstance($config);
+            $cache = $this->getCacheFactory()->get($driver, $config, false);
             $cache->save("test", "test");
             $test = $cache->fetch("test");
             if ("test" !== $test) {
-                $message = Translator::getInstance()->trans("The initialization of the driver is ok but it could not fetch the test value !");
+                $message = $this->getTranslator()->trans("The initialization of the driver is ok but it could not fetch the test value !");
             }
             $cache->delete("test");
-
         } catch (\Exception $ex) {
             $message = $ex->getMessage();
         }
@@ -105,7 +109,7 @@ class CacheConfigurationController extends BaseAdminController
 
     public function saveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -144,7 +148,7 @@ class CacheConfigurationController extends BaseAdminController
         $data  = $form->getData();
 
         foreach ($data as $key => $value) {
-            if (!in_array($key, array('success_url', 'error_message'))) {
+            if (!in_array($key, ['success_url', 'error_message'])) {
                 $event->__set("tcache_$key", $value);
             }
         }
@@ -156,30 +160,49 @@ class CacheConfigurationController extends BaseAdminController
 
     public function statsAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::VIEW)) {
             return $response;
         }
 
-        $stats = CacheFactory::getInstance()->getStats();
+        $stats = $this->getCache()->getStats();
 
-        return $this->render("includes/config-cache-stats", array("stats" => $stats));
+        return $this->render("includes/config-cache-stats", ["stats" => $stats]);
     }
 
 
     public function flushAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::CACHE, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $ret = CacheFactory::getInstance()->deleteAll();
+        $ret = $this->getCache()->deleteAll();
 
-        return $this->jsonResponse(json_encode(array(
-            "success" => $ret,
-            "message" => $ret ?
-                    Translator::getInstance()->trans("The cache has been flushed.") :
-                    Translator::getInstance()->trans("The cache can't be flushed.")
-        )));
+        return $this->jsonResponse(
+            json_encode(
+                [
+                    "success" => $ret,
+                    "message" => $ret ?
+                        $this->getTranslator()->trans("The cache has been flushed.") :
+                        $this->getTranslator()->trans("The cache can't be flushed.")
+                ]
+            )
+        );
     }
 
+    /**
+     * @return CacheDriverInterface
+     */
+    protected function getCache()
+    {
+        return $this->container->get('thelia.cache');
+    }
+
+    /**
+     * @return CacheFactory
+     */
+    protected function getCacheFactory()
+    {
+        return $this->container->get('thelia.cache.factory');
+    }
 } 
