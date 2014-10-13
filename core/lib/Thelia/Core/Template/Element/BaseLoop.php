@@ -54,6 +54,7 @@ abstract class BaseLoop
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
+    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args */
     protected $args;
 
     protected $countable = true;

@@ -198,6 +198,7 @@
         </service>
 
         <service id="thelia.action.tcache" class="Thelia\Action\CacheFactory">
+            <argument type="service" id="thelia.cache"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
