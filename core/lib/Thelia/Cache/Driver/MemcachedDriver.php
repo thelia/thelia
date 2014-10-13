@@ -37,11 +37,9 @@ class MemcachedDriver extends BaseCacheDriver
     /**
      * Init the cache.
      */
-    public function init(array $params = null)
+    public function initDriver(array $params = null)
     {
         $memcached = new Memcached();
-
-        $this->initDefault($params);
 
         $server = $this->getParam(
             $params,
@@ -55,12 +53,12 @@ class MemcachedDriver extends BaseCacheDriver
             self::CONFIG_PORT,
             self::DEFAULT_PORT);
 
+
         $memcached->addServer($server, $port);
 
         $this->cache = new MemcachedCache();
 
         $this->cache->setMemcached($memcached);
-
     }
 
 } 

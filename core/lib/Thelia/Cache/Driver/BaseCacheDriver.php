@@ -25,6 +25,16 @@ use Thelia\Model\ConfigQuery;
 abstract class BaseCacheDriver implements CacheDriverInterface
 {
 
+    const CONFIG_ENABLED = 'tcache_enabled';
+
+    const CONFIG_DRIVER  = 'tcache_driver';
+
+    const DEFAULT_DRIVER = 'null';
+
+    const CONFIG_NAMESPACE = 'tcache_namespace';
+
+    const DEFAULT_NAMESPACE = '';
+
     const CONFIG_LIFE_TIME = 'tcache_life_time';
 
     const DEFAULT_LIFE_TIME = 30;
@@ -36,15 +46,24 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     /** @var bool Is the cache feature is activated or not */
     protected $sleep = false;
 
-    /** @var bool Default life time for entry */
+    /** @var int Default life time for entry */
     protected $lifeTime = null;
+
+    /** @var string Default namespace for entry */
+    protected $namespace = null;
 
 
     /**
      * @inheritdoc
      */
-    public abstract function init(array $params = null);
+    public function init(array $params = null) {
 
+        $this->initDefault($params);
+
+        $this->initDriver($params);
+
+        $this->postInit($params);
+    }
 
     protected function initDefault(array $params = null)
     {
@@ -54,6 +73,22 @@ abstract class BaseCacheDriver implements CacheDriverInterface
             self::CONFIG_LIFE_TIME,
             self::DEFAULT_LIFE_TIME
         );
+
+        $this->namespace = $this->getParam(
+            $params,
+            "namespace",
+            self::CONFIG_NAMESPACE,
+            self::DEFAULT_NAMESPACE
+        );
+    }
+
+    protected abstract function initDriver();
+
+    protected function postInit($params) {
+
+        if (null !== $this->cache) {
+            $this->cache->setNamespace($this->namespace);
+        }
     }
 
     /**
@@ -135,7 +170,7 @@ abstract class BaseCacheDriver implements CacheDriverInterface
      */
     public function getStats()
     {
-        $this->cache->getStats();
+        return $this->cache->getStats();
     }
 
     /**

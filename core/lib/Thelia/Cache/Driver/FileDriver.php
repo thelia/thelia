@@ -26,17 +26,15 @@ class FileDriver extends BaseCacheDriver
 
     const CONFIG_DIRECTORY = 'tcache_file_directory';
 
-    const DEFAULT_DIRECTORY = "doctrine";
+    const DEFAULT_DIRECTORY = "thelia";
 
     const CONFIG_EXTENSION = 'tcache_file_extension';
 
     /**
      * Init the cache.
      */
-    public function init(array $params = null)
+    public function initDriver(array $params = null)
     {
-        $this->initDefault($params);
-
         $directory = $this->getParam(
             $params,
             "directory",
