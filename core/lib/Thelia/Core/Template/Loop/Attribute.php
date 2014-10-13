@@ -130,12 +130,8 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();
 
             $search
-                ->joinAttributeTemplate(null, Criteria::LEFT_JOIN)
-                ->withColumn(AttributeTemplateTableMap::POSITION, 'position')
                 ->filterById($exclude_attributes, Criteria::NOT_IN)
             ;
-
-            $this->useAttributePosistion = false;
         }
 
         $orders  = $this->getOrder();
