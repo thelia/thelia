@@ -52,11 +52,6 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 {
     protected $timestampable = true;
 
-    // cache
-    protected $isCacheable = false;
-    protected $cacheByCustomer = true;
-    protected $cacheAttribute = 'product';
-
     /**
      * @return ArgumentCollection
      */
