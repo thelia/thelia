@@ -22,6 +22,10 @@ php Thelia module:deactivate HookTest
 echo "Clearing cache"
 php Thelia cache:clear --env=prod
 
+php Thelia module:refresh
+
+php Thelia module:activate Front
+
 echo "CasperJS"
 cd ../casperjs
 export DISPLAY=:99.0
