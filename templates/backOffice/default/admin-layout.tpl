@@ -134,17 +134,6 @@
 
                 <div class="row">
         			<div class="navbar-header">
-	                        {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-	                        <form class="navbar-form-xs col-xs-8 visible-xs" action="{url path='/admin/search'}">
-	                            <div class="input-group">
-	                                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-	                                <span class="input-group-btn">
-	                                    <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-	                                </span>
-	                            </div>
-	
-	                        </form>
-	                        {/loop}            			
 				<button type="button" class="btn navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 					<span class="sr-only">Toggle navigation</span>
 					<span class="icon-bar"></span>
