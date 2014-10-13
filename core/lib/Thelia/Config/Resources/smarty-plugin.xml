@@ -118,13 +118,15 @@
         <service id="smarty.plugin.hook" class="Thelia\Core\Template\Smarty\Plugins\Hook" scope="request">
             <argument>%kernel.debug%</argument>
             <tag name="thelia.parser.register_plugin"/>
-            <!--
-            <argument type="service" id="request" />
-            <argument type="service" id="thelia.securityContext" />
-            <argument type="service" id="thelia.taxEngine" />
-            <argument type="service" id="thelia.parser.context"/>
-            -->
             <argument type="service" id="event_dispatcher"/>
+        </service>
+
+        <service id="smarty.plugin.cache" class="Thelia\Core\Template\Smarty\Plugins\TheliaCache" scope="request">
+            <argument>%kernel.debug%</argument>
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="request" />
+            <argument type="service" id="thelia.cache" />
+            <argument type="service" id="thelia.translator" />
         </service>
 
     </services>
