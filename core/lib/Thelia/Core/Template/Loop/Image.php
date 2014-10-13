@@ -40,8 +40,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
     protected $timestampable = true;
 
-    protected $isCacheable = false;
-
     /**
      * @var array Possible standard image sources
      */
@@ -362,9 +360,4 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         return false;
     }
-
-    public function getCacheRef(){
-        return sprintf("%s::%s", $this->object_type, $this->object_id);
-    }
-
 }

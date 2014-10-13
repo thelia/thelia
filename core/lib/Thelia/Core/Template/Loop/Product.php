@@ -48,10 +48,6 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
     protected $timestampable = true;
     protected $versionable = true;
 
-    protected $isCacheable = false;
-    protected $cacheAttribute = 'id';
-
-
     /**
      * @return ArgumentCollection
      */
@@ -1010,10 +1006,5 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         return $search;
-    }
-
-    public function getCacheRef()
-    {
-        return sprintf("product::%s", $this->getId());
     }
 }
