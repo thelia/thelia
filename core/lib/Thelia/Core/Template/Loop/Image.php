@@ -394,8 +394,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     }
 
 
-    protected function isCacheable(){
-
+    protected function isCacheable()
+    {
         $this->object_type = null;
         $this->object_id  = null;
 

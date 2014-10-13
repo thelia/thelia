@@ -79,7 +79,7 @@ class TCache extends BaseAction implements EventSubscriberInterface
     }
 
 
-    function __construct(CacheDriverInterface $cache)
+    public function __construct(CacheDriverInterface $cache)
     {
         $this->cache = $cache;
     }
@@ -137,4 +137,4 @@ class TCache extends BaseAction implements EventSubscriberInterface
         return $event;
     }
 
-} 
+}

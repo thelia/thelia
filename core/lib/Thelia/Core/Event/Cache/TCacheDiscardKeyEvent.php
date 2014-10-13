@@ -20,8 +20,8 @@ use Thelia\Core\Event\TCacheEvent;
  * @package Thelia\Core\Event\Cache
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class TCacheDiscardKeyEvent extends TCacheEvent {
-
+class TCacheDiscardKeyEvent extends TCacheEvent
+{
     protected $key = null;
 
     /**
@@ -41,4 +41,4 @@ class TCacheDiscardKeyEvent extends TCacheEvent {
         return $this->key;
     }
 
-} 
+}

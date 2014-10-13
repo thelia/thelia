@@ -27,4 +27,4 @@ class TCacheUpdateEvent extends ActionEvent
     {
         return $this->parameters;
     }
-} 
+}

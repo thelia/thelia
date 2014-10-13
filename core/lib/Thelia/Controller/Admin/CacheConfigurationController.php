@@ -176,7 +176,7 @@ class CacheConfigurationController extends BaseAdminController
             return $response;
         }
 
-        $ret = $this->getCache()->deleteAll();
+        $ret = $this->getCache()->flush();
 
         return $this->jsonResponse(
             json_encode(
@@ -205,4 +205,4 @@ class CacheConfigurationController extends BaseAdminController
     {
         return $this->container->get('thelia.cache.factory');
     }
-} 
+}

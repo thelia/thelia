@@ -138,4 +138,4 @@ class TheliaCache extends AbstractSmartyPlugin
         ];
     }
 
-} 
+}
