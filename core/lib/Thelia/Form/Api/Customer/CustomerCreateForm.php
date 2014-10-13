@@ -22,7 +22,6 @@ use Thelia\Form\CustomerCreateForm as BaseCustomerCreateForm;
  */
 class CustomerCreateForm extends BaseCustomerCreateForm
 {
-
     public function buildForm()
     {
         parent::buildForm();
@@ -36,5 +35,4 @@ class CustomerCreateForm extends BaseCustomerCreateForm
                 ]
             ]);
     }
-
 }

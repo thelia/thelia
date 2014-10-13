@@ -36,7 +36,6 @@ use Thelia\Model\CustomerQuery;
  */
 class CustomerController extends BaseApiController
 {
-
     public function listAction()
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
@@ -58,7 +57,6 @@ class CustomerController extends BaseApiController
         $results = $customerLoop->exec($paginate);
 
         return JsonResponse::create($results);
-
     }
 
     public function getCustomerAction($customer_id)
@@ -84,14 +82,13 @@ class CustomerController extends BaseApiController
         }
 
         return JsonResponse::create($result);
-
     }
 
     public function createCustomerAction()
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
         $request = $this->getRequest();
-        $form = new CustomerCreateForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
+        $form = new CustomerCreateForm($this->getRequest(), "form", [], ['csrf_protection' => false]);
 
         try {
             $customerForm = $this->validateForm($form);
@@ -113,7 +110,7 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::UPDATE);
 
-        $form = new CustomerUpdateForm($this->getRequest(), "form",[], ['csrf_protection' => false]);
+        $form = new CustomerUpdateForm($this->getRequest(), "form", [], ['csrf_protection' => false]);
 
         $customer = CustomerQuery::create()
             ->findPk($customer_id);
@@ -131,7 +128,6 @@ class CustomerController extends BaseApiController
             $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $event);
 
             return Response::create(null, 204);
-
         } catch (FormValidationException $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }

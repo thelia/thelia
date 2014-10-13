@@ -26,7 +26,6 @@ use Thelia\Model\Api as ApiModel;
  */
 class Api extends BaseAction implements EventSubscriberInterface
 {
-
     public function createApi(ApiCreateEvent $event)
     {
         $api = new ApiModel();
@@ -35,7 +34,6 @@ class Api extends BaseAction implements EventSubscriberInterface
             ->setProfileId($event->getProfile())
             ->save()
         ;
-
     }
 
     public function deleteApi(ApiDeleteEvent $event)

@@ -25,7 +25,6 @@ use Thelia\Model\Api;
  */
 class BaseApiController extends BaseController
 {
-
     protected $apiUser;
     protected $currentRouter = "router.api";
 

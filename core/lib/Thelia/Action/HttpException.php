@@ -56,7 +56,6 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         if ($exception instanceof BaseHttpException && null === $event->getResponse()) {
             $this->displayException($event);
         }
-
     }
 
     protected function displayAdminGeneralError(GetResponseForExceptionEvent $event)

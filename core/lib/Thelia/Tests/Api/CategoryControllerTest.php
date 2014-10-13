@@ -16,7 +16,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\ApiTestCase;
 
-
 /**
  * Class CategoryControllerTest
  * @package Thelia\Tests\Api
@@ -30,7 +29,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/categories?sign='.$this->getSignParameter(''), [],[],
+            '/api/categories?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -45,7 +46,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/categories?lang=fr_FR&sign='.$this->getSignParameter(''), [],[],
+            '/api/categories?lang=fr_FR&sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -64,7 +67,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/categories/1?sign='.$this->getSignParameter(''), [],[],
+            '/api/categories/1?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -79,7 +84,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/categories/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(''), [],[],
+            '/api/categories/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -105,7 +112,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'POST',
-            '/api/categories?&sign='.$this->getSignParameter($requestContent), [], [],
+            '/api/categories?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
@@ -114,7 +123,6 @@ class CategoryControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('en_US', $content[0]['LOCALE']);
-
     }
 
     public function testCreateFr()
@@ -136,7 +144,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'POST',
-            '/api/categories?&sign='.$this->getSignParameter($requestContent), [], [],
+            '/api/categories?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
@@ -145,7 +155,6 @@ class CategoryControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('fr_FR', $content[0]['LOCALE']);
-
     }
 
     public function testUpdate()
@@ -172,7 +181,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'PUT',
-            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter($requestContent), [], [],
+            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
@@ -190,7 +201,9 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'DELETE',
-            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter(''), [], [],
+            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 

@@ -25,7 +25,6 @@ use Thelia\Core\Template\Loop\Title;
  */
 class TitleController extends BaseApiController
 {
-
     public function listAction()
     {
         $this->checkAuth(AdminResources::TITLE, [], AccessManager::VIEW);

@@ -61,5 +61,4 @@ class ApiCreateEvent extends ActionEvent
     {
         return $this->profile;
     }
-
 }

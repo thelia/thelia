@@ -22,7 +22,6 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
 use Thelia\Form\ProductCreationForm;
 
-
 /**
  * Class ProductController
  * @package Thelia\Controller\Api
@@ -100,7 +99,6 @@ class ProductController extends BaseApiController
             $response->setStatusCode(201);
 
             return $response;
-
         } catch (\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }

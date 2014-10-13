@@ -14,7 +14,6 @@ namespace Thelia\Tests\Api;
 
 use Thelia\Tests\ApiTestCase;
 
-
 /**
  * Class TitleControllerTest
  * @package Thelia\Tests\Api
@@ -28,7 +27,9 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/title?sign='.$this->getSignParameter(''), [], [],
+            '/api/title?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -43,7 +44,9 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/title?lang=fr_FR&sign='.$this->getSignParameter(''), [], [],
+            '/api/title?lang=fr_FR&sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -62,14 +65,15 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/title/1?sign='.$this->getSignParameter(''), [], [],
+            '/api/title/1?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
         $content = json_decode($client->getResponse()->getContent(), true);
         $this->assertCount(1, $content, 'response must contains only 1 result');
-
     }
 
     public function testGetActionWithLocale()
@@ -78,7 +82,9 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/title/1?lang=fr_FR&sign='.$this->getSignParameter(''), [], [],
+            '/api/title/1?lang=fr_FR&sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -87,7 +93,6 @@ class TitleControllerTest extends ApiTestCase
         $this->assertCount(1, $content, 'response must contains only 1 result');
         $firstResult = $content[0];
         $this->assertEquals('fr_FR', $firstResult['LOCALE'], 'the returned locale must be fr_FR');
-
     }
 
     public function testGetActionWithUnexistingId()
@@ -96,7 +101,9 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/title/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(''), [], [],
+            '/api/title/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(''),
+            [],
+            [],
             $this->getServerParameters()
         );
 

@@ -16,5 +16,4 @@ use Thelia\Model\Base\ApiQuery as BaseApiQuery;
  */
 class ApiQuery extends BaseApiQuery
 {
-
-} // ApiQuery
+}

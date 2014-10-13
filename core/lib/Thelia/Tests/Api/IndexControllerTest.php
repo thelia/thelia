@@ -21,7 +21,6 @@ use Thelia\Tests\ApiTestCase;
  */
 class IndexControllerTest extends ApiTestCase
 {
-
     public function testIndexAction()
     {
         $client = static::createClient();
@@ -33,8 +32,5 @@ class IndexControllerTest extends ApiTestCase
         $response = $client->getResponse();
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('OK', $response->getContent());
-
-
     }
-
 }

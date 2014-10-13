@@ -263,7 +263,6 @@ class ContentExport extends ExportHandler implements
         /** @var \Thelia\Model\FolderDocument $folderDocument */
         foreach ($folderDocuments as $folderDocument) {
             $this->addFileToArray($folderDocument, $documentPaths);
-
         }
 
         $contentDocuments = ContentDocumentQuery::create()

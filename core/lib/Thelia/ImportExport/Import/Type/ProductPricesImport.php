@@ -64,7 +64,6 @@ class ProductPricesImport extends ImportHandler
         $translator = Translator::getInstance();
 
         while (null !== $row = $data->popRow()) {
-
             $this->checkMandatoryColumns($row);
 
             $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
@@ -79,7 +78,6 @@ class ProductPricesImport extends ImportHandler
 
                 $errors[] = $errorMessage ;
             } else {
-
                 $currency = null;
 
                 if (isset($row["currency"])) {

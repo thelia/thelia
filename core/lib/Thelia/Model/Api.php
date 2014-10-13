@@ -48,7 +48,6 @@ class Api extends BaseApi implements UserInterface
         $fs->touch($file);
         file_put_contents($file, Password::generateHexaRandom(45));
         $fs->chmod($file, 0600);
-
     }
 
     public function getSecureKey()

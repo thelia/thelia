@@ -22,7 +22,6 @@ use Thelia\Model\Api;
  */
 class ApiDeleteEvent extends ActionEvent
 {
-
     /**
      * @var \Thelia\Model\Api
      */

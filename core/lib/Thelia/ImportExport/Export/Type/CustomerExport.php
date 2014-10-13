@@ -207,7 +207,6 @@ class CustomerExport extends ExportHandler
                     "last_order_DATE" => "",
                 ];
             } else {
-
                 /**
                  * Reformat created_at date
                  */

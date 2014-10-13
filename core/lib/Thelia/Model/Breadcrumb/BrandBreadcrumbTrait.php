@@ -30,7 +30,6 @@ trait BrandBreadcrumbTrait
         ];
 
         if (null !== $brand = BrandQuery::create()->findPk($this->getBrandId())) {
-
             $breadcrumb[$brand->setLocale($locale)->getTitle()] = sprintf(
                 "%s?current_tab=%s",
                 $router->generate('admin.brand.update', ['brand_id' => $brand->getId()], Router::ABSOLUTE_URL),

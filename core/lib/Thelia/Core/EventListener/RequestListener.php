@@ -248,7 +248,6 @@ class RequestListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-
         return [
             KernelEvents::REQUEST => [
                 ["registerValidatorTranslator", 128],

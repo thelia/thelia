@@ -99,7 +99,6 @@ class ApiController extends BaseAdminController
         $form = new ApiCreateForm($this->getRequest());
         $error_msg = null;
         try {
-
             $createForm = $this->validateForm($form);
 
             $event = new ApiCreateEvent(
@@ -110,7 +109,6 @@ class ApiController extends BaseAdminController
             $this->dispatch(TheliaEvents::API_CREATE, $event);
 
             return RedirectResponse::create($form->getSuccessUrl());
-
         } catch (FormValidationException $e) {
             $error_msg = $this->createStandardFormValidationErrorMessage($e);
         } catch (\Exception $e) {
@@ -157,7 +155,6 @@ class ApiController extends BaseAdminController
         $error_msg = null;
         $form = new ApiUpdateForm($this->getRequest());
         try {
-
             $updateForm = $this->validateForm($form);
 
             $event = new ApiUpdateEvent($api, $updateForm->get('profile')->getData() ?: null);
@@ -165,7 +162,6 @@ class ApiController extends BaseAdminController
             $this->dispatch(TheliaEvents::API_UPDATE, $event);
 
             $response = RedirectResponse::create(URL::getInstance()->absoluteUrl($this->getRoute('admin.configuration.api')));
-
         } catch (FormValidationException $e) {
             $error_msg = $this->createStandardFormValidationErrorMessage($e);
         } catch (\Exception $e) {
@@ -212,5 +208,4 @@ class ApiController extends BaseAdminController
             ]
         );
     }
-
 }

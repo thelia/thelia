@@ -14,7 +14,6 @@ namespace Thelia\Tests;
 
 use Thelia\Model\ApiQuery;
 
-
 /**
  * Class ApiTestCase
  * @package Thelia\Tests
@@ -22,7 +21,6 @@ use Thelia\Model\ApiQuery;
  */
 class ApiTestCase extends WebTestCase
 {
-
     const API_KEY = "79E95BD784CADA0C9A578282E";
 
     protected function getServerParameters()

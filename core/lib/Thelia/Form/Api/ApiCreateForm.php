@@ -24,7 +24,6 @@ use Thelia\Model\ProfileQuery;
  */
 class ApiCreateForm extends BaseForm
 {
-
     /**
      *
      * in this function you add all the fields you need for your Form.

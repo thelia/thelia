@@ -66,5 +66,4 @@ class ApiUpdateEvent extends ActionEvent
     {
         return $this->profile;
     }
-
 }

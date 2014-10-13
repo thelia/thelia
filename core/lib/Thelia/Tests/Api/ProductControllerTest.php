@@ -17,7 +17,6 @@ use Thelia\Model\CurrencyQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Tests\ApiTestCase;
 
-
 /**
  * Class ProductControllerTest
  * @package Thelia\Tests\Api
@@ -34,7 +33,9 @@ class ProductControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/products?sign='.$this->getSignParameter(""),[],[],
+            '/api/products?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -53,7 +54,9 @@ class ProductControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/products?limit=2&sign='.$this->getSignParameter(""),[],[],
+            '/api/products?limit=2&sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -72,7 +75,9 @@ class ProductControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/products/1?sign='.$this->getSignParameter(""),[],[],
+            '/api/products/1?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -91,7 +96,9 @@ class ProductControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/products/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(""),[],[],
+            '/api/products/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -125,7 +132,9 @@ class ProductControllerTest extends ApiTestCase
 
         $client->request(
             'POST',
-            '/api/products?&sign='.$this->getSignParameter($requestContent), [], [],
+            '/api/products?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );

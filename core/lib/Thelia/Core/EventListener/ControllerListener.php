@@ -31,7 +31,6 @@ use Thelia\Model\ApiQuery;
  */
 class ControllerListener implements EventSubscriberInterface
 {
-
     protected $securityContext;
 
     public function __construct(SecurityContext $securityContext)
@@ -44,7 +43,6 @@ class ControllerListener implements EventSubscriberInterface
         $controller = $event->getController();
         //check if an admin is logged in
         if ($controller[0] instanceof BaseAdminController) {
-
             if (false === $this->securityContext->hasAdminUser() && $event->getRequest()->attributes->get('not-logged') != 1) {
                 throw new AdminAccessDenied();
             }
@@ -66,7 +64,6 @@ class ControllerListener implements EventSubscriberInterface
 
     private function checkApiAccess(Request $request)
     {
-
         $key = $request->headers->get('authorization');
         if (null !== $key) {
             $key = substr($key, 6);

@@ -24,10 +24,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class IndexController extends BaseApiController
 {
-
     public function indexAction()
     {
         return Response::create("OK");
     }
-
 }

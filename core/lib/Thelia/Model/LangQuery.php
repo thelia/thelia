@@ -16,8 +16,6 @@ use Thelia\Model\Base\LangQuery as BaseLangQuery;
  */
 class LangQuery extends BaseLangQuery
 {
-
-
     public function findByIdOrLocale($search)
     {
         $find = $this->findPk($search);

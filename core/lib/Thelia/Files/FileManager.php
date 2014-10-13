@@ -113,7 +113,6 @@ class FileManager
         $newUploadedFile = null;
 
         if ($uploadedFile !== null) {
-
             $directory = $model->getUploadDir();
 
             $fileName = $this->renameFile($model->getId(), $uploadedFile);
@@ -149,7 +148,6 @@ class FileManager
         $nbModifiedLines = 0;
 
         if ($fileModel->getFile() !== null) {
-
             $fileModel->setParentId($parentId);
 
             $nbModifiedLines = $fileModel->save();

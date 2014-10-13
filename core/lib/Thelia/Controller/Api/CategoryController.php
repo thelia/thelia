@@ -27,7 +27,6 @@ use Thelia\Form\CategoryModificationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CategoryQuery;
 
-
 /**
  * Class CategoryController
  * @package Thelia\Controller\Api
@@ -90,7 +89,7 @@ class CategoryController extends BaseApiController
         $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::CREATE);
         $request = $this->getRequest();
 
-        $form = new CategoryCreationForm($request, "form",[], ['csrf_protection' => false]);
+        $form = new CategoryCreationForm($request, "form", [], ['csrf_protection' => false]);
 
         try {
             $categoryForm = $this->validateForm($form);
@@ -110,7 +109,7 @@ class CategoryController extends BaseApiController
             $response->setStatusCode(201);
 
             return $response;
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }
@@ -143,8 +142,7 @@ class CategoryController extends BaseApiController
             $this->dispatch(TheliaEvents::CATEGORY_UPDATE, $event);
 
             return JsonResponse::create(null, 204);
-
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }
@@ -165,8 +163,7 @@ class CategoryController extends BaseApiController
             $this->dispatch(TheliaEvents::CATEGORY_DELETE, $event);
 
             return Response::create('', 204);
-
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 400);
         }
     }

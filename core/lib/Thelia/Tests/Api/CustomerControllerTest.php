@@ -15,7 +15,6 @@ namespace Thelia\Tests\Api;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tests\ApiTestCase;
 
-
 /**
  * Class CustomerControllerTest
  * @package Thelia\Tests\Api
@@ -23,7 +22,6 @@ use Thelia\Tests\ApiTestCase;
  */
 class CustomerControllerTest extends ApiTestCase
 {
-
     /**
      * @covers \Thelia\Controller\Api\CustomerController::listAction
      */
@@ -33,7 +31,9 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/customers?sign='.$this->getSignParameter(""),[],[],
+            '/api/customers?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -53,12 +53,13 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/customers?order=foo&sign='.$this->getSignParameter(""),[],[],
+            '/api/customers?order=foo&sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode(), 'Http status code must be 400');
-
     }
 
     /**
@@ -70,7 +71,9 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/customers?limit=1&sign='.$this->getSignParameter(""),[],[],
+            '/api/customers?limit=1&sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -105,7 +108,9 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/customers/1?&sign='.$this->getSignParameter(""),[],[],
+            '/api/customers/1?&sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -126,7 +131,9 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'GET',
-            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter(""),[],[],
+            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -157,7 +164,9 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'POST',
-            '/api/customers?&sign='.$this->getSignParameter($requestContent),[],[],
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
@@ -167,7 +176,6 @@ class CustomerControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
 
         return $content[0]['ID'];
-
     }
 
     public function testCreateWithExistingEmail()
@@ -196,13 +204,14 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'POST',
-            '/api/customers?&sign='.$this->getSignParameter($requestContent),[],[],
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
-
     }
 
     /**
@@ -214,7 +223,9 @@ class CustomerControllerTest extends ApiTestCase
 
         $client->request(
             'DELETE',
-            '/api/customers/'.$customer_id.'?sign='.$this->getSignParameter(""),[],[],
+            '/api/customers/'.$customer_id.'?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
@@ -226,12 +237,13 @@ class CustomerControllerTest extends ApiTestCase
         $client = static::createClient();
         $client->request(
             'DELETE',
-            '/api/customers/1?sign='.$this->getSignParameter(""),[],[],
+            '/api/customers/1?sign='.$this->getSignParameter(""),
+            [],
+            [],
             $this->getServerParameters()
         );
 
         $this->assertEquals(403, $client->getResponse()->getStatusCode(), "the response code must be 403 because the customer already have orders");
-
     }
 
     public function testUpdateCustomer()
@@ -257,7 +269,9 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'PUT',
-            '/api/customers/1?&sign='.$this->getSignParameter($requestContent),[],[],
+            '/api/customers/1?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
@@ -288,7 +302,9 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'PUT',
-            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter($requestContent),[],[],
+            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
             $servers,
             $requestContent
         );
