@@ -164,7 +164,7 @@
         <service
             id="thelia.cache"
             class="Thelia\Cache\Driver\CacheDriverInterface"
-            factory-class="thelia.cache.factory"
+            factory-service="thelia.cache.factory"
             factory-method="get">
         </service>
 
