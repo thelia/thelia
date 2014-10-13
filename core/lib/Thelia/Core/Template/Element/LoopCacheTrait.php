@@ -29,11 +29,11 @@ use Thelia\Type\TypeCollection;
 trait LoopCacheTrait
 {
 
-    /** @var Request $request */
-    protected $request;
+    /** @var Request $request
+    protected $request;*/
 
-    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args */
-    protected $args;
+    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args
+    protected $args;*/
 
     /** @var bool Use the CacheFactory feature */
     protected $isCacheable = false;
@@ -98,8 +98,8 @@ trait LoopCacheTrait
 
         // add role constraint
         if ($this->useCacheByUser) {
-            if (null !== $customer = $this->getSession()->getCustomerUser() !== null) {
-                $hash .= '.' . $this->request->getSession()->getCustomer();
+            if (null !== $customer = $this->request->getSession()->getCustomerUser()) {
+                $hash .= '.' . $customer;
             }
         }
 
