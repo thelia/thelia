@@ -26,7 +26,7 @@ class NullDriver extends BaseCacheDriver
     /**
      * Init the cache.
      */
-    public function init(array $params = null)
+    public function initDriver(array $params = null)
     {
 
     }
