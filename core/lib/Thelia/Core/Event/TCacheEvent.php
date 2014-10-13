@@ -19,8 +19,8 @@ namespace Thelia\Core\Event;
  * @package Thelia\Core\Event
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class TCacheEvent extends ActionEvent {
-
+class TCacheEvent extends ActionEvent
+{
     protected $response = null;
 
     /**
@@ -42,4 +42,4 @@ class TCacheEvent extends ActionEvent {
 
 
 
-} 
+}

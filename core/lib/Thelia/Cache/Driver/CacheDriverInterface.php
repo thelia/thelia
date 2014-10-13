@@ -72,7 +72,7 @@ interface CacheDriverInterface
      *
      * @param string $id       The cache id.
      * @param mixed  $data     The cache entry/data.
-     * @param int    $lifeTime The cache lifetime.
+     * @param int    $lifeTime The cache lifetime in seconds.
      *                         If != 0, sets a specific lifetime for this cache entry (0 => infinite lifeTime).
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
@@ -99,8 +99,17 @@ interface CacheDriverInterface
 
     /**
      * Deletes all cache entries.
+     *
+     * @return boolean TRUE if the cache entries were successfully flushed, FALSE otherwise.
      */
     public function deleteAll();
+
+    /**
+     * Deletes all cache entries.
+     *
+     * @return boolean TRUE if the cache entries were successfully flushed, FALSE otherwise.
+     */
+    public function flush();
 
     /**
      * Temporary deactivate the cache.

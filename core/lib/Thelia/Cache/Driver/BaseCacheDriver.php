@@ -136,7 +136,7 @@ abstract class BaseCacheDriver implements CacheDriverInterface
      */
     public function delete($id)
     {
-        $this->cache->delete($id);
+        return $this->cache->delete($id);
     }
 
     /**
@@ -160,9 +160,17 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     /**
      * @inheritdoc
      */
+    public function flush()
+    {
+        return $this->cache->flushAll();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function deleteAll()
     {
-        $this->cache->deleteAll();
+        return $this->cache->deleteAll();
     }
 
     /**

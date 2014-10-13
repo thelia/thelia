@@ -3,6 +3,7 @@
    {hook name="category.sidebar-body"}
 {/ifhook}
 {elsehook rel="category.sidebar-body"}
+
 <section id="categories" class="block block-nav" role="navigation" aria-labelledby="categories-label">
     <div class="block-heading"><h3 class="block-title" id="categories-label">{intl l="Categories"}</h3></div>
     <div class="block-content">
@@ -21,7 +22,7 @@
                             {else}
                             <ul id="collapse{$parent}" class="collapse">
                         {/if}
-                {/if}
+                    {/if}
 
                     {loop name="cat-parent-$level" type="category" parent=$parent need_count_child=1 not_empty="1"}
 
@@ -37,8 +38,9 @@
                 </ul>
             {/function}
 
-            {menu parent='0'}
-
+            {cache key="menu" category=$current_category_id lang={lang attr="id"}}
+                {menu parent='0'}
+            {/cache}
         </nav>
     </div>
 </section>

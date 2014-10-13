@@ -23,4 +23,4 @@ use Thelia\Core\Event\TCacheEvent;
 class TCacheFlushEvent extends TCacheEvent
 {
 
-} 
+}

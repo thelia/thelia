@@ -27,8 +27,8 @@ use Thelia\Model\ConfigQuery;
  * @package Thelia\Form
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class CacheConfigurationForm extends BaseForm {
-
+class CacheConfigurationForm extends BaseForm
+{
     protected function buildForm()
     {
         $this->formBuilder
@@ -70,7 +70,7 @@ class CacheConfigurationForm extends BaseForm {
                         BaseCacheDriver::CONFIG_LIFE_TIME,
                         BaseCacheDriver::DEFAULT_LIFE_TIME
                     )),
-                    "label" => Translator::getInstance()->trans('Life Time'),
+                    "label" => Translator::getInstance()->trans('Life Time (in seconds)'),
                     "label_attr" => [
                         "for" => "lifetime"
                     ],
@@ -168,4 +168,4 @@ class CacheConfigurationForm extends BaseForm {
         return "thelia_admin_cache";
     }
 
-} 
+}
