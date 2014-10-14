@@ -44,8 +44,8 @@ class HookController extends AbstractCrudController
     {
         parent::__construct(
             'hook',
-            'manual',
-            'hook_order',
+            'id',
+            'order',
             AdminResources::HOOK,
             TheliaEvents::HOOK_CREATE,
             TheliaEvents::HOOK_UPDATE,
@@ -55,7 +55,7 @@ class HookController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -64,13 +64,13 @@ class HookController extends AbstractCrudController
 
     public function discoverAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::VIEW)) {
             return $response;
         }
 
         $templateType = intval($this->getRequest()->get("template_type", TemplateDefinition::FRONT_OFFICE));
 
-        $json_data = array();
+        $json_data = [];
         try {
             // parse the current template
             $hookHelper = $this->container->get("thelia.hookHelper");
@@ -80,8 +80,8 @@ class HookController extends AbstractCrudController
             $allHooks = $this->getAllHooks($templateType);
 
             // diff
-            $newHooks      = array();
-            $existingHooks = array();
+            $newHooks      = [];
+            $existingHooks = [];
             foreach ($hooks as $hook) {
                 if (array_key_exists($hook["code"], $allHooks)) {
                     $existingHooks[] = $hook["code"];
@@ -94,15 +94,15 @@ class HookController extends AbstractCrudController
                 unset($allHooks[$code]);
             }
 
-            $json_data = array(
+            $json_data = [
                 "success" => true,
                 "new"     => $newHooks,
                 "missing" => $allHooks
-            );
+            ];
 
             $response = JsonResponse::create($json_data);
         } catch (\Exception $e) {
-            $response  = JsonResponse::create(array("error" => $e->getMessage()), 500);
+            $response = JsonResponse::create(["error" => $e->getMessage()], 500);
         }
 
         return $response;
@@ -110,11 +110,11 @@ class HookController extends AbstractCrudController
 
     public function discoverSaveAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::HOOK, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::HOOK, [], AccessManager::UPDATE)) {
             return $response;
         }
 
-        $errors = array();
+        $errors = [];
 
         $templateType = $this->getRequest()->request->get("templateType");
 
@@ -126,7 +126,8 @@ class HookController extends AbstractCrudController
                 $this->dispatch(TheliaEvents::HOOK_CREATE_ALL, $event);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to create new hook %s"), $hook["code"]);
+                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to create new hook %s"),
+                        $hook["code"]);
                 }
             }
         }
@@ -139,17 +140,18 @@ class HookController extends AbstractCrudController
                 $this->dispatch(TheliaEvents::HOOK_DEACTIVATION, $event);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to deactivate hook with id %s"), $hookId);
+                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to deactivate hook with id %s"),
+                        $hookId);
                 }
             }
         }
 
-        $json_data = array(
+        $json_data = [
             "success" => true
-        );
+        ];
 
         if (count($errors)) {
-            $response  = JsonResponse::create(array("error" => $errors), 500);
+            $response = JsonResponse::create(["error" => $errors], 500);
         } else {
             $response = JsonResponse::create($json_data);
         }
@@ -201,16 +203,16 @@ class HookController extends AbstractCrudController
             ->filterByType($templateType, Criteria::EQUAL)
             ->find();
 
-        $ret = array();
+        $ret = [];
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $ret[$hook->getCode()] = array(
+            $ret[$hook->getCode()] = [
                 "id"       => $hook->getId(),
                 "code"     => $hook->getCode(),
                 "native"   => $hook->getNative(),
                 "activate" => $hook->getActivate(),
                 "title"    => $hook->getTitle()
-            );
+            ];
         }
 
         return $ret;
@@ -241,7 +243,7 @@ class HookController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'          => $object->getId(),
             'code'        => $object->getCode(),
             'type'        => $object->getType(),
@@ -253,7 +255,7 @@ class HookController extends AbstractCrudController
             'title'       => $object->getTitle(),
             'chapo'       => $object->getChapo(),
             'description' => $object->getDescription(),
-        );
+        ];
 
         return new HookModificationForm($this->getRequest(), 'form', $data);
     }
@@ -379,7 +381,7 @@ class HookController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("hooks", array("display_hook" => 20));
+        return $this->render("hooks", ['order' => $currentOrder,]);
     }
 
     /**
@@ -392,9 +394,9 @@ class HookController extends AbstractCrudController
 
     protected function getEditionArgument()
     {
-        return array(
+        return [
             'hook_id' => $this->getRequest()->get('hook_id', 0)
-        );
+        ];
     }
 
     /**
@@ -421,7 +423,7 @@ class HookController extends AbstractCrudController
 
     public function toggleNativeAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -445,7 +447,7 @@ class HookController extends AbstractCrudController
 
     public function toggleActivationAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, [], AccessManager::UPDATE)) {
             return $response;
         }
 

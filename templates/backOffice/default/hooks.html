@@ -67,11 +67,51 @@
                                 </caption>
                                 <thead>
                                     <tr>
-                                        <th>{intl l="ID"}</th>
-                                        <th>{intl l="Code"}</th>
-                                        <th>{intl l="Title"}</th>
-                                        <th>{intl l="Official"}</th>
-                                        <th>{intl l="Active"}</th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='id'
+                                            reverse_order='id_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l='ID'}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='code'
+                                            reverse_order='code_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l='Code'}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='alpha'
+                                            reverse_order='alpha_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Title"}"
+                                            }
+                                            </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='native'
+                                            reverse_order='native_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Official"}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='enabled'
+                                            reverse_order='enabled_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Active"}"
+                                            }
+                                        </th>
 
                                         {hook name="hooks.table-header" location="hooks_table_header" }
 
