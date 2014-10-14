@@ -1114,6 +1114,8 @@ return array(
     'You can\'t do exports, you don\'t have any formatter that handles this.' => 'Cet export n\'est pas faisable, vousd n\'avez aucun formatteur pouvant le gérer',
     'You don\'t have any export' => 'Vous n\'avez aucun export',
     'You don\'t have any import' => 'Vous n\'avez aucun import',
+    'You have no orders for the moment.' => 'Aucune commande n\'a encore été passée.',
+    'You have no registred customers for the moment.' => 'Vous n\'avez aucun client enregistré pour le moment.',
     'You may also quickly create combinations from products attributes using the  <a href="%url" data-toggle="modal">Combination Builder</a>.' => 'Vous pouvez aussi créer rapidement une série de combinaisons avec <a href="%url" data-toggle="modal">le gestionnaire de combinaisons</a>.',
     'Your current IP address is %ip' => 'Votre adresse IP est %ip',
     'Your email' => 'Votre email',
