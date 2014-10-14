@@ -93,5 +93,10 @@
     <route id="api.tax-rule.list" path="/api/tax-rules" methods="get">
         <default key="_controller">Thelia\Controller\Api\TaxRuleController::listAction</default>
     </route>
+
+    <route id="api.tax-rule.get" path="/api/tax-rules/{tax_rule_id}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\TaxRuleController::getAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
     <!-- end tax rule -->
 </routes>

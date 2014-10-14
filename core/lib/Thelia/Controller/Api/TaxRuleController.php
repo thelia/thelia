@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Controller\Admin\ApiController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -42,5 +43,30 @@ class TaxRuleController extends BaseApiController
         $page = 0;
 
         return JsonResponse::create($taxRuleLoop->exec($page));
+    }
+
+    public function getAction($tax_rule_id)
+    {
+        $this->checkAuth(AdminResources::TAX, [], AccessManager::VIEW);
+
+        $request = $this->getRequest();
+        $taxRuleLoop = new TaxRule($this->getContainer());
+
+        $args = [];
+        if ($request->query->has('lang')) {
+            $args['lang'] = $request->query->get('lang');
+        }
+        $args['id'] = $tax_rule_id;
+        $taxRuleLoop->initializeArgs($args);
+
+        $page = 0;
+
+        $result = $taxRuleLoop->exec($page);
+
+        if ($result->isEmpty()) {
+            throw new HttpException(404, sprintf('{"error": "tax rule with id %d not found"}', $tax_rule_id));
+        }
+
+        return JsonResponse::create($result);
     }
 }
