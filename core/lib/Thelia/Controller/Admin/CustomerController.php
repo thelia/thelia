@@ -214,15 +214,22 @@ class CustomerController extends AbstractCrudController
 
     public function deleteAction()
     {
+        $error_msg = "No error.";
+        $removal_error = false;
+
         try {
             parent::deleteAction();
+
+            $this->redirectToEditionTemplate();
         } catch (CustomerException $e) {
             $error_msg = $e->getMessage();
+
+            $removal_error = true;
         }
 
-        return $this->renderListTemplate($this->getCurrentListOrder(), array(
-                "removal_error" => true,
-                "error_message" => $error_msg
-            ));
+        return $this->renderListTemplate($this->getCurrentListOrder(), [
+            "removal_error" => $removal_error,
+            "error_message" => $error_msg
+        ]);
     }
 }
