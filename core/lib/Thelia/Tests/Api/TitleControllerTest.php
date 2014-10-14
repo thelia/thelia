@@ -108,6 +108,6 @@ class TitleControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
-        $content = json_decode($client->getResponse()->getContent(), true);
+
     }
 }

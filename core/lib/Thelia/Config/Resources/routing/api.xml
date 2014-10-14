@@ -87,4 +87,11 @@
     </route>
 
     <!-- end category route -->
+
+    <!-- tax rule route -->
+
+    <route id="api.tax-rule.list" path="/api/tax-rules" methods="get">
+        <default key="_controller">Thelia\Controller\Api\TaxRuleController::listAction</default>
+    </route>
+    <!-- end tax rule -->
 </routes>
