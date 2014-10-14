@@ -703,6 +703,7 @@ return array(
     'No hooks has been created yet. Click the + button to create one.' => 'No hooks has been created yet. Click the + button to create one.',
     'No logo image' => 'No logo image',
     'No mailing template has been created yet. Click the + button to create one.' => 'No mailing template has been created yet. Click the + button to create one.',
+    'No orders fo this customer.' => 'No orders fo this customer.',
     'No product attribute has been created yet. Click the + button to create one.' => 'No product attribute has been created yet. Click the + button to create one.',
     'No product feature has been created yet. Click the + button to create one.' => 'No product feature has been created yet. Click the + button to create one.',
     'No product template has been created yet. Click the + button to create one.' => 'No product template has been created yet. Click the + button to create one.',
