@@ -53,7 +53,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param null $cartItemId
+     * @param int $cartItemId
      */
     public function setCartItemId($cartItemId)
     {
@@ -63,7 +63,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null
+     * @return int
      */
     public function getCartItemId()
     {
@@ -79,7 +79,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $address
+     * @param int $address an address ID
      */
     public function setInvoiceAddress($address)
     {
@@ -87,7 +87,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $address
+     * @param int $address an address ID
      */
     public function setDeliveryAddress($address)
     {
@@ -95,7 +95,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $module
+     * @param int $module a delivery module ID
      */
     public function setDeliveryModule($module)
     {
@@ -103,7 +103,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $module
+     * @param int $module a payment module ID
      */
     public function setPaymentModule($module)
     {
@@ -111,7 +111,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $postage
+     * @param double  $postage the postage amount
      */
     public function setPostage($postage)
     {
@@ -119,7 +119,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $ref
+     * @param string $ref the order reference
      */
     public function setRef($ref)
     {
@@ -127,7 +127,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param int $status
+     * @param int $status the order status ID
      */
     public function setStatus($status)
     {
@@ -135,7 +135,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param $deliveryRef
+     * @param string $deliveryRef the delivery reference
      */
     public function setDeliveryRef($deliveryRef)
     {
@@ -143,7 +143,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|Order
+     * @return Order the order
      */
     public function getOrder()
     {
@@ -151,15 +151,20 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|Order
+     * @return Order the placed order, valid only after order payment
+     * @throws \LogicException if the method is called before payment
      */
     public function getPlacedOrder()
     {
+        if (null === $this->placedOrder) {
+            throw new \LogicException("The placed order is defined only after dispatching of the ORDER_PAY event");
+        }
+
         return $this->placedOrder;
     }
 
     /**
-     * @return null|int
+     * @return null|int the invoice address ID
      */
     public function getInvoiceAddress()
     {
@@ -167,7 +172,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|int the delivery addres ID
      */
     public function getDeliveryAddress()
     {
@@ -175,7 +180,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|int the delivery module ID
      */
     public function getDeliveryModule()
     {
@@ -183,7 +188,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|int the payment module ID
      */
     public function getPaymentModule()
     {
@@ -191,7 +196,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|double the postage amount
      */
     public function getPostage()
     {
@@ -199,7 +204,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|string the order reference
      */
     public function getRef()
     {
@@ -207,7 +212,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|int
+     * @return null|int the order status ID
      */
     public function getStatus()
     {
@@ -215,7 +220,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return null|string
+     * @return null|string the delivery reference
      */
     public function getDeliveryRef()
     {
@@ -223,7 +228,7 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @param  Response $response
+     * @param  Response $response the payment request response
      * @return $this
      */
     public function setResponse(Response $response)
@@ -234,13 +239,16 @@ class OrderEvent extends ActionEvent
     }
 
     /**
-     * @return Response
+     * @return Response the payment request response
      */
     public function getResponse()
     {
         return $this->response;
     }
 
+    /**
+     * @return bool true if this event has a payment request response
+     */
     public function hasResponse()
     {
         return null !== $this->response;
