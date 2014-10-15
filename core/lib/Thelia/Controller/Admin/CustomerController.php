@@ -219,8 +219,6 @@ class CustomerController extends AbstractCrudController
 
         try {
             parent::deleteAction();
-
-            $this->redirectToEditionTemplate();
         } catch (CustomerException $e) {
             $error_msg = $e->getMessage();
 
