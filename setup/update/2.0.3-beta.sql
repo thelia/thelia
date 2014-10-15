@@ -523,14 +523,14 @@ INSERT INTO `config`(`name`, `value`, `secured`, `hidden`, `created_at`, `update
 ('form_firewall_time_to_wait', '60', 0, 0, NOW(), NOW()),
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
-('from_firewall_active', '1', 0, 0, NOW(), NOW())
+('form_firewall_active', '1', 0, 0, NOW(), NOW())
 ;
 
 SELECT @bf_time := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_time_to_wait';
 SELECT @time := `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
 SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_attempts';
 SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
-SELECT @active := `id` FROM `config` WHERE `name` =  'from_firewall_active';
+SELECT @active := `id` FROM `config` WHERE `name` =  'form_firewall_active';
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
