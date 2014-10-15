@@ -141,12 +141,8 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             $exclude_features = FeatureTemplateQuery::create()->filterByTemplateId($exclude_template)->select('feature_id')->find();
 
             $search
-                ->joinFeatureTemplate(null, Criteria::LEFT_JOIN)
-                ->withColumn(FeatureTemplateTableMap::POSITION, 'position')
                 ->filterById($exclude_features, Criteria::NOT_IN)
             ;
-
-            $this->useFeaturePosition = false;
         }
 
         $title = $this->getTitle();
