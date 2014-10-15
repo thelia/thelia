@@ -276,8 +276,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         }
                     }
                 }
-
                 $loopResultRow->set("CONFIGURABLE", $hasConfigurationInterface ? 1 : 0);
+
+                // Does module have hook(s)
+                $hookable = false;
+                $moduleHookCount = ModuleHookQuery::create()
+                    ->filterByModuleId($module->getId())
+                    ->count()
+                ;
+                $hookable = ($moduleHookCount > 0);
+
+                $loopResultRow->set("HOOKABLE", $hookable ? 1 : 0);
+
 
                 if (null !== $this->getProfile()) {
                     $accessValue = $module->getVirtualColumn('access');
