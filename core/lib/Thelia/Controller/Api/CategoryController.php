@@ -110,7 +110,7 @@ class CategoryController extends BaseApiController
 
             return $response;
         } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -143,7 +143,7 @@ class CategoryController extends BaseApiController
 
             return JsonResponse::create(null, 204);
         } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -164,7 +164,7 @@ class CategoryController extends BaseApiController
 
             return Response::create('', 204);
         } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 }

@@ -16,11 +16,14 @@ use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
 use Thelia\Form\ProductCreationForm;
+use Thelia\Form\ProductModificationForm;
+use Thelia\Model\ProductQuery;
 
 /**
  * Class ProductController
@@ -100,7 +103,40 @@ class ProductController extends BaseApiController
 
             return $response;
         } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function updateAction($product_id)
+    {
+        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE);
+
+        $product = ProductQuery::create()
+            ->findPk($product_id);
+
+        if (null === $product) {
+            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $product_id));
+        }
+
+        $request = $this->getRequest();
+
+        $form = new ProductModificationForm($request, 'form', ['id' => $product_id], ['csrf_protection' => false]);
+
+        $data = $request->request->all();
+        $data[$form->getName()]['id'] = $product_id;
+        $request->request->add($data);
+
+        try {
+            $updateForm = $this->validateForm($form);
+
+            $event = new ProductUpdateEvent($product_id);
+            $event->bindForm($updateForm);
+
+            $this->dispatch(TheliaEvents::PRODUCT_UPDATE, $event);
+
+            return JsonResponse::create(null, 204);
+        } catch (\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 }

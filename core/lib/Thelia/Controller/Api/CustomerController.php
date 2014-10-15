@@ -102,7 +102,7 @@ class CustomerController extends BaseApiController
 
             return $response;
         } catch (FormValidationException $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -129,7 +129,7 @@ class CustomerController extends BaseApiController
 
             return Response::create(null, 204);
         } catch (FormValidationException $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 400);
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
         }
     }
 
