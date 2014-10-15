@@ -58,25 +58,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
         if ($cartItem === null || $newness) {
-            $productSaleElements = ProductSaleElementsQuery::create()
-                ->findPk($productSaleElementsId);
+            $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
 
             if (null !== $productSaleElements) {
                 $productPrices = $productSaleElements->getPricesByCurrency($currency, $discount);
-                $event->setCartItem(
-                    $this->doAddItem($event->getDispatcher(), $cart, $productId, $productSaleElements, $quantity, $productPrices)
-                );
+
+                $cartItem = $this->doAddItem($event->getDispatcher(), $cart, $productId, $productSaleElements, $quantity, $productPrices);
             }
+        } elseif ($append && $cartItem !== null) {
+            $cartItem->addQuantity($quantity)->save();
         }
 
-        if ($append && $cartItem !== null) {
-            $cartItem->addQuantity($quantity)
-                ->save();
-
-            $event->setCartItem(
-                $cartItem
-            );
-        }
+        $event->setCartItem($cartItem);
     }
 
     /**
