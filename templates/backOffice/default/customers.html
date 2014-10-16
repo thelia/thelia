@@ -24,9 +24,8 @@
                 <div class="col-md-12">
                     <div class="general-block-decorator">
                         {if $removal_error }
-                            <div class="alert alert-danger fade in">
-                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                                <h4 class="modal-title">{$error_message}</h4>
+                            <div class="alert alert-danger">
+                                {$error_message}
                             </div>
                         {/if}
                         <div class="table-responsive">
@@ -194,6 +193,16 @@
                                         </tr>
                                     </tfoot>
                                 {/ifloop}
+
+                                {elseloop rel="customer_list"}
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="alert alert-info">
+                                            {intl l='You have no registred customers for the moment.'}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {/elseloop}
                             </table>
                         </div>
                     </div>

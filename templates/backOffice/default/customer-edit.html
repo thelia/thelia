@@ -302,6 +302,17 @@
                                                 {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
                                             </tr>
                                         {/loop}
+
+                                        {elseloop rel="order-list"}
+                                            <tr>
+                                                <td colspan="4">
+                                                    <div class="alert alert-info">
+                                                        {intl l="No orders fo this customer."}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/elseloop}
+
                                         </tbody>
                                         <tfoot>
                                         <tr>
