@@ -164,9 +164,9 @@ class CategoryControllerTest extends ApiTestCase
             'parent' => 0,
             'locale' => 'en_US',
             'visible' => 1,
-            'chapo' => 'cat chapo',
-            'description' => 'cat description',
-            'postscriptum' => 'cat postscriptum'
+            'chapo' => 'category chapo',
+            'description' => 'category description',
+            'postscriptum' => 'category postscriptum'
         ];
         $requestContent = json_encode($content);
         $client = static::createClient();
