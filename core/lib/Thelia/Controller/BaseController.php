@@ -222,7 +222,7 @@ abstract class BaseController extends ContainerAware
         $form = $aBaseForm->getForm();
 
         if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
-            $form->submit($aBaseForm->getRequest());
+            $form->handleRequest($aBaseForm->getRequest());
 
             if ($form->isValid()) {
                 $env = $this->container->getParameter("kernel.environment");
