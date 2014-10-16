@@ -22,8 +22,8 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
-use Thelia\Form\CategoryCreationForm;
-use Thelia\Form\CategoryModificationForm;
+use Thelia\Form\Api\Category\CategoryCreationForm;
+use Thelia\Form\Api\Category\CategoryModificationForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CategoryQuery;
 

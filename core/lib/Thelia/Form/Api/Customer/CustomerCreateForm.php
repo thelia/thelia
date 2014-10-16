@@ -35,4 +35,9 @@ class CustomerCreateForm extends BaseCustomerCreateForm
                 ]
             ]);
     }
+
+    public function getName()
+    {
+        return '';
+    }
 }

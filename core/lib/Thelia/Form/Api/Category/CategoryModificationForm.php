@@ -10,30 +10,17 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Form\Api\Customer;
+namespace Thelia\Form\Api\Category;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\CustomerUpdateForm as BaseCustomerUpdateForm;
+use Thelia\Form\CategoryModificationForm as BaseCategoryModificationForm;
 
 /**
- * Class CustomerUpdateForm
- * @package Thelia\Form\Api\Customer
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * Class CategoryModificationForm
+ * @package Thelia\Form\Api\Category
+ * @author manuel raynaud <manu@thelia.net>
  */
-class CustomerUpdateForm extends BaseCustomerUpdateForm
+class CategoryModificationForm extends BaseCategoryModificationForm
 {
-    public function buildForm()
-    {
-        parent::buildForm();
-
-        $this->formBuilder
-            ->add('lang', 'integer', [
-                'constraints' => [
-                    new NotBlank()
-                ]
-            ]);
-    }
-
     public function getName()
     {
         return '';

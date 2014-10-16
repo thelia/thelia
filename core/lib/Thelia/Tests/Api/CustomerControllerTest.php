@@ -143,18 +143,16 @@ class CustomerControllerTest extends ApiTestCase
     public function testCreate()
     {
         $user = [
-            'thelia_customer_create' => [
-                'title' => 1,
-                'firstname' => 'Thelia',
-                'lastname'  => 'Thelia',
-                'address1'  => 'street address 1',
-                'city'      => 'Clermont-Ferrand',
-                'zipcode'   => 63100,
-                'country'   => 64,
-                'email'     => sprintf("%s@thelia.fr", uniqid()),
-                'password'  => 'azerty',
-                'lang'      => 1
-            ]
+            'title' => 1,
+            'firstname' => 'Thelia',
+            'lastname'  => 'Thelia',
+            'address1'  => 'street address 1',
+            'city'      => 'Clermont-Ferrand',
+            'zipcode'   => 63100,
+            'country'   => 64,
+            'email'     => sprintf("%s@thelia.fr", uniqid()),
+            'password'  => 'azerty',
+            'lang'      => 1
         ];
 
         $requestContent = json_encode($user);
@@ -183,18 +181,16 @@ class CustomerControllerTest extends ApiTestCase
         $customer = CustomerQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
 
         $user = [
-            'thelia_customer_create' => [
-                'title' => 1,
-                'firstname' => 'Thelia',
-                'lastname'  => 'Thelia',
-                'address1'  => 'street address 1',
-                'city'      => 'Clermont-Ferrand',
-                'zipcode'   => 63100,
-                'country'   => 64,
-                'email'     => $customer->getEmail(),
-                'password'  => 'azerty',
-                'lang'      => 1
-            ]
+            'title' => 1,
+            'firstname' => 'Thelia',
+            'lastname'  => 'Thelia',
+            'address1'  => 'street address 1',
+            'city'      => 'Clermont-Ferrand',
+            'zipcode'   => 63100,
+            'country'   => 64,
+            'email'     => $customer->getEmail(),
+            'password'  => 'azerty',
+            'lang'      => 1
         ];
 
         $requestContent = json_encode($user);
@@ -249,17 +245,15 @@ class CustomerControllerTest extends ApiTestCase
     public function testUpdateCustomer()
     {
         $user = [
-            'thelia_customer_update' => [
-                'title' => 1,
-                'firstname' => 'Thelia',
-                'lastname'  => 'Thelia',
-                'address1'  => 'street address 1',
-                'city'      => 'Clermont-Ferrand',
-                'zipcode'   => 63100,
-                'country'   => 64,
-                'email'     => sprintf("%s@thelia.fr", uniqid()),
-                'lang'      => 1
-            ]
+            'title' => 1,
+            'firstname' => 'Thelia',
+            'lastname'  => 'Thelia',
+            'address1'  => 'street address 1',
+            'city'      => 'Clermont-Ferrand',
+            'zipcode'   => 63100,
+            'country'   => 64,
+            'email'     => sprintf("%s@thelia.fr", uniqid()),
+            'lang'      => 1
         ];
 
         $requestContent = json_encode($user);
@@ -282,17 +276,15 @@ class CustomerControllerTest extends ApiTestCase
     public function testUpdateCustomerWitnUnexistingCustomer()
     {
         $user = [
-            'thelia_customer_update' => [
-                'title' => 1,
-                'firstname' => 'Thelia',
-                'lastname'  => 'Thelia',
-                'address1'  => 'street address 1',
-                'city'      => 'Clermont-Ferrand',
-                'zipcode'   => 63100,
-                'country'   => 64,
-                'email'     => sprintf("%s@thelia.fr", uniqid()),
-                'lang'      => 1
-            ]
+            'title' => 1,
+            'firstname' => 'Thelia',
+            'lastname'  => 'Thelia',
+            'address1'  => 'street address 1',
+            'city'      => 'Clermont-Ferrand',
+            'zipcode'   => 63100,
+            'country'   => 64,
+            'email'     => sprintf("%s@thelia.fr", uniqid()),
+            'lang'      => 1
         ];
 
         $requestContent = json_encode($user);

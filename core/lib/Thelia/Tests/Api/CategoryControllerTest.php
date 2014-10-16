@@ -96,12 +96,10 @@ class CategoryControllerTest extends ApiTestCase
     public function testCreate()
     {
         $category = [
-            'thelia_category_creation' => [
-                'title' => 'test en',
-                'locale' => 'en_US',
-                'visible' => 1,
-                'parent' => 0
-            ]
+            'title' => 'test en',
+            'locale' => 'en_US',
+            'visible' => 1,
+            'parent' => 0
         ];
 
         $requestContent = json_encode($category);
@@ -128,12 +126,10 @@ class CategoryControllerTest extends ApiTestCase
     public function testCreateFr()
     {
         $category = [
-            'thelia_category_creation' => [
-                'title' => 'test fr',
-                'locale' => 'fr_FR',
-                'visible' => 1,
-                'parent' => 0
-            ]
+            'title' => 'test fr',
+            'locale' => 'fr_FR',
+            'visible' => 1,
+            'parent' => 0
         ];
 
         $requestContent = json_encode($category);
@@ -164,15 +160,13 @@ class CategoryControllerTest extends ApiTestCase
             ->findOne();
 
         $content = [
-            'thelia_category_modification' => [
-                'title' => 'foo',
-                'parent' => 0,
-                'locale' => 'en_US',
-                'visible' => 1,
-                'chapo' => 'cat chapo',
-                'description' => 'cat description',
-                'postscriptum' => 'cat postscriptum'
-            ]
+            'title' => 'foo',
+            'parent' => 0,
+            'locale' => 'en_US',
+            'visible' => 1,
+            'chapo' => 'cat chapo',
+            'description' => 'cat description',
+            'postscriptum' => 'cat postscriptum'
         ];
         $requestContent = json_encode($content);
         $client = static::createClient();
