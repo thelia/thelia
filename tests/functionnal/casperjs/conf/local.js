@@ -16,6 +16,12 @@ if (casper.cli.has('thelia2_base_url')){
     casper.test.comment('If you want to use custom URL just set the environment variable `thelia2_base_url`');
 }
 
+// Administrator account
+var administrator = {
+    login: "thelia2",
+    password: "thelia2"
+};
+
 // Screenshot Dir
 var screenshot_dir = 'tests/functionnal/casperjs/screenshot/';
 if (casper.cli.has('thelia2_screenshot_path')){
