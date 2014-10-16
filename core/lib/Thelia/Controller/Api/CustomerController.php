@@ -110,14 +110,14 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::UPDATE);
 
-        $form = new CustomerUpdateForm($this->getRequest(), "form", [], ['csrf_protection' => false]);
-
         $customer = CustomerQuery::create()
             ->findPk($customer_id);
 
         if (null === $customer) {
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
         }
+
+        $form = new CustomerUpdateForm($this->getRequest(), "form", [], ['csrf_protection' => false, 'method' => 'PUT']);
 
         try {
             $customerForm = $this->validateForm($form);

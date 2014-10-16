@@ -59,7 +59,7 @@ class CustomerControllerTest extends ApiTestCase
             $this->getServerParameters()
         );
 
-        $this->assertEquals(500, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
+        $this->assertEquals(400, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
     }
 
     /**

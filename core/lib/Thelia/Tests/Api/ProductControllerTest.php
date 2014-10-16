@@ -114,17 +114,17 @@ class ProductControllerTest extends ApiTestCase
         $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(1);
         $taxRule = TaxRuleQuery::create()->findOneByIsDefault(1);
         $product = [
-            'thelia_product_creation' => [
-                'ref' => uniqid('testCreateProduct'),
-                'locale' => 'en_US',
-                'title' => 'product create from api',
-                'default_category' => $category->getId(),
-                'visible' => 1,
-                'price' => '10',
-                'currency' => $defaultCurrency->getId(),
-                'tax_rule' => $taxRule->getId(),
-                'weight' => 10
-            ]
+            'ref' => uniqid('testCreateProduct'),
+            'locale' => 'en_US',
+            'title' => 'product create from api',
+            'description' => 'product description from api',
+            'default_category' => $category->getId(),
+            'visible' => 1,
+            'price' => '10',
+            'currency' => $defaultCurrency->getId(),
+            'tax_rule' => $taxRule->getId(),
+            'weight' => 10,
+            'brand_id' => 0
         ];
 
         $requestContent = json_encode($product);
@@ -186,6 +186,5 @@ class ProductControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'Http status code must be 204');
-
     }
 }

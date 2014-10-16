@@ -126,7 +126,15 @@ class CategoryController extends BaseApiController
             throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
         }
 
-        $form = new CategoryModificationForm($request, 'form', ['id' => $category_id], ['csrf_protection' => false]);
+        $form = new CategoryModificationForm(
+            $request,
+            'form',
+            ['id' => $category_id],
+            [
+                'csrf_protection' => false,
+                'method' => 'PUT'
+            ]
+        );
 
         try {
             $categoryForm = $this->validateForm($form);

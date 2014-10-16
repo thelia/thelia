@@ -26,7 +26,6 @@ use Thelia\Core\Template\Loop\TaxRule;
  */
 class TaxRuleController extends BaseApiController
 {
-
     public function listAction()
     {
         $this->checkAuth(AdminResources::TAX, [], AccessManager::VIEW);

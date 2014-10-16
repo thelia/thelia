@@ -21,7 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
-use Thelia\Form\ProductCreationForm;
+use Thelia\Form\Api\Product\ProductCreationForm;
 use Thelia\Form\ProductModificationForm;
 use Thelia\Model\ProductQuery;
 
@@ -97,6 +97,12 @@ class ProductController extends BaseApiController
 
             $product = $event->getProduct();
 
+            $updateEvent = new ProductUpdateEvent($product->getId());
+
+            $updateEvent->bindForm($creationForm);
+
+            $this->dispatch(TheliaEvents::PRODUCT_UPDATE, $updateEvent);
+
             $request->query->set('lang', $creationForm->get('locale')->getData());
             $response = $this->getProductAction($product->getId());
             $response->setStatusCode(201);
@@ -120,7 +126,15 @@ class ProductController extends BaseApiController
 
         $request = $this->getRequest();
 
-        $form = new ProductModificationForm($request, 'form', ['id' => $product_id], ['csrf_protection' => false]);
+        $form = new ProductModificationForm(
+            $request,
+            'form',
+            ['id' => $product_id],
+            [
+                'csrf_protection' => false,
+                'method' => 'PUT'
+            ]
+        );
 
         $data = $request->request->all();
         $data[$form->getName()]['id'] = $product_id;

@@ -21,7 +21,6 @@ use Thelia\Tests\ApiTestCase;
  */
 class TaxRuleControllerTest extends ApiTestCase
 {
-
     public function testListAction()
     {
         $client = static::createClient();
