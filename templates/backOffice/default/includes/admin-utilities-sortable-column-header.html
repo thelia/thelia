@@ -7,4 +7,4 @@ the header on a sortable column
 {else if $admin_utilities_sort_direction == 'down'}
     <i class="glyphicon glyphicon-chevron-down"></i>
 {/if}
-<a href="{$admin_utilities_sorting_url}">{$admin_utilities_header_text}</a>
+<a href="{$admin_utilities_sorting_url}" class="u-sort-{$admin_utilities_sort_direction}">{$admin_utilities_header_text}</a>
