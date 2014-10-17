@@ -49,7 +49,7 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
 
         test.comment('Get current configuration on home page');
 
-        test.assertTitle("", "This is the home page");
+        test.assertTitle(thelia2_store_name, "This is the home page : " + this.getTitle());
 
         // 2 modules in hook home.body
         test.assertElementCount(
@@ -84,7 +84,7 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
             hookId = null;
 
         moduleHookTag = this.getElementInfo(
-            xp('//tr[@class="hook-module"]/td[.="' + modules.promoProducts.title + '"]/..')
+            xp('//tr[@class="hook-module"]/td[normalize-space(.)="' + modules.promoProducts.title + '"]/..')
         );
 
         test.assertTruthy(moduleHookTag != null, "The module Promo Product exist");
@@ -118,7 +118,7 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
         test.assertTitle("Modules - Thelia Back Office", "This is the page to manage modules hooks");
 
         moduleIdTag = this.getElementInfo(
-            xp('//tr/td[.="' + modules.blockCurrency.title + '"]/../td[1]')
+            xp('//tr/td[normalize-space(.)="' + modules.blockCurrency.title + '"]/../td[1]')
         );
 
         test.assertTruthy(moduleIdTag != null, "The module Block Currency exists");
@@ -152,7 +152,7 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
             hookId = null;
 
         hookTag = this.getElementInfo(
-            xp('//tr/td/a[.="main.navbar-primary"]/../../td[1]')
+            xp('//tr/td/a[normalize-space(.)="main.navbar-primary"]/../../td[1]')
         );
 
         test.assertTruthy(hookTag != null, "The hook main.navbar-primary exists");
@@ -179,7 +179,7 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
 
         test.comment('Get new configuration on home page');
 
-        test.assertTitle("", "This is the home page");
+        test.assertTitle(thelia2_store_name, "This is the home page : " + this.getTitle());
 
         // 1 module in hook home.body
         test.assertElementCount(
@@ -205,6 +205,11 @@ casper.test.begin('Front Homepage', 21, function suite(test) {
             "Main navigation doesn't exists"
         );
 
+    });
+
+    casper.thenOpen(thelia2_base_url + 'admin/logout', function() {
+        test.comment('logout');
+        test.assertTitle("Welcome - Thelia Back Office", "This is the good title. url: " + this.getCurrentUrl());
     });
 
     casper.run(function() {

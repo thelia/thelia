@@ -3,7 +3,7 @@ casper.test.comment('== Login ==');
 casper.test.begin('Login', 5, function suite(test) {
 
     casper.start(thelia2_base_url + "login", function() {
-        test.assertTitle("Login - Thelia V2", "title is the one expected");
+        test.assertTitle("Login - " + thelia2_store_name, "title is the one expected");
         test.assertExists('form#form-login', "login form is found");
         this.capture(screenshot_dir + 'front/30_login.png');
 

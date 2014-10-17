@@ -48,7 +48,7 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
 
         test.comment('Get current order on home page');
 
-        test.assertTitle("Thelia", "This is the home page");
+        test.assertTitle(thelia2_store_name, "This is the home page : " + this.getTitle());
 
         homeModules = this.getElementsInfo('#content > section');
         test.assertTruthy(
@@ -78,7 +78,7 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
         var linePromoProducts = null;
 
         linePromoProducts = this.getElementInfo(
-            xp('//tr[@class="hook-module"]/td[.="' + modules.promoProducts.title + '"]/..')
+            xp('//tr[@class="hook-module"]/td[normalize-space(.)="' + modules.promoProducts.title + '"]/..')
         );
 
         test.assertTruthy(linePromoProducts != null, "The module Promo Product exist");
@@ -99,7 +99,7 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
 
         test.comment('Get new order on home page');
 
-        test.assertTitle("Thelia", "This is the home page");
+        test.assertTitle(thelia2_store_name, "This is the home page : " + this.getTitle());
 
         homeModules = this.getElementsInfo('#content > section');
         test.assertTruthy(
@@ -117,6 +117,11 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
             "The order of the module on the home page has change : " + order.join(', ')
         );
 
+    });
+
+    casper.thenOpen(thelia2_base_url + 'admin/logout', function() {
+        test.comment('logout');
+        test.assertTitle("Welcome - Thelia Back Office");
     });
 
     casper.run(function() {
