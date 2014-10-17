@@ -22,6 +22,9 @@ var administrator = {
     password: "thelia2"
 };
 
+// Default
+var thelia2_store_name = "Thelia V2";
+
 // Screenshot Dir
 var screenshot_dir = 'tests/functionnal/casperjs/screenshot/';
 if (casper.cli.has('thelia2_screenshot_path')){
@@ -36,6 +39,9 @@ casper.test.comment('Viewport size: '+ casper.options.viewportSize.width + 'x' +
 
 // Default timeout in ms
 var thelia_default_timeout = 15000;
+// for the waitFor method
+casper.options.waitTimeout = thelia_default_timeout;
+
 casper.test.comment('Default timeout: '+ thelia_default_timeout + ' ms');
 
 // Email created during front/20_register.js test
