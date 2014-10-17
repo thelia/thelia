@@ -126,8 +126,10 @@ class HookController extends AbstractCrudController
                 $this->dispatch(TheliaEvents::HOOK_CREATE_ALL, $event);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to create new hook %s"),
-                        $hook["code"]);
+                    $errors[] = sprintf(
+                        Translator::getInstance()->trans("Failed to create new hook %s"),
+                        $hook["code"]
+                    );
                 }
             }
         }
@@ -140,8 +142,10 @@ class HookController extends AbstractCrudController
                 $this->dispatch(TheliaEvents::HOOK_DEACTIVATION, $event);
 
                 if (!$event->hasHook()) {
-                    $errors[] = sprintf(Translator::getInstance()->trans("Failed to deactivate hook with id %s"),
-                        $hookId);
+                    $errors[] = sprintf(
+                        Translator::getInstance()->trans("Failed to deactivate hook with id %s"),
+                        $hookId
+                    );
                 }
             }
         }
@@ -381,7 +385,7 @@ class HookController extends AbstractCrudController
      */
     protected function renderListTemplate($currentOrder)
     {
-        return $this->render("hooks", ['order' => $currentOrder,]);
+        return $this->render("hooks", ['order' => $currentOrder]);
     }
 
     /**
