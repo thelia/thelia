@@ -80,7 +80,10 @@ class OrderController extends BaseFrontController
             if (null !== $deliveryAddress) {
 
                 $deliveryModule = ModuleQuery::create()
-                    ->findOneByCode('VirtualProductDelivery');
+                    ->filterByCode('VirtualProductDelivery')
+                    ->filterByActivate(1)
+                    ->findOne()
+                ;
 
                 if (null !== $deliveryModule) {
                     /* get postage amount */
@@ -97,6 +100,14 @@ class OrderController extends BaseFrontController
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
 
                     return $this->generateRedirectFromRoute("order.invoice");
+                } else {
+                    Tlog::getInstance()->error(
+                        $this->getTranslator()->trans(
+                            "To enabled the virtual product functionality, the module VirtualProductDelivery should be activated",
+                            [],
+                            Front::MESSAGE_DOMAIN
+                        )
+                    );
                 }
             }
         }
