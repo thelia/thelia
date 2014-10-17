@@ -4,7 +4,7 @@ casper.test.comment('== Hook - changing position ==');
 
 casper.test.begin('Front Homepage', 11, function suite(test) {
 
-    var order = [];
+
 
     var modules = {
         newProducts: {
@@ -46,20 +46,22 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
     // Get current order
     casper.thenOpen(thelia2_base_url, function() {
 
+        var order = [], i;
+
         test.comment('Get current order on home page');
 
         test.assertTitle(thelia2_store_name, "This is the home page : " + this.getTitle());
 
         homeModules = this.getElementsInfo('#content > section');
+        for (i=0 ; i<homeModules.length ; i++){
+            order.push(homeModules[i].attributes['id'])
+        }
+
         test.assertTruthy(
             homeModules.length == 2,
-            "2 modules on home page"
+            "2 modules on home page : " + order.join(", ")
         );
 
-        order = [
-            homeModules[0].attributes['id'],
-            homeModules[1].attributes['id']
-        ];
 
         test.assertTruthy(
             order.join() == [modules.newProducts.id, modules.promoProducts.id].join(),
