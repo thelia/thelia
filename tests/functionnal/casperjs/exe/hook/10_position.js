@@ -62,7 +62,6 @@ casper.test.begin('Front Homepage', 11, function suite(test) {
             "2 modules on home page : " + order.join(", ")
         );
 
-
         test.assertTruthy(
             order.join() == [modules.newProducts.id, modules.promoProducts.id].join(),
             "The order of the module on the home page is good : " + order.join(', ')
