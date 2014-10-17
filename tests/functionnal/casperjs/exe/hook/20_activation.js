@@ -2,7 +2,7 @@ var xp = require('casper').selectXPath;
 
 casper.test.comment('== Hook - changing position ==');
 
-casper.test.begin('Front Homepage', 21, function suite(test) {
+casper.test.begin('Front Homepage', 22, function suite(test) {
 
     var modules = {
         newProducts: {
