@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
@@ -39,11 +40,34 @@ abstract class BaseForm
     protected $formBuilder;
 
     /**
+     * @var \Symfony\Component\Form\FormFactoryBuilderInterface
+     */
+    protected $formFactoryBuilder;
+
+    /**
      * @var \Symfony\Component\Form\Form
      */
     protected $form;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var Request
+     */
     protected $request;
+
+    /**
+     * @var \Symfony\Component\Validator\ValidatorBuilderInterface
+     */
+    protected $validatorBuilder;
+
+    /**
+     * @var \Symfony\Component\Translation\TranslatorInterface
+     */
+    protected $translator;
 
     private $view = null;
 
@@ -59,40 +83,33 @@ abstract class BaseForm
      */
     private $error_message = '';
 
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
-    {
+    public function __construct(
+        Request $request,
+        $type = "form",
+        $data = array(),
+        $options = array(),
+        ContainerInterface $container = null
+    ) {
         $this->request = $request;
 
-        $validator = Validation::createValidatorBuilder();
+        if (null !== $container) {
+            $this->container = $container;
 
-        if (!isset($options["attr"]["name"])) {
-            $options["attr"]["thelia_name"] = $this->getName();
+            $this->initFormWithContainer($type, $data, $options);
+        } else {
+
+            $this->initFormWithRequest($type, $data, $options);
         }
 
-        $builder =  Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension());
-        if (!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
-            $builder->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            );
-        }
-
-        $translator = Translator::getInstance();
-
-        $validator
-            ->setTranslationDomain('validators')
-            ->setTranslator($translator);
-        $this->formBuilder = $builder
-            ->addExtension(new ValidatorExtension($validator->getValidator()))
+        $this->formBuilder = $this->formFactoryBuilder
+            ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
             ->getFormFactory()
-            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options));
+            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options))
         ;
 
+        /**
+         * Build the form
+         */
         $this->buildForm();
 
         // If not already set, define the success_url field
@@ -110,6 +127,32 @@ abstract class BaseForm
         }
 
         $this->form = $this->formBuilder->getForm();
+    }
+
+    public function initFormWithContainer($type, $data, $options)
+    {
+        $this->translator = $this->container->get("thelia.translator");
+
+        /**
+         * @var \Symfony\Component\Form\FormFactoryBuilderInterface $formFactoryBuilder
+         */
+        $this->formFactoryBuilder = $this->container->get("thelia.form_factory_builder");
+
+        $this->validatorBuilder = $this->container->get("thelia.forms.validator_builder");
+    }
+
+    protected function initFormWithRequest($type, $data, $options)
+    {
+        $this->validatorBuilder = Validation::createValidatorBuilder();
+
+        $this->formFactoryBuilder =  Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension());
+
+        $this->translator = Translator::getInstance();
+
+        $this->validatorBuilder
+            ->setTranslationDomain('validators')
+            ->setTranslator($this->translator);
     }
 
     /**

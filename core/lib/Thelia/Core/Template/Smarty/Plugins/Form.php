@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
@@ -58,6 +59,9 @@ class Form extends AbstractSmartyPlugin
     /** @var  Request $request */
     protected $request;
 
+    /** @var  ContainerInterface */
+    protected $container;
+
     /** @var  ParserContext $parserContext */
     protected $parserContext;
 
@@ -66,9 +70,10 @@ class Form extends AbstractSmartyPlugin
 
     protected $formDefinition = array();
 
-    public function __construct(Request $request, ParserContext $parserContext, ParserInterface $parser)
+    public function __construct(ContainerInterface $container, ParserContext $parserContext, ParserInterface $parser)
     {
-        $this->request = $request;
+        $this->container = $container;
+        $this->request = $container->get("request");
         $this->parserContext = $parserContext;
         $this->parser = $parser;
     }
@@ -111,7 +116,7 @@ class Form extends AbstractSmartyPlugin
                 // Create a new one
                 $class = new \ReflectionClass($formClass);
 
-                $instance = $class->newInstance($this->request, "form");
+                $instance = $class->newInstance($this->request, "form", array(), array(), $this->container);
             }
 
             $instance->createView();

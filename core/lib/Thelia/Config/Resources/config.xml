@@ -38,6 +38,7 @@
         <parameter key="export.base_url">/admin/export</parameter>
 
         <parameter key="thelia.token_id">thelia.token_provider</parameter>
+        <parameter key="thelia.validator.translation_domain">validators</parameter>
     </parameters>
 
 
@@ -204,6 +205,26 @@
             <argument type="service" id="request" />
             <argument type="service" id="thelia.translator" />
             <argument>%thelia.token_id%</argument>
+        </service>
+
+        <!-- Forms services ( factory builder, Thelia form types ) -->
+        <service id="thelia.forms.validator_builder" class="Symfony\Component\Validator\ValidatorBuilder">
+            <call method="setTranslationDomain">
+                <argument>%thelia.validator.translation_domain%</argument>
+            </call>
+            <call method="setTranslator">
+                <argument type="service" id="thelia.translator" />
+            </call>
+        </service>
+
+        <service id="thelia.form_factory_builder" class="Symfony\Component\Form\FormFactoryBuilder" scope="request" />
+
+        <service id="thelia.forms.extension.http_foundation_extension" class="Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension">
+            <tag name="thelia.forms.extension" />
+        </service>
+
+        <service id="thelia.forms.extension.core_extension" class="Symfony\Component\Form\Extension\Core\CoreExtension">
+            <tag name="thelia.forms.extension" />
         </service>
     </services>
 </config>
