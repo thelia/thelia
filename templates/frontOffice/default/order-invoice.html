@@ -175,6 +175,7 @@
                                     <!-- /input-group -->
                                 </td>
                             </tr>
+                            {if {cart attr="is_virtual"} != 1}
                             <tr>
                                 <th class="shipping">{intl l="Shipping Tax"}</th>
                                 <td class="shipping">
@@ -183,6 +184,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            {/if}
                             <tr>
                                 <th>{intl l="Total excl. taxes"}</th>
                                 <td>
