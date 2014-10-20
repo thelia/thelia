@@ -21,8 +21,8 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CouponQuery;
 use Thelia\Model\LangQuery;
-use Thelia\Model\ModuleQuery;
 use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 
 /**
@@ -74,27 +74,27 @@ class CouponCreationForm extends BaseForm
             ->add(
                 'code',
                 'text',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
                         new Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "checkDuplicateCouponCode"),
-                                ),
-                            )
+                            [
+                                "methods" => [
+                                    [$this, "checkDuplicateCouponCode"],
+                                ],
+                            ]
                         )
-                    )
-                )
+                    ]
+                ]
             )
             ->add(
                 'title',
                 'text',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank()
-                    )
-                )
+                    ]
+                ]
             )
             ->add(
                 'shortDescription',
@@ -109,107 +109,110 @@ class CouponCreationForm extends BaseForm
             ->add(
                 'type',
                 'text',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
                         new NotEqualTo(
-                            array(
+                            [
                                 'value' => -1
-                            )
+                            ]
                         )
-                    )
-                )
+                    ]
+                ]
             )
             ->add(
                 'isEnabled',
                 'text',
-                array()
+                []
             )
             ->add(
                 'expirationDate',
                 'text',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
                         new Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "checkLocalizedDate"),
-                                ),
-                            )
+                            [
+                                "methods" => [
+                                    [$this, "checkLocalizedDate"],
+                                ],
+                            ]
                         )
-                    )
-                )
+                    ]
+                ]
             )
             ->add(
                 'isCumulative',
                 'text',
-                array()
+                []
             )
             ->add(
                 'isRemovingPostage',
                 'text',
-                array()
+                []
             )
             ->add(
                 'freeShippingForCountries',
                 'choice',
-                array(
+                [
                     'multiple' => true,
-                    'choices' => $countries
-                )
+                    'choices'  => $countries
+                ]
             )
             ->add(
                 'freeShippingForModules',
                 'choice',
-                array(
+                [
                     'multiple' => true,
-                    'choices' => $modules
-                )
+                    'choices'  => $modules
+                ]
             )
             ->add(
                 'isAvailableOnSpecialOffers',
                 'text',
-                array()
+                []
             )
             ->add(
                 'maxUsage',
                 'text',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank(),
                         new GreaterThanOrEqual(['value' => -1])
-                    )
-                )
+                    ]
+                ]
             )
             ->add(
                 'perCustomerUsageCount',
                 'choice',
-                array(
+                [
                     'multiple' => false,
                     'required' => true,
                     'choices'  => [
                         1 => Translator::getInstance()->trans('Per customer'),
                         0 => Translator::getInstance()->trans('Overall')
                     ]
-                )
+                ]
             )
             ->add(
                 'locale',
                 'hidden',
-                array(
-                    'constraints' => array(
+                [
+                    'constraints' => [
                         new NotBlank()
-                    )
-                )
+                    ]
+                ]
             )
-            ->add('coupon_specific', 'collection', array(
+            ->add(
+                'coupon_specific',
+                'collection',
+                [
                     'allow_add'    => true,
                     'allow_delete' => true,
-            ))
+                ]
+            )
         ;
     }
-
 
     /**
      * Check coupon code unicity
@@ -223,9 +226,10 @@ class CouponCreationForm extends BaseForm
 
         if ($exists) {
             $context->addViolation(
-                Translator::getInstance()->trans("The coupon code '%code' already exists. Please choose another coupon code", [
-                        '%code' => $value,
-                    ])
+                Translator::getInstance()->trans("The coupon code '%code' already exists. Please choose another coupon code",
+                [
+                    '%code' => $value,
+                ])
             );
         }
     }
@@ -241,10 +245,15 @@ class CouponCreationForm extends BaseForm
         $format = LangQuery::create()->findOneByByDefault(true)->getDateFormat();
 
         if (false === \DateTime::createFromFormat($format, $value)) {
-            $context->addViolation(Translator::getInstance()->trans("Date '%date' is invalid, please enter a valid date using %fmt format", [
-                '%fmt' => $format,
-                '%date' => $value
-            ]));
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    "Date '%date' is invalid, please enter a valid date using %fmt format",
+                    [
+                        '%fmt'  => $format,
+                        '%date' => $value
+                    ]
+                )
+            );
         }
     }
 

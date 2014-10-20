@@ -13,56 +13,61 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Thelia\Model\CurrencyQuery;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\CurrencyQuery;
 
 class CurrencyCreationForm extends BaseForm
 {
     protected function buildForm($change_mode = false)
     {
         $this->formBuilder
-            ->add("name"   , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans('Name *'),
-                "label_attr" => array(
-                    "for" => "name"
-                ))
+            ->add("name", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ],
+                    "label"       => Translator::getInstance()->trans('Name *'),
+                    "label_attr"  => [
+                        "for" => "name"
+                    ]
+                ]
             )
-            ->add("locale" , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ))
+            ->add("locale", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ]
+                ]
             )
-            ->add("symbol" , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans('Symbol *'),
-                "label_attr" => array(
-                    "for" => "symbol"
-                ))
+            ->add("symbol", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ],
+                    "label"       => Translator::getInstance()->trans('Symbol *'),
+                    "label_attr"  => [
+                        "for" => "symbol"
+                    ]
+                ]
             )
-            ->add("rate"   , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans('Rate from &euro; *'),
-                "label_attr" => array(
-                    "for" => "rate"
-                ))
+            ->add("rate", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ],
+                    "label"       => Translator::getInstance()->trans('Rate from &euro; *'),
+                    "label_attr"  => [
+                        "for" => "rate"
+                    ]
+                ]
             )
-            ->add("code"   , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans('ISO 4217 code *'),
-                "label_attr" => array(
-                    "for" => "iso_4217_code"
-                ))
+            ->add("code", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ],
+                    "label"       => Translator::getInstance()->trans('ISO 4217 code *'),
+                    "label_attr"  => [
+                        "for" => "iso_4217_code"
+                    ]
+                ]
             )
         ;
     }
@@ -77,7 +82,12 @@ class CurrencyCreationForm extends BaseForm
         $currency = CurrencyQuery::create()->findOneByCode($value);
 
         if ($currency) {
-            $context->addViolation(Translator::getInstance()->trans('A currency with code "%name" already exists.', array('%name' => $value)));
+            $context->addViolation(
+                Translator::getInstance()->trans(
+                    'A currency with code "%name" already exists.',
+                    ['%name' => $value]
+                )
+            );
         }
     }
 }

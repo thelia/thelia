@@ -21,26 +21,28 @@ class AttributeAvCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title"   , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Title *"),
-                "label_attr" => array(
-                    "for" => "title"
-                ))
-            )
-            ->add("locale" , "text"  , array(
-                "constraints" => array(
-                    new NotBlank()
-                ))
-            )
-            ->add("attribute_id", "hidden", array(
-                "constraints" => array(
+            ->add("title", "text", [
+                    "constraints" => [
                         new NotBlank()
-                ))
+                    ],
+                    "label"       => Translator::getInstance()->trans("Title *"),
+                    "label_attr"  => [
+                        "for" => "title"
+                    ]
+                ]
             )
-        ;
+            ->add("locale", "text", [
+                    "constraints" => [
+                        new NotBlank()
+                    ]
+                ]
+            )
+            ->add("attribute_id", "hidden", [
+                    "constraints" => [
+                        new NotBlank()
+                    ]
+                ]
+            );
     }
 
     public function getName()
