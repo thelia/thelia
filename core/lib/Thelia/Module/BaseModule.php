@@ -801,5 +801,4 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     {
         return self::$moduleCategories;
     }
-
 }

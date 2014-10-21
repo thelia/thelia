@@ -61,11 +61,11 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'module_type',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array(
+                    new Type\EnumListType([
                         BaseModule::CLASSIC_MODULE_TYPE,
                         BaseModule::DELIVERY_MODULE_TYPE,
                         BaseModule::PAYMENT_MODULE_TYPE,
-                    ))
+                    ])
                 )
             ),
             new Argument(
@@ -77,7 +77,18 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'title', 'title_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                    new Type\EnumListType([
+                            'id',
+                            'id_reverse',
+                            'code',
+                            'code_reverse',
+                            'title',
+                            'title_reverse',
+                            'manual',
+                            'manual_reverse',
+                            'enabled',
+                            'enabled_reverse'
+                    ])
                 ),
                 'manual'
             ),
@@ -137,7 +148,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -195,22 +206,21 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow
                     ->set("ID", $module->getId())
                     ->set("IS_TRANSLATED", $module->getVirtualColumn('IS_TRANSLATED'))
-                    ->set("LOCALE"       , $this->locale)
-                    ->set("TITLE"        , $module->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO"        , $module->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION"  , $module->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM" , $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("CODE"         , $module->getCode())
-                    ->set("TYPE"         , $module->getType())
-                    ->set("CATEGORY"     , $module->getCategory())
-                    ->set("ACTIVE"       , $module->getActivate())
-                    ->set("VERSION"      , $module->getVersion())
-                    ->set("VERSION_MIN"  , $module->getVersionMin())
-                    ->set("VERSION_MAX"  , $module->getVersionMax())
-                    ->set("CLASS"        , $module->getFullNamespace())
-                    ->set("POSITION"     , $module->getPosition())
-                    ->set("EXISTS"       , $exists)
-                ;
+                    ->set("LOCALE", $this->locale)
+                    ->set("TITLE", $module->getVirtualColumn('i18n_TITLE'))
+                    ->set("CHAPO", $module->getVirtualColumn('i18n_CHAPO'))
+                    ->set("DESCRIPTION", $module->getVirtualColumn('i18n_DESCRIPTION'))
+                    ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                    ->set("CODE", $module->getCode())
+                    ->set("TYPE", $module->getType())
+                    ->set("CATEGORY", $module->getCategory())
+                    ->set("ACTIVE", $module->getActivate())
+                    ->set("VERSION", $module->getVersion())
+                    ->set("VERSION_MIN", $module->getVersionMin())
+                    ->set("VERSION_MAX", $module->getVersionMax())
+                    ->set("CLASS", $module->getFullNamespace())
+                    ->set("POSITION", $module->getPosition())
+                    ->set("EXISTS", $exists);
 
                 $hasConfigurationInterface = false;
 
@@ -221,11 +231,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->filterByModuleId($module->getId())
                         ->filterByActive(true)
                         ->useHookQuery()
-                            ->filterByCode('module.configuration')
-                            ->filterByType(TemplateDefinition::BACK_OFFICE)
+                        ->filterByCode('module.configuration')
+                        ->filterByType(TemplateDefinition::BACK_OFFICE)
                         ->endUse()
-                        ->findOne()
-                    ;
+                        ->findOne();
                     $hasConfigurationInterface = (null !== $hookConfiguration);
 
                     if (false === $hasConfigurationInterface) {
@@ -252,7 +261,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     // Make a quick and dirty test on the module's config.xml file
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
-                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false) {
+                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/',
+                            $configContent) !== false
+                    ) {
                         $hasConfigurationInterface = true;
                     }
 
@@ -276,10 +287,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     $accessValue = $module->getVirtualColumn('access');
                     $manager = new AccessManager($accessValue);
 
-                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW) ? 1 : 0)
                         ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
-                        ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
+                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE) ? 1 : 0)
+                        ->set("DELETABLE", $manager->can(AccessManager::DELETE) ? 1 : 0);
                 }
 
                 $loopResult->addRow($loopResultRow);

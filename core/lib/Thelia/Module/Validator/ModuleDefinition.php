@@ -269,5 +269,4 @@ class ModuleDefinition
     {
         return $this->dependencies;
     }
-
 }

@@ -14,8 +14,8 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\FlashMessage as FlashMessageBag;
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -53,23 +53,25 @@ class FlashMessage extends AbstractSmartyPlugin
      */
     public function __construct(Request $request, Translator $translator)
     {
-        $this->request    = $request;
+        $this->request = $request;
         $this->translator = $translator;
     }
 
     /**
      * Process the count function: executes a loop and return the number of items found
      *
-     * @param array                     $params   parameters array
+     * @param array $params parameters array
      * @param \Smarty_Internal_Template $template
      *
      * @return int                       the item count
      * @throws \InvalidArgumentException if a parameter is missing
      *
      */
-    public function hasFlashMessage($params, /** @noinspection PhpUnusedParameterInspection */
-                                    $template)
-    {
+    public function hasFlashMessage(
+        $params,
+        /** @noinspection PhpUnusedParameterInspection */
+        $template
+    ) {
         $type = $this->getParam($params, 'type', null);
 
         if (null == $type) {
@@ -85,10 +87,10 @@ class FlashMessage extends AbstractSmartyPlugin
      * Get FlashMessage
      * And clean session from this key
      *
-     * @param array                     $params   Block parameters
-     * @param mixed                     $content  Block content
+     * @param array $params Block parameters
+     * @param mixed $content Block content
      * @param \Smarty_Internal_Template $template Template
-     * @param bool                      $repeat   Control how many times
+     * @param bool $repeat Control how many times
      *                                            the block is displayed
      *
      * @return mixed
@@ -106,7 +108,7 @@ class FlashMessage extends AbstractSmartyPlugin
             } else {
                 $this->results->add(
                     $type,
-                    $this->request->getSession()->getFlashBag()->get($type, array())
+                    $this->request->getSession()->getFlashBag()->get($type, [])
                 );
             }
 
@@ -142,9 +144,9 @@ class FlashMessage extends AbstractSmartyPlugin
      */
     public function getPluginDescriptors()
     {
-        return array(
+        return [
             new SmartyPluginDescriptor("function", "hasflash", $this, "hasFlashMessage"),
             new SmartyPluginDescriptor("block", "flash", $this, "getFlashMessage")
-        );
+        ];
     }
 }

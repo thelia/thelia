@@ -103,5 +103,4 @@ class ModuleInstallEvent extends ActionEvent
     {
         return $this->modulePath;
     }
-
 }

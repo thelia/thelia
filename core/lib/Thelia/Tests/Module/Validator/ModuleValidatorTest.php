@@ -19,8 +19,8 @@ use Thelia\Module\Validator\ModuleValidator;
  * @package Thelia\Tests\Module\Validator
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleValidatorTest extends \PHPUnit_Framework_TestCase {
-
+class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
+{
 
     /**
      * @expectedException \Thelia\Exception\ModuleException
@@ -66,9 +66,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase {
 
         // load
         $moduleValidator->load();
-
     }
-
 
 
     private function getStubTranslator($i18nOutput = '')
@@ -81,7 +79,5 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase {
             ->will($this->returnValue($i18nOutput));
 
         return $stubTranslator;
-
     }
-
-} 
+}

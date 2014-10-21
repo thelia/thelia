@@ -21,7 +21,7 @@ use OutOfBoundsException;
  */
 class InvalidModuleException extends OutOfBoundsException
 {
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * @param array $errors
@@ -38,5 +38,4 @@ class InvalidModuleException extends OutOfBoundsException
     {
         return $this->errors;
     }
-
 }

@@ -113,7 +113,7 @@ class ModuleValidator
      */
     public function getTranslator()
     {
-        if (null === $this->translator){
+        if (null === $this->translator) {
             $this->translator = Translator::getInstance();
         }
 
@@ -149,7 +149,6 @@ class ModuleValidator
         $this->checkModuleVersion();
 
         $this->checkModuleDependencies();
-
     }
 
     protected function checkDirectoryStructure()
@@ -184,7 +183,7 @@ class ModuleValidator
         try {
             // validation with xsd
             $this->moduleDescriptor = $descriptorValidator->getDescriptor($path);
-            $this->moduleVersion    = $descriptorValidator->getModuleVersion();
+            $this->moduleVersion = $descriptorValidator->getModuleVersion();
         } catch (InvalidXmlDocumentException $ex) {
             throw $ex;
         }
@@ -203,47 +202,47 @@ class ModuleValidator
         $moduleDefinition = new ModuleDefinition();
 
         $moduleDefinition->setCode(basename($this->modulePath));
-        $moduleDefinition->setNamespace((string) $this->moduleDescriptor->fullnamespace);
-        $moduleDefinition->setVersion((string) $this->moduleDescriptor->version);
+        $moduleDefinition->setNamespace((string)$this->moduleDescriptor->fullnamespace);
+        $moduleDefinition->setVersion((string)$this->moduleDescriptor->version);
 
         $languages = [];
-        if ($this->getModuleVersion() != "1"){
+        if ($this->getModuleVersion() != "1") {
             foreach ($this->moduleDescriptor->languages->language as $language) {
-                $languages[] = (string) $language;
+                $languages[] = (string)$language;
             }
         }
         $moduleDefinition->setLanguages($languages);
 
         $descriptives = [];
         foreach ($this->moduleDescriptor->descriptive as $descriptive) {
-            $descriptives[(string) $descriptive['locale']] = [
-                'title'        => (string) $descriptive->title,
-                'subtitle'     => (string) $descriptive->subtitle,
-                'description'  => (string) $descriptive->description,
-                'postscriptum' => (string) $descriptive->postscriptum,
+            $descriptives[(string)$descriptive['locale']] = [
+                'title' => (string)$descriptive->title,
+                'subtitle' => (string)$descriptive->subtitle,
+                'description' => (string)$descriptive->description,
+                'postscriptum' => (string)$descriptive->postscriptum,
             ];
         }
         $moduleDefinition->setDescriptives($descriptives);
 
         $dependencies = [];
-        if (isset($this->moduleDescriptor->required)){
+        if (isset($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {
                 $dependencies[] = [
-                    (string) $dependency,
-                    (string) $dependency['version'],
+                    (string)$dependency,
+                    (string)$dependency['version'],
                 ];
             }
         }
         $moduleDefinition->setDependencies($dependencies);
 
-        $moduleDefinition->setLogo((string) $this->moduleDescriptor->logo);
-        $moduleDefinition->setMinVersion((string) $this->moduleDescriptor->min);
-        $moduleDefinition->setMaxVersion((string) $this->moduleDescriptor->max);
-        $moduleDefinition->setType((string) $this->moduleDescriptor->type);
-        $moduleDefinition->setStability((string) $this->moduleDescriptor->stability);
+        $moduleDefinition->setLogo((string)$this->moduleDescriptor->logo);
+        $moduleDefinition->setMinVersion((string)$this->moduleDescriptor->min);
+        $moduleDefinition->setMaxVersion((string)$this->moduleDescriptor->max);
+        $moduleDefinition->setType((string)$this->moduleDescriptor->type);
+        $moduleDefinition->setStability((string)$this->moduleDescriptor->stability);
 
         // documentation
-        $moduleDefinition->setDocumentation((string) $this->moduleDescriptor->documentation);
+        $moduleDefinition->setDocumentation((string)$this->moduleDescriptor->documentation);
 
         $this->moduleDefinition = $moduleDefinition;
     }
@@ -300,8 +299,7 @@ class ModuleValidator
         foreach ($this->moduleDefinition->getDependencies() as $dependency) {
 
             $module = ModuleQuery::create()
-                ->findOneByCode($dependency[0])
-            ;
+                ->findOneByCode($dependency[0]);
 
             $pass = false;
 
@@ -313,7 +311,6 @@ class ModuleValidator
                     ) {
                         $pass = true;
                     }
-
                 }
             }
 
@@ -322,7 +319,7 @@ class ModuleValidator
                     $errors[] = $this->getTranslator()->trans(
                         '%module (version: %version)',
                         [
-                            '%module'  => $dependency[0],
+                            '%module' => $dependency[0],
                             '%version' => $dependency[1]
                         ]
                     );
@@ -330,7 +327,6 @@ class ModuleValidator
                     $errors[] = sprintf('%s', $dependency[0]);
                 }
             }
-
         }
 
         if (count($errors) > 0) {
@@ -341,7 +337,5 @@ class ModuleValidator
 
             throw new ModuleException($errors);
         }
-
     }
-
 }
