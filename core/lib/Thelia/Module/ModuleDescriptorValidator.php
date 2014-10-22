@@ -29,6 +29,9 @@ class ModuleDescriptorValidator
         '2' => 'module-2_1.xsd'
     ];
 
+    /** @var Finder */
+    protected $xsdFinder;
+
     protected $moduleVersion;
 
     public function __construct()
@@ -88,7 +91,7 @@ class ModuleDescriptorValidator
      * @param \SplFileInfo $xsdFile The XSD file
      * @return array an array of errors if validation fails, otherwise an empty array
      */
-    protected function schemaValidate($dom, $xsdFile)
+    protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
     {
         $errors = [];
 

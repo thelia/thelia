@@ -13,10 +13,10 @@
 namespace Thelia\Form;
 
 use Exception;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Log\Tlog;
 use Thelia\Module\Validator\ModuleDefinition;
 use Thelia\Module\Validator\ModuleValidator;
 use ZipArchive;
@@ -42,36 +42,37 @@ class ModuleInstallForm extends BaseForm
                 'module',
                 'file',
                 [
-                    'required'    => true,
-                    'constraints' => array(
+                    'required' => true,
+                    'constraints' => [
                         new Constraints\File(
-                            array(
-                                'mimeTypes'        => array(
+                            [
+                                'mimeTypes' => [
                                     'application/zip'
-                                ),
+                                ],
                                 'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file')
-                            )
+                            ]
                         ),
-                        new Constraints\Callback(array(
-                            "methods" => array(
-                                array($this, "checkModuleValidity")
-                            )
-                        ))
-                    ),
-                    'label'       => Translator::getInstance()->trans('The module zip file'),
-                    'label_attr'  => [
+                        new Constraints\Callback([
+                            "methods" => [
+                                [$this, "checkModuleValidity"]
+                            ]
+                        ])
+                    ],
+                    'label' => Translator::getInstance()->trans('The module zip file'),
+                    'label_attr' => [
                         'for' => 'module'
                     ]
                 ]
             );
-
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
-     * @param ExecutionContextInterface                           $context
+     * Check module validity
+     *
+     * @param UploadedFile $file
+     * @param ExecutionContextInterface $context
      */
-    public function checkModuleValidity($file, ExecutionContextInterface $context)
+    public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context)
     {
         $modulePath = $this->unzipModule($file);
 
@@ -95,16 +96,13 @@ class ModuleInstallForm extends BaseForm
                 $moduleValidator->validate();
 
                 $this->moduleDefinition = $moduleValidator->getModuleDefinition();
-
             } catch (Exception $ex) {
-
                 $context->addViolation(
                     Translator::getInstance()->trans(
                         "The module is not valid : %message",
-                        array('%message' => $ex->getMessage())
+                        ['%message' => $ex->getMessage()]
                     )
                 );
-
             }
         }
     }
@@ -115,7 +113,7 @@ class ModuleInstallForm extends BaseForm
     }
 
     /**
-     * @return null
+     * @return string|null
      */
     public function getModulePath()
     {
@@ -123,14 +121,16 @@ class ModuleInstallForm extends BaseForm
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * Unzip a module file.
      *
-     * @return bool
+     * @param UploadedFile $file
+     *
+     * @return string|bool the path where the module has been extracted or false if an error has occured
      */
-    protected function unzipModule($file)
+    protected function unzipModule(UploadedFile $file)
     {
         $extractPath = false;
-        $zip         = new ZipArchive();
+        $zip = new ZipArchive();
         if ($zip->open($file->getRealPath()) === true) {
 
             $extractPath = $this->tempdir();
@@ -142,12 +142,16 @@ class ModuleInstallForm extends BaseForm
             }
 
             $zip->close();
-
         }
 
         return $extractPath;
     }
 
+    /**
+     * create a unique directory.
+     *
+     * @return bool|string the directory path or false if it fails
+     */
     protected function tempdir()
     {
         $tempfile = tempnam(sys_get_temp_dir(), '');
@@ -165,11 +169,11 @@ class ModuleInstallForm extends BaseForm
     protected function getDirContents($dir)
     {
 
-        $paths = array_diff(scandir($dir), array('..', '.'));
+        $paths = array_diff(scandir($dir), ['..', '.']);
 
         $out = [
             'directories' => [],
-            'files'       => [],
+            'files' => [],
         ];
 
         foreach ($paths as $path) {
@@ -187,5 +191,4 @@ class ModuleInstallForm extends BaseForm
     {
         return "module_install";
     }
-
 }

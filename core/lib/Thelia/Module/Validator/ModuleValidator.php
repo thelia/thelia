@@ -25,6 +25,7 @@ use Thelia\Module\ModuleDescriptorValidator;
 
 /**
  * Class ModuleValidartor
+ *
  * @package Thelia\Module\Validator
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
@@ -157,7 +158,7 @@ class ModuleValidator
         }
 
         if (null === $this->moduleDescriptor) {
-            throw new Exception(
+            throw new \Exception(
                 $this->getTranslator()->trans(
                     "The module definition has not been initialized."
                 )
@@ -216,7 +217,7 @@ class ModuleValidator
     public function loadModuleDefinition()
     {
         if (null === $this->moduleDescriptor) {
-            throw new Exception(
+            throw new \Exception(
                 $this->getTranslator()->trans(
                     "The module descriptor has not been initialized."
                 )

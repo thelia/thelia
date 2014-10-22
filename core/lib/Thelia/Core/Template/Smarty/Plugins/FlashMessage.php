@@ -19,21 +19,22 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Translation\Translator;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 9/18/13
- * Time: 3:56 PM
- *
  * Plugin for smarty defining blocks allowing to get flash message
  * A flash message is a variable, array, object stored in session under the flashMessage key
- * ex $SESSION['flashMessage']['myKey']
+ * ex $SESSION['flashMessage']['myType']
  *
  * blocks :
- *  - {flashMessage key="myKey"} ... {/flashMessage}
  *
+ * ```
+ * {flash type="myType"}
+ *     <div class="alert alert-success">{$MESSAGE}</div>
+ * {/flash}
+ * ```
  * Class Form
  *
  * @package Thelia\Core\Template\Smarty\Plugins
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class FlashMessage extends AbstractSmartyPlugin
 {
@@ -97,7 +98,7 @@ class FlashMessage extends AbstractSmartyPlugin
      */
     public function getFlashMessage($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        $type = $this->getParam($params, 'type', 0);
+        $type = $this->getParam($params, 'type', false);
 
         if (null === $content) {
 
