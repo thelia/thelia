@@ -17,6 +17,7 @@ use Thelia\Core\Thelia;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\ModuleException;
+use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
@@ -31,6 +32,9 @@ class ModuleValidator
 {
 
     protected $modulePath;
+
+    /** @var bool */
+    protected $isLoaded = false;
 
     /** @var ModuleDescriptorValidator */
     protected $moduleDescriptor;
@@ -121,6 +125,11 @@ class ModuleValidator
     }
 
 
+    /**
+     * Loads the module description and configuration.
+     *
+     * @throws FileNotFoundException if modules does not exist or not contains module.xml or config.xml
+     */
     public function load()
     {
         $this->checkDirectoryStructure();
@@ -128,11 +137,24 @@ class ModuleValidator
         $this->loadModuleDescriptor();
 
         $this->loadModuleDefinition();
+
+        $this->isLoaded = true;
     }
 
-    public function validate()
+    /**
+     * Validate a module, checks :
+     *
+     * - version of Thelia
+     * - modules dependencies
+     *
+     * @param bool $checkCurrentVersion if true it will also check if the module is
+     *                                  already installed (not activated - present in module list)
+     */
+    public function validate($checkCurrentVersion = true)
     {
-        $this->load();
+        if (false === $this->isLoaded) {
+            $this->load();
+        }
 
         if (null === $this->moduleDescriptor) {
             throw new Exception(
@@ -146,7 +168,9 @@ class ModuleValidator
 
         $this->checkMaxVersion();
 
-        $this->checkModuleVersion();
+        if (true === $checkCurrentVersion) {
+            $this->checkModuleVersion();
+        }
 
         $this->checkModuleDependencies();
     }
@@ -304,11 +328,8 @@ class ModuleValidator
             $pass = false;
 
             if (null !== $module) {
-                if ($module->getActivate() !== BaseModule::IS_ACTIVATED) {
-
-                    if ("" == $dependency[1] ||
-                        version_compare($module->getVersion(), $dependency[1], ">=")
-                    ) {
+                if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
+                    if ("" == $dependency[1] || version_compare($module->getVersion(), $dependency[1], ">=")) {
                         $pass = true;
                     }
                 }
@@ -330,12 +351,64 @@ class ModuleValidator
         }
 
         if (count($errors) > 0) {
-            $errors = $this->getTranslator()->trans(
+            $errorsMessage = $this->getTranslator()->trans(
                 'The module requires this activated modules : %modules',
                 ['%modules' => implode(', ', $errors)]
             );
 
-            throw new ModuleException($errors);
+            throw new ModuleException($errorsMessage);
         }
+    }
+
+    /**
+     * Get an array of modules that depend of the current module
+     *
+     * @param  bool|null $active if true only search in activated module, false only deactivated and null on all modules
+     * @return array     array of array with `code` which is the module code that depends of this current module and
+     *                   `version` which is the required version of current module
+     */
+    public function getModulesDependOf($active = true)
+    {
+        $code = $this->getModuleDefinition()->getCode();
+        $query = ModuleQuery::create();
+        $dependantModules = [];
+
+        if (true === $active) {
+            $query->findByActivate(1);
+        } elseif (false === $active) {
+            $query->findByActivate(0);
+        }
+
+        $modules = $query->find();
+
+        /** @var Module $module */
+        foreach ($modules as $module) {
+
+            $validator = new ModuleValidator($module->getAbsoluteBaseDir());
+            try {
+                $validator->load();
+                $definition = $validator->getModuleDefinition();
+                $dependencies = $definition->getDependencies();
+
+                if (count($dependencies) > 0) {
+
+                    foreach ($dependencies as $dependency) {
+
+                        if ($dependency[0] == $code) {
+                            $dependantModules[] = [
+                                'code' => $definition->getCode(),
+                                'version' => $dependency[1]
+                            ];
+
+                            break;
+                        }
+                    }
+                }
+            } catch (\Exception $ex) {
+                ;
+            }
+        }
+
+        return $dependantModules;
     }
 }

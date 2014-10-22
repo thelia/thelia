@@ -49,8 +49,8 @@ class ModuleDescriptorValidator
 
     public function validate($xml_file, $version = null)
     {
-        $dom          = new \DOMDocument();
-        $errorMessage = [];
+        $dom    = new \DOMDocument();
+        $errors = [];
 
         if ($dom->load($xml_file)) {
             /** @var \SplFileInfo $xsdFile */
@@ -62,41 +62,66 @@ class ModuleDescriptorValidator
                     continue;
                 }
 
-                $errorMessage = [];
+                $errors = $this->schemaValidate($dom, $xsdFile);
 
-                try {
+                if (count($errors) === 0) {
+                    $this->moduleVersion = $xsdVersion;
 
-                    libxml_use_internal_errors(true);
-
-                    if ($dom->schemaValidate($xsdFile->getRealPath())) {
-                        $this->moduleVersion = $xsdVersion;
-
-                        return true;
-                    } else {
-                        $errors = libxml_get_errors();
-                        foreach ($errors as $error) {
-                            $errorMessage[] = sprintf(
-                                'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
-                                $error->message,
-                                $error->level,
-                                $error->code,
-                                $error->file,
-                                $error->line,
-                                $error->column
-                            );
-                        }
-                        libxml_clear_errors();
-                    }
-
-                    libxml_use_internal_errors(false);
-
-                } catch (ErrorException $ex) {
-                    libxml_use_internal_errors(false);
+                    return true;
                 }
             }
         }
 
-        throw new InvalidXmlDocumentException(sprintf("%s file is not a valid file : %s", $xml_file, implode(", ", $errorMessage)));
+        throw new InvalidXmlDocumentException(
+            sprintf(
+                "%s file is not a valid file : %s",
+                $xml_file,
+                implode(", ", $errors)
+            )
+        );
+    }
+
+    /**
+     * Validate the schema of a XML file with a given xsd file
+     *
+     * @param \DOMDocument $dom The XML document
+     * @param \SplFileInfo $xsdFile The XSD file
+     * @return array an array of errors if validation fails, otherwise an empty array
+     */
+    protected function schemaValidate($dom, $xsdFile)
+    {
+        $errors = [];
+
+        try {
+
+            libxml_use_internal_errors(true);
+
+            if (!$dom->schemaValidate($xsdFile->getRealPath())) {
+
+                $errors = libxml_get_errors();
+
+                foreach ($errors as $error) {
+                    $errorMessage[] = sprintf(
+                        'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
+                        $error->message,
+                        $error->level,
+                        $error->code,
+                        $error->file,
+                        $error->line,
+                        $error->column
+                    );
+                }
+
+                libxml_clear_errors();
+            }
+
+            libxml_use_internal_errors(false);
+
+        } catch (ErrorException $ex) {
+            libxml_use_internal_errors(false);
+        }
+
+        return $errors;
     }
 
     public function getDescriptor($xml_file)

@@ -26,15 +26,16 @@ use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\ModuleManagement;
+use Thelia\Module\Validator\ModuleValidator;
 
 /**
  * Class Module
@@ -73,6 +74,75 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function checkToggleActivation(ModuleToggleActivationEvent $event)
+    {
+        if (true === $event->noCheck) {
+            return;
+        }
+
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+
+            try {
+                if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+                    $this->checkDeactivation($module);
+                } else {
+                    $this->checkActivation($module);
+                }
+            } catch (\Exception $ex) {
+                $event->stopPropagation();
+                throw $ex;
+            }
+        }
+
+    }
+
+    /**
+     * Check if module can be activated : supported version of Thelia, module dependencies.
+     *
+     * @param \Thelia\Model\Module $module
+     * @return bool true if the module can be activated, otherwise false
+     */
+    private function checkActivation($module)
+    {
+        try {
+            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+            $moduleValidator->validate(false);
+        } catch (\Exception $ex) {
+            throw $ex;
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if module can be deactivated safely because other modules
+     * could have dependencies to this module
+     *
+     * @param  \Thelia\Model\Module $module
+     * @return bool true if the module can be deactivated, otherwise false
+     */
+    private function checkDeactivation($module)
+    {
+        $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+        $moduleValidator->load();
+
+        $modules = $moduleValidator->getModulesDependOf();
+
+        if (count($modules) > 0){
+            $moduleList = implode(', ', array_column($modules, 'code'));
+            $message = (count($modules) == 1)
+                ? Translator::getInstance()->trans('%s has dependency to module %s. You have to deactivate this module before.')
+                : Translator::getInstance()->trans('%s have dependencies to module %s. You have to deactivate these modules before.')
+            ;
+
+            throw new ModuleException(
+                sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode())
+            );
+        }
+
+        return true;
+    }
+
     public function delete(ModuleDeleteEvent $event)
     {
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
@@ -84,10 +154,13 @@ class Module extends BaseAction implements EventSubscriberInterface
                     throw new \LogicException(
                         Translator::getInstance()->trans(
                             'Cannot instanciante module "%name%": the namespace is null. Maybe the model is not loaded ?',
-                            array('%name%' => $module->getCode())
+                            ['%name%' => $module->getCode()]
                         )
                     );
                 }
+
+                // check for modules that depend of this one
+                $this->checkDeactivation($module);
 
                 try {
                     $instance = $module->createInstance();
@@ -106,7 +179,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
                             'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
-                            array('%name%' => $module->getCode())
+                            ['%name%' => $module->getCode()]
                         )
                     );
                 }
@@ -170,6 +243,8 @@ class Module extends BaseAction implements EventSubscriberInterface
             if ($activated) {
                 // deactivate
                 $toggleEvent = new ModuleToggleActivationEvent($oldModule);
+                // disable the check of the module because it's already done
+                $toggleEvent->noCheck = true;
                 $toggleEvent->setDispatcher($dispatcher);
 
                 $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
@@ -204,13 +279,14 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // Update the module
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
-        $moduleManagement     = new ModuleManagement();
-        $file                 = new SplFileInfo($moduleDescriptorFile);
-        $module               = $moduleManagement->updateModule($file);
+        $moduleManagement = new ModuleManagement();
+        $file = new SplFileInfo($moduleDescriptorFile);
+        $module = $moduleManagement->updateModule($file);
 
         // activate if old was activated
         if ($activated) {
             $toggleEvent = new ModuleToggleActivationEvent($module);
+            $toggleEvent->noCheck = true;
             $toggleEvent->setDispatcher($dispatcher);
 
             $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
@@ -235,10 +311,10 @@ class Module extends BaseAction implements EventSubscriberInterface
             throw new \RuntimeException(
                 Translator::getInstance()->trans(
                     "Failed to find a payment Module with ID=%mid for order ID=%oid",
-                    array(
+                    [
                         "%mid" => $order->getPaymentModuleId(),
                         "%oid" => $order->getId()
-                    )
+                    ]
                 )
             );
         }
@@ -295,13 +371,16 @@ class Module extends BaseAction implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            TheliaEvents::MODULE_TOGGLE_ACTIVATION => array('toggleActivation', 128),
-            TheliaEvents::MODULE_UPDATE_POSITION   => array('updatePosition', 128),
-            TheliaEvents::MODULE_DELETE            => array('delete', 128),
-            TheliaEvents::MODULE_UPDATE            => array('update', 128),
-            TheliaEvents::MODULE_INSTALL           => array('install', 128),
-            TheliaEvents::MODULE_PAY               => array('pay', 128),
-        );
+        return [
+            TheliaEvents::MODULE_TOGGLE_ACTIVATION => [
+                ['checkToggleActivation', 255],
+                ['toggleActivation', 128]
+            ],
+            TheliaEvents::MODULE_UPDATE_POSITION => ['updatePosition', 128],
+            TheliaEvents::MODULE_DELETE => ['delete', 128],
+            TheliaEvents::MODULE_UPDATE => ['update', 128],
+            TheliaEvents::MODULE_INSTALL => ['install', 128],
+            TheliaEvents::MODULE_PAY => ['pay', 128],
+        ];
     }
 }

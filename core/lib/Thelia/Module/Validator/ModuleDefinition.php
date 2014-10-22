@@ -19,59 +19,47 @@ namespace Thelia\Module\Validator;
  */
 class ModuleDefinition
 {
-
+    /** @var string */
     protected $code;
 
+    /** @var string */
     protected $namespace;
 
+    /** @var string */
     protected $type;
 
+    /** @var string */
     protected $logo;
 
-    protected $languages;
+    /** @var array */
+    protected $languages = [];
 
-    protected $descriptives;
+    /** @var array */
+    protected $descriptives = [];
 
+    /** @var string */
     protected $minVersion;
 
+    /** @var string */
     protected $maxVersion;
 
+    /** @var string */
     protected $version;
 
-    protected $dependencies;
+    /** @var array */
+    protected $dependencies = [];
 
+    /** @var string */
     protected $documentation;
 
+    /** @var string */
     protected $stability;
 
-    protected $authors;
+    /** @var array */
+    protected $authors = [];
 
     /**
-     * @param mixed $code
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    /**
-     * @param mixed $authors
-     */
-    public function setAuthors($authors)
-    {
-        $this->authors = $authors;
-    }
-
-    /**
-     * @return mixed
+     * @return array
      */
     public function getAuthors()
     {
@@ -79,183 +67,39 @@ class ModuleDefinition
     }
 
     /**
-     * @param mixed $descriptives
+     * @param array $authors
      */
-    public function setDescriptives($descriptives)
+    public function setAuthors($authors)
     {
-        $this->descriptives = $descriptives;
+        $this->authors = $authors;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getDescriptives()
+    public function getCode()
     {
-        return $this->descriptives;
+        return $this->code;
     }
 
     /**
-     * @param mixed $documentation
+     * @param string $code
      */
-    public function setDocumentation($documentation)
+    public function setCode($code)
     {
-        $this->documentation = $documentation;
+        $this->code = $code;
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getDocumentation()
+    public function getDependencies()
     {
-        return $this->documentation;
+        return $this->dependencies;
     }
 
     /**
-     * @param mixed $languages
-     */
-    public function setLanguages($languages)
-    {
-        $this->languages = $languages;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLanguages()
-    {
-        return $this->languages;
-    }
-
-    /**
-     * @param mixed $logo
-     */
-    public function setLogo($logo)
-    {
-        $this->logo = $logo;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLogo()
-    {
-        return $this->logo;
-    }
-
-    /**
-     * @param mixed $maxVersion
-     */
-    public function setMaxVersion($maxVersion)
-    {
-        $this->maxVersion = $maxVersion;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMaxVersion()
-    {
-        return $this->maxVersion;
-    }
-
-    /**
-     * @param mixed $minVersion
-     */
-    public function setMinVersion($minVersion)
-    {
-        $this->minVersion = $minVersion;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMinVersion()
-    {
-        return $this->minVersion;
-    }
-
-    /**
-     * @param mixed $namespace
-     */
-    public function setNamespace($namespace)
-    {
-        $this->namespace = $namespace;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getNamespace()
-    {
-        return $this->namespace;
-    }
-
-    /**
-     * @param mixed $stability
-     */
-    public function setStability($stability)
-    {
-        $this->stability = $stability;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getStability()
-    {
-        return $this->stability;
-    }
-
-    /**
-     * @param mixed $tags
-     */
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTags()
-    {
-        return $this->tags;
-    }
-
-    /**
-     * @param mixed $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param mixed $version
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * @param mixed $dependencies
+     * @param array $dependencies
      */
     public function setDependencies($dependencies)
     {
@@ -263,10 +107,162 @@ class ModuleDefinition
     }
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getDependencies()
+    public function getDescriptives()
     {
-        return $this->dependencies;
+        return $this->descriptives;
+    }
+
+    /**
+     * @param array $descriptives
+     */
+    public function setDescriptives($descriptives)
+    {
+        $this->descriptives = $descriptives;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocumentation()
+    {
+        return $this->documentation;
+    }
+
+    /**
+     * @param string $documentation
+     */
+    public function setDocumentation($documentation)
+    {
+        $this->documentation = $documentation;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages()
+    {
+        return $this->languages;
+    }
+
+    /**
+     * @param array $languages
+     */
+    public function setLanguages($languages)
+    {
+        $this->languages = $languages;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLogo()
+    {
+        return $this->logo;
+    }
+
+    /**
+     * @param string $logo
+     */
+    public function setLogo($logo)
+    {
+        $this->logo = $logo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMaxVersion()
+    {
+        return $this->maxVersion;
+    }
+
+    /**
+     * @param string $maxVersion
+     */
+    public function setMaxVersion($maxVersion)
+    {
+        $this->maxVersion = $maxVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMinVersion()
+    {
+        return $this->minVersion;
+    }
+
+    /**
+     * @param string $minVersion
+     */
+    public function setMinVersion($minVersion)
+    {
+        $this->minVersion = $minVersion;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamespace()
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @param string $namespace
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStability()
+    {
+        return $this->stability;
+    }
+
+    /**
+     * @param string $stability
+     */
+    public function setStability($stability)
+    {
+        $this->stability = $stability;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * @param string $version
+     */
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 }
