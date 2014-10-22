@@ -54,6 +54,23 @@ casper.test.begin('Newsletter', 12, function suite(test) {
 
     casper.wait(thelia_default_timeout, function(){
 
+        casper.test.comment('== Test submission');
+
+        this.fill('form#form-newsletter', {
+            'thelia_newsletter[email]': 'test@thelia.net',
+            'thelia_newsletter[firstname]': 'Thelia',
+            'thelia_newsletter[lastname]': 'Thelia'
+        }, true);
+
+        casper.evaluate(function(email) {
+            document.querySelector('#email_newsletter').value = email;
+        }, 'test@thelia.net');
+
+        this.click('form#form-newsletter button[type="submit"]');
+    });
+
+    casper.wait(thelia_default_timeout, function(){
+
         casper.test.comment('== Existing email on submission');
 
         this.fill('form#form-newsletter', {
