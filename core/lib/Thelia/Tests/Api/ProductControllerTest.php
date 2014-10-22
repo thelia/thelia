@@ -159,17 +159,15 @@ class ProductControllerTest extends ApiTestCase
         $product = ProductQuery::create()->findPk($productId);
 
         $productData = [
-            'thelia_product_modification' => [
-                'ref' => $product->getRef(),
-                'locale' => 'en_US',
-                'title' => 'product updated from api',
-                'default_category' => $product->getDefaultCategoryId(),
-                'visible' => 1,
-                'description' => 'product description updated from api',
-                'chapo' => 'product chapo updated from api',
-                'postscriptum' => 'product postscriptum',
-                'brand_id' => 0
-            ]
+            'ref' => $product->getRef(),
+            'locale' => 'en_US',
+            'title' => 'product updated from api',
+            'default_category' => $product->getDefaultCategoryId(),
+            'visible' => 1,
+            'description' => 'product description updated from api',
+            'chapo' => 'product chapo updated from api',
+            'postscriptum' => 'product postscriptum',
+            'brand_id' => 0
         ];
 
         $requestContent = json_encode($productData);

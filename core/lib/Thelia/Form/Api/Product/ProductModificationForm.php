@@ -12,45 +12,15 @@
 
 namespace Thelia\Form\Api\Product;
 
-use Thelia\Core\Translation\Translator;
-use Thelia\Form\ProductCreationForm as BaseProductCreationForm;
-use Thelia\Form\ProductModificationForm;
-use Thelia\Form\StandardDescriptionFieldsTrait;
+use Thelia\Form\ProductModificationForm as BaseProductModificationForm;
 
 /**
- * Class ProductCreateForm
+ * Class ProductModificationForm
  * @package Thelia\Form\Api\Product
  * @author manuel raynaud <manu@thelia.net>
  */
-class ProductCreationForm extends BaseProductCreationForm
+class ProductModificationForm extends BaseProductModificationForm
 {
-    use StandardDescriptionFieldsTrait;
-
-    /**
-     * @inherited
-     */
-    protected function buildForm()
-    {
-        $translator = Translator::getInstance();
-        BaseProductCreationForm::buildForm();
-
-        $this
-            ->formBuilder
-            ->add("brand_id", "integer", [
-                'required'    => true,
-                'label'       => $translator->trans('Brand / Supplier'),
-                'label_attr'  => [
-                    'for' => 'mode',
-                    'help' => $translator->trans("Select the product brand, or supplier."),
-                ],
-            ]);
-
-        $this->addStandardDescFields(array('title', 'locale'));
-    }
-
-    /**
-     * @return string the name of you form. This name must be unique
-     */
     public function getName()
     {
         return '';

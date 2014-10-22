@@ -22,7 +22,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
 use Thelia\Form\Api\Product\ProductCreationForm;
-use Thelia\Form\ProductModificationForm;
+use Thelia\Form\Api\Product\ProductModificationForm;
 use Thelia\Model\ProductQuery;
 
 /**
@@ -137,7 +137,7 @@ class ProductController extends BaseApiController
         );
 
         $data = $request->request->all();
-        $data[$form->getName()]['id'] = $product_id;
+        $data['id'] = $product_id;
         $request->request->add($data);
 
         try {
