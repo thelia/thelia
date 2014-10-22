@@ -7,6 +7,7 @@ UPDATE `config` SET `value`='alpha2' WHERE `name`='thelia_extra_version';
 
 UPDATE `config` SET `name`='form_firewall_active' WHERE `name`='from_firewall_active';
 
+
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -38,7 +39,23 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+7, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
   (@max_id+8, 'en_US', 'Order - After product list', '', ''),
   (@max_id+8, 'fr_FR', 'Commande - Après la liste des produits', '', '')
+
+# ======================================================================================================================
+# Module version, min & max Thelia version supported
+# ======================================================================================================================
+
+ALTER TABLE `module`
+  ADD COLUMN `category` VARCHAR(50) DEFAULT 'classic' NOT NULL
+  AFTER `type`
 ;
 
+UPDATE `module` SET `category` = 'classic' WHERE `type` = 1;
+UPDATE `module` SET `category` = 'delivery' WHERE `type` = 2;
+UPDATE `module` SET `category` = 'payment' WHERE `type` = 3;
+
+ALTER TABLE `module`
+  ADD COLUMN `version` VARCHAR(10) DEFAULT '' NOT NULL
+  AFTER `code`
+;
 
 SET FOREIGN_KEY_CHECKS = 1;
