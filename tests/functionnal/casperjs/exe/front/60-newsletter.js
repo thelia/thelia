@@ -5,8 +5,17 @@ casper.test.begin('Newsletter', 12, function suite(test) {
     var newEmail = '';
 
     casper.start(thelia2_base_url + "newsletter", function() {
-        test.assertTitle("Newsletter - Thelia V2", "title is the one expected");
+        if (this.exists('.navbar-customer .logout')) {
+            this.click('.navbar-customer .logout');
 
+        }
+    });
+
+    casper.thenOpen(thelia2_base_url + "newsletter", function(){
+        test.assertTitle("Newsletter - Thelia V2", "title is the one expected");
+    });
+
+    casper.wait(thelia_default_timeout, function() {
         test.assertExists('.navbar-customer .register', 'user is disconnected');
 
         test.assertExists('form#form-newsletter', "newsletter form is found");
@@ -25,11 +34,10 @@ casper.test.begin('Newsletter', 12, function suite(test) {
             'thelia_newsletter[firstname]': 'Thelia',
             'thelia_newsletter[lastname]': 'Thelia'
         }, true);
-
     });
 
 
-    casper.then(function() {
+    casper.wait(thelia_default_timeout, function(){
 
         casper.evaluate(function(email) {
             document.querySelector('#email_newsletter').value = email;
