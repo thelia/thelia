@@ -16,8 +16,10 @@ use Propel\Runtime\Propel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Product;
@@ -117,12 +119,7 @@ class ProductController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE);
 
-        $product = ProductQuery::create()
-            ->findPk($product_id);
-
-        if (null === $product) {
-            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $product_id));
-        }
+        $this->checkProductExists($product_id);
 
         $request = $this->getRequest();
 
@@ -151,6 +148,36 @@ class ProductController extends BaseApiController
             return JsonResponse::create(null, 204);
         } catch (\Exception $e) {
             return JsonResponse::create(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteAction($product_id)
+    {
+        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::DELETE);
+
+        $this->checkProductExists($product_id);
+
+        try {
+            $event = new ProductDeleteEvent($product_id);
+
+            $this->dispatch(TheliaEvents::PRODUCT_DELETE, $event);
+            return Response::create('', 204);
+        } catch (\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * @param $product_id
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function checkProductExists($product_id)
+    {
+        $product = ProductQuery::create()
+            ->findPk($product_id);
+
+        if (null === $product) {
+            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $product_id));
         }
     }
 }

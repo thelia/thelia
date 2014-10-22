@@ -184,5 +184,26 @@ class ProductControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'Http status code must be 204');
+
+        return $productId;
+    }
+
+    /**
+     * @param $productId
+     * @depends testUpdateAction
+     */
+    public function testDeleteAction($productId)
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/products/'.$productId.'?sign='.$this->getSignParameter(""),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'Http status code must be 204');
     }
 }

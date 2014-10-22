@@ -65,6 +65,11 @@
     <route id="api.product.create" path="/api/products" methods="post">
         <default key="_controller">Thelia\Controller\Api\ProductController::createAction</default>
     </route>
+
+    <route id="api.product.delete" path="/api/products/{product_id}" methods="delete">
+        <default key="_controller">Thelia\Controller\Api\ProductController::deleteAction</default>
+        <requirement key="product_id">\d+</requirement>
+    </route>
     <!-- end product route -->
 
     <!-- category route -->
