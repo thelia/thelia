@@ -125,7 +125,7 @@ abstract class BaseForm
          * Build the form
          */
 
-        // We need to wrap the dispatch with a condition for retro-compatibility
+        // We need to wrap the dispatch with a condition for backward compatibility
         if ($this->hasContainer()) {
             $event = new TheliaFormEvent($this);
 

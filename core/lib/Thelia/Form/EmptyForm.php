@@ -50,5 +50,4 @@ class EmptyForm extends BaseForm
     {
         return "empty";
     }
-
 }

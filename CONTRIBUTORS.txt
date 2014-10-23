@@ -4,6 +4,7 @@ please email us (info@thelia.net) or fork this file on Github and send a pull-re
 Manuel Raynaud - manu@thelia.net
 Etienne Roudeix - etienne.roudeix@gmail.com
 Franck Allimant - franck@allimant.org
+Benjamin Perche - bperche@openstudio.fr
 Julien Chanséaume - jchanseaume@openstudio.fr
 Guillaume Morel - gmorel@openstudio.fr
 Michaël Espeche - mespeche@openstudio.fr

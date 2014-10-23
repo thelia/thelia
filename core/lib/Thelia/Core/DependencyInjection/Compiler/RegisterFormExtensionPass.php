@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Class RegisterFormExtensionPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class RegisterFormExtensionPass implements CompilerPassInterface
 {
