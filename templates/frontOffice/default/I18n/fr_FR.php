@@ -44,7 +44,7 @@ return array(
     'Checkout' => 'Commande',
     'Choose your delivery address' => 'Choisissez une adresse de livraison',
     'Choose your delivery method' => 'Choisissez votre moyen de livraison',
-    'Choose your payment method' => 'Choisissez voter moyen de paiement',
+    'Choose your payment method' => 'Choisissez votre moyen de paiement',
     'Code :' => 'Code : ',
     'Connecting to the secure payment server, please wait a few seconds...' => 'Connexion au serveur sécurisé, merci de patienter quelques secondes.',
     'Contact Us' => 'Contactez-nous',
