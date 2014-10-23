@@ -98,7 +98,7 @@ class Form extends AbstractSmartyPlugin
             $formType = $this->getParam($params, 'type', 'form');
 
             if (null == $name) {
-                throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
+                $name = "thelia.empty";
             }
 
             if (!isset($this->formDefinition[$name])) {
@@ -495,13 +495,13 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'field' parameter is missing");
         }
 
-        if (empty($instance->getView()[$fieldName])) {
-            throw new \InvalidArgumentException(
-                sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName())
-            );
-        }
+        $view = $this->retrieveField(
+            $fieldName,
+            $instance->getView(),
+            $instance->getName()
+        );
 
-        return $instance->getView()[$fieldName];
+        return $view;
     }
 
     protected function getFormFieldsFromTag($params)
@@ -543,10 +543,20 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'field' parameter is missing");
         }
 
-        $fieldData = $instance->getForm()->all()[$fieldName];
+        $fieldData = $this->retrieveField(
+            $fieldName,
+            $instance->getForm()->all(),
+            $instance->getName()
+        );
 
         if (empty( $fieldData )) {
-            throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s children", $fieldName, $instance->getName()));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Field name '%s' not found in form %s children",
+                    $fieldName,
+                    $instance->getName()
+                )
+            );
         }
 
         return $fieldData->getConfig();
@@ -565,16 +575,34 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
         }
 
-        if (!$instance instanceof \Thelia\Form\BaseForm) {
+        if (!$instance instanceof BaseForm) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    "form parameter in form_field block must be an instance of \Thelia\Form\BaseForm, instance of %s found",
+                    "form parameter in form_field block must be an instance of ".
+                    "\Thelia\Form\BaseForm, instance of %s found",
                     get_class($instance)
                 )
             );
         }
 
         return $instance;
+    }
+
+
+    protected function retrieveField($needle, $haystack, $formName)
+    {
+        $splitName = explode(".", $needle);
+
+        foreach ($splitName as $level) {
+            if (empty($haystack[$level])) {
+                throw new \InvalidArgumentException(
+                    sprintf("Field name '%s' not found in form %s", $needle, $formName)
+                );
+            }
+            $haystack = $haystack[$level];
+        }
+
+        return $haystack;
     }
 
     /**

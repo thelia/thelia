@@ -546,6 +546,10 @@ abstract class BaseController extends ContainerAware
             static::$formDefinition = $this->container->getParameter("thelia.parser.forms");
         }
 
+        if (empty($name)) {
+            $name = "thelia.empty";
+        }
+
         if (!isset(static::$formDefinition[$name])) {
             throw new \OutOfBoundsException(
                 sprintf("The form '%s' doesn't exist", $name)

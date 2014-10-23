@@ -90,6 +90,11 @@ abstract class BaseForm
      */
     protected $dispatcher;
 
+    /**
+     * @var string
+     */
+    private $type;
+
     public function __construct(
         Request $request,
         $type = "form",
@@ -98,6 +103,7 @@ abstract class BaseForm
         ContainerInterface $container = null
     ) {
         $this->request = $request;
+        $this->type = $type;
 
         if (null !== $container) {
             $this->container = $container;
@@ -193,6 +199,14 @@ abstract class BaseForm
     public function getFormBuilder()
     {
         return $this->formBuilder;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**

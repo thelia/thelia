@@ -50,6 +50,4 @@ class TheliaFormEvent extends Event
 
         return $this;
     }
-
-
 }

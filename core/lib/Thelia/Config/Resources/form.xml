@@ -144,6 +144,8 @@
         <form name="thelia.admin.sale.creation" class="Thelia\Form\Sale\SaleCreationForm"/>
         <form name="thelia.admin.sale.modification" class="Thelia\Form\Sale\SaleModificationForm"/>
 
+        <form name="thelia.empty" class="Thelia\Form\EmptyForm"/>
+
     </forms>
 
 </config>
