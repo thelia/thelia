@@ -129,6 +129,15 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
             "command" => $this->command->getName(),
             "COMMAND" => "set",
             "name"    => $varName,
+            "value"   => "0"
+        ]);
+
+        $this->assertVariableEqual($varName, "0");
+
+        $tester->execute([
+            "command" => $this->command->getName(),
+            "COMMAND" => "set",
+            "name"    => $varName,
             "value"   => "Thelia"
         ]);
 
