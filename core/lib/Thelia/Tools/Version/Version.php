@@ -28,6 +28,23 @@ use Thelia\Tools\Version\Constraints\ConstraintNearlyEqual;
 class Version
 {
 
+    /**
+     * Test if a version matched the version contraints.
+     *
+     * constraints can be simple or complex (multiple constraints separated by space) :
+     *
+     * - "~2.1" : version 2.1.*
+     * - "~2.1 <=2.1.4" : version 2.1.* but lower or equal to 2.1.4
+     * - ">=2.1" : version 2.1.*, 2.2, ...
+     * - ">2.1.1 <=2.1.5" : version greater than 2.1.1 but lower or equal than 2.1.5
+     * - ...
+     *
+     * @param string $version the version to test
+     * @param string $constraints the versions constraints
+     * @param bool $strict if true 2.1 is different of 2.1.0, if false version are normalized so 2.1
+     *                     will be expended to 2.1.0
+     * @return bool true if version matches the constraints
+     */
     static public function test($version, $constraints, $strict = false)
     {
         $constraints = self::parse($constraints, $strict);
