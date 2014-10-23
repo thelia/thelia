@@ -322,22 +322,28 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         return $this->_moduleModel;
     }
 
+
     /**
+     * Module A may use static method from module B, thus we have to cache
+     * a couple (module code => module id).
+     *
      * @return int The module id, in a static way, with a cache
      */
-    private static $moduleId = null;
+    private static $moduleIds = [];
 
     public static function getModuleId()
     {
-        if (self::$moduleId === null) {
-            if (null === $module = ModuleQuery::create()->findOneByCode(self::getModuleCode())) {
-                throw new ModuleException(sprintf("Module Code `%s` not found", self::getModuleCode()), ModuleException::CODE_NOT_FOUND);
+        $code = self::getModuleCode();
+
+        if (! isset(self::$moduleIds[$code])) {
+            if (null === $module = ModuleQuery::create()->findOneByCode($code)) {
+                throw new ModuleException(sprintf("Module Code `%s` not found", $code), ModuleException::CODE_NOT_FOUND);
             }
 
-            self::$moduleId = $module->getId();
+            self::$moduleIds[$code] = $module->getId();
         }
 
-        return self::$moduleId;
+        return self::$moduleIds[$code];
     }
 
     /**
