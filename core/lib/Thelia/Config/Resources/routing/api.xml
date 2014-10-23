@@ -47,7 +47,6 @@
     <!-- end title route -->
 
     <!-- product route -->
-
     <route id="api.product.list" path="/api/products" methods="get">
         <default key="_controller">Thelia\Controller\Api\ProductController::listAction</default>
     </route>
@@ -71,6 +70,15 @@
         <requirement key="product_id">\d+</requirement>
     </route>
     <!-- end product route -->
+
+    <!-- product image route -->
+    <route id="api.product.image.list" path="/api/products/{entityId}/images">
+        <default key="_controller">Thelia\Controller\Api\ImageController::listAction</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end product image route -->
 
     <!-- category route -->
     <route id="api.category.list" path="/api/categories" methods="get">

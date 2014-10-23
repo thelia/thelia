@@ -21,7 +21,6 @@ use Thelia\Form\CategoryCreationForm as BaseCategoryCreationForm;
  */
 class CategoryCreationForm extends BaseCategoryCreationForm
 {
-
     public function getName()
     {
         return '';
