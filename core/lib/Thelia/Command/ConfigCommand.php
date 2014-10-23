@@ -79,7 +79,7 @@ class ConfigCommand extends ContainerAwareCommand
     {
         $command = $input->getArgument("COMMAND");
 
-        switch ($command){
+        switch ($command) {
             case "list":
                 $this->listConfig($input, $output);
                 break;
@@ -134,7 +134,6 @@ class ConfigCommand extends ContainerAwareCommand
             ->setRows($rows)
         ;
         $table->render($output);
-
     }
 
     private function getConfig(InputInterface $input, OutputInterface $output)
@@ -178,8 +177,6 @@ class ConfigCommand extends ContainerAwareCommand
 
         $varName = $input->getArgument("name");
         $varValue = $input->getArgument("value");
-
-        var_dump($varName, $varValue);
 
         if (!isset($varName) || !isset($varValue)) {
             $output->writeln(
