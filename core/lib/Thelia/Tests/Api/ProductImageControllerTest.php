@@ -12,6 +12,8 @@
 
 namespace Thelia\Tests\Api;
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Tests\ApiTestCase;
 
 /**
@@ -21,6 +23,23 @@ use Thelia\Tests\ApiTestCase;
  */
 class ProductImageControllerTest extends ApiTestCase
 {
+    public static function setUpBeforeClass()
+    {
+        $fs = new Filesystem();
+
+        $fs->copy(
+            __DIR__ . '/fixtures/base.png',
+            __DIR__ . '/fixtures/visuel.png'
+        );
+
+        $fs->copy(
+            __DIR__ . '/fixtures/base.png',
+            __DIR__ . '/fixtures/visuel2.png'
+        );
+
+
+    }
+
     public function testListAction()
     {
         $client = static::createClient();
@@ -85,5 +104,63 @@ class ProductImageControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
+    }
+
+    public function testCreateImageAction()
+    {
+        $client = static::createClient();
+
+        $servers = $this->getServerParameters();
+
+        $image = new UploadedFile(
+            __DIR__ . '/fixtures/visuel.png',
+            'visuel.png',
+            'image/png'
+        );
+
+        $image2 = new UploadedFile(
+            __DIR__ . '/fixtures/visuel2.png',
+            'visuel2.png',
+            'image/png'
+        );
+
+        $client->request(
+            'POST',
+            '/api/products/1/images?&sign='.$this->getSignParameter(''),
+            [],
+            [
+                'image1' => $image,
+                'image2' => $image2
+            ],
+            $servers
+        );
+
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+    }
+
+    public function testCreateImageActionWithWrongMimeType()
+    {
+        $client = static::createClient();
+
+        $servers = $this->getServerParameters();
+
+        $image = new UploadedFile(
+            __DIR__ . '/fixtures/fail.pdf',
+            'fail.png',
+            'image/png'
+        );
+
+
+        $client->request(
+            'POST',
+            '/api/products/1/images?&sign='.$this->getSignParameter(''),
+            [],
+            [
+                'image1' => $image
+            ],
+            $servers
+        );
+
+        $this->assertEquals(500, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
     }
 }

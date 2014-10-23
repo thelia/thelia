@@ -22,6 +22,8 @@ use Thelia\Core\Event\UpdateFilePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Files\Exception\ProcessFileException;
+use Thelia\Files\FileConfiguration;
 use Thelia\Files\FileManager;
 use Thelia\Files\FileModelInterface;
 use Thelia\Form\Exception\FormValidationException;
@@ -77,38 +79,76 @@ class FileController extends BaseAdminController
 
         $this->checkXmlHttpRequest();
 
+
         if ($this->getRequest()->isMethod('POST')) {
             /** @var UploadedFile $fileBeingUploaded */
             $fileBeingUploaded = $this->getRequest()->files->get('file');
-
-            $fileManager = $this->getFileManager();
-
-            // Validate if file is too big
-            if ($fileBeingUploaded->getError() == 1) {
-                $message = $this->getTranslator()
-                    ->trans(
-                        'File is too large, please retry with a file having a size less than %size%.',
-                        array('%size%' => ini_get('upload_max_filesize')),
-                        'core'
-                    );
-
-                return new ResponseRest($message, 'text', 403);
+            try {
+                $this->processImage(
+                    $fileBeingUploaded,
+                    $parentId,
+                    $parentType,
+                    $objectType,
+                    $validMimeTypes,
+                    $extBlackList
+                );
+            } catch (ProcessFileException $e) {
+                return new ResponseRest($e->getMessage(), 'text', $e->getCode());
             }
 
-            $message = null;
-            $realFileName = $fileBeingUploaded->getClientOriginalName();
+            return new ResponseRest(array('status' => true, 'message' => ''));
+        }
 
-            if (! empty($validMimeTypes)) {
-                $mimeType = $fileBeingUploaded->getMimeType();
+        return new Response('', 404);
+    }
 
-                if (!isset($validMimeTypes[$mimeType])) {
-                    $message = $this->getTranslator()
-                        ->trans(
-                            'Only files having the following mime type are allowed: %types%',
-                            [ '%types%' => implode(', ', $validMimeTypes)]
-                        );
-                }
+    /**
+     *
+     * Process file uploaded
+     *
+     * @param UploadedFile $fileBeingUploaded
+     * @param int $parentId
+     * @param string $parentType
+     * @param string $objectType
+     * @param array $validMimeTypes
+     * @param array $extBlackList
+     * @return ResponseRest
+     */
+    public function processImage(
+        $fileBeingUploaded,
+        $parentId,
+        $parentType,
+        $objectType,
+        $validMimeTypes = array(),
+        $extBlackList = array()
+    ) {
+        $fileManager = $this->getFileManager();
 
+        // Validate if file is too big
+        if ($fileBeingUploaded->getError() == 1) {
+            $message = $this->getTranslator()
+                ->trans(
+                    'File is too large, please retry with a file having a size less than %size%.',
+                    array('%size%' => ini_get('upload_max_filesize')),
+                    'core'
+                );
+
+            throw new ProcessFileException($message, 403);
+        }
+
+        $message = null;
+        $realFileName = $fileBeingUploaded->getClientOriginalName();
+
+        if (! empty($validMimeTypes)) {
+            $mimeType = $fileBeingUploaded->getMimeType();
+
+            if (!isset($validMimeTypes[$mimeType])) {
+                $message = $this->getTranslator()
+                    ->trans(
+                        'Only files having the following mime type are allowed: %types%',
+                        [ '%types%' => implode(', ', array_keys($validMimeTypes))]
+                    );
+            } else {
                 $regex = "#^(.+)\.(".implode("|", $validMimeTypes[$mimeType]).")$#i";
 
                 if (!preg_match($regex, $realFileName)) {
@@ -122,73 +162,72 @@ class FileController extends BaseAdminController
                         );
                 }
             }
-
-            if (!empty($extBlackList)) {
-                $regex = "#^(.+)\.(".implode("|", $extBlackList).")$#i";
-
-                if (preg_match($regex, $realFileName)) {
-                    $message = $this->getTranslator()
-                        ->trans(
-                            'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
-                            [
-                                '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
-                            ]
-                        );
-                }
-            }
-
-            if ($message !== null) {
-                return new ResponseRest($message, 'text', 415);
-            }
-
-            $fileModel = $fileManager->getModelInstance($objectType, $parentType);
-
-            $parentModel = $fileModel->getParentFileModel();
-
-            if ($parentModel === null || $fileModel === null || $fileBeingUploaded === null) {
-                return new Response('', 404);
-            }
-
-            $defaultTitle = $parentModel->getTitle();
-
-            if (empty($defaultTitle)) {
-                $defaultTitle = $fileBeingUploaded->getClientOriginalName();
-            }
-
-            $fileModel
-                ->setParentId($parentId)
-                ->setLocale(Lang::getDefaultLanguage()->getLocale())
-                ->setTitle($defaultTitle)
-            ;
-
-            $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
-            $fileCreateOrUpdateEvent->setModel($fileModel);
-            $fileCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
-            $fileCreateOrUpdateEvent->setParentName($parentModel->getTitle());
-
-            // Dispatch Event to the Action
-            $this->dispatch(
-                TheliaEvents::IMAGE_SAVE,
-                $fileCreateOrUpdateEvent
-            );
-
-            $this->adminLogAppend(
-                AdminResources::retrieve($parentType),
-                AccessManager::UPDATE,
-                $this->getTranslator()->trans(
-                    'Saving %obj% for %parentName% parent id %parentId%',
-                    array(
-                        '%parentName%' => $fileCreateOrUpdateEvent->getParentName(),
-                        '%parentId%' => $fileCreateOrUpdateEvent->getParentId(),
-                        '%obj%' => $objectType
-                    )
-                )
-            );
-
-            return new ResponseRest(array('status' => true, 'message' => ''));
         }
 
-        return new Response('', 404);
+        if (!empty($extBlackList)) {
+            $regex = "#^(.+)\.(".implode("|", $extBlackList).")$#i";
+
+            if (preg_match($regex, $realFileName)) {
+                $message = $this->getTranslator()
+                    ->trans(
+                        'Files with the following extension are not allowed: %extension, please do an archive of the file if you want to upload it',
+                        [
+                            '%extension' => $fileBeingUploaded->getClientOriginalExtension(),
+                        ]
+                    );
+            }
+        }
+
+        if ($message !== null) {
+            throw new ProcessFileException($message, 415);
+        }
+
+        $fileModel = $fileManager->getModelInstance($objectType, $parentType);
+
+        $parentModel = $fileModel->getParentFileModel();
+
+        if ($parentModel === null || $fileModel === null || $fileBeingUploaded === null) {
+            throw new ProcessFileException('', 404);
+        }
+
+        $defaultTitle = $parentModel->getTitle();
+
+        if (empty($defaultTitle)) {
+            $defaultTitle = $fileBeingUploaded->getClientOriginalName();
+        }
+
+        $fileModel
+            ->setParentId($parentId)
+            ->setLocale(Lang::getDefaultLanguage()->getLocale())
+            ->setTitle($defaultTitle)
+        ;
+
+        $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
+        $fileCreateOrUpdateEvent->setModel($fileModel);
+        $fileCreateOrUpdateEvent->setUploadedFile($fileBeingUploaded);
+        $fileCreateOrUpdateEvent->setParentName($parentModel->getTitle());
+
+        // Dispatch Event to the Action
+        $this->dispatch(
+            TheliaEvents::IMAGE_SAVE,
+            $fileCreateOrUpdateEvent
+        );
+
+        $this->adminLogAppend(
+            AdminResources::retrieve($parentType),
+            AccessManager::UPDATE,
+            $this->getTranslator()->trans(
+                'Saving %obj% for %parentName% parent id %parentId%',
+                array(
+                    '%parentName%' => $fileCreateOrUpdateEvent->getParentName(),
+                    '%parentId%' => $fileCreateOrUpdateEvent->getParentId(),
+                    '%obj%' => $objectType
+                )
+            )
+        );
+
+        //return new ResponseRest(array('status' => true, 'message' => ''));
+        return $fileCreateOrUpdateEvent;
     }
 
     /**
@@ -201,15 +240,13 @@ class FileController extends BaseAdminController
      */
     public function saveImageAjaxAction($parentId, $parentType)
     {
+        $config = FileConfiguration::getImageConfig();
         return $this->saveFileAjaxAction(
             $parentId,
             $parentType,
-            'image',
-            [
-                'image/jpeg' => ["jpg", "jpeg"],
-                'image/png' => ["png"],
-                'image/gif' => ["gif"],
-            ]
+            $config['objectType'],
+            $config['validMimeTypes'],
+            $config['extBlackList']
         );
     }
 
@@ -223,20 +260,13 @@ class FileController extends BaseAdminController
      */
     public function saveDocumentAjaxAction($parentId, $parentType)
     {
+        $config = FileConfiguration::getDocumentConfig();
         return $this->saveFileAjaxAction(
             $parentId,
             $parentType,
-            'document',
-            [],
-            [
-                "php",
-                "php3",
-                "php4",
-                "php5",
-                "php6",
-                "asp",
-                "aspx",
-            ]
+            $config['objectType'],
+            $config['validMimeTypes'],
+            $config['extBlackList']
         );
     }
 

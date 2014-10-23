@@ -14,9 +14,11 @@ namespace Thelia\Controller\Api;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Thelia\Controller\Admin\FileController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Image;
+use Thelia\Files\FileConfiguration;
 use Thelia\Model\ProductQuery;
 
 /**
@@ -94,6 +96,52 @@ class ImageController extends BaseApiController
         }
 
         return JsonResponse::create($results);
+    }
+
+    public function createImageAction($entityId)
+    {
+        $request = $this->getRequest();
+
+        $entity = $request->attributes->get('entity');
+
+        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+
+        $fileController = new FileController();
+        $fileController->setContainer($this->getContainer());
+
+        $config = FileConfiguration::getImageConfig();
+
+        $files = $request->files->all();
+
+        $errors = [];
+
+        foreach ($files as $file) {
+            try {
+                $fileController->processImage(
+                    $file,
+                    $entityId,
+                    $entity,
+                    $config['objectType'],
+                    $config['validMimeTypes'],
+                    $config['extBlackList']
+                );
+            } catch (\Exception $e) {
+                $errors = [
+                    'file' => $file->getClientOriginalName(),
+                    'message' => $e->getMessage(),
+                ];
+            }
+
+        }
+
+        if (!empty($errors)) {
+            $response = JsonResponse::create($errors, 500);
+        } else {
+            $response = $this->listAction($entityId);
+            $response->setStatusCode(201);
+        }
+
+        return $response;
     }
 
     /**
