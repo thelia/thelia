@@ -48,7 +48,7 @@ class CouponCreationForm extends BaseForm
 
         $list = CountryQuery::create()->find();
 
-        /** @var Country $item */
+        /** @var \Thelia\Model\Country $item */
         foreach ($list as $item) {
             $countries[$item->getId()] = $item->getTitle();
         }
@@ -226,10 +226,10 @@ class CouponCreationForm extends BaseForm
 
         if ($exists) {
             $context->addViolation(
-                Translator::getInstance()->trans("The coupon code '%code' already exists. Please choose another coupon code",
-                [
-                    '%code' => $value,
-                ])
+                Translator::getInstance()->trans(
+                    "The coupon code '%code' already exists. Please choose another coupon code",
+                    ['%code' => $value]
+                )
             );
         }
     }
