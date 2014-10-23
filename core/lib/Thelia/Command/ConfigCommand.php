@@ -53,7 +53,7 @@ class ConfigCommand extends ContainerAwareCommand
             ->addArgument(
                 'name',
                 InputArgument::OPTIONAL,
-                'The vairable name'
+                'The variable name'
             )
             ->addArgument(
                 'value',
@@ -83,6 +83,7 @@ class ConfigCommand extends ContainerAwareCommand
             case "list":
                 $this->listConfig($input, $output);
                 break;
+
             case "get":
                 $this->getConfig($input, $output);
                 break;
@@ -141,7 +142,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $varName = $input->getArgument("name");
 
-        if (empty($varName)) {
+        if (!isset($varName)) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
@@ -178,7 +179,9 @@ class ConfigCommand extends ContainerAwareCommand
         $varName = $input->getArgument("name");
         $varValue = $input->getArgument("value");
 
-        if (empty($varName) || empty($varValue)) {
+        var_dump($varName, $varValue);
+
+        if (!isset($varName) || !isset($varValue)) {
             $output->writeln(
                 "<error>Need argument 'name' and 'value' for set command</error>"
             );
@@ -200,7 +203,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $varName = $input->getArgument("name");
 
-        if (empty($varName)) {
+        if (!isset($varName)) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
