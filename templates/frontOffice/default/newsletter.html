@@ -30,6 +30,27 @@
                         </div>
                     {/form_field}
 
+                    {loop type="auth" name="customer_newsletter_block" role="CUSTOMER"}{/loop}
+                    {elseloop rel="customer_newsletter_block"}
+                        {form_field form=$form field="firstname"}
+                        <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
+                            <label for="{$label_attr.for}">{$label}</label>
+                            <div class="control-input">
+                                <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                            </div>
+                        </div>
+                        {/form_field}
+
+                        {form_field form=$form field="lastname"}
+                            <div class="form-group {if $error}has-error{elseif !$error && $value != ""}has-success{/if}">
+                                <label for="{$label_attr.for}">{$label}</label>
+                                <div class="control-input">
+                                    <input type="text" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255">
+                                </div>
+                            </div>
+                        {/form_field}
+                    {/elseloop}
+
                     <div class="form-group group-btn">
                         <div class="control-btn">
                             <button type="submit" class="btn btn-submit">{intl l="Subscribe"}</button>
