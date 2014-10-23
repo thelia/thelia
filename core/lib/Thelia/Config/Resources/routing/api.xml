@@ -78,6 +78,13 @@
         <requirement key="entityId">\d+</requirement>
     </route>
 
+    <route id="api.product.image.get" path="/api/products/{entityId}/images/{imageId}">
+        <default key="_controller">Thelia\Controller\Api\ImageController::getImageAction</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
+
     <!-- end product image route -->
 
     <!-- category route -->

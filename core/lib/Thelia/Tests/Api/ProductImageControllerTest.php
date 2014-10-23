@@ -53,4 +53,37 @@ class ProductImageControllerTest extends ApiTestCase
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
     }
+
+    public function testGetAction()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/api/products/1/images/1?sign='.$this->getSignParameter(""),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+        $this->assertCount(1, $content, 'image get action must retrieve 1 image');
+    }
+
+    public function testGetActionWithNonExistingImage()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'GET',
+            '/api/products/1/images/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(""),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
+    }
 }

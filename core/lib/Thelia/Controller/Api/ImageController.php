@@ -32,11 +32,12 @@ class ImageController extends BaseApiController
      */
     public function listAction($entityId)
     {
-        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
 
         $request = $this->getRequest();
 
         $entity = $request->attributes->get('entity');
+
+        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
 
         $this->checkEntityExists($entity, $entityId);
 
@@ -62,9 +63,37 @@ class ImageController extends BaseApiController
         return JsonResponse::create($imageLoop->exec($paginate));
     }
 
-    public function getImageAction($product_id, $image_id)
+    public function getImageAction($entityId, $imageId)
     {
-        $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
+        $request = $this->getRequest();
+
+        $entity = $request->attributes->get('entity');
+
+        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::VIEW);
+
+        $this->checkEntityExists($entity, $entityId);
+
+        $params = array_merge(
+            $request->query->all(),
+            [
+                'source' => strtolower($entity),
+                'source_id' => $entityId,
+                'id' => $imageId
+            ]
+        );
+
+        $imageLoop = new Image($this->getContainer());
+        $imageLoop->initializeArgs($params);
+
+        $paginate = 0;
+
+        $results = $imageLoop->exec($paginate);
+
+        if ($results->isEmpty()) {
+            throw new HttpException(404, sprintf('{"error": "Image with id %d not found"}', $imageId));
+        }
+
+        return JsonResponse::create($results);
     }
 
     /**
