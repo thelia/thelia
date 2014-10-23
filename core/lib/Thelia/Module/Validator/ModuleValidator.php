@@ -22,6 +22,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\Exception\InvalidXmlDocumentException;
 use Thelia\Module\ModuleDescriptorValidator;
+use Thelia\Tools\Version\Version;
 
 /**
  * Class ModuleValidartor
@@ -165,9 +166,7 @@ class ModuleValidator
             );
         }
 
-        $this->checkMinVersion();
-
-        $this->checkMaxVersion();
+        $this->checkVersion();
 
         if (true === $checkCurrentVersion) {
             $this->checkModuleVersion();
@@ -261,8 +260,7 @@ class ModuleValidator
         $moduleDefinition->setDependencies($dependencies);
 
         $moduleDefinition->setLogo((string)$this->moduleDescriptor->logo);
-        $moduleDefinition->setMinVersion((string)$this->moduleDescriptor->min);
-        $moduleDefinition->setMaxVersion((string)$this->moduleDescriptor->max);
+        $moduleDefinition->setTheliaVersion((string)$this->moduleDescriptor->thelia);
         $moduleDefinition->setType((string)$this->moduleDescriptor->type);
         $moduleDefinition->setStability((string)$this->moduleDescriptor->stability);
 
@@ -272,28 +270,14 @@ class ModuleValidator
         $this->moduleDefinition = $moduleDefinition;
     }
 
-    protected function checkMinVersion()
+    protected function checkVersion()
     {
-        if ($this->moduleDefinition->getMinVersion()) {
-            if (version_compare(Thelia::THELIA_VERSION, $this->moduleDefinition->getMinVersion(), '<=')) {
+        if ($this->moduleDefinition->getTheliaVersion()) {
+            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion())) {
                 throw new ModuleException(
                     $this->getTranslator()->trans(
                         "The module requires a version of Thelia >= %version",
-                        ['%version' => $this->moduleDefinition->getMinVersion()]
-                    )
-                );
-            }
-        }
-    }
-
-    protected function checkMaxVersion()
-    {
-        if ($this->moduleDefinition->getMaxVersion()) {
-            if (version_compare(Thelia::THELIA_VERSION, $this->moduleDefinition->getMaxVersion(), '>=')) {
-                throw new ModuleException(
-                    $this->getTranslator()->trans(
-                        "The module requires a version of Thelia <= %version",
-                        ['%version' => $this->moduleDefinition->getMaxVersion()]
+                        ['%version' => $this->moduleDefinition->getVersion()]
                     )
                 );
             }
@@ -330,7 +314,7 @@ class ModuleValidator
 
             if (null !== $module) {
                 if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                    if ("" == $dependency[1] || version_compare($module->getVersion(), $dependency[1], ">=")) {
+                    if ("" == $dependency[1] || Version::test($module->getVersion(), $dependency[1])) {
                         $pass = true;
                     }
                 }

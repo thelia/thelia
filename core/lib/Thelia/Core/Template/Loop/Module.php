@@ -216,8 +216,6 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("CATEGORY", $module->getCategory())
                     ->set("ACTIVE", $module->getActivate())
                     ->set("VERSION", $module->getVersion())
-                    ->set("VERSION_MIN", $module->getVersionMin())
-                    ->set("VERSION_MAX", $module->getVersionMax())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
                     ->set("EXISTS", $exists);

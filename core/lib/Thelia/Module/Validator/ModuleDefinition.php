@@ -38,10 +38,7 @@ class ModuleDefinition
     protected $descriptives = [];
 
     /** @var string */
-    protected $minVersion;
-
-    /** @var string */
-    protected $maxVersion;
+    protected $theliaVersion;
 
     /** @var string */
     protected $version;
@@ -173,33 +170,17 @@ class ModuleDefinition
     /**
      * @return string
      */
-    public function getMaxVersion()
+    public function getTheliaVersion()
     {
-        return $this->maxVersion;
+        return $this->theliaVersion;
     }
 
     /**
-     * @param string $maxVersion
+     * @param string $theliaVersion
      */
-    public function setMaxVersion($maxVersion)
+    public function setTheliaVersion($theliaVersion)
     {
-        $this->maxVersion = $maxVersion;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMinVersion()
-    {
-        return $this->minVersion;
-    }
-
-    /**
-     * @param string $minVersion
-     */
-    public function setMinVersion($minVersion)
-    {
-        $this->minVersion = $minVersion;
+        $this->theliaVersion = $theliaVersion;
     }
 
     /**

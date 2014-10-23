@@ -58,7 +58,7 @@ class ModuleTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ModuleTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -84,16 +84,6 @@ class ModuleTableMap extends TableMap
      * the column name for the VERSION field
      */
     const VERSION = 'module.VERSION';
-
-    /**
-     * the column name for the VERSION_MIN field
-     */
-    const VERSION_MIN = 'module.VERSION_MIN';
-
-    /**
-     * the column name for the VERSION_MAX field
-     */
-    const VERSION_MAX = 'module.VERSION_MAX';
 
     /**
      * the column name for the TYPE field
@@ -151,12 +141,12 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Version', 'VersionMin', 'VersionMax', 'Type', 'Category', 'Activate', 'Position', 'FullNamespace', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'version', 'versionMin', 'versionMax', 'type', 'category', 'activate', 'position', 'fullNamespace', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID, ModuleTableMap::CODE, ModuleTableMap::VERSION, ModuleTableMap::VERSION_MIN, ModuleTableMap::VERSION_MAX, ModuleTableMap::TYPE, ModuleTableMap::CATEGORY, ModuleTableMap::ACTIVATE, ModuleTableMap::POSITION, ModuleTableMap::FULL_NAMESPACE, ModuleTableMap::CREATED_AT, ModuleTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'VERSION', 'VERSION_MIN', 'VERSION_MAX', 'TYPE', 'CATEGORY', 'ACTIVATE', 'POSITION', 'FULL_NAMESPACE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'version', 'version_min', 'version_max', 'type', 'category', 'activate', 'position', 'full_namespace', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Version', 'Type', 'Category', 'Activate', 'Position', 'FullNamespace', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'version', 'type', 'category', 'activate', 'position', 'fullNamespace', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ModuleTableMap::ID, ModuleTableMap::CODE, ModuleTableMap::VERSION, ModuleTableMap::TYPE, ModuleTableMap::CATEGORY, ModuleTableMap::ACTIVATE, ModuleTableMap::POSITION, ModuleTableMap::FULL_NAMESPACE, ModuleTableMap::CREATED_AT, ModuleTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'VERSION', 'TYPE', 'CATEGORY', 'ACTIVATE', 'POSITION', 'FULL_NAMESPACE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'version', 'type', 'category', 'activate', 'position', 'full_namespace', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -166,12 +156,12 @@ class ModuleTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Version' => 2, 'VersionMin' => 3, 'VersionMax' => 4, 'Type' => 5, 'Category' => 6, 'Activate' => 7, 'Position' => 8, 'FullNamespace' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'version' => 2, 'versionMin' => 3, 'versionMax' => 4, 'type' => 5, 'category' => 6, 'activate' => 7, 'position' => 8, 'fullNamespace' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(ModuleTableMap::ID => 0, ModuleTableMap::CODE => 1, ModuleTableMap::VERSION => 2, ModuleTableMap::VERSION_MIN => 3, ModuleTableMap::VERSION_MAX => 4, ModuleTableMap::TYPE => 5, ModuleTableMap::CATEGORY => 6, ModuleTableMap::ACTIVATE => 7, ModuleTableMap::POSITION => 8, ModuleTableMap::FULL_NAMESPACE => 9, ModuleTableMap::CREATED_AT => 10, ModuleTableMap::UPDATED_AT => 11, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'VERSION' => 2, 'VERSION_MIN' => 3, 'VERSION_MAX' => 4, 'TYPE' => 5, 'CATEGORY' => 6, 'ACTIVATE' => 7, 'POSITION' => 8, 'FULL_NAMESPACE' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'version' => 2, 'version_min' => 3, 'version_max' => 4, 'type' => 5, 'category' => 6, 'activate' => 7, 'position' => 8, 'full_namespace' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Version' => 2, 'Type' => 3, 'Category' => 4, 'Activate' => 5, 'Position' => 6, 'FullNamespace' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'version' => 2, 'type' => 3, 'category' => 4, 'activate' => 5, 'position' => 6, 'fullNamespace' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
+        self::TYPE_COLNAME       => array(ModuleTableMap::ID => 0, ModuleTableMap::CODE => 1, ModuleTableMap::VERSION => 2, ModuleTableMap::TYPE => 3, ModuleTableMap::CATEGORY => 4, ModuleTableMap::ACTIVATE => 5, ModuleTableMap::POSITION => 6, ModuleTableMap::FULL_NAMESPACE => 7, ModuleTableMap::CREATED_AT => 8, ModuleTableMap::UPDATED_AT => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'VERSION' => 2, 'TYPE' => 3, 'CATEGORY' => 4, 'ACTIVATE' => 5, 'POSITION' => 6, 'FULL_NAMESPACE' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'version' => 2, 'type' => 3, 'category' => 4, 'activate' => 5, 'position' => 6, 'full_namespace' => 7, 'created_at' => 8, 'updated_at' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -193,8 +183,6 @@ class ModuleTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 55, null);
         $this->addColumn('VERSION', 'Version', 'VARCHAR', true, 10, '');
-        $this->addColumn('VERSION_MIN', 'VersionMin', 'VARCHAR', true, 10, '');
-        $this->addColumn('VERSION_MAX', 'VersionMax', 'VARCHAR', true, 10, '');
         $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
         $this->addColumn('CATEGORY', 'Category', 'VARCHAR', true, 50, 'classic');
         $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
@@ -394,8 +382,6 @@ class ModuleTableMap extends TableMap
             $criteria->addSelectColumn(ModuleTableMap::ID);
             $criteria->addSelectColumn(ModuleTableMap::CODE);
             $criteria->addSelectColumn(ModuleTableMap::VERSION);
-            $criteria->addSelectColumn(ModuleTableMap::VERSION_MIN);
-            $criteria->addSelectColumn(ModuleTableMap::VERSION_MAX);
             $criteria->addSelectColumn(ModuleTableMap::TYPE);
             $criteria->addSelectColumn(ModuleTableMap::CATEGORY);
             $criteria->addSelectColumn(ModuleTableMap::ACTIVATE);
@@ -407,8 +393,6 @@ class ModuleTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_MIN');
-            $criteria->addSelectColumn($alias . '.VERSION_MAX');
             $criteria->addSelectColumn($alias . '.TYPE');
             $criteria->addSelectColumn($alias . '.CATEGORY');
             $criteria->addSelectColumn($alias . '.ACTIVATE');

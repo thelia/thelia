@@ -25,8 +25,6 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildModuleQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildModuleQuery orderByVersion($order = Criteria::ASC) Order by the version column
- * @method     ChildModuleQuery orderByVersionMin($order = Criteria::ASC) Order by the version_min column
- * @method     ChildModuleQuery orderByVersionMax($order = Criteria::ASC) Order by the version_max column
  * @method     ChildModuleQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method     ChildModuleQuery orderByCategory($order = Criteria::ASC) Order by the category column
  * @method     ChildModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
@@ -38,8 +36,6 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModuleQuery groupById() Group by the id column
  * @method     ChildModuleQuery groupByCode() Group by the code column
  * @method     ChildModuleQuery groupByVersion() Group by the version column
- * @method     ChildModuleQuery groupByVersionMin() Group by the version_min column
- * @method     ChildModuleQuery groupByVersionMax() Group by the version_max column
  * @method     ChildModuleQuery groupByType() Group by the type column
  * @method     ChildModuleQuery groupByCategory() Group by the category column
  * @method     ChildModuleQuery groupByActivate() Group by the activate column
@@ -98,8 +94,6 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     ChildModule findOneById(int $id) Return the first ChildModule filtered by the id column
  * @method     ChildModule findOneByCode(string $code) Return the first ChildModule filtered by the code column
  * @method     ChildModule findOneByVersion(string $version) Return the first ChildModule filtered by the version column
- * @method     ChildModule findOneByVersionMin(string $version_min) Return the first ChildModule filtered by the version_min column
- * @method     ChildModule findOneByVersionMax(string $version_max) Return the first ChildModule filtered by the version_max column
  * @method     ChildModule findOneByType(int $type) Return the first ChildModule filtered by the type column
  * @method     ChildModule findOneByCategory(string $category) Return the first ChildModule filtered by the category column
  * @method     ChildModule findOneByActivate(int $activate) Return the first ChildModule filtered by the activate column
@@ -111,8 +105,6 @@ use Thelia\Model\Map\ModuleTableMap;
  * @method     array findById(int $id) Return ChildModule objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildModule objects filtered by the code column
  * @method     array findByVersion(string $version) Return ChildModule objects filtered by the version column
- * @method     array findByVersionMin(string $version_min) Return ChildModule objects filtered by the version_min column
- * @method     array findByVersionMax(string $version_max) Return ChildModule objects filtered by the version_max column
  * @method     array findByType(int $type) Return ChildModule objects filtered by the type column
  * @method     array findByCategory(string $category) Return ChildModule objects filtered by the category column
  * @method     array findByActivate(int $activate) Return ChildModule objects filtered by the activate column
@@ -208,7 +200,7 @@ abstract class ModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `VERSION_MIN`, `VERSION_MAX`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -394,64 +386,6 @@ abstract class ModuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ModuleTableMap::VERSION, $version, $comparison);
-    }
-
-    /**
-     * Filter the query on the version_min column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVersionMin('fooValue');   // WHERE version_min = 'fooValue'
-     * $query->filterByVersionMin('%fooValue%'); // WHERE version_min LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $versionMin The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildModuleQuery The current query, for fluid interface
-     */
-    public function filterByVersionMin($versionMin = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($versionMin)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $versionMin)) {
-                $versionMin = str_replace('*', '%', $versionMin);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ModuleTableMap::VERSION_MIN, $versionMin, $comparison);
-    }
-
-    /**
-     * Filter the query on the version_max column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByVersionMax('fooValue');   // WHERE version_max = 'fooValue'
-     * $query->filterByVersionMax('%fooValue%'); // WHERE version_max LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $versionMax The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildModuleQuery The current query, for fluid interface
-     */
-    public function filterByVersionMax($versionMax = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($versionMax)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $versionMax)) {
-                $versionMax = str_replace('*', '%', $versionMax);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(ModuleTableMap::VERSION_MAX, $versionMax, $comparison);
     }
 
     /**
