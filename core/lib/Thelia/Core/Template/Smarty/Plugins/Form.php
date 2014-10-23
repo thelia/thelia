@@ -214,7 +214,9 @@ class Form extends AbstractSmartyPlugin
 
             switch ($formFieldView->vars['type']) {
                 case "choice":
-                    if (!isset($formFieldView->vars['options']['choices']) || !is_array($formFieldView->vars['options']['choices'])) {
+                    if (!isset($formFieldView->vars['options']['choices']) ||
+                        !is_array($formFieldView->vars['options']['choices'])
+                    ) {
                         //throw new
                     }
                     $choices = array();

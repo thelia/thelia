@@ -536,13 +536,14 @@ abstract class BaseController extends ContainerAware
      * @param $type
      * @param array $data
      * @param array $options
+     * @return BaseForm
      *
      * This method builds a thelia form with its name
      */
-    protected function createTheliaForm($name, $type = "form", array $data = array(), array $options = array())
+    public function createForm($name, $type = "form", array $data = array(), array $options = array())
     {
         if (static::$formDefinition === null) {
-            static::$formDefinition = $this->container->get("thelia.parser.forms");
+            static::$formDefinition = $this->container->getParameter("thelia.parser.forms");
         }
 
         if (!isset(static::$formDefinition[$name])) {
@@ -551,7 +552,7 @@ abstract class BaseController extends ContainerAware
             );
         }
 
-        return new static::$formDefinition[$name]($this->getRequest(), $type, $data, $options);
+        return new static::$formDefinition[$name]($this->getRequest(), $type, $data, $options, $this->container);
     }
 
     /**
