@@ -95,6 +95,7 @@ class Form extends AbstractSmartyPlugin
     {
         if ($repeat) {
             $name = $this->getParam($params, 'name');
+            $formType = $this->getParam($params, 'type', 'form');
 
             if (null == $name) {
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
@@ -116,7 +117,7 @@ class Form extends AbstractSmartyPlugin
                 // Create a new one
                 $class = new \ReflectionClass($formClass);
 
-                $instance = $class->newInstance($this->request, "form", array(), array(), $this->container);
+                $instance = $class->newInstance($this->request, $formType, array(), array(), $this->container);
             }
 
             $instance->createView();
@@ -300,7 +301,6 @@ class Form extends AbstractSmartyPlugin
      * @param  array                     $params
      * @param  string                    $content
      * @param  \Smarty_Internal_Template $template
-     * @param  string                    $templateTypeName
      * @return string
      */
     protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
