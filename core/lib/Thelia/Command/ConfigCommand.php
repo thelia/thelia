@@ -141,7 +141,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $varName = $input->getArgument("name");
 
-        if (!isset($varName)) {
+        if (null === $varName) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
@@ -178,7 +178,7 @@ class ConfigCommand extends ContainerAwareCommand
         $varName = $input->getArgument("name");
         $varValue = $input->getArgument("value");
 
-        if (!isset($varName) || !isset($varValue)) {
+        if (null === $varName || null === $varValue) {
             $output->writeln(
                 "<error>Need argument 'name' and 'value' for set command</error>"
             );
@@ -200,7 +200,7 @@ class ConfigCommand extends ContainerAwareCommand
 
         $varName = $input->getArgument("name");
 
-        if (!isset($varName)) {
+        if (null === $varName) {
             $output->writeln(
                 "<error>Need argument 'name' for get command</error>"
             );
