@@ -840,4 +840,9 @@ final class TheliaEvents
     const META_DATA_CREATE = "thelia.metadata.create";
     const META_DATA_UPDATE = "thelia.metadata.update";
     const META_DATA_DELETE = "thelia.metadata.delete";
+
+    // -- Form events -------------------------------------------
+
+    const FORM_BEFORE_BUILD = "thelia.form.before_build";
+    const FORM_AFTER_BUILD = "thelia.form.after_build";
 }

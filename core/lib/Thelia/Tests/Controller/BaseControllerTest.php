@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Controller;
 
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Validator\ValidatorBuilder;
@@ -65,9 +66,10 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
         $container->set("request", new Request());
         $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
 
+        $container->set("event_dispatcher", new EventDispatcher());
+
         $this->controller->setContainer($container);
     }
-
 
     public function testCreateFormWithoutType()
     {

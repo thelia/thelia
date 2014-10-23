@@ -21,6 +21,8 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validation;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\TheliaFormEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -35,7 +37,7 @@ use Thelia\Tools\URL;
 abstract class BaseForm
 {
     /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
+     * @var \Symfony\Component\Form\FormBuilderInterface
      */
     protected $formBuilder;
 
@@ -83,6 +85,11 @@ abstract class BaseForm
      */
     private $error_message = '';
 
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    protected $dispatcher;
+
     public function __construct(
         Request $request,
         $type = "form",
@@ -94,6 +101,7 @@ abstract class BaseForm
 
         if (null !== $container) {
             $this->container = $container;
+            $this->dispatcher = $container->get("event_dispatcher");
 
             $this->initFormWithContainer($type, $data, $options);
         } else {
@@ -110,7 +118,31 @@ abstract class BaseForm
         /**
          * Build the form
          */
+
+        // We need to wrap the dispatch with a condition for retro-compatibility
+        if ($this->hasContainer()) {
+            $event = new TheliaFormEvent($this);
+
+            /**
+             * If the form has the container, disptach the events
+             */
+            $this->dispatcher->dispatch(
+                TheliaEvents::FORM_BEFORE_BUILD,
+                $event
+            );
+        }
+
         $this->buildForm();
+
+        if ($this->hasContainer()) {
+            /**
+             * If the form has the container, disptach the events
+             */
+            $this->dispatcher->dispatch(
+                TheliaEvents::FORM_AFTER_BUILD,
+                $event
+            );
+        }
 
         // If not already set, define the success_url field
         // This field is not included in the standard form hidden fields
@@ -153,6 +185,14 @@ abstract class BaseForm
         $this->validatorBuilder
             ->setTranslationDomain('validators')
             ->setTranslator($this->translator);
+    }
+
+    /**
+     * @return \Symfony\Component\Form\FormBuilderInterface
+     */
+    public function getFormBuilder()
+    {
+        return $this->formBuilder;
     }
 
     /**
@@ -277,6 +317,14 @@ abstract class BaseForm
     public function getForm()
     {
         return $this->form;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasContainer()
+    {
+        return $this->container !== null;
     }
 
     /**
