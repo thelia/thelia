@@ -15,6 +15,9 @@ namespace Thelia\Controller\Api;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Controller\Admin\FileController;
+use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Image;
@@ -142,6 +145,36 @@ class ImageController extends BaseApiController
         }
 
         return $response;
+    }
+
+    public function deleteImageAction($entityId, $imageId)
+    {
+        $request = $this->getRequest();
+
+        $entity = $request->attributes->get('entity');
+
+        $this->checkAuth(AdminResources::retrieve($entity), [], AccessManager::UPDATE);
+
+        $this->checkEntityExists($entity, $entityId);
+
+        $class = sprintf("Thelia\\Model\\%sImageQuery", ucfirst($entity));
+
+        $method = new \ReflectionMethod($class, 'create');
+        $search = $method->invoke(null);
+
+        $entityModel = $search->findPk($imageId);
+
+        if (null === $entityModel) {
+            throw new HttpException(404, sprintf('{"error": "image with id %d not found"}', $imageId));
+        }
+
+        try {
+            $fileDeleteEvent =  new FileDeleteEvent($entityModel);
+            $this->dispatch(TheliaEvents::IMAGE_DELETE, $fileDeleteEvent);
+            return Response::create('', 204);
+        } catch (\Exception $e) {
+            return JsonResponse::create(['error' => $e->getMessage()], 500);
+        }
     }
 
     /**

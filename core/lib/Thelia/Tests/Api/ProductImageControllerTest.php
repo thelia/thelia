@@ -136,6 +136,12 @@ class ProductImageControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'Http status code must be 201');
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $last = array_pop($content);
+
+        return $last['ID'];
     }
 
     public function testCreateImageActionWithWrongMimeType()
@@ -162,5 +168,23 @@ class ProductImageControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(500, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
+    }
+
+    /**
+     * @depends testCreateImageAction
+     */
+    public function testDeleteImageAction($imageId)
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/products/1/images/'.$imageId.'?sign='.$this->getSignParameter(""),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'Http status code must be 204');
     }
 }
