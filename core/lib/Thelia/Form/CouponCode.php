@@ -23,7 +23,7 @@ use Thelia\Model\CouponQuery;
  * Manage how a coupon is entered by a customer
  *
  * @package Thelia\Form
- * @author Guillaume MOREL <gmorel@openstudio.fr>
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CouponCode extends BaseForm
 {
@@ -33,19 +33,22 @@ class CouponCode extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("coupon-code", "text", array(
-                "required" => true,
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array(
-                            array($this,
-                                "verifyExistingCode")
-                        )
-                    ))
-                )
+            ->add(
+                "coupon-code",
+                "text",
+                [
+                    "required"    => true,
+                    "constraints" => [
+                        new Constraints\NotBlank(),
+                        new Constraints\Callback([
+                            "methods" => [
+                                [$this, "verifyExistingCode"]
+                            ]
+                        ])
+                    ]
+                ]
             )
-        );
+        ;
     }
 
     public function verifyExistingCode($value, ExecutionContextInterface $context)
