@@ -78,6 +78,9 @@
                                                     {$smarty.get.update_status_error_message}
                                                 </div>
                                             {/if}
+
+                                            {hook name="order.before-order-product-list" location="before-order-product-list" }
+
                                             <table class="table table-striped table-condensed table-left-aligned">
                                                 <caption class="clearfix">
                                                    {intl l='Cart - Prices in %currency' currency={$orderCurrency}}
@@ -104,6 +107,7 @@
                                                         {assign "realTax" $PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PRICE}
                                                     {/if}
+                                                    {hook name="order.before-order-product-row" location="before-order-product-row" }
                                                     <tr>
                                                         <td>
                                                             {ifloop rel="my_product_loop"}
@@ -133,6 +137,7 @@
                                                         <td class="text-right">{$QUANTITY}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice * $QUANTITY symbol=$orderCurrency}</td>
                                                     </tr>
+                                                    {hook name="order.after-order-product-row" location="after-order-product-row" }
                                                 {/loop}
                                                 </tbody>
                                                 <tbody class="table-condensed">
@@ -175,6 +180,8 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+
+                                            {hook name="order.after-order-product-list" location="after-order-product-list" }
                                         </div>
 
 
