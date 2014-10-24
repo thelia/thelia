@@ -14,10 +14,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+2, 'order-edit.cart-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+3, 'order-edit.bill-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+4, 'order-edit.bill-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+5, 'order.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+6, 'order.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+7, 'order.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+8, 'order.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+5, 'order-edit.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+6, 'order-edit.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+7, 'order-edit.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+8, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES

@@ -70,7 +70,7 @@
                                 <div class="tab-content">
                                     <div class="tab-pane fade {if $order_tab == 'cart'}active in{/if}" id="cart">
 
-                                        {hook name="order-edit.cart-top" location="order-edit-cart-top" }
+                                        {hook name="order-edit.cart-top" location="order-edit-cart-top" order_id=$order_id}
 
                                         <div class="table-responsive">
                                             {if $smarty.get.update_status_error_message}
@@ -79,7 +79,7 @@
                                                 </div>
                                             {/if}
 
-                                            {hook name="order.before-order-product-list" location="before-order-product-list" }
+                                            {hook name="order-edit.before-order-product-list" location="before-order-product-list" order_id=$order_id}
 
                                             <table class="table table-striped table-condensed table-left-aligned">
                                                 <caption class="clearfix">
@@ -107,7 +107,7 @@
                                                         {assign "realTax" $PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PRICE}
                                                     {/if}
-                                                    {hook name="order.before-order-product-row" location="before-order-product-row" }
+                                                    {hook name="order-edit.before-order-product-row" location="before-order-product-row" order_id=$order_id order_product_id=$ID}
                                                     <tr>
                                                         <td>
                                                             {ifloop rel="my_product_loop"}
@@ -129,7 +129,7 @@
                                                                 {/loop}
                                                             </dl>
                                                             {/ifloop}
-                                                            {hook name="order.product-list" location="order-product-list" }
+                                                            {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
                                                         <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
@@ -137,7 +137,7 @@
                                                         <td class="text-right">{$QUANTITY}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice * $QUANTITY symbol=$orderCurrency}</td>
                                                     </tr>
-                                                    {hook name="order.after-order-product-row" location="after-order-product-row" }
+                                                    {hook name="order-edit.after-order-product-row" location="after-order-product-row" order_id=$order_id order_product_id=$ID}
                                                 {/loop}
                                                 </tbody>
                                                 <tbody class="table-condensed">
@@ -181,7 +181,7 @@
                                                 </tbody>
                                             </table>
 
-                                            {hook name="order.after-order-product-list" location="after-order-product-list" }
+                                            {hook name="order-edit.after-order-product-list" location="after-order-product-list" order_id=$order_id}
                                         </div>
 
 
@@ -228,13 +228,13 @@
                                             </table>
                                         </div>
 
-                                        {hook name="order-edit.cart-bottom" location="order-edit-cart-bottom" }
+                                        {hook name="order-edit.cart-bottom" location="order-edit-cart-bottom" order_id=$order_id}
 
                                     </div> <!-- #cart -->
 
                                     <div class="tab-pane fade {if $order_tab == 'bill'}active in{/if} clearfix" id="bill">
 
-                                        {hook name="order-edit.bill-top" location="order-edit-bill-top" }
+                                        {hook name="order-edit.bill-top" location="order-edit-bill-top" order_id=$order_id}
 
                                         <div class="title title-without-tabs clearfix">
                                             {intl l='Delivery module'}
@@ -407,7 +407,7 @@
                                             </div>
                                         </div>
 
-                                        {hook name="order-edit.bill-bottom" location="order-edit-bill-bottom" }
+                                        {hook name="order-edit.bill-bottom" location="order-edit-bill-bottom" order_id=$order_id}
 
                                     </div> <!-- #bill -->
 

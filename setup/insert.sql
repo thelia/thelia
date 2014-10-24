@@ -713,10 +713,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2025, 'order-edit.cart-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2026, 'order-edit.bill-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2027, 'order-edit.bill-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2028, 'order.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2029, 'order.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2030, 'order.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2031, 'order.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2028, 'order-edit.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2029, 'order-edit.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2030, 'order-edit.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
