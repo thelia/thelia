@@ -16,6 +16,7 @@ return array(
     'Address' => 'Adresa',
     'Address %nb' => 'Adresa %nb',
     'Address Update' => 'Aktualizace adresy',
+    'All' => 'Vše',
     'All contents' => 'Celý obsah',
     'All contents in' => 'Celý obsah v',
     'All products' => 'Všechna zboží',
