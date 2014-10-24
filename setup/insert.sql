@@ -707,7 +707,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
-(2023, 'wysiwyg.js', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2023, 'wysiwyg.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+
+(2024, 'order-edit.cart-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2025, 'order-edit.cart-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2026, 'order-edit.bill-top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2027, 'order-edit.bill-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2028, 'order.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2029, 'order.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2030, 'order.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2031, 'order.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -1724,7 +1733,25 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (2022, 'en_US', 'Order confirmation - after the order summary', '', ''),
 
 (2023, 'fr_FR', 'Partout ou l''éditeur WYSIWYG est nécessaire', '', ''),
-(2023, 'en_US', 'Where the WYSIWYG editor is required', '', '')
+(2023, 'en_US', 'Where the WYSIWYG editor is required', '', ''),
+
+(2024, 'en_US', 'Order - cart top', '', ''),
+(2024, 'fr_FR', 'Commande - panier haut', '', ''),
+(2025, 'en_US', 'Order - cart bottom', '', ''),
+(2025, 'fr_FR', 'Commande - panier bas', '', ''),
+(2026, 'en_US', 'Order - bill top', '', ''),
+(2026, 'fr_FR', 'Commande - facture haut', '', ''),
+(2027, 'en_US', 'Order - bill bottom', '', ''),
+(2027, 'fr_FR', 'Commande - facture bas', '', ''),
+
+(2028, 'en_US', 'Order - Before product list', '', ''),
+(2028, 'fr_FR', 'Commande - Avant la liste des produits', '', ''),
+(2029, 'en_US', 'Order - Before starting product row', '', ''),
+(2029, 'fr_FR', 'Commande - Avant d''ouvrir la ligne produit', '', ''),
+(2030, 'en_US', 'Order - After closing product row', '', ''),
+(2030, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
+(2031, 'en_US', 'Order - After product list', '', ''),
+(2031, 'fr_FR', 'Commande - Après la liste des produits', '', '')
 ;
 
 
