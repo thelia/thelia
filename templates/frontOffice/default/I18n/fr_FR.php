@@ -17,6 +17,7 @@ return array(
     'Address' => 'Adresse',
     'Address %nb' => 'Adresse n°',
     'Address Update' => 'Mise à jour de l\'adresse',
+    'All' => 'Tout',
     'All brands' => 'Toutes les marques',
     'All brands in %store' => 'Toutes les marques %store',
     'All contents' => 'Tous les contenus',

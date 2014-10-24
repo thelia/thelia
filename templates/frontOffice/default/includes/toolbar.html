@@ -10,7 +10,7 @@
                     <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
                     <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
                     <option value="{url path={navigate to="current"} limit="50"}"{if $limit==50}selected{/if}>50</option>
-                    <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>All</option>
+                    <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
                 </select>
                 <span class="per-page">{intl l="per page"}</span>
             </span><!-- /.limiter -->

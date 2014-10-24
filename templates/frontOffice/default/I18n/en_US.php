@@ -17,6 +17,7 @@ return array(
     'Address' => 'Address',
     'Address %nb' => 'Address %nb',
     'Address Update' => 'Address update',
+    'All' => 'All',
     'All brands' => 'All brands',
     'All brands in %store' => 'All brands in %store',
     'All contents' => 'All contents',

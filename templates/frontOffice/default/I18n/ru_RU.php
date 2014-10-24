@@ -16,6 +16,7 @@ return array(
     'Address' => 'Адрес',
     'Address %nb' => 'Адрес %nb',
     'Address Update' => 'Обновить адрес',
+    'All' => 'Bсе',
     'All contents' => 'Все содержимое',
     'All contents in' => 'Все содержимое в',
     'All products' => 'Все товары',

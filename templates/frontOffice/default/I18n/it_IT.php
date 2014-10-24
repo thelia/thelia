@@ -15,6 +15,7 @@ return array(
     'Address' => 'Indirizzo',
     'Address %nb' => 'Indirizzo %nb',
     'Address Update' => 'Aggiornamento dell\' indirizzo',
+    'All' => 'Tutto',
     'All rights reserved.' => 'Tutti i diritti riservati.',
     'Amount' => 'Importo',
     'Availability' => 'Disponibilità',

@@ -12,6 +12,7 @@ return array(
     'Additional Info' => 'Información adicional',
     'Address %nb' => 'Dirección %nb',
     'Address Update' => 'Dirección actualizada',
+    'All' => 'Todo',
     'Address' => 'Dirección',
     'Amount' => 'Importe',
     'Availability' => 'Disponibilidad',
