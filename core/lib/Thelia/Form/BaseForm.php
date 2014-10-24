@@ -124,28 +124,29 @@ abstract class BaseForm
         /**
          * Build the form
          */
+        $name = $this->getName();
 
         // We need to wrap the dispatch with a condition for backward compatibility
-        if ($this->hasContainer()) {
+        if ($this->hasContainer() && $name !== null && $name !== '') {
             $event = new TheliaFormEvent($this);
 
             /**
              * If the form has the container, disptach the events
              */
             $this->dispatcher->dispatch(
-                TheliaEvents::FORM_BEFORE_BUILD,
+                TheliaEvents::FORM_BEFORE_BUILD . "." . $name,
                 $event
             );
         }
 
         $this->buildForm();
 
-        if ($this->hasContainer()) {
+        if ($this->hasContainer()  && $name !== null && $name !== '') {
             /**
              * If the form has the container, disptach the events
              */
             $this->dispatcher->dispatch(
-                TheliaEvents::FORM_AFTER_BUILD,
+                TheliaEvents::FORM_AFTER_BUILD . "." . $name,
                 $event
             );
         }
