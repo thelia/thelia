@@ -114,15 +114,10 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="thelia" minOccurs="0">
+                <xs:element name="thelia" minOccurs="0" type="xs:string">
                     <xs:annotation>
                         <xs:documentation>minimum required version of Thelia in 'dot' format (for example 1.2.3.4)</xs:documentation>
                     </xs:annotation>
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            <xs:pattern value="[0-9\.]+"/>
-                        </xs:restriction>
-                    </xs:simpleType>
                 </xs:element>
                 <xs:element name="stability">
                     <xs:annotation>
