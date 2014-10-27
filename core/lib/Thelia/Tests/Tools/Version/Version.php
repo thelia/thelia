@@ -15,7 +15,6 @@ namespace Thelia\Tests\Tools\Version;
 
 use Thelia\Tools\Version\Version as Tester;
 
-
 /**
  * Class Version
  * @package Thelia\Tests\Tools\Version
