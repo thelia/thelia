@@ -45,9 +45,9 @@ class Version
      *                     will be expended to 2.1.0
      * @return bool true if version matches the constraints
      */
-    static public function test($version, $constraints, $strict = false)
+    static public function test($version, $constraints, $strict = false, $defaultComparison = "=")
     {
-        $constraints = self::parse($constraints, $strict);
+        $constraints = self::parse($constraints, $defaultComparison);
 
         /** @var ConstraintInterface $constraint */
         foreach ($constraints as $constraint) {
@@ -59,11 +59,15 @@ class Version
         return true;
     }
 
-    private static function parse($constraints)
+    private static function parse($constraints, $defaultComparison = "=")
     {
         $constraintsList = [];
 
         foreach (explode(" ", $constraints) as $expression) {
+
+            if (1 === preg_match('/^[0-9]/', $expression)) {
+                $expression = $defaultComparison . $expression;
+            }
 
             if (strpos($expression, '>=') !== false) {
                 $constraint = new ConstraintGreater($expression);

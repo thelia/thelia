@@ -273,7 +273,7 @@ class ModuleValidator
     protected function checkVersion()
     {
         if ($this->moduleDefinition->getTheliaVersion()) {
-            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion())) {
+            if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, ">=")) {
                 throw new ModuleException(
                     $this->getTranslator()->trans(
                         "The module requires a version of Thelia >= %version",
@@ -314,7 +314,7 @@ class ModuleValidator
 
             if (null !== $module) {
                 if ($module->getActivate() === BaseModule::IS_ACTIVATED) {
-                    if ("" == $dependency[1] || Version::test($module->getVersion(), $dependency[1])) {
+                    if ("" == $dependency[1] || Version::test($module->getVersion(), $dependency[1], false, ">=")) {
                         $pass = true;
                     }
                 }
