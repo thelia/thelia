@@ -205,7 +205,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     $quality = $event->getQuality();
 
                     if (is_null($quality)) {
-                        $quality = ConfigQuery::read('default_image_quality_percent', 75);
+                        $quality = ConfigQuery::read('default_images_quality_percent', 75);
                     }
 
                     // Allow image post-processing (watermarging, or other stuff...)
