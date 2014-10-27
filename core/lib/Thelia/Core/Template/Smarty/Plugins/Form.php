@@ -621,6 +621,14 @@ class Form extends AbstractSmartyPlugin
         return $haystack;
     }
 
+    /**
+     * @param $params
+     * @param $name
+     * @param bool $throwException
+     * @return mixed|null
+     *
+     * Get a symfony form object form a function/block parameter
+     */
     protected function getSymfonyFormFromParams($params, $name, $throwException = false)
     {
         $sfForm = $this->getParam($params, $name);
@@ -643,6 +651,15 @@ class Form extends AbstractSmartyPlugin
         return $sfForm;
     }
 
+    /**
+     * @param $params
+     * @param $content
+     * @param \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return mixed
+     *
+     * Loops around a form collection entries and assigns values to template
+     */
     public function renderFormCollection($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         /**
@@ -652,7 +669,7 @@ class Form extends AbstractSmartyPlugin
         $row = $this->getSymfonyFormFromParams($params, "row");
         $collection = $this->resolveCollection($this->getParam($params, "collection"), $form);
 
-        $hash = $this->getFormStackHash($form, $row);
+        $hash = $this->initializeCollection($form, $collection, $row);
 
         $limit = $this->getParam($params, "limit", -1);
 
@@ -673,15 +690,6 @@ class Form extends AbstractSmartyPlugin
          */
         $limit = (int) $limit;
         $hasLimit = $limit >= 0;
-
-
-        if (!isset($this->formCollectionStack[$hash])) {
-            $this->formCollectionStack[$hash] = $collection->all();
-        }
-
-        if (!isset($this->formCollectionCount[$hash])) {
-            $this->formCollectionCount[$hash] = ["count" => 0, "limit" => 0];
-        }
 
         /**
          * If we have reached the limit, stop
@@ -705,7 +713,8 @@ class Form extends AbstractSmartyPlugin
          * Assign variables into the template
          */
         $template->assign("row", $row);
-        $template->assign("collection_count", $this->formCollectionCount[$hash]["count"]++);
+        $template->assign("collection_current", $this->formCollectionCount[$hash]["count"]++);
+        $template->assign("collection_count", $this->formCollectionCount[$hash]["total_count"]);
 
         /**
          * Increment the current limit state
@@ -720,12 +729,19 @@ class Form extends AbstractSmartyPlugin
         return $content;
     }
 
-    protected function getFormStackHash(BaseForm $form, SymfonyForm $row = null)
+    /**
+     * @param BaseForm $form
+     * @param SymfonyForm $field
+     * @return string
+     *
+     * Get definition, return hash
+     */
+    protected function getFormStackHash(BaseForm $form, SymfonyForm $field = null)
     {
         $build = get_class($form) . ":" . $form->getType();
 
-        if (null !== $row) {
-            $build .= ":" . $this->buildFieldName($row);
+        if (null !== $field) {
+            $build .= ":" . $this->buildFieldName($field);
         }
 
         return md5($build);
@@ -734,7 +750,9 @@ class Form extends AbstractSmartyPlugin
     /**
      * @param $collection
      * @param BaseForm $form
-     * @return \Symfony\Component\Form\Form
+     * @return SymfonyForm
+     *
+     * Extract the collection object from the form
      */
     protected function resolveCollection($collection, BaseForm $form)
     {
@@ -793,6 +811,15 @@ class Form extends AbstractSmartyPlugin
         return $collectionConfig;
     }
 
+    /**
+     * @param $params
+     * @param $content
+     * @param \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return string
+     *
+     * Injects a collection field variables into the parser
+     */
     public function renderFormCollectionField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if (!$repeat) {
@@ -815,8 +842,6 @@ class Form extends AbstractSmartyPlugin
             $formFieldConfig->getType(),
             $formFieldConfig->getOptions()
         );
-
-        $repeat = true;
 
         return '';
     }
@@ -856,6 +881,54 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
+     * @param $params
+     * @param \Smarty_Internal_Template $template
+     * @return mixed
+     *
+     * Counts collection entries
+     */
+    public function formCollectionCount($params, \Smarty_Internal_Template $template)
+    {
+        /**
+         * Get parameters
+         */
+        $form = $this->getInstanceFromParams($params);
+        $row = $this->getSymfonyFormFromParams($params, "row");
+        $collection = $this->resolveCollection($this->getParam($params, "collection"), $form);
+
+        $hash = $this->initializeCollection($form, $collection, $row);
+
+        return $this->formCollectionCount[$hash]["total_count"];
+    }
+
+    /**
+     * @param BaseForm $form
+     * @param SymfonyForm $collection
+     * @param SymfonyForm $row
+     * @return string
+     *
+     * Initialize a collection into this class ( values stack, counting table )
+     */
+    protected function initializeCollection(BaseForm $form, SymfonyForm $collection, SymfonyForm $row = null)
+    {
+        $hash = $this->getFormStackHash($form, $collection);
+
+        if (!isset($this->formCollectionStack[$hash])) {
+            $this->formCollectionStack[$hash] = $collection->all();
+        }
+
+        if (!isset($this->formCollectionCount[$hash])) {
+            $this->formCollectionCount[$hash] = [
+                "count" => 0,
+                "limit" => 0,
+                "total_count" => count($this->formCollectionStack[$hash]),
+            ];
+        }
+
+        return $hash;
+    }
+
+    /**
      * @return array an array of SmartyPluginDescriptor
      */
     public function getPluginDescriptors()
@@ -872,6 +945,7 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("block", "custom_render_form_field", $this, "customFormFieldRendering"),
             new SmartyPluginDescriptor("block", "form_collection", $this, "renderFormCollection"),
             new SmartyPluginDescriptor("block", "form_collection_field", $this, "renderFormCollectionField"),
+            new SmartyPluginDescriptor("function", "form_collection_count", $this, "formCollectionCount"),
         );
     }
 }
