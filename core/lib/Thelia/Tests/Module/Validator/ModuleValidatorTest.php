@@ -184,7 +184,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function($l, $p) {
-                        foreach ($p as $pk => $pv){
+                        foreach ($p as $pk => $pv) {
                             $l = str_replace($pk, $pv, $l);
                         }
                         return $l;
