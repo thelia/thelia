@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_1.xsd">
+    <fullnamespace>Module2\Module2</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Module test 2</title>
+    </descriptive>
+    <languages>
+        <language>en_US</language>
+    </languages>
+    <version>0.1</version>
+    <author>
+        <name>Julien Chanséaume</name>
+        <email>jchanseaume@openstudio.fr</email>
+    </author>
+    <type>classic</type>
+    <required>
+        <module version="&gt;=0.1">Front</module>
+        <module version="&gt;=0.1">HookCart</module>
+        <module version="&gt;=0.2">HookSearch</module>
+
+    </required>
+    <thelia>2.1.0</thelia>
+    <stability>other</stability>
+</module>
