@@ -19,7 +19,6 @@ use Thelia\Tools\Version\Constraints\ConstraintInterface;
 use Thelia\Tools\Version\Constraints\ConstraintLower;
 use Thelia\Tools\Version\Constraints\ConstraintNearlyEqual;
 
-
 /**
  * Class Version
  * @package Thelia\Tools
@@ -27,7 +26,6 @@ use Thelia\Tools\Version\Constraints\ConstraintNearlyEqual;
  */
 class Version
 {
-
     /**
      * Test if a version matched the version contraints.
      *
@@ -39,13 +37,14 @@ class Version
      * - ">2.1.1 <=2.1.5" : version greater than 2.1.1 but lower or equal than 2.1.5
      * - ...
      *
-     * @param string $version the version to test
-     * @param string $constraints the versions constraints
-     * @param bool $strict if true 2.1 is different of 2.1.0, if false version are normalized so 2.1
-     *                     will be expended to 2.1.0
-     * @return bool true if version matches the constraints
+     * @param string $version           the version to test
+     * @param string $constraints       the versions constraints
+     * @param bool   $strict            if true 2.1 is different of 2.1.0, if false version are normalized so 2.1
+     *                                  will be expended to 2.1.0
+     * @param string $defaultComparison the default comparison if nothing provided
+     * @return bool                     true if version matches the constraints
      */
-    static public function test($version, $constraints, $strict = false, $defaultComparison = "=")
+    public static function test($version, $constraints, $strict = false, $defaultComparison = "=")
     {
         $constraints = self::parse($constraints, $defaultComparison);
 

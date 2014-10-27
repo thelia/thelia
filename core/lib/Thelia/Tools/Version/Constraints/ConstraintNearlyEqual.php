@@ -10,9 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Tools\Version\Constraints;
-
 
 /**
  * Class ConstraintNearlyEqual
@@ -21,7 +19,7 @@ namespace Thelia\Tools\Version\Constraints;
  */
 class ConstraintNearlyEqual extends BaseConstraint
 {
-    function __construct($expression)
+    public function __construct($expression)
     {
         $this->expression = str_replace('~', '', $expression);
     }

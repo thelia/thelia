@@ -10,9 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-
 namespace Thelia\Tools\Version\Constraints;
-
 
 /**
  * Class ContraintInterface
@@ -21,7 +19,6 @@ namespace Thelia\Tools\Version\Constraints;
  */
 interface ConstraintInterface
 {
-
     /**
      * Normalize a version number in a version that will be used in `version_compare`
      *

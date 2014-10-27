@@ -259,11 +259,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     // Make a quick and dirty test on the module's config.xml file
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
-                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/',
-                            $configContent) !== false
-                    ) {
-                        $hasConfigurationInterface = true;
-                    }
+                    $hasConfigurationInterface = $configContent &&
+                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false
+                    ;
 
                     if (false === $hasConfigurationInterface) {
                         // Make a quick and dirty test on the module's routing.xml file
