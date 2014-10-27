@@ -229,35 +229,13 @@ class ModuleValidator
         $moduleDefinition->setNamespace((string)$this->moduleDescriptor->fullnamespace);
         $moduleDefinition->setVersion((string)$this->moduleDescriptor->version);
 
-        $languages = [];
-        if ($this->getModuleVersion() != "1") {
-            foreach ($this->moduleDescriptor->languages->language as $language) {
-                $languages[] = (string)$language;
-            }
-        }
-        $moduleDefinition->setLanguages($languages);
+        $this->getModuleLanguages($moduleDefinition);
 
-        $descriptives = [];
-        foreach ($this->moduleDescriptor->descriptive as $descriptive) {
-            $descriptives[(string)$descriptive['locale']] = [
-                'title' => (string)$descriptive->title,
-                'subtitle' => (string)$descriptive->subtitle,
-                'description' => (string)$descriptive->description,
-                'postscriptum' => (string)$descriptive->postscriptum,
-            ];
-        }
-        $moduleDefinition->setDescriptives($descriptives);
+        $this->getModuleDescriptives($moduleDefinition);
 
-        $dependencies = [];
-        if (isset($this->moduleDescriptor->required)) {
-            foreach ($this->moduleDescriptor->required->module as $dependency) {
-                $dependencies[] = [
-                    (string)$dependency,
-                    (string)$dependency['version'],
-                ];
-            }
-        }
-        $moduleDefinition->setDependencies($dependencies);
+        $this->getModuleDependencies($moduleDefinition);
+
+        $this->getModuleAuthors($moduleDefinition);
 
         $moduleDefinition->setLogo((string)$this->moduleDescriptor->logo);
         $moduleDefinition->setTheliaVersion((string)$this->moduleDescriptor->thelia);
@@ -395,5 +373,72 @@ class ModuleValidator
         }
 
         return $dependantModules;
+    }
+
+    /**
+     * @param ModuleDefinition $moduleDefinition
+     */
+    protected function getModuleLanguages(ModuleDefinition $moduleDefinition)
+    {
+        $languages = [];
+        if ($this->getModuleVersion() != "1") {
+            foreach ($this->moduleDescriptor->languages->language as $language) {
+                $languages[] = (string)$language;
+            }
+        }
+        $moduleDefinition->setLanguages($languages);
+    }
+
+    /**
+     * @param ModuleDefinition $moduleDefinition
+     */
+    protected function getModuleDescriptives(ModuleDefinition $moduleDefinition)
+    {
+        $descriptives = [];
+        foreach ($this->moduleDescriptor->descriptive as $descriptive) {
+            $descriptives[(string)$descriptive['locale']] = [
+                'title' => (string)$descriptive->title,
+                'subtitle' => (string)$descriptive->subtitle,
+                'description' => (string)$descriptive->description,
+                'postscriptum' => (string)$descriptive->postscriptum,
+            ];
+        }
+        $moduleDefinition->setDescriptives($descriptives);
+    }
+
+    /**
+     * @param ModuleDefinition $moduleDefinition
+     */
+    protected function getModuleDependencies(ModuleDefinition $moduleDefinition)
+    {
+        $dependencies = [];
+        if (0 !== count($this->moduleDescriptor->required)) {
+            foreach ($this->moduleDescriptor->required->module as $dependency) {
+                $dependencies[] = [
+                    (string)$dependency,
+                    (string)$dependency['version'],
+                ];
+            }
+        }
+        $moduleDefinition->setDependencies($dependencies);
+    }
+
+    /**
+     * @param ModuleDefinition $moduleDefinition
+     */
+    protected function getModuleAuthors(ModuleDefinition $moduleDefinition)
+    {
+        $authors = [];
+        if (0 !== count($this->moduleDescriptor->author)) {
+            foreach ($this->moduleDescriptor->author as $author) {
+                $authors[] = [
+                    (string)$author->name,
+                    (string)$author->company,
+                    (string)$author->email,
+                    (string)$author->website
+                ];
+            }
+        }
+        $moduleDefinition->setAuthors($authors);
     }
 }
