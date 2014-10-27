@@ -93,7 +93,7 @@ class ModuleDescriptorValidator
      */
     protected function schemaValidate(\DOMDocument $dom, \SplFileInfo $xsdFile)
     {
-        $errors = [];
+        $errorMessages = [];
 
         try {
 
@@ -104,7 +104,7 @@ class ModuleDescriptorValidator
                 $errors = libxml_get_errors();
 
                 foreach ($errors as $error) {
-                    $errorMessage[] = sprintf(
+                    $errorMessages[] = sprintf(
                         'XML error "%s" [%d] (Code %d) in %s on line %d column %d' . "\n",
                         $error->message,
                         $error->level,
@@ -124,7 +124,7 @@ class ModuleDescriptorValidator
             libxml_use_internal_errors(false);
         }
 
-        return $errors;
+        return $errorMessages;
     }
 
     public function getDescriptor($xml_file)
