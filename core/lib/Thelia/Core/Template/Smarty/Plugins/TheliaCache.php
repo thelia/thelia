@@ -20,7 +20,6 @@ use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Translation\Translator;
 
-
 /**
  * Class TheliaCache
  *
@@ -30,6 +29,8 @@ use Thelia\Core\Translation\Translator;
 class TheliaCache extends AbstractSmartyPlugin
 {
     use TCacheSupportTrait;
+
+    const REF_DELIMITER = ",";
 
     /** @var Request $request */
     protected $request;
@@ -48,8 +49,8 @@ class TheliaCache extends AbstractSmartyPlugin
         CacheDriverInterface $cache,
         Translator $translator
     ) {
-        $this->request    = $request;
-        $this->cache      = $cache;
+        $this->request = $request;
+        $this->cache = $cache;
         $this->translator = $translator;
     }
 
@@ -63,8 +64,7 @@ class TheliaCache extends AbstractSmartyPlugin
      */
     public function cacheBlock($params, $content, $template, &$repeat)
     {
-
-        $key  = $this->getParam($params, 'key');
+        $key = $this->getParam($params, 'key');
 
         if (null == $key) {
             throw new \InvalidArgumentException(
@@ -84,8 +84,8 @@ class TheliaCache extends AbstractSmartyPlugin
             }
         } else {
             // last call - save cache
-            $ttl  = $this->getParam($params, 'ttl');
-            $rel  = $this->getParam($params, 'rel');
+            $ttl = $this->getParam($params, 'ttl');
+            $rel = $this->getParam($params, 'rel');
             $references = $this->getReferences($rel);
 
             $this->setCache(
@@ -121,8 +121,8 @@ class TheliaCache extends AbstractSmartyPlugin
     {
         $references = [];
 
-        if (null !== $rel){
-            $references = explode(self::REL_DELIMITER, $rel);
+        if (null !== $rel) {
+            $references = explode(self::REF_DELIMITER, $rel);
         }
 
         return $references;
@@ -137,5 +137,4 @@ class TheliaCache extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('block', 'cache', $this, 'cacheBlock'),
         ];
     }
-
 }

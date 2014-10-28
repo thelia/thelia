@@ -13,15 +13,12 @@
 
 namespace Thelia\Cache;
 
-
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Cache\Driver\CacheDriverInterface;
 
-
 trait TCacheSupportTrait
 {
-
     /** @var \Thelia\Cache\Driver\BaseCacheDriver $cache */
     protected $cache = null;
 
@@ -53,7 +50,7 @@ trait TCacheSupportTrait
 
     protected function hasCache($key)
     {
-        $cache   = $this->getCacheManager();
+        $cache = $this->getCacheManager();
 
         if (null !== $cache && null !== $key) {
             return $this->cache->contains($key);
@@ -64,7 +61,7 @@ trait TCacheSupportTrait
 
     protected function getCache($key)
     {
-        $cache   = $this->getCacheManager();
+        $cache = $this->getCacheManager();
         $content = null;
         if (null !== $cache && null !== $key) {
             $content = $cache->fetch($key);

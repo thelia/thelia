@@ -47,7 +47,7 @@ class CacheFactory
 
         $instance = null;
 
-        switch ($driver){
+        switch ($driver) {
             case 'array':
                 $instance = new ArrayDriver();
                 break;
@@ -60,7 +60,7 @@ class CacheFactory
             case 'null':
                 $instance = new NullDriver();
                 break;
-            default;
+            default:
                 if (true === $fallback) {
                     $instance = new NullDriver();
                 } else {
@@ -68,12 +68,10 @@ class CacheFactory
                 }
         }
 
-        Tlog::getInstance()->debug(sprintf(" GU Cache : loading Drivr %s ", $driver));
-
         try {
             /** @var \Thelia\Cache\Driver\BaseCacheDriver $instance */
             $instance->init($params);
-        } catch (\RuntimeException $ex){
+        } catch (\RuntimeException $ex) {
             if ($fallback) {
                 $instance = new NullDriver();
             }
@@ -81,5 +79,4 @@ class CacheFactory
 
         return $instance;
     }
-
-} 
+}

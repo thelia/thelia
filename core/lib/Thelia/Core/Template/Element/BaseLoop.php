@@ -67,7 +67,6 @@ abstract class BaseLoop
     private static $cacheLoopResult = [];
     private static $cacheCount = [];
 
-
     /**
      * Create a new Loop
      *

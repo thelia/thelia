@@ -15,7 +15,6 @@ namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\ApcCache;
 
-
 /**
  * Class FileDriver
  * @package Thelia\Cache\Driver
@@ -23,7 +22,6 @@ use Doctrine\Common\Cache\ApcCache;
  */
 class ApcDriver extends BaseCacheDriver
 {
-
     /**
      * Init the cache.
      */
@@ -31,5 +29,4 @@ class ApcDriver extends BaseCacheDriver
     {
         $this->cache = new ApcCache();
     }
-
-} 
+}

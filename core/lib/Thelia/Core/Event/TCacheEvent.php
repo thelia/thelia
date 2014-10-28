@@ -13,7 +13,6 @@
 
 namespace Thelia\Core\Event;
 
-
 /**
  * Class TCacheEvent
  * @package Thelia\Core\Event
@@ -39,7 +38,4 @@ class TCacheEvent extends ActionEvent
     {
         return $this->response;
     }
-
-
-
 }

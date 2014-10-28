@@ -12,8 +12,8 @@
 
 
 namespace Thelia\Core\Event\Cache;
-use Thelia\Core\Event\TCacheEvent;
 
+use Thelia\Core\Event\TCacheEvent;
 
 /**
  * Class TCacheDiscardRef
@@ -22,7 +22,6 @@ use Thelia\Core\Event\TCacheEvent;
  */
 class TCacheDiscardRefEvent extends TCacheEvent
 {
-
     protected $ref = null;
 
     /**
@@ -41,6 +40,4 @@ class TCacheDiscardRefEvent extends TCacheEvent
     {
         return $this->ref;
     }
-
-
 }

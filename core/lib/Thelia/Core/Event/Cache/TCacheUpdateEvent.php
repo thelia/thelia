@@ -12,8 +12,8 @@
 
 
 namespace Thelia\Core\Event\Cache;
-use Thelia\Core\Event\ActionEvent;
 
+use Thelia\Core\Event\ActionEvent;
 
 /**
  * Class TCacheUpdateEvent
@@ -22,7 +22,6 @@ use Thelia\Core\Event\ActionEvent;
  */
 class TCacheUpdateEvent extends ActionEvent
 {
-
     public function all()
     {
         return $this->parameters;

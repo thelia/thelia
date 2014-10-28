@@ -12,8 +12,8 @@
 
 
 namespace Thelia\Core\Event\Cache;
-use Thelia\Core\Event\TCacheEvent;
 
+use Thelia\Core\Event\TCacheEvent;
 
 /**
  * Class TCacheFlushEvent
@@ -22,5 +22,4 @@ use Thelia\Core\Event\TCacheEvent;
  */
 class TCacheFlushEvent extends TCacheEvent
 {
-
 }

@@ -15,7 +15,6 @@ namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\FilesystemCache;
 
-
 /**
  * Class FileDriver
  * @package Thelia\Cache\Driver
@@ -23,7 +22,6 @@ use Doctrine\Common\Cache\FilesystemCache;
  */
 class FileDriver extends BaseCacheDriver
 {
-
     const CONFIG_DIRECTORY = 'tcache_file_directory';
 
     const DEFAULT_DIRECTORY = "thelia";
@@ -49,5 +47,4 @@ class FileDriver extends BaseCacheDriver
 
         $this->cache = new FilesystemCache($directory, $extension);
     }
-
-} 
+}
