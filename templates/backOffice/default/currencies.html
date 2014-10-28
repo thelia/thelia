@@ -153,8 +153,8 @@
                                                 </td>
 
                                                 <td class="text-center">
-                                                    <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                                        <input class="change-default" type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
+                                                    <div class="make-switch switch-small change-default" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                        <input type="radio" name="is_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
                                                     </div>
                                                 </td>
 
@@ -351,14 +351,14 @@
 
             {* Change default status *}
 
-            $('.change-default').change(function(ev) {
+            $('.change-default').on("switch-change", function(event, data) {
                 var $loader = $('<div class="loader"></div>');
                 $('body').append($loader);
                 $loader.show();
                 var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
 
                 // Perform ID subtitutions
-                url = url.replace('__ID__', $(this).val());
+                url = url.replace('__ID__', $("input", this).val());
 
                 // Reload the page
                 location.href = url;
