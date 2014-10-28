@@ -27,7 +27,7 @@ class ExportForm extends BaseForm
 {
     protected $translator;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
+    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
     {
         $this->translator = Translator::getInstance();
 

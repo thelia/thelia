@@ -56,7 +56,7 @@
         <service id="smart.plugin.form" class="Thelia\Core\Template\Smarty\Plugins\Form" scope="request">
             <tag name="thelia.parser.register_plugin"/>
 
-            <argument type="service" id="request"/>
+            <argument type="service" id="service_container"/>
             <argument type="service" id="thelia.parser.context"/>
             <argument type="service" id="thelia.parser"/>
 

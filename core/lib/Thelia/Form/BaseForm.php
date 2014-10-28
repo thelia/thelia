@@ -12,6 +12,7 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
@@ -20,6 +21,8 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validation;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\TheliaFormEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
@@ -34,16 +37,39 @@ use Thelia\Tools\URL;
 abstract class BaseForm
 {
     /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
+     * @var \Symfony\Component\Form\FormBuilderInterface
      */
     protected $formBuilder;
+
+    /**
+     * @var \Symfony\Component\Form\FormFactoryBuilderInterface
+     */
+    protected $formFactoryBuilder;
 
     /**
      * @var \Symfony\Component\Form\Form
      */
     protected $form;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * @var Request
+     */
     protected $request;
+
+    /**
+     * @var \Symfony\Component\Validator\ValidatorBuilderInterface
+     */
+    protected $validatorBuilder;
+
+    /**
+     * @var \Symfony\Component\Translation\TranslatorInterface
+     */
+    protected $translator;
 
     private $view = null;
 
@@ -59,41 +85,71 @@ abstract class BaseForm
      */
     private $error_message = '';
 
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
-    {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * @var string
+     */
+    private $type;
+
+    public function __construct(
+        Request $request,
+        $type = "form",
+        $data = array(),
+        $options = array(),
+        ContainerInterface $container = null
+    ) {
         $this->request = $request;
+        $this->type = $type;
 
-        $validator = Validation::createValidatorBuilder();
+        if (null !== $container) {
+            $this->container = $container;
+            $this->dispatcher = $container->get("event_dispatcher");
 
-        if (!isset($options["attr"]["name"])) {
-            $options["attr"]["thelia_name"] = $this->getName();
+            $this->initFormWithContainer($type, $data, $options);
+        } else {
+
+            $this->initFormWithRequest($type, $data, $options);
         }
 
-        $builder =  Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension());
-        if (!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
-            $builder->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
+        $this->formBuilder = $this->formFactoryBuilder
+            ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
+            ->getFormFactory()
+            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options))
+        ;
+
+        /**
+         * Build the form
+         */
+        $name = $this->getName();
+
+        // We need to wrap the dispatch with a condition for backward compatibility
+        if ($this->hasContainer() && $name !== null && $name !== '') {
+            $event = new TheliaFormEvent($this);
+
+            /**
+             * If the form has the container, disptach the events
+             */
+            $this->dispatcher->dispatch(
+                TheliaEvents::FORM_BEFORE_BUILD . "." . $name,
+                $event
             );
         }
 
-        $translator = Translator::getInstance();
-
-        $validator
-            ->setTranslationDomain('validators')
-            ->setTranslator($translator);
-        $this->formBuilder = $builder
-            ->addExtension(new ValidatorExtension($validator->getValidator()))
-            ->getFormFactory()
-            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options));
-        ;
-
         $this->buildForm();
+
+        if ($this->hasContainer()  && $name !== null && $name !== '') {
+            /**
+             * If the form has the container, disptach the events
+             */
+            $this->dispatcher->dispatch(
+                TheliaEvents::FORM_AFTER_BUILD . "." . $name,
+                $event
+            );
+        }
 
         // If not already set, define the success_url field
         // This field is not included in the standard form hidden fields
@@ -110,6 +166,48 @@ abstract class BaseForm
         }
 
         $this->form = $this->formBuilder->getForm();
+    }
+
+    public function initFormWithContainer($type, $data, $options)
+    {
+        $this->translator = $this->container->get("thelia.translator");
+
+        /**
+         * @var \Symfony\Component\Form\FormFactoryBuilderInterface $formFactoryBuilder
+         */
+        $this->formFactoryBuilder = $this->container->get("thelia.form_factory_builder");
+
+        $this->validatorBuilder = $this->container->get("thelia.forms.validator_builder");
+    }
+
+    protected function initFormWithRequest($type, $data, $options)
+    {
+        $this->validatorBuilder = Validation::createValidatorBuilder();
+
+        $this->formFactoryBuilder =  Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension());
+
+        $this->translator = Translator::getInstance();
+
+        $this->validatorBuilder
+            ->setTranslationDomain('validators')
+            ->setTranslator($this->translator);
+    }
+
+    /**
+     * @return \Symfony\Component\Form\FormBuilderInterface
+     */
+    public function getFormBuilder()
+    {
+        return $this->formBuilder;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -234,6 +332,14 @@ abstract class BaseForm
     public function getForm()
     {
         return $this->form;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasContainer()
+    {
+        return $this->container !== null;
     }
 
     /**

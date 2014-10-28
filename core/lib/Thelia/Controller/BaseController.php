@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\PdfEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -27,6 +28,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\FirewallForm;
+use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderQuery;
 
@@ -36,7 +38,6 @@ use Thelia\Core\Event\ActionEvent;
 
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
-use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\DefaultActionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Tools\URL;
@@ -48,6 +49,7 @@ use Thelia\Tools\URL;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Manuel Raynaud <manu@thelia.net>
+ * @author Benjamin Perche <bperche@openstudio.fr>
  */
 
 abstract class BaseController extends ContainerAware
@@ -57,6 +59,8 @@ abstract class BaseController extends ContainerAware
     protected $currentRouter;
 
     protected $translator;
+
+    protected static $formDefinition;
 
     /**
      * Return an empty response (after an ajax request, for example)
@@ -69,11 +73,13 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * Return a JSON response
+     * @param $jsonData
+     * @param int $status
+     * @return Response Return a JSON response
      */
-    protected function jsonResponse($json_data, $status = 200)
+    protected function jsonResponse($jsonData, $status = 200)
     {
-        return new Response($json_data, $status, array('content-type' => 'application/json'));
+        return new Response($jsonData, $status, array('content-type' => 'application/json'));
     }
 
     /**
@@ -98,7 +104,7 @@ abstract class BaseController extends ContainerAware
      * Dispatch a Thelia event
      *
      * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param Event  $event     the action event, or null (a DefaultActionEvent will be dispatched)
+     * @param ActionEvent  $event     the action event, or null (a DefaultActionEvent will be dispatched)
      */
     protected function dispatch($eventName, ActionEvent $event = null)
     {
@@ -185,12 +191,12 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * Get all errors that occured in a form
+     * Get all errors that occurred in a form
      *
      * @param  \Symfony\Component\Form\Form $form
      * @return string                       the error string
      */
-    private function getErrorMessages(\Symfony\Component\Form\Form $form)
+    private function getErrorMessages(Form $form)
     {
         $errors = '';
 
@@ -230,7 +236,8 @@ abstract class BaseController extends ContainerAware
                 if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($env)) {
                     throw new FormValidationException(
                         $this->getTranslator()->trans(
-                            "You've submitted this form too many times. Further submissions will be ignored during %time",
+                            "You've submitted this form too many times. ".
+                            "Further submissions will be ignored during %time",
                             [
                                 "%time" => $aBaseForm->getWaitingTime(),
                             ]
@@ -244,13 +251,25 @@ abstract class BaseController extends ContainerAware
                 if ($form->get("error_message")->getData() != null) {
                     $errorMessage = $form->get("error_message")->getData();
                 } else {
-                    $errorMessage = sprintf($this->getTranslator()->trans("Missing or invalid data: %s"), $this->getErrorMessages($form));
+                    $errorMessage = sprintf(
+                        $this->getTranslator()->trans(
+                            "Missing or invalid data: %s"
+                        ),
+                        $this->getErrorMessages($form)
+                    );
                 }
 
                 throw new FormValidationException($errorMessage);
             }
         } else {
-            throw new FormValidationException(sprintf($this->getTranslator()->trans("Wrong form method, %s expected."), $expectedMethod));
+            throw new FormValidationException(
+                sprintf(
+                    $this->getTranslator()->trans(
+                        "Wrong form method, %s expected."
+                    ),
+                    $expectedMethod
+                )
+            );
         }
     }
 
@@ -287,7 +306,13 @@ abstract class BaseController extends ContainerAware
                 return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef());
             }
         } catch (\Exception $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('error during generating invoice pdf for order id : %d with message "%s"', $order_id, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf(
+                    'error during generating invoice pdf for order id : %d with message "%s"',
+                    $order_id,
+                    $e->getMessage()
+                )
+            );
         }
     }
 
@@ -309,9 +334,27 @@ abstract class BaseController extends ContainerAware
         return $url;
     }
 
-    protected function retrieveUrlFromRouteId($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
-    {
-        return URL::getInstance()->absoluteUrl($this->getRoute($routeId, $routeParameters, $referenceType), $urlParameters);
+    /**
+     * @param $routeId
+     * @param array $urlParameters
+     * @param array $routeParameters
+     * @param bool $referenceType
+     * @return string
+     */
+    protected function retrieveUrlFromRouteId(
+        $routeId,
+        array $urlParameters = [],
+        array $routeParameters = [],
+        $referenceType = Router::ABSOLUTE_PATH
+    ) {
+        return URL::getInstance()->absoluteUrl(
+            $this->getRoute(
+                $routeId,
+                $routeParameters,
+                $referenceType
+            ),
+            $urlParameters
+        );
     }
 
     /**
@@ -353,8 +396,13 @@ abstract class BaseController extends ContainerAware
      * @param  bool                                       $referenceType
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function generateRedirectFromRoute($routeId, array $urlParameters = [], array $routeParameters = [], $referenceType = Router::ABSOLUTE_PATH)
-    {
+    protected function generateRedirectFromRoute(
+        $routeId,
+        array $urlParameters = [],
+        array $routeParameters = [],
+        $referenceType = Router::ABSOLUTE_PATH
+    ) {
+
         return $this->generateRedirect(
             $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
         );
@@ -401,8 +449,12 @@ abstract class BaseController extends ContainerAware
      * @throws \InvalidArgumentException           When the router doesn't exist
      * @return string                              The generated URL
      */
-    protected function getRouteFromRouter($routerName, $routeId, $parameters = array(), $referenceType = Router::ABSOLUTE_URL)
-    {
+    protected function getRouteFromRouter(
+        $routerName,
+        $routeId,
+        $parameters = array(),
+        $referenceType = Router::ABSOLUTE_URL
+    ) {
         /** @var Router $router */
         $router =  $this->getRouter($routerName);
 
@@ -480,7 +532,36 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * @return a ParserInterface instance parser
+     * @param $name
+     * @param $type
+     * @param array $data
+     * @param array $options
+     * @return BaseForm
+     *
+     * This method builds a thelia form with its name
+     */
+    public function createForm($name, $type = "form", array $data = array(), array $options = array())
+    {
+        if (static::$formDefinition === null) {
+            static::$formDefinition = $this->container->getParameter("thelia.parser.forms");
+        }
+
+        if (empty($name)) {
+            $name = "thelia.empty";
+        }
+
+        if (!isset(static::$formDefinition[$name])) {
+            throw new \OutOfBoundsException(
+                sprintf("The form '%s' doesn't exist", $name)
+            );
+        }
+
+        return new static::$formDefinition[$name]($this->getRequest(), $type, $data, $options, $this->container);
+    }
+
+    /**
+     * @param null|mixed $template
+     * @return \Thelia\Core\Template\ParserInterface instance parser
      */
     abstract protected function getParser($template = null);
 
@@ -515,12 +596,18 @@ abstract class BaseController extends ContainerAware
      * @param int    $status  http status. Must be a 30x status
      * @param array  $cookies
      *
-     * @deprecated redirect is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
+     * @deprecated redirect is deprecated since version 2.1 and will be removed in 2.3.
+     * You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
      * @see generateRedirect instead of this method
      */
     public function redirect($url, $status = 302, $cookies = array())
     {
-        trigger_error('redirect is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response. ', E_USER_DEPRECATED);
+        trigger_error(
+            'redirect is deprecated since version 2.1 and will be removed in 2.3. '.
+            'You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of '.
+            'send a response.',
+            E_USER_DEPRECATED
+        );
 
         Redirect::exec($url, $status, $cookies);
     }
@@ -544,12 +631,18 @@ abstract class BaseController extends ContainerAware
      *
      * @param BaseForm $form a base form, which may contains the success URL
      *
-     * @deprecated redirectSuccess is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
+     * @deprecated redirectSuccess is deprecated since version 2.1 and will be removed in 2.3.
+     * You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response.
      * @see generateSuccessRedirect instead of this method
      */
     protected function redirectSuccess(BaseForm $form = null)
     {
-        trigger_error('redirectSuccess is deprecated since version 2.1 and will be removed in 2.3. You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of send a response. ', E_USER_DEPRECATED);
+        trigger_error(
+            'redirect is deprecated since version 2.1 and will be removed in 2.3. '.
+            'You must return an instance of \Symfony\Component\HttpFoundation\RedirectResponse insteand of '.
+            'send a response.',
+            E_USER_DEPRECATED
+        );
 
         if ($form != null) {
             $url = $form->getSuccessUrl();

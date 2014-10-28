@@ -39,14 +39,14 @@ class ParserContext implements \IteratorAggregate
      */
     public function addForm(BaseForm $form)
     {
-        $this->set(get_class($form)/*$form->getName()*/, $form);
+        $this->set(get_class($form) .":". $form->getType(), $form);
 
         return $this;
     }
 
-    public function getForm($name)
+    public function getForm($name, $type = "form")
     {
-        return $this->get($name, null);
+        return $this->get($name . ":" . $type, null);
     }
 
     public function setGeneralError($error)

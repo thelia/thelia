@@ -12,10 +12,12 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormConfigInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\HttpFoundation\Request;
@@ -25,6 +27,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Form\BaseForm;
+use Symfony\Component\Form\Form as SymfonyForm;
 
 /**
  *
@@ -52,11 +55,16 @@ use Thelia\Form\BaseForm;
  */
 class Form extends AbstractSmartyPlugin
 {
+    const COLLECTION_TYPE_NAME = "collection";
+
     private static $taggedFieldsStack = null;
     private static $taggedFieldsStackPosition = null;
 
     /** @var  Request $request */
     protected $request;
+
+    /** @var  ContainerInterface */
+    protected $container;
 
     /** @var  ParserContext $parserContext */
     protected $parserContext;
@@ -66,9 +74,16 @@ class Form extends AbstractSmartyPlugin
 
     protected $formDefinition = array();
 
-    public function __construct(Request $request, ParserContext $parserContext, ParserInterface $parser)
+    /** @var array The form collection stack */
+    protected $formCollectionStack = array();
+
+    /** @var array Counts collection loop in page */
+    protected $formCollectionCount = array();
+
+    public function __construct(ContainerInterface $container, ParserContext $parserContext, ParserInterface $parser)
     {
-        $this->request = $request;
+        $this->container = $container;
+        $this->request = $container->get("request");
         $this->parserContext = $parserContext;
         $this->parser = $parser;
     }
@@ -90,9 +105,10 @@ class Form extends AbstractSmartyPlugin
     {
         if ($repeat) {
             $name = $this->getParam($params, 'name');
+            $formType = $this->getParam($params, 'type', 'form');
 
             if (null == $name) {
-                throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
+                $name = "thelia.empty";
             }
 
             if (!isset($this->formDefinition[$name])) {
@@ -102,7 +118,7 @@ class Form extends AbstractSmartyPlugin
             $formClass = $this->formDefinition[$name];
 
             // Check if parser context contains our form
-            $form = $this->parserContext->getForm($formClass);
+            $form = $this->parserContext->getForm($formClass, $formType);
 
             if (null != $form) {
                 // Re-use the form
@@ -111,12 +127,13 @@ class Form extends AbstractSmartyPlugin
                 // Create a new one
                 $class = new \ReflectionClass($formClass);
 
-                $instance = $class->newInstance($this->request, "form");
+                $instance = $class->newInstance($this->request, $formType, array(), array(), $this->container);
             }
 
             $instance->createView();
 
             $template->assign("form", $instance);
+            $template->assign("form_name", $instance->getName());
 
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
@@ -209,7 +226,9 @@ class Form extends AbstractSmartyPlugin
 
             switch ($formFieldView->vars['type']) {
                 case "choice":
-                    if (!isset($formFieldView->vars['options']['choices']) || !is_array($formFieldView->vars['options']['choices'])) {
+                    if (!isset($formFieldView->vars['options']['choices']) ||
+                        !is_array($formFieldView->vars['options']['choices'])
+                    ) {
                         //throw new
                     }
                     $choices = array();
@@ -293,7 +312,6 @@ class Form extends AbstractSmartyPlugin
      * @param  array                     $params
      * @param  string                    $content
      * @param  \Smarty_Internal_Template $template
-     * @param  string                    $templateTypeName
      * @return string
      */
     protected function automaticFormFieldRendering($params, $content, $template, $templateFile)
@@ -488,13 +506,13 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'field' parameter is missing");
         }
 
-        if (empty($instance->getView()[$fieldName])) {
-            throw new \InvalidArgumentException(
-                sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName())
-            );
-        }
+        $view = $this->retrieveField(
+            $fieldName,
+            $instance->getView(),
+            $instance->getName()
+        );
 
-        return $instance->getView()[$fieldName];
+        return $view;
     }
 
     protected function getFormFieldsFromTag($params)
@@ -536,10 +554,20 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("'field' parameter is missing");
         }
 
-        $fieldData = $instance->getForm()->all()[$fieldName];
+        $fieldData = $this->retrieveField(
+            $fieldName,
+            $instance->getForm()->all(),
+            $instance->getName()
+        );
 
         if (empty( $fieldData )) {
-            throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s children", $fieldName, $instance->getName()));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Field name '%s' not found in form %s children",
+                    $fieldName,
+                    $instance->getName()
+                )
+            );
         }
 
         return $fieldData->getConfig();
@@ -558,10 +586,11 @@ class Form extends AbstractSmartyPlugin
             throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
         }
 
-        if (!$instance instanceof \Thelia\Form\BaseForm) {
+        if (!$instance instanceof BaseForm) {
             throw new \InvalidArgumentException(
                 sprintf(
-                    "form parameter in form_field block must be an instance of \Thelia\Form\BaseForm, instance of %s found",
+                    "form parameter in form_field block must be an instance of ".
+                    "\Thelia\Form\BaseForm, instance of %s found",
                     get_class($instance)
                 )
             );
@@ -571,7 +600,336 @@ class Form extends AbstractSmartyPlugin
     }
 
     /**
-     * @return an array of SmartyPluginDescriptor
+     * @param $needle
+     * @param $haystack
+     * @param $formName
+     * @return \Symfony\Component\Form\Form
+     */
+    protected function retrieveField($needle, $haystack, $formName)
+    {
+        $splitName = explode(".", $needle);
+
+        foreach ($splitName as $level) {
+            if (empty($haystack[$level])) {
+                throw new \InvalidArgumentException(
+                    sprintf("Field name '%s' not found in form %s", $needle, $formName)
+                );
+            }
+            $haystack = $haystack[$level];
+        }
+
+        return $haystack;
+    }
+
+    /**
+     * @param $params
+     * @param $name
+     * @param bool $throwException
+     * @return mixed|null
+     *
+     * Get a symfony form object form a function/block parameter
+     */
+    protected function getSymfonyFormFromParams($params, $name, $throwException = false)
+    {
+        $sfForm = $this->getParam($params, $name);
+
+        if (null === $sfForm && false === $throwException) {
+            return null;
+        }
+
+        if (!$sfForm instanceof SymfonyForm) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "%s parameter must be an instance of ".
+                    "\Symfony\Component\Form\Form, instance of %s found",
+                    $name,
+                    is_object($sfForm) ? get_class($sfForm) : gettype($sfForm)
+                )
+            );
+        }
+
+        return $sfForm;
+    }
+
+    /**
+     * @param $params
+     * @param $content
+     * @param \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return mixed
+     *
+     * Loops around a form collection entries and assigns values to template
+     */
+    public function renderFormCollection($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        /**
+         * Get parameters
+         */
+        $form = $this->getInstanceFromParams($params);
+        $row = $this->getSymfonyFormFromParams($params, "row");
+        $collection = $this->resolveCollection($this->getParam($params, "collection"), $form);
+
+        $hash = $this->initializeCollection($form, $collection, $row);
+
+        $limit = $this->getParam($params, "limit", -1);
+
+        /**
+         * Check if it has a limit
+         */
+        if (!preg_match("#^\-?\d+$#", $limit)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Invalid value for 'limit' parameter in 'form_collection'. '%s' given, integer expected",
+                    $limit
+                )
+            );
+        }
+
+        /**
+         * Then load stack and create the stack count
+         */
+        $limit = (int) $limit;
+        $hasLimit = $limit >= 0;
+
+        /**
+         * If we have reached the limit, stop
+         */
+        $collectionLimit = $this->formCollectionCount[$hash]["limit"];
+
+        if (($hasLimit && $limit === $collectionLimit) ||
+            null === $row = array_shift($this->formCollectionStack[$hash])
+        ) {
+            $repeat = false;
+
+            /**
+             * Reload stack limit
+             */
+            $this->formCollectionCount[$hash]["limit"] = 0;
+
+            return $content;
+        }
+
+        /**
+         * Assign variables into the template
+         */
+        $template->assign("row", $row);
+        $template->assign("collection_current", $this->formCollectionCount[$hash]["count"]++);
+        $template->assign("collection_count", $this->formCollectionCount[$hash]["total_count"]);
+
+        /**
+         * Increment the current limit state
+         * Force the repeat
+         */
+        $this->formCollectionCount[$hash]["limit"]++;
+        $repeat = true;
+
+        /**
+         * ANd return the content
+         */
+        return $content;
+    }
+
+    /**
+     * @param BaseForm $form
+     * @param SymfonyForm $field
+     * @return string
+     *
+     * Get definition, return hash
+     */
+    protected function getFormStackHash(BaseForm $form, SymfonyForm $field = null)
+    {
+        $build = get_class($form) . ":" . $form->getType();
+
+        if (null !== $field) {
+            $build .= ":" . $this->buildFieldName($field);
+        }
+
+        return md5($build);
+    }
+
+    /**
+     * @param $collection
+     * @param BaseForm $form
+     * @return SymfonyForm
+     *
+     * Extract the collection object from the form
+     */
+    protected function resolveCollection($collection, BaseForm $form)
+    {
+        if (null === $collection) {
+            throw new \InvalidArgumentException(
+                "Missing parameter 'collection' in 'form_collection"
+            );
+        }
+
+        $sfForm = $form->getForm();
+
+        if (!$sfForm->has($collection)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Field name '%s' not found in form %s children",
+                    $collection,
+                    $form->getName()
+                )
+            );
+        }
+
+        /**
+         * Check that the field is a "collection" type
+         */
+        $collectionConfig = $this->retrieveField(
+            $collection,
+            $sfForm->all(),
+            $form->getName()
+        );
+
+        $fieldType = $collectionConfig->getConfig()->getType();
+
+        if ($fieldType->getName() !== static::COLLECTION_TYPE_NAME) {
+            $baseFieldType = $fieldType;
+            $resolved = false;
+
+            while (null !== $fieldType && !$resolved) {
+                if ($fieldType->getName() !== static::COLLECTION_TYPE_NAME) {
+                    $fieldType = $fieldType->getParent();
+                }
+            }
+
+            if (!$resolved) {
+                throw new \LogicException(
+                    sprintf(
+                        "The field '%s' is not a collection, it's a '%s'.".
+                        "You can't use it with the function 'form_collection' in form '%s'",
+                        $collection,
+                        $baseFieldType->getName(),
+                        $form->getName()
+                    )
+                );
+            }
+        }
+
+        return $collectionConfig;
+    }
+
+    /**
+     * @param $params
+     * @param $content
+     * @param \Smarty_Internal_Template $template
+     * @param $repeat
+     * @return string
+     *
+     * Injects a collection field variables into the parser
+     */
+    public function renderFormCollectionField($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        if (!$repeat) {
+            return $content;
+        }
+
+        $form = $this->getInstanceFromParams($params);
+        /** @var \Symfony\Component\Form\Form $row */
+        $row = $this->getSymfonyFormFromParams($params, "row", true);
+        $field = $this->getParam($params, "field");
+
+        $formField = $this->retrieveField($field, $row->all(), $form->getName());
+
+        $formFieldConfig = $formField->getConfig();
+
+        $this->assignFieldValues(
+            $template,
+            $this->buildFieldName($formField),
+            $formField->getViewData(),
+            $formFieldConfig->getType(),
+            $formFieldConfig->getOptions()
+        );
+
+        return '';
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param array $tree
+     * @return string
+     *
+     * Tail recursive method that builds the field full name
+     */
+    protected function buildFieldName(FormInterface $form, array &$tree = array())
+    {
+        $config = $form->getConfig();
+        $parent = $form->getParent();
+        $hasParent = null !== $parent;
+
+        if (null !== $proprietyPath = $config->getPropertyPath()) {
+            $name = (string) $proprietyPath;
+        } else {
+            $name = $config->getName();
+
+            if ($name === null) {
+                $name = '';
+            } elseif ($name !== '' && $hasParent) {
+                $name = "[$name]";
+            }
+        }
+
+        array_unshift($tree, $name);
+
+        if (!$hasParent) {
+            return implode("", $tree);
+        }
+
+        return $this->buildFieldName($parent, $tree);
+    }
+
+    /**
+     * @param $params
+     * @param \Smarty_Internal_Template $template
+     * @return mixed
+     *
+     * Counts collection entries
+     */
+    public function formCollectionCount($params, \Smarty_Internal_Template $template)
+    {
+        /**
+         * Get parameters
+         */
+        $form = $this->getInstanceFromParams($params);
+        $row = $this->getSymfonyFormFromParams($params, "row");
+        $collection = $this->resolveCollection($this->getParam($params, "collection"), $form);
+
+        $hash = $this->initializeCollection($form, $collection, $row);
+
+        return $this->formCollectionCount[$hash]["total_count"];
+    }
+
+    /**
+     * @param BaseForm $form
+     * @param SymfonyForm $collection
+     * @param SymfonyForm $row
+     * @return string
+     *
+     * Initialize a collection into this class ( values stack, counting table )
+     */
+    protected function initializeCollection(BaseForm $form, SymfonyForm $collection, SymfonyForm $row = null)
+    {
+        $hash = $this->getFormStackHash($form, $collection);
+
+        if (!isset($this->formCollectionStack[$hash])) {
+            $this->formCollectionStack[$hash] = $collection->all();
+        }
+
+        if (!isset($this->formCollectionCount[$hash])) {
+            $this->formCollectionCount[$hash] = [
+                "count" => 0,
+                "limit" => 0,
+                "total_count" => count($this->formCollectionStack[$hash]),
+            ];
+        }
+
+        return $hash;
+    }
+
+    /**
+     * @return array an array of SmartyPluginDescriptor
      */
     public function getPluginDescriptors()
     {
@@ -585,6 +943,9 @@ class Form extends AbstractSmartyPlugin
             new SmartyPluginDescriptor("function", "form_field_attributes", $this, "standardFormFieldAttributes"),
             new SmartyPluginDescriptor("function", "render_form_field", $this, "standardFormFieldRendering"),
             new SmartyPluginDescriptor("block", "custom_render_form_field", $this, "customFormFieldRendering"),
+            new SmartyPluginDescriptor("block", "form_collection", $this, "renderFormCollection"),
+            new SmartyPluginDescriptor("block", "form_collection_field", $this, "renderFormCollectionField"),
+            new SmartyPluginDescriptor("function", "form_collection_count", $this, "formCollectionCount"),
         );
     }
 }
