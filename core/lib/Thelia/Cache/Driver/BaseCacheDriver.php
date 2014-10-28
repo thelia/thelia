@@ -16,7 +16,6 @@ namespace Thelia\Cache\Driver;
 use Doctrine\Common\Cache\CacheProvider;
 use Thelia\Model\ConfigQuery;
 
-
 /**
  * Class CacheDriverInterface
  * @package Thelia\Cache\Driver
@@ -27,7 +26,7 @@ abstract class BaseCacheDriver implements CacheDriverInterface
 
     const CONFIG_ENABLED = 'tcache_enabled';
 
-    const CONFIG_DRIVER  = 'tcache_driver';
+    const CONFIG_DRIVER = 'tcache_driver';
 
     const DEFAULT_DRIVER = 'null';
 
@@ -52,12 +51,11 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     /** @var string Default namespace for entry */
     protected $namespace = null;
 
-
     /**
      * @inheritdoc
      */
-    public function init(array $params = null) {
-
+    public function init(array $params = null)
+    {
         $this->initDefault($params);
 
         $this->initDriver($params);
@@ -82,9 +80,36 @@ abstract class BaseCacheDriver implements CacheDriverInterface
         );
     }
 
+    /**
+     * Extract a param from the params array
+     *
+     * @param array $params array of parameters
+     * @param string $key the param key
+     * @param string $configKey the config key to search if key is not found in params
+     * @param mixed $default a default value
+     *
+     * @return mixed|null
+     */
+    protected function getParam($params, $key, $configKey, $default)
+    {
+        $ret = null;
+
+        if (is_array($params) && array_key_exists($key, $params) && "" !== $params[$key]) {
+            $ret = $params[$key];
+        } else {
+            $ret = ConfigQuery::read($configKey, $default);
+            if ("" === $ret) {
+                $ret = $default;
+            }
+        }
+
+        return $ret;
+    }
+
     protected abstract function initDriver();
 
-    protected function postInit($params) {
+    protected function postInit($params)
+    {
 
         if (null !== $this->cache) {
             $this->cache->setNamespace($this->namespace);
@@ -124,6 +149,25 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     }
 
     /**
+     * Add a reference to the cache with key $key
+     *
+     * @param string $ref the reference key
+     * @param string $key the cache key
+     *
+     * @return boolean true if the ref hs been added, false otherwise
+     */
+    protected function addRef($ref, $key)
+    {
+        $content = $this->cache->fetch($ref);
+        if (!is_array($content)) {
+            $content = [];
+        }
+        $content[] = $key;
+
+        return $this->cache->save($ref, $content, 0);
+    }
+
+    /**
      * @inheritdoc
      */
     public function fetch($id)
@@ -145,7 +189,7 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     public function deleteRef($ref)
     {
         $deleted = 0;
-        $keys    = $this->cache->fetch($ref);
+        $keys = $this->cache->fetch($ref);
         if (is_array($keys)) {
             foreach ($keys as $key) {
                 if ($this->cache->delete($key)) {
@@ -204,51 +248,4 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     {
         return $this->sleep;
     }
-
-    /**
-     * Add a reference to the cache with key $key
-     *
-     * @param string $ref the reference key
-     * @param string $key the cache key
-     *
-     * @return boolean true if the ref hs been added, false otherwise
-     */
-    protected function addRef($ref, $key)
-    {
-        $content = $this->cache->fetch($ref);
-        if (!is_array($content)) {
-            $content = [];
-        }
-        $content[] = $key;
-
-        return $this->cache->save($ref, $content, 0);
-    }
-
-    /**
-     * Extract a param from the params array
-     *
-     * @param array $params array of parameters
-     * @param string $key the param key
-     * @param string $configKey the config key to search if key is not found in params
-     * @param mixed $default a default value
-     *
-     * @return mixed|null
-     */
-    protected function getParam($params, $key, $configKey, $default)
-    {
-        $ret = null;
-
-        if (is_array($params) && array_key_exists($key, $params) && "" !== $params[$key]) {
-            $ret = $params[$key];
-        } else {
-            $ret = ConfigQuery::read($configKey, $default);
-            if ("" === $ret) {
-                $ret = $default;
-            }
-        }
-
-        return $ret;
-    }
-
-
 }

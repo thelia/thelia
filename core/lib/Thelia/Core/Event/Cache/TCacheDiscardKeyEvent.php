@@ -12,8 +12,8 @@
 
 
 namespace Thelia\Core\Event\Cache;
-use Thelia\Core\Event\TCacheEvent;
 
+use Thelia\Core\Event\TCacheEvent;
 
 /**
  * Class TCacheDiscardKeyEvent
@@ -40,5 +40,4 @@ class TCacheDiscardKeyEvent extends TCacheEvent
     {
         return $this->key;
     }
-
 }

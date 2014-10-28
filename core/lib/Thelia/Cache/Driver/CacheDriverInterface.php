@@ -11,7 +11,6 @@
 /*************************************************************************************/
 namespace Thelia\Cache\Driver;
 
-
 /**
  * Class CacheDriverInterface
  * @package Thelia\Cache\Driver
@@ -70,9 +69,9 @@ interface CacheDriverInterface
     /**
      * Puts data into the cache.
      *
-     * @param string $id       The cache id.
-     * @param mixed  $data     The cache entry/data.
-     * @param int    $lifeTime The cache lifetime in seconds.
+     * @param string $id The cache id.
+     * @param mixed $data The cache entry/data.
+     * @param int $lifeTime The cache lifetime in seconds.
      *                         If != 0, sets a specific lifetime for this cache entry (0 => infinite lifeTime).
      *
      * @return boolean TRUE if the entry was successfully stored in the cache, FALSE otherwise.
@@ -127,5 +126,4 @@ interface CacheDriverInterface
      * @return boolean true if sleep is active, false otherwise
      */
     public function isSleeping();
-
 }

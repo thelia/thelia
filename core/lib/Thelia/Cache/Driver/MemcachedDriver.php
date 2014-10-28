@@ -16,7 +16,6 @@ namespace Thelia\Cache\Driver;
 use Doctrine\Common\Cache\MemcachedCache;
 use Memcached;
 
-
 /**
  * Class MemcachedDriver
  * @package Thelia\Cache\Driver
@@ -24,7 +23,6 @@ use Memcached;
  */
 class MemcachedDriver extends BaseCacheDriver
 {
-
     const CONFIG_SERVER = 'tcache_memcached_server';
 
     const DEFAULT_SERVER = "localhost";
@@ -32,7 +30,6 @@ class MemcachedDriver extends BaseCacheDriver
     const CONFIG_PORT = 'tcache_memcached_port';
 
     const DEFAULT_PORT = "11211";
-
 
     /**
      * Init the cache.
@@ -60,5 +57,4 @@ class MemcachedDriver extends BaseCacheDriver
 
         $this->cache->setMemcached($memcached);
     }
-
-} 
+}

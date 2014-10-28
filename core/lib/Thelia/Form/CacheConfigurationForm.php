@@ -13,13 +13,12 @@
 
 namespace Thelia\Form;
 
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Cache\CacheFactory;
 use Thelia\Cache\Driver\BaseCacheDriver;
 use Thelia\Cache\Driver\FileDriver;
 use Thelia\Cache\Driver\MemcachedDriver;
 use Thelia\Core\Translation\Translator;
-use Symfony\Component\Validator\Constraints;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -137,13 +136,11 @@ class CacheConfigurationForm extends BaseForm
                     ],
                     "required" => false
                 ]
-            )
-        ;
+            );
     }
 
     public function getEvent()
     {
-
     }
 
     protected function getDriverList()
@@ -160,12 +157,10 @@ class CacheConfigurationForm extends BaseForm
 
     public function verifyDriver($value, ExecutionContextInterface $context)
     {
-
     }
 
     public function getName()
     {
         return "thelia_admin_cache";
     }
-
 }

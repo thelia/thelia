@@ -17,23 +17,19 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Log\Tlog;
 use Thelia\Type\TypeCollection;
 
-
 /**
  * Add Cache functionality for loop.
- *
- *
  *
  * @package Thelia\Core\Template\Smarty\Plugins
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 trait LoopCacheTrait
 {
+    /** @var Request $request */
+    protected $request;
 
-    /** @var Request $request
-    protected $request;*/
-
-    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args
-    protected $args;*/
+    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args */
+    protected $args;
 
     /** @var bool Use the CacheFactory feature */
     protected $isCacheable = false;
@@ -50,7 +46,6 @@ trait LoopCacheTrait
     /** @var string The related attribute */
     protected $cacheAttribute = 'id';
 
-
     /**
      * Check the attributes of the loop to know if we can cache the loop
      * or not. If the loop is not cacheable it returns `null`. Else it returns
@@ -63,22 +58,17 @@ trait LoopCacheTrait
      */
     public function getCacheKey()
     {
-        Tlog::getInstance()->debug(" GU GET Cache Key");
-
         // check if we can cache this loop
         if (!$this->isCacheable) {
-            //Tlog::getInstance()->debug(" GU NOT isCacheable");
             return null;
         }
 
         if ($this->args->hasKey("nocache")) {
-            //Tlog::getInstance()->debug(" GU NO CACHE");
             return null;
         }
 
         // check if we can cache this loop
         if (!$this->isCacheable()) {
-            //Tlog::getInstance()->debug(" GU NOT isCacheable()");
             return null;
         }
 
@@ -119,7 +109,6 @@ trait LoopCacheTrait
      */
     protected function isCacheable()
     {
-
         if ($this->args->hasKey($this->cacheAttribute)) {
             $arg = $this->args->get($this->cacheAttribute);
             if ($arg instanceof TypeCollection) {
@@ -142,5 +131,4 @@ trait LoopCacheTrait
      * @return array|string|null  a reference or an array of references related to this cache
      */
     abstract public function getCacheRef();
-
 }

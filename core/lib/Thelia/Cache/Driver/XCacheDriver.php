@@ -15,7 +15,6 @@ namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\XcacheCache;
 
-
 /**
  * Class XCacheDriver
  * @package Thelia\Cache\Driver
@@ -23,7 +22,6 @@ use Doctrine\Common\Cache\XcacheCache;
  */
 class XCacheDriver extends BaseCacheDriver
 {
-
     /**
      * Init the cache.
      */
@@ -31,5 +29,4 @@ class XCacheDriver extends BaseCacheDriver
     {
         $this->cache = new XcacheCache();
     }
-
-} 
+}

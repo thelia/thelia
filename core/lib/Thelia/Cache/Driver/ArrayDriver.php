@@ -15,7 +15,6 @@ namespace Thelia\Cache\Driver;
 
 use Doctrine\Common\Cache\ArrayCache;
 
-
 /**
  * Class ArrayDriver
  * @package Thelia\Cache\Driver
@@ -23,13 +22,20 @@ use Doctrine\Common\Cache\ArrayCache;
  */
 class ArrayDriver extends BaseCacheDriver
 {
-
     /**
      * Init the cache.
      */
     public function initDriver(array $params = null)
     {
         $this->cache = new ArrayCache();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteRef($ref)
+    {
+        return 0;
     }
 
     /**
@@ -44,14 +50,4 @@ class ArrayDriver extends BaseCacheDriver
     {
         return false;
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteRef($ref)
-    {
-        return 0;
-    }
-
-
 }

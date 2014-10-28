@@ -13,7 +13,6 @@
 
 namespace Thelia\Cache\Driver;
 
-
 /**
  * Class NullDriver
  * @package Thelia\Cache\Driver
@@ -21,14 +20,11 @@ namespace Thelia\Cache\Driver;
  */
 class NullDriver extends BaseCacheDriver
 {
-
-
     /**
      * Init the cache.
      */
     public function initDriver(array $params = null)
     {
-
     }
 
     public function fetch($id)
@@ -60,6 +56,4 @@ class NullDriver extends BaseCacheDriver
     {
         return null;
     }
-
-
 }

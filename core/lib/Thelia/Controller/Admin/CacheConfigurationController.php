@@ -19,10 +19,7 @@ use Thelia\Core\Event\Cache\TCacheUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\CacheConfigurationForm;
-use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class CacheConfigurationController
@@ -31,7 +28,6 @@ use Thelia\Model\ConfigQuery;
  */
 class CacheConfigurationController extends BaseAdminController
 {
-
     /** @var  CacheFactory */
     protected $cacheFactory;
 
@@ -85,7 +81,6 @@ class CacheConfigurationController extends BaseAdminController
                 ]
             )
         );
-
     }
 
     protected function testConfig($driver, array $config)
@@ -106,7 +101,6 @@ class CacheConfigurationController extends BaseAdminController
         return $message;
     }
 
-
     public function saveAction()
     {
         if (null !== $response = $this->checkAuth(AdminResources::CACHE, [], AccessManager::UPDATE)) {
@@ -114,7 +108,7 @@ class CacheConfigurationController extends BaseAdminController
         }
 
         $error_message = false;
-        $cacheForm     = new CacheConfigurationForm($this->getRequest());
+        $cacheForm = new CacheConfigurationForm($this->getRequest());
 
         try {
 
@@ -124,8 +118,7 @@ class CacheConfigurationController extends BaseAdminController
 
             $this->dispatch(TheliaEvents::TCACHE_UPDATE, $event);
 
-            $this->redirect($cacheForm->getSuccessUrl());
-
+            return $this->generateRedirect($cacheForm->getSuccessUrl());
         } catch (\Exception $ex) {
             $error_message = $ex->getMessage();
         }
@@ -145,7 +138,7 @@ class CacheConfigurationController extends BaseAdminController
     protected function createModificationEvent($form)
     {
         $event = new TCacheUpdateEvent();
-        $data  = $form->getData();
+        $data = $form->getData();
 
         foreach ($data as $key => $value) {
             if (!in_array($key, ['success_url', 'error_message'])) {
@@ -154,7 +147,6 @@ class CacheConfigurationController extends BaseAdminController
         }
 
         return $event;
-
     }
 
 
