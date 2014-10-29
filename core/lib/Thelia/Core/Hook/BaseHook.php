@@ -287,8 +287,6 @@ abstract class BaseHook
     /**
      * Get the cart from the session
      *
-     * @param EventDispatcherInterface $dispatcher the event dispatcher, required to get the cart from session.
-     *
      * @return \Thelia\Model\Cart|null
      */
     protected function getCart()
