@@ -950,14 +950,14 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "promo":
                     if ($complex) {
-                        $search->addDescendingOrderByColumn('main_product_is_new');
+                        $search->addDescendingOrderByColumn('main_product_is_promo');
                     } else {
                         $search->addDescendingOrderByColumn('is_promo');
                     }
                     break;
                 case "new":
                     if ($complex) {
-                        $search->addDescendingOrderByColumn('main_product_is_promo');
+                        $search->addDescendingOrderByColumn('main_product_is_new');
                     } else {
                         $search->addDescendingOrderByColumn('is_new');
                     }
