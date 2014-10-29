@@ -79,7 +79,21 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                    new Type\EnumListType(
+                        [
+                            'id', 'id_reverse',
+                            'alpha', 'alpha_reverse',
+                            'min_price', 'max_price',
+                            'manual', 'manual_reverse',
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
+                            'ref',
+                            'promo',
+                            'new',
+                            'random',
+                            'given_id'
+                        ]
+                    )
                 ),
                 'alpha'
             ),
@@ -110,8 +124,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             new Argument(
                 'attribute_non_strict_match',
                 new TypeCollection(
-                    new Type\EnumListType(array('min_stock', 'promo', 'new', 'min_weight', 'max_weight', 'min_price', 'max_price')),
-                    new Type\EnumType(array('*', 'none'))
+                    new Type\EnumListType(['min_stock', 'promo', 'new', 'min_weight', 'max_weight', 'min_price', 'max_price']),
+                    new Type\EnumType(['*', 'none'])
                 ),
                 'none'
             )
@@ -120,10 +134,10 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function getSearchIn()
     {
-        return array(
+        return [
             "ref",
             "title",
-        );
+        ];
     }
 
     /**
@@ -467,7 +481,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         }
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
+        $this->configureI18nProcessing($search, ['TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']);
 
         $id = $this->getId();
 
@@ -493,12 +507,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $categoryDefault = $this->getCategoryDefault();
 
         if (!is_null($category) ||!is_null($categoryDefault)) {
-            $categoryIds = array();
+            $categoryIds = [];
             if (!is_array($category)) {
-                $category = array();
+                $category = [];
             }
             if (!is_array($categoryDefault)) {
-                $categoryDefault = array();
+                $categoryDefault = [];
             }
 
             $categoryIds = array_merge($categoryIds, $category, $categoryDefault);
@@ -672,7 +686,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 }
 
                 $isPSELeftJoinList[] = 'is_min_price';
-                $isProductPriceFirstLeftJoin = array('is_min_price', 'min_price_data');
+                $isProductPriceFirstLeftJoin = ['is_min_price', 'min_price_data'];
 
                 $minPriceJoin = new Join();
                 $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data');
@@ -708,7 +722,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
             if (null !== $max_price) {
                 $isPSELeftJoinList[] = 'is_max_price';
-                $isProductPriceFirstLeftJoin = array('is_max_price', 'max_price_data');
+                $isProductPriceFirstLeftJoin = ['is_max_price', 'max_price_data'];
 
                 $maxPriceJoin = new Join();
                 $maxPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data');
@@ -758,7 +772,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $joiningTable = $isPSELeftJoinList[0];
                 }
 
-                $isProductPriceFirstLeftJoin = array($joiningTable, 'global_price_data');
+                $isProductPriceFirstLeftJoin = [$joiningTable, 'global_price_data'];
 
                 $globalPriceJoin = new Join();
                 $globalPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
@@ -790,8 +804,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
              *
              * So that we can say the product is in global promo only with is_promo.PROMO, we must acknowledge it with (is_promo.PROMO OR is_new.PROMO)
              */
-            $booleanMatchedPromoList = array();
-            $booleanMatchedNewnessList = array();
+            $booleanMatchedPromoList = [];
+            $booleanMatchedNewnessList = [];
             foreach ($isPSELeftJoinList as $isPSELeftJoin) {
                 $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
                 $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
@@ -961,6 +975,18 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     } else {
                         $search->addDescendingOrderByColumn('is_new');
                     }
+                    break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
                     break;
                 case "given_id":
                     if (null === $id) {
