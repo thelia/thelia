@@ -57,7 +57,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        $cart = $this->request->getSession()->getSessionCart($this->getDispatcher(), $this->request);
+        $cart = $this->request->getSession()->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
             return array();
