@@ -19,4 +19,4 @@ echo [INFO] Desactivating Hook Test Module
 php Thelia module:deactivate HookTest
 
 echo [INFO] Removing hook test template
-del /f /s /q templates\frontOffice\hooktest
+rd templates\frontOffice\hooktest /s /q
