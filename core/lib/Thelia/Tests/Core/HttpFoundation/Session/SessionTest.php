@@ -73,6 +73,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
                 if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
                     $this->cartAction->restoreCurrentCart($event);
                 }
+                else if ($type == TheliaEvents::CART_CREATE_NEW) {
+                    $this->cartAction->createEmptyCart($event);
+                }
             }
         ));
     }
