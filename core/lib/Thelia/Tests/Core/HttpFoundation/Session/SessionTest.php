@@ -13,8 +13,12 @@
 namespace Thelia\Tests\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Event\Cart\CartRestoreEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 
 /**
@@ -26,37 +30,91 @@ use Thelia\Model\Customer;
  */
 class SessionTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var  Session */
     protected $session;
+
+    /** @var  Request */
+    protected $request;
+
+    protected $dispatcher, $dispatcherNull;
+
+    protected $cartToken;
+
+    protected $cartAction;
 
     public function setUp()
     {
+        $this->request = new Request();
+
         $this->session = new Session(new MockArraySessionStorage());
+
+        $this->request->setSession($this->session);
+
+        $this->cartAction = new \Thelia\Action\Cart($this->request);
+
+        $this->dispatcherNull = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface",
+           array(),
+           array(),
+           '',
+           TRUE,
+           TRUE,
+           TRUE,
+           FALSE);
+
+        $this->dispatcher
+            ->expects($this->any())
+            ->method('dispatch')
+            ->will($this->returnCallback(function ($type, $event) {
+
+                $event->setDispatcher($this->dispatcher);
+
+                if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
+                    $this->cartAction->restoreCurrentCart($event);
+                }
+            }
+        ));
     }
 
-    public function testGetCartWithoutExistingCart()
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetCartWithoutExistingCartAndNoDispatcher()
+    {
+        $session = $this->session;
+
+        $cart = $session->getSessionCart();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetCartWithoutExistingCartAndDeprecatedMethod()
     {
         $session = $this->session;
 
         $cart = $session->getCart();
-
-        $this->assertNull($cart);
     }
 
-    public function testGetCartWithExistingCartWithoutCustomerConnected()
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetCartUnableToCreateCart()
     {
         $session = $this->session;
 
-        $testCart = new Cart();
-        $testCart->setToken(uniqid("testSessionGetCart1", true));
-        $testCart->save();
+        $cart = $session->getSessionCart($this->dispatcherNull);
+    }
 
-        $session->setCart($testCart->getId());
+    public function testGetCartWithoutExistingCartNoCustomer()
+    {
+        $session = $this->session;
 
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->dispatcher);
 
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
-        $this->assertEquals($testCart->getToken(), $cart->getToken());
     }
 
     public function testGetCartWithExistingCustomerButNoCart()
@@ -72,16 +130,18 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $session->setCustomerUser($customer);
 
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->dispatcher);
 
-        $this->assertNull($cart);
+        $this->assertNotNull($cart);
+        $this->assertEquals($customer->getId(), $cart->getCustomerId());
+        $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
     }
 
     public function testGetCartWithExistingCartAndCustomerButWithoutReferenceToCustomerInCart()
     {
         $session = $this->session;
 
-        //create a fake customer just for test. If not persists test fails !
+        // create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
         $customer->setFirstname("john test session");
         $customer->setLastname("doe");
@@ -94,11 +154,14 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $testCart->setToken(uniqid("testSessionGetCart2", true));
         $testCart->save();
 
-        $session->setCart($testCart->getId());
+        $this->request->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
 
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->dispatcher);
 
-        $this->assertNull($cart);
+        $this->assertNotNull($cart);
+        $this->assertEquals($customer->getId(), $cart->getCustomerId());
+        $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
+
     }
 
     public function testGetCartWithExistingCartAndCustomerAndReferencesEachOther()
@@ -119,9 +182,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $testCart->setCustomerId($customer->getId());
         $testCart->save();
 
-        $session->setCart($testCart->getId());
+        $this->request->cookies->set(ConfigQuery::read("cart.cookie_name", 'thelia_cart'), $testCart->getToken());
 
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->dispatcher);
 
         $this->assertNotNull($cart);
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');

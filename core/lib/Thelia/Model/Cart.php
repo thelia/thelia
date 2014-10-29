@@ -14,9 +14,13 @@ class Cart extends BaseCart
     /**
      * Duplicate the current existing cart. Only the token is changed
      *
-     * @param $token
-     * @param  Customer $customer
+     * @param string $token
+     * @param Customer $customer
+     * @param Currency $currency
+     * @param EventDispatcherInterface $dispatcher
      * @return Cart
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
      */
     public function duplicate($token, Customer $customer = null, Currency $currency = null, EventDispatcherInterface $dispatcher)
     {

@@ -33,7 +33,7 @@ class VirtualProductDelivery extends AbstractDeliveryModule
      */
     public function isValidDelivery(Country $country)
     {
-        $cart = $this->getRequest()->getSession()->getCart();
+        $cart = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
         foreach ($cart->getCartItems() as $cartItem) {
             if (!$cartItem->getProduct()->getVirtual()) {
                 return false;

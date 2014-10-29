@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Hook;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -283,12 +284,14 @@ abstract class BaseHook
     /**
      * Get the cart from the session
      *
+     * @param EventDispatcherInterface $dispatcher the event dispatcher, required to get the cart from session.
+     *
      * @return \Thelia\Model\Cart|null
      */
-    protected function getCart()
+    protected function getCart(EventDispatcherInterface $dispatcher)
     {
         if (null === $this->cart) {
-            $this->cart = $this->getSession() ? $this->getSession()->getCart() : null;
+            $this->cart = $this->getSession() ? $this->getSession()->getSessionCart($dispatcher) : null;
         }
 
         return $this->cart;

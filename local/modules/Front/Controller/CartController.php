@@ -40,8 +40,6 @@ use Thelia\Tools\URL;
 
 class CartController extends BaseFrontController
 {
-    use \Thelia\Cart\CartTrait;
-
     public function addItem()
     {
         $request = $this->getRequest();
@@ -154,13 +152,11 @@ class CartController extends BaseFrontController
     }
 
     /**
-     * use Thelia\Cart\CartTrait for searching current cart or create a new one
-     *
      * @return \Thelia\Core\Event\Cart\CartEvent
      */
     protected function getCartEvent()
     {
-        $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
 
         return new CartEvent($cart);
     }

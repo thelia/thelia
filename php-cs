@@ -1,7 +1,6 @@
 #!/bin/bash
 
 php-cs-fixer fix core/lib/Thelia/Action/ --level=psr2
-php-cs-fixer fix core/lib/Thelia/Cart/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Command/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Condition/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Config/ --level=psr2

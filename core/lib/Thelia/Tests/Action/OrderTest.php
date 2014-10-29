@@ -183,7 +183,7 @@ class OrderTest extends \PHPUnit_Framework_TestCase
             $this->cartItems[] = $cartItem;
         }
 
-        $this->request->getSession()->setCart($cart->getId());
+        $this->request->getSession()->set("thelia.cart_id", $cart->getId());
 
         return $cart;
     }

@@ -23,29 +23,28 @@
 namespace Front\Controller;
 
 use Front\Front;
-use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\LostPasswordEvent;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Form\CustomerCreateForm;
 use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerLostPasswordForm;
 use Thelia\Form\CustomerPasswordUpdateForm;
 use Thelia\Form\CustomerProfileUpdateForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\NewsletterQuery;
 use Thelia\Tools\RememberMeTrait;
 use Thelia\Tools\URL;
-use Thelia\Log\Tlog;
-use Thelia\Core\Security\Exception\WrongPasswordException;
 
 /**
  * Class CustomerController
@@ -54,8 +53,6 @@ use Thelia\Core\Security\Exception\WrongPasswordException;
  */
 class CustomerController extends BaseFrontController
 {
-    use CartTrait;
-
     use RememberMeTrait;
 
     /**
@@ -194,7 +191,7 @@ class CustomerController extends BaseFrontController
 
                 $this->processLogin($customerCreateEvent->getCustomer());
 
-                $cart = $this->getCart($this->getDispatcher(), $this->getRequest());
+                $cart = $this->getSession()->getSessionCart($this->getDispatcher());
                 if ($cart->getCartItems()->count() > 0) {
                     $response = $this->generateRedirectFromRoute('cart.view');
                 } else {

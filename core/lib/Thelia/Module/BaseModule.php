@@ -167,6 +167,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     public function getDispatcher()
     {
         if ($this->hasDispatcher() === false) {
+            // Try to get dispatcher from container.
+            $this->setDispatcher($this->getContainer()->get('event_dispatcher'));
+        }
+
+        if ($this->hasDispatcher() === false) {
             throw new \RuntimeException("Sorry, the dispatcher is not available in this context");
         }
 
@@ -410,7 +415,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $session = $this->getRequest()->getSession();
 
         /** @var Cart $cart */
-        $cart = $session->getCart();
+        $cart = $session->getSessionCart($this->getDispatcher());
 
         /** @var Order $order */
         $order = $session->getOrder();

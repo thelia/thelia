@@ -328,6 +328,12 @@ final class TheliaEvents
     const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
     const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
+    /** Restore a current cart in the session, either by reloading it from the database, or creating a new one */
+    const CART_RESTORE_CURRENT = "cart.restore.current";
+
+    /** Create a new, empty cart in the session, and attach it to the current customer, if any. */
+    const CART_CREATE_NEW = "cart.create.new";
+
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
      */

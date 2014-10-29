@@ -26,25 +26,24 @@ use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\Order\OrderEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Form\OrderDelivery;
 use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
-use Thelia\Model\OrderProductQuery;
-use Thelia\Model\OrderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\OrderProductQuery;
+use Thelia\Model\OrderQuery;
 
 
 /**
@@ -54,9 +53,6 @@ use Thelia\Model\Order;
  */
 class OrderController extends BaseFrontController
 {
-    use CartTrait;
-
-
     /**
      * Check if the cart contains only virtual products.
      */
@@ -66,7 +62,7 @@ class OrderController extends BaseFrontController
         $this->checkCartNotEmpty();
 
         // check if the cart contains only virtual products
-        $cart = $this->getSession()->getCart();
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
 
         if ($cart->isVirtual()) {
             // get the virtual product module

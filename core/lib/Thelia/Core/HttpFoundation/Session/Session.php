@@ -12,22 +12,27 @@
 
 namespace Thelia\Core\HttpFoundation\Session;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartRestoreEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Exception\InvalidCartException;
-use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
+use Thelia\Model\CartQuery;
 use Thelia\Model\Currency;
+use Thelia\Model\Lang;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
-use Thelia\Model\Lang;
 
 /**
  *
  * extends mfony\Component\HttpFoundation\Session\Session for adding some helpers
  *
  * Class Session
+ *
  * @package Thelia\Core\HttpFoundation\Session
+ *
  * Symfony\Component\HttpFoundation\Request
  */
 class Session extends BaseSession
@@ -124,6 +129,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return UserInterface|null the current front office user, or null if none is legged in
+     */
     public function getCustomerUser()
     {
         return $this->get('thelia.customer_user');
@@ -164,7 +172,7 @@ class Session extends BaseSession
 
     /**
      *
-     * @return the return-to URL, or the index page if none is defined.
+     * @return string the return-to URL, or the index page if none is defined.
      */
     public function getReturnToUrl()
     {
@@ -174,55 +182,101 @@ class Session extends BaseSession
     // -- Cart ------------------------------------------------------------------
 
     /**
-     * return cart if exists and is valid (checking customer)
+     * Return the cart stored in the current session
      *
-     * @return \Thelia\Model\Cart|null
+     * @param EventDispatcherInterface $dispatcher the event dispatcher, required if no cart is currently stored in the session
+     *
+     * @return Cart The cart in the current session .
      */
-    public function getCart()
+    public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
-        $cart_id =  $this->get("thelia.cart_id");
-        $cart = null;
-        if ($cart_id) {
+        $cart_id = $this->get("thelia.cart_id", null);
+
+        if (null !== $cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
-            if ($cart) {
-                try {
-                    $this->verifyValidCart($cart);
-                } catch (InvalidCartException $e) {
-                    $cart = null;
-                }
+        } else {
+            $cart = null;
+        }
+
+        // If we do not have a cart, or if the current cart is nor valid
+        // restore it from the cart cookie, or create a new one
+        if (null === $cart || ! $this->isValidCart($cart)) {
+
+            // A dispatcher is required here. If we do not have it, throw an exception
+            // This is a temporary workaround to ensure backward compatibility with getCart(),
+            // When genCart() will be removed, this check should be removed, and  $dispatcher should become
+            // a required parameter.
+
+            if (null == $dispatcher) {
+                throw new \InvalidArgumentException(
+                    "In this context (no cart in session), an EventDispatcher should be provided to Session::getSessionCart()."
+                );
             }
+
+            $cartEvent = new CartRestoreEvent();
+
+            $dispatcher->dispatch(TheliaEvents::CART_RESTORE_CURRENT, $cartEvent);
+
+            if (null === $cart = $cartEvent->getCart()) {
+                throw new \LogicException(
+                    "Unable to get a Cart."
+                );
+            }
+
+            // Store the cart ID.
+            $this->set("thelia.cart_id", $cart->getId());
         }
 
         return $cart;
     }
 
     /**
+     * Clear the current session cart, and store a new, empty one in the session.
      *
-     *
-     * @param  \Thelia\Model\Cart                     $cart
-     * @throws \Thelia\Exception\InvalidCartException
+     * @param EventDispatcherInterface $dispatcher
      */
-    protected function verifyValidCart(Cart $cart)
+    public function clearSessionCart(EventDispatcherInterface $dispatcher)
     {
-        $customer = $this->getCustomerUser();
-        if ($customer && $cart->getCustomerId() != $customer->getId()) {
-            throw new InvalidCartException("customer in session and customer_id in cart are not the same");
-        } elseif ($customer === null && $cart->getCustomerId() !== null) {
-            throw new InvalidCartException("Customer exists in cart and not in session");
+        $event = new CartCreateEvent();
+
+        $dispatcher->dispatch(TheliaEvents::CART_CREATE_NEW, $event);
+
+        if (null === $cart = $event->getCart()) {
+            throw new \LogicException(
+                "Unable to get a new empty Cart."
+            );
         }
+
+        // Store the cart ID.
+        $this->set("thelia.cart_id", $cart->getId());
     }
 
     /**
-     * assign cart id in session
+     * Return cart if it exists and is valid (checking customer)
      *
-     * @param $cart_id
-     * @return $this
+     * @return \Thelia\Model\Cart|null
+     * @deprecated use getSessionCart() instead
      */
-    public function setCart($cart_id)
+    public function getCart()
     {
-        $this->set("thelia.cart_id", $cart_id);
+        return $this->getSessionCart(null);
+    }
 
-        return $this;
+    /**
+     * A cart is valid if its customer ID is the same as the current logged in user
+     *
+     * @param Cart $cart The cart to check
+     *
+     * @return bool true if the cart is valid, false otherwise
+     */
+    protected function isValidCart(Cart $cart)
+    {
+        $customer = $this->getCustomerUser();
+
+        return (null === $customer && $cart->getCustomerId() !== null)
+               ||
+               (null !== $customer && $cart->getCustomerId() == $customer->getId())
+        ;
     }
 
     // -- Order ------------------------------------------------------------------

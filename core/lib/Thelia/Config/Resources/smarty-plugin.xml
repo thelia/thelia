@@ -85,6 +85,7 @@
         <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="request" />
+            <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.securityContext" />
         </service>
 
