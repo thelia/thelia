@@ -40,7 +40,7 @@ use Thelia\Module\Validator\ModuleValidator;
 /**
  * Class Module
  * @package Thelia\Action
- * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <manu@thelia.net>
  */
 class Module extends BaseAction implements EventSubscriberInterface
 {

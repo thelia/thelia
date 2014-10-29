@@ -33,7 +33,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 /**
  * Class ModuleController
  * @package Thelia\Controller\Admin
- * @author  Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author  Manuel Raynaud <manu@thelia.net>
  */
 class ModuleController extends AbstractCrudController
 {
