@@ -56,6 +56,9 @@ abstract class BaseHook
     /** @var AssetResolverInterface $assetsResolver */
     public $assetsResolver = null;
 
+    /** @var EventDispatcherInterface  */
+    public $dispatcher = null;
+
     /** @var Request $request */
     protected $request = null;
 
@@ -288,10 +291,10 @@ abstract class BaseHook
      *
      * @return \Thelia\Model\Cart|null
      */
-    protected function getCart(EventDispatcherInterface $dispatcher)
+    protected function getCart()
     {
         if (null === $this->cart) {
-            $this->cart = $this->getSession() ? $this->getSession()->getSessionCart($dispatcher) : null;
+            $this->cart = $this->getSession() ? $this->getSession()->getSessionCart($this->dispatcher) : null;
         }
 
         return $this->cart;
