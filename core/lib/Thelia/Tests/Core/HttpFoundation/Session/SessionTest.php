@@ -17,9 +17,11 @@ use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Cart;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Tools\TokenProvider;
 
 /**
  * Test the helpers adding in Session class
@@ -50,7 +52,12 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->request->setSession($this->session);
 
-        $this->cartAction = new \Thelia\Action\Cart($this->request);
+        $translator = new Translator($this->getMock("\Symfony\Component\DependencyInjection\ContainerInterface"));
+
+        $this->cartAction = new \Thelia\Action\Cart(
+            $this->request,
+            new TokenProvider($this->request, $translator, 'baba au rhum')
+        );
 
         $this->dispatcherNull = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
@@ -97,7 +104,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $session = $this->session;
 
-        $cart = $session->getCart();
+        $cart = @$session->getCart();
     }
 
     /**
