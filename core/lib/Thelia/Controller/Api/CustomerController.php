@@ -88,7 +88,13 @@ class CustomerController extends BaseApiController
     {
         $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
         $request = $this->getRequest();
-        $form = new CustomerCreateForm($this->getRequest(), "form", [], ['csrf_protection' => false]);
+
+        $form = $this->createForm(
+            "thelia.api.customer.create",
+            "form",
+            [],
+            ['csrf_protection' => false]
+        );
 
         try {
             $customerForm = $this->validateForm($form);
@@ -117,7 +123,12 @@ class CustomerController extends BaseApiController
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
         }
 
-        $form = new CustomerUpdateForm($this->getRequest(), "form", [], ['csrf_protection' => false, 'method' => 'PUT']);
+        $form = $this->createForm(
+            "thelia.api.customer.update",
+            "form",
+            [],
+            ['csrf_protection' => false, 'method' => 'PUT']
+        );
 
         try {
             $customerForm = $this->validateForm($form);
