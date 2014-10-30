@@ -151,7 +151,7 @@
                                     {/loop}
                                 {/if}
 
-                                {if $HOOKABLE == 1}
+                                {if $HOOKABLE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
                                 <a class="{if ! $ACTIVE}disabled {/if} btn btn-default btn-xs" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
                             {/loop}
