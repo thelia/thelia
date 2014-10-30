@@ -128,6 +128,7 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
                 ->set('NAME', $area->getName())
                 ->set('POSTAGE', $area->getPostage())
             ;
+	    $this->addOutputFields($loopResultRow, $area);
 
             $loopResult->addRow($loopResultRow);
         }

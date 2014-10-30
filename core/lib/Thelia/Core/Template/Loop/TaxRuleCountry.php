@@ -163,6 +163,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("TAX_DESCRIPTION", $taxRuleCountry->getVirtualColumn(TaxTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
                 ;
             }
+	    $this->addOutputFields($loopResultRow, $taxRuleCountry);
 
             $loopResult->addRow($loopResultRow);
         }

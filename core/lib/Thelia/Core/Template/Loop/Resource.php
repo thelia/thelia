@@ -104,6 +104,8 @@ class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
             }
 
+	    $this->addOutputFields($loopResultRow, $resource);
+
             $loopResult->addRow($loopResultRow);
         }
 

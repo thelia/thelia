@@ -110,6 +110,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("HTML_MESSAGE", $result->getVirtualColumn('i18n_HTML_MESSAGE'))
                 ->set("SECURED", $result->getSecured())
             ;
+	    $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);
         }

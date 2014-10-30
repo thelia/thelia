@@ -135,6 +135,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $featureValue->getPosition())
             ;
+	    $this->addOutputFields($loopResultRow, $featureValue);
 
             $loopResult->addRow($loopResultRow);
         }

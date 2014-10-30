@@ -103,6 +103,7 @@ class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
                     ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
                     ->set("PER_CUSTOMER_USAGE_COUNT", $orderCoupon->getPerCustomerUsageCount())
                 ;
+		$this->addOutputFields($loopResultRow, $orderCoupon);
 
                 $loopResult->addRow($loopResultRow);
             }

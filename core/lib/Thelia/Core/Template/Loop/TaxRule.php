@@ -110,6 +110,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("DESCRIPTION", $taxRule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("IS_DEFAULT", $taxRule->getIsDefault() ? '1' : '0')
             ;
+	    $this->addOutputFields($loopResultRow, $taxRule);
 
             $loopResult->addRow($loopResultRow);
         }

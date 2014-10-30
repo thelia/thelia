@@ -186,6 +186,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition())
             ;
+	    $this->addOutputFields($loopResultRow, $folder);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -93,6 +93,7 @@ class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSea
                 ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $orderAttributeCombination->getAttributeAvDescription())
                 ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $orderAttributeCombination->getAttributeAvPostscriptum())
             ;
+	    $this->addOutputFields($loopResultRow, $orderAttributeCombination);
 
             $loopResult->addRow($loopResultRow);
         }
