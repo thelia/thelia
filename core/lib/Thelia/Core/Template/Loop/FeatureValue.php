@@ -139,6 +139,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 
                 ->set("POSITION"         , $featureValue->getPosition())
             ;
+	    $this->addOutputFields($loopResultRow, $featureValue);
 
             $loopResult->addRow($loopResultRow);
         }

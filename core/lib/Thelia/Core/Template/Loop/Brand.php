@@ -202,6 +202,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("VISIBLE"                 , $brand->getVisible())
                 ->set("LOGO_IMAGE_ID"           , $brand->getLogoImageId() ?: 0)
             ;
+	    $this->addOutputFields($loopResultRow, $brand);
 
             $loopResult->addRow($loopResultRow);
         }

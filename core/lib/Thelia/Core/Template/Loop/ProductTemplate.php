@@ -82,6 +82,7 @@ class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("LOCALE" , $this->locale)
                 ->set("NAME" , $template->getVirtualColumn('i18n_NAME'))
             ;
+	    $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);
         }
