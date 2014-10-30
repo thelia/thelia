@@ -191,7 +191,6 @@ class Session extends BaseSession
     public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
         $cart_id = $this->get("thelia.cart_id", null);
-
         if (null !== $cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
         } else {
@@ -201,7 +200,6 @@ class Session extends BaseSession
         // If we do not have a cart, or if the current cart is nor valid
         // restore it from the cart cookie, or create a new one
         if (null === $cart || ! $this->isValidCart($cart)) {
-
             // A dispatcher is required here. If we do not have it, throw an exception
             // This is a temporary workaround to ensure backward compatibility with getCart(),
             // When genCart() will be removed, this check should be removed, and  $dispatcher should become

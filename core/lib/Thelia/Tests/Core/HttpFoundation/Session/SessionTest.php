@@ -37,7 +37,9 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     /** @var  Request */
     protected $request;
 
-    protected $dispatcher, $dispatcherNull;
+    protected $dispatcher;
+
+    protected $dispatcherNull;
 
     protected $cartToken;
 
@@ -51,17 +53,17 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->request->setSession($this->session);
 
-        $translator = new Translator($this->getMock("\Symfony\Component\DependencyInjection\ContainerInterface"));
+        $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));
 
         $this->cartAction = new \Thelia\Action\Cart(
             $this->request,
             new TokenProvider($this->request, $translator, 'baba au rhum')
         );
 
-        $this->dispatcherNull = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+        $this->dispatcherNull = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->dispatcher = $this->getMock(
-            "Symfony\Component\EventDispatcher\EventDispatcherInterface",
+            'Symfony\Component\EventDispatcher\EventDispatcherInterface',
             array(),
             array(),
             '',
@@ -74,17 +76,19 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher
             ->expects($this->any())
             ->method('dispatch')
-            ->will($this->returnCallback(function ($type, $event) {
-                $event->setDispatcher($this->dispatcher);
+            ->will(
+                $this->returnCallback(
+                    function ($type, $event) {
+                    $event->setDispatcher($this->dispatcher);
 
-                if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
-                    $this->cartAction->restoreCurrentCart($event);
-                }
-                elseif ($type == TheliaEvents::CART_CREATE_NEW) {
-                    $this->cartAction->createEmptyCart($event);
-                }
-            }
-        ));
+                        if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
+                            $this->cartAction->restoreCurrentCart($event);
+                        } elseif ($type == TheliaEvents::CART_CREATE_NEW) {
+                            $this->cartAction->createEmptyCart($event);
+                        }
+                    }
+                )
+            );
     }
 
     /**
@@ -104,7 +108,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $session = $this->session;
 
-        $cart = @$session->getCart();
+        @$session->getCart();
     }
 
     /**
@@ -114,7 +118,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     {
         $session = $this->session;
 
-        $cart = $session->getSessionCart($this->dispatcherNull);
+        $session->getSessionCart($this->dispatcherNull);
     }
 
     public function testGetCartWithoutExistingCartNoCustomer()
