@@ -16,18 +16,15 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
-use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-
-use Thelia\Type\TypeCollection;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
@@ -52,6 +49,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('currency'),
             Argument::createIntTypeArgument('product'),
+            Argument::createBooleanTypeArgument('promo'),
+            Argument::createBooleanTypeArgument('new'),
+            Argument::createBooleanTypeArgument('default'),
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
@@ -84,6 +84,24 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             } else {
                 throw new \InvalidArgumentException("Either 'id' or 'product' argument should be present");
             }
+        }
+
+        $promo = $this->getPromo();
+
+        if (null !== $promo) {
+            $search->filterByPromo($promo);
+        }
+
+        $new = $this->getNew();
+
+        if (null !== $new) {
+            $search->filterByPromo($new);
+        }
+
+        $default = $this->getDefault();
+
+        if (null !== $default) {
+            $search->filterByIsDefault($default);
         }
 
         $orders  = $this->getOrder();
@@ -137,8 +155,8 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         /**
          * rate value is checked as a float in overloaded getRate method.
          */
-        $priceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END';
-        $promoPriceSelectorAsSQL = 'CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END';
+        $priceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PRICE * ' . $currency->getRate() . ' ELSE `price`.PRICE END, 2)';
+        $promoPriceSelectorAsSQL = 'ROUND(CASE WHEN ISNULL(`price`.PRICE) OR `price`.FROM_DEFAULT_CURRENCY = 1 THEN `price_default_currency`.PROMO_PRICE  * ' . $currency->getRate() . ' ELSE `price`.PROMO_PRICE END, 2)';
         $search->withColumn($priceSelectorAsSQL, 'price_PRICE')
             ->withColumn($promoPriceSelectorAsSQL, 'price_PROMO_PRICE')
             ->withColumn('CASE WHEN ' . ProductSaleElementsTableMap::PROMO . ' = 1 THEN ' . $promoPriceSelectorAsSQL . ' ELSE ' . $priceSelectorAsSQL . ' END', 'price_FINAL_PRICE');
@@ -146,7 +164,6 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         $search->groupById();
 
         return $search;
-
     }
 
     public function parseResults(LoopResult $loopResult)
@@ -187,22 +204,23 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             }
 
             $loopResultRow
-                ->set("ID"                , $PSEValue->getId())
-                ->set("QUANTITY"          , $PSEValue->getQuantity())
-                ->set("IS_PROMO"          , $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set("IS_NEW"            , $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("IS_DEFAULT"        , $PSEValue->getIsDefault() === 1 ? 1 : 0)
-                ->set("WEIGHT"            , $PSEValue->getWeight())
-                ->set("REF"               , $PSEValue->getRef())
-                ->set("EAN_CODE"          , $PSEValue->getEanCode())
-                ->set("PRICE"             , $price)
-                ->set("PRICE_TAX"         , $taxedPrice - $price)
-                ->set("TAXED_PRICE"       , $taxedPrice)
-                ->set("PROMO_PRICE"       , $promoPrice)
-                ->set("PROMO_PRICE_TAX"   , $taxedPromoPrice - $promoPrice)
-                ->set("TAXED_PROMO_PRICE" , $taxedPromoPrice);
-	    $this->addOutputFields($loopResultRow, $PSEValue);
-
+                ->set("ID", $PSEValue->getId())
+                ->set("QUANTITY", $PSEValue->getQuantity())
+                ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
+                ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
+                ->set("IS_DEFAULT", $PSEValue->getIsDefault() === 1 ? 1 : 0)
+                ->set("WEIGHT", $PSEValue->getWeight())
+                ->set("REF", $PSEValue->getRef())
+                ->set("EAN_CODE", $PSEValue->getEanCode())
+                ->set("PRODUCT_ID", $PSEValue->getProductId())
+                ->set("PRICE", $price)
+                ->set("PRICE_TAX", $taxedPrice - $price)
+                ->set("TAXED_PRICE", $taxedPrice)
+                ->set("PROMO_PRICE", $promoPrice)
+                ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
+                ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
+	
+            $this->addOutputFields($loopResultRow, $PSEValue);
             $loopResult->addRow($loopResultRow);
         }
 
