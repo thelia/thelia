@@ -37,7 +37,7 @@ casper.test.begin('Front Homepage', 12, function suite(test) {
         this.click('div.loginpage button[type="submit"]');
     });
 
-    casper.wait(thelia_default_timeout, function(){
+    casper.waitForSelector('body .homepage', function(){
 
         test.assertTitle("Back-office home - Thelia Back Office", "This is the dashboard");
 
@@ -88,10 +88,19 @@ casper.test.begin('Front Homepage', 12, function suite(test) {
 
         // trigger position change
         this.click('tr[data-module-id="' + modulePromoProductId + '"] a.u-position-up');
-    });
 
-    casper.wait(thelia_default_timeout, function(){
-        test.comment('waiting...');
+        casper.waitFor(
+            function(){
+                var linePromoProductPosition = this.getElementInfo(
+                    'tr[data-module-id="' + modulePromoProductId + '"] .moduleHookPositionChange'
+                );
+                return linePromoProductPosition.text == "1";
+            },
+            function(){
+                test.comment('Position for hooks position has changed');
+            }
+        );
+
     });
 
     // Get new order

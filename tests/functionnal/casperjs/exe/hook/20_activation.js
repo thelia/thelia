@@ -37,7 +37,7 @@ casper.test.begin('Front Homepage', 22, function suite(test) {
         this.click('div.loginpage button[type="submit"]');
     });
 
-    casper.wait(thelia_default_timeout, function(){
+    casper.waitForSelector('body .homepage', function(){
 
         test.assertTitle("Back-office home - Thelia Back Office", "This is the dashboard");
 
@@ -100,10 +100,11 @@ casper.test.begin('Front Homepage', 22, function suite(test) {
         this.click('tr[data-module-id="' + hookId + '"] div.module-hook-activation .switch-left');
 
         test.comment('waiting...');
-    });
 
-    casper.wait(thelia_default_timeout, function(){
-        test.comment('done');
+        casper.waitForSelector('tr[data-module-id="' + hookId + '"] .switch-off', function(){
+            test.comment('Status for hook position has changed');
+        });
+
     });
 
     // deactivation of module Block Currency
@@ -130,14 +131,15 @@ casper.test.begin('Front Homepage', 22, function suite(test) {
             '.make-switch[data-id="' + moduleId + '"] .switch-on',
             'module Block Currency is activated'
         );
+
         // trigger toggle activation
         this.click('.make-switch[data-id="' + moduleId + '"] .switch-left');
 
         test.comment('waiting...');
-    });
 
-    casper.wait(thelia_default_timeout, function(){
-        test.comment('done');
+        casper.waitForSelector('.make-switch[data-id="' + moduleId + '"] .switch-off', function(){
+            test.comment('Status for module has changed');
+        });
     });
 
     // deactivation of hook main.navbar-primary
@@ -168,10 +170,10 @@ casper.test.begin('Front Homepage', 22, function suite(test) {
         this.click('.make-switch[data-id="' + hookId + '"] .switch-left');
 
         test.comment('waiting...');
-    });
 
-    casper.wait(thelia_default_timeout, function(){
-        test.comment('done');
+        casper.waitForSelector('.make-switch[data-id="' + hookId + '"] .switch-off', function(){
+            test.comment('Status for hook has changed');
+        });
     });
 
     // Test the new home page

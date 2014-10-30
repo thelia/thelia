@@ -6,42 +6,42 @@ var x = require('casper').selectXPath;
 casper.test.begin('Back Office - Pages', 100, function suite(test) {
 
     var pages = [
-        { "url": "admin", "title": "Back-office home"},
-        { "url": "admin/home", "title": "Back-office home"},
-        { "url": "admin/catalog", "title": "Categories"},
-        { "url": "admin/customers", "title": "Customer"},
-        { "url": "admin/orders", "title": "Orders"},
-        { "url": "admin/categories", "title": "Categories"},
-        { "url": "admin/products", "title": "Categories"},
-        { "url": "admin/folders", "title": "Folders"},
-        { "url": "admin/coupon", "title": "Coupons"},
-        { "url": "admin/configuration", "title": "Configuration"},
-        { "url": "admin/configuration/variables", "title": "Thelia System Variables"},
-        { "url": "admin/configuration/store", "title": "Store"},
-        { "url": "admin/configuration/system-logs", "title": "System Logs"},
-        { "url": "admin/configuration/messages", "title": "Thelia Mailing Templates"},
-        { "url": "admin/configuration/currencies", "title": "Currencies"},
-        { "url": "admin/configuration/templates", "title": "Thelia Product Templates"},
-        { "url": "admin/configuration/attributes", "title": "Thelia Product Attributes"},
-        { "url": "admin/configuration/shipping_zones", "title": "Thelia Shipping zones"},
-        { "url": "admin/configuration/countries", "title": "Countries"},
-        { "url": "admin/configuration/profiles", "title": "Administration profiles"},
-        { "url": "admin/configuration/administrators", "title": "Back-office users"},
-        { "url": "admin/configuration/mailingSystem", "title": "Thelia Mailing System"},
-        { "url": "admin/configuration/adminLogs", "title": "Administration logs"},
-        { "url": "admin/configuration/features", "title": "Thelia Product Features"},
-        { "url": "admin/configuration/advanced", "title": "Advanced configuration"},
-        { "url": "admin/modules", "title": "Modules"},
-        { "url": "admin/hooks", "title": "Hooks"},
-        { "url": "admin/module-hooks", "title": "Hooks position"},
-        { "url": "admin/configuration/taxes_rules", "title": "Taxes rules"},
-        { "url": "admin/configuration/languages", "title": "Thelia Languages"},
-        { "url": "admin/configuration/translations", "title": "Translation"},
-        { "url": "admin/brand", "title": "Brands"},
-        { "url": "admin/export", "title": "Exports"},
-        { "url": "admin/import", "title": "Imports"},
-        { "url": "admin/sales", "title": "Sales management"},
-        { "url": "admin/logout", "title": "Welcome"}
+        {"url": "admin", "title": "Back-office home"},
+        {"url": "admin/home", "title": "Back-office home"},
+        {"url": "admin/catalog", "title": "Categories"},
+        {"url": "admin/customers", "title": "Customer"},
+        {"url": "admin/orders", "title": "Orders"},
+        {"url": "admin/categories", "title": "Categories"},
+        {"url": "admin/products", "title": "Categories"},
+        {"url": "admin/folders", "title": "Folders"},
+        {"url": "admin/coupon", "title": "Coupons"},
+        {"url": "admin/configuration", "title": "Configuration"},
+        {"url": "admin/configuration/variables", "title": "Thelia System Variables"},
+        {"url": "admin/configuration/store", "title": "Store"},
+        {"url": "admin/configuration/system-logs", "title": "System Logs"},
+        {"url": "admin/configuration/messages", "title": "Thelia Mailing Templates"},
+        {"url": "admin/configuration/currencies", "title": "Currencies"},
+        {"url": "admin/configuration/templates", "title": "Thelia Product Templates"},
+        {"url": "admin/configuration/attributes", "title": "Thelia Product Attributes"},
+        {"url": "admin/configuration/shipping_zones", "title": "Thelia Shipping zones"},
+        {"url": "admin/configuration/countries", "title": "Countries"},
+        {"url": "admin/configuration/profiles", "title": "Administration profiles"},
+        {"url": "admin/configuration/administrators", "title": "Back-office users"},
+        {"url": "admin/configuration/mailingSystem", "title": "Thelia Mailing System"},
+        {"url": "admin/configuration/adminLogs", "title": "Administration logs"},
+        {"url": "admin/configuration/features", "title": "Thelia Product Features"},
+        {"url": "admin/configuration/advanced", "title": "Advanced configuration"},
+        {"url": "admin/modules", "title": "Modules"},
+        {"url": "admin/hooks", "title": "Hooks"},
+        {"url": "admin/module-hooks", "title": "Hooks position"},
+        {"url": "admin/configuration/taxes_rules", "title": "Taxes rules"},
+        {"url": "admin/configuration/languages", "title": "Thelia Languages"},
+        {"url": "admin/configuration/translations", "title": "Translation"},
+        {"url": "admin/brand", "title": "Brands"},
+        {"url": "admin/export", "title": "Exports"},
+        {"url": "admin/import", "title": "Imports"},
+        {"url": "admin/sales", "title": "Sales management"},
+        {"url": "admin/logout", "title": "Welcome"}
     ];
 
 
@@ -67,12 +67,16 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
         this.echo('Waiting...');
     });
 
-    casper.wait(thelia_default_timeout, function(){
+    casper.then(function(){
+
         this.echo('Done');
         this.echo('Processing ' + pages.length + ' URLs');
 
-        casper.each(pages, function(self, page) {
+        casper.eachThen(pages, function(response) {
 
+            var page = response.data;
+
+            this.echo('Loading page : ' + page.url);
             casper.thenOpen(thelia2_base_url + page.url);
 
             casper.waitForSelector("footer.footer",
@@ -82,12 +86,12 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
 
                     test.assertExists(
                         "footer.footer",
-                        "Page " + page.url + " [" + pageTitle + "] loaded !"
+                        "Page " + page.url + " [" + pageTitle + "] loaded"
                     );
                     test.assertEquals(
                         pageTitle,
                         page.title,
-                        "Le titre de la page est correct : " + pageTitle
+                        "The page title is correct : " + pageTitle
                     );
 
                     // page.title = pageTitle;
@@ -105,15 +109,6 @@ casper.test.begin('Back Office - Pages', 100, function suite(test) {
         });
 
     });
-
-
-    /*
-    casper.wait(thelia_default_timeout, function(){
-
-        require('utils').dump(pages);
-
-    });
-    */
 
     casper.run(function() {test.done();});
 
