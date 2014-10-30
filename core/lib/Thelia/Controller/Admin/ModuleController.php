@@ -12,13 +12,18 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Core\Event\Module\ModuleEvent;
+use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Exception\InvalidModuleException;
+use Thelia\Form\Exception\FormValidationException;
+use Thelia\Form\ModuleInstallForm;
 use Thelia\Form\ModuleModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
@@ -28,10 +33,13 @@ use Thelia\Core\Event\UpdatePositionEvent;
 /**
  * Class ModuleController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@thelia.net>
  */
 class ModuleController extends AbstractCrudController
 {
+
+    protected $moduleErrors = [];
+
     public function __construct()
     {
         parent::__construct(
@@ -155,7 +163,10 @@ class ModuleController extends AbstractCrudController
         // We always return to the feature edition form
         return $this->render(
             'modules',
-            array('module_order' => $currentOrder)
+            array(
+                'module_order'  => $currentOrder,
+                'module_errors' => $this->moduleErrors
+            )
         );
     }
 
@@ -185,8 +196,14 @@ class ModuleController extends AbstractCrudController
             return $response;
         }
 
-        $moduleManagement = new ModuleManagement();
-        $moduleManagement->updateModules();
+        try {
+            $moduleManagement = new ModuleManagement();
+            $moduleManagement->updateModules();
+        } catch (InvalidModuleException $ex) {
+            $this->moduleErrors = $ex->getErrors();
+        } catch (Exception $ex) {
+            Tlog::getInstance()->addError("Failed to list modules:", $ex);
+        }
 
         return $this->renderList();
     }
@@ -287,5 +304,74 @@ class ModuleController extends AbstractCrudController
         }
 
         return $response;
+    }
+
+    public function installAction()
+    {
+
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)) {
+            return $response;
+        }
+
+        $newModule        = null;
+        $moduleDefinition = null;
+        $message          = false;
+
+        $moduleInstall = new ModuleInstallForm($this->getRequest());
+
+        try {
+            $form = $this->validateForm($moduleInstall, "post");
+
+            $moduleDefinition = $moduleInstall->getModuleDefinition();
+            $modulePath       = $moduleInstall->getModulePath();
+
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
+            $file = $form->get("module")->getData();
+
+            $moduleInstallEvent = new ModuleInstallEvent();
+            $moduleInstallEvent
+                ->setModulePath($modulePath)
+                ->setModuleDefinition($moduleDefinition);
+
+            $this->dispatch(TheliaEvents::MODULE_INSTALL, $moduleInstallEvent);
+
+            $newModule = $moduleInstallEvent->getModule();
+
+            if (null !== $newModule) {
+
+                $this->getSession()->getFlashBag()->add(
+                    'module-installed',
+                    $this->getTranslator()->trans(
+                        'The module %module has been installed successfully.',
+                        ['%module' => $moduleDefinition->getCode()]
+                    )
+                );
+
+                return $this->generateRedirectFromRoute('admin.module');
+
+            } else {
+                $message = $this->getTranslator()->trans(
+                    "Sorry, an error occured."
+                );
+            }
+
+        } catch (FormValidationException $e) {
+            $message = $e->getMessage();
+        } catch (\Exception $e) {
+            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()]);
+        }
+
+        if ($message !== false) {
+            Tlog::getInstance()->error(sprintf("Error during module installation process. Exception was %s", $message));
+
+            $moduleInstall->setErrorMessage($message);
+
+            $this->getParserContext()
+                ->addForm($moduleInstall)
+                ->setGeneralError($message);
+
+            return $this->render("modules");
+        }
+
     }
 }

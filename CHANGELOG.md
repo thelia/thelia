@@ -1,3 +1,11 @@
+#2.1.0-alpha2
+- Module :
+    - New schema for modules
+    - Module installation from back office
+    - Dependency check to Thelia version and other modules during installation, activation, deactivation and deletion
+- Smarty :
+    - new plugin `flash` to support symfony flash message.
+
 #2.1.0-alpha1
 - Added sale management feature
 - Added `module_id` parameter to Area loop

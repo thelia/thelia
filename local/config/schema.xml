@@ -761,7 +761,9 @@
   <table name="module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="55" type="VARCHAR" />
+    <column name="version" type="VARCHAR" size="10" required="true" default="" />
     <column name="type" required="true" type="TINYINT" />
+    <column name="category" required="true" type="VARCHAR" size="50" default="classic" />
     <column name="activate" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />

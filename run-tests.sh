@@ -6,8 +6,14 @@
 # will exit with non-zero error code if any of the command fails
 set -e
 
+echo "backup DB"
+mysqldump -h localhost -u $DB_USER thelia >../thelia.sql
+
 echo "phpunit"
 phpunit
+
+echo "restore DB"
+mysql -h localhost -u $DB_USER thelia <../thelia.sql
 
 echo "Clearing cache"
 php Thelia cache:clear --env=prod

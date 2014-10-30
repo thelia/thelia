@@ -896,7 +896,9 @@ CREATE TABLE `module`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(55) NOT NULL,
+    `version` VARCHAR(10) DEFAULT '' NOT NULL,
     `type` TINYINT NOT NULL,
+    `category` VARCHAR(50) DEFAULT 'classic' NOT NULL,
     `activate` TINYINT,
     `position` INTEGER,
     `full_namespace` VARCHAR(255),

@@ -15,6 +15,7 @@ return array(
     'Sorry, an error occured: %s' => 'Désolé. Une erreur s\'est produite : %s',
     'Sorry, an error occurred: %message' => 'Désolé. Une erreur s\'est produite : %s',
     'The file [%file] does not exist' => 'Le fichier [%file] n\'existe pas',
+    'To enabled the virtual product functionality, the module VirtualProductDelivery should be activated' => 'Pour utiliser la fonctionnalité des produits virtuels, le module VirtualProductDelivery doit être activé.',
     'Wrong email or password. Please try again' => 'Adresse email ou mot de passe incorrect. Merci de ré-essayer.',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'Vous être actuellement connecté au site. Vous devez vous déconnecter pour demander un nouveau mot de passe.',
 );

@@ -717,9 +717,10 @@ final class TheliaEvents
     /**
      * module
      */
-    const MODULE_CREATE = 'thelia.module.create';
-    const MODULE_UPDATE = 'thelia.module.update';
-    const MODULE_DELETE = 'thelia.module.delete';
+    const MODULE_CREATE  = 'thelia.module.create';
+    const MODULE_UPDATE  = 'thelia.module.update';
+    const MODULE_DELETE  = 'thelia.module.delete';
+    const MODULE_INSTALL = 'thelia.module.install';
 
     /* Invoke payment module */
 

@@ -1,0 +1,41 @@
+<div class="col-md-12">
+    <div class="general-block-decorator">
+
+        <div class="title title-without-tabs">
+            {intl l='Install or update a module'}
+        </div>
+
+        <div class="form-container">
+            {form name="thelia.admin.module.install"}
+            <form method="POST" action="{url path='/admin/module/install'}" {form_enctype form=$form}>
+                {form_hidden_fields form=$form}
+
+                {form_field form=$form field='success_url'}
+                <input type="hidden" name="{$name}" value="{url path='/admin/module'}" />
+                {/form_field}
+
+                {flash type="module-installed"}
+                <div class="alert alert-success">{$MESSAGE}</div>
+                {/flash}
+
+                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                {form_field form=$form field='module'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
+                        <span class="label-help-block">{intl l="Your module should be packaged in a zip file."}</span>
+                    </label>
+                    <div class="input-group">
+                        <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Module file'}" placeholder="{intl l='Module file'}" class="form-control">
+                        <span class="input-group-btn">
+                            <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl l="Install !"}" >
+                        </span>
+                    </div>
+                </div>
+                {/form_field}
+
+            </form>
+            {/form}
+        </div>
+    </div>
+</div>

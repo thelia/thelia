@@ -24,7 +24,9 @@ use Thelia\Model\Map\ModuleTableMap;
  *
  * @method     ChildModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildModuleQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method     ChildModuleQuery orderByVersion($order = Criteria::ASC) Order by the version column
  * @method     ChildModuleQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method     ChildModuleQuery orderByCategory($order = Criteria::ASC) Order by the category column
  * @method     ChildModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method     ChildModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildModuleQuery orderByFullNamespace($order = Criteria::ASC) Order by the full_namespace column
@@ -33,7 +35,9 @@ use Thelia\Model\Map\ModuleTableMap;
  *
  * @method     ChildModuleQuery groupById() Group by the id column
  * @method     ChildModuleQuery groupByCode() Group by the code column
+ * @method     ChildModuleQuery groupByVersion() Group by the version column
  * @method     ChildModuleQuery groupByType() Group by the type column
+ * @method     ChildModuleQuery groupByCategory() Group by the category column
  * @method     ChildModuleQuery groupByActivate() Group by the activate column
  * @method     ChildModuleQuery groupByPosition() Group by the position column
  * @method     ChildModuleQuery groupByFullNamespace() Group by the full_namespace column
@@ -89,7 +93,9 @@ use Thelia\Model\Map\ModuleTableMap;
  *
  * @method     ChildModule findOneById(int $id) Return the first ChildModule filtered by the id column
  * @method     ChildModule findOneByCode(string $code) Return the first ChildModule filtered by the code column
+ * @method     ChildModule findOneByVersion(string $version) Return the first ChildModule filtered by the version column
  * @method     ChildModule findOneByType(int $type) Return the first ChildModule filtered by the type column
+ * @method     ChildModule findOneByCategory(string $category) Return the first ChildModule filtered by the category column
  * @method     ChildModule findOneByActivate(int $activate) Return the first ChildModule filtered by the activate column
  * @method     ChildModule findOneByPosition(int $position) Return the first ChildModule filtered by the position column
  * @method     ChildModule findOneByFullNamespace(string $full_namespace) Return the first ChildModule filtered by the full_namespace column
@@ -98,7 +104,9 @@ use Thelia\Model\Map\ModuleTableMap;
  *
  * @method     array findById(int $id) Return ChildModule objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildModule objects filtered by the code column
+ * @method     array findByVersion(string $version) Return ChildModule objects filtered by the version column
  * @method     array findByType(int $type) Return ChildModule objects filtered by the type column
+ * @method     array findByCategory(string $category) Return ChildModule objects filtered by the category column
  * @method     array findByActivate(int $activate) Return ChildModule objects filtered by the activate column
  * @method     array findByPosition(int $position) Return ChildModule objects filtered by the position column
  * @method     array findByFullNamespace(string $full_namespace) Return ChildModule objects filtered by the full_namespace column
@@ -192,7 +200,7 @@ abstract class ModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `VERSION`, `TYPE`, `CATEGORY`, `ACTIVATE`, `POSITION`, `FULL_NAMESPACE`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -352,6 +360,35 @@ abstract class ModuleQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the version column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersion('fooValue');   // WHERE version = 'fooValue'
+     * $query->filterByVersion('%fooValue%'); // WHERE version LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $version The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByVersion($version = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($version)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $version)) {
+                $version = str_replace('*', '%', $version);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ModuleTableMap::VERSION, $version, $comparison);
+    }
+
+    /**
      * Filter the query on the type column
      *
      * Example usage:
@@ -390,6 +427,35 @@ abstract class ModuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ModuleTableMap::TYPE, $type, $comparison);
+    }
+
+    /**
+     * Filter the query on the category column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCategory('fooValue');   // WHERE category = 'fooValue'
+     * $query->filterByCategory('%fooValue%'); // WHERE category LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $category The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildModuleQuery The current query, for fluid interface
+     */
+    public function filterByCategory($category = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($category)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $category)) {
+                $category = str_replace('*', '%', $category);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ModuleTableMap::CATEGORY, $category, $comparison);
     }
 
     /**

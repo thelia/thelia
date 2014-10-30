@@ -61,17 +61,34 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'module_type',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array(
+                    new Type\EnumListType([
                         BaseModule::CLASSIC_MODULE_TYPE,
                         BaseModule::DELIVERY_MODULE_TYPE,
                         BaseModule::PAYMENT_MODULE_TYPE,
-                    ))
+                    ])
+                )
+            ),
+            new Argument(
+                'module_category',
+                new Type\TypeCollection(
+                    new Type\EnumListType(explode(',', BaseModule::MODULE_CATEGORIES))
                 )
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'title', 'title_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                    new Type\EnumListType([
+                            'id',
+                            'id_reverse',
+                            'code',
+                            'code_reverse',
+                            'title',
+                            'title_reverse',
+                            'manual',
+                            'manual_reverse',
+                            'enabled',
+                            'enabled_reverse'
+                    ])
                 ),
                 'manual'
             ),
@@ -113,6 +130,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByType($moduleType, Criteria::IN);
         }
 
+        $moduleCategory = $this->getModule_category();
+
+        if (null !== $moduleCategory) {
+            $search->filterByCategory($moduleCategory, Criteria::IN);
+        }
+
         $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
@@ -125,7 +148,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByActivate($active ? 1 : 0, Criteria::EQUAL);
         }
 
-        $orders  = $this->getOrder();
+        $orders = $this->getOrder();
 
         foreach ($orders as $order) {
             switch ($order) {
@@ -190,11 +213,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("POSTSCRIPTUM", $module->getVirtualColumn('i18n_POSTSCRIPTUM'))
                     ->set("CODE", $module->getCode())
                     ->set("TYPE", $module->getType())
+                    ->set("CATEGORY", $module->getCategory())
                     ->set("ACTIVE", $module->getActivate())
+                    ->set("VERSION", $module->getVersion())
                     ->set("CLASS", $module->getFullNamespace())
                     ->set("POSITION", $module->getPosition())
-                    ->set("EXISTS", $exists)
-                ;
+                    ->set("EXISTS", $exists);
 
                 $hasConfigurationInterface = false;
 
@@ -205,11 +229,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->filterByModuleId($module->getId())
                         ->filterByActive(true)
                         ->useHookQuery()
-                            ->filterByCode('module.configuration')
-                            ->filterByType(TemplateDefinition::BACK_OFFICE)
+                        ->filterByCode('module.configuration')
+                        ->filterByType(TemplateDefinition::BACK_OFFICE)
                         ->endUse()
-                        ->findOne()
-                    ;
+                        ->findOne();
                     $hasConfigurationInterface = (null !== $hookConfiguration);
 
                     if (false === $hasConfigurationInterface) {
@@ -236,9 +259,9 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     // Make a quick and dirty test on the module's config.xml file
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
-                    if ($configContent && preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false) {
-                        $hasConfigurationInterface = true;
-                    }
+                    $hasConfigurationInterface = $configContent &&
+                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false
+                    ;
 
                     if (false === $hasConfigurationInterface) {
                         // Make a quick and dirty test on the module's routing.xml file
@@ -260,10 +283,10 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     $accessValue = $module->getVirtualColumn('access');
                     $manager = new AccessManager($accessValue);
 
-                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW)? 1 : 0)
+                    $loopResultRow->set("VIEWABLE", $manager->can(AccessManager::VIEW) ? 1 : 0)
                         ->set("CREATABLE", $manager->can(AccessManager::CREATE) ? 1 : 0)
-                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE)? 1 : 0)
-                        ->set("DELETABLE", $manager->can(AccessManager::DELETE)? 1 : 0);
+                        ->set("UPDATABLE", $manager->can(AccessManager::UPDATE) ? 1 : 0)
+                        ->set("DELETABLE", $manager->can(AccessManager::DELETE) ? 1 : 0);
                 }
 
                 $loopResult->addRow($loopResultRow);
