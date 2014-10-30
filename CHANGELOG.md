@@ -5,6 +5,7 @@
     - Dependency check to Thelia version and other modules during installation, activation, deactivation and deletion
 - Smarty :
     - new plugin `flash` to support symfony flash message.
+- Loop : new method addOutputFields is called in parseResults method
 
 #2.1.0-alpha1
 - Added sale management feature
@@ -52,7 +53,6 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
 - product_sale_elements_id is added to order_product table.
-- Loop : new method addOutputFields is called in parseResults method
 
 #2.0.3
 - Fix js syntax in order-delivery template
