@@ -1055,6 +1055,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
         }
 
+        $this->addOutputFields($loopResultRow, $product);
+
         return $loopResultRow;
     }
 
