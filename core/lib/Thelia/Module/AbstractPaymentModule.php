@@ -41,7 +41,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
             "order-payment-gateway.html",
             array(
                 "order_id"          => $order->getId(),
-                "cart_count"        => $this->getRequest()->getSession()->getCart()->getCartItems()->count(),
+                "cart_count"        => $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems()->count(),
                 "gateway_url"       => $gateway_url,
                 "payment_form_data" => $form_data
             )

@@ -35,7 +35,7 @@ class BaseFrontController extends BaseController
 
     protected function checkCartNotEmpty()
     {
-        $cart = $this->getSession()->getCart();
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
         if ($cart===null || $cart->countCartItems() == 0) {
             throw new RedirectException($this->retrieveUrlFromRouteId('cart.view'));
         }

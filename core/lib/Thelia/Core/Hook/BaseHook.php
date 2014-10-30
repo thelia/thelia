@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Hook;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -54,6 +55,9 @@ abstract class BaseHook
 
     /** @var AssetResolverInterface $assetsResolver */
     public $assetsResolver = null;
+
+    /** @var EventDispatcherInterface  */
+    public $dispatcher = null;
 
     /** @var Request $request */
     protected $request = null;
@@ -288,7 +292,7 @@ abstract class BaseHook
     protected function getCart()
     {
         if (null === $this->cart) {
-            $this->cart = $this->getSession() ? $this->getSession()->getCart() : null;
+            $this->cart = $this->getSession() ? $this->getSession()->getSessionCart($this->dispatcher) : null;
         }
 
         return $this->cart;

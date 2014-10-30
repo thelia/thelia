@@ -13,10 +13,12 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -114,15 +116,17 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
     /**
      * Clear all coupons in session.
+     *
+     * @param Event $event
      */
-    public function clearAllCoupons()
+    public function clearAllCoupons(Event $event)
     {
         // Tell coupons to clear any data they may have stored
         $this->couponManager->clear();
 
         $this->request->getSession()->setConsumedCoupons(array());
 
-        $this->updateOrderDiscount(null);
+        $this->updateOrderDiscount($event);
     }
 
     /**
@@ -159,7 +163,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
 
                 $this->request
                     ->getSession()
-                    ->getCart()
+                    ->getSessionCart($event->getDispatcher())
                     ->setDiscount($totalDiscount)
                     ->save();
 
@@ -175,13 +179,13 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $event->setDiscount($totalDiscount);
     }
 
-    public function updateOrderDiscount(/** @noinspection PhpUnusedParameterInspection */ $event)
+    public function updateOrderDiscount(Event $event)
     {
         $discount = $this->couponManager->getDiscount();
 
         $this->request
             ->getSession()
-            ->getCart()
+            ->getSessionCart($event->getDispatcher())
             ->setDiscount($discount)
             ->save();
 

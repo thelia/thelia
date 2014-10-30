@@ -7,6 +7,22 @@ UPDATE `config` SET `value`='alpha2' WHERE `name`='thelia_extra_version';
 
 UPDATE `config` SET `name`='form_firewall_active' WHERE `name`='from_firewall_active';
 
+INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+('cart.use_persistent_cookie', '0', 0, 0, NOW(), NOW()),
+('cart.cookie_name', 'thelia_cart', 0, 0, NOW(), NOW()),
+('cart.cookie_lifetime', '31536060', 0, 0, NOW(), NOW())
+;
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
+(@max_id + 2, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
+(@max_id + 3, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
+(@max_id + 4, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
+(@max_id + 5, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
+(@max_id + 6, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL)
+;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
@@ -39,6 +55,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+7, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
   (@max_id+8, 'en_US', 'Order - After product list', '', ''),
   (@max_id+8, 'fr_FR', 'Commande - Après la liste des produits', '', '')
+;
 
 # ======================================================================================================================
 # Module version, min & max Thelia version supported

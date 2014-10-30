@@ -14,28 +14,25 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Model\Base\BrandQuery;
-use Thelia\Model\Brand;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\OrderQuery;
-
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 use Thelia\TaxEngine\TaxEngine;
 use Thelia\Tools\DateTimeFormat;
-use Thelia\Cart\CartTrait;
 
 /**
  * Implementation of data access to main Thelia objects (users, cart, etc.)
@@ -45,8 +42,6 @@ use Thelia\Cart\CartTrait;
  */
 class DataAccessFunctions extends AbstractSmartyPlugin
 {
-    use CartTrait;
-
     private $securityContext;
     protected $parserContext;
     protected $request;
@@ -185,7 +180,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
             self::$dataAccessCache['currentCountry'] = $taxCountry;
         }
 
-        $cart = $this->getCart($this->getDispatcher(), $this->request);
+        $cart = $this->request->getSession()->getSessionCart($this->getDispatcher());
+
         $result = "";
         switch ($params["attr"]) {
             case "count_product":

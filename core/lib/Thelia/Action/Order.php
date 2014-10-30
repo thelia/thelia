@@ -15,7 +15,6 @@ namespace Thelia\Action;
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Cart\CartTrait;
 use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
@@ -56,8 +55,6 @@ use Thelia\Tools\I18n;
  */
 class Order extends BaseAction implements EventSubscriberInterface
 {
-    use CartTrait;
-
     /**
      * @var \Thelia\Core\HttpFoundation\Request
      */
@@ -362,12 +359,14 @@ class Order extends BaseAction implements EventSubscriberInterface
     {
         $session = $this->getSession();
 
+        $dispatcher = $event->getDispatcher();
+
         $placedOrder = $this->createOrder(
             $event->getDispatcher(),
             $event->getOrder(),
             $session->getCurrency(),
             $session->getLang(),
-            $session->getCart(),
+            $session->getSessionCart($dispatcher),
             $this->securityContext->getCustomerUser()
         );
 
@@ -376,9 +375,6 @@ class Order extends BaseAction implements EventSubscriberInterface
         /* but memorize placed order */
         $event->setOrder(new OrderModel());
         $event->setPlacedOrder($placedOrder);
-
-        /* empty cart */
-        $dispatcher = $event->getDispatcher();
 
         /* call pay method */
         $payEvent = new OrderPaymentEvent($placedOrder);
@@ -411,7 +407,7 @@ class Order extends BaseAction implements EventSubscriberInterface
         // Empty cart and clear current order
         $session = $this->getSession();
 
-        $this->createCart($session);
+        $session->clearSessionCart($event->getDispatcher());
 
         $session->setOrder(new OrderModel());
     }

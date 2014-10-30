@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
@@ -23,20 +24,22 @@ use Thelia\Model\ModuleQuery;
 
 class Security extends AbstractSmartyPlugin
 {
+    protected $dispatcher;
     protected $request;
     private $securityContext;
 
-    public function __construct(Request $request, SecurityContext $securityContext)
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
     {
         $this->securityContext = $securityContext;
         $this->request = $request;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Process security check function
      *
      * @param  array                                                   $params
-     * @param  unknown                                                 $smarty
+     * @param  \Smarty                                                 $smarty
      * @return string                                                  no text is returned.
      * @throws \Thelia\Core\Security\Exception\AuthenticationException
      */
@@ -71,7 +74,7 @@ class Security extends AbstractSmartyPlugin
 
     public function checkCartNotEmptyFunction($params, &$smarty)
     {
-        $cart = $this->request->getSession()->getCart();
+        $cart = $this->request->getSession()->getSessionCart($this->dispatcher);
         if ($cart===null || $cart->countCartItems() == 0) {
             throw new OrderException('Cart must not be empty', OrderException::CART_EMPTY, array('empty' => 1));
         }
@@ -86,7 +89,10 @@ class Security extends AbstractSmartyPlugin
         if ($order !== null) {
             $checkAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
             $checkModule = ModuleQuery::create()->findPk($order->getDeliveryModuleId());
+        } else {
+            $checkAddress = $checkModule = null;
         }
+
         if (null === $order || null == $checkAddress || null === $checkModule) {
             throw new OrderException('Delivery must be defined', OrderException::UNDEFINED_DELIVERY, array('missing' => 1));
         }
@@ -97,7 +103,7 @@ class Security extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {

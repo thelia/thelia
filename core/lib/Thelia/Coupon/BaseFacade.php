@@ -24,7 +24,6 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
-use Thelia\Cart\CartTrait;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 
@@ -37,10 +36,6 @@ use Thelia\Model\CurrencyQuery;
  */
 class BaseFacade implements FacadeInterface
 {
-    use CartTrait {
-        CartTrait::getCart as getCartFromTrait;
-    }
-
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
@@ -67,7 +62,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getCart()
     {
-        return $this->getCartFromTrait($this->getDispatcher(), $this->getRequest());
+        return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
     }
 
     /**
@@ -117,13 +112,15 @@ class BaseFacade implements FacadeInterface
     /**
      * Return Products total price
      *
+     * @param bool $withItemsInPromo if true, the discounted items are included in the total
+     *
      * @return float
      */
     public function getCartTotalPrice($withItemsInPromo = true)
     {
         $total = 0;
 
-        $cartItems = $this->getRequest()->getSession()->getCart()->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
 
         foreach ($cartItems as $cartItem) {
             if ($withItemsInPromo || ! $cartItem->getPromo()) {
@@ -137,7 +134,7 @@ class BaseFacade implements FacadeInterface
     public function getCartTotalTaxPrice($withItemsInPromo = true)
     {
         $taxCountry = $this->getContainer()->get('thelia.taxEngine')->getDeliveryCountry();
-        $cartItems = $this->getRequest()->getSession()->getCart()->getCartItems();
+        $cartItems = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems();
 
         $total = 0;
 
@@ -175,7 +172,7 @@ class BaseFacade implements FacadeInterface
      */
     public function getNbArticlesInCart()
     {
-        return count($this->getRequest()->getSession()->getCart()->getCartItems());
+        return count($this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getCartItems());
     }
 
     /**

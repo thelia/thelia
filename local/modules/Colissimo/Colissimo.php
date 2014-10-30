@@ -59,7 +59,7 @@ class Colissimo extends AbstractDeliveryModule
             end($areaPrices);
             $maxWeight = key($areaPrices);
 
-            $cartWeight = $this->getRequest()->getSession()->getCart()->getWeight();
+            $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
             if ($cartWeight <= $maxWeight) return true;
         }
@@ -135,7 +135,7 @@ class Colissimo extends AbstractDeliveryModule
      */
     public function getPostage(Country $country)
     {
-        $cartWeight = $this->getRequest()->getSession()->getCart()->getWeight();
+        $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
         $postage = self::getPostageAmount(
             $country->getAreaId(),

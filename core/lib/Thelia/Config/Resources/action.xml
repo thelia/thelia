@@ -63,7 +63,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+        <service id="thelia.action.cart" class="Thelia\Action\Cart" scope="request">
+            <argument type="service" id="request"/>
+            <argument type="service" id="thelia.token_provider"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 

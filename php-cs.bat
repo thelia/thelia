@@ -1,7 +1,6 @@
 @echo off
-echo "Running php-cs-fixer..."
+echo Running php-cs-fixer...
 call php-cs-fixer fix core\lib\Thelia\Action --level=psr2
-call php-cs-fixer fix core\lib\Thelia\Cart --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Command --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Condition --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Config --level=psr2
@@ -22,4 +21,4 @@ call php-cs-fixer fix core\lib\Thelia\TaxEngine --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Tests --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Tools --level=psr2
 call php-cs-fixer fix core\lib\Thelia\Type --level=psr2
-echo "Done."
+echo Done.
