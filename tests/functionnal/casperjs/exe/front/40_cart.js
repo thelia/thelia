@@ -6,7 +6,8 @@ casper.test.begin('Cart', 5, function suite(test) {
 
     casper.start(thelia2_base_url, function() {
 
-        productUrl = this.getElementAttribute('a.product-info', 'href');
+        var productsUrl = this.getElementsAttribute('a.product-info', 'href');
+        productUrl = productsUrl[Math.floor(Math.random() * productsUrl.length)];
 
         this.echo("product : " + productUrl);
 
