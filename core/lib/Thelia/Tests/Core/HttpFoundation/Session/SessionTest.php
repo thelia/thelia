@@ -13,7 +13,6 @@
 namespace Thelia\Tests\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
@@ -61,26 +60,27 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->dispatcherNull = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
-        $this->dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface",
-           array(),
-           array(),
-           '',
-           TRUE,
-           TRUE,
-           TRUE,
-           FALSE);
+        $this->dispatcher = $this->getMock(
+            "Symfony\Component\EventDispatcher\EventDispatcherInterface",
+            array(),
+            array(),
+            '',
+            true,
+            true,
+            true,
+            false
+        );
 
         $this->dispatcher
             ->expects($this->any())
             ->method('dispatch')
             ->will($this->returnCallback(function ($type, $event) {
-
                 $event->setDispatcher($this->dispatcher);
 
                 if ($type == TheliaEvents::CART_RESTORE_CURRENT) {
                     $this->cartAction->restoreCurrentCart($event);
                 }
-                else if ($type == TheliaEvents::CART_CREATE_NEW) {
+                elseif ($type == TheliaEvents::CART_CREATE_NEW) {
                     $this->cartAction->createEmptyCart($event);
                 }
             }

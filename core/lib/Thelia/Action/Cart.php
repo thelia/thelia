@@ -414,5 +414,4 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CHANGE_DEFAULT_CURRENCY => array("updateCart", 128),
         );
     }
-
 }
