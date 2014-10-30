@@ -259,6 +259,11 @@ class Session extends BaseSession
      */
     public function getCart()
     {
+        trigger_error(
+            'getCart is deprecated, please use getSessionCart method instead',
+            E_USER_DEPRECATED
+        );
+
         return $this->getSessionCart(null);
     }
 

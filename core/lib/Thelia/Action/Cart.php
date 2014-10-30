@@ -33,6 +33,7 @@ use Thelia\Model\Customer as CustomerModel;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\Tools\ProductPriceTools;
+use Thelia\Tools\TokenProvider;
 
 /**
  *
@@ -50,11 +51,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /** @var Session  */
     protected $session;
 
-    public function __construct(Request $request)
+    /** @var  TokenProvider */
+    protected $tokenProvider;
+
+    public function __construct(Request $request, TokenProvider $tokenProvider)
     {
         $this->request = $request;
 
         $this->session = $request->getSession();
+
+        $this->tokenProvider = $tokenProvider;
     }
 
     /**
@@ -385,8 +391,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $id = null;
 
         if (ConfigQuery::read("cart.use_persistent_cookie", 1) == 1) {
-            $id = uniqid('', true);
-
+            $id = $this->tokenProvider->getToken();
             $this->session->set('cart_use_cookie', $id);
         }
 
