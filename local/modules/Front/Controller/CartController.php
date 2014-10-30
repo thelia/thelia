@@ -26,6 +26,7 @@ use Front\Front;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Cart\CartTrait;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -74,11 +75,7 @@ class CartController extends BaseFrontController
             $message = $e->getMessage();
         }
 
-        // If Ajax Request
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            $request = $this->getRequest();
-            $request->attributes->set('_view', "includes/mini-cart");
-        }
+        $this->changeViewForAjax();
 
         if ($message) {
             $cartAdd->setErrorMessage($message);
@@ -108,6 +105,7 @@ class CartController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
+        $this->changeViewForAjax();
     }
 
     public function deleteItem()
@@ -133,6 +131,16 @@ class CartController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
+        $this->changeViewForAjax();
+    }
+
+    protected function changeViewForAjax()
+    {
+        // If Ajax Request
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            $request = $this->getRequest();
+            $request->attributes->set('_view', "includes/mini-cart");
+        }
     }
 
     public function changeCountry()
@@ -204,8 +212,7 @@ class CartController extends BaseFrontController
                     $orderEvent->setPostage($postage);
 
                     $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                }
-                catch (DeliveryException $ex) {
+                } catch (DeliveryException $ex) {
                     // The postage has been chosen, but changes in the cart causes an exception.
                     // Reset the postage data in the order
                     $orderEvent->setDeliveryModule(0);
