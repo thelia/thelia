@@ -247,7 +247,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                     ->set("OBJECT_TYPE", $this->objectType)
                     ->set("OBJECT_ID", $this->objectId)
                 ;
-		$this->addOutputFields($loopResultRow, $result);
+                $this->addOutputFields($loopResultRow, $result);
 
                 $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {

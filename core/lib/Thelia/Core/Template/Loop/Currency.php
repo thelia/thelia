@@ -166,7 +166,7 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("POSITION", $currency->getPosition())
                 ->set("IS_DEFAULT", $currency->getByDefault())
             ;
-	    $this->addOutputFields($loopResultRow, $currency);
+            $this->addOutputFields($loopResultRow, $currency);
 
             $loopResult->addRow($loopResultRow);
         }

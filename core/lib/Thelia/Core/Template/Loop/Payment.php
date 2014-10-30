@@ -54,7 +54,7 @@ class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
                 ->set('DESCRIPTION', $paymentModule->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set('POSTSCRIPTUM', $paymentModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
-	    $this->addOutputFields($loopResultRow, $paymentModule);
+            $this->addOutputFields($loopResultRow, $paymentModule);
 
             $loopResult->addRow($loopResultRow);
         }

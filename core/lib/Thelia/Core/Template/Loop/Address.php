@@ -132,7 +132,7 @@ class Address extends BaseLoop implements PropelSearchLoopInterface
                 ->set("CELLPHONE", $address->getCellphone())
                 ->set("DEFAULT", $address->getIsDefault())
             ;
-	    $this->addOutputFields($loopResultRow, $address);
+            $this->addOutputFields($loopResultRow, $address);
 
             $loopResult->addRow($loopResultRow);
         }

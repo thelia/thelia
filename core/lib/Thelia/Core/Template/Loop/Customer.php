@@ -222,7 +222,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set("SPONSOR", $customer->getSponsor())
                 ->set("DISCOUNT", $customer->getDiscount())
             ;
-	    $this->addOutputFields($loopResultRow, $customer);
+            $this->addOutputFields($loopResultRow, $customer);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -114,7 +114,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                 ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
                 ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
                 ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
-	    $this->addOutputFields($loopResultRow, $attributeCombination);
+            $this->addOutputFields($loopResultRow, $attributeCombination);
             $loopResult->addRow($loopResultRow);
         }
 

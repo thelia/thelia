@@ -122,7 +122,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("TIME_FORMAT", $result->getTimeFormat())
                 ->set("POSITION", $result->getPosition())
             ;
-	    $this->addOutputFields($loopResultRow, $result);
+            $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -117,7 +117,7 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set("PARENT", $orderProduct->getParent())
                 ->set("EAN_CODE", $orderProduct->getEanCode())
             ;
-	    $this->addOutputFields($loopResultRow, $orderProduct);
+            $this->addOutputFields($loopResultRow, $orderProduct);
 
             $loopResult->addRow($loopResultRow);
         }

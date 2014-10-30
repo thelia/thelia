@@ -71,7 +71,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
                 ->set("DESCRIPTION", $item->get_description())
                 ->set("DATE", $item->get_date('U'))
             ;
-	    $this->addOutputFields($loopResultRow, $item);
+            $this->addOutputFields($loopResultRow, $item);
 
             $loopResult->addRow($loopResultRow);
         }

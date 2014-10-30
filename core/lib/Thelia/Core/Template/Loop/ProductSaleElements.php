@@ -219,7 +219,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
                 ->set("PROMO_PRICE", $promoPrice)
                 ->set("PROMO_PRICE_TAX", $taxedPromoPrice - $promoPrice)
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice);
-	
+        
             $this->addOutputFields($loopResultRow, $PSEValue);
             $loopResult->addRow($loopResultRow);
         }

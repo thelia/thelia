@@ -211,7 +211,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $this->useFeaturePosition ? $feature->getPosition() : $feature->getVirtualColumn('position'))
             ;
-	    $this->addOutputFields($loopResultRow, $feature);
+            $this->addOutputFields($loopResultRow, $feature);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -86,7 +86,7 @@ class Delivery extends BaseSpecificModule
                         ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
                         ->set('POSTAGE', $postage)
                     ;
-		    $this->addOutputFields($loopResultRow, $deliveryModule);
+                    $this->addOutputFields($loopResultRow, $deliveryModule);
 
                     $loopResult->addRow($loopResultRow);
                 }

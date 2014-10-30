@@ -79,7 +79,7 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
                 ->set("LOGIN", $admin->getLogin())
                 ->set("LOCALE", $admin->getLocale())
             ;
-	    $this->addOutputFields($loopResultRow, $admin);
+            $this->addOutputFields($loopResultRow, $admin);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -82,7 +82,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("DESCRIPTION", $orderStatus->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $orderStatus->getVirtualColumn('i18n_POSTSCRIPTUM'))
             ;
-	    $this->addOutputFields($loopResultRow, $orderStatus);
+            $this->addOutputFields($loopResultRow, $orderStatus);
 
             $loopResult->addRow($loopResultRow);
         }

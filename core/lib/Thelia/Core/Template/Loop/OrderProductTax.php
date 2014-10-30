@@ -67,7 +67,7 @@ class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
                 ->set("AMOUNT", $orderProductTax->getAmount())
                 ->set("PROMO_AMOUNT", $orderProductTax->getPromoAmount())
             ;
-	    $this->addOutputFields($loopResultRow, $orderProductTax);
+            $this->addOutputFields($loopResultRow, $orderProductTax);
 
             $loopResult->addRow($loopResultRow);
         }
