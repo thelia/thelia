@@ -45,7 +45,6 @@ casper.test.begin('Cart', 5, function suite(test) {
 
     casper.thenOpen(thelia2_base_url + "cart", function() {
         this.echo(this.getTitle());
-        //this.echo(this.getHTML());
         test.assertExists("#cart .table-cart", "Cart table exists");
         test.assertElementCount("#cart .table-cart tbody tr h3.name a", 1, "Cart contains 1 product")
         var link = this.getElementInfo('#cart .table-cart tbody tr h3.name a');

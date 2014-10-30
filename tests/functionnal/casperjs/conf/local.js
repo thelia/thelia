@@ -32,4 +32,10 @@ casper.test.comment('Viewport size: '+ casper.options.viewportSize.width + 'x' +
 var thelia_default_timeout = 15000;
 casper.test.comment('Default timeout: '+ thelia_default_timeout + ' ms');
 
+// Email created during front/20_register.js test
+var thelia_customer = {
+    "email": null,
+    "password": "thelia"
+};
+
 casper.test.done();

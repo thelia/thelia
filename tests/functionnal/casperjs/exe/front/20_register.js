@@ -48,8 +48,6 @@ casper.test.begin('Register', 15, function suite(test) {
         test.assertExists('.group-password.has-error', 'password can not be empty');
         test.assertExists('.group-password_confirm.has-error', 'password confirm can not be empty');
 
-        newEmail = Math.random().toString(36).substr(2,7) + '@thelia.net';
-
         this.fill('form#form-register', {
             'thelia_customer_create[title]': 1,
             'thelia_customer_create[firstname]': 'thelia',
@@ -76,6 +74,11 @@ casper.test.begin('Register', 15, function suite(test) {
         '.group-email .help-block',
         function(){
             test.assertSelectorHasText('.group-email .help-block', 'This email already exists.');
+
+            // generate a new email and save it
+            // we're going to use this new account later
+            newEmail = Math.random().toString(36).substr(2,7) + '@thelia.net';
+            thelia_customer.email = newEmail;
 
             this.fill('form#form-register', {
                 'thelia_customer_create[email]': newEmail,
