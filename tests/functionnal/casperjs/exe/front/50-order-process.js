@@ -31,11 +31,18 @@ casper.test.begin('Order process', 4, function suite(test) {
         }
     });
 
-    casper.wait(thelia_default_timeout, function(){
-        test.assertTitle("My order - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
+    casper.waitForSelector(
+        'title',
+        function(){
+            test.assertTitle("My order - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
 
-        test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
-    });
+            test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
+        },
+        function(){
+            this.die("The 'title' tag didn't change");
+        },
+        thelia_default_timeout
+    );
 
     casper.run(function() {
         test.done();

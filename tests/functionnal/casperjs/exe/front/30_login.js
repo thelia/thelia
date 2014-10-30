@@ -29,39 +29,56 @@ casper.test.begin('Login', 5, function suite(test) {
 
     });
 
-    casper.wait(thelia_default_timeout, function(){
+    casper.waitForSelector(
+        'form#form-login .alert-danger',
+        function(){
+            this.capture(screenshot_dir + 'front/30_login-ko.png');
 
-        this.capture(screenshot_dir + 'front/30_login-ko.png');
+            test.assertSelectorHasText('form#form-login .alert-danger', 'Wrong email or password. Please try again');
 
-        test.assertSelectorHasText('form#form-login .alert-danger', 'Wrong email or password. Please try again');
+            casper.test.comment('== Login with a good account');
 
-        casper.test.comment('== Login with a good account');
+            casper.evaluate(function(username, password) {
+                document.querySelector('#email').value = username;
+                document.querySelector('#password').disabled = false;
+                document.querySelector('#password').value = password;
+            }, 'test@thelia.net', 'azerty');
 
-        casper.evaluate(function(username, password) {
-            document.querySelector('#email').value = username;
-            document.querySelector('#password').disabled = false;
-            document.querySelector('#password').value = password;
-        }, 'test@thelia.net', 'azerty');
+            this.click('form#form-login button[type="submit"]');
+        },
+        function(){
+            this.die("Selector 'form#form-login .alert-danger' not found. It should contain the message 'Wrong email or password. Please try again'");
+        },
+        thelia_default_timeout
+    );
 
-        this.click('form#form-login button[type="submit"]');
-    });
 
+    casper.waitForSelector(
+        'a.logout',
+        function(){
+            this.capture(screenshot_dir + 'front/30_login-ok.png');
+            test.assertExists('a.logout', 'Logout button exists');
 
-    casper.wait(thelia_default_timeout, function(){
+            casper.test.comment('== Logout');
 
-        this.capture(screenshot_dir + 'front/30_login-ok.png');
-        test.assertExists('a.logout', 'Logout button exists');
+            this.click('a.logout');
+        },
+        function(){
+            this.die("Logout button not found");
+        },
+        thelia_default_timeout
+    );
 
-        casper.test.comment('== Logout');
-
-        this.click('a.logout');
-    });
-
-    casper.wait(thelia_default_timeout, function(){
-
-        test.assertExists('a.login', 'Login button exists');
-
-    });
+    casper.waitForSelector(
+        'a.login',
+        function() {
+            test.assertExists('a.login', 'Login button exists');
+        },
+        function() {
+            this.die('Login button not found');
+        },
+        thelia_default_timeout
+    );
 
 
     casper.run(function() {
