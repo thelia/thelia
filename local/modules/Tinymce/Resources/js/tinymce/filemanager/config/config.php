@@ -13,19 +13,23 @@ $thelia = new Thelia($env, false);
 
 $thelia->boot();
 
-$httpKernel = $thelia->getContainer()->get('http_kernel');
+$eventDispatcher = $thelia->getContainer()->get('event_dispatcher');
+$thelia->getContainer()->get('thelia.translator');
+$thelia->getContainer()->get('thelia.url.manager');
+$thelia->getContainer()->enterScope('request');
+$thelia->getContainer()->set('request', $request, 'request');
+$event = new \Thelia\Core\Event\SessionEvent(THELIA_CACHE_DIR . $env, false, $env);
 
-$httpKernel->getContainer()->enterScope('request');
-$httpKernel->getContainer()->set('request', $request, 'request');
-$httpKernel->initSession($request);
+$eventDispatcher->dispatch(\Thelia\Core\TheliaKernelEvents::SESSION, $event);
+$session = $event->getSession();
+$session->start();
+$request->setSession($session);
 
 /** @var \Thelia\Core\Security\SecurityContext $securityContext */
-$securityContext = $httpKernel->getContainer()->get('thelia.securityContext');
+$securityContext = $thelia->getContainer()->get('thelia.securityContext');
 
 // We just check the current user has the ADMIN role.
-$isGranted = $securityContext->isGranted(
-    array('ADMIN'), array(), array(), array()
-);
+$isGranted = $securityContext->isGranted(['ADMIN'], [], [], []);
 
 if (false === $isGranted) {
     echo "Sorry, it seems that you're not allowed to use this function. ADMIN role is required.";
