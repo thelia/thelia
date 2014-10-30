@@ -111,6 +111,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
+            $this->addOutputFields($loopResultRow, $cartItem);
             $loopResult->addRow($loopResultRow);
         }
 

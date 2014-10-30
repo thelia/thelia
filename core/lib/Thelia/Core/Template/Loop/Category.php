@@ -260,6 +260,8 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ;
             }
 
+	    $this->addOutputFields($loopResultRow, $category);
+
             $loopResult->addRow($loopResultRow);
         }
 
