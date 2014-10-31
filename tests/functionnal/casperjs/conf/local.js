@@ -28,8 +28,14 @@ casper.test.comment('Screenshots will be saved under : '+ screenshot_dir);
 casper.options.viewportSize = {width: 1024, height: 768};
 casper.test.comment('Viewport size: '+ casper.options.viewportSize.width + 'x' + casper.options.viewportSize.height);
 
-// Default time to wait in ms
+// Default timeout in ms
 var thelia_default_timeout = 15000;
 casper.test.comment('Default timeout: '+ thelia_default_timeout + ' ms');
+
+// Email created during front/20_register.js test
+var thelia_customer = {
+    "email": null,
+    "password": "thelia"
+};
 
 casper.test.done();
