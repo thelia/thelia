@@ -47,7 +47,7 @@ class HomeController extends BaseAdminController
             'http' => [
                 'method' => 'GET',
                 'header' => "User-Agent: Thelia version ".Thelia::THELIA_VERSION."\r\n".
-                    "Referer: ".$this->getRequest()->getHttpHost()."\r\n".
+                    "Referer: ".$this->getRequest()->getSchemeAndHttpHost()."\r\n".
                     "Accept-Language: ".$this->getRequest()->getSession()->getLang()->getCode()."\r\n"
             ]
         ];
