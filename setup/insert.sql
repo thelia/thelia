@@ -1717,7 +1717,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (1301, 'fr_FR', 'Promotion - formulaire de suppression', '', ''),
 (1302, 'en_US', 'Sales - JavaScript', '', ''),
 (1302, 'fr_FR', 'Promotions - JavaScript', '', ''),
-(1303, 'en_US', 'Product - at te bottom of a product combination', '', ''),
+(1303, 'en_US', 'Product - at the bottom of a product combination', '', ''),
 (1303, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', ''),
 
 (2001, 'fr_FR', 'Facture - CSS', '', ''),

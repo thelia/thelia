@@ -42,6 +42,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+13, 'sale.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+14, 'sale.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+15, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -75,6 +76,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+14, 'fr_FR', 'Promotion - formulaire de suppression', '', ''),
   (@max_id+15, 'en_US', 'Sales - JavaScript', '', ''),
   (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', '')
+  (@max_id+16, 'en_US', 'Product - at the bottom of a product combination', '', ''),
+  (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', '')
 ;
 
 # ======================================================================================================================
