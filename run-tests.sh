@@ -15,6 +15,10 @@ phpunit
 echo "restore DB"
 mysql -h localhost -u $DB_USER thelia <../thelia.sql
 
+echo "deactivate modules only needed by phpunit tests"
+php Thelia module:refresh
+php Thelia module:deactivate HookTest
+
 echo "Clearing cache"
 php Thelia cache:clear --env=prod
 
