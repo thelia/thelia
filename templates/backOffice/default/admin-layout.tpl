@@ -75,7 +75,7 @@
 		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
 
                         <div class="clearfix pull-right hidden-xs">
-                            <div class="button-toolbar pull-righ" role="toolbar">
+                            <div class="button-toolbar pull-right" role="toolbar">
 
                                 {hook name="main.topbar-top" }
 
@@ -85,7 +85,7 @@
                                     <button class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
                                     </button>
-                                    <ul class="dropdown-menu">
+                                    <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
                                         <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
                                     </ul>
@@ -390,9 +390,23 @@
     {* A basic brandbar is displayed if user is not connected *}
 
 	{elseloop rel="top-bar-auth"}
-	    <div class="brandbar brandbar-wide container">
-	        <a class="navbar-brand" href="{url path='/admin'}">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, the open source e-commerce solution'}" />{/images}</a>
-	    </div>
+    <div class="topbar">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-md-12 clearfix">
+                    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
+                    <div class="clearfix pull-right hidden-xs">
+                        <div class="button-toolbar pull-right" role="toolbar">
+                            <div class="btn-group">
+                                <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 	{/elseloop}
 
     {* -- Main page content section ----------------------------------------- *}
