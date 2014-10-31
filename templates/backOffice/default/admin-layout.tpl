@@ -443,18 +443,28 @@
     <script>
         (function($) {
             $(document).ready(function(){
-               var testModal = $(".modal-force-show");
-               if(testModal.length > 0) {
-                   testModal.modal("show");
-               }
+                var testModal = $(".modal-force-show");
+                if(testModal.length > 0) {
+                    testModal.modal("show");
+                }
+
+                // Autofocus first form field on modal
+                var $modal = $('.modal');
+                if ($modal.length > 0) {
+                    $modal.on('shown.bs.modal', function() {
+                        var $firstField = $('input:visible:first', $modal);
+                        console.log($firstField);
+                        $firstField.focus();
+                    });
+                }
             });
         })(jQuery);
     </script>
 
 	{* Modules scripts are included now *}
-	{hook name='main.footer-js' location="footer_js"}
+                {hook name='main.footer-js' location="footer_js"}
 
-    {block name="javascript-last-call"}{/block}
-</body>
-</html>
+                {block name="javascript-last-call"}{/block}
+                </body>
+         </html>
 
