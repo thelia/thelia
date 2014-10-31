@@ -115,6 +115,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $featureAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $featureAv->getPosition());
+            $this->addOutputFields($loopResultRow, $featureAv);
 
             $loopResult->addRow($loopResultRow);
         }

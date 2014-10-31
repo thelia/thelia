@@ -145,6 +145,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("TITLE", $tax->getVirtualColumn('i18n_TITLE'))
                 ->set("DESCRIPTION", $tax->getVirtualColumn('i18n_DESCRIPTION'))
             ;
+            $this->addOutputFields($loopResultRow, $tax);
 
             $loopResult->addRow($loopResultRow);
         }

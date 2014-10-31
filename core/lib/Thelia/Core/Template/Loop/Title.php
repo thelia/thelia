@@ -75,6 +75,7 @@ class Title extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'))
                 ->set("POSITION", $title->getPosition());
+            $this->addOutputFields($loopResultRow, $title);
 
             $loopResult->addRow($loopResultRow);
         }

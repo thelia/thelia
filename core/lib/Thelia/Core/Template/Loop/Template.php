@@ -81,6 +81,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
                 ->set("RELATIVE_PATH", $template->getPath())
                 ->set("ABSOLUTE_PATH", $template->getAbsolutePath())
             ;
+            $this->addOutputFields($loopResultRow, $template);
 
             $loopResult->addRow($loopResultRow);
         }

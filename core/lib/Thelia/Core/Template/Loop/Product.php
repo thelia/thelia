@@ -234,7 +234,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("PRODUCT_SALE_ELEMENT", $product->getVirtualColumn('pse_id'))
                 ->set("PSE_COUNT", $product->getVirtualColumn('pse_count'))
             ;
-
+            $this->addOutputFields($loopResultRow, $product);
 
             $loopResult->addRow($this->associateValues($loopResultRow, $product, $default_category_id));
         }

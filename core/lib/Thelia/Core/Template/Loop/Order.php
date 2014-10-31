@@ -266,6 +266,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('TOTAL_AMOUNT', $amount - $tax)
                 ->set('TOTAL_TAXED_AMOUNT', $amount)
             ;
+            $this->addOutputFields($loopResultRow, $order);
 
             $loopResult->addRow($loopResultRow);
         }

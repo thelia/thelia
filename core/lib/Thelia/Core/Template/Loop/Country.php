@@ -104,6 +104,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
                 ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
             ;
+            $this->addOutputFields($loopResultRow, $country);
 
             $loopResult->addRow($loopResultRow);
         }

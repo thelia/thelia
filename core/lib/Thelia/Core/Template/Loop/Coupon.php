@@ -244,6 +244,7 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("FREE_SHIPPING_FOR_MODULES_LIST", implode(',', $freeShippingForModulesIds))
                 ->set("DISCOUNT_AMOUNT", $discount)
             ;
+            $this->addOutputFields($loopResultRow, $coupon);
 
             $loopResult->addRow($loopResultRow);
         }

@@ -157,6 +157,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
                 ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $attributeAv->getPosition())
             ;
+            $this->addOutputFields($loopResultRow, $attributeAv);
 
             $loopResult->addRow($loopResultRow);
         }

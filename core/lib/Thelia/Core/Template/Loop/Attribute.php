@@ -183,6 +183,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("POSTSCRIPTUM", $attribute->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $this->useAttributePosistion ? $attribute->getPosition() : $attribute->getVirtualColumn('position'))
             ;
+            $this->addOutputFields($loopResultRow, $attribute);
 
             $loopResult->addRow($loopResultRow);
         }
