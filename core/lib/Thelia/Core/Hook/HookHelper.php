@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Hook;
 
-use Thelia\Core\Template\Smarty\SmartyHelper;
+use TheliaSmarty\Template\SmartyHelper;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;

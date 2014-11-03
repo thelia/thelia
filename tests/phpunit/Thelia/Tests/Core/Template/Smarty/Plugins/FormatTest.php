@@ -15,10 +15,10 @@ namespace Thelia\Tests\Core\Template\Smarty\Plugins;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Template\Smarty\Plugins\Format;
+use TheliaSmarty\Template\Plugins\Format;
 
 /**
- * @coversDefaultClass \Thelia\Core\Template\Smarty\Plugins\Format
+ * @coversDefaultClass \TheliaSmarty\Template\Plugins\Format
  */
 class FormatTest extends \PHPUnit_Framework_TestCase
 {
@@ -42,7 +42,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $dateTime = new \DateTime();
         $format = "Y-m-d H:i:s";
 
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatDate(array(
            "date" => $dateTime,
@@ -65,7 +65,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $langMock = $this->getLangMock();
         $this->request->getSession()->setLang($langMock);
 
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatDate(array("date" => $dateTime));
 
@@ -85,7 +85,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $langMock = $this->getLangMock();
         $this->request->getSession()->setLang($langMock);
 
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatDate(array(
             "date" => $dateTime,
@@ -145,7 +145,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      * test formatDate without mandatory parameters
      *
      * @covers ::formatDate
-     * @expectedException \Thelia\Core\Template\Smarty\Exception\SmartyPluginException
+     * @expectedException \TheliaSmarty\Template\Exception\SmartyPluginException
      */
     public function testFormatDateWithoutDate()
     {
@@ -169,7 +169,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         // 2014-06-17
         $dateTime->setTimestamp(1402987842);
 
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatDate(array(
                 'date' => $dateTime,
@@ -187,7 +187,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatNumberWithoutParams()
     {
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatNumber(array());
 
@@ -201,7 +201,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
      */
     public function testFormatNumberWithAllParams()
     {
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $number = 1256.12;
         $decimals = 1;
@@ -227,7 +227,7 @@ class FormatTest extends \PHPUnit_Framework_TestCase
         $langMock = $this->getLangMock();
         $this->request->getSession()->setLang($langMock);
 
-        $formatClass = new Format($this->request);
+        $formatClass = new \TheliaSmarty\Template\Plugins\Format($this->request);
 
         $render = $formatClass->formatNumber(array(
             "number" => $number

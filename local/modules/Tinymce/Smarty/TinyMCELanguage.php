@@ -16,8 +16,8 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 class TinyMCELanguage extends AbstractSmartyPlugin
 {
@@ -63,7 +63,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'tinymce_lang', $this, 'guessTinyMCELanguage'),
+            new \TheliaSmarty\Template\SmartyPluginDescriptor('function', 'tinymce_lang', $this, 'guessTinyMCELanguage'),
         );
     }
 }

@@ -12,7 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Smarty;
 
-use Thelia\Core\Template\Smarty\SmartyHelper;
+use TheliaSmarty\Template\SmartyHelper;
 
 /**
  * Class SmartyHelperTest
@@ -81,7 +81,7 @@ cillum dolore {hook name={intl l="test"}} eu fugiat nulla pariatur. Excepteur si
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = SmartyHelper::getFunctionsDefinition($content);
+        $functions = \TheliaSmarty\Template\SmartyHelper::getFunctionsDefinition($content);
 
         $this->assertCount(2, $functions);
 

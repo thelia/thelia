@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
-use Thelia\Core\Template\Smarty\SmartyParser;
+use TheliaSmarty\Template\SmartyParser;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -205,7 +205,7 @@ abstract class BaseHook
     }
 
     /**
-     * @param \Thelia\Core\Template\Smarty\SmartyParser $parser
+     * @param \TheliaSmarty\Template\SmartyParser $parser
      */
     public function setParser($parser)
     {
@@ -213,7 +213,7 @@ abstract class BaseHook
     }
 
     /**
-     * @return \Thelia\Core\Template\Smarty\SmartyParser
+     * @return \TheliaSmarty\Template\SmartyParser
      */
     public function getParser()
     {

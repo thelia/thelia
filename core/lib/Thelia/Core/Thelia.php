@@ -176,8 +176,7 @@ class Thelia extends Kernel
 
             $translationDirs = array();
 
-            /** @var ParserInterface $parser */
-            $parser = $container->getDefinition('thelia.parser');
+
 
             /** @var Module $module */
             foreach ($modules as $module) {
@@ -237,7 +236,8 @@ class Thelia extends Kernel
                         $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
                             $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
                     }
-
+                    /** @var ParserInterface $parser */
+                    $parser = $container->getDefinition('thelia.parser');
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
                     Tlog::getInstance()->addError(

@@ -23,7 +23,6 @@ use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormExtensionPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
 use Thelia\Core\DependencyInjection\Compiler\StackPass;
@@ -58,7 +57,6 @@ class TheliaBundle extends Bundle
         $container
             ->addCompilerPass(new TranslatorPass())
             ->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
-            ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())

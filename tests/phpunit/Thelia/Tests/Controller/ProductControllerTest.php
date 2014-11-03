@@ -32,7 +32,7 @@ class ProductControllerTest extends ControllerTestBase
      */
     protected function buildContainer(ContainerBuilder $container)
     {
-        $smarty = $this->getMockBuilder("Thelia\\Core\\Template\\Smarty\\SmartyParser")
+        $smarty = $this->getMockBuilder("TheliaSmarty\\Template\\SmartyParser")
             ->disableOriginalConstructor()
             ->getMock()
         ;

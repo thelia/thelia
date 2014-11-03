@@ -15,7 +15,7 @@ namespace Thelia\Tests\Model;
 use Thelia\Model\ConfigQuery;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Model\Message as ModelMessage;
-use Thelia\Core\Template\Smarty\SmartyParser;
+use TheliaSmarty\Template\SmartyParser;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TemplateHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

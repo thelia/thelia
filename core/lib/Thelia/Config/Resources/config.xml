@@ -74,6 +74,11 @@
             <argument type="service" id="request" />
         </service>
 
+        <!--  The assets manager -->
+        <service id="assetic.asset.manager" class="Thelia\Core\Template\Assets\AsseticAssetManager" >
+            <argument>%kernel.debug%</argument>
+        </service>
+
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
@@ -99,21 +104,7 @@
             <argument type="service" id="request" />
 		</service>
 
-		<!--  Parser context -->
 
-        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
-        	<argument type="service" id="request" />
-        </service>
-
-		<!-- Parser configuration -->
-
-        <service id="thelia.parser" class="Thelia\Core\Template\Smarty\SmartyParser" scope="request">
-            <argument type="service" id="request" />
-            <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.parser.context"/>
-            <argument >%kernel.environment%</argument>
-            <argument >%kernel.debug%</argument>
-        </service>
 
         <!-- The file manager -->
         <service id="thelia.file_manager" class="Thelia\Files\FileManager">
