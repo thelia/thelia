@@ -197,7 +197,6 @@ $(function() {
     // vitual product
     $('#virtual_field').change(function(event) {
         var $virtual = $(this);
-
         if ($virtual.prop("checked")){
             var $virtualDocumentsSelector;
             $('#virtual-product-file').removeClass("hidden");
@@ -216,7 +215,7 @@ $(function() {
                             virtualDocumentsSelector,
                             option;
                         virtualDocumentsSelector = $virtualDocumentsSelector.get(0);
-                        virtualDocumentsSelector.options.length = 1
+                        virtualDocumentsSelector.options.length = 1;
                         if (data.length == 0){
                             $('#virtual-product-message').removeClass('hidden');
                         } else {
@@ -225,7 +224,8 @@ $(function() {
                                 if (data[i].selected){
                                     selectedOption = i + 1;
                                 }
-                                virtualDocumentsSelector.options[virtualDocumentsSelector.options.length] = new Option(data[i].title, data[i].id);
+                                virtualDocumentsSelector.options[virtualDocumentsSelector.options.length]
+                                    = new Option(data[i].title + ' (' + data[i].file + ')', data[i].id);
                             }
                             virtualDocumentsSelector.selectedIndex = selectedOption;
 

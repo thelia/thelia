@@ -298,6 +298,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow
                     ->set("ID", $result->getId())
                     ->set("LOCALE", $this->locale)
+                    ->set("IMAGE_FILE", $result->getFile())
                     ->set("IMAGE_URL", $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
