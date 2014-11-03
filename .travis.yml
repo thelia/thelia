@@ -22,6 +22,7 @@ before_script:
   - php Thelia module:activate Cheque
   - php Thelia module:activate HookTest
   - php Thelia module:activate VirtualProductDelivery
+  - php Thelia admin:create --login_name thelia2 --password thelia2 --last_name thelia2 --first_name thelia2
   - "export PHANTOMJS_EXECUTABLE='phantomjs --local-to-remote-url-access=yes --ignore-ssl-errors=yes'"
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"

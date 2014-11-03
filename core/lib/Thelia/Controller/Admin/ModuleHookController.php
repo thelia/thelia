@@ -50,7 +50,7 @@ class ModuleHookController extends AbstractCrudController
 
     public function indexAction()
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::VIEW)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
             return $response;
         }
 
@@ -59,7 +59,7 @@ class ModuleHookController extends AbstractCrudController
 
     public function toggleActivationAction($module_hook_id)
     {
-        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, array(), AccessManager::UPDATE)) {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::UPDATE)) {
             return $response;
         }
 
@@ -75,9 +75,7 @@ class ModuleHookController extends AbstractCrudController
 
         if ($this->getRequest()->isXmlHttpRequest()) {
             if ($message) {
-                $response = $this->jsonResponse(json_encode(array(
-                    "error" => $message
-                )), 500);
+                $response = $this->jsonResponse(json_encode([ "error" => $message]), 500);
             } else {
                 $response = $this->nullResponse();
             }
@@ -120,13 +118,13 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        $data = array(
+        $data = [
             'id'        => $object->getId(),
             'hook_id'   => $object->getHookId(),
             'classname' => $object->getClassname(),
             'method'    => $object->getMethod(),
             'active'    => $object->getActive(),
-        );
+        ];
 
         return new ModuleHookModificationForm($this->getRequest(), 'form', $data);
     }
@@ -241,7 +239,7 @@ class ModuleHookController extends AbstractCrudController
     {
         return $this->render(
             'module-hooks',
-            array('module_order' => $currentOrder)
+            ['module_order' => $currentOrder]
         );
     }
 
@@ -255,9 +253,9 @@ class ModuleHookController extends AbstractCrudController
 
     protected function getEditionArgument()
     {
-        return array(
+        return [
             'module_hook_id' => $this->getRequest()->get('module_hook_id', 0)
-        );
+        ];
     }
 
     /**
@@ -282,13 +280,13 @@ class ModuleHookController extends AbstractCrudController
 
     protected function getViewArguments()
     {
-        return array();
+        return [];
     }
 
     protected function getRouteArguments($module_hook_id = null)
     {
-        return array(
-            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id,
-        );
+        return [
+            'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id
+        ];
     }
 }

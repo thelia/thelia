@@ -5,7 +5,7 @@ casper.test.begin('Register', 15, function suite(test) {
     var newEmail = '';
 
     casper.start(thelia2_base_url + "register", function() {
-        test.assertTitle("Register - Thelia V2", "title is the one expected");
+        test.assertTitle("Register - " + thelia2_store_name, "title is the one expected");
         test.assertExists('form#form-register', "register form is found");
         this.capture(screenshot_dir + 'front/20_register.png');
 

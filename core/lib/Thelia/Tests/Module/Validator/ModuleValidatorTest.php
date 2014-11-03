@@ -183,7 +183,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will(
                 $this->returnCallback(
-                    function($l, $p) {
+                    function ($l, $p) {
                         foreach ($p as $pk => $pv) {
                             $l = str_replace($pk, $pv, $l);
                         }

@@ -37,7 +37,7 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
     protected $timestampable = true;
 
     /**
-     * @return ArgumentCollection
+     * {@inheritdoc}
      */
     protected function getArgDefinitions()
     {
@@ -52,18 +52,19 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'hook_type',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array(
+                    new Type\EnumListType([
                         TemplateDefinition::FRONT_OFFICE,
                         TemplateDefinition::BACK_OFFICE,
                         TemplateDefinition::EMAIL,
                         TemplateDefinition::PDF,
-                    ))
+                    ])
                 )
             ),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'enabled', 'enabled_reverse'))
+                    new Type\EnumListType(['id', 'id_reverse', 'code', 'code_reverse', 'alpha', 'alpha_reverse',
+                        'manual', 'manual_reverse', 'enabled', 'enabled_reverse', 'native', 'native_reverse' ])
                 ),
                 'id'
             ),
@@ -72,12 +73,15 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildModelCriteria()
     {
         $search = HookQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION'));
+        $this->configureI18nProcessing($search, ['TITLE', 'CHAPO', 'DESCRIPTION']);
 
         $id = $this->getId();
 
@@ -139,12 +143,22 @@ class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
                 case "enabled_reverse":
                     $search->orderByActivate(Criteria::DESC);
                     break;
+                case "native":
+                    $search->orderByNative(Criteria::ASC);
+                    break;
+                case "native_reverse":
+                    $search->orderByNative(Criteria::DESC);
+                    break;
             }
         }
 
         return $search;
     }
 
+
+    /**
+     * {@inheritdoc}
+     */
     public function parseResults(LoopResult $loopResult)
     {
         /** @var \Thelia\Model\Hook $hook */

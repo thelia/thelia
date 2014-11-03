@@ -35,6 +35,14 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+6, 'order-edit.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+7, 'order-edit.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+8, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+9, 'sales.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+10, 'sales.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+11, 'sales.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+12, 'sales.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+13, 'sale.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+14, 'sale.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+15, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -46,7 +54,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+3, 'fr_FR', 'Commande - facture haut', '', ''),
   (@max_id+4, 'en_US', 'Order - bill bottom', '', ''),
   (@max_id+4, 'fr_FR', 'Commande - facture bas', '', ''),
-
   (@max_id+5, 'en_US', 'Order - Before product list', '', ''),
   (@max_id+5, 'fr_FR', 'Commande - Avant la liste des produits', '', ''),
   (@max_id+6, 'en_US', 'Order - Before starting product row', '', ''),
@@ -54,7 +61,23 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+7, 'en_US', 'Order - After closing product row', '', ''),
   (@max_id+7, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
   (@max_id+8, 'en_US', 'Order - After product list', '', ''),
-  (@max_id+8, 'fr_FR', 'Commande - Après la liste des produits', '', '')
+  (@max_id+8, 'fr_FR', 'Commande - Après la liste des produits', '', ''),
+  (@max_id+9, 'en_US', 'Sales - at the top', '', ''),
+  (@max_id+9, 'fr_FR', 'Promotions - en haut', '', ''),
+  (@max_id+10, 'en_US', 'Sales - table header', '', ''),
+  (@max_id+10, 'fr_FR', 'Promotions - colonne tableau', '', ''),
+  (@max_id+11, 'en_US', 'Sales - table row', '', ''),
+  (@max_id+11, 'fr_FR', 'Promotions - ligne du tableau', '', ''),
+  (@max_id+12, 'en_US', 'Sales - at the bottom', '', ''),
+  (@max_id+12, 'fr_FR', 'Promotions - en bas', '', ''),
+  (@max_id+13, 'en_US', 'Sale - create form', '', ''),
+  (@max_id+13, 'fr_FR', 'Promotion - formulaire de création', '', ''),
+  (@max_id+14, 'en_US', 'Sale - delete form', '', ''),
+  (@max_id+14, 'fr_FR', 'Promotion - formulaire de suppression', '', ''),
+  (@max_id+15, 'en_US', 'Sales - JavaScript', '', ''),
+  (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', '')
+  (@max_id+16, 'en_US', 'Product - at the bottom of a product combination', '', ''),
+  (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', '')
 ;
 
 # ======================================================================================================================

@@ -39,10 +39,20 @@
 
             <div class="col-md-12">
             {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+
             {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}
 
+            </div>
+
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <ul>
+                        <li><a href="{url path='/admin/hooks'}" class="text-info">{intl l="Manage hooks"}</a></li>
+                        <li><a href="{url path='/admin/module-hooks'}" class="text-info">{intl l="Manage hooks positions"}</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 

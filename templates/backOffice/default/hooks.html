@@ -67,11 +67,51 @@
                                 </caption>
                                 <thead>
                                     <tr>
-                                        <th>{intl l="ID"}</th>
-                                        <th>{intl l="Code"}</th>
-                                        <th>{intl l="Title"}</th>
-                                        <th>{intl l="Official"}</th>
-                                        <th>{intl l="Active"}</th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='id'
+                                            reverse_order='id_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l='ID'}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='code'
+                                            reverse_order='code_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l='Code'}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='alpha'
+                                            reverse_order='alpha_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Title"}"
+                                            }
+                                            </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='native'
+                                            reverse_order='native_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Official"}"
+                                            }
+                                        </th>
+                                        <th>
+                                            {admin_sortable_header
+                                            current_order=$order
+                                            order='enabled'
+                                            reverse_order='enabled_reverse'
+                                            path='/admin/hooks'
+                                            label="{intl l="Active"}"
+                                            }
+                                        </th>
 
                                         {hook name="hooks.table-header" location="hooks_table_header" }
 
@@ -93,7 +133,7 @@
                                         {/if}
                                     </td>
                                     <td>
-                                        <div class="make-switch switch-small hook-activation" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                        <div class="make-switch switch-small hook-activation u-toggle-state" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>" data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
                                             <input type="checkbox" {if $ACTIVE}checked="checked"{/if} />
                                         </div>
                                     </td>
@@ -134,6 +174,16 @@
                 </form>
 
             </div>
+
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <ul>
+                        <li><a href="{url path='/admin/modules'}" class="text-info">{intl l="Manage modules"}</a></li>
+                        <li><a href="{url path='/admin/module-hooks'}" class="text-info">{intl l="Manage hooks positions"}</a></li>
+                    </ul>
+                </div>
+            </div>
+
 
         </div>
 

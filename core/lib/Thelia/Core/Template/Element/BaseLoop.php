@@ -541,7 +541,7 @@ abstract class BaseLoop
      * @param LoopResultRow $loopResultRow
      * @param object|array $item
      *
-     */    
+     */
     protected function addOutputFields(LoopResultRow $loopResultRow, $item) { }
 
 }

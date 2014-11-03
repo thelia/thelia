@@ -44,7 +44,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta charset="utf-8">
 
     {* Page Title *}
-    <title>{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{/if}{/strip}{/block}</title>
+    <title>{block name="page-title"}{strip}{if $page_title}{$page_title}{elseif $breadcrumbs}{foreach from=$breadcrumbs|array_reverse item=breadcrumb}{$breadcrumb.title|unescape} - {/foreach}{$store_name}{else}{$store_name}{/if}{/strip}{/block}</title>
 
     {* Meta Tags *}
     <meta name="generator" content="{intl l='Thelia V2'}">
@@ -104,92 +104,12 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <a class="navbar-brand" href="{navigate to="index"}">{$store_name}</a>
             </div>
 
-            <!-- Place everything within .nav-collapse to hide it until above 768px -->
+            {ifhook rel="main.navbar-secondary"}
+            {* Place everything within .nav-collapse to hide it until above 768px *}
             <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
                 {hook name="main.navbar-secondary"}
-                {elsehook rel="main.navbar-secondary"}
-                    {if {count type="currency" exclude={currency attr="id"}} != 0 }
-                    <ul class="nav navbar-nav navbar-currency navbar-left">
-                        <li class="dropdown">
-                            <a href="{url path="/currency"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Currency:"}--> {currency attr="code"}</a>
-                            <ul class="dropdown-menu">
-                                {loop type="currency" name="currency_available" exclude={currency attr="id"} }
-                                    <li><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
-                                {/loop}
-                            </ul>
-                        </li>
-                    </ul>
-                    {/if}
-                    {if {count type="lang" exclude={lang attr='id'}} != 0 }
-                    <ul class="nav navbar-nav navbar-lang navbar-left">
-                        <li class="dropdown">
-                            <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown"><!--{intl l="Language:"}--> {lang attr="title"}</a>
-                            <ul class="dropdown-menu">
-                                {loop type="lang" name="lang_available" exclude={lang attr="id"}}
-                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
-                                {/loop}
-                            </ul>
-                        </li>
-                    </ul>
-                    {/if}
-                    <div class="search-container navbar-form navbar-left">
-                        <form id="form-search" action="{url path="/search"}" method="get" role="search" aria-labelledby="search-label">
-                            <label id="search-label" for="q">{intl l="Search a product"}</label>
-                            <div class="input-group">
-                                <input type="search" name="q" id="q" placeholder="{intl l="Search..."}" class="form-control" autocomplete="off" aria-required="true" required pattern=".{ldelim}2,{rdelim}" title="{intl l="Minimum 2 characters."}">
-                                <div class="input-group-btn">
-                                    <button type="submit" class="btn btn-search"><i class="icon-search"></i> <span>{intl l="Search"}</span></button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <ul class="nav navbar-nav navbar-cart navbar-right">
-                        {include file="includes/mini-cart.html" nocache}
-                    </ul>
-                    <ul class="nav navbar-nav navbar-customer navbar-right">
-                        {loop type="auth" name="customer_info_block" role="CUSTOMER"}
-                            <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
-                            <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
-                        {/loop}
-                        {elseloop rel="customer_info_block"}
-                        <li><a href="{url path="/register"}" class="register">{intl l="Register!"}</a></li>
-                        <li class="dropdown">
-                            <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!"}</a>
-                            <div class="dropdown-menu">
-                                {form name="thelia.front.customer.login"}
-                                <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
-                                    {form_hidden_fields form=$form}
-                                    {form_field form=$form field="success_url"}
-                                        <input type="hidden" name="{$name}" value="{navigate to="current"}">
-                                    {/form_field}
-                                    {form_field form=$form field="email"}
-                                    <div class="form-group group-email">
-                                        <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                        <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
-                                    </div>
-                                    {/form_field}
-                                    {form_field form=$form field="password"}
-                                    <div class="form-group group-password">
-                                        <label for="{$label_attr.for}-mini">{intl l="Password"}</label>
-                                        <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
-                                    </div>
-                                    {/form_field}
-                                    {form_field form=$form field="account"}
-                                    <input type="hidden" name="{$name}" value="1">
-                                    {/form_field}
-                                    <div class="form-group group-btn">
-                                        <button type="submit" class="btn btn-login-mini">{intl l="Sign In" d="hookcustomer.fo.default"}</button>
-                                        <a href="{url path="/register"}" class="btn btn-register-mini">{intl l="Register" d="hookcustomer.fo.default"}</a>
-                                    </div>
-                                    <a href="{url path="/password"}" class="mini-forgot-password">{intl l="Forgot your Password?"}</a>
-                                </form>
-                                {/form}
-                        </div>
-                        </li>
-                        {/elseloop}
-                    </ul>
-                {/elsehook}
             </nav>
+            {/ifhook}
         </div>
     </div>
 
@@ -202,29 +122,6 @@ GNU General Public License : http://www.gnu.org/licenses/
                 </a>
             </h1>
             {hook name="main.navbar-primary"}
-            {elsehook rel="main.navbar-primary"}
-            <nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-primary">
-                            <span class="sr-only">{intl l="Toggle navigation" d="hooknavigation.fo.default"}</span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                            <span class="icon-bar"></span>
-                        </button>
-                        <a class="navbar-brand" href="{navigate to="index"}">{intl l="Categories" d="hooknavigation.fo.default"}</a>
-                    </div>
-                    <div class="collapse navbar-collapse" id="navbar-primary">
-                        <ul class="nav navbar-nav navbar-categories">
-                            <li><a href="{navigate to="index"}" class="home">{intl l="Home" d="hooknavigation.fo.default"}</a></li>
-                            {loop type="category" name="category.navigation" parent="0"}
-                                <li><a href="{$URL}">{$TITLE}</a></li>
-                            {/loop}
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-            {/elsehook}
         </div>
     </header><!-- /.header -->
 
@@ -292,176 +189,6 @@ GNU General Public License : http://www.gnu.org/licenses/
         </div>
     </section>
     {/ifhook}
-    {elsehook rel="main.footer-body"}
-    <section class="footer-block">
-        <div class="container">
-            <div class="blocks block-col-4">
-                <div class="col">
-                    <section class="block block-links">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Latest articles"}</h3></div>
-                        <div class="block-content">
-                            {ifloop rel="blog.articles"}
-                                <ul>
-                                    {loop type="content" name="blog.articles" folder="1" limit="3"}
-                                        <li>
-                                            <a href="{$URL}">
-                                                <h4 class="block-subtitle">{$TITLE}</h4>
-                                                <p>{$CHAPO}</p>
-                                            </a>
-                                        </li>
-                                    {/loop}
-                                </ul>
-                            {/ifloop}
-                            {elseloop rel="blog.articles"}
-                                <ul>
-                                    <li>{intl l="No articles currently"}</li>
-                                </ul>
-                            {/elseloop}
-                        </div>
-                    </section>
-                </div>
-                <div class="col">
-                    <section class="block block-default">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Useful links"}</h3></div>
-                        <div class="block-content">
-                            <ul>
-                                {loop name="footer_links" type="content" folder="2"}
-                                    <li><a href="{$URL}">{$TITLE}</a></li>
-                                {/loop}
-                                {loop type="auth" name="customer_is_logged" role="CUSTOMER"}
-                                    <li><a href="{url path="/logout"}" class="logout">{intl l="Log out!"}</a></li>
-                                    <li><a href="{url path="/account"}" class="account">{intl l="My Account"}</a></li>
-                                {/loop}
-                                {elseloop rel="customer_is_logged"}
-                                <li><a href="{url path="/login"}">{intl l="Login"}</a></li>
-                                <li><a href="{url path="/register"}">{intl l="Register"}</a></li>
-                                {/elseloop}
-                                <li><a href="{url path="/cart"}">{intl l="Cart"}</a></li>
-                                <li><a href="{url path="/order/delivery"}">{intl l="Checkout"}</a></li>
-                            </ul>
-                        </div>
-                    </section>
-                </div>
-                <div class="col">
-                    <section class="block block-social">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Follow us"}</h3></div>
-                        <div class="block-content">
-                            <p>{intl l="Follow us introduction"}</p>
-                            <ul role="presentation">
-                                <li>
-                                    <a href="https://www.facebook.com/theliaecommerce" rel="nofollow" class="facebook" data-toggle="tooltip" data-placement="top" title="{intl l="Facebook"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-facebook icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="Facebook"}</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://twitter.com/theliaecommerce" rel="nofollow" class="twitter" data-toggle="tooltip" data-placement="top" title="{intl l="Twitter"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-twitter icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="Twitter"}</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="http://instagram.com" rel="nofollow" class="instagram" data-toggle="tooltip" data-placement="top" title="{intl l="Instagram"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-instagram icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="Instagram"}</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://plus.google.com/+TheliaNet" rel="nofollow" class="google-plus" data-toggle="tooltip" data-placement="top" title="{intl l="Google+"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-google-plus icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="Google+"}</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="http://www.youtube.com" rel="nofollow" class="youtube" data-toggle="tooltip" data-placement="top" title="{intl l="Youtube"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-youtube icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="Youtube"}</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="http://thelia.net/feed/" class="rss" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="RSS"}" target="_blank">
-                                        <span class="icon-stack">
-                                            <span class="icon-circle icon-stack-base"></span>
-                                            <span class="icon-rss icon-light"></span>
-                                        </span>
-                                        <span class="visible-print">{intl l="RSS"}</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </section>
-
-                    <section class="block block-newsletter">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Newsletter"}</h3></div>
-                        <div class="block-content">
-                            <p id="newsletter-describe">{intl l="Sign up to receive our latest news."}</p>
-                            {form name="thelia.front.newsletter"}
-                            <form id="form-newsletter-mini" action="{url path="/newsletter"}" method="post">
-                                {form_hidden_fields form=$form}
-                                {form_field form=$form field="email"}
-                                <div class="form-group">
-                                    <label for="{$label_attr.for}-mini">{intl l="Email address"}</label>
-                                    <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" placeholder="{intl l="Your email address"}" aria-describedby="newsletter-describe" {if $required} aria-required="true" required{/if} autocomplete="off">
-                                </div>
-                                {/form_field}
-                                <button type="submit" class="btn btn-subscribe">{intl l="Subscribe"}</button>
-                            </form>
-                            {/form}
-                        </div>
-                    </section>
-                </div>
-
-                <div class="col">
-                    <section class="block block-contact" itemscope itemtype="http://schema.org/Organization">
-                        <div class="block-heading"><h3 class="block-title">{intl l="Contact Us"}</h3></div>
-                        <div class="block-content">
-                            <meta itemprop="name" content="{$store_name}">
-                            <ul>
-                                <li class="contact-address">
-                                    <address class="adr" itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                                        <span class="street-address" itemprop="streetAddress">{config key="store_address1"} {config key="store_address2"} {config key="store_address3"}</span><br>
-                                        <span class="postal-code" itemprop="postalCode">{config key="store_zipcode"}</span>
-                                        <span class="locality" itemprop="addressLocality">
-                                            {config key="store_city"}
-                                            {if {config key="store_country"} }
-                                                {loop type="country" name="address.country.title" id={config key="store_country"}}, <span class="country-name">{$TITLE}</span>{/loop}
-                                            {/if}
-                                        </span>
-                                    </address>
-                                </li>
-                                {if {config key="store_phone"} }
-                                <li class="contact-phone">
-                                    <span class="tel" itemprop="telephone">{config key="store_phone"}</span>
-                                </li>
-                                {/if}
-                                {if {config key="store_email"} }
-                                <li class="contact-email">
-                                    {mailto address={config key="store_email"} encode="hex" extra='class="email" itemprop="email"'}
-                                </li>
-                                {/if}
-                            </ul>
-                        </div>
-                    </section>
-                </div>
-            </div>
-        </div>
-    </section><!-- /.footer-block -->
-    {/elsehook}
 
     {ifhook rel="main.footer-bottom"}
     <footer class="footer-info" role="contentinfo">

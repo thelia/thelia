@@ -58,22 +58,52 @@
                     </select>
                 </div>
                 <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-status">
-                        <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" /> {intl l="Hide empty hook"}
+                    <label for="hooks-filter-status">{intl l="Hide empty hook"}</label><br />
+                    <div class="make-switch switch-small hooks-filter-status"
+                         data-id="{$ID}"
+                         data-on="success"
+                         data-off="danger"
+                         data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>"
+                         data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                        <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" />
+                    </div>
+                </div>
+            </div>
+            <div>&nbsp;</div>
+            <div class="row">
+                <div class="col-md-3 col-sm-12 text-right">
+                    <label for="hooks-filter-name">
+                        {intl l="Filter by hook name:"}
                     </label>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <input type="search" class="form-control" id="hooks-filter-name" value="" />
                 </div>
             </div>
 
         </div>
 
+
         <div class="row">
             <div class="col-md-12">
+
                 {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
+
                 {loop type="hook" name="hook" order=$hook_order backend_context=1}
-                <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}" data-id="{$ID}" data-type="{$TYPE}" data-block="{$BLOCK}">
+                <div class="hook general-block-decorator{if $BLOCK} hook-block{/if}{if $BY_MODULE} hook-by-module{/if}"
+                    data-id="{$ID}"
+                    data-type="{$TYPE}"
+                    data-block="{$BLOCK}"
+                    data-title="{$TITLE}"
+                    data-code="{$CODE}"
+                    >
                     <p class="title title-without-tabs">
                         <a class="btn btn-default btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
                             <span class="glyphicon glyphicon-info-sign"></span>
+                        </a>
+                        <a class="btn btn-default btn-primary action-edit-hook-btn pull-right"
+                           href="{url path="/admin/hook/update/{$ID}" }">
+                            <span class="glyphicon glyphicon-edit"></span>
                         </a>
                         {$ID}. {$TITLE}
                     </p>
@@ -97,9 +127,21 @@
                             {intl l="Block :"} <strong>{if $BLOCK}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
                         </div>
                     </div>
+
                     {include file="includes/module-hook-block.html" hook_id="{$ID}" by_module="{$BY_MODULE}"}
+
                 </div>
                 {/loop}
+
+            </div>
+
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <ul>
+                        <li><a href="{url path='/admin/modules'}" class="text-info">{intl l="Manage modules"}</a></li>
+                        <li><a href="{url path='/admin/hooks'}" class="text-info">{intl l="Manage hooks"}</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -272,8 +314,9 @@ form_error_message = $form_error_message
             var isFilterProcessing = false,
                 $fStatus = $('#hooks-filter-status'),
                 $fModule = $('#hooks-filter-module'),
-                $fType   = $('#hooks-filter-type');
-                $fEmpty  = $('#hooks-filter-empty');
+                $fType   = $('#hooks-filter-type'),
+                $fEmpty  = $('#hooks-filter-empty'),
+                $fName   = $('#hooks-filter-name');
 
             var filterProcess = function filterProcess(){
                 if (! isFilterProcessing) {
@@ -283,16 +326,30 @@ form_error_message = $form_error_message
                         status: $fStatus.val(),
                         module: $fModule.val(),
                         type: $fType.val(),
-                        empty: $fEmpty.is(":checked")
+                        empty: $fEmpty.is(":checked"),
+                        name: $fName.val()
                     };
+
+                    var reName = null;
+                    if (formData.name){
+                        reStrName = escapeRegExp(formData.name).replace(/\s+/, ".*");
+                        reName = new RegExp(reStrName, 'i');
+                    }
 
                     // filters hook type first
                     $(".hooks .hook").each(function(){
                         var $hook = $(this),
-                                empty = true,
-                                $lines;
+                            empty = true,
+                            isNameMatch = true,
+                            $lines;
 
-                        if (formData.type == "" || formData.type == $hook.data("type")){
+                        if (reName){
+                            isNameMatch = $hook.data("title").search(reName) != -1
+                                || $hook.data("code").search(reName) != -1
+                            ;
+                        }
+
+                        if (isNameMatch && (formData.type == "" || formData.type == $hook.data("type"))){
                             $hook.removeClass("hidden");
                             // test each line
                             $lines = $hook.find("tr.hook-module");
@@ -321,8 +378,37 @@ form_error_message = $form_error_message
                 }
             };
 
+            var escapeRegExp = function escapeRegExp(string){
+                return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            };
+
+            var parseQueryString = function() {
+                var str = window.location.search;
+                var objURL = {};
+                str.replace(
+                        new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+                        function( $0, $1, $2, $3 ){
+                            objURL[ $1 ] = $3;
+                        }
+                );
+                return objURL;
+            };
+
             /* filters */
             $('.hooks-filter select, .hooks-filter input').on('change', filterProcess);
+            $('#hooks-filter-name').on('keyup', filterProcess);
+
+            // fill the form with querystring
+            var qs = parseQueryString();
+
+            if (qs['status']) { $fStatus.val(qs['status']); }
+            if (qs['module']) { $fModule.val(qs['module']); }
+            if (qs['type']) { $fType.val(qs['type']); }
+            if (qs['empty']) {
+                $fEmpty.get().checked = qs['empty'] == '1';
+            }
+            if (qs['name']) { $fName.val(qs['name']); }
+
             filterProcess();
         });
     </script>

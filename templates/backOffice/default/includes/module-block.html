@@ -151,8 +151,14 @@
                                     {/loop}
                                 {/if}
 
+                                {if $HOOKABLE}
+                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
+                                <a class="{if ! $ACTIVE}disabled {/if} btn btn-default btn-xs" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
+                            {/loop}
+                                {/if}
+
                                 {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"><span class="glyphicon glyphicon-book"></span></a>
+                                    <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
                                 {/loop*}
 
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}

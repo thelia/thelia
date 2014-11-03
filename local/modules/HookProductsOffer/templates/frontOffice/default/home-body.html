@@ -1,20 +1,23 @@
-{loop name="current-sales" type="sale" limit="2"}
-    <section id="product-sale-{$ID}">
-        <div class="products-heading">
-            <h2>{$SALE_LABEL} <a href="{url path="/sale" sale=$ID}" class="btn-all">{intl l="+ View All"}</a></h2>
-            <div class="short-description" itemprop="description">{$CHAPO}</div>
-        </div>
+{ifloop rel="current-sales"}
+    <section id="products-offer">
+    {loop name="current-sales" type="sale" limit="2"}
+        <section id="product-sale-{$ID}">
+            <div class="products-heading">
+                <h2>{$SALE_LABEL} <a href="{url path="/sale" sale=$ID}" class="btn-all">{intl l="+ View All"}</a></h2>
+                <div class="short-description" itemprop="description">{$CHAPO}</div>
+            </div>
 
-        <div class="products-content">
-            <ul class="products-grid product-col-5 hover-effect">
-                {loop name="products_in_sale" type="product" limit="5" sale=$ID}
-                    {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
-                {/loop}
-            </ul>
-        </div>
-    </section><!-- #products-sale-XX -->
-{/loop}
-
+            <div class="products-content">
+                <ul class="products-grid product-col-5 hover-effect">
+                    {loop name="products_in_sale" type="product" limit="5" sale=$ID}
+                        {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
+                    {/loop}
+                </ul>
+            </div>
+        </section><!-- #products-sale-XX -->
+    {/loop}
+    </section>
+{/ifloop}
 {* Display "regular" promos, if any, only if we don't have active sales *}
 
 {elseloop rel="current-sales"}

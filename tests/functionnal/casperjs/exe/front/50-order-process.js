@@ -3,7 +3,6 @@ casper.test.comment('== Order process ==');
 casper.test.begin('Order process', 4, function suite(test) {
 
     //first log in user
-
     casper.start(thelia2_base_url, function() {
         //login
         casper.evaluate(function(username, password) {
@@ -36,7 +35,7 @@ casper.test.begin('Order process', 4, function suite(test) {
                     test.info("with a virtual product, the delivery page is skipped");
                     test.skip(2);
                 } else {
-                    test.assertTitle("Billing and delivery - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
+                    test.assertTitle("Billing and delivery - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
                     this.capture(screenshot_dir + 'front/50_delivery_list.png');
 
                     test.assertEval(function () {
@@ -53,7 +52,7 @@ casper.test.begin('Order process', 4, function suite(test) {
     casper.waitForSelector(
         '.footer-container',
         function(){
-            test.assertTitle("My order - Cart - Thelia V2", "title is the one expected for url : " + this.getCurrentUrl());
+            test.assertTitle("My order - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
             test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
         },
         function(){
