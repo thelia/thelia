@@ -97,17 +97,18 @@
                     data-title="{$TITLE}"
                     data-code="{$CODE}"
                     >
-                    <p class="title title-without-tabs">
-                        <a class="btn btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                        </a>
-                        &nbsp;
-                        <a class="btn btn-primary action-edit-hook-btn pull-right"
-                           href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
-                            <span class="glyphicon glyphicon-edit"></span>
-                        </a>
+                    <div class="title title-without-tabs">
                         {$ID}. {$TITLE}
-                    </p>
+                        <div class="text-right pull-right">
+                            <a class="btn btn-primary action-edit-hook-btn" href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="btn btn-primary action-info-btn" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                            </a>
+                        </div>
+                    </div>
+
                     <div class="row hidden" id="hook-info-{$ID}">
                         <div class="hook-description col-md-8">
                             {if $DESCRIPTION}
