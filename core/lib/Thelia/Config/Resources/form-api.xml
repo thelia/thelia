@@ -5,8 +5,14 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <forms>
-        <!-- Forms for API -->
+        <form name="thelia.api.empty" class="Thelia\Form\Api\ApiEmptyForm" />
+
+        <!-- Forms for Customer -->
         <form name="thelia.api.customer.create" class="Thelia\Form\Api\Customer\CustomerCreateForm"/>
         <form name="thelia.api.customer.update" class="Thelia\Form\Api\Customer\CustomerUpdateForm"/>
+
+        <!-- Product sale elements form -->
+        <form name="thelia.api.product_sale_elements" class="Thelia\Form\Api\ProductSaleElements\ProductSaleElementsForm" />
+
     </forms>
 </config>

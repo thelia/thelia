@@ -25,6 +25,8 @@ use Thelia\Model\Api;
  */
 class BaseApiController extends BaseController
 {
+    const EMPTY_FORM_NAME = "thelia.api.empty";
+
     protected $apiUser;
     protected $currentRouter = "router.api";
 

@@ -54,6 +54,8 @@ use Thelia\Tools\URL;
 
 abstract class BaseController extends ContainerAware
 {
+    const EMPTY_FORM_NAME = "thelia.empty";
+
     protected $tokenProvider;
 
     protected $currentRouter;
@@ -546,7 +548,7 @@ abstract class BaseController extends ContainerAware
         }
 
         if (empty($name)) {
-            $name = "thelia.empty";
+            $name = static::EMPTY_FORM_NAME;
         }
 
         if (!isset(static::$formDefinition[$name])) {

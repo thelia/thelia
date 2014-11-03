@@ -100,6 +100,34 @@
 
     <!-- end product image route -->
 
+    <!-- product sale elements route -->
+    <route id="api.product.pse.list" path="/api/pse/product/{productId}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\ProductSaleElementsController::listAction</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.get" path="/api/pse/{pseId}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\ProductSaleElementsController::getPseAction</default>
+        <requirement key="pseId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.delete" path="/api/pse/{pseId}" methods="delete">
+        <default key="_controller">Thelia\Controller\Api\ProductSaleElementsController::deleteAction</default>
+        <requirement key="pseId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.create" path="/api/pse" methods="post">
+        <default key="_controller">Thelia\Controller\Api\ProductSaleElementsController::createAction</default>
+        <requirement key="productId">\d+</requirement>
+    </route>
+
+    <route id="api.product.pse.update" path="/api/pse/{pseId}" methods="put">
+        <default key="_controller">Thelia\Controller\Api\ProductSaleElementsController::updateAction</default>
+        <default key="pseId">\d+</default>
+    </route>
+
+    <!-- end product sale elements route -->
+
     <!-- category route -->
     <route id="api.category.list" path="/api/categories" methods="get">
         <default key="_controller">Thelia\Controller\Api\CategoryController::listAction</default>
