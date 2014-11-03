@@ -36,7 +36,7 @@
                                 <option value="4" {if $template_type eq "4"}selected {/if}>{intl l="email"}</option>
                             </select>
                         </div>
-                        <button type="button" id="discover-parse" class="btn btn-default btn-primary">{intl l="Parse template"}</button>
+                        <button type="button" id="discover-parse" class="btn btn-primary">{intl l="Parse template"}</button>
                         <div>&nbsp;</div>
                         <div id="discover-content"></div>
                     </form>
@@ -54,7 +54,7 @@
                                 <caption class="clearfix">
                                     {intl l='Hooks'}
                                     {loop type="auth" name="can_create" role="ADMIN" resource="admin.hook" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new hook'}" href="#add_hook_dialog" data-toggle="modal">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Add a new hook'}" href="#add_hook_dialog" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                     {/loop}

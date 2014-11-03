@@ -22,7 +22,7 @@
             <div class="clearfix">
                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.module-hook" access="CREATE"}
                 <div class="pull-right">
-                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
+                    <a class="btn btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
                         <span class="glyphicon glyphicon-plus-sign"></span>
                     </a>
                 </div>
@@ -98,11 +98,12 @@
                     data-code="{$CODE}"
                     >
                     <p class="title title-without-tabs">
-                        <a class="btn btn-default btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                        <a class="btn btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
                             <span class="glyphicon glyphicon-info-sign"></span>
                         </a>
-                        <a class="btn btn-default btn-primary action-edit-hook-btn pull-right"
-                           href="{url path="/admin/hook/update/{$ID}" }">
+                        &nbsp;
+                        <a class="btn btn-primary action-edit-hook-btn pull-right"
+                           href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                         {$ID}. {$TITLE}

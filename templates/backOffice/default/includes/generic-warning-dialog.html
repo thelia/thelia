@@ -26,7 +26,7 @@ A generic modal creation dialog template. Parameters
                 </div>
 
 	            <div class="modal-footer">
-	                <button {if ! empty($ok_button_id)}id="{$ok_button_id}"{/if} type="button" data-dismiss="modal" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {$dialog_ok_label|default:{intl l='OK'}}</button>
+	                <button {if ! empty($ok_button_id)}id="{$ok_button_id}"{/if} type="button" data-dismiss="modal" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {$dialog_ok_label|default:{intl l='OK'}}</button>
 	            </div>
 
         </div>

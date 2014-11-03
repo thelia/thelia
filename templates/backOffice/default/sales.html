@@ -31,10 +31,10 @@
                                <caption class="clearfix">
                                    {intl l='Sales management'}
                                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.sales" access="CREATE"}
-                                        <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new sale'}" href="#creation_dialog" data-toggle="modal">
+                                        <a class="btn btn-primary action-btn" title="{intl l='Add a new sale'}" href="#creation_dialog" data-toggle="modal">
                                             <span class="glyphicon glyphicon-plus-sign"></span>
                                        </a>
-                                       <a class="btn btn-default btn-primary action-btn" href="#confirm_sale_status_reset" data-toggle="modal">
+                                       <a class="btn btn-primary action-btn" href="#confirm_sale_status_reset" data-toggle="modal">
                                            {intl l='Reset sale status for all products'}
                                        </a>
                                        <a class="btn btn-default btn-default action-btn" href="{url path="/admin/sales/check-activation"}">

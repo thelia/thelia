@@ -35,7 +35,7 @@ A generic modal creation dialog template. Parameters
 
 	            <div class="modal-footer">
 	                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span> {$dialog_cancel_label|default:{intl l='Cancel'}}</button>
-                    <button {if ! empty($ok_button_id)}id="{$ok_button_id}"{/if} type="submit" class="btn btn-default btn-primary"><span class="glyphicon glyphicon-check"></span> {$dialog_ok_label|default:{intl l='OK'}}</button>
+                    <button {if ! empty($ok_button_id)}id="{$ok_button_id}"{/if} type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span> {$dialog_ok_label|default:{intl l='OK'}}</button>
 	            </div>
 
             </form>
