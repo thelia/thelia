@@ -12,10 +12,8 @@
 
 namespace Thelia\Core\Template;
 
-
 interface ParserHelperInterface
 {
-
     /**
      * Parse a string and get all parser's function and block with theirs arguments.
      *

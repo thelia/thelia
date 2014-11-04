@@ -19,7 +19,6 @@ namespace Thelia\Tools\Version\Constraints;
  */
 abstract class BaseConstraint implements ConstraintInterface
 {
-
     protected $operator = "=";
 
     protected $expression = null;

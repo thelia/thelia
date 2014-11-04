@@ -25,7 +25,6 @@ use Thelia\Tools\URL;
  */
 class RedirectException extends BaseAction implements EventSubscriberInterface
 {
-
     /**
     * @var ParserInterface
     */
@@ -47,7 +46,6 @@ class RedirectException extends BaseAction implements EventSubscriberInterface
             $response = RedirectResponse::create($this->urlManager->viewUrl($exception->getLoginTemplate()));
             $event->setResponse($response);
         }
-
     }
     /**
      * Returns an array of event names this subscriber wants to listen to.

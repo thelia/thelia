@@ -23,7 +23,6 @@ use Thelia\Module\Exception\InvalidXmlDocumentException;
  */
 class ModuleDescriptorValidator
 {
-
     protected static $versions = [
         '1' => 'module.xsd',
         '2' => 'module-2_1.xsd'
@@ -58,7 +57,6 @@ class ModuleDescriptorValidator
         if ($dom->load($xml_file)) {
             /** @var \SplFileInfo $xsdFile */
             foreach ($this->xsdFinder as $xsdFile) {
-
                 $xsdVersion = array_search($xsdFile->getBasename(), self::$versions);
 
                 if (false === $xsdVersion || (null !== $version && $version != $xsdVersion)) {
@@ -96,11 +94,9 @@ class ModuleDescriptorValidator
         $errorMessages = [];
 
         try {
-
             libxml_use_internal_errors(true);
 
             if (!$dom->schemaValidate($xsdFile->getRealPath())) {
-
                 $errors = libxml_get_errors();
 
                 foreach ($errors as $error) {
@@ -119,7 +115,6 @@ class ModuleDescriptorValidator
             }
 
             libxml_use_internal_errors(false);
-
         } catch (ErrorException $ex) {
             libxml_use_internal_errors(false);
         }

@@ -216,7 +216,6 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-
                     // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {
                         $translationDirs[$module->getTranslationDomain()] = $dir;

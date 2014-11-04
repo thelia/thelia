@@ -32,7 +32,6 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidator
 {
-
     protected $modulePath;
 
     /** @var bool */
@@ -280,11 +279,9 @@ class ModuleValidator
 
     protected function checkModuleDependencies()
     {
-
         $errors = [];
 
         foreach ($this->moduleDefinition->getDependencies() as $dependency) {
-
             $module = ModuleQuery::create()
                 ->findOneByCode($dependency[0]);
 
@@ -346,7 +343,6 @@ class ModuleValidator
 
         /** @var Module $module */
         foreach ($modules as $module) {
-
             $validator = new ModuleValidator($module->getAbsoluteBaseDir());
             try {
                 $validator->load();
@@ -354,9 +350,7 @@ class ModuleValidator
                 $dependencies = $definition->getDependencies();
 
                 if (count($dependencies) > 0) {
-
                     foreach ($dependencies as $dependency) {
-
                         if ($dependency[0] == $code) {
                             $dependantModules[] = [
                                 'code' => $definition->getCode(),

@@ -28,7 +28,6 @@ use ZipArchive;
  */
 class ModuleInstallForm extends BaseForm
 {
-
     /** @var ModuleDefinition */
     protected $moduleDefinition = null;
 
@@ -36,7 +35,6 @@ class ModuleInstallForm extends BaseForm
 
     protected function buildForm($change_mode = false)
     {
-
         $this->formBuilder
             ->add(
                 'module',
@@ -77,7 +75,6 @@ class ModuleInstallForm extends BaseForm
         $modulePath = $this->unzipModule($file);
 
         if ($modulePath !== false) {
-
             try {
                 // get the first directory
                 $moduleFiles = $this->getDirContents($modulePath);
@@ -132,7 +129,6 @@ class ModuleInstallForm extends BaseForm
         $extractPath = false;
         $zip = new ZipArchive();
         if ($zip->open($file->getRealPath()) === true) {
-
             $extractPath = $this->tempdir();
 
             if ($extractPath !== false) {
@@ -168,7 +164,6 @@ class ModuleInstallForm extends BaseForm
 
     protected function getDirContents($dir)
     {
-
         $paths = array_diff(scandir($dir), ['..', '.']);
 
         $out = [

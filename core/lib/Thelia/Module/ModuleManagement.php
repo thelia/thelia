@@ -52,7 +52,6 @@ class ModuleManagement
         $this->errors = [];
 
         foreach ($finder as $file) {
-
             try {
                 $this->updateModule($file);
             } catch (\Exception $ex) {
@@ -65,7 +64,6 @@ class ModuleManagement
             $ex->setErrors($this->errors);
             throw $ex;
         }
-
     }
 
     /**
@@ -112,7 +110,6 @@ class ModuleManagement
         }
 
         return $module;
-
     }
 
     /**
@@ -140,7 +137,6 @@ class ModuleManagement
 
     private function saveDescription(Module $module, \SimpleXMLElement $content, ConnectionInterface $con)
     {
-
         foreach ($content->descriptive as $description) {
             $locale = (string)$description->attributes()->locale;
 
@@ -152,6 +148,5 @@ class ModuleManagement
                 ->setChapo(isset($description->subtitle) ? $description->subtitle : null)
                 ->save($con);
         }
-
     }
 }

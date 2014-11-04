@@ -64,7 +64,6 @@ class ConfigCommandTest extends \PHPUnit_Framework_TestCase
         $commands = $this->getFakeCommands();
 
         foreach ($commands as $command) {
-
             $arguments = array_merge(
                 $command['args'],
                 ["command" => $this->command->getName()]

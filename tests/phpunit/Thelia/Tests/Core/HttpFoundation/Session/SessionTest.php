@@ -175,7 +175,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotNull($cart);
         $this->assertEquals($customer->getId(), $cart->getCustomerId());
         $this->assertInstanceOf("\Thelia\Model\Cart", $cart, '$cart must be an instance of Thelia\Model\Cart');
-
     }
 
     public function testGetCartWithExistingCartAndCustomerAndReferencesEachOther()

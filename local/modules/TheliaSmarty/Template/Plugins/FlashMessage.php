@@ -101,7 +101,6 @@ class FlashMessage extends AbstractSmartyPlugin
         $type = $this->getParam($params, 'type', false);
 
         if (null === $content) {
-
             $this->results = new FlashMessageBag();
 
             if (false === $type) {
@@ -116,7 +115,6 @@ class FlashMessage extends AbstractSmartyPlugin
             if ($this->results->isEmpty()) {
                 $repeat = false;
             }
-
         } else {
             $this->results->next();
         }
