@@ -19,7 +19,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
-use TheliaSmarty\Template\SmartyParser;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\CustomerQuery;
 
@@ -57,9 +56,11 @@ class CustomerTest extends \PHPUnit_Framework_TestCase
 
         $this->securityContext = new SecurityContext($this->request);
 
+        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
+
         $this->customerAction = new Customer(
             $this->securityContext,
-            new MailerFactory($dispatcher, new SmartyParser($this->request, $dispatcher, new ParserContext($this->request)))
+            new MailerFactory($dispatcher, $parser)
         );
     }
 

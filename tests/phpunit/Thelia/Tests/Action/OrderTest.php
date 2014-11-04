@@ -105,10 +105,10 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         $this->orderEvent->setDispatcher($dispatcher);
 
-        // public function __construct(Request $this->request, ParserInterface $parser, MailerFactory $mailer, SecurityContext $securityContext)
-
-        $mailerFactory = new MailerFactory($dispatcher,
-            new SmartyParser($this->request, $dispatcher, new ParserContext($this->request))
+        $parser = $this->getMock("Thelia\\Core\\Template\\ParserInterface");
+        $mailerFactory = new MailerFactory(
+            $dispatcher,
+            $parser
         );
 
         $this->orderAction = new Order(

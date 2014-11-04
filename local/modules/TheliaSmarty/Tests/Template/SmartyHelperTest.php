@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Core\Template\Smarty;
+namespace TheliaSmarty\Tests\Template;
 
 use TheliaSmarty\Template\SmartyHelper;
 
@@ -21,6 +21,16 @@ use TheliaSmarty\Template\SmartyHelper;
  */
 class SmartyHelperTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var SmartyHelper
+     */
+    protected static $smartyParserHelper;
+
+    public static function setUpBeforeClass()
+    {
+        self::$smartyParserHelper = new SmartyHelper();
+    }
+
     public function testFunctionsDefinition()
     {
         $content = <<<EOT
@@ -32,7 +42,7 @@ cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = SmartyHelper::getFunctionsDefinition($content);
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content);
 
         $this->assertCount(1, $functions);
         $this->assertArrayHasKey("name", $functions[0]);
@@ -53,7 +63,7 @@ cillum dolore {function name="{$test}"} eu fugiat nulla pariatur. Excepteur sint
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = SmartyHelper::getFunctionsDefinition($content);
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content);
 
         $this->assertCount(2, $functions);
 
@@ -81,7 +91,7 @@ cillum dolore {hook name={intl l="test"}} eu fugiat nulla pariatur. Excepteur si
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = \TheliaSmarty\Template\SmartyHelper::getFunctionsDefinition($content);
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content);
 
         $this->assertCount(2, $functions);
 
@@ -105,7 +115,7 @@ cillum dolore {function name={intl l="test"}} eu fugiat nulla pariatur. Excepteu
 proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 EOT;
 
-        $functions = SmartyHelper::getFunctionsDefinition($content, array("hook"));
+        $functions = self::$smartyParserHelper->getFunctionsDefinition($content, array("hook"));
 
         $this->assertCount(1, $functions);
 
