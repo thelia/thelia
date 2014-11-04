@@ -12,6 +12,8 @@
 
 namespace TheliaSmarty\Template;
 
+use Thelia\Core\Template\ParserHelperInterface;
+
 /**
  * Helper class for smarty templates
  *
@@ -19,7 +21,7 @@ namespace TheliaSmarty\Template;
  * @package Thelia\Core\Template\Smarty
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class SmartyHelper
+class SmartyHelper implements ParserHelperInterface
 {
     /**
      * Parse a string and get all smarty function and block with theirs arguments.
@@ -32,7 +34,7 @@ class SmartyHelper
      *
      * @return array array of functions with 2 index name and attributes an array of name, value
      */
-    public static function getFunctionsDefinition($content, array $functions = array())
+    public function getFunctionsDefinition($content, array $functions = array())
     {
         $strlen = strlen($content);
 

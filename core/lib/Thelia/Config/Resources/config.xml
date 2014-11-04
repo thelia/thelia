@@ -96,7 +96,9 @@
 
         <!--  Hook Helper -->
 
-        <service id="thelia.hookHelper" class="Thelia\Core\Hook\HookHelper" />
+        <service id="thelia.hookHelper" class="Thelia\Core\Hook\HookHelper" >
+            <argument type="service" id="thelia.parser.helper" />
+        </service>
 
 		<!-- Security context for front and back office -->
 
