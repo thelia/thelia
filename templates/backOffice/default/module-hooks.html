@@ -22,67 +22,68 @@
             <div class="clearfix">
                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.module-hook" access="CREATE"}
                 <div class="pull-right">
-                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
+                    <a class="btn btn-primary action-btn" title="{intl l='Add a new module in a hook'}" href="#add_module_hook_dialog" data-toggle="modal">
                         <span class="glyphicon glyphicon-plus-sign"></span>
                     </a>
                 </div>
                 {/loop}
                 <p class="title title-without-tabs">{intl l="Hooks position"}</p>
             </div>
-            <div class="hooks-filter row">
-                <div class="col-md-3">
-                    <label for="hooks-filter-status">{intl l="By status"}</label><br />
-                    <select id="hooks-filter-status" class="form-control">
-                        <option value="">{intl l="All"}</option>
-                        <option value="1">{intl l="Active"}</option>
-                        <option value="0">{intl l="Inactive"}</option>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-module">{intl l="By module"}</label><br />
-                    <select id="hooks-filter-module" class="form-control">
-                        <option value="">{intl l="All"}</option>
-                        {loop type="module" name="module" order=$module_order backend_context=1}
-                        <option value="{$ID}">{$TITLE}</option>
-                        {/loop}
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-type">{intl l="By type"}</label><br />
-                    <select id="hooks-filter-type" class="form-control">
-                        <option value="">{intl l="All"}</option>
-                        <option value="1">{intl l="Front Office"}</option>
-                        <option value="2">{intl l="Back Office"}</option>
-                        <option value="3">{intl l="pdf"}</option>
-                        <option value="4">{intl l="email"}</option>
-                    </select>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <label for="hooks-filter-status">{intl l="Hide empty hook"}</label><br />
-                    <div class="make-switch switch-small hooks-filter-status"
-                         data-id="{$ID}"
-                         data-on="success"
-                         data-off="danger"
-                         data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>"
-                         data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
-                        <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" />
+            <div class="hooks-filter">
+                <form class="form-horizontal" role="form" action="#" id="hook-filter-form">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="hooks-filter-status">{intl l="By status"}</label>
+                        <div class="col-sm-2">
+                            <select id="hooks-filter-status" class="form-control">
+                                <option value="">{intl l="All"}</option>
+                                <option value="1">{intl l="Active"}</option>
+                                <option value="0">{intl l="Inactive"}</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label" for="hooks-filter-module">{intl l="By module"}</label>
+                        <div class="col-sm-2">
+                            <select id="hooks-filter-module" class="form-control">
+                                <option value="">{intl l="All"}</option>
+                                {loop type="module" name="module" order='title' backend_context=1}
+                                <option value="{$ID}">{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label" for="hooks-filter-type">{intl l="By type"}</label>
+                        <div class="col-sm-2">
+                            <select id="hooks-filter-type" class="form-control">
+                                <option value="">{intl l="All"}</option>
+                                <option value="1">{intl l="Front Office"}</option>
+                                <option value="2">{intl l="Back Office"}</option>
+                                <option value="3">{intl l="pdf"}</option>
+                                <option value="4">{intl l="email"}</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div>&nbsp;</div>
-            <div class="row">
-                <div class="col-md-3 col-sm-12 text-right">
-                    <label for="hooks-filter-name">
-                        {intl l="Filter by hook name:"}
-                    </label>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <input type="search" class="form-control" id="hooks-filter-name" value="" />
-                </div>
-            </div>
 
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="hooks-filter-status">{intl l="Hide empty hook"}</label>
+                        <div class="col-sm-2">
+                            <div class="make-switch switch-small hooks-filter-status"
+                                data-id="{$ID}"
+                                data-on="success"
+                                data-off="danger"
+                                data-on-label="<i class='glyphicon glyphicon-ok-circle'></i>"
+                                data-off-label="<i class='glyphicon glyphicon-remove-circle'></i>">
+                                <input type="checkbox" id="hooks-filter-empty" value="1" checked="checked" />
+                            </div>
+                        </div>
+
+                        <label class="col-sm-2 control-label" for="hooks-filter-name">{intl l="Filter by hook name:"}</label>
+                        <div class="col-sm-4">
+                            <input type="search" class="form-control" id="hooks-filter-name" value="" />
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-
 
         <div class="row">
             <div class="col-md-12">
@@ -97,34 +98,38 @@
                     data-title="{$TITLE}"
                     data-code="{$CODE}"
                     >
-                    <p class="title title-without-tabs">
-                        <a class="btn btn-default btn-primary action-info-btn pull-right" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
-                            <span class="glyphicon glyphicon-info-sign"></span>
-                        </a>
-                        <a class="btn btn-default btn-primary action-edit-hook-btn pull-right"
-                           href="{url path="/admin/hook/update/{$ID}" }">
-                            <span class="glyphicon glyphicon-edit"></span>
-                        </a>
+                    <div class="title title-without-tabs">
                         {$ID}. {$TITLE}
-                    </p>
-                    <div class="row hidden" id="hook-info-{$ID}">
-                        <div class="hook-description col-md-8">
-                            {if $DESCRIPTION}
-                                {$DESCRIPTION}
-                            {else}
-                                <em>{intl l="No description for this hook"}</em>
-                            {/if}
+                        <div class="text-right pull-right">
+                            <a class="btn btn-primary action-edit-hook-btn" href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                            <a class="btn btn-primary action-info-btn" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                                <span class="glyphicon glyphicon-info-sign"></span>
+                            </a>
                         </div>
-                        <div class="hook-ref col-md-4">
-                            {intl l="Code:"} <strong>{$CODE}</strong><br />
-                            {intl l="Type:"} <strong>
-                                {if $TYPE == 1}{intl l="Front Office"}{/if}
-                                {if $TYPE == 2}{intl l="Back Office"}{/if}
-                                {if $TYPE == 3}{intl l="pdf"}{/if}
-                                {if $TYPE == 4}{intl l="email"}{/if}
-                            </strong><br />
-                            {intl l="By module:"} <strong>{if $BY_MODULE}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
-                            {intl l="Block :"} <strong>{if $BLOCK}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                    </div>
+
+                    <div class="well well-sm hidden" id="hook-info-{$ID}">
+                        <div class="row">
+                            <div class="hook-description col-md-8">
+                                {if $DESCRIPTION}
+                                    {$DESCRIPTION}
+                                {else}
+                                    <em>{intl l="No description for this hook"}</em>
+                                {/if}
+                            </div>
+                            <div class="hook-ref col-md-4">
+                                {intl l="Code:"} <strong>{$CODE}</strong><br />
+                                {intl l="Type:"} <strong>
+                                    {if $TYPE == 1}{intl l="Front Office"}{/if}
+                                    {if $TYPE == 2}{intl l="Back Office"}{/if}
+                                    {if $TYPE == 3}{intl l="pdf"}{/if}
+                                    {if $TYPE == 4}{intl l="email"}{/if}
+                                </strong><br />
+                                {intl l="By module:"} <strong>{if $BY_MODULE}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                                {intl l="Block :"} <strong>{if $BLOCK}{intl l="Yes"}{else}{intl l="No"}{/if}</strong><br />
+                            </div>
                         </div>
                     </div>
 
@@ -393,6 +398,11 @@ form_error_message = $form_error_message
                 );
                 return objURL;
             };
+
+            /* Prevent filter form submission */
+            $('#hook-filter-form').submit(function(ev) {
+                ev.preventDefault();
+            });
 
             /* filters */
             $('.hooks-filter select, .hooks-filter input').on('change', filterProcess);

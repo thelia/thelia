@@ -36,7 +36,7 @@
                                 {hook name="coupon.list-caption" location="coupon_list_caption" }
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
-                                    <a class="btn btn-default btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
+                                    <a class="btn btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
                                         <span class="glyphicon glyphicon-plus-sign"></span>
                                     </a>
                                 {/loop}

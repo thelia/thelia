@@ -81,8 +81,8 @@
 
                                 <div class="btn-group">
                                     <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                                    <button class="btn btn-default btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
-                                    <button class="btn btn-default btn-primary dropdown-toggle" data-toggle="dropdown">
+                                    <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
+                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-right">
