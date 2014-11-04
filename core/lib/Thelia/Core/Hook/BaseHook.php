@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
-use TheliaSmarty\Template\SmartyParser;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\Cart;
 use Thelia\Model\Currency;
 use Thelia\Model\Customer;
@@ -46,7 +46,7 @@ abstract class BaseHook
     public $module = null;
 
     /**
-     * @var SmartyParser
+     * @var \Thelia\Core\Template\ParserInterface
      */
     public $parser = null;
 
@@ -94,8 +94,7 @@ abstract class BaseHook
 
         if (null !== $templateDir) {
             // retrieve the template
-            $smartyParser = $this->parser;
-            $content      = $smartyParser->render($templateDir . DS . $templateName, $parameters);
+            $content      = $this->parser->render($templateDir . DS . $templateName, $parameters);
         } else {
             $content = sprintf("ERR: Unknown template %s for module %s", $templateName, $this->module->getCode());
         }
@@ -205,9 +204,9 @@ abstract class BaseHook
     }
 
     /**
-     * @param \TheliaSmarty\Template\SmartyParser $parser
+     * @param \Thelia\Core\Template\ParserInterface $parser
      */
-    public function setParser($parser)
+    public function setParser(ParserInterface $parser)
     {
         $this->parser = $parser;
     }
