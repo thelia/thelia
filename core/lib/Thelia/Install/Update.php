@@ -97,4 +97,9 @@ class Update
 
         ConfigQuery::write('thelia_version', $version);
     }
+
+    public function getVersion()
+    {
+        return self::$version;
+    }
 }
