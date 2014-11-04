@@ -57,6 +57,7 @@ use Thelia\Model\AttributeQuery;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\MetaData;
+use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductQuery;
@@ -553,16 +554,18 @@ class ProductController extends AbstractSeoCrudController
             ->filterByVisible(0)
             ->orderByPosition()
             ->find()
-            ->toArray();
+        ;
 
         $results = [];
 
         if (null !== $documents) {
+            /** @var ProductDocument $document */
             foreach ($documents as $document) {
                 $results[] = [
-                    'id'       => $document['Id'],
-                    'title'    => $document['File'],
-                    'selected' => ($document['Id'] == $selectedId)
+                    'id'       => $document->getId(),
+                    'title'    => $document->getTitle(),
+                    'file'     => $document->getFile(),
+                    'selected' => ($document->getId() == $selectedId)
                 ];
             }
         }

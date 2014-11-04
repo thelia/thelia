@@ -235,6 +235,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 $loopResultRow
                     ->set("ID", $result->getId())
                     ->set("LOCALE", $this->locale)
+                    ->set("DOCUMENT_FILE", $result->getFile())
                     ->set("DOCUMENT_URL", $event->getDocumentUrl())
                     ->set("DOCUMENT_PATH", $event->getDocumentPath())
                     ->set("ORIGINAL_DOCUMENT_PATH", $source_filepath)
