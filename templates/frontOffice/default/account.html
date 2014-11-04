@@ -87,7 +87,12 @@
                                 <tbody>
                                 {loop type="address" name="customer.addresses" customer="current"}
                                 <tr class="{if $DEFAULT == 1}address-primary{else}address-additional{/if}" id="customer-address-{$ID}">
-                                    <th>{$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}</th>
+                                    <th>{if $DEFAULT === 1}
+                                            {intl l="Main Address"}
+                                        {else}
+                                            {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
+                                        {/if}
+                                    </th>
                                     <td>
                                         <ul class="list-address">
                                             <li>
