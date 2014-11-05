@@ -28,7 +28,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
  * @package Thelia\Tests\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Message extends \PHPUnit_Framework_TestCase
+class MessageTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var ContainerBuilder $container
@@ -64,7 +64,7 @@ class Message extends \PHPUnit_Framework_TestCase
         $container->set('request', $request);
 
         $this->parser = new SmartyParser($request, $dispatcher, new ParserContext($request), 'dev', true);
-        $this->parser->setTemplate(TemplateHelper::getInstance()->getActiveMailTemplate());
+        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveMailTemplate());
 
         $container->set('thelia.parser', $this->parser);
 

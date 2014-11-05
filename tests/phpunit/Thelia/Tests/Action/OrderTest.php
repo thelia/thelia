@@ -22,7 +22,6 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserContext;
-use TheliaSmarty\Template\SmartyParser;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\OrderAddressQuery;
