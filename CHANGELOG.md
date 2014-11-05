@@ -6,6 +6,12 @@
 - Smarty :
     - new plugin `flash` to support symfony flash message.
 - Loop : new method addOutputFields in order to add custom fields in an overridden loop
+- Tests:
+    - Move tests from ```core/lib/Thelia/Tests``` to ```tests/phpunit/Thelia/Tests```
+    - Update PHPUnit from 4.1.3 to 4.1.6
+- Symfony components:
+    - Update from 2.3.* to 2.3.21
+
 
 #2.1.0-alpha1
 - Added sale management feature
