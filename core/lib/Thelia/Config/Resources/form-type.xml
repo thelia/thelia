@@ -17,6 +17,15 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.customer_title" class="Thelia\Core\Form\Type\CustomerTitleType">
+            <argument type="service" id="thelia.form.type.field.customer_title_id" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.customer_title_i18n" class="Thelia\Core\Form\Type\CustomerTitleI18nType">
+            <tag name="thelia.form.type" />
+        </service>
+
         <!-- Unique field type -->
         <service id="thelia.form.type.field.product_id" class="Thelia\Core\Form\Type\Field\ProductIdType">
             <argument type="service" id="thelia.translator" />
@@ -39,6 +48,11 @@
         </service>
 
         <service id="thelia.form.type.field.attribute_av" class="Thelia\Core\Form\Type\Field\AttributeAvIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.customer_title_id" class="Thelia\Core\Form\Type\Field\CustomerTitleIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />
         </service>

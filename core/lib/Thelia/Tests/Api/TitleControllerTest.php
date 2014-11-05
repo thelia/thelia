@@ -12,11 +12,13 @@
 
 namespace Thelia\Tests\Api;
 
+use Thelia\Model\CustomerTitleQuery;
 use Thelia\Tests\ApiTestCase;
 
 /**
  * Class TitleControllerTest
  * @package Thelia\Tests\Api
+ * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class TitleControllerTest extends ApiTestCase
@@ -33,9 +35,15 @@ class TitleControllerTest extends ApiTestCase
             $this->getServerParameters()
         );
 
+        $maxCount = CustomerTitleQuery::create()->count();
+
+        if ($maxCount > 10) {
+            $maxCount = 10;
+        }
+
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
         $content = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(3, $content, 'reponse must contains 3 results');
+        $this->assertCount($maxCount, $content, sprintf('reponse must contains %d results', $maxCount));
     }
 
     public function testListActionWithLocale()
@@ -50,9 +58,15 @@ class TitleControllerTest extends ApiTestCase
             $this->getServerParameters()
         );
 
+        $maxCount = CustomerTitleQuery::create()->count();
+
+        if ($maxCount > 10) {
+            $maxCount = 10;
+        }
+
         $this->assertEquals(200, $client->getResponse()->getStatusCode(), 'Http status code must be 200');
         $content = json_decode($client->getResponse()->getContent(), true);
-        $this->assertCount(3, $content, 'response must contains 3 results');
+        $this->assertCount($maxCount, $content, sprintf('reponse must contains %d results', $maxCount));
 
         $firstResult = $content[0];
 
@@ -108,5 +122,120 @@ class TitleControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(404, $client->getResponse()->getStatusCode(), 'Http status code must be 404');
+    }
+
+    public function testCreateAction()
+    {
+        $client = static::createClient();
+
+        $data = [
+            "i18n" => [
+                [
+                    "locale" => "en_US",
+                    "short" => "Mr"
+                ],
+                [
+                    "locale" => "fr_FR",
+                    "short" => "M.",
+                    "long" => "Monsieur"
+                ]
+            ]
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'POST',
+            '/api/title?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(201, $response->getStatusCode(), sprintf(
+            'Http status code must be 201. Error: %s',
+            $client->getResponse()->getContent()
+        ));
+
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Mr', $content[0]['SHORT']);
+        $this->assertEquals('', $content[0]['LONG']);
+
+        return $content[0]['ID'];
+    }
+
+    /**
+     * @param $titleId
+     * @depends testCreateAction
+     */
+    public function testUpdateAction($titleId)
+    {
+        $client = static::createClient();
+
+        $data = [
+            "i18n" => [
+                [
+                    "locale" => "en_US",
+                    "long" => "Mister"
+                ],
+            ],
+            "default" => true,
+            "title_id" => $titleId,
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'PUT',
+            '/api/title?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(201, $response->getStatusCode(), sprintf(
+            'Http status code must be 201. Error: %s',
+            $client->getResponse()->getContent()
+        ));
+
+        $content = json_decode($response->getContent(), true);
+
+        $this->assertEquals('Mr', $content[0]['SHORT']);
+        $this->assertEquals('Mister', $content[0]['LONG']);
+        $this->assertEquals(1, $content[0]['DEFAULT']);
+
+        return $titleId;
+    }
+
+    /**
+     * @param $titleId
+     * @depends testUpdateAction
+     */
+    public function testDeleteAction($titleId)
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/title/'.$titleId.'?sign='.$this->getSignParameter(''),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(204, $client->getResponse()->getStatusCode());
     }
 }

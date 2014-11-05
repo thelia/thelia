@@ -40,9 +40,22 @@
         <default key="_controller">Thelia\Controller\Api\TitleController::listAction</default>
     </route>
 
-    <route id="api.title.get" path="/api/title/{title_id}" methods="get">
+    <route id="api.title.create" path="/api/title" methods="post">
+        <default key="_controller">Thelia\Controller\Api\TitleController::createAction</default>
+    </route>
+
+    <route id="api.title.update" path="/api/title" methods="put">
+        <default key="_controller">Thelia\Controller\Api\TitleController::updateAction</default>
+    </route>
+
+    <route id="api.title.get" path="/api/title/{titleId}" methods="get">
         <default key="_controller">Thelia\Controller\Api\TitleController::getTitleAction</default>
-        <requirement key="title_id">\d+</requirement>
+        <requirement key="titleId">\d+</requirement>
+    </route>
+
+    <route id="api.title.delete" path="/api/title/{titleId}" methods="delete">
+        <default key="_controller">Thelia\Controller\Api\TitleController::deleteAction</default>
+        <requirement key="titleId">\d+</requirement>
     </route>
     <!-- end title route -->
 
