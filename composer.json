@@ -29,7 +29,7 @@
         "ptachoire/cssembed": "1.0.*",
         "doctrine/cache": "v1.3.0",
         "simplepie/simplepie": "1.3.*",
-        "imagine/imagine": "0.*",
+        "imagine/imagine": "v0.5.0",
         "symfony/icu": "1.0",
         "swiftmailer/swiftmailer": "5.2.*",
         "symfony/serializer": "2.3.*",
@@ -55,7 +55,8 @@
     "autoload": {
         "psr-0": {
             "": "local/modules/",
-            "Thelia": "core/lib/"
+            "Thelia": "core/lib/",
+            "Thelia\\Tests" : "tests/phpunit/"
         }
     },
     "extra": {
