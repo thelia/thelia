@@ -12,8 +12,13 @@
 
 namespace Thelia\Install;
 
+use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Symfony\Component\Yaml\Yaml;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Config\DefinePropel;
+use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -42,8 +47,29 @@ class Update
         '12' => '2.1.0-alpha1',
     );
 
-    protected function isLatestVersion($version)
+    protected $updatedVersions = [];
+
+    public function __construct($isInitialized = true)
     {
+        if (false === $isInitialized) {
+            $definePropel = new DefinePropel(
+                new DatabaseConfiguration(),
+                Yaml::parse(THELIA_CONF_DIR . 'database.yml')
+            );
+            $serviceContainer = Propel::getServiceContainer();
+            $serviceContainer->setAdapterClass('thelia', 'mysql');
+            $manager = new ConnectionManagerSingle();
+            $manager->setConfiguration($definePropel->getConfig());
+            $serviceContainer->setConnectionManager('thelia', $manager);
+        }
+    }
+
+
+    public function isLatestVersion($version = null)
+    {
+        if (null === $version) {
+            $version = $this->getCurrentVersion();
+        }
         $lastEntry = end(self::$version);
 
         return $lastEntry == $version;
@@ -54,10 +80,11 @@ class Update
         $logger = Tlog::getInstance();
         $logger->setLevel(Tlog::DEBUG);
 
-        $updatedVersions = array();
+        $this->updatedVersions = array();
 
         $currentVersion = ConfigQuery::read('thelia_version');
         $logger->debug("start update process");
+
         if (true === $this->isLatestVersion($currentVersion)) {
             $logger->debug("You already have the latest version. No update available");
             throw new UpToDateException('You already have the latest version. No update available');
@@ -68,38 +95,84 @@ class Update
         $con->beginTransaction();
         $logger->debug("begin transaction");
         $database = new Database($con->getWrappedConnection());
+        $version = null;
+
         try {
             $size = count(self::$version);
             for ($i = ++$index; $i < $size; $i++) {
-                $this->updateToVersion(self::$version[$i], $database, $logger);
-                $updatedVersions[] = self::$version[$i];
+                $version = self::$version[$i];
+                $this->updateToVersion($version, $database, $logger);
+                $this->updatedVersions[] = $version;
             }
             $con->commit();
             $logger->debug('update successfully');
-        } catch (PropelException $e) {
+        } catch (\Exception $e) {
             $con->rollBack();
             $logger->error(sprintf('error during update process with message : %s', $e->getMessage()));
-            throw $e;
+
+            $ex = new UpdateException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $ex->setVersion($version);
+            throw $ex;
         }
 
         $logger->debug('end of update processing');
 
-        return $updatedVersions;
+        return $this->updatedVersions;
     }
 
     protected function updateToVersion($version, Database $database, Tlog $logger)
     {
-        if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
-            $logger->debug(sprintf('inserting file %s', $version.'$sql'));
-            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version.'.sql'));
-            $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
+        // sql update
+        if (file_exists(THELIA_ROOT . '/setup/update/' . $version . '.sql')) {
+            $logger->debug(sprintf('inserting file %s', $version . '.sql'));
+            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/' . $version . '.sql'));
+            $logger->debug(sprintf('end inserting file %s', $version . '.sql'));
+        }
+
+        // php update
+        if (file_exists(THELIA_ROOT . '/setup/update/' . $version . '.php')) {
+            $logger->debug(sprintf('executing file %s', $version . '.php'));
+            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version . '.php'));
+            $logger->debug(sprintf('end executing file %s', $version . '.php'));
         }
 
         ConfigQuery::write('thelia_version', $version);
     }
 
-    public function getVersion()
+    public function getCurrentVersion()
+    {
+        $currentVersion = ConfigQuery::read('thelia_version');
+        return $currentVersion;
+    }
+
+    public function setCurrentVersion($version)
+    {
+        ConfigQuery::write('thelia_version', $version);
+    }
+
+    public function getLatestVersion(){
+        return end(self::$version);
+    }
+
+    public function getVersions()
     {
         return self::$version;
     }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedVersions()
+    {
+        return $this->updatedVersions;
+    }
+
+    /**
+     * @param array $updatedVersions
+     */
+    public function setUpdatedVersions($updatedVersions)
+    {
+        $this->updatedVersions = $updatedVersions;
+    }
+
 }

@@ -33,11 +33,37 @@ $trans = new Translator($_SESSION['install']['lang']);
 $trans->addLoader("php",  new Symfony\Component\Translation\Loader\PhpFileLoader());
 $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php', $_SESSION['install']['lang']);
 
+if (!isset($context)) {
+    $context = 'install';
+}
+
+// Check if we store is already configured and if we have to switch on an update process
+if ($context == "install" && $step == 1) {
+    try {
+        $checkPermission = new \Thelia\Install\CheckPermission(true, $trans);
+        $isValid = $checkPermission->exec();
+        $validationMessage = $checkPermission->getValidationMessages();
+    } catch (\Thelia\Install\Exception\AlreadyInstallException $ex) {
+        $update = new \Thelia\Install\Update(false);
+        if (!$update->isLatestVersion()) {
+            $updateLocation = str_replace('/index.php', '', $_SERVER["REQUEST_URI"]) . '/update.php';
+            header("Location: " . $updateLocation);
+            die();
+        }
+    }
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="">
 <head>
-    <title>Installation</title>
+    <title><?php
+        if ($context == "install") {
+            echo $trans->trans('Installation');
+        } else {
+            echo $trans->trans('Update');
+        }
+    ?></title>
     <link rel="shortcut icon" href="fd33fd0-6fda040.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
@@ -56,6 +82,11 @@ $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php',
         </div>
     </div>
 </div>
+<?php
+
+// Installation
+
+if ($context == "install") { ?>
 <div class="install">
     <div id="wrapper" class="container">
         <div class="row">
@@ -72,3 +103,23 @@ $trans->addResource('php', __DIR__.'/I18n/'.$_SESSION['install']['lang'].'.php',
                             <li class="<?php if($step == 6){ echo 'active'; } elseif ($step > 6) { echo 'complete'; }?>"><span class="badge">6</span><?php echo $trans->trans('Thanks'); ?><span class="chevron"></span></li>
                         </ul>
                     </div>
+
+<?php
+
+// Update
+
+} else { ?>
+<div class="update">
+    <div id="wrapper" class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="general-block-decorator">
+                    <h3 class="title title-without-tabs"><?php echo $trans->trans('Thelia installation wizard'); ?></h3>
+                    <div class="wizard">
+                        <ul>
+                            <li class="<?php if($step == 1){ echo 'active'; } elseif ($step > 1) { echo 'complete'; }?>"><span class="badge">1</span><?php echo $trans->trans('Welcome'); ?><span class="chevron"></span></li>
+                            <li class="<?php if($step == 2){ echo 'active'; } elseif ($step > 2) { echo 'complete'; }?>"><span class="badge">2</span><?php echo $trans->trans('Process'); ?><span class="chevron"></span></li>
+                        </ul>
+                    </div>
+<?php
+}
