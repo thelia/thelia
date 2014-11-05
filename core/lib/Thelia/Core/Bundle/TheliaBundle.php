@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
-
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
+use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiveBuilderPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
@@ -55,6 +55,7 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container
+            ->addCompilerPass(new FallbackParserPass())
             ->addCompilerPass(new TranslatorPass())
             ->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
             ->addCompilerPass(new RegisterRouterPass())
