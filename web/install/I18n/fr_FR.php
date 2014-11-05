@@ -39,5 +39,17 @@ return array(
     'website url :' => 'URL du site :',
     'Welcome' => 'Bienvenue',
     'Welcome in the Thelia installation wizard.' => 'Bienvenue dans l\'assistant d\'installation de Thelia.',
-    'Wrong connection information' => 'Les informations de connexion semblent erronées'
+    'Wrong connection information' => 'Les informations de connexion semblent erronées',
+    'Installation' => 'Installation',
+    'Update' => 'Mise à jour',
+    'Welcome in the Thelia updater wizard.' => 'Bienvenue dans l\'assistant de mise à jour Thelia.',
+    'It seems that Thelia database is already up to date.' => 'Il semble que votre base de données soit déjà à jour.',
+    'For the moment, the wizard allows only an update of the database. To update your php files you must proceed manually.' => 'Pour l\'instant, l\'assistant ne permet que la mise à jour de la base de données. Pour mettre à jour vos fichiers php, vous devez procéder manuellement.',
+    'Would you like to update your installation of Thelia from version <strong>%current</strong> to version <strong>%latest</strong>.' => 'Voulez-vous mettre à jour votre installation de Thelia de la version <strong>%current</strong> à la version <strong>%latest</strong>.',
+    'It\'s strongly recommended to make a backup before proceeding.' => 'Il est chaudement recommendé d\'effectuer une sauvegarde avant de procéder.',
+    'Thelia has been successfully updated to version %version' => 'Thelia a été mis à jour en version %version',
+    'Update proccess trace' => 'Trace du processus de mise à jour.',
+    'update to version %version' => 'mise à jour vers la version %version',
+    'Update Thelia' => "Mettre à jour Thelia",
+    'Updating Thelia.' => "Mise à jour de Thelia.",
 );

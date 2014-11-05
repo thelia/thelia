@@ -65,7 +65,7 @@ include("header.php");
 
 </div>
 <div class="clearfix">
-    <a href="updater.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update'); ?></a>
+    <a href="updater.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update Thelia'); ?></a>
 </div>
 <?php
 

@@ -150,7 +150,8 @@ class Update
         ConfigQuery::write('thelia_version', $version);
     }
 
-    public function getLatestVersion(){
+    public function getLatestVersion()
+    {
         return end(self::$version);
     }
 
@@ -174,5 +175,4 @@ class Update
     {
         $this->updatedVersions = $updatedVersions;
     }
-
 }

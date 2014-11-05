@@ -118,7 +118,7 @@ if ($context == "install") { ?>
                     <div class="wizard">
                         <ul>
                             <li class="<?php if($step == 1){ echo 'active'; } elseif ($step > 1) { echo 'complete'; }?>"><span class="badge">1</span><?php echo $trans->trans('Welcome'); ?><span class="chevron"></span></li>
-                            <li class="<?php if($step == 2){ echo 'active'; } elseif ($step > 2) { echo 'complete'; }?>"><span class="badge">2</span><?php echo $trans->trans('Process'); ?><span class="chevron"></span></li>
+                            <li class="<?php if($step == 2){ echo 'active'; } elseif ($step > 2) { echo 'complete'; }?>"><span class="badge">2</span><?php echo $trans->trans('Update'); ?><span class="chevron"></span></li>
                         </ul>
                     </div>
 <?php

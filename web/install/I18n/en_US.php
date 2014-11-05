@@ -40,4 +40,16 @@ return array(
     'Welcome' => 'Welcome',
     'Welcome in the Thelia installation wizard.' => 'Welcome to the Thelia installation wizard.',
     'Wrong connection information' => 'Wrong connection information',
+    'Installation' => 'Installation',
+    'Update' => 'Update',
+    'Welcome in the Thelia updater wizard.' => 'Welcome in the Thelia updater wizard.',
+    'It seems that Thelia database is already up to date.' => 'It seems that Thelia database is already up to date.',
+    'For the moment, the wizard allows only an update of the database. To update your php files you must proceed manually.' => 'For the moment, the wizard allows only an update of the database. To update your php files you must proceed manually.',
+    'Would you like to update your installation of Thelia from version <strong>%current</strong> to version <strong>%latest</strong>.' => 'Would you like to update your installation of Thelia from version <strong>%current</strong> to version <strong>%latest</strong>.',
+    'It\'s strongly recommended to make a backup before proceeding.' => 'It\'s strongly recommended to make a backup before proceeding.',
+    'Thelia has been successfully updated to version %version' => 'Thelia has been successfully updated to version %version',
+    'Update proccess trace' => 'Update proccess trace',
+    'update to version %version' => 'update to version %version',
+    'Update Thelia' => 'Update Thelia',
+    'Updating Thelia.' => 'Updating Thelia.'
 );
