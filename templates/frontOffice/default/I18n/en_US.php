@@ -99,6 +99,7 @@ return array(
     'Log out!' => 'Log out!',
     'Login' => 'Login',
     'Login Information' => 'Login Information',
+    'Main Address' => 'Main Address',
     'Minimum 2 characters.' => 'Minimum 2 characters.',
     'More information about this brand' => 'More information about this brand',
     'Multi-payment platform' => 'Multi-payment platform',
