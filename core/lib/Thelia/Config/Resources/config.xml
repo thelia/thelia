@@ -106,6 +106,10 @@
             <argument type="service" id="request" />
 		</service>
 
+        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
+            <argument type="service" id="request" />
+        </service>
+
 
 
         <!-- The file manager -->

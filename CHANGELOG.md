@@ -1,4 +1,16 @@
 #2.1.0-alpha2
+- Templating :
+    - Smarty is now a dedicated Module and no more present in the core of Thelia
+    - All the template logic works now with abstracted class or interface, so it is possible to create a new Module for
+an other template engine
+    - A new interface has been introduced, the ParserHelperInterface : its purpose is to parse a string and get all
+parser's function and block with theirs arguments.
+    - A new service has been introduced : thelia.parser.helper and it must be the implementation of ParserHelperInterface
+    - If you want to create a new Template module, you must declare those services :
+        - thelia.parser : the class that implements ParserInterface
+        - thelia.parser.helper : the class that implements ParserHelperInterface
+        - thelia.parser.asset.resolver : the class that implements AssetResolverInterface
+
 - Module :
     - New schema for modules
     - Module installation from back office

@@ -204,7 +204,9 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('17', 'en_US',  'New Products block', NULL,  NULL,  NULL),
 ('17', 'fr_FR',  'Bloc nouveaux produits', NULL,  NULL,  NULL),
 ('18', 'en_US',  'Products offer block', NULL,  NULL,  NULL),
-('18', 'fr_FR',  'Bloc promotions', NULL,  NULL,  NULL)
+('18', 'fr_FR',  'Bloc promotions', NULL,  NULL,  NULL),
+('19', 'en_US',  '>Smarty template engine integration', NULL,  NULL,  NULL),
+('19', 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL)
 ;
 
 
