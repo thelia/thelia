@@ -92,6 +92,7 @@ abstract class BaseLoop
             Argument::createBooleanTypeArgument('backend_context', false),
             Argument::createBooleanTypeArgument('force_return', false),
             Argument::createAnyTypeArgument('type'),
+            Argument::createBooleanTypeArgument('no-cache', false)
         ];
 
         if (true === $this->countable) {
@@ -375,27 +376,33 @@ abstract class BaseLoop
     public function count()
     {
         $hash = $this->args->getHash();
-        if (false === isset(self::$cacheCount[$hash])) {
-            $count = 0;
-            if ($this instanceof PropelSearchLoopInterface) {
-                $searchModelCriteria = $this->buildModelCriteria();
-                if (null === $searchModelCriteria) {
-                    $count = 0;
-                } else {
-                    $count = $searchModelCriteria->count();
-                }
-            } elseif ($this instanceof ArraySearchLoopInterface) {
-                $searchArray = $this->buildArray();
-                if (null === $searchArray) {
-                    $count = 0;
-                } else {
-                    $count = count($searchArray);
-                }
+
+        if (($isCaching = $this->isCaching()) && isset(self::$cacheCount[$hash])) {
+            return self::$cacheCount[$hash];
+        }
+
+        $count = 0;
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->buildModelCriteria();
+            if (null === $searchModelCriteria) {
+                $count = 0;
+            } else {
+                $count = $searchModelCriteria->count();
             }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->buildArray();
+            if (null === $searchArray) {
+                $count = 0;
+            } else {
+                $count = count($searchArray);
+            }
+        }
+
+        if ($isCaching) {
             self::$cacheCount[$hash] = $count;
         }
 
-        return self::$cacheCount[$hash];
+        return $count;
     }
 
     /**
@@ -406,42 +413,49 @@ abstract class BaseLoop
     public function exec(&$pagination)
     {
         $hash = $this->args->getHash();
-        if (false === isset(self::$cacheLoopResult[$hash])) {
-            $results = [];
 
-            if ($this instanceof PropelSearchLoopInterface) {
-                $searchModelCriteria = $this->buildModelCriteria();
-
-                if (null !== $searchModelCriteria) {
-                    $results = $this->search(
-                        $searchModelCriteria,
-                        $pagination
-                    );
-                }
-            } elseif ($this instanceof ArraySearchLoopInterface) {
-                $searchArray = $this->buildArray();
-
-                if (null !== $searchArray) {
-                    $results = $this->searchArray($searchArray);
-                }
-            }
-
-            $loopResult = new LoopResult($results);
-
-            if (true === $this->countable) {
-                $loopResult->setCountable();
-            }
-            if (true === $this->timestampable) {
-                $loopResult->setTimestamped();
-            }
-            if (true === $this->versionable) {
-                $loopResult->setVersioned();
-            }
-
-            self::$cacheLoopResult[$hash] = $this->parseResults($loopResult);
+        if (($isCaching = $this->isCaching()) && isset(self::$cacheLoopResult[$hash])) {
+            return self::$cacheLoopResult[$hash];
         }
 
-        return self::$cacheLoopResult[$hash];
+        $results = [];
+
+        if ($this instanceof PropelSearchLoopInterface) {
+            $searchModelCriteria = $this->buildModelCriteria();
+
+            if (null !== $searchModelCriteria) {
+                $results = $this->search(
+                    $searchModelCriteria,
+                    $pagination
+                );
+            }
+        } elseif ($this instanceof ArraySearchLoopInterface) {
+            $searchArray = $this->buildArray();
+
+            if (null !== $searchArray) {
+                $results = $this->searchArray($searchArray);
+            }
+        }
+
+        $loopResult = new LoopResult($results);
+
+        if (true === $this->countable) {
+            $loopResult->setCountable();
+        }
+        if (true === $this->timestampable) {
+            $loopResult->setTimestamped();
+        }
+        if (true === $this->versionable) {
+            $loopResult->setVersioned();
+        }
+
+        $parsedResults = $this->parseResults($loopResult);
+
+        if ($isCaching) {
+            self::$cacheLoopResult[$hash] = $parsedResults;
+        }
+
+        return $parsedResults;
     }
 
     protected function checkInterface()
@@ -501,6 +515,11 @@ abstract class BaseLoop
                 );
             }
         }
+    }
+
+    protected function isCaching()
+    {
+        return $this->getArg("no-cache")->getValue();
     }
 
     /**
