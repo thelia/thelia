@@ -99,6 +99,7 @@ return array(
     'Log out!' => 'Se déconnecter',
     'Login' => 'Connexion',
     'Login Information' => 'Informations de connexion',
+    'Main Address' => 'Adresse Principale',
     'Minimum 2 characters.' => '2 caractères minimum.',
     'More information about this brand' => 'Plus de détails sur cette marque',
     'Multi-payment platform' => 'Plateforme de paiement multiple',
