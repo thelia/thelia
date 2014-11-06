@@ -197,7 +197,7 @@ class TitleControllerTest extends ApiTestCase
 
         $client->request(
             'PUT',
-            '/api/title?sign='.$this->getSignParameter($requestContent),
+            '/api/title?no-cache=yes&sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,
@@ -224,6 +224,49 @@ class TitleControllerTest extends ApiTestCase
      * @param $titleId
      * @depends testUpdateAction
      */
+    public function testUpdateActionWithFormError($titleId)
+    {
+        $client = static::createClient();
+
+        $data = [
+            "i18n" => [
+                [
+                    "locale" => "en_US",
+                    "short" => "This sentence is really too long for a short"
+                ],
+            ],
+            "default" => true,
+            "title_id" => $titleId,
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'PUT',
+            '/api/title?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(500, $response->getStatusCode(), sprintf(
+            'Http status code must be 500. Error: %s',
+            $client->getResponse()->getContent()
+        ));
+
+        return $titleId;
+    }
+
+    /**
+     * @param $titleId
+     * @depends testUpdateActionWithFormError
+     */
     public function testDeleteAction($titleId)
     {
         $client = static::createClient();
@@ -237,5 +280,95 @@ class TitleControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode());
+    }
+
+    public function testCreateActionWithNotCompleteForm()
+    {
+        $client = static::createClient();
+
+        $data = [
+            "i18n" => [
+                [
+                    "short" => "Mr"
+                ],
+                [
+                    "locale" => "fr_FR",
+                    "short" => "Mr",
+                ],
+            ]
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'POST',
+            '/api/title?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(500, $response->getStatusCode(), sprintf(
+            'Http status code must be 500. Error: %s',
+            $client->getResponse()->getContent()
+        ));
+    }
+
+    public function testUpdateActionWithNotExistingTitleId()
+    {
+        $client = static::createClient();
+
+        $data = [
+            "i18n" => [
+                [
+                    "locale" => "en_US",
+                    "long" => "Mister"
+                ],
+            ],
+            "default" => true,
+            "title_id" => PHP_INT_MAX,
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'PUT',
+            '/api/title?sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(404, $response->getStatusCode(), sprintf(
+            'Http status code must be 404. Error: %s',
+            $client->getResponse()->getContent()
+        ));
+    }
+
+    public function testDeleteActionWithNotExistingTitleId()
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/title/'.PHP_INT_MAX.'?sign='.$this->getSignParameter(''),
+            [],
+            [],
+            $this->getServerParameters()
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 }

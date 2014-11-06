@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Model\Base\CustomerTitle as BaseCustomerTitle;
 use Thelia\Model\Map\CustomerTitleTableMap;
@@ -18,7 +19,10 @@ class CustomerTitle extends BaseCustomerTitle
         $con->beginTransaction();
 
         try {
-            CustomerTitleQuery::create()->update("`customer_title` SET `by_default` = 0");
+            CustomerTitleQuery::create()
+                ->update(array('ByDefault' => '0'))
+            ;
+
             $this->setByDefault(1)->save();
 
             $con->commit();

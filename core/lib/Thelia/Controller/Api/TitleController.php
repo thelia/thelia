@@ -175,6 +175,8 @@ class TitleController extends BaseApiController
             $this->processUpdate($event, $i18n);
 
             $con->commit();
+        } catch (\OutOfBoundsException $e) {
+            return new JsonResponse(["error" => $e->getMessage()], 404);
         } catch (\Exception $e) {
             $con->rollBack();
 
@@ -228,7 +230,7 @@ class TitleController extends BaseApiController
             return new JsonResponse(["error" => $e->getMessage()], 500);
         }
 
-        return new JsonResponse([], 201);
+        return $this->nullResponse(204);
     }
 
     /**
@@ -309,7 +311,17 @@ class TitleController extends BaseApiController
         $data = $event->getData();
 
         $title = CustomerTitleQuery::create()->findPk($data["title_id"]);
-        $data["default"] = (bool) $title->getByDefault();
+
+        if (null === $title) {
+            throw new \OutOfBoundsException(
+                sprintf(
+                    "The customer title id '%d' doesn't exist",
+                    $data["title_id"]
+                )
+            );
+        }
+
+        $data["default"] |= (bool) $title->getByDefault();
 
         $titleI18ns = CustomerTitleI18nQuery::create()
             ->filterById($data["title_id"])

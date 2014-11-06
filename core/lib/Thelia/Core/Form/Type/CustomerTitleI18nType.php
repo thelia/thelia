@@ -11,7 +11,9 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Form\Type;
+
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -22,6 +24,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class CustomerTitleI18nType extends AbstractTheliaType
 {
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->replaceDefaults([
+            "cascade_validation" => true,
+        ]);
+    }
+
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
