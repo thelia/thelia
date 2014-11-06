@@ -519,7 +519,7 @@ abstract class BaseLoop
 
     protected function isCaching()
     {
-        return $this->getArg("no-cache")->getValue();
+        return !$this->getArg("no-cache")->getValue();
     }
 
     /**
