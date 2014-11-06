@@ -1,2 +1,0 @@
-## Smarty for Thelia
-
