@@ -72,13 +72,16 @@ var pseManager = (function($){
 
                 for (pse in PSE){
                     combinations = PSE[pse].combinations;
+
                     combinationName = [];
-                    for (i = 0; i < combinations.length; i++){
-                        combinationName.push(PSE_COMBINATIONS_VALUE[combinations[i]][0]);
+                    if (undefined != combinations) {
+                        for (i = 0; i < combinations.length; i++){
+                            combinationName.push(PSE_COMBINATIONS_VALUE[combinations[i]][0]);
+                        }
                     }
                     $pse.fallback
                         .append("<option value='" + pse + "'>"
-                            + combinationName.join(', ') + "</option>");
+                        + combinationName.join(', ') + "</option>");
                 }
 
                 $("#pse-options .pse-fallback").on("change",function(){
@@ -105,7 +108,7 @@ var pseManager = (function($){
                     combinationValue = PSE_COMBINATIONS_VALUE[combinationValueId];
                     $pse.options[combinationValue[1]]
                         .append("<option value='" + combinationValueId + "'>"
-                            + combinationValue[0] + "</option>");
+                        + combinationValue[0] + "</option>");
                 }
 
                 setPseForm();
@@ -118,12 +121,15 @@ var pseManager = (function($){
             pse = null,
             combinationValueId;
         pse = PSE[id || $pse.pseId];
-        if ($pse.useFallback) {
-            $pse.fallbak.val(pse.id);
-        } else {
-            for (var i=0; i<pse.combinations.length; i++){
-                combinationValueId = pse.combinations[i];
-                $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+
+        if (undefined != pse) {
+            if ($pse.useFallback) {
+                $pse.fallbak.val(pse.id);
+            } else if (undefined != pse) {
+                for (var i = 0; i < pse.combinations.length; i++) {
+                    combinationValueId = pse.combinations[i];
+                    $pse['options'][PSE_COMBINATIONS_VALUE[combinationValueId][1]].val(pse.combinations[i])
+                }
             }
         }
     }
@@ -161,9 +167,9 @@ var pseManager = (function($){
 
     function displayNotice() {
         var $validity = $pse.validity;
-        $validity.show('fast', function(){
+        $validity.stop().show('fast', function(){
             setTimeout(function(){
-                $validity.hide('fast');
+                $validity.stop().hide('fast');
             }, 3000);
         });
     }
@@ -175,70 +181,87 @@ var pseManager = (function($){
             i
             ;
 
-        $pse.ref.html(pse.ref);
-        // $pse.ean.html(pse.ean);
-        // name
-        if (PSE_COUNT > 1) {
+        if (undefined != pse) {
 
-            for (i = 0; i < pse.combinations.length; i++){
-                pseValueId = pse.combinations[i]
-                name.push(
-                    //PSE_COMBINATIONS[PSE_COMBINATIONS_VALUE[pseValueId][1]].name +
-                    //":" +
-                    PSE_COMBINATIONS_VALUE[pseValueId][0]
-                )
+            $pse.ref.html(pse.ref);
+            // $pse.ean.html(pse.ean);
+            // name
+            if (PSE_COUNT > 1) {
+
+                for (i = 0; i < pse.combinations.length; i++) {
+                    pseValueId = pse.combinations[i]
+                    name.push(
+                        //PSE_COMBINATIONS[PSE_COMBINATIONS_VALUE[pseValueId][1]].name +
+                        //":" +
+                        PSE_COMBINATIONS_VALUE[pseValueId][0]
+                    )
+                }
+
+                $pse.name.html(" - " + name.join(", ") + "");
             }
 
-            $pse.name.html(" - " + name.join(", ") + "");
-        }
+            // promo
+            if (pse.isPromo) {
+                $pse.product.addClass("product--is-promo");
+            } else {
+                $pse.product.removeClass("product--is-promo");
+            }
 
-        // promo
-        if (pse.isPromo) {
-            $pse.product.addClass("product--is-promo");
-        } else {
-            $pse.product.removeClass("product--is-promo");
-        }
+            // new
+            if (pse.isNew) {
+                $pse.product.addClass("product--is-new");
+            } else {
+                $pse.product.removeClass("product--is-new");
+            }
 
-        // new
-        if (pse.isNew) {
-            $pse.product.addClass("product--is-new");
-        } else {
-            $pse.product.removeClass("product--is-new");
-        }
+            // availability
+            if (pse.quantity > 0 || !PSE_CHECK_AVAILABILITY) {
+                setProductAvailable(true);
 
-        // availability
-        if (pse.quantity > 0 || ! PSE_CHECK_AVAILABILITY) {
+                if (parseInt($pse.quantity.val()) > pse.quantity) {
+                    $pse.quantity.val(pse.quantity);
+                }
+                if (PSE_CHECK_AVAILABILITY) {
+                    $pse.quantity.attr("max", pse.quantity);
+                } else {
+                    $pse.quantity.attr("max", PSE_DEFAULT_AVAILABLE_STOCK);
+                    $pse.quantity.val("1");
+                }
+
+            } else {
+                setProductAvailable(false);
+            }
+
+            // price
+            if (pse.isPromo) {
+                $pse.priceOld.html(pse.price);
+                $pse.price.html(pse.promo);
+            } else {
+                $pse.priceOld.html("");
+                $pse.price.html(pse.price);
+            }
+        }
+        else {
+            setProductAvailable(false);
+        }
+    }
+
+    function setProductAvailable(available) {
+
+        if (available) {
             $pse.availability
                 .removeClass("out-of-stock")
                 .addClass("in-stock")
                 .attr("href", "http://schema.org/InStock");
 
-            if (parseInt($pse.quantity.val()) > pse.quantity){
-                $pse.quantity.val(pse.quantity);
-            }
-            if (PSE_CHECK_AVAILABILITY) {
-                $pse.quantity.attr("max", pse.quantity);
-            } else {
-                $pse.quantity.attr("max", PSE_DEFAULT_AVAILABLE_STOCK);
-                $pse.quantity.val("1");
-            }
             $pse.submit.prop("disabled", false);
-
-        } else {
+        }
+        else {
             $pse.availability.removeClass("in-stock")
                 .addClass("out-of-stock")
                 .attr("href", "http://schema.org/OutOfStock");
 
             $pse.submit.prop("disabled", true);
-        }
-
-        // price
-        if (pse.isPromo){
-            $pse.priceOld.html(pse.price);
-            $pse.price.html(pse.promo);
-        } else {
-            $pse.priceOld.html("");
-            $pse.price.html(pse.price);
         }
     }
 
@@ -253,20 +276,23 @@ var pseManager = (function($){
         for (pse in PSE){
             pseId = pse;
             combinations = PSE[pse].combinations;
-            for (i = 0; i < selection.length; i++){
-                existCombination = false;
-                for (j = 0; j < combinations.length; j++){
-                    if (selection[i] == combinations[j]){
-                        existCombination = true;
+
+            if (undefined != combinations) {
+                for (i = 0; i < selection.length; i++) {
+                    existCombination = false;
+                    for (j = 0; j < combinations.length; j++) {
+                        if (selection[i] == combinations[j]) {
+                            existCombination = true;
+                            break;
+                        }
+                    }
+                    if (existCombination === false) {
                         break;
                     }
                 }
-                if (existCombination === false) {
-                    break;
+                if (existCombination) {
+                    return pseId;
                 }
-            }
-            if (existCombination) {
-                return pseId;
             }
         }
 
@@ -282,14 +308,17 @@ var pseManager = (function($){
 
         for (pse in PSE){
             combinations = PSE[pse].combinations;
-            pseCount = 0;
-            for (i = 0; i < combinations.length; i++) {
-                pseCount += PSE_COMBINATIONS_VALUE[combinations[i]][1];
-            }
-            if (count == -1){
-                count = pseCount;
-            } else if (count != pseCount) {
-                return true;
+
+            if (undefined != combinations) {
+                pseCount = 0;
+                for (i = 0; i < combinations.length; i++) {
+                    pseCount += PSE_COMBINATIONS_VALUE[combinations[i]][1];
+                }
+                if (count == -1) {
+                    count = pseCount;
+                } else if (count != pseCount) {
+                    return true;
+                }
             }
         }
 
@@ -321,8 +350,8 @@ var pseManager = (function($){
 /* JQUERY PREVENT CONFLICT */
 (function ($) {
 
-/*  ------------------------------------------------------------------
-    callback Function ------------------------------------------------ */
+    /*  ------------------------------------------------------------------
+     callback Function ------------------------------------------------ */
     var confirmCallback = {
         'address.delete': function ($elm) {
             $.post($elm.attr('href'), function (data) {
@@ -336,7 +365,7 @@ var pseManager = (function($){
     };
 
 
-/*  ------------------------------------------------------------------
+    /*  ------------------------------------------------------------------
      onLoad Function ------------------------------------------------- */
     $(document).ready(function () {
 
@@ -352,7 +381,7 @@ var pseManager = (function($){
 
         // Check if the size of the window is appropriate for ajax
         var doAjax = ($(window).width() > 768) ? true : false;
-        
+
         // Main Navigation Hover
         $('.nav-secondary')
             .on('click.subnav', '[data-toggle=dropdown]', function (event) {
@@ -413,7 +442,7 @@ var pseManager = (function($){
         });
 
         // Product Quick view Dialog
-        $(document).on('click.product-quickview', '.product-quickview', function () { 
+        $(document).on('click.product-quickview', '.product-quickview', function () {
             if (doAjax) {
                 $.get(this.href,
                     function (data) {
@@ -428,8 +457,8 @@ var pseManager = (function($){
                         });
                         window.pseManager.load();
                     }
-                ); 
-                return false; 
+                );
+                return false;
             }
             return;
         });
@@ -566,16 +595,16 @@ var pseManager = (function($){
         });
 
         // Product details Thumbnails
-         $(document).on('click.thumbnails', '#product-thumbnails .thumbnail', function () {
-                if ($(this).hasClass('active')) { return false; }
+        $(document).on('click.thumbnails', '#product-thumbnails .thumbnail', function () {
+            if ($(this).hasClass('active')) { return false; }
 
-                var $productGallery = $(this).closest("#product-gallery"); 
-                $('.product-image > img', $productGallery).attr('src',$(this).attr('href'));
-                $('.thumbnail', $productGallery).removeClass('active');
-                $(this).addClass('active');
+            var $productGallery = $(this).closest("#product-gallery");
+            $('.product-image > img', $productGallery).attr('src',$(this).attr('href'));
+            $('.thumbnail', $productGallery).removeClass('active');
+            $(this).addClass('active');
 
-                return false;
-            });
+            return false;
+        });
 
         // Show Carousel control if needed
         $('#product-gallery').each(function () {
@@ -614,4 +643,3 @@ var pseManager = (function($){
 
 
 })(jQuery);
-
