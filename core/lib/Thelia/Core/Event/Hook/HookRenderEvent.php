@@ -13,7 +13,7 @@
 namespace Thelia\Core\Event\Hook;
 
 /**
- * HookRenderEvent is used by the hook smarty plugin function.
+ * HookRenderEvent is used by the hook template engine plugin function.
  *
  * Class HookRenderEvent
  * @package Thelia\Core\Event\Hook

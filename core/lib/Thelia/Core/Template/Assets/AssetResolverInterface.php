@@ -25,7 +25,7 @@ interface AssetResolverInterface
     /**
      * Generate an asset URL
      *
-     * @param string $source a module code, or SmartyParser::TEMPLATE_ASSETS_KEY
+     * @param string $source a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
      * @param string $file the file path, relative to a template base directory (e.g. assets/css/style.css)
      * @param string $type the asset type, either 'css' or '
      * @param ParserInterface $parserInterface the current template parser
@@ -45,7 +45,7 @@ interface AssetResolverInterface
      *      - in the module in the current template if it exists
      *      - in the module in the default template
      *
-     * @param  string $source a module code, or or SmartyParser::TEMPLATE_ASSETS_KEY
+     * @param  string $source a module code, or ParserInterface::TEMPLATE_ASSETS_KEY
      * @param  string $templateName a template name, or false to use the current template
      * @param  string $fileName the filename
      * @param  ParserInterface $parserInterface the current template parser

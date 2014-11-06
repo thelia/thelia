@@ -278,7 +278,7 @@ class ExportController extends BaseAdminController
         }
 
         /**
-         * Use the loop to inject the same vars in Smarty
+         * Use the loop to inject the same vars in the Template engine
          */
         $loop = new ExportLoop($this->container);
 
@@ -303,7 +303,7 @@ class ExportController extends BaseAdminController
         }
 
         /**
-         * Inject conditions in smarty,
+         * Inject conditions in template engine,
          * It is used to display or not the checkboxes "Include images"
          * and "Include documents"
          */

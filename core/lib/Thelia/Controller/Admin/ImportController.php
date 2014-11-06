@@ -344,7 +344,7 @@ class ImportController extends BaseAdminController
         }
 
         /**
-         * Use the loop to inject the same vars in Smarty
+         * Use the loop to inject the same vars in the template engine
          */
         $loop = new ImportLoop($this->container);
 
@@ -392,7 +392,7 @@ class ImportController extends BaseAdminController
         ;
 
         /**
-         * Inject them in smarty
+         * Inject them in template engine
          */
         $parserContext
             ->set("ALLOWED_MIME_TYPES", implode(",", $mimeTypes))
