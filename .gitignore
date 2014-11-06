@@ -37,6 +37,7 @@ local/modules/*
 !local/modules/Colissimo/
 !local/modules/Hook*/
 !local/modules/VirtualProductDelivery/
+!local/modules/TheliaSmarty/
 local/modules/HookTest/
 
 # Ignore everything in the "templates" directory, except the "default template"

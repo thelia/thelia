@@ -38,7 +38,8 @@
         "symfony/http-foundation": "2.3.*",
         "symfony/form": "2.3.*",
         "stack/builder": "1.0.*",
-        "thelia/currency-converter": "~1.0"
+        "thelia/currency-converter": "~1.0",
+        "smarty/smarty": "v3.1.19"
     },
     "require-dev": {
         "phpunit/phpunit": "4.1.*",
@@ -63,5 +64,28 @@
         "branch-alias": {
             "dev-master": "2.1.0-dev"
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "smarty/smarty",
+                "version": "3.1.19",
+                "dist": {
+                    "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "http://smarty-php.googlecode.com/svn/",
+                    "type": "svn",
+                    "reference": "tags/Smarty_3_1_19/distribution/"
+                },
+                "autoload": {
+                    "classmap": [
+                        "libs/"
+                    ]
+                }
+            }
+        }
+    ]
 }

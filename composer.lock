@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "40816351095c03ebb5467325f829caab",
+    "hash": "22c7173a015c5f5bf05d64c7cbfd20b3",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2885,6 +2885,54 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "time": "2014-09-01 10:45:00"
+        },
+        {
+            "name": "thelia/installer",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/installer.git",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/installer/zipball/02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "1.0.0"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Thelia\\Composer\\TheliaInstallerPlugin"
+            },
+            "autoload": {
+                "psr-0": {
+                    "Thelia\\Composer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL V3"
+            ],
+            "authors": [
+                {
+                    "name": "Manuel Raynaud",
+                    "email": "raynaud.manu@gmail.com",
+                    "homepage": "https://github.com/lunika"
+                }
+            ],
+            "description": "custom installer for Thelia.",
+            "keywords": [
+                "Thelia",
+                "Thelia-module",
+                "Thelia-template"
+            ],
+            "time": "2014-09-01 10:26:56"
         }
     ],
     "aliases": [],
@@ -2892,7 +2940,6 @@
     "stability-flags": {
         "propel/propel": 20,
         "kriswallsmith/assetic": 20,
-        "thelia/smarty-module": 20,
         "maximebf/debugbar": 20,
         "fzaninotto/faker": 20
     },
