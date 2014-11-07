@@ -1,5 +1,9 @@
 {extends file="layout.tpl"}
 
+{block name="init"}
+    {$errorStock = "FALSE"}
+{/block}
+
 {* Body Class *}
 {block name="body-class"}page-cart{/block}
 
@@ -19,7 +23,7 @@
 
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
-
+            <div id="errorStock" class="alert alert-warning" style="display:none;">{intl l="We apologize but some of the ordered products are not available any more."}</div>
             {hook name="cart.top"}
 
             <table class="table table-cart">
@@ -72,6 +76,7 @@
                                     {if $STOCK > 0}
                                         <dd>{intl l="In Stock"}</dd>
                                     {else}
+                                        {$errorStock="TRUE"}
                                         <dd>{intl l="Out of Stock"}</dd>
                                     {/if}
                                     <dt>{intl l="No."}</dt>
@@ -224,6 +229,9 @@
             var $form = $(this).parents('form');
             $form.submit();
         })
+        {if $errorStock=="TRUE"}
+          $("#errorStock").show();
+        {/if}
     });
 </script>
 {hook name="cart.after-javascript-include"}

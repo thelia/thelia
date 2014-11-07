@@ -493,7 +493,7 @@ class OrderController extends BaseFrontController
           if($pse->getQuantity() <=0 ) $flagQuantity = 1;
         }
         if ($flagQuantity == 1) {
-            $this->redirectToRoute('cart.view');
+            return $this->generateRedirectFromRoute('cart.view');
         }
     }
     
