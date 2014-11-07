@@ -12,19 +12,13 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
-use Thelia\Form\Api\Category\CategoryCreationForm;
-use Thelia\Form\Api\Category\CategoryModificationForm;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CategoryQuery;
 
 /**
@@ -32,147 +26,117 @@ use Thelia\Model\CategoryQuery;
  * @package Thelia\Controller\Api
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class CategoryController extends BaseApiController
+class CategoryController extends AbstractCrudApiController
 {
-    public function listAction()
+    public function __construct()
     {
-        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        if ($request->query->has('id')) {
-            $request->query->remove('id');
-        }
-
-        $params = array_merge(
-            $request->query->all(),
-            [
-                'limit' => $request->query->get('limit', 10),
-                'offset' => $request->query->get('offset', 0)
-            ]
+        parent::__construct(
+            "category",
+            AdminResources::CATEGORY,
+            TheliaEvents::CATEGORY_CREATE,
+            TheliaEvents::CATEGORY_UPDATE,
+            TheliaEvents::CATEGORY_DELETE
         );
-
-        return JsonResponse::create($this->baseCategorySearch($params));
     }
 
-    public function getAction($category_id)
+    /**
+     * @return \Thelia\Core\Template\Element\BaseLoop
+     *
+     * Get the entity loop instance
+     */
+    protected function getLoop()
     {
-        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        $params = array_merge(
-            $request->query->all(),
-            [
-                'id' => $category_id,
-                'limit' => 1
-            ]
-        );
-
-        $category = $this->baseCategorySearch($params);
-
-        if ($category->isEmpty()) {
-            throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
-        }
-
-        return JsonResponse::create($category);
+        return new Category($this->container);
     }
 
-    private function baseCategorySearch($params)
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    protected function getCreationForm(array $data = array())
     {
-        $categoryLoop = new Category($this->getContainer());
-        $categoryLoop->initializeArgs($params);
-        $paginate = 0;
-        return $categoryLoop->exec($paginate);
+        return $this->createForm("thelia.api.category.create", "form", $data, [
+            'csrf_protection' => false,
+        ]);
     }
 
-    public function createAction()
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    protected function getUpdateForm(array $data = array())
     {
-        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::CREATE);
-        $request = $this->getRequest();
-
-        $form = new CategoryCreationForm($request, "form", [], ['csrf_protection' => false]);
-
-        try {
-            $categoryForm = $this->validateForm($form);
-
-            $event = (new CategoryCreateEvent())
-                ->setTitle($categoryForm->get('title')->getData())
-                ->setLocale($categoryForm->get('locale')->getData())
-                ->setVisible($categoryForm->get('visible')->getData())
-                ->setParent($categoryForm->get('parent')->getData())
-            ;
-
-            $this->dispatch(TheliaEvents::CATEGORY_CREATE, $event);
-            $category = $event->getCategory();
-
-            $request->query->set('lang', $categoryForm->get('locale')->getData());
-            $response = $this->getAction($category->getId());
-            $response->setStatusCode(201);
-
-            return $response;
-        } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 500);
-        }
+        return $this->createForm("thelia.api.category.update", "form", $data, [
+            'csrf_protection' => false,
+            'method' => 'PUT',
+        ]);
     }
 
-    public function updateAction($category_id)
+    /**
+     * @param Event $event
+     * @return null|mixed
+     *
+     * Get the object from the event
+     *
+     * if return null or false, the action will throw a 404
+     */
+    protected function extractObjectFromEvent(Event $event)
     {
-        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::UPDATE);
-        $request = $this->getRequest();
-
-        $category = CategoryQuery::create()
-            ->findPk($category_id);
-
-        if (null === $category) {
-            throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
-        }
-
-        $form = new CategoryModificationForm(
-            $request,
-            'form',
-            ['id' => $category_id],
-            [
-                'csrf_protection' => false,
-                'method' => 'PUT'
-            ]
-        );
-
-        try {
-            $categoryForm = $this->validateForm($form);
-
-            $event = (new CategoryUpdateEvent($category_id))
-                ->setLocale($categoryForm->get('locale')->getData())
-                ->setParent($categoryForm->get('parent')->getData())
-                ->setTitle($categoryForm->get('title')->getData())
-                ->setChapo($categoryForm->get('chapo')->getData())
-                ->setDescription($categoryForm->get('description')->getData())
-                ->setPostscriptum($categoryForm->get('postscriptum')->getData());
-
-            $this->dispatch(TheliaEvents::CATEGORY_UPDATE, $event);
-
-            return JsonResponse::create(null, 204);
-        } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 500);
-        }
+        return $event->getCategory();
     }
 
-    public function deleteAction($category_id)
+
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getCreationEvent(array &$data)
     {
-        $this->checkAuth(AdminResources::CATEGORY, [], AccessManager::DELETE);
+        $event = new CategoryCreateEvent();
 
-        $category = CategoryQuery::create()
-            ->findPk($category_id);
+        $event
+            ->setLocale($data['locale'])
+            ->setTitle($data['title'])
+            ->setVisible($data['visible'])
+            ->setParent($data['parent'])
+        ;
 
-        if (null === $category) {
-            throw new HttpException(404, sprintf('{"error": "category with id %d not found"}', $category_id));
-        }
+        $this->setLocaleIntoQuery($data["locale"]);
 
-        try {
-            $event = new CategoryDeleteEvent($category_id);
-            $this->dispatch(TheliaEvents::CATEGORY_DELETE, $event);
+        return $event;
+    }
 
-            return Response::create('', 204);
-        } catch (\Exception $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 500);
-        }
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getUpdateEvent(array &$data)
+    {
+        $event = new CategoryUpdateEvent($data["id"]);
+
+        $event
+            ->setLocale($data['locale'])
+            ->setParent($data['parent'])
+            ->setTitle($data['title'])
+            ->setChapo($data['chapo'])
+            ->setDescription($data['description'])
+            ->setPostscriptum($data['postscriptum']);
+        ;
+
+        $this->setLocaleIntoQuery($data["locale"]);
+
+        return $event;
+    }
+
+    /**
+     * @param mixed $entityId
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getDeleteEvent($entityId)
+    {
+        $event = new CategoryDeleteEvent($entityId);
+        $event->setCategory(CategoryQuery::create()->findPk($entityId));
+
+        return $event;
     }
 }

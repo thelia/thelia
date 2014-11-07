@@ -160,6 +160,7 @@ class CategoryControllerTest extends ApiTestCase
             ->findOne();
 
         $content = [
+            'id' => $category->getId(),
             'title' => 'foo',
             'parent' => 0,
             'locale' => 'en_US',
@@ -175,14 +176,14 @@ class CategoryControllerTest extends ApiTestCase
 
         $client->request(
             'PUT',
-            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter($requestContent),
+            '/api/categories?sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,
             $requestContent
         );
 
-        $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'HTTP status code must be 204');
+        $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'HTTP status code must be 204');
     }
 
     public function testDeleteAction()

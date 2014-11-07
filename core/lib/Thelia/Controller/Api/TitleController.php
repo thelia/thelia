@@ -66,22 +66,24 @@ class TitleController extends AbstractCrudApiController
     }
 
     /**
+     * @param array $data
      * @return \Thelia\Form\BaseForm
      */
-    protected function getCreationForm()
+    protected function getCreationForm(array $data = array())
     {
-        return $this->createForm(null, "customer_title", [], array(
+        return $this->createForm(null, "customer_title", $data, array(
             "csrf_protection" => false,
             "cascade_validation" => true,
         ));
     }
 
     /**
+     * @param array $data
      * @return \Thelia\Form\BaseForm
      */
-    protected function getUpdateForm()
+    protected function getUpdateForm(array $data = array())
     {
-        return $this->createForm(null, "customer_title", [], array(
+        return $this->createForm(null, "customer_title", $data, array(
             "csrf_protection" => false,
             "cascade_validation" => true,
             "validation_groups" => ["Default", "update"],
@@ -100,17 +102,6 @@ class TitleController extends AbstractCrudApiController
     protected function extractObjectFromEvent(Event $event)
     {
         return $event->getCustomerTitle();
-    }
-
-    /**
-     * @param mixed $obj
-     * @return mixed
-     *
-     * After having extracted the object, now extract the id.
-     */
-    protected function extractIdFromObject($obj)
-    {
-        return $obj->getId();
     }
 
     /**

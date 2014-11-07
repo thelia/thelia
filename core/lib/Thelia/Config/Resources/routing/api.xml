@@ -146,23 +146,22 @@
         <default key="_controller">Thelia\Controller\Api\CategoryController::listAction</default>
     </route>
 
-    <route id="api.category.get" path="/api/categories/{category_id}" methods="get">
+    <route id="api.category.get" path="/api/categories/{entityId}" methods="get">
         <default key="_controller">Thelia\Controller\Api\CategoryController::getAction</default>
-        <requirement key="category_id">\d+</requirement>
+        <requirement key="entityId">\d+</requirement>
     </route>
 
     <route id="api.category.create" path="/api/categories" methods="post">
         <default key="_controller">Thelia\Controller\Api\CategoryController::createAction</default>
     </route>
 
-    <route id="api.category.update" path="/api/categories/{category_id}" methods="put">
+    <route id="api.category.update" path="/api/categories" methods="put">
         <default key="_controller">Thelia\Controller\Api\CategoryController::updateAction</default>
-        <requirement key="category_id">\d+</requirement>
     </route>
 
-    <route id="api.category.delete" path="/api/categories/{category_id}" methods="delete">
+    <route id="api.category.delete" path="/api/categories/{entityId}" methods="delete">
         <default key="_controller">Thelia\Controller\Api\CategoryController::deleteAction</default>
-        <requirement key="category_id">\d+</requirement>
+        <requirement key="entityId">\d+</requirement>
     </route>
 
     <!-- end category route -->

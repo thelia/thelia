@@ -11,6 +11,11 @@
         <form name="thelia.api.customer.create" class="Thelia\Form\Api\Customer\CustomerCreateForm"/>
         <form name="thelia.api.customer.update" class="Thelia\Form\Api\Customer\CustomerUpdateForm"/>
 
+        <!-- Forms for Category -->
+        <form name="thelia.api.category.create" class="Thelia\Form\Api\Category\CategoryCreationForm"/>
+        <form name="thelia.api.category.update" class="Thelia\Form\Api\Category\CategoryModificationForm"/>
+
+
         <!-- Product sale elements form -->
         <form name="thelia.api.product_sale_elements" class="Thelia\Form\Api\ProductSaleElements\ProductSaleElementsForm" />
 
