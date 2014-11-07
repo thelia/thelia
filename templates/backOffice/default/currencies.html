@@ -84,13 +84,13 @@
                                             }
                                         </th>
 
-                                        <th class="text-right">
+                                        <th class="text-center">
                                             {admin_sortable_header
                                             current_order=$order
                                             order='rate'
                                             reverse_order='rate_reverse'
                                             path='/admin/configuration/currencies'
-                                            label="{intl l="Rate in &euro;"}"
+                                            label="{intl l="Exchange rate"}"
                                             }
                                         </th>
 
@@ -138,7 +138,7 @@
 
                                             <td class="text-center">{$SYMBOL}</td>
 
-                                            <td class="text-right">{format_number number="$RATE" decimals="4"}</td>
+                                            <td class="text-center">{format_number number="$RATE" decimals="4"}</td>
 
                                             <td class="text-center">
                                                 {admin_position_block
