@@ -12,20 +12,17 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Translation\Translator;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Model\Currency as CurrencyModel;
-
-use Thelia\Core\Event\TheliaEvents;
-
-use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
-use Thelia\Model\ConfigQuery;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Currency as CurrencyModel;
+use Thelia\Model\CurrencyQuery;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
@@ -40,13 +37,11 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
         $currency
             ->setDispatcher($event->getDispatcher())
-
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
             ->setRate($event->getRate())
             ->setCode(strtoupper($event->getCode()))
-
             ->save()
         ;
 
@@ -93,6 +88,11 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->save()
             ;
 
+            // Update rates when setting a new default currency
+            if ($event->getIsDefault()) {
+                $event->getDispatcher()->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
+            }
+
             $event->setCurrency($currency);
         }
     }
@@ -120,24 +120,63 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates(ActionEvent $event)
+    public function updateRates(Event $event)
     {
+        // Get the URL for EUR currency exchenge rates.
         $rates_url = ConfigQuery::read('currency_rate_update_url', 'http://www.ecb.int/stats/eurofxref/eurofxref-daily.xml');
 
         $rate_data = @file_get_contents($rates_url);
 
         if ($rate_data && $sxe = new \SimpleXMLElement($rate_data)) {
-            foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
-                $code = strtoupper($last["currency"]);
-                $rate = floatval($last['rate']);
+            if (null !== $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true)) {
+                $defaultCode = $defaultCurrency->getCode();
 
-                if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
-                    $currency
-                        ->setDispatcher($event->getDispatcher())
-                        ->setRate($rate)
-                        ->save()
-                    ;
+                $rateFactor = false;
+
+                if ($defaultCode != 'EUR') {
+                    // Find the exchange rate for this currency
+                    foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
+                        $code = strtoupper($last["currency"]);
+
+                        if ($code == $defaultCode) {
+                            // Get the rate factor
+                            $rateFactor = 1 / floatval($last['rate']);
+                        }
+                    }
+                } else {
+                    $rateFactor = 1;
                 }
+
+                if (false === $rateFactor) {
+                    throw new \LogicException(
+                        sprintf(
+                            "Unable to find the exchange rate for default currency %s",
+                            $defaultCurrency->getCode()
+                        )
+                    );
+                }
+
+                // As EUR is missing in the rate results, apply the rateFactor to the EUR currency, if it exists
+                if (null !== $euroCurrency = CurrencyQuery::create()->findOneByCode('EUR')) {
+                    $euroCurrency
+                        ->setDispatcher($event->getDispatcher())
+                        ->setRate($rateFactor)
+                        ->save();
+                }
+
+                foreach ($sxe->Cube[0]->Cube[0]->Cube as $last) {
+                    $code = strtoupper($last["currency"]);
+                    $rate = $rateFactor * floatval($last['rate']);
+
+                    if (null !== $currency = CurrencyQuery::create()->findOneByCode($code)) {
+                        $currency
+                            ->setDispatcher($event->getDispatcher())
+                            ->setRate($rate)
+                            ->save();
+                    }
+                }
+            } else {
+                throw new \LogicException("Unable to find a default currency, please define a default currency.");
             }
         } else {
             throw new \RuntimeException(sprintf("Failed to get currency rates data from URL %s", $rates_url));

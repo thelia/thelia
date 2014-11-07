@@ -85,7 +85,7 @@ class TranslationsController extends BaseAdminController
                 'item_to_translate'             => $item_to_translate,
                 'item_name'                     => $item_name,
                 'module_part'                   => $module_part,
-                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 0),
+                'view_missing_traductions_only' => $this->getRequest()->get('view_missing_traductions_only', 1),
                 'max_input_vars_warning'        => false,
         );
 
