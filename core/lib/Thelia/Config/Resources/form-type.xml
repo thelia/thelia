@@ -26,6 +26,19 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.tax_rule" class="Thelia\Core\TaxRuleType">
+            <argument type="service" id="thelia.form.type.field.tax_rule_id" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.tax_rule_i18n" class="Thelia\Core\Form\Type\TaxRuleI18nType">
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.country_tax" class="Thelia\Core\Form\Type\CountryTaxType">
+            <tag name="thelia.form.type" />
+        </service>
+
         <!-- Unique field type -->
         <service id="thelia.form.type.field.product_id" class="Thelia\Core\Form\Type\Field\ProductIdType">
             <argument type="service" id="thelia.translator" />
@@ -57,6 +70,15 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.field.country_id" class="Thelia\Core\Form\Type\Field\CountryIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.tax_id" class="Thelia\Core\Form\Type\Field\TaxIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
     </services>
 
 </config>
