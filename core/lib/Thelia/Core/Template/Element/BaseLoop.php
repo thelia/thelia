@@ -21,6 +21,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\NotImplementedException;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
@@ -32,6 +33,9 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop
 {
+    /* Use of CacheFactory */
+    use \Thelia\Core\Template\Element\LoopCacheTrait;
+
     /**
      * @var \Thelia\Core\HttpFoundation\Request
      */
@@ -50,6 +54,7 @@ abstract class BaseLoop
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
+    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args */
     protected $args;
 
     protected $countable = true;
@@ -521,6 +526,23 @@ abstract class BaseLoop
     {
         return !$this->getArg("no-cache")->getValue();
     }
+
+    /**
+     * Return an array of references to this cache. This references are used to delete
+     * cache entries that are no more up to time.
+     *
+     * For instance, when an object is saved, an event will be trigger to delete cache related
+     * to this object.
+     *
+     * @return array|string|null  a reference or an array of references related to this cache
+     */
+    public function getCacheRef()
+    {
+        throw new NotImplementedException(
+            $this->translator->trans("Cacheable loop must override 'getCacheRef'")
+        );
+    }
+
 
     /**
      * @param LoopResult $loopResult

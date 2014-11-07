@@ -1,0 +1,38 @@
+{if $stats}
+
+<ul class="list-group">
+    {if $stats.hits}
+    <li class="list-group-item">
+        <strong>{intl l="hits"}</strong> : <span class="badge">{$stats.hits}</span>
+        <br/><small>{intl l="Number of keys that have been requested and found present."}</small>
+    </li>
+    {/if}
+    {if $stats.misses}
+    <li class="list-group-item">
+        <strong>{intl l="misses"}</strong> : <span class="badge">{$stats.misses}</span>
+        <br/><small>{intl l="Number of items that have been requested and not found."}</small>
+    </li>
+    {/if}
+    {if $stats.uptime}
+    <li class="list-group-item">
+        <strong>{intl l="uptime"}</strong> : <span class="badge">{$stats.uptime}</span>
+        <br/><small>{intl l="Time that the server is running."}</small>
+    </li>
+    {/if}
+    {if $stats.memory_usage}
+    <li class="list-group-item">
+        <strong>{intl l="memory_usage"}</strong> : <span class="badge">{$stats.memory_usage}</span>
+        <br/><small>{intl l="Memory used by this server to store items."}</small>
+    </li>
+    {/if}
+    {if $stats.memory_available}
+    <li class="list-group-item">
+        <strong>{intl l="memory_available"}</strong> : <span class="badge">{$stats.memory_available}</span>
+        <br/><small>{intl l="Memory allowed to use for storage."}</small>
+    </li>
+    {/if}
+</ul>
+
+{else}
+    <p>{intl l="There is no statistics"} </p>
+{/if}

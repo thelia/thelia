@@ -120,4 +120,5 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
         return $loopResult;
     }
+
 }
