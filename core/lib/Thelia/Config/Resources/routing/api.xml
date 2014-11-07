@@ -48,14 +48,14 @@
         <default key="_controller">Thelia\Controller\Api\TitleController::updateAction</default>
     </route>
 
-    <route id="api.title.get" path="/api/title/{titleId}" methods="get">
-        <default key="_controller">Thelia\Controller\Api\TitleController::getTitleAction</default>
-        <requirement key="titleId">\d+</requirement>
+    <route id="api.title.get" path="/api/title/{entityId}" methods="get">
+        <default key="_controller">Thelia\Controller\Api\TitleController::getAction</default>
+        <requirement key="entityId">\d+</requirement>
     </route>
 
-    <route id="api.title.delete" path="/api/title/{titleId}" methods="delete">
+    <route id="api.title.delete" path="/api/title/{entityId}" methods="delete">
         <default key="_controller">Thelia\Controller\Api\TitleController::deleteAction</default>
-        <requirement key="titleId">\d+</requirement>
+        <requirement key="entityId">\d+</requirement>
     </route>
     <!-- end title route -->
 

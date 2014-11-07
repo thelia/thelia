@@ -26,7 +26,7 @@
             <tag name="thelia.form.type" />
         </service>
 
-        <service id="thelia.form.type.tax_rule" class="Thelia\Core\TaxRuleType">
+        <service id="thelia.form.type.tax_rule" class="Thelia\Core\Form\Type\TaxRuleType">
             <argument type="service" id="thelia.form.type.field.tax_rule_id" />
             <tag name="thelia.form.type" />
         </service>

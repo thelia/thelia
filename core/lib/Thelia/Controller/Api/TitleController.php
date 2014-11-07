@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,219 +33,113 @@ use Thelia\Model\Map\CustomerTitleTableMap;
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class TitleController extends BaseApiController
+class TitleController extends AbstractCrudApiController
 {
-    /**
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * Lists customer titles
-     * @Route("/api/title")
-     * @Method("GET")
-     */
-    public function listAction()
+    public function __construct()
     {
-        $this->checkAuth(AdminResources::TITLE, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        $params = array_merge(
+        parent::__construct(
+            "customer title",
+            AdminResources::TITLE,
             [
-                "limit" => 10,
+                TheliaEvents::CUSTOMER_TITLE_BEFORE_CREATE,
+                TheliaEvents::CUSTOMER_TITLE_CREATE,
+                TheliaEvents::CUSTOMER_TITLE_AFTER_CREATE,
             ],
-            $request->query->all()
+            [
+                TheliaEvents::CUSTOMER_TITLE_BEFORE_UPDATE,
+                TheliaEvents::CUSTOMER_TITLE_UPDATE,
+                TheliaEvents::CUSTOMER_TITLE_AFTER_UPDATE,
+            ],
+            TheliaEvents::CUSTOMER_TITLE_DELETE
         );
+    }
 
-        return JsonResponse::create($this->getTitle($params));
+
+    /**
+     * @return \Thelia\Core\Template\Element\BaseLoop
+     *
+     * Get the entity loop instance
+     */
+    protected function getLoop()
+    {
+        return new Title($this->container);
     }
 
     /**
-     * @param $titleId
-     * @return \Symfony\Component\HttpFoundation\Response
-     *
-     * Get a title details
-     * @Route("/api/title/{titleId}", requirements={"titleId" = "\d+"})
-     * @Method("GET")
+     * @return \Thelia\Form\BaseForm
      */
-    public function getTitleAction($titleId)
+    protected function getCreationForm()
     {
-        $this->checkAuth(AdminResources::TITLE, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        $params = $request->query->all();
-        $params['id'] = $titleId;
-
-        $result = $this->getTitle($params);
-
-        if ($result->isEmpty()) {
-            throw new HttpException(404, sprintf('{"error": "title with id %d not found"}', $titleId));
-        }
-
-        return JsonResponse::create($result);
-    }
-
-    /**
-     * @return JsonResponse
-     *
-     * Create a customer title
-     * @Route("/api/title")
-     * @Method("POST")
-     */
-    public function createAction()
-    {
-        $this->checkAuth(AdminResources::TITLE, [], AccessManager::CREATE);
-
-        $baseForm = $this->createForm(null, "customer_title", [], array(
+        return $this->createForm(null, "customer_title", [], array(
             "csrf_protection" => false,
             "cascade_validation" => true,
         ));
-
-        $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-
-        try {
-            $form = $this->validateForm($baseForm);
-            $data = $form->getData();
-
-            $i18n = $data["i18n"];
-            $event = $this->createEvent($data);
-
-            /**
-             * The first row is the creation, after it's update
-             */
-            $this->hydrateEvent(array_shift($i18n), $event);
-
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_BEFORE_CREATE, $event);
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_CREATE, $event);
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_AFTER_CREATE, $event);
-
-            $this->processUpdate($event, $i18n);
-
-            $con->commit();
-        } catch (\Exception $e) {
-            $con->rollBack();
-
-            return new JsonResponse(["error" => $e->getMessage()], 500);
-        }
-
-        return new JsonResponse(
-            $this->getTitle(
-                array_merge(
-                    $this->getRequest()->query->all(),
-                    [
-                        "id" => $event->getCustomerTitle()->getId(),
-                    ]
-                )
-            ),
-            201
-        );
     }
 
     /**
-     * @return JsonResponse
-     *
-     * Update a customer title
-     * @Route("/api/title")
-     * @Method("PUT")
+     * @return \Thelia\Form\BaseForm
      */
-    public function updateAction()
+    protected function getUpdateForm()
     {
-        $this->checkAuth(AdminResources::TITLE, [], AccessManager::UPDATE);
-
-        $baseForm = $this->createForm(null, "customer_title", [], array(
+        return $this->createForm(null, "customer_title", [], array(
             "csrf_protection" => false,
             "cascade_validation" => true,
             "validation_groups" => ["Default", "update"],
             "method" => "PUT",
         ));
-
-        $baseForm->getFormBuilder()
-            ->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                [$this, "hydrateUpdateForm"]
-            );
-
-        $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-
-        try {
-            $form = $this->validateForm($baseForm);
-            $data = $form->getData();
-
-            $i18n = $data["i18n"];
-            $event = $this->createEvent($data);
-
-            $this->processUpdate($event, $i18n);
-
-            $con->commit();
-        } catch (\OutOfBoundsException $e) {
-            return new JsonResponse(["error" => $e->getMessage()], 404);
-        } catch (\Exception $e) {
-            $con->rollBack();
-
-            return new JsonResponse(["error" => $e->getMessage()], 500);
-        }
-
-        return new JsonResponse(
-            $this->getTitle(
-                array_merge(
-                    $this->getRequest()->query->all(),
-                    ["id" => $event->getCustomerTitle()->getId()]
-                )
-            ),
-            201
-        );
     }
 
     /**
-     * @param $titleId
-     * @return JsonResponse
+     * @param Event $event
+     * @return null|mixed
      *
-     * Delete a customer title
-     * @Route("/api/title/{titleId}", requirements={"titleId" = "\d+"})
-     * @Method("DELETE")
+     * Get the object from the event
+     *
+     * if return null or false, the action will throw a 404
      */
-    public function deleteAction($titleId)
+    protected function extractObjectFromEvent(Event $event)
     {
-        $this->checkAuth(AdminResources::TITLE, [], AccessManager::DELETE);
-
-        $con = Propel::getConnection(CustomerTitleTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-
-        try {
-            $event = $this->createEvent(["title_id" => $titleId]);
-
-            if (null === $event->getCustomerTitle()) {
-                return new JsonResponse(
-                    [
-                        "error" => "The title id '%d' doesn't exist"
-                    ],
-                    404
-                );
-            }
-
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_DELETE, $event);
-
-            $con->commit();
-        } catch (\Exception $e) {
-            $con->rollBack();
-
-            return new JsonResponse(["error" => $e->getMessage()], 500);
-        }
-
-        return $this->nullResponse(204);
+        return $event->getCustomerTitle();
     }
 
     /**
-     * @param $params
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @param mixed $obj
+     * @return mixed
      *
-     * Get the results of customer-title loop
+     * After having extracted the object, now extract the id.
      */
-    protected function getTitle($params)
+    protected function extractIdFromObject($obj)
     {
-        $titleLoop = new Title($this->getContainer());
-        $titleLoop->initializeArgs($params);
+        return $obj->getId();
+    }
 
-        return $titleLoop->exec($pagination);
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getCreationEvent(array &$data)
+    {
+        return $this->createEvent($data);
+    }
+
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getUpdateEvent(array &$data)
+    {
+        return $this->createEvent($data);
+    }
+
+    /**
+     * @param mixed $entityId
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getDeleteEvent($entityId)
+    {
+        $data = ["title_id" => $entityId];
+
+        return $this->createEvent($data);
     }
 
     /**
@@ -253,7 +148,7 @@ class TitleController extends BaseApiController
      *
      * Handler to create the customer title event
      */
-    protected function createEvent(array $data)
+    protected function createEvent(array &$data)
     {
         $event = new CustomerTitleEvent();
 
@@ -263,6 +158,12 @@ class TitleController extends BaseApiController
 
         if (isset($data["title_id"])) {
             $event->setCustomerTitle(CustomerTitleQuery::create()->findPk($data["title_id"]));
+        }
+
+        if (isset($data["i18n"]) && !empty($data["i18n"])) {
+            $row = array_shift($data["i18n"]);
+
+            $this->hydrateEvent($row, $event);
         }
 
         return $event;
@@ -283,21 +184,22 @@ class TitleController extends BaseApiController
         ;
     }
 
-    /**
-     * @param CustomerTitleEvent $event
-     * @param array $i18nRows
-     *
-     * Handler to process update for each i18n row
-     */
-    protected function processUpdate(CustomerTitleEvent $event, array $i18nRows)
+    protected function afterCreateEvents(Event $event, array &$data)
     {
-        while (null !== $i18n = array_shift($i18nRows)) {
-            $this->hydrateEvent($i18n, $event);
+        $dispatcher = $this->getDispatcher();
 
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_BEFORE_UPDATE, $event);
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_UPDATE, $event);
-            $this->dispatch(TheliaEvents::CUSTOMER_TITLE_AFTER_UPDATE, $event);
+        while (null !== $i18nRow = array_shift($data["i18n"])) {
+            $this->hydrateEvent($i18nRow, $event);
+
+            foreach ($this->updateEvents as $eventName) {
+                $dispatcher->dispatch($eventName, $event);
+            }
         }
+    }
+
+    protected function afterUpdateEvents(Event $event, array &$data)
+    {
+        $this->afterCreateEvents($event, $data);
     }
 
     /**

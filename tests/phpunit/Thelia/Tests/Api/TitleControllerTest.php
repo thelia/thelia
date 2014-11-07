@@ -351,8 +351,8 @@ class TitleControllerTest extends ApiTestCase
 
         $response = $client->getResponse();
 
-        $this->assertEquals(404, $response->getStatusCode(), sprintf(
-            'Http status code must be 404. Error: %s',
+        $this->assertEquals(500, $response->getStatusCode(), sprintf(
+            'Http status code must be 500. Error: %s',
             $client->getResponse()->getContent()
         ));
     }
