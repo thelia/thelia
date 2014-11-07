@@ -1,0 +1,429 @@
+<?php
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
+
+namespace Thelia\Controller\Api;
+
+use Propel\Runtime\Propel;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\Security\AccessManager;
+
+/**
+ * Class AbstractCrudApiController
+ * @package Thelia\Controller\Api
+ * @author Benjamin Perche <bperche@openstudio.fr>
+ */
+abstract class AbstractCrudApiController extends BaseApiController
+{
+    /**
+     * @var string
+     *
+     * The entity name to display errors
+     */
+    protected $objName;
+
+    /**
+     * @var mixed|array
+     *
+     * ACL resources used for rights checking
+     */
+    protected $resources;
+
+    /**
+     * @var array
+     *
+     * Events to call on entity creation
+     */
+    protected $createEvents;
+
+    /**
+     * @var array
+     *
+     * Events to call on entity update
+     */
+    protected $updateEvents;
+
+    /**
+     * @var array
+     *
+     * Events to call on entity deletion
+     */
+    protected $deleteEvents;
+
+    /**
+     * @var mixed|array
+     *
+     * ACL modules used for rights checking
+     */
+    protected $modules;
+
+    /**
+     * @var integer
+     *
+     * limit for the list operation
+     */
+    protected $listLimit;
+
+    /**
+     * @var string
+     *
+     * The id parameter used to filter in the loop
+     */
+    protected $idParameterName;
+
+    /**
+     * @param $objName
+     * @param $resources
+     * @param $createEvents
+     * @param $updateEvents
+     * @param $deleteEvents
+     * @param array $modules The module codes related to the ACL
+     * @param int $listLimit The loop count limit in list action
+     * @param string $idParameterName The "id" parameter name in your loop. Generally "id"
+     */
+    public function __construct(
+        $objName,
+        $resources,
+        $createEvents,
+        $updateEvents,
+        $deleteEvents,
+        $modules = [],
+        $listLimit = 10,
+        $idParameterName = "id"
+    ) {
+        $this->objName = $objName;
+        $this->resources = $resources;
+
+        $this->initializeEvents([
+            "createEvents" => $createEvents,
+            "updateEvents" => $updateEvents,
+            "deleteEvents" => $deleteEvents,
+        ]);
+
+        $this->modules = $modules;
+        $this->listLimit = $listLimit;
+        $this->idParameterName = $idParameterName;
+    }
+
+    public function listAction()
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
+        $request = $this->getRequest();
+
+        $params = array_merge(
+            [
+                "limit" => $this->listLimit,
+            ],
+            $request->query->all()
+        );
+
+        return JsonResponse::create($this->getLoopResults($params));
+    }
+
+    public function getAction($entityId)
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
+        $request = $this->getRequest();
+
+        $params = array_merge(
+            $request->query->all(),
+            [
+                $this->idParameterName => $entityId,
+            ]
+        );
+
+        $result = $this->getLoopResults($params);
+
+        if ($result->isEmpty()) {
+            $this->entityNotFound();
+        }
+
+        return JsonResponse::create($result);
+    }
+
+    public function createAction()
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::CREATE);
+
+        $baseForm = $this->getCreationForm();
+
+        $con = Propel::getConnection();
+        $con->beginTransaction();
+
+        try {
+            $form = $this->validateForm($baseForm);
+            $data = $form->getData();
+
+            $event = $this->getCreationEvent($data);
+
+            $dispatcher = $this->getDispatcher();
+            foreach ($this->createEvents as $eventName) {
+                $dispatcher->dispatch($eventName, $event);
+            }
+
+            $this->afterCreateEvents($event, $data);
+
+            $con->commit();
+        } catch (HttpException $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], $e->getStatusCode());
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], 500);
+        }
+
+        $obj = $this->extractObjectFromEvent($event);
+        $id = $this->extractIdFromObject($obj);
+
+        return new JsonResponse(
+            $this->getLoopResults(
+                array_merge(
+                    $this->getRequest()->query->all(),
+                    [$this->idParameterName => $id]
+                )
+            ),
+            201
+        );
+    }
+
+    /**
+     * @return JsonResponse
+     *
+     * Generic action to update an entity
+     */
+    public function updateAction()
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::UPDATE);
+
+        $baseForm = $this->getUpdateForm();
+
+        $baseForm->getFormBuilder()
+            ->addEventListener(
+                FormEvents::PRE_SUBMIT,
+                [$this, "hydrateUpdateForm"]
+            )
+        ;
+
+        $con = Propel::getConnection();
+        $con->beginTransaction();
+
+        try {
+            $form = $this->validateForm($baseForm);
+            $data = $form->getData();
+            $event = $this->getUpdateEvent($data);
+
+            $dispatcher = $this->getDispatcher();
+            foreach ($this->updateEvents as $eventName) {
+                $dispatcher->dispatch($eventName, $event);
+            }
+
+            $this->afterUpdateEvents($event, $data);
+
+            $con->commit();
+        } catch (HttpException $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], $e->getStatusCode());
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], 500);
+        }
+
+        $obj = $this->extractObjectFromEvent($event);
+        $id = $this->extractIdFromObject($obj);
+
+        return new JsonResponse(
+            $this->getLoopResults(
+                array_merge(
+                    $this->getRequest()->query->all(),
+                    [$this->idParameterName => $id]
+                )
+            ),
+            201
+        );
+    }
+
+    public function deleteAction($entityId)
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::DELETE);
+
+        $con = Propel::getConnection();
+        $con->beginTransaction();
+
+        try {
+            $event = $this->getDeleteEvent($entityId);
+
+            $obj = $this->extractObjectFromEvent($event);
+
+            if (null === $obj || false === $obj) {
+                $this->entityNotFound();
+            }
+
+            $dispatcher = $this->getDispatcher();
+            foreach ($this->deleteEvents as $eventName) {
+                $dispatcher->dispatch($eventName, $event);
+            }
+
+            $con->commit();
+
+        } catch (HttpException $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], $e->getStatusCode());
+        } catch (\Exception $e) {
+            $con->rollBack();
+
+            return new JsonResponse(["error" => $e->getMessage()], 500);
+        }
+
+        return $this->nullResponse(204);
+    }
+
+    protected function getLoopResults($loopParams)
+    {
+        $loop = $this->getLoop();
+        $loop->initializeArgs($loopParams);
+
+        return $loop->exec($pagination);
+    }
+
+    // Helpers
+
+    protected function entityNotFound()
+    {
+        throw new NotFoundHttpException(
+            json_encode([
+                "error" => sprintf("%s %s not found", $this->objName, $this->idParameterName)
+            ])
+        );
+    }
+
+    protected function initializeEvents($eventsDefinition)
+    {
+        foreach ($eventsDefinition as $variableName => $eventValue) {
+            $value = array();
+
+            if (!empty($eventValue) && !is_array($eventValue)) {
+                $value = [$eventValue];
+            } elseif (is_array($eventValue)) {
+                $value = $eventValue;
+            }
+
+            $this->$variableName = $value;
+        }
+    }
+
+    protected function setLocaleIntoQuery($locale, $parameterName = 'lang')
+    {
+        $request = $this->getRequest();
+        if (!$request->query->has($parameterName)) {
+            $request->query->set($parameterName, $locale);
+        }
+    }
+
+    // Inner logic, override those methods to use your logic
+
+    /**
+     * @param mixed $obj
+     * @return mixed
+     *
+     * After having extracted the object, now extract the id.
+     */
+    protected function extractIdFromObject($obj)
+    {
+        return $obj->getId();
+    }
+
+    public function hydrateUpdateForm(FormEvent $event)
+    {
+        // This method is called on FormEvents::PRE_SUBMIT
+    }
+
+    /**
+     * @param Event $event
+     * @param array $data
+     *
+     * Hook after creation
+     */
+    protected function afterCreateEvents(Event $event, array &$data)
+    {
+        // This method is called after dispatches in createAction
+    }
+
+    /**
+     * @param Event $event
+     * @param array $data
+     *
+     * Hook after update
+     */
+    protected function afterUpdateEvents(Event $event, array &$data)
+    {
+        // This method is called after dispatches in updateAction
+    }
+
+    // Abstract methods
+
+    /**
+     * @return \Thelia\Core\Template\Element\BaseLoop
+     *
+     * Get the entity loop instance
+     */
+    abstract protected function getLoop();
+
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    abstract protected function getCreationForm(array $data = array());
+
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    abstract protected function getUpdateForm(array $data = array());
+
+    /**
+     * @param Event $event
+     * @return null|mixed
+     *
+     * Get the object from the event
+     *
+     * if return null or false, the action will throw a 404
+     */
+    abstract protected function extractObjectFromEvent(Event $event);
+
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    abstract protected function getCreationEvent(array &$data);
+
+
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    abstract protected function getUpdateEvent(array &$data);
+
+    /**
+     * @param mixed $entityId
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    abstract protected function getDeleteEvent($entityId);
+}
