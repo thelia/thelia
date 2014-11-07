@@ -271,7 +271,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                 $filePath = $directoryContent->getPathName();
 
                 /* is it a picture ? */
-                if ( Image::isImage($filePath) ) {
+                if (Image::isImage($filePath)) {
                     $con->beginTransaction();
 
                     $image = new ModuleImage();
