@@ -31,9 +31,14 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
     /** @var \Thelia\Controller\BaseController */
     protected $controller;
 
+    /** @var  \ReflectionProperty */
+    protected $definitionReflection;
+
+    protected $formDefinition;
+
     protected function setUp()
     {
-        $this->controller = $this->getMock(
+        $this->controller = $controller = $this->getMock(
             "Thelia\\Controller\\BaseController",
             [
                 "getParser",
@@ -41,6 +46,17 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
                 "renderRaw"
             ]
         );
+
+        /**
+         * Reset static :: $formDefinition on controllers
+         */
+        $this->definitionReflection = $reflection = (new \ReflectionObject($this->controller))
+            ->getProperty('formDefinition')
+        ;
+        $reflection->setAccessible(true);
+        $this->formDefinition = $reflection->getValue();
+
+        $reflection->setValue(null);
 
         /**
          * Add the test type to the factory and
@@ -59,7 +75,7 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
         $container->setParameter(
             "thelia.parser.forms",
             array(
-                "test_form" => "Thelia\Tests\Resources\Form\TestForm",
+                "test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm",
             )
         );
 
@@ -69,6 +85,11 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
         $container->set("event_dispatcher", new EventDispatcher());
 
         $this->controller->setContainer($container);
+    }
+
+    protected function tearDown()
+    {
+        $this->definitionReflection->setValue($this->formDefinition);
     }
 
     public function testCreateFormWithoutType()
