@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Core\Form\Type;
+
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Thelia\Form\StandardDescriptionFieldsTrait;

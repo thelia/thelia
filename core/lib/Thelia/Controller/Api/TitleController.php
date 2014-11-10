@@ -206,12 +206,7 @@ class TitleController extends AbstractCrudApiController
         $title = CustomerTitleQuery::create()->findPk($data["title_id"]);
 
         if (null === $title) {
-            throw new \OutOfBoundsException(
-                sprintf(
-                    "The customer title id '%d' doesn't exist",
-                    $data["title_id"]
-                )
-            );
+            $this->entityNotFound($data["title_id"]);
         }
 
         $data["default"] |= (bool) $title->getByDefault();

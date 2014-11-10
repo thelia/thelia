@@ -10,25 +10,27 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Form\Type\Field;
+namespace Thelia\Core\Form\Type;
 
-use Thelia\Model\CustomerTitleQuery;
+use Symfony\Component\Form\FormBuilderInterface;
 
 /**
- * Class CustomerTitleIdType
- * @package Thelia\Core\Form\Type\Field
+ * Class ImageType
+ * @package Thelia\Core\Form\Type
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class CustomerTitleIdType extends AbstractIdType
+class ImageType extends AbstractTheliaType
 {
-    /**
-     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
-     *
-     * Get the model query to check
-     */
-    protected function getQuery()
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        return new CustomerTitleQuery();
+        $builder
+            ->add("i18n", "collection", array(
+                "type" => "standard_fields",
+                "allow_add" => true,
+                "allow_delete" => true,
+                "cascade_validation" => true,
+            ))
+        ;
     }
 
     /**
@@ -38,6 +40,6 @@ class CustomerTitleIdType extends AbstractIdType
      */
     public function getName()
     {
-        return "customer_title_id";
+        return "image";
     }
 }

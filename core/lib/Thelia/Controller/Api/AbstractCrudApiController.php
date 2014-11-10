@@ -148,7 +148,7 @@ abstract class AbstractCrudApiController extends BaseApiController
         $result = $this->getLoopResults($params);
 
         if ($result->isEmpty()) {
-            $this->entityNotFound();
+            $this->entityNotFound($entityId);
         }
 
         return JsonResponse::create($result);
@@ -272,7 +272,7 @@ abstract class AbstractCrudApiController extends BaseApiController
             $obj = $this->extractObjectFromEvent($event);
 
             if (null === $obj || false === $obj) {
-                $this->entityNotFound();
+                $this->entityNotFound($entityId);
             }
 
             $dispatcher = $this->getDispatcher();
@@ -305,11 +305,11 @@ abstract class AbstractCrudApiController extends BaseApiController
 
     // Helpers
 
-    protected function entityNotFound()
+    protected function entityNotFound($entityId)
     {
         throw new NotFoundHttpException(
             json_encode([
-                "error" => sprintf("%s %s not found", $this->objName, $this->idParameterName)
+                "error" => sprintf("%s %s %d not found", $this->objName, $this->idParameterName, $entityId)
             ])
         );
     }

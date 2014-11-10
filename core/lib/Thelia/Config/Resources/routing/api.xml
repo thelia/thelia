@@ -98,6 +98,13 @@
         <requirement key="imageId">\d+</requirement>
     </route>
 
+    <route id="api.product.image.update" path="/api/products/{entityId}/images/{imageId}" methods="put">
+        <default key="_controller">Thelia\Controller\Api\ImageController::updateImageAction</default>
+        <default key="entity">Product</default>
+        <requirement key="entityId">\d+</requirement>
+        <requirement key="imageId">\d+</requirement>
+    </route>
+
     <route id="api.product.image.delete" path="/api/products/{entityId}/images/{imageId}" methods="delete">
         <default key="_controller">Thelia\Controller\Api\ImageController::deleteImageAction</default>
         <default key="entity">Product</default>

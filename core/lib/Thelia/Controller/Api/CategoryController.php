@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
@@ -138,5 +139,14 @@ class CategoryController extends AbstractCrudApiController
         $event->setCategory(CategoryQuery::create()->findPk($entityId));
 
         return $event;
+    }
+
+    public function hydrateUpdateForm(FormEvent $event)
+    {
+        $id = $event->getData()["id"];
+
+        if (null === CategoryQuery::create()->findPk($id)) {
+            $this->entityNotFound($id);
+        }
     }
 }

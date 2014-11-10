@@ -40,5 +40,4 @@ class AttributeAvIdType extends AbstractIdType
     {
         return "attribute_av";
     }
-
 }

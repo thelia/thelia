@@ -58,5 +58,4 @@ class ProductSaleElementsForm extends BaseForm
     {
         return '';
     }
-
 }

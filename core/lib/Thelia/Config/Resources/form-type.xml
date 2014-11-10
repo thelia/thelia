@@ -39,6 +39,10 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.image" class="Thelia\Core\Form\Type\ImageType">
+            <tag name="thelia.form.type" />
+        </service>
+
         <!-- Unique field type -->
         <service id="thelia.form.type.field.product_id" class="Thelia\Core\Form\Type\Field\ProductIdType">
             <argument type="service" id="thelia.translator" />
