@@ -99,4 +99,7 @@ ALTER TABLE `module`
   AFTER `code`
 ;
 
+UPDATE `country` SET `isoalpha2` = 'BH' WHERE `isoalpha3` = 'BHR';
+UPDATE `country` SET `isoalpha2` = 'BG' WHERE `isoalpha3` = 'MDG';
+
 SET FOREIGN_KEY_CHECKS = 1;
