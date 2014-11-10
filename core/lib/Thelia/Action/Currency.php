@@ -155,7 +155,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             $currency->setRate($rate->getNumber(-1))->save();
         }
     }
-    
+
     /**
      * Changes position, selecting absolute ou relative change.
      *

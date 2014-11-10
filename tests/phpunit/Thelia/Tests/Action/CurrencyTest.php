@@ -16,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Action\Currency;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\CurrencyConverter\CurrencyConverter;
+use Thelia\CurrencyConverter\Provider\ECBProvider;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Model\CurrencyQuery;
@@ -49,7 +51,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Currency();
+        $action = new Currency($this->getCurrencyConverter());
         $action->create($event);
 
         $createdCurrency = $event->getCurrency();
@@ -82,7 +84,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
             ;
 
-        $action = new Currency();
+        $action = new Currency($this->getCurrencyConverter());
         $action->update($event);
 
         $updatedCurrency = $event->getCurrency();
@@ -108,7 +110,7 @@ class CurrencyTest extends ContainerAwareTestCase
             ->setIsDefault(1)
             ->setDispatcher($this->dispatcher);
 
-        $action = new Currency();
+        $action = new Currency($this->getCurrencyConverter());
         $action->setDefault($event);
 
         $updatedCurrency = $event->getCurrency();
@@ -133,7 +135,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $event = new CurrencyDeleteEvent($currency->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Currency();
+        $action = new Currency($this->getCurrencyConverter());
         $action->delete($event);
 
         $deletedCurrency = $event->getCurrency();
@@ -159,7 +161,7 @@ class CurrencyTest extends ContainerAwareTestCase
         $event = new CurrencyDeleteEvent($currency->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Currency();
+        $action = new Currency($this->getCurrencyConverter());
         $action->delete($event);
     }
 
@@ -177,5 +179,13 @@ class CurrencyTest extends ContainerAwareTestCase
     protected function buildContainer(ContainerBuilder $container)
     {
         // TODO: Implement buildContainer() method.
+    }
+
+    protected function getCurrencyConverter()
+    {
+        $ecbProvider = new ECBProvider();
+        $currencyConverter = new CurrencyConverter($ecbProvider);
+
+        return $currencyConverter;
     }
 }
