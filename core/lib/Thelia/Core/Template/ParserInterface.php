@@ -20,6 +20,11 @@ namespace Thelia\Core\Template;
 
 interface ParserInterface
 {
+
+    // A key to identify assets defined in a template. This will be the name of the directory in which the template
+    // assets will be copied and generated in the web cache.
+    const TEMPLATE_ASSETS_KEY = 'template-assets';
+
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true);
 
     public function renderString($templateText, array $parameters = array(), $compressOutput = true);

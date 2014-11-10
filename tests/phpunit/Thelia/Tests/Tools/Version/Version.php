@@ -22,7 +22,6 @@ use Thelia\Tools\Version\Version as Tester;
  */
 class Version extends \PHPUnit_Framework_TestCase
 {
-
     public function compareProvider()
     {
         return [

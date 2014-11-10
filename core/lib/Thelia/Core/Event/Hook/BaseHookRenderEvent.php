@@ -24,7 +24,7 @@ class BaseHookRenderEvent extends Event
     /** @var  string $code the code of the hook */
     protected $code = array();
 
-    /** @var  array $arguments an array of arguments passed to the smarty function  */
+    /** @var  array $arguments an array of arguments passed to the template engine function  */
     protected $arguments = array();
 
     public function __construct($code, array $arguments = array())

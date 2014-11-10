@@ -104,4 +104,16 @@ ALTER TABLE `module`
 UPDATE `country` SET `isoalpha2` = 'BH' WHERE `isoalpha3` = 'BHR';
 UPDATE `country` SET `isoalpha2` = 'BG' WHERE `isoalpha3` = 'MDG';
 
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
+
+INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
+(@max_id+1, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW())
+;
+
+INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id+1, 'en_US',  '>Smarty template engine integration', NULL,  NULL,  NULL),
+(@max_id+1, 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL)
+;
+
 SET FOREIGN_KEY_CHECKS = 1;

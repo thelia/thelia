@@ -16,14 +16,13 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Scope;
-
 use Thelia\Core\DependencyInjection\Compiler\CurrencyConverterProviderPass;
+use Thelia\Core\DependencyInjection\Compiler\FallbackParserPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterArchiveBuilderPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterFormExtensionPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
-use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterCouponConditionPass;
 use Thelia\Core\DependencyInjection\Compiler\StackPass;
@@ -56,9 +55,9 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container
+            ->addCompilerPass(new FallbackParserPass())
             ->addCompilerPass(new TranslatorPass())
             ->addCompilerPass(new RegisterListenersPass(), PassConfig::TYPE_AFTER_REMOVING)
-            ->addCompilerPass(new RegisterParserPluginPass())
             ->addCompilerPass(new RegisterRouterPass())
             ->addCompilerPass(new RegisterCouponPass())
             ->addCompilerPass(new RegisterCouponConditionPass())

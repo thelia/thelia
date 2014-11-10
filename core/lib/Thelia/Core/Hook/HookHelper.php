@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Hook;
 
-use Thelia\Core\Template\Smarty\SmartyHelper;
+use Thelia\Core\Template\ParserHelperInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
@@ -29,8 +29,14 @@ class HookHelper
     /** @var array messages used to build title for hooks */
     protected $messages = array();
 
-    public function __construct()
+    /**
+     * @var ParserHelperInterface
+     */
+    protected $parserHelper;
+
+    public function __construct(ParserHelperInterface $parserHelper)
     {
+        $this->parserHelper = $parserHelper;
     }
 
     public function parseActiveTemplate($templateType = TemplateDefinition::FRONT_OFFICE)
@@ -115,7 +121,7 @@ class HookHelper
 
                     if (in_array($ext, $allowed_exts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
-                            foreach (SmartyHelper::getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
+                            foreach ($this->parserHelper->getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
                                 $hooks[] = $hook;
                             }
                         }

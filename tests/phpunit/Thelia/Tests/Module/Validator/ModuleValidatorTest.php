@@ -24,7 +24,6 @@ use Thelia\Tools\Version\Version;
  */
 class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @expectedException \Thelia\Exception\ModuleException
      */
@@ -129,7 +128,6 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         }
 
         if (null !== $exceptionExpected) {
-
             $this->assertInstanceOf(
                 $exceptionExpected,
                 $exception,
@@ -147,14 +145,12 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
                     $path . " module exception should contain : " . $exceptionMessage
                 );
             }
-
         } else {
             $this->assertNull(
                 $exception,
                 $path . " module should not return exception [" . $exception->getMessage() . ']'
             );
         }
-
     }
 
     /**

@@ -11,9 +11,9 @@
 /*************************************************************************************/
 
 namespace TheliaDebugBar\Smarty\Plugin;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\Smarty\an;
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 use DebugBar\DebugBar as BaseDebugBar;
 use Thelia\Tools\URL;
 

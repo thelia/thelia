@@ -280,7 +280,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart = null;
 
         if ($this->request->cookies->has($cookieName)) {
-
             // The cart cookie exists -> get the cart token
             $token = $this->request->cookies->get($cookieName);
 
@@ -288,16 +287,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             // Check if a cart exists for this token
             if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
-
                 Tlog::getInstance()->addDebug("Cart has been found in the database");
 
                 if (null !== $customer = $this->session->getCustomerUser()) {
-
                     Tlog::getInstance()->addDebug("Customer " . $customer->getId() . " is logged in");
 
                     // A customer is logged in.
                     if ($cart->getCustomerId() != $customer->getId()) {
-
                         Tlog::getInstance()->addDebug("Cart customer (".$cart->getCustomerId().") <> current customer -> duplication");
 
                         // The cart does not belongs to the current customer
@@ -309,7 +305,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
                         );
                     }
                 } elseif ($cart->getCustomerId() != null) {
-
                     Tlog::getInstance()->addDebug("No customer logged in, but customer defined in cart (".$cart->getCustomerId().") -> duplication");
 
                     // Just duplicate the current cart, without assigning a customer ID.
@@ -320,7 +315,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // Still no cart ? Create a new one.
         if (null === $cart) {
-
             Tlog::getInstance()->addDebug("No cart found, creating a new one.");
 
             $cartCreateEvent = new CartCreateEvent();

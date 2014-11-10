@@ -402,7 +402,6 @@ abstract class BaseController extends ContainerAware
         array $routeParameters = [],
         $referenceType = Router::ABSOLUTE_PATH
     ) {
-
         return $this->generateRedirect(
             $this->retrieveUrlFromRouteId($routeId, $urlParameters, $routeParameters, $referenceType)
         );

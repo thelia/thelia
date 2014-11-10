@@ -36,7 +36,6 @@ class FlashMessage implements \Iterator
                 "message" => $message
             ];
         }
-
     }
 
     public function addAll($all)
@@ -44,7 +43,6 @@ class FlashMessage implements \Iterator
         foreach ($all as $type => $messages) {
             $this->add($type, $messages);
         }
-
     }
 
     public function isEmpty()

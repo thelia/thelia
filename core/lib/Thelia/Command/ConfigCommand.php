@@ -39,7 +39,6 @@ use Thelia\Model\ConfigQuery;
  */
 class ConfigCommand extends ContainerAwareCommand
 {
-
     protected function configure()
     {
         $this
@@ -138,7 +137,6 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function getConfig(InputInterface $input, OutputInterface $output)
     {
-
         $varName = $input->getArgument("name");
 
         if (null === $varName) {
@@ -174,7 +172,6 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function setConfig(InputInterface $input, OutputInterface $output)
     {
-
         $varName = $input->getArgument("name");
         $varValue = $input->getArgument("value");
 
@@ -197,7 +194,6 @@ class ConfigCommand extends ContainerAwareCommand
 
     private function deleteConfig(InputInterface $input, OutputInterface $output)
     {
-
         $varName = $input->getArgument("name");
 
         if (null === $varName) {

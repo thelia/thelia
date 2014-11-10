@@ -176,8 +176,7 @@ class Thelia extends Kernel
 
             $translationDirs = array();
 
-            /** @var ParserInterface $parser */
-            $parser = $container->getDefinition('thelia.parser');
+
 
             /** @var Module $module */
             foreach ($modules as $module) {
@@ -187,7 +186,7 @@ class Thelia extends Kernel
                     $definition->addMethodCall("setContainer", array(new Reference('service_container')));
 
                     $container->setDefinition(
-                        "module.".$module->getCode(),
+                        "module." . $module->getCode(),
                         $definition
                     );
 
@@ -202,8 +201,21 @@ class Thelia extends Kernel
                     }
 
                     $loader = new XmlFileLoader($container, new FileLocator($module->getAbsoluteConfigPath()));
-                    $loader->load("config.xml", "module.".$module->getCode());
+                    $loader->load("config.xml", "module." . $module->getCode());
+                } catch (\Exception $e) {
+                    Tlog::getInstance()->addError(
+                        sprintf("Failed to load module %s: %s", $module->getCode(), $e->getMessage()),
+                        $e
+                    );
+                }
+            }
 
+            /** @var ParserInterface $parser */
+            $parser = $container->getDefinition('thelia.parser');
+
+            /** @var Module $module */
+            foreach ($modules as $module) {
+                try {
                     // Core module translation
                     if (is_dir($dir = $module->getAbsoluteI18nPath())) {
                         $translationDirs[$module->getTranslationDomain()] = $dir;

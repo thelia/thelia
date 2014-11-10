@@ -81,7 +81,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
                     $this->checkDeactivation($module);
@@ -93,7 +92,6 @@ class Module extends BaseAction implements EventSubscriberInterface
                 throw $ex;
             }
         }
-
     }
 
     /**
@@ -259,7 +257,6 @@ class Module extends BaseAction implements EventSubscriberInterface
             try {
                 $dispatcher->dispatch(TheliaEvents::MODULE_DELETE, $deleteEvent);
             } catch (Exception $ex) {
-
                 // if module has not been deleted
                 if ($fs->exists($modulePath)) {
                     throw $ex;

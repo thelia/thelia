@@ -111,7 +111,6 @@ abstract class BaseForm
 
             $this->initFormWithContainer($type, $data, $options);
         } else {
-
             $this->initFormWithRequest($type, $data, $options);
         }
 

@@ -37,7 +37,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
  */
 class ModuleController extends AbstractCrudController
 {
-
     protected $moduleErrors = [];
 
     public function __construct()
@@ -308,7 +307,6 @@ class ModuleController extends AbstractCrudController
 
     public function installAction()
     {
-
         if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::CREATE)) {
             return $response;
         }
@@ -338,7 +336,6 @@ class ModuleController extends AbstractCrudController
             $newModule = $moduleInstallEvent->getModule();
 
             if (null !== $newModule) {
-
                 $this->getSession()->getFlashBag()->add(
                     'module-installed',
                     $this->getTranslator()->trans(
@@ -348,13 +345,11 @@ class ModuleController extends AbstractCrudController
                 );
 
                 return $this->generateRedirectFromRoute('admin.module');
-
             } else {
                 $message = $this->getTranslator()->trans(
                     "Sorry, an error occured."
                 );
             }
-
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         } catch (\Exception $e) {
@@ -372,6 +367,5 @@ class ModuleController extends AbstractCrudController
 
             return $this->render("modules");
         }
-
     }
 }
