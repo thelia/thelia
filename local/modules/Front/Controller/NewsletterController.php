@@ -23,10 +23,12 @@
 
 namespace Front\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\NewsletterForm;
+use Thelia\Log\Tlog;
 
 /**
  * Class NewsletterController
@@ -38,7 +40,7 @@ class NewsletterController extends BaseFrontController
 
     public function subscribeAction()
     {
-        $error_message = false;
+        $errorMessage = false;
         $newsletterForm = new NewsletterForm($this->getRequest());
 
         try {
@@ -61,33 +63,38 @@ class NewsletterController extends BaseFrontController
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
         } catch (\Exception $e) {
-            $error_message = $e->getMessage();
+            $errorMessage = $e->getMessage();
+
+            Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
         }
 
-        \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $error_message));
 
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
-            if ($error_message) {
-                $response = $this->jsonResponse(json_encode(array(
-                            "success" => false,
-                            "message" => $error_message
-                        )));
+            $response = new JsonResponse();
+
+            if ($errorMessage) {
+                $response = $response->setContent(array(
+                    "success" => false,
+                    "message" => $errorMessage
+                ));
             } else {
-                $response = $this->jsonResponse(json_encode(array(
-                            "success" => true,
-                            "message" => $this->getTranslator()->trans("Thanks for signing up! We'll keep you posted whenever we have any new updates.")
-                        )));
+                $response = $response->setContent(array(
+                    "success" => true,
+                    "message" => $this->getTranslator()->trans(
+                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                    )
+                ));
             }
 
             return $response;
 
         } else {
-            $newsletterForm->setErrorMessage($error_message);
+            $newsletterForm->setErrorMessage($errorMessage);
 
             $this->getParserContext()
                 ->addForm($newsletterForm)
-                ->setGeneralError($error_message)
+                ->setGeneralError($errorMessage)
             ;
         }
 
