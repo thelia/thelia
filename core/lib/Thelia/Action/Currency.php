@@ -20,12 +20,25 @@ use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\CurrencyConverter\CurrencyConverter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 
 class Currency extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var CurrencyConverter
+     */
+    protected $currencyConverter;
+
+    /**
+     * @param CurrencyConverter $currencyConverter
+     */
+    public function __construct(CurrencyConverter $currencyConverter)
+    {
+        $this->currencyConverter = $currencyConverter;
+    }
     /**
      * Create a new currencyuration entry
      *
