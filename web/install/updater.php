@@ -77,7 +77,7 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
                 </div>
             <?php } ?>
 
-            <p class="lead"><?php echo $trans->trans('Update proccess trace'); ?></p>
+            <p class="lead"><?php echo $trans->trans('Update proccess'); ?></p>
             <ul class="list-unstyled list-group">
                 <?php foreach ($update->getUpdatedVersions() as $version) { ?>
                     <li class="list-group-item text-success"><?php
@@ -91,8 +91,21 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
                     ?></li>
                 <?php } ?>
             </ul>
+            <?php
 
-        <?php } ?>
+            if (null !== $updateError) { ?>
+                <p class="lead"><?php echo $trans->trans('Update proccess trace'); ?></p>
+                <ul class="list-unstyled list-group">
+                    <?php foreach ($update->getLogs() as $log) { ?>
+                        <li class="list-group-item"><?php
+                            echo sprintf("[%s] %s", $log[0], $log[1]);
+                            ?></li>
+                    <?php } ?>
+                </ul>
+
+            <?php }
+            }
+        ?>
 
     </div>
 <?php

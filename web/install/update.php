@@ -64,10 +64,13 @@ include("header.php");
     <?php } ?>
 
 </div>
-<div class="clearfix">
-    <a href="updater.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update Thelia'); ?></a>
-</div>
+<?php if (!$update->isLatestVersion()) { ?>
+    <div class="clearfix">
+        <a href="updater.php" class="pull-right btn btn-default btn-primary"><span
+                class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update Thelia'); ?></a>
+    </div>
 <?php
+}
 
 include("footer.php");
 
