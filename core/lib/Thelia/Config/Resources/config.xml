@@ -226,5 +226,11 @@
         <service id="thelia.forms.extension.core_extension" class="Symfony\Component\Form\Extension\Core\CoreExtension">
             <tag name="thelia.forms.extension" />
         </service>
+
+        <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />
+
+        <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
+            <tag name="currency.converter.provider" priority="0" />
+        </service>
     </services>
 </config>

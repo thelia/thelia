@@ -99,6 +99,7 @@
         </service>
 
         <service id="thelia.action.currency" class="Thelia\Action\Currency">
+            <argument type="service" id="currency.converter" />
             <tag name="kernel.event_subscriber"/>
         </service>
 

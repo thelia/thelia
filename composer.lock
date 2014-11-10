@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d66dfa5618d89613455348bb069d75e4",
+    "hash": "40816351095c03ebb5467325f829caab",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -591,24 +591,58 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "3.1.19",
+            "version": "v3.1.19",
             "source": {
-                "type": "svn",
-                "url": "http://smarty-php.googlecode.com/svn/",
-                "reference": "tags/Smarty_3_1_19/distribution/"
+                "type": "git",
+                "url": "https://github.com/smarty-php/smarty.git",
+                "reference": "be0fd3186ceec57e4da9a44031f517c06ae2418a"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/be0fd3186ceec57e4da9a44031f517c06ae2418a",
+                "reference": "be0fd3186ceec57e4da9a44031f517c06ae2418a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
-                    "libs/"
+                    "libs/Smarty.class.php",
+                    "libs/SmartyBC.class.php",
+                    "libs/sysplugins/smarty_security.php"
                 ]
-            }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Monte Ohrt",
+                    "email": "monte@ohrt.com"
+                },
+                {
+                    "name": "Uwe Tews",
+                    "email": "uwe.tews@googlemail.com"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "rodney.rehm@medialize.de"
+                }
+            ],
+            "description": "Smarty - the compiling PHP template engine",
+            "homepage": "http://www.smarty.net",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2014-10-31 01:29:14"
         },
         {
             "name": "stack/builder",
@@ -1966,6 +2000,92 @@
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
             "time": "2014-10-01 05:38:33"
+        },
+        {
+            "name": "thelia/currency-converter",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/CurrencyConverter.git",
+                "reference": "7ca97c650275548631c3f3c609d6b70b0f374a48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/CurrencyConverter/zipball/7ca97c650275548631c3f3c609d6b70b0f374a48",
+                "reference": "7ca97c650275548631c3f3c609d6b70b0f374a48",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "thelia/math-tools": "~1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Thelia\\CurrencyConverter\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Manuel Raynaud",
+                    "email": "manu@thelia.net"
+                }
+            ],
+            "description": "php 5.4 currency tools",
+            "time": "2014-11-10 08:09:40"
+        },
+        {
+            "name": "thelia/math-tools",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/math-tools.git",
+                "reference": "151c819df2b428fffde19314e8a02bef02dbad31"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/math-tools/zipball/151c819df2b428fffde19314e8a02bef02dbad31",
+                "reference": "151c819df2b428fffde19314e8a02bef02dbad31",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Thelia\\Math\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Benjamin Perche",
+                    "email": "bperche@openstudio.com"
+                }
+            ],
+            "description": "Number management library",
+            "time": "2014-11-07 14:57:24"
         }
     ],
     "packages-dev": [
