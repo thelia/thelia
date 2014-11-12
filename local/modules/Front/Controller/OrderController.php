@@ -266,7 +266,9 @@ class OrderController extends BaseFrontController
         
         /* check stock not empty */
         if(true === ConfigQuery::checkAvailableStock()) {
-          return $this->checkStockNotEmpty();
+          if (null !== $response = $this->checkStockNotEmpty(); {
+            return $response;
+          } 
         }
         
         /* check delivery address and module */
