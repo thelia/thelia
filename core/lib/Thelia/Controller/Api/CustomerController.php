@@ -12,184 +12,165 @@
 
 namespace Thelia\Controller\Api;
 
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Customer;
-use Thelia\Exception\CustomerException;
-use Thelia\Form\Api\Customer\CustomerCreateForm;
-use Thelia\Form\Api\Customer\CustomerUpdateForm;
-use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 
 /**
  * Class CustomerController
  * @package Thelia\Controller\Api
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class CustomerController extends BaseApiController
+class CustomerController extends AbstractCrudApiController
 {
-    public function listAction()
+    public function __construct()
     {
-        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        $customerLoop = new Customer($this->getContainer());
-        try {
-            $parameters = array_merge($request->query->all(), [
-                'current' => false,
-                'limit' => $request->query->get('limit', 10),
-                'offset' => $request->query->get('offset', 0)
-            ]);
-            $customerLoop->initializeArgs($parameters);
-        } catch (\InvalidArgumentException $e) {
-            throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
-        }
-
-        $paginate = 0;
-        $results = $customerLoop->exec($paginate);
-
-        return JsonResponse::create($results);
-    }
-
-    public function getCustomerAction($customer_id)
-    {
-        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::VIEW);
-        $request = $this->getRequest();
-
-        $customer = new Customer($this->getContainer());
-
-        try {
-            $customer->initializeArgs([
-                'current'   => false,
-                'id'        => $customer_id
-            ]);
-        } catch (\InvalidArgumentException $e) {
-            throw new BadRequestHttpException(sprintf('{"error": "%s"}', $e->getMessage()));
-        }
-        $paginate = 0;
-        $result = $customer->exec($paginate);
-
-        if ($result->isEmpty()) {
-            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
-        }
-
-        return JsonResponse::create($result);
-    }
-
-    public function createCustomerAction()
-    {
-        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::CREATE);
-        $request = $this->getRequest();
-
-        $form = $this->createForm(
-            "thelia.api.customer.create",
-            "form",
+        parent::__construct(
+            "customer",
+            AdminResources::CUSTOMER,
+            TheliaEvents::CUSTOMER_CREATEACCOUNT,
+            TheliaEvents::CUSTOMER_UPDATEACCOUNT,
+            TheliaEvents::CUSTOMER_DELETEACCOUNT,
             [],
-            ['csrf_protection' => false]
+            [
+                "limit" => 10,
+                "offset" => 0,
+                "current" => false,
+            ]
         );
-
-        try {
-            $customerForm = $this->validateForm($form);
-            $event = $this->hydrateEvent($customerForm);
-
-            $this->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $event);
-            $customer = $event->getCustomer();
-
-            $response = $this->getCustomerAction($customer->getId());
-            $response->setStatusCode(201);
-
-            return $response;
-        } catch (FormValidationException $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 500);
-        }
     }
 
-    public function updateCustomerAction($customer_id)
+
+    /**
+     * @return \Thelia\Core\Template\Element\BaseLoop
+     *
+     * Get the entity loop instance
+     */
+    protected function getLoop()
     {
-        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::UPDATE);
+        return new Customer($this->container);
+    }
 
-        $customer = CustomerQuery::create()
-            ->findPk($customer_id);
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    protected function getCreationForm(array $data = array())
+    {
+        return $this->createForm("thelia.api.customer.create");
+    }
 
-        if (null === $customer) {
-            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
-        }
-
-        $form = $this->createForm(
+    /**
+     * @param array $data
+     * @return \Thelia\Form\BaseForm
+     */
+    protected function getUpdateForm(array $data = array())
+    {
+        return $this->createForm(
             "thelia.api.customer.update",
             "form",
             [],
-            ['csrf_protection' => false, 'method' => 'PUT']
+            ['method' => 'PUT']
         );
-
-        try {
-            $customerForm = $this->validateForm($form);
-            $event = $this->hydrateEvent($customerForm);
-
-            $event->setCustomer($customer);
-
-            $this->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $event);
-
-            return Response::create(null, 204);
-        } catch (FormValidationException $e) {
-            return JsonResponse::create(['error' => $e->getMessage()], 500);
-        }
     }
 
-    public function deleteCustomerAction($customer_id)
+    /**
+     * @param Event $event
+     * @return null|mixed
+     *
+     * Get the object from the event
+     *
+     * if return null or false, the action will throw a 404
+     */
+    protected function extractObjectFromEvent(Event $event)
     {
-        $this->checkAuth(AdminResources::CUSTOMER, [], AccessManager::DELETE);
+        return $event->getCustomer();
+    }
 
-        $customer = CustomerQuery::create()
-            ->findPk($customer_id);
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getCreationEvent(array &$data)
+    {
+        return $this->hydrateEvent($data);
+    }
+
+    /**
+     * @param array $data
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getUpdateEvent(array &$data)
+    {
+        return $this->hydrateEvent($data);
+    }
+
+    /**
+     * @param mixed $entityId
+     * @return \Symfony\Component\EventDispatcher\Event
+     */
+    protected function getDeleteEvent($entityId)
+    {
+        $customer = CustomerQuery::create()->findPk($entityId);
 
         if (null === $customer) {
             throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
         }
 
-        $event = new CustomerEvent($customer);
-
-        try {
-            $this->dispatch(TheliaEvents::CUSTOMER_DELETEACCOUNT, $event);
-        } catch (CustomerException $e) {
-            throw new HttpException(403, '{"error": "Impossible to delete a customer who already have orders"}');
-        }
-
-        return Response::create(null, 204);
+        return new CustomerEvent($customer);
     }
 
-    protected function hydrateEvent(Form $form)
+    protected function hydrateEvent(array $data)
     {
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-            $form->get('title')->getData(),
-            $form->get('firstname')->getData(),
-            $form->get('lastname')->getData(),
-            $form->get('address1')->getData(),
-            $form->get('address2')->getData(),
-            $form->get('address3')->getData(),
-            $form->get('phone')->getData(),
-            $form->get('cellphone')->getData(),
-            $form->get('zipcode')->getData(),
-            $form->get('city')->getData(),
-            $form->get('country')->getData(),
-            $form->get('email')->getData(),
-            $form->get('password')->getData(),
-            $form->get('lang')->getData(),
-            $form->has('reseller') ? $form->get('reseller')->getData():null,
-            $form->has('sponsor') ? $form->get('sponsor')->getData():null,
-            $form->has('discount') ? $form->get('discount')->getData():null,
-            $form->get('company')->getData(),
+            $data['title'],
+            $data['firstname'],
+            $data['lastname'],
+            $data['address1'],
+            $data['address2'],
+            $data['address3'],
+            $data['phone'],
+            $data['cellphone'],
+            $data['zipcode'],
+            $data['city'],
+            $data['country'],
+            $data['email'],
+            $data['password'],
+            $data['lang'],
+            isset($data["reseller"]) ? $data["reseller"] : null,
+            isset($data["sponsor"]) ? $data["sponsor"] : null,
+            isset($data["discount"]) ? $data["discount"] : null,
+            $data['company'],
             null
         );
 
+        if (isset($data["id"])) {
+            $customerCreateEvent->setCustomer(CustomerQuery::create()->findPk($data["id"]));
+        }
+
         return $customerCreateEvent;
+    }
+
+    public function deleteAction($entityId)
+    {
+        $query = CustomerQuery::create()
+            ->joinOrder()
+            ->filterById($entityId)
+            ->findOne()
+        ;
+
+        if (null !== $query) {
+            throw new HttpException(403, json_encode([
+                "error" => sprintf("You can't delete the customer %d as he has orders", $entityId),
+            ]));
+        }
+
+        return parent::deleteAction($entityId);
     }
 }

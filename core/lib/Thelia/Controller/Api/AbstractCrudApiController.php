@@ -75,7 +75,7 @@ abstract class AbstractCrudApiController extends BaseApiController
      *
      * limit for the list operation
      */
-    protected $listLimit;
+    protected $defaultLoopArgs;
 
     /**
      * @var string
@@ -91,7 +91,7 @@ abstract class AbstractCrudApiController extends BaseApiController
      * @param $updateEvents
      * @param $deleteEvents
      * @param array $modules The module codes related to the ACL
-     * @param int $listLimit The loop count limit in list action
+     * @param array $defaultLoopArgs The loop default arguments
      * @param string $idParameterName The "id" parameter name in your loop. Generally "id"
      */
     public function __construct(
@@ -101,7 +101,7 @@ abstract class AbstractCrudApiController extends BaseApiController
         $updateEvents,
         $deleteEvents,
         $modules = [],
-        $listLimit = 10,
+        $defaultLoopArgs = null,
         $idParameterName = "id"
     ) {
         $this->objName = $objName;
@@ -114,25 +114,46 @@ abstract class AbstractCrudApiController extends BaseApiController
         ]);
 
         $this->modules = $modules;
-        $this->listLimit = $listLimit;
+        $this->defaultLoopArgs = $defaultLoopArgs ?: ["limit" => 10, "offset" => 0];
         $this->idParameterName = $idParameterName;
     }
 
+    /**
+     * @return JsonResponse
+     *
+     * The method provides the "list" feed for an entity.
+     */
     public function listAction()
     {
         $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
         $request = $this->getRequest();
 
         $params = array_merge(
-            [
-                "limit" => $this->listLimit,
-            ],
+            $this->defaultLoopArgs,
             $request->query->all()
         );
 
-        return JsonResponse::create($this->getLoopResults($params));
+        try {
+            $results = $this->getLoopResults($params);
+        } catch (\Exception $e) {
+            throw new HttpException(500, json_encode(["error" => $e->getMessage()]));
+        }
+
+        return JsonResponse::create($results);
     }
 
+    /**
+     * @param $entityId
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * This method provides the "GET" feed for an entity,
+     * you can define a route like this:
+     *
+     * <route id="api.my-entity.get" path="/api/my-entity/{entityId}" methods="get">
+     *   <default key="_controller">Thelia:Api\MyEntity:get</default>
+     *   <requirement key="entityId">\d+</requirement>
+     * </route>
+     */
     public function getAction($entityId)
     {
         $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
@@ -154,6 +175,11 @@ abstract class AbstractCrudApiController extends BaseApiController
         return JsonResponse::create($result);
     }
 
+    /**
+     * @return JsonResponse
+     *
+     * This feed creates your entity.
+     */
     public function createAction()
     {
         $this->checkAuth($this->resources, $this->modules, AccessManager::CREATE);
@@ -259,6 +285,12 @@ abstract class AbstractCrudApiController extends BaseApiController
         );
     }
 
+    /**
+     * @param $entityId
+     * @return JsonResponse|\Thelia\Core\HttpFoundation\Response
+     *
+     * generic feed for deleting an entity
+     */
     public function deleteAction($entityId)
     {
         $this->checkAuth($this->resources, $this->modules, AccessManager::DELETE);
@@ -295,16 +327,29 @@ abstract class AbstractCrudApiController extends BaseApiController
         return $this->nullResponse(204);
     }
 
+    /**
+     * @param $loopParams
+     * @return \Thelia\Core\Template\Element\LoopResult
+     *
+     * Returns the current class' loop results with the given parameters
+     */
     protected function getLoopResults($loopParams)
     {
         $loop = $this->getLoop();
-        $loop->initializeArgs($loopParams);
+        $loop->initializeArgs(
+            array_merge($this->defaultLoopArgs, $loopParams)
+        );
 
         return $loop->exec($pagination);
     }
 
     // Helpers
 
+    /**
+     * @param $entityId
+     *
+     * Throws a 404 exception building an error message with $this->objName and the entity id
+     */
     protected function entityNotFound($entityId)
     {
         throw new NotFoundHttpException(
@@ -314,6 +359,11 @@ abstract class AbstractCrudApiController extends BaseApiController
         );
     }
 
+    /**
+     * @param $eventsDefinition
+     *
+     * Register events into the class' variables
+     */
     protected function initializeEvents($eventsDefinition)
     {
         foreach ($eventsDefinition as $variableName => $eventValue) {
@@ -329,6 +379,12 @@ abstract class AbstractCrudApiController extends BaseApiController
         }
     }
 
+    /**
+     * @param $locale
+     * @param string $parameterName
+     *
+     * This helper defines the lang into the query ( you can use it to force a lang into a loop )
+     */
     protected function setLocaleIntoQuery($locale, $parameterName = 'lang')
     {
         $request = $this->getRequest();
@@ -350,6 +406,13 @@ abstract class AbstractCrudApiController extends BaseApiController
         return $obj->getId();
     }
 
+    /**
+     * @param FormEvent $event
+     *
+     * This method in called on your update form FormEvents::PRE_SUBMIT event.
+     *
+     * You can treat the given form, rewrite some data ...
+     */
     public function hydrateUpdateForm(FormEvent $event)
     {
         // This method is called on FormEvents::PRE_SUBMIT
@@ -359,7 +422,7 @@ abstract class AbstractCrudApiController extends BaseApiController
      * @param Event $event
      * @param array $data
      *
-     * Hook after creation
+     * Hook after the entity creation
      */
     protected function afterCreateEvents(Event $event, array &$data)
     {
@@ -370,7 +433,7 @@ abstract class AbstractCrudApiController extends BaseApiController
      * @param Event $event
      * @param array $data
      *
-     * Hook after update
+     * Hook after the entity update
      */
     protected function afterUpdateEvents(Event $event, array &$data)
     {
@@ -389,12 +452,16 @@ abstract class AbstractCrudApiController extends BaseApiController
     /**
      * @param array $data
      * @return \Thelia\Form\BaseForm
+     *
+     * Gives the form used for entities creation.
      */
     abstract protected function getCreationForm(array $data = array());
 
     /**
      * @param array $data
      * @return \Thelia\Form\BaseForm
+     *
+     * Gives the form used for entities update
      */
     abstract protected function getUpdateForm(array $data = array());
 
@@ -411,6 +478,8 @@ abstract class AbstractCrudApiController extends BaseApiController
     /**
      * @param array $data
      * @return \Symfony\Component\EventDispatcher\Event
+     *
+     * Hydrates an event object to dispatch on creation.
      */
     abstract protected function getCreationEvent(array &$data);
 
@@ -418,12 +487,16 @@ abstract class AbstractCrudApiController extends BaseApiController
     /**
      * @param array $data
      * @return \Symfony\Component\EventDispatcher\Event
+     *
+     * Hydrates an event object to dispatch on update.
      */
     abstract protected function getUpdateEvent(array &$data);
 
     /**
      * @param mixed $entityId
      * @return \Symfony\Component\EventDispatcher\Event
+     *
+     * Hydrates an event object to dispatch on entity deletion.
      */
     abstract protected function getDeleteEvent($entityId);
 }

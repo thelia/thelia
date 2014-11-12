@@ -71,10 +71,7 @@ class TitleController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-        return $this->createForm(null, "customer_title", $data, array(
-            "csrf_protection" => false,
-            "cascade_validation" => true,
-        ));
+        return $this->createForm(null, "customer_title", $data);
     }
 
     /**
@@ -84,8 +81,6 @@ class TitleController extends AbstractCrudApiController
     protected function getUpdateForm(array $data = array())
     {
         return $this->createForm(null, "customer_title", $data, array(
-            "csrf_protection" => false,
-            "cascade_validation" => true,
             "validation_groups" => ["Default", "update"],
             "method" => "PUT",
         ));

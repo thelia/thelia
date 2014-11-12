@@ -59,7 +59,7 @@ class CustomerControllerTest extends ApiTestCase
             $this->getServerParameters()
         );
 
-        $this->assertEquals(400, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
+        $this->assertEquals(500, $client->getResponse()->getStatusCode(), 'Http status code must be 500');
     }
 
     /**
@@ -213,13 +213,13 @@ class CustomerControllerTest extends ApiTestCase
     /**
      * @depends testCreate
      */
-    public function testDelete($customer_id)
+    public function testDelete($customerId)
     {
         $client = static::createClient();
 
         $client->request(
             'DELETE',
-            '/api/customers/'.$customer_id.'?sign='.$this->getSignParameter(""),
+            '/api/customers/'.$customerId.'?sign='.$this->getSignParameter(""),
             [],
             [],
             $this->getServerParameters()
@@ -245,6 +245,7 @@ class CustomerControllerTest extends ApiTestCase
     public function testUpdateCustomer()
     {
         $user = [
+            'id' => 1,
             'title' => 1,
             'firstname' => 'Thelia',
             'lastname'  => 'Thelia',
@@ -263,19 +264,20 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'PUT',
-            '/api/customers/1?&sign='.$this->getSignParameter($requestContent),
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,
             $requestContent
         );
 
-        $this->assertEquals(204, $client->getResponse()->getStatusCode());
+        $this->assertEquals(201, $client->getResponse()->getStatusCode());
     }
 
-    public function testUpdateCustomerWitnUnexistingCustomer()
+    public function testUpdateCustomerWithUnexistingCustomer()
     {
         $user = [
+            'id' => PHP_INT_MAX,
             'title' => 1,
             'firstname' => 'Thelia',
             'lastname'  => 'Thelia',
@@ -294,13 +296,13 @@ class CustomerControllerTest extends ApiTestCase
         $servers['CONTENT_TYPE'] = 'application/json';
         $client->request(
             'PUT',
-            '/api/customers/'.PHP_INT_MAX.'?&sign='.$this->getSignParameter($requestContent),
+            '/api/customers?&sign='.$this->getSignParameter($requestContent),
             [],
             [],
             $servers,
             $requestContent
         );
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(500, $client->getResponse()->getStatusCode());
     }
 }

@@ -52,19 +52,21 @@ class BaseApiController extends BaseController
     }
 
     /**
+     * @param null|mixed $template
      * @return a ParserInterface instance parser
      */
     protected function getParser($template = null)
     {
-        throw new \RuntimeException("The parser is not available here");
+        throw new \RuntimeException("The parser is not available in an API controller");
     }
 
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $content
-     * @param  array                                $args   the template arguments
-     * @param  int                                  $status http code status
+     * @param mixed $content the response content
+     * @param array $args   the template arguments
+     * @param int   $status http code status
+     * @param array $headers The HTTP headers of the response
      * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function render($content, $args = array(), $status = 200, $headers = array())
@@ -88,5 +90,26 @@ class BaseApiController extends BaseController
         }
 
         return $content;
+    }
+
+    /**
+     * @param $name
+     * @param string $type
+     * @param array $data
+     * @param array $options
+     * @return \Thelia\Form\BaseForm
+     *
+     * Deactivate csrf token by default on API
+     */
+    public function createForm($name, $type = "form", array $data = array(), array $options = array())
+    {
+        $options = array_merge(
+            [
+                "csrf_protection" => false,
+            ],
+            $options
+        );
+
+        return parent::createForm($name, $type, $data, $options);
     }
 }

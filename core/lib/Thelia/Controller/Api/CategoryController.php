@@ -56,9 +56,7 @@ class CategoryController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-        return $this->createForm("thelia.api.category.create", "form", $data, [
-            'csrf_protection' => false,
-        ]);
+        return $this->createForm("thelia.api.category.create", "form", $data);
     }
 
     /**
@@ -68,7 +66,6 @@ class CategoryController extends AbstractCrudApiController
     protected function getUpdateForm(array $data = array())
     {
         return $this->createForm("thelia.api.category.update", "form", $data, [
-            'csrf_protection' => false,
             'method' => 'PUT',
         ]);
     }

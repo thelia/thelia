@@ -10,30 +10,34 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Form\Api\Customer;
+namespace Thelia\Core\Form\Type\Field;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Form\CustomerUpdateForm as BaseCustomerUpdateForm;
+use Thelia\Model\CustomerQuery;
 
 /**
- * Class CustomerUpdateForm
- * @package Thelia\Form\Api\Customer
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * Class CustomerIdType
+ * @package Thelia\Core\Form\Type\Field
+ * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class CustomerUpdateForm extends BaseCustomerUpdateForm
+class CustomerIdType extends AbstractIdType
 {
-    public function buildForm()
+    /**
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     *
+     * Get the model query to check
+     */
+    protected function getQuery()
     {
-        parent::buildForm();
-
-        $this->formBuilder
-            ->add('lang', 'lang_id')
-            ->add('id', 'customer_id')
-        ;
+        return new CustomerQuery();
     }
 
+    /**
+     * Returns the name of this type.
+     *
+     * @return string The name of this type
+     */
     public function getName()
     {
-        return '';
+        return "customer_id";
     }
 }

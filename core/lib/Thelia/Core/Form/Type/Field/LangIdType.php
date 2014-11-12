@@ -10,42 +10,25 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Form\Type;
+namespace Thelia\Core\Form\Type\Field;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Validator\Constraints\Count;
+use Thelia\Model\LangQuery;
 
 /**
- * Class CountryTaxType
- * @package Thelia\Core\Form\Type
+ * Class LangIdType
+ * @package Thelia\Core\Form\Type\Field
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class CountryTaxType extends AbstractTheliaType
+class LangIdType extends AbstractIdType
 {
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    /**
+     * @return \Propel\Runtime\ActiveQuery\ModelCriteria
+     *
+     * Get the model query to check
+     */
+    protected function getQuery()
     {
-        $resolver->replaceDefaults([
-            "type" => "form",
-            "cascade_validation" => true,
-        ]);
-    }
-
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        $builder
-            ->add("country", "country_id")
-            ->add("tax", "collection", array(
-                "type" => "tax_id",
-                "required" => true,
-                "allow_add" => true,
-                "cascade_validation" => true,
-                "constraints" => array(
-                    new Count(["min" => 1])
-                )
-            ))
-        ;
+        return new LangQuery();
     }
 
     /**
@@ -55,11 +38,6 @@ class CountryTaxType extends AbstractTheliaType
      */
     public function getName()
     {
-        return "country_tax";
-    }
-
-    public function getParent()
-    {
-        return "collection";
+        return "lang_id";
     }
 }

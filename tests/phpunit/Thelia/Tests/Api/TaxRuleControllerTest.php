@@ -12,6 +12,10 @@
 
 namespace Thelia\Tests\Api;
 
+use Thelia\Model\CountryQuery;
+use Thelia\Model\Map\CountryTableMap;
+use Thelia\Model\Map\TaxTableMap;
+use Thelia\Model\TaxQuery;
 use Thelia\Tests\ApiTestCase;
 
 /**
@@ -99,5 +103,177 @@ class TaxRuleControllerTest extends ApiTestCase
         $firstResult = $content[0];
 
         $this->assertEquals('fr_FR', $firstResult['LOCALE'], 'the returned locale must be fr_FR');
+    }
+
+    public function testCreateTaxRule()
+    {
+        $taxes = TaxQuery::create()
+            ->limit(2)
+            ->select(TaxTableMap::ID)
+            ->find()
+            ->toArray()
+        ;
+
+        $countries = CountryQuery::create()
+            ->limit(2)
+            ->select(CountryTableMap::ID)
+            ->find()
+            ->toArray()
+        ;
+
+        $data = [
+            "country" => $countries,
+            "tax" => $taxes,
+            "i18n" => array(
+                [
+                    "locale" => "en_US",
+                    "title" => "Test tax rule",
+                    "description" => "foo",
+                ],
+                [
+                    "locale" => "fr_FR",
+                    "title" => "Test règle de taxe",
+                ]
+            )
+        ];
+
+        $requestContent = json_encode($data);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/tax-rules?lang=en_US&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $content = json_decode($response->getContent(), true)[0];
+
+        $this->assertEquals("Test tax rule", $content["TITLE"]);
+        $this->assertEquals(0, $content["IS_DEFAULT"]);
+
+        return $content["ID"];
+    }
+
+    /**
+     * @param $taxRuleId
+     * @depends testCreateTaxRule
+     */
+    public function testUpdateTaxRule($taxRuleId)
+    {
+        $data = [
+            "id" => $taxRuleId,
+            "default" => true,
+            "i18n" => array(
+                [
+                    "locale" => "en_US",
+                    "description" => "bar",
+                ],
+                [
+                    "locale" => "fr_FR",
+                    "description" => "baz",
+                ]
+            )
+        ];
+
+        $requestContent = json_encode($data);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'PUT',
+            '/api/tax-rules?lang=fr_FR&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(201, $response->getStatusCode());
+
+        $content = json_decode($response->getContent(), true)[0];
+
+        $this->assertEquals("Test règle de taxe", $content["TITLE"]);
+        $this->assertEquals("baz", $content["DESCRIPTION"]);
+        $this->assertEquals(1, $content["IS_DEFAULT"]);
+
+        return $content["ID"];
+    }
+
+    /**
+     * @param $taxRuleId
+     * @depends testCreateTaxRule
+     */
+    public function testDeleteTaxRule($taxRuleId)
+    {
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+
+        $client->request(
+            'DELETE',
+            '/api/tax-rules/'.$taxRuleId.'?lang=fr_FR&sign='.$this->getSignParameter(''),
+            [],
+            [],
+            $servers
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(204, $response->getStatusCode());
+    }
+
+    public function testCreateTaxRuleWithInvalidData()
+    {
+        $countries = CountryQuery::create()
+            ->limit(2)
+            ->select(CountryTableMap::ID)
+            ->find()
+            ->toArray()
+        ;
+
+        $data = [
+            "country" => $countries,
+            "tax" => array(),
+            "i18n" => array(
+                [
+                    "locale" => "en_US",
+                    "title" => "Test tax rule",
+                    "description" => "foo",
+                ],
+                [
+                    "locale" => "fr_FR",
+                    "title" => "Test règle de taxe",
+                ]
+            )
+        ];
+
+        $requestContent = json_encode($data);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/tax-rules?lang=en_US&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $response = $client->getResponse();
+
+        $this->assertEquals(500, $response->getStatusCode());
     }
 }

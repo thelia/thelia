@@ -35,10 +35,6 @@
             <tag name="thelia.form.type" />
         </service>
 
-        <service id="thelia.form.type.country_tax" class="Thelia\Core\Form\Type\CountryTaxType">
-            <tag name="thelia.form.type" />
-        </service>
-
         <service id="thelia.form.type.image" class="Thelia\Core\Form\Type\ImageType">
             <tag name="thelia.form.type" />
         </service>
@@ -80,6 +76,16 @@
         </service>
 
         <service id="thelia.form.type.field.tax_id" class="Thelia\Core\Form\Type\Field\TaxIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.customer_id" class="Thelia\Core\Form\Type\Field\CustomerIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.lang_id" class="Thelia\Core\Form\Type\Field\LangIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />
         </service>
