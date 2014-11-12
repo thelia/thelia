@@ -23,7 +23,7 @@
         {intl l="To login, please use the email address <span style=\"font-family: courier, fixed; font-size: 120%\">%email</span>" email={$EMAIL}}<br /><br />
     {/loop}
     {if ! empty($password)}
-        {intl l="Your password is <span style=\"font-family: courier, fixed; font-size: 120%\">%pass</span>" pass=$password}<br /><br />
+        {intl l="Your password is <span style=\"font-family: courier, fixed; font-size: 120%\">%pass</span>" pass={$password}}<br /><br />
     {/if}
     {intl l='You can change your password and your account details at any time <a href="%url">in our store</a>.' url={url path="/account"}}<br /><br />
     {intl l='Kind regards'},<br />

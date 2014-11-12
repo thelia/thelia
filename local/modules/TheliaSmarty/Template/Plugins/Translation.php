@@ -20,6 +20,14 @@ class Translation extends AbstractSmartyPlugin
 {
     protected $translator;
     protected $defaultTranslationDomain = '';
+    protected $defaultLocale = null;
+
+    protected $protectedParams = [
+        'l',
+        'd',
+        'js',
+        'locale'
+    ];
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -39,6 +47,18 @@ class Translation extends AbstractSmartyPlugin
     }
 
     /**
+     * Set the default locale
+     *
+     * @param  array                     $params
+     * @param  \Smarty_Internal_Template $smarty
+     * @return string
+     */
+    public function setDefaultLocale($params, &$smarty)
+    {
+        $this->defaultLocale = $this->getParam($params, 'locale');
+    }
+
+    /**
      * Process translate function
      *
      * @param  array                     $params
@@ -52,7 +72,7 @@ class Translation extends AbstractSmartyPlugin
         $vars = array();
 
         foreach ($params as $name => $value) {
-            if ($name != 'l' && $name != 'd' && $name != 'js') {
+            if (!in_array($name, $this->protectedParams)) {
                 $vars["%$name"] = $value;
             }
         }
@@ -60,7 +80,8 @@ class Translation extends AbstractSmartyPlugin
         $str = $this->translator->trans(
             $this->getParam($params, 'l'),
             $vars,
-            $this->getParam($params, 'd', $this->defaultTranslationDomain)
+            $this->getParam($params, 'd', $this->defaultTranslationDomain),
+            $this->getParam($params, 'locale', $this->defaultLocale)
         );
 
         if ($this->getParam($params, 'js', 0)) {
@@ -80,6 +101,7 @@ class Translation extends AbstractSmartyPlugin
         return array(
             new SmartyPluginDescriptor('function', 'intl', $this, 'translate'),
             new SmartyPluginDescriptor('function', 'default_translation_domain', $this, 'setDefaultTranslationDomain'),
+            new SmartyPluginDescriptor('function', 'default_locale', $this, 'setDefaultLocale'),
         );
     }
 }
