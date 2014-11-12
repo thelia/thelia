@@ -57,6 +57,9 @@ class Update
     /** @var PDO  */
     protected $connection = null;
 
+    /** @var string|null  */
+    protected $backupFile = null;
+
     public function __construct($usePropel = true)
     {
         $this->usePropel = $usePropel;
@@ -118,7 +121,10 @@ class Update
         }
 
         $index = array_search($currentVersion, self::$version);
+
+        $this->connection->exec("SET autocommit = 0");
         $this->connection->beginTransaction();
+
         $database = new Database($this->connection);
         $version = null;
 
@@ -142,10 +148,62 @@ class Update
             $ex->setVersion($version);
             throw $ex;
         }
-
         $this->log('debug', 'end of update processing');
 
         return $this->updatedVersions;
+    }
+
+    public function backupDb()
+    {
+        $database = new Database($this->connection);
+
+        $this->backupFile = THELIA_ROOT . 'local/backup/update.sql';
+
+        try {
+            $this->log('debug', sprintf('Backup database to file : %s', $this->backupFile));
+
+            if (file_exists($this->backupFile)) {
+                // remove file
+                unlink($this->backupFile);
+            }
+
+            $database->backupDb($this->backupFile);
+        } catch (\Exception $ex) {
+            $this->log('error', sprintf('error during backup process with message : %s', $ex->getMessage()));
+            print $ex->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    public function restoreDb()
+    {
+        $database = new Database($this->connection);
+
+        try {
+            $this->log('debug', sprintf('Restore database with file : %s', $this->backupFile));
+
+            if (!file_exists($this->backupFile)) {
+                return false;
+            }
+
+            $database->restoreDb($this->backupFile);
+        } catch (\Exception $ex) {
+            $this->log('error', sprintf('error during restore process with message : %s', $ex->getMessage()));
+            print $ex->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getBackupFile()
+    {
+        return $this->backupFile;
     }
 
     public function getLogs()
@@ -184,16 +242,16 @@ class Update
     protected function updateToVersion($version, Database $database)
     {
         // sql update
-        if (file_exists(THELIA_ROOT . '/setup/update/' . $version . '.sql')) {
+        if (file_exists(THELIA_ROOT . 'setup/update/' . $version . '.sql')) {
             $this->log('debug', sprintf('inserting file %s', $version . '.sql'));
-            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/' . $version . '.sql'));
+            $database->insertSql(null, array(THELIA_ROOT . 'setup/update/' . $version . '.sql'));
             $this->log('debug', sprintf('end inserting file %s', $version . '.sql'));
         }
 
         // php update
-        if (file_exists(THELIA_ROOT . '/setup/update/' . $version . '.php')) {
+        if (file_exists(THELIA_ROOT . 'setup/update/' . $version . '.php')) {
             $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once THELIA_ROOT . '/setup/update/'.$version . '.php';
+            include_once THELIA_ROOT . 'setup/update/'.$version . '.php';
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
