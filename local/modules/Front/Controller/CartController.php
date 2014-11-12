@@ -59,7 +59,9 @@ class CartController extends BaseFrontController
             $this->afterModifyCart();
 
 
-            if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $this->changeViewForAjax();
+            } else if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
                 return $response;
             }
 
@@ -74,7 +76,6 @@ class CartController extends BaseFrontController
             $message = $e->getMessage();
         }
 
-        $this->changeViewForAjax();
 
         if ($message) {
             $cartAdd->setErrorMessage($message);
@@ -97,14 +98,17 @@ class CartController extends BaseFrontController
 
             $this->afterModifyCart();
 
-            if (null !== $response = $this->generateSuccessRedirect()) {
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $this->changeViewForAjax();
+            } else if (null !== $response = $this->generateSuccessRedirect()) {
                 return $response;
             }
+
+
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
-        $this->changeViewForAjax();
     }
 
     public function deleteItem()
