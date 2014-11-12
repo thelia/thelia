@@ -50,6 +50,12 @@ return array(
     'Thelia has been successfully updated to version %version' => 'Thelia has been successfully updated to version %version',
     'Update proccess trace' => 'Update proccess trace',
     'update to version %version' => 'update to version %version',
+    'Backup and update Thelia' => 'Backup and update Thelia',
     'Update Thelia' => 'Update Thelia',
-    'Updating Thelia.' => 'Updating Thelia.'
+    'Updating Thelia.' => 'Updating Thelia.',
+    'Sorry, your database can\'t be backed up. Try to do it manually' => 'Sorry, your database can\'t be backed up. Try to do it manually',
+    'Your database has been backed up. The sql file : %file' => 'Your database has been backed up. The sql file : %file',
+    'Sorry, your database can\'t be restored. Try to do it manually' => 'Sorry, your database can\'t be restored. Try to do it manually',
+    'The sql dump has been saved in %file' => 'The sql dump has been saved in %file',
+    'Your database has been restored.' => 'Your database has been restored.'
 );

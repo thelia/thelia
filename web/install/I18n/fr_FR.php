@@ -52,4 +52,12 @@ return array(
     'update to version %version' => 'mise à jour vers la version %version',
     'Update Thelia' => "Mettre à jour Thelia",
     'Updating Thelia.' => "Mise à jour de Thelia.",
+    'Backup and update Thelia' => 'Backup and update Thelia',
+    'Update Thelia' => 'Update Thelia',
+    'Updating Thelia.' => 'Updating Thelia.',
+    'Sorry, your database can\'t be backed up. Try to do it manually' => 'Désolé, votre base de données n\'a pas pu être sauvegardé. Essayez de le faire manuellement.',
+    'Your database has been backed up. The sql file : %file' => 'Votre base de données a été sauvegardé. Le fichier sql : %file',
+    'Sorry, your database can\'t be restored. Try to do it manually' => 'Désolé, votre base de données n\'a pas pu être restauré. Essayez de le faire manuellement.',
+    'The sql dump has been saved in %file' => 'Le fichier sql a été sauvegardé dans %file',
+    'Your database has been restored.' => 'Votre base de données a été restauré.',
 );
