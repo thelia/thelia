@@ -13,6 +13,7 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Thelia\Model\ConfigQuery;
 
 /**
  * extends Symfony\Component\HttpFoundation\Request for adding some helpers
@@ -23,6 +24,24 @@ use Symfony\Component\HttpFoundation\Request as BaseRequest;
  */
 class Request extends BaseRequest
 {
+    /**
+     * Filter PathInfo to allow slash ending uri
+     *
+     * example:
+     * /admin will be the same as /admin/
+     */
+    public function getPathInfo()
+    {
+        $pathInfo = parent::getPathInfo();
+        $pathLength = strlen($pathInfo);
+
+        if ($pathInfo !== "/" && $pathInfo[$pathLength - 1] === "/" && (bool) ConfigQuery::read("allow_slash_ended_uri", false)) {
+            $this->pathInfo = $pathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
+        }
+
+        return $pathInfo;
+    }
+
     public function getProductId()
     {
         return $this->get("product_id");

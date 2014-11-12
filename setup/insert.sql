@@ -66,7 +66,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_time_to_wait', '60', 0, 0, NOW(), NOW()),
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
-('form_firewall_active', '1', 0, 0, NOW(), NOW());
+('form_firewall_active', '1', 0, 0, NOW(), NOW()),
+
+('allow_slash_ended_uri', 1, 0, 0, NOW(), NOW());
 
 
 
@@ -3124,6 +3126,7 @@ SELECT @time := `id` FROM `config` WHERE `name` =  'form_firewall_time_to_wait';
 SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_bruteforce_attempts';
 SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
 SELECT @active := `id` FROM `config` WHERE `name` =  'form_firewall_active';
+SELECT @slash_ended_uri := `id` FROM `config` WHERE `name` =  'allow_slash_ended_uri';
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
@@ -3149,4 +3152,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
   (@active, 'en_US', '[Firewall] Activate the firewall', NULL, NULL, NULL),
   (@active, 'fr_FR', '[Pare-feu] Activer le pare-feu', NULL, NULL, NULL)
+;
+
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+  (@slash_ended_uri, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL),
+  (@slash_ended_uri, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
 ;
