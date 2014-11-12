@@ -209,6 +209,8 @@ class MailerFactory
                 $this->parser->assign($name, $value);
             }
 
+            $this->parser->assign('locale', $locale);
+
             $instance = \Swift_Message::newInstance();
 
             // Add from addresses
