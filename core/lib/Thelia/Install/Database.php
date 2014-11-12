@@ -12,6 +12,7 @@
 
 namespace Thelia\Install;
 
+use PDO;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
@@ -135,6 +136,96 @@ class Database
         }
 
         return $query;
+    }
+
+    /**
+     * Backup the db OR just a table
+     *
+     * @param string $tables
+     */
+    public function backupDb($filename, $tables = '*')
+    {
+
+        $data = [];
+
+        // get all of the tables
+        if ($tables == '*') {
+            $tables = array();
+            $result = $this->connection->prepare('SHOW TABLES');
+            $result->execute();
+            while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                $tables[] = $row[0];
+            }
+        } else {
+            $tables = is_array($tables) ? $tables : explode(',', $tables);
+        }
+
+        $data[] = "\n";
+        $data[] = 'SET foreign_key_checks=0;';
+        $data[] = "\n\n";
+
+        foreach ($tables as $table) {
+
+
+            $result = $this->connection->prepare('SELECT * FROM ' . $table);
+            $result->execute();
+            $fieldCount = $result->columnCount();
+
+            $data[] = 'DROP TABLE `' . $table . '`;';
+
+            $resultStruct = $this->connection->prepare('SHOW CREATE TABLE `' . $table . '`');
+            $resultStruct->execute();
+
+            $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
+
+            $data[] = "\n\n";
+            $data[] = $rowStruct[1];
+            $data[] = ";\n\n";
+
+            for ($i = 0; $i < $fieldCount; $i++) {
+                while ($row = $result->fetch(PDO::FETCH_NUM)) {
+                    $data[] = 'INSERT INTO `' . $table . '` VALUES(';
+                    for ($j = 0; $j < $fieldCount; $j++) {
+                        $row[$j] = addslashes($row[$j]);
+                        $row[$j] = str_replace("\n", "\\n", $row[$j]);
+                        if (isset($row[$j])) {
+                            $data[] = '"' . $row[$j] . '"';
+                        } else {
+                            $data[] = '""';
+                        }
+                        if ($j < ($fieldCount - 1)) {
+                            $data[] = ',';
+                        }
+                    }
+                    $data[] = ");\n";
+                }
+            }
+            $data[] = "\n\n\n";
+        }
+
+        $data[] = 'SET foreign_key_checks=1;';
+
+        //save filename
+        $this->writeUTF8filename($filename, $data);
+    }
+
+    public function restoreDb($filename)
+    {
+        $this->insertSql(null, [$filename]);
+    }
+
+    /**
+     * save as utf8 encoding
+     */
+    private function writeUTF8filename($filenamename, $data)
+    {
+
+        $f = fopen($filenamename, "w+");
+
+        # Now UTF-8 - Add byte order mark
+        //fwrite($f, pack("CCC",0xef,0xbb,0xbf));
+        fwrite($f, implode('', $data));
+        fclose($f);
     }
 
     /**
