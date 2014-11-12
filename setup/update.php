@@ -41,141 +41,121 @@ if (php_sapi_name() != 'cli') {
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Yaml;
+use Thelia\Install\Exception\UpdateException;
 
 /***************************************************
- * retrieve the root dir
+ * Load Update class
  ***************************************************/
 
-$rootPath = realpath(dirname(dirname(__FILE__)));
-
-/***************************************************
- * Get database config
- ***************************************************/
-
-// Load local/config/database.yml
-$databasePath = joinPaths($rootPath, 'local', 'config', 'database.yml');
-
-if (!(file_exists($databasePath) && is_readable($databasePath))) {
-    echo "Thelia is not installed (no database.yml file)" . PHP_EOL;
+try {
+    $update = new \Thelia\Install\Update(false);
+} catch (UpdateException $ex) {
+    echo $ex->getMessage() . PHP_EOL;
     exit(2);
 }
 
-try {
-    $dbConfig = Yaml::parse($databasePath);
-    $dbConfig = $dbConfig['database']['connection'];
-} catch (ParseException $ex) {
-    echo "database.yml is not a valid file : " . $ex->getMessage() . PHP_EOL;
+/***************************************************
+ * Check if update is needed
+ ***************************************************/
+
+if ($update->isLatestVersion()) {
+    echo "You already have the latest version of Thelia : " . $update->getCurrentVersion() . PHP_EOL;
     exit(3);
 }
 
-/***************************************************
- * Get a connection to DB
- ***************************************************/
-
-$dbConn = null;
-try {
-    $dbConn = new PDO(
-        $dbConfig['dsn'],
-        $dbConfig['user'],
-        $dbConfig['password']
-    );
-} catch (PDOException $e) {
-    echo "Error connecting to db : " . $e->getMessage() . PHP_EOL;
-    exit(4);
-}
-
-/***************************************************
- * Get Versions
- ***************************************************/
-
-$update = new \Thelia\Install\Update();
-$versions = $update->getVersion();
-$latestVersion = end($versions);
-$currentVersion = null;
-
-try {
-    $stmt = $dbConn->prepare('SELECT * from config where name = ? LIMIT 1');
-    $stmt->execute(['thelia_version']);
-    if (false !== $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $currentVersion = $row['value'];
-    }
-} catch (PDOException $e) {
-    echo "Error retrieving current version : " . $e->getMessage() . PHP_EOL;
-    exit(4);
-}
-
-if (null === $currentVersion) {
-    echo "Error retrieving current version" . PHP_EOL;
-    exit(5);
-}
-
-/***************************************************
- * Update process
- ***************************************************/
-
-if (version_compare($latestVersion, $currentVersion, "<=")) {
-    echo "You already have the latest version of Thelia : " . $currentVersion . PHP_EOL;
-    exit(6);
-}
-
-echo sprintf("Would you like to upgrade from version %s to version %s ?" . PHP_EOL, $currentVersion, $latestVersion);
-echo "Please make a full backup of your site before (database, files)" . PHP_EOL;
-
 while (1) {
-    echo sprintf("Continue update process ? (Y/n)" . PHP_EOL, $currentVersion, $latestVersion);
+    echo sprintf(
+        "You are going to update Thelia from version %s to version %s." . PHP_EOL,
+        $update->getCurrentVersion(),
+        $update->getLatestVersion()
+    );
+    echo "Continue update process ? (Y/n)" . PHP_EOL;
 
     $rep = readStdin(true);
     if ($rep == 'y') {
         break;
     } elseif ($rep == 'n') {
+        echo "Update aborted" . PHP_EOL;
         exit(0);
     }
 }
 
-$dbConn->beginTransaction();
-$updatePath = joinPaths($rootPath, 'setup', 'update');
-$database = new \Thelia\Install\Database($dbConn);
+$backup = false;
+while (1) {
+    echo sprintf("Would you like to backup the current database before proceeding ? (Y/n)" . PHP_EOL);
 
-try {
-    foreach ($versions as $number => $version) {
-        if (version_compare($version, $currentVersion, ">")) {
-            echo sprintf(PHP_EOL . "== Update to version %s ==" . PHP_EOL, $version);
-
-            // sql update
-            $sqlPath = joinPaths($updatePath, $version . '.sql');
-            if (is_readable($sqlPath)) {
-                echo sprintf("Importing sql : %s" . PHP_EOL, $sqlPath);
-                $database->insertSql(null, [$sqlPath]);
-            }
-
-            // php update
-            $phpPath = joinPaths($updatePath, $version . '.php');
-            if (is_readable($phpPath)) {
-                echo sprintf("Executing php : %s" . PHP_EOL, $phpPath);
-                include_once $phpPath;
-            }
-
-            // todo: provide a mechanism to update module
-            // it could be : for activated modules, look in module directory in update/thelia/$version.(sql|php)
-        }
+    $rep = readStdin(true);
+    if ($rep == 'y') {
+        $backup = true;
+        break;
+    } elseif ($rep == 'n') {
+        $backup = false;
+        break;
     }
-} catch (\Exception $ex) {
-    echo sprintf("Error in update process : %s" . PHP_EOL, $ex->getMessage());
-    echo "All databases update will be rolled back" . PHP_EOL;
-    $dbConn->rollBack();
-    exit(7);
 }
 
-$dbConn->commit();
+/***************************************************
+ * Update
+ ***************************************************/
 
-$dbConn = null;
+$updateError = null;
 
+try {
+    // backup db
+    if (true === $backup) {
+        if (false === $update->backupDb()) {
+            echo PHP_EOL . 'Sorry, your database can\'t be backup. Try to do it manually.' . PHP_EOL;
+            exit(4);
+        }
+    }
+    // update
+    $update->process($backup);
+} catch (UpdateException $ex) {
+    $updateError = $ex;
+}
+
+if (null === $updateError) {
+    echo sprintf(PHP_EOL . 'Thelia as been successfully updated to version %s' . PHP_EOL, $update->getCurrentVersion());
+} else {
+    echo sprintf(PHP_EOL . 'Sorry, an unexpected error has occured : %s' . PHP_EOL, $updateError->getMessage());
+    print $updateError->getTraceAsString() . PHP_EOL;
+    print "Trace: " . PHP_EOL;
+    foreach ($update->getLogs() as $log) {
+        echo sprintf('[%s] %s' . PHP_EOL, $log[0], $log[1]);
+    }
+
+    if (true === $backup) {
+
+        while (1) {
+            echo "Would you like to restore the backup database ? (Y/n)" . PHP_EOL;
+
+            $rep = readStdin(true);
+            if ($rep == 'y') {
+
+                echo "Database restore started. Wait, it could take a while..." . PHP_EOL;
+
+                if (false === $update->restoreDb()) {
+                    echo sprintf(
+                        PHP_EOL . 'Sorry, your database can\'t be restore. Try to do it manually : %s' . PHP_EOL,
+                        $update->getBackupFile()
+                    );
+                    exit(5);
+                } else {
+                    echo "Database successfully restore." . PHP_EOL;
+                    exit(5);
+                }
+                break;
+            } elseif ($rep == 'n') {
+                exit(0);
+            }
+        }
+
+    }
+}
 
 /***************************************************
-Try to delete cache
-***************************************************/
+ * Try to delete cache
+ ***************************************************/
 
 $finder = new Finder();
 $fs = new Filesystem();
