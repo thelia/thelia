@@ -66,7 +66,9 @@ include("header.php");
 </div>
 <?php if (!$update->isLatestVersion()) { ?>
     <div class="clearfix">
-        <a href="updater.php" class="pull-right btn btn-default btn-primary"><span
+        <a href="updater.php?backup=1" class="pull-right btn btn-default btn-primary"><span
+                class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Backup and update Thelia'); ?></a>
+        <a href="updater.php" class="pull-right btn btn-default"><span
                 class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update Thelia'); ?></a>
     </div>
 <?php
