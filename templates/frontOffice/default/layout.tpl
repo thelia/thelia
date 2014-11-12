@@ -445,7 +445,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     }
 </script>
 
-<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{lang attr="code"}.js"></script>
 
 
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
