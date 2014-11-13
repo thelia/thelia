@@ -52,7 +52,6 @@ GNU General Public License : http://www.gnu.org/licenses/
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     {block name="meta"}
         <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
-        <meta name="robots" content="noindex,nofollow">
     {/block}
 
     {* Stylesheets *}
