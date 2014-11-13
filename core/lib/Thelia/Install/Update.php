@@ -28,6 +28,10 @@ use Thelia\Log\Tlog;
  */
 class Update
 {
+    const SQL_DIR = 'setup/update/sql/';
+
+    const PHP_DIR = 'setup/update/php/';
+
     protected static $version = array(
         '0' => '2.0.0-beta1',
         '1' => '2.0.0-beta2',
@@ -73,7 +77,7 @@ class Update
             $this->logger = Tlog::getInstance();
             $this->logger->setLevel(Tlog::DEBUG);
         } else {
-            $this->logger = [];
+            $this->logs = [];
         }
 
         $dbConfig = null;
@@ -127,7 +131,6 @@ class Update
 
         $index = array_search($currentVersion, self::$version);
 
-        $this->connection->exec("SET autocommit = 0");
         $this->connection->beginTransaction();
 
         $database = new Database($this->connection);
@@ -158,6 +161,12 @@ class Update
         return $this->updatedVersions;
     }
 
+
+    /**
+     * Backup current DB to file local/backup/update.sql
+     *
+     * @return bool if it succeeds, false otherwise
+     */
     public function backupDb()
     {
         $database = new Database($this->connection);
@@ -189,6 +198,11 @@ class Update
         return true;
     }
 
+    /**
+     * Restores file local/backup/update.sql to current DB
+     *
+     * @return bool if it succeeds, false otherwise
+     */
     public function restoreDb()
     {
         $database = new Database($this->connection);
@@ -254,16 +268,30 @@ class Update
     protected function updateToVersion($version, Database $database)
     {
         // sql update
-        if (file_exists(THELIA_ROOT . 'setup/update/' . $version . '.sql')) {
+        $filename = sprintf(
+            "%s%s%s",
+            THELIA_ROOT,
+            str_replace('/', DS, self::SQL_DIR),
+            $version . '.sql'
+        );
+
+        if (file_exists($filename)) {
             $this->log('debug', sprintf('inserting file %s', $version . '.sql'));
-            $database->insertSql(null, array(THELIA_ROOT . 'setup/update/' . $version . '.sql'));
+            $database->insertSql(null, [$filename]);
             $this->log('debug', sprintf('end inserting file %s', $version . '.sql'));
         }
 
         // php update
-        if (file_exists(THELIA_ROOT . 'setup/update/' . $version . '.php')) {
+        $filename = sprintf(
+            "%s%s%s",
+            THELIA_ROOT,
+            str_replace('/', DS, self::PHP_DIR),
+            $version . '.php'
+        );
+
+        if (file_exists($filename)) {
             $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once THELIA_ROOT . 'setup/update/'.$version . '.php';
+            include_once $filename;
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
@@ -276,7 +304,7 @@ class Update
 
         if (null !== $this->connection) {
             try {
-                $stmt = $this->connection->prepare('SELECT * from config where name = ? LIMIT 1');
+                $stmt = $this->connection->prepare('SELECT value from config where name = ? LIMIT 1');
                 $stmt->execute(['thelia_version']);
                 if (false !== $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     $currentVersion = $row['value'];

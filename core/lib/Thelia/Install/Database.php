@@ -141,6 +141,7 @@ class Database
     /**
      * Backup the db OR just a table
      *
+     * @param string $filename
      * @param string $tables
      */
     public function backupDb($filename, $tables = '*')
@@ -206,24 +207,30 @@ class Database
         $data[] = 'SET foreign_key_checks=1;';
 
         //save filename
-        $this->writeUTF8filename($filename, $data);
+        $this->writeFilename($filename, $data);
     }
 
+
+    /**
+     * Restore a file in the current db
+     *
+     * @param string $filename the file containing sql queries
+     */
     public function restoreDb($filename)
     {
         $this->insertSql(null, [$filename]);
     }
 
     /**
-     * save as utf8 encoding
+     * Save an array of data to a filename
+     *
+     * @param string $filename
+     * @param array $data
      */
-    private function writeUTF8filename($filenamename, $data)
+    private function writeFilename($filename, $data)
     {
+        $f = fopen($filename, "w+");
 
-        $f = fopen($filenamename, "w+");
-
-        # Now UTF-8 - Add byte order mark
-        //fwrite($f, pack("CCC",0xef,0xbb,0xbf));
         fwrite($f, implode('', $data));
         fclose($f);
     }
