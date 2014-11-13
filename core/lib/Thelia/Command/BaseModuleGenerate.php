@@ -46,7 +46,12 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand
     protected function verifyExistingModule()
     {
         if (file_exists($this->moduleDirectory)) {
-            throw new \RuntimeException(sprintf("%s module already exists", $this->module));
+            throw new \RuntimeException(
+                sprintf(
+                    "%s module already exists. Use --force option to force generation.",
+                    $this->module
+                )
+            );
         }
     }
 
