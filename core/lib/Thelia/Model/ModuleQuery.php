@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -49,6 +50,41 @@ class ModuleQuery extends BaseModuleQuery
             ->filterByType($moduleType)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
             ->filterById($id);
+    }
+
+
+    /**
+     *
+     * if the container is provided, this method will found the module in the container. Reflection is used instead.
+     * If it's possible use it with the container.
+     *
+     * @param ContainerInterface $container optional
+     * @return bool
+     */
+    public static function existVirtualProductDelivery(ContainerInterface $container = null)
+    {
+        $modules = self::create()
+            ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
+            ->filterByActivate(BaseModule::IS_ACTIVATED)
+            ->find()
+        ;
+
+        $result = false;
+
+        /** @var \Thelia\Model\Module $module */
+        foreach ($modules as $module) {
+            if (null !== $container) {
+                $instance = $module->getModuleInstance($container);
+            } else {
+                $instance = $module->createInstance();
+            }
+
+            if (true === $instance->handleVirtualProductDelivery()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 // ModuleQuery

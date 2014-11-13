@@ -16,4 +16,12 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
 {
     // This class is the base class for delivery modules
     // It may contains common methods in the future.
+
+    /**
+     * @return bool
+     */
+    public function handleVirtualProductDelivery()
+    {
+        return false;
+    }
 }

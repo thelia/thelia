@@ -54,6 +54,16 @@ class VirtualProductDelivery extends AbstractDeliveryModule
         return 0.0;
     }
 
+    /**
+     * This module manages virtual product delivery
+     *
+     * @return bool
+     */
+    public function handleVirtualProductDelivery()
+    {
+        return true;
+    }
+
 
     public function postActivation(ConnectionInterface $con = null)
     {
