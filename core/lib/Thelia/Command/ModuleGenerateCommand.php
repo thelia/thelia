@@ -51,7 +51,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $this->module = $this->formatModuleName($input->getArgument("name"));
         $this->moduleDirectory = THELIA_MODULE_DIR . DIRECTORY_SEPARATOR . $this->module;
 
-        try{
+        try {
             $this->verifyExistingModule();
         } catch (\RuntimeException $ex) {
             if (false === $input->getOption('force')) {
@@ -62,7 +62,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $this->createDirectories();
         $this->createFiles();
         if (method_exists($this, "renderBlock")) {
-            //impossible to change output class in CommandTester...
+            // impossible to change output class in CommandTester...
             $output->renderBlock(array(
                 '',
                 sprintf("module %s create with success", $this->module),
