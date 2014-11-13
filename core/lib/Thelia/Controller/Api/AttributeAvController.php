@@ -109,5 +109,4 @@ class AttributeAvController extends AbstractCrudApiController
     protected function getDeleteEvent($entityId)
     {
     }
-
 }

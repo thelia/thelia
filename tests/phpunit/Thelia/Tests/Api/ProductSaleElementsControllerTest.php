@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Api;
 
+use Propel\Runtime\Propel;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
@@ -253,6 +254,153 @@ class ProductSaleElementsControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'Http status code must be 204');
+    }
+
+    public function testCreateMultiplePSEInOneShot()
+    {
+        $client  = static::createClient();
+
+        $product = $this->getProduct();
+        $currency = $this->getCurrency();
+        $taxRule = $this->getTaxRule();
+
+        $attributeAvs = AttributeAvQuery::create()
+            ->limit(2)
+            ->select(AttributeAvTableMap::ID)
+            ->find()
+            ->toArray();
+
+        $data = [
+            "pse" => [
+                [
+                    "product_id" => $product->getId(),
+                    "tax_rule_id" => $taxRule->getId(),
+                    "currency_id" => $currency->getId(),
+                    "price" => "3.12",
+                    "reference" => "foo",
+                    "quantity" => 1,
+                    "attribute_av" => $attributeAvs,
+                    "onsale" => true,
+                    "isnew" => true,
+                ],
+                [
+                    "product_id" => $product->getId(),
+                    "tax_rule_id" => $taxRule->getId(),
+                    "currency_id" => $currency->getId(),
+                    "price" => "3.33",
+                    "reference" => "bar",
+                    "quantity" => 10,
+                    "attribute_av" => [$attributeAvs[0]],
+                    "onsale" => true,
+                    "isnew" => true,
+                ],
+                [
+                    "product_id" => $product->getId(),
+                    "tax_rule_id" => $taxRule->getId(),
+                    "currency_id" => $currency->getId(),
+                    "price" => "12.09",
+                    "reference" => "baz",
+                    "quantity" => 100,
+                    "attribute_av" => [$attributeAvs[1]],
+                    "onsale" => true,
+                    "isnew" => true,
+                ]
+            ]
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'POST',
+            '/api/pse?order=quantity&sign=' . $this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(
+            201,
+            $client->getResponse()->getStatusCode(),
+            sprintf(
+                'Http status code must be 201. Error: %s',
+                $client->getResponse()->getContent()
+            )
+        );
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(3, $content);
+        $this->assertEquals('3.12', $content[0]['PRICE']);
+        $this->assertEquals('3.33', $content[1]['PRICE']);
+        $this->assertEquals('12.09', $content[2]['PRICE']);
+
+        $ids = array();
+
+        foreach ($content as $entry) {
+            $ids[] = $entry["ID"];
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param $ids
+     * @depends testCreateMultiplePSEInOneShot
+     */
+    public function testUpdateMultiplePSEInOneShot($ids)
+    {
+        $client  = static::createClient();
+
+        $data = [
+            "pse" => [
+                [
+                    "id" => $ids[0],
+                    "price" => "3.50",
+                ],
+                [
+                    "id" => $ids[1],
+                    "price" => "2.54",
+                ],
+                [
+                    "id" => $ids[2],
+                    "price" => "9.60",
+                ]
+            ]
+        ];
+
+        $requestContent = json_encode($data);
+
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+
+        $client->request(
+            'PUT',
+            '/api/pse?order=quantity&sign=' . $this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(
+            201,
+            $client->getResponse()->getStatusCode(),
+            sprintf(
+                'Http status code must be 201. Error: %s',
+                $client->getResponse()->getContent()
+            )
+        );
+
+        $content = json_decode($client->getResponse()->getContent(), true);
+
+        $this->assertCount(3, $content);
+        $this->assertEquals('3.50', $content[0]['PRICE']);
+        $this->assertEquals('2.54', $content[1]['PRICE']);
+        $this->assertEquals('9.60', $content[2]['PRICE']);
     }
 
     public function testDeleteActionWithNonExistingProduct()

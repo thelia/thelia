@@ -394,7 +394,7 @@ class ProductSaleElementsController extends BaseApiController
         $data = array();
 
         foreach ($event->getData()["pse"] as $entry) {
-             $productSaleElementIds[$entry["id"]] = &$entry;
+             $productSaleElementIds[$entry["id"]] = $entry;
         }
 
         $productSaleElements = ProductSaleElementsQuery::create()
@@ -409,7 +409,7 @@ class ProductSaleElementsController extends BaseApiController
 
             $data["pse"][$productSaleElement->getId()] = array_merge(
                 [
-                    "id" => $id = $productSaleElement->getId(),
+                    "id" => $productSaleElement->getId(),
                     "reference" => $productSaleElement->getRef(),
                     "tax_rule_id" => $product->getTaxRuleId(),
                     "ean_code" => $productSaleElement->getEanCode(),
@@ -423,7 +423,7 @@ class ProductSaleElementsController extends BaseApiController
                     "currency_id" => $currencyId,
                     "use_exchange_rate" => $fromDefaultCurrency
                 ],
-                $productSaleElementIds[$id]
+                $productSaleElementIds[$productSaleElement->getId()]
             );
         }
 
