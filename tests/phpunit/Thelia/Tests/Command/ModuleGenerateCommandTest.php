@@ -89,6 +89,30 @@ class ModuleGenerateCommandTest extends BaseCommandTest
     }
 
     /**
+     * @depends testGenerateModule
+     */
+    public function testGenerateDuplicateModuleWithForceOption()
+    {
+        $tester = $this->commandTester;
+
+        // remove the config.xml
+        $fs = new Filesystem();
+        $configFile = THELIA_MODULE_DIR . "Test" .
+            DIRECTORY_SEPARATOR . "Config" .
+            DIRECTORY_SEPARATOR . "config.xml"
+        ;
+        $fs->remove($configFile);
+
+        $tester->execute(array(
+            "command" => $this->command->getName(),
+            "name" => "test",
+            "--force" => ""
+        ));
+
+        $this->assertTrue($fs->exists($configFile));
+    }
+
+    /**
      * @expectedException \RuntimeException
      */
     public function testGenerateWithReservedKeyWord()
