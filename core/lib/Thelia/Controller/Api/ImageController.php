@@ -39,12 +39,11 @@ use Thelia\Model\ProductQuery;
 class ImageController extends BaseApiController
 {
     /**
-     * @param $entityId source's primary key (product's pk, category's pk, etc)
+     * @param integer $entityId source's primary key (product's pk, category's pk, etc)
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction($entityId)
     {
-
         $request = $this->getRequest();
 
         $entity = $request->attributes->get('entity');
@@ -118,28 +117,12 @@ class ImageController extends BaseApiController
         $fileController->setContainer($this->getContainer());
 
         $config = FileConfiguration::getImageConfig();
-
         $files = $request->files->all();
 
-        $errors = [];
+        $errors = null;
 
         foreach ($files as $file) {
-            try {
-                $fileController->processImage(
-                    $file,
-                    $entityId,
-                    $entity,
-                    $config['objectType'],
-                    $config['validMimeTypes'],
-                    $config['extBlackList']
-                );
-            } catch (\Exception $e) {
-                $errors = [
-                    'file' => $file->getClientOriginalName(),
-                    'message' => $e->getMessage(),
-                ];
-            }
-
+            $errors = $this->processImage($fileController, $file, $entityId, $entity, $config);
         }
 
         if (!empty($errors)) {
@@ -168,36 +151,7 @@ class ImageController extends BaseApiController
         $hasImage = $request->files->count() == 1;
 
         if ($hasImage) {
-            $file = $request->files->all();
-            reset($file);
-            $file = current($file);
-
-            $fileController = new FileController();
-            $fileController->setContainer($this->getContainer());
-
-            $config = FileConfiguration::getImageConfig();
-
-            $errors = [];
-
-            try {
-                $fileController->processImage(
-                    $file,
-                    $entityId,
-                    $entity,
-                    $config['objectType'],
-                    $config['validMimeTypes'],
-                    $config['extBlackList']
-                );
-            } catch (\Exception $e) {
-                $errors = [
-                    'file' => $file->getClientOriginalName(),
-                    'message' => $e->getMessage(),
-                ];
-            }
-
-            if (!empty($errors)) {
-                throw new HttpException(500, json_encode($errors));
-            }
+            $this->processImageUpdate($entityId, $entity);
         }
 
         /**
@@ -213,39 +167,7 @@ class ImageController extends BaseApiController
             ->addEventListener(
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($entity, $imageId) {
-                    $data = $event->getData();
-                    $temporaryRegister = array();
-
-                    foreach ($data["i18n"] as $key => &$value) {
-                        $temporaryRegister["i18n"][$value["locale"]] = $value;
-
-                        unset($data["i18n"][$key]);
-                    }
-
-                    $data = $temporaryRegister;
-
-                    $i18ns = $this->getImageI18ns($entity, $imageId);
-
-                    foreach ($i18ns as $i18n) {
-                        $row = array(
-                            "locale" => $i18n->getLocale(),
-                            "title" => $i18n->getTitle(),
-                            "chapo" => $i18n->getChapo(),
-                            "description" => $i18n->getDescription(),
-                            "postscriptum" => $i18n->getPostscriptum(),
-                        );
-
-                        if (!isset($data["i18n"][$i18n->getLocale()])) {
-                            $data["i18n"][$i18n->getLocale()] = array();
-                        }
-
-                        $data["i18n"][$i18n->getLocale()] = array_merge(
-                            $row,
-                            $data["i18n"][$i18n->getLocale()]
-                        );
-                    }
-
-                    $event->setData($data);
+                    $this->onFormPreSubmit($event, $imageId, $entity);
                 }
             )
         ;
@@ -267,7 +189,6 @@ class ImageController extends BaseApiController
             }
 
             $image->save();
-
             $con->commit();
         } catch (\Exception $e) {
             $con->rollBack();
@@ -278,6 +199,82 @@ class ImageController extends BaseApiController
         }
 
         return $this->getImageAction($entityId, $imageId)->setStatusCode(201);
+    }
+
+    protected function onFormPreSubmit(FormEvent $event, $entityId, $entity)
+    {
+        $data = $event->getData();
+        $temporaryRegister = array();
+
+        foreach ($data["i18n"] as $key => &$value) {
+            $temporaryRegister["i18n"][$value["locale"]] = $value;
+
+            unset($data["i18n"][$key]);
+        }
+
+        $data = $temporaryRegister;
+
+        $i18ns = $this->getImageI18ns($entity, $entityId);
+
+        foreach ($i18ns as $i18n) {
+            $row = array(
+                "locale" => $i18n->getLocale(),
+                "title" => $i18n->getTitle(),
+                "chapo" => $i18n->getChapo(),
+                "description" => $i18n->getDescription(),
+                "postscriptum" => $i18n->getPostscriptum(),
+            );
+
+            if (!isset($data["i18n"][$i18n->getLocale()])) {
+                $data["i18n"][$i18n->getLocale()] = array();
+            }
+
+            $data["i18n"][$i18n->getLocale()] = array_merge(
+                $row,
+                $data["i18n"][$i18n->getLocale()]
+            );
+        }
+
+        $event->setData($data);
+    }
+
+    protected function processImageUpdate($entityId, $entity)
+    {
+        $file = $this->getRequest()->files->all();
+        reset($file);
+        $file = current($file);
+
+        $fileController = new FileController();
+        $fileController->setContainer($this->getContainer());
+
+        $config = FileConfiguration::getImageConfig();
+
+        $errors = $this->processImage($fileController, $file, $entityId, $entity, $config);
+
+        if (!empty($errors)) {
+            throw new HttpException(500, json_encode($errors));
+        }
+    }
+
+    protected function processImage(FileController $fileController, $file, $entityId, $entity, array $config)
+    {
+        try {
+            $fileController->processImage(
+                $file,
+                $entityId,
+                $entity,
+                $config['objectType'],
+                $config['validMimeTypes'],
+                $config['extBlackList']
+            );
+        } catch (\Exception $e) {
+            return [
+                'file' => $file->getClientOriginalName(),
+                'message' => $e->getMessage(),
+            ];
+        }
+
+        return null;
     }
 
     public function deleteImageAction($entityId, $imageId)

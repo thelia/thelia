@@ -12,7 +12,6 @@
 
 namespace Thelia\Tests\Api;
 
-use Propel\Runtime\Propel;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
