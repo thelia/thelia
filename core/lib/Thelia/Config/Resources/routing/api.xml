@@ -195,4 +195,17 @@
         <requirement key="entityId">\d+</requirement>
     </route>
     <!-- end tax rule -->
+
+    <!-- attribute av route -->
+
+    <route id="api.attribute-av.list" path="/api/attribute-avs" methods="get">
+        <default key="_controller">Thelia:Api\AttributeAv:list</default>
+    </route>
+
+    <route id="api.attribute-av.get" path="/api/attribute-avs/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\AttributeAv:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end attribute av route -->
 </routes>
