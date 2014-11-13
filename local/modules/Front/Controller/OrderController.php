@@ -263,7 +263,14 @@ class OrderController extends BaseFrontController
 
         /* check cart count */
         $this->checkCartNotEmpty();
-
+        
+        /* check stock not empty */
+        if(true === ConfigQuery::checkAvailableStock()) {
+          if (null !== $response = $this->checkStockNotEmpty()) {
+            return $response;
+          } 
+        }
+        
         /* check delivery address and module */
         $this->checkValidDelivery();
 
@@ -477,5 +484,19 @@ class OrderController extends BaseFrontController
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
-
+    
+    private function checkStockNotEmpty()
+    {
+        $cart = $this->getSession()->getCart();
+        $cartItems = $cart->getCartItems();
+        $flagQuantity = 0;
+        foreach ($cartItems as $cartItem) {
+          $pse = $cartItem->getProductSaleElements();
+          if($pse->getQuantity() <=0 ) $flagQuantity = 1;
+        }
+        if ($flagQuantity == 1) {
+            return $this->generateRedirectFromRoute('cart.view');
+        }
+    }
+    
 }
