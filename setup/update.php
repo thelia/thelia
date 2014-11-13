@@ -104,7 +104,7 @@ try {
     // backup db
     if (true === $backup) {
         if (false === $update->backupDb()) {
-            echo PHP_EOL . 'Sorry, your database can\'t be backup. Try to do it manually.' . PHP_EOL;
+            echo PHP_EOL . 'Sorry, your database can\'t be backed up. Try to do it manually.' . PHP_EOL;
             exit(4);
         }
     }

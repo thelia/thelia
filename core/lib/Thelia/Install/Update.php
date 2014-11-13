@@ -14,6 +14,7 @@ namespace Thelia\Install;
 
 use PDO;
 use PDOException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use Thelia\Install\Exception\UpdateException;
@@ -43,6 +44,7 @@ class Update
         '12' => '2.1.0-alpha1',
     );
 
+    /** @var bool */
     protected $usePropel = null;
 
     /** @var null|Tlog */
@@ -59,6 +61,9 @@ class Update
 
     /** @var string|null  */
     protected $backupFile = null;
+
+    /** @var string */
+    protected $backupDir = 'local/backup/';
 
     public function __construct($usePropel = true)
     {
@@ -157,20 +162,27 @@ class Update
     {
         $database = new Database($this->connection);
 
-        $this->backupFile = THELIA_ROOT . 'local/backup/update.sql';
+        $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
+
+        $fs = new Filesystem();
 
         try {
             $this->log('debug', sprintf('Backup database to file : %s', $this->backupFile));
 
-            if (file_exists($this->backupFile)) {
+            // test if backup dir exists
+            if (!$fs->exists(THELIA_ROOT . $this->backupDir)) {
+                $fs->mkdir(THELIA_ROOT . $this->backupDir);
+            }
+
+            // test if backup file already exists
+            if ($fs->exists($this->backupFile)) {
                 // remove file
-                unlink($this->backupFile);
+                $fs->remove($this->backupFile);
             }
 
             $database->backupDb($this->backupFile);
         } catch (\Exception $ex) {
             $this->log('error', sprintf('error during backup process with message : %s', $ex->getMessage()));
-            print $ex->getMessage();
             return false;
         }
 
