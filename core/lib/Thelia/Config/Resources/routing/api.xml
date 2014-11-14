@@ -234,4 +234,17 @@
     </route>
 
     <!-- end tax route -->
+
+    <!-- tax route -->
+
+    <route id="api.languages.list" path="/api/languages" methods="get">
+        <default key="_controller">Thelia:Api\Lang:list</default>
+    </route>
+
+    <route id="api.languages.get" path="/api/languages/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Lang:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end tax route -->
 </routes>
