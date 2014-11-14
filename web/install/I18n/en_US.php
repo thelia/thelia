@@ -57,5 +57,8 @@ return array(
     'Your database has been backed up. The sql file : %file' => 'Your database has been backed up. The sql file : %file',
     'Sorry, your database can\'t be restored. Try to do it manually' => 'Sorry, your database can\'t be restored. Try to do it manually',
     'The sql dump has been saved in %file' => 'The sql dump has been saved in %file',
-    'Your database has been restored.' => 'Your database has been restored.'
+    'Your database has been restored.' => 'Your database has been restored.',
+    'Cache directory has been cleared' => 'Cache directory has been cleared',
+    'Cache directory has not been cleared. Please manually delete content of cache directory.' => 'Cache directory has not been cleared. Please manually delete content of cache directory.',
+    'The update wizard directory will be removed' => 'The update wizard directory will be removed',
 );
