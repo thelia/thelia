@@ -47,6 +47,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+            Argument::createBooleanTypeArgument('need_count_child', false),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
             Argument::createIntListTypeArgument('exclude', array()),
             new Argument(
@@ -109,17 +110,25 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $results = $search->find();
 
+        $need_count_child = $this->getNeedCountChild();
+
         foreach ($results as $result) {
-            $resultsList[] = array(
+
+            $row = array(
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                 "PARENT" => $result->getParent(),
                 "URL" => $result->getUrl($this->locale),
                 "VISIBLE" => $result->getVisible() ? "1" : "0",
                 "LEVEL" => $level,
-                'CHILD_COUNT' => $result->countChild(),
                 'PREV_LEVEL' => $previousLevel,
             );
+
+            if ($need_count_child) {
+                $row['CHILD_COUNT'] = $result->countChild();
+            }
+
+            $resultsList[] = $row;
 
             $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $max_level, $exclude, $resultsList);
         }
