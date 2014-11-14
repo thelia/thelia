@@ -50,8 +50,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+15, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
   (@max_id+17, 'main.before-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+18, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+19, 'account.order-details-virtual', 1, 1, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+18, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -90,9 +89,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+17, 'en_US', 'Layout - Before the main content', '', ''),
   (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
   (@max_id+18, 'en_US', 'Admin layout - After the main content', '', ''),
-  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
-  (@max_id+19, 'en_US', 'Account - Details if virtual products are present', '', ''),
-  (@max_id+19, 'fr_FR', 'Compte - Détails des produits virtuels achetés', '', '')
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', '')
 ;
 
 # ======================================================================================================================

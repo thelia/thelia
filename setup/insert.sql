@@ -402,7 +402,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (184, 'content.sidebar-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (185, 'order-delivery.extra', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 (186, 'order-delivery.javascript', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-(187, 'account.order-details-virtual', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1122,8 +1121,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (185, 'en_US', 'Delivery choice - extra area', '', ''),
 (186, 'fr_FR', 'Choix du transporteur - javascript', '', ''),
 (186, 'en_US', 'Delivery choice - javascript', '', ''),
-(187, 'fr_FR', 'Compte - Détails des produits virtuels achetés', '', ''),
-(187, 'en_US', 'Account - Details if virtual products are present', '', ''),
 (1000, 'en_US', 'Category - content', '', ''),
 (1000, 'fr_FR', 'Catégorie - contenu', '', ''),
 (1001, 'en_US', 'Content - content', '', ''),
