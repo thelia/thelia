@@ -13,21 +13,21 @@ You can backup your database with tools such as [phpmyadmin](http://www.phpmyadm
 - Then you should replace (not only copy) all the files from the new Thelia version :
    - all files from root directory
    - bin (*optional*)
-   - cache (*optional*)
    - core (**mandatory**)
    - setup (**mandatory**)
 - Then, you have to merge (copy in your existent directories) these other directories. Normally, 
-    you haven't modify files inside these directories. But If you have modify files, proceed carefully and try to report
-    all your changes.      
+    you haven't modify files inside these directories (just created new ones - like your frontOffice template). 
+    But If you have modified files, you should proceed carefully and try to report all your changes.      
    - local/config
    - local/modules
    - templates
    - web
 
+
 ## 2. Update database
 
 Then you have 2 different ways to proceed. In each method, a backup of your database can be automatically 
-performs if you want to. If an error is encountered, then your database will be restored.   
+performed if you want to. If an error is encountered, then your database will be restored.   
 But if your database is quite large, it's better to make a backup manually. 
 
 ### 2.1. use the update script
@@ -50,7 +50,11 @@ The update wizard in accessible with your favorite browser :
 http://yourdomain.tld/[/subdomain_if_needed]/install
 ```
 
-Note: the wizard is available only if your Thelia is not already in the latest version.
+Note:
+ 
+- the wizard is available only if your Thelia is not already in the latest version.
+- at the end of the process, the install directory will be removed.
+
 
 ## 3. Clear cache
 
