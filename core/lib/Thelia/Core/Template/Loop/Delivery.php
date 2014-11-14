@@ -53,19 +53,26 @@ class Delivery extends BaseSpecificModule
             $country = $this->container->get('thelia.taxEngine')->getDeliveryCountry();
         }
 
+        $virtual = $this->request->getSession()->getSessionCart($this->dispatcher)->isVirtual();
+
         /** @var Module $deliveryModule */
         foreach ($loopResult->getResultDataCollection() as $deliveryModule) {
             $areaDeliveryModule = AreaDeliveryModuleQuery::create()
                 ->findByCountryAndModule($country, $deliveryModule);
 
-            if (null === $areaDeliveryModule) {
+            if (null === $areaDeliveryModule && false === $virtual) {
+                continue;
+            }
+
+            /** @var DeliveryModuleInterface $moduleInstance */
+            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+
+            if (true === $virtual && false === $moduleInstance->handleVirtualProductDelivery() && false === $this->getBackendContext()) {
                 continue;
             }
 
             $loopResultRow = new LoopResultRow($deliveryModule);
 
-            /** @var DeliveryModuleInterface $moduleInstance */
-            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
 
             if (false === $moduleInstance instanceof DeliveryModuleInterface) {
                 throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));

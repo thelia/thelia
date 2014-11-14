@@ -75,28 +75,9 @@ class OrderController extends BaseFrontController
 
             if (null !== $deliveryAddress) {
 
-                $deliveryModule = ModuleQuery::create()
-                    ->filterByCode('VirtualProductDelivery')
-                    ->filterByActivate(1)
-                    ->findOne()
-                ;
+                $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery($this->container);
 
-                if (null !== $deliveryModule) {
-                    /* get postage amount */
-                    $moduleInstance = $deliveryModule->getModuleInstance($this->container);
-                    $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
-
-                    $orderEvent = $this->getOrderEvent();
-                    $orderEvent->setDeliveryAddress($deliveryAddress->getId());
-                    $orderEvent->setDeliveryModule($deliveryModule->getId());
-                    $orderEvent->setPostage($postage);
-
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
-                    $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-
-                    return $this->generateRedirectFromRoute("order.invoice");
-                } else {
+                if (false === $deliveryModule) {
                     Tlog::getInstance()->error(
                         $this->getTranslator()->trans(
                             "To enabled the virtual product functionality, the module VirtualProductDelivery should be activated",
@@ -104,11 +85,31 @@ class OrderController extends BaseFrontController
                             Front::MESSAGE_DOMAIN
                         )
                     );
+                } else if (count($deliveryModule) == 1) {
+                    return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
                 }
             }
         }
 
         return $this->render('order-delivery');
+    }
+
+    private function registerVirtualProductDelivery($moduleInstance, $deliveryAddress)
+    {
+        /* get postage amount */
+        $deliveryModule = $moduleInstance->getModuleModel();
+        $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+
+        $orderEvent = $this->getOrderEvent();
+        $orderEvent->setDeliveryAddress($deliveryAddress->getId());
+        $orderEvent->setDeliveryModule($deliveryModule->getId());
+        $orderEvent->setPostage($postage);
+
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
+
+        return $this->generateRedirectFromRoute("order.invoice");
     }
 
     /**

@@ -58,18 +58,20 @@ class ModuleQuery extends BaseModuleQuery
      * if the container is provided, this method will found the module in the container. Reflection is used instead.
      * If it's possible use it with the container.
      *
+     * return false if no delivery modules are found, an array of BaseModule otherwise.
+     *
      * @param ContainerInterface $container optional
-     * @return bool
+     * @return false|\Thelia\Module\BaseModule[]
      */
-    public static function existVirtualProductDelivery(ContainerInterface $container = null)
+    public function retrieveVirtualProductDelivery(ContainerInterface $container = null)
     {
-        $modules = self::create()
+        $modules = $this
             ->filterByType(BaseModule::DELIVERY_MODULE_TYPE)
             ->filterByActivate(BaseModule::IS_ACTIVATED)
             ->find()
         ;
 
-        $result = false;
+        $result = [];
 
         /** @var \Thelia\Model\Module $module */
         foreach ($modules as $module) {
@@ -80,11 +82,11 @@ class ModuleQuery extends BaseModuleQuery
             }
 
             if (true === $instance->handleVirtualProductDelivery()) {
-                return true;
+                $result[] = $instance;
             }
         }
 
-        return false;
+        return empty($result) ? false : $result;
     }
 }
 // ModuleQuery
