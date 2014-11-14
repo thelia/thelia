@@ -410,9 +410,11 @@
 	{/elseloop}
 
     {* -- Main page content section ----------------------------------------- *}
+    {hook name="main.before-content" location="before_content"}
 
 	{block name="main-content"}Put here the content of the template{/block}
 
+    {hook name="main.after-content" location="after_content"}
     {* -- Footer section ---------------------------------------------------- *}
 
     {hook name="main.before-footer" location="before_footer" }

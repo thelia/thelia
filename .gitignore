@@ -37,6 +37,7 @@ local/modules/*
 !local/modules/Colissimo/
 !local/modules/Hook*/
 !local/modules/VirtualProductDelivery/
+!local/modules/VirtualProductControl/
 !local/modules/TheliaSmarty/
 local/modules/HookTest/
 

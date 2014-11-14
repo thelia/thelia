@@ -10,18 +10,35 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Module;
+namespace VirtualProductControl\Hook;
 
-abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
+use Thelia\Core\Event\Hook\HookRenderEvent;
+use Thelia\Core\Hook\BaseHook;
+use Thelia\Model\ModuleQuery;
+use Thelia\Model\ProductQuery;
+
+/**
+ * Class VirtualProductHook
+ * @package VirtualProductHook\Hook
+ * @author Manuel Raynaud <manu@thelia.net>
+ */
+class VirtualProductHook extends BaseHook
 {
-    // This class is the base class for delivery modules
-    // It may contains common methods in the future.
 
-    /**
-     * @return bool
-     */
-    public function handleVirtualProductDelivery()
+    public function onMainBeforeContent(HookRenderEvent $event)
     {
-        return false;
+        $products = ProductQuery::create()
+            ->filterByVirtual(1)
+            ->filterByVisible(1)
+            ->count();
+
+        if ($products > 0) {
+            $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery();
+
+            if (false === $deliveryModule) {
+                $event->add($this->render('virtual-delivery-warning.html'));
+            }
+        }
+
     }
 }

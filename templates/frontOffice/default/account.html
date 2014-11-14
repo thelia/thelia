@@ -187,11 +187,11 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {loop name="virtual.order.products" type="order_product" virtual="1" order="$ID"}
-                                                        <tr>
-                                                            <td>{$TITLE}</td>
-                                                            <td><a href="{url path="/account/download/$ID"}" class="btn"><span class="glyphicon glyphicon-download"></span> {intl l="Download"}</a></td>
-                                                        </tr>
+                                                    {loop name="virtual.order.products" type="order_product" virtual="1" order={$ID}}
+                                                    <tr>
+                                                        <td>{$TITLE}</td>
+                                                        <td><a href="{url path="/account/download/$ID"}" class="btn"><span class="glyphicon glyphicon-download"></span> {intl l="Download"}</a></td>
+                                                    </tr>
                                                     {/loop}
                                                 </tbody>
                                             </table>

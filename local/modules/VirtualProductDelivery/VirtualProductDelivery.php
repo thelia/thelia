@@ -33,14 +33,7 @@ class VirtualProductDelivery extends AbstractDeliveryModule
      */
     public function isValidDelivery(Country $country)
     {
-        $cart = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher());
-        foreach ($cart->getCartItems() as $cartItem) {
-            if (!$cartItem->getProduct()->getVirtual()) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->isVirtual();
     }
 
     public function getPostage(Country $country)
@@ -52,6 +45,16 @@ class VirtualProductDelivery extends AbstractDeliveryModule
         }
 
         return 0.0;
+    }
+
+    /**
+     * This module manages virtual product delivery
+     *
+     * @return bool
+     */
+    public function handleVirtualProductDelivery()
+    {
+        return true;
     }
 
 

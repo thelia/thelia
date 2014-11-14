@@ -39,4 +39,12 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      * @throws DeliveryException if the postage price cannot be calculated.
      */
     public function getPostage(Country $country);
+
+    /**
+     *
+     * This method return true if your delivery manages virtual product delivery.
+     *
+     * @return bool
+     */
+    public function handleVirtualProductDelivery();
 }

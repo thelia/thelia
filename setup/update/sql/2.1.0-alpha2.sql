@@ -48,7 +48,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+13, 'sale.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+14, 'sale.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+15, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW())
+  (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+  (@max_id+17, 'main.before-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+18, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -83,7 +85,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+15, 'en_US', 'Sales - JavaScript', '', ''),
   (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', ''),
   (@max_id+16, 'en_US', 'Product - at the bottom of a product combination', '', ''),
-  (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', '')
+  (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', ''),
+  (@max_id+17, 'en_US', 'Layout - Before the main content', '', ''),
+  (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
+  (@max_id+18, 'en_US', 'Admin layout - After the main content', '', ''),
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', '')
 ;
 
 # ======================================================================================================================
@@ -109,14 +115,19 @@ UPDATE `country` SET `isoalpha2` = 'BG' WHERE `isoalpha3` = 'MDG';
 
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
+SELECT @max_classic_position := IFNULL(MAX(`position`),0) FROM `module` WHERE `type`=1;
+
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(@max_id+1, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW())
+(@max_id+1, 'TheliaSmarty', 1, 1, @max_classic_position+1, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
+(@max_id+2, 'VirtualProductControl', 1, 1, @max_classic_position+2, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW())
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id+1, 'en_US',  '>Smarty template engine integration', NULL,  NULL,  NULL),
-(@max_id+1, 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL)
+(@max_id+1, 'en_US',  'Smarty template engine integration', NULL,  NULL,  NULL),
+(@max_id+1, 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL),
+(@max_id+2, 'en_US',  'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL),
+(@max_id+2, 'fr_FR',  'Contôle de produit virtuel', 'Vérifie qu''un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

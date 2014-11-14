@@ -10,18 +10,16 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Module;
+namespace VirtualProductControl;
 
-abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModuleInterface
+use Thelia\Module\BaseModule;
+
+class VirtualProductControl extends BaseModule
 {
-    // This class is the base class for delivery modules
-    // It may contains common methods in the future.
-
-    /**
-     * @return bool
+    /*
+     * You may now override BaseModuleInterface methods, such as:
+     * install, destroy, preActivation, postActivation, preDeactivation, postDeactivation
+     *
+     * Have fun !
      */
-    public function handleVirtualProductDelivery()
-    {
-        return false;
-    }
 }
