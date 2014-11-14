@@ -56,13 +56,13 @@ try {
 <?php
 }
 catch (\Thelia\Install\Exception\AlreadyInstallException $ex) {
-    ?>
-    <div class="alert alert-danger">
-        <?php echo $trans->trans(
-            'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.'
-    ); ?>
-    </div>
-    <?php
+        ?>
+        <div class="alert alert-danger">
+            <?php echo $trans->trans(
+                'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.'
+            ); ?>
+        </div>
+        <?php
 }
 catch (\Exception $ex) {
     ?>

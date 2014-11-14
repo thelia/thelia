@@ -15,6 +15,7 @@ parser's function and block with theirs arguments.
     - New schema for modules
     - Module installation from back office
     - Dependency check to Thelia version and other modules during installation, activation, deactivation and deletion
+    - update command has been removed and replaced by a php script and a web wizard.
 - Smarty :
     - new plugin `flash` to support symfony flash message.
 - Loop : new method addOutputFields in order to add custom fields in an overridden loop

@@ -12,12 +12,14 @@
 
 namespace Thelia\Install;
 
-use Propel\Runtime\Exception\PropelException;
-use Propel\Runtime\Propel;
+use PDO;
+use PDOException;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
+use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\Map\ProductTableMap;
 
 /**
  * Class Update
@@ -26,6 +28,10 @@ use Thelia\Model\Map\ProductTableMap;
  */
 class Update
 {
+    const SQL_DIR = 'setup/update/sql/';
+
+    const PHP_DIR = 'setup/update/php/';
+
     protected static $version = array(
         '0' => '2.0.0-beta1',
         '1' => '2.0.0-beta2',
@@ -42,8 +48,70 @@ class Update
         '12' => '2.1.0-alpha1',
     );
 
-    protected function isLatestVersion($version)
+    /** @var bool */
+    protected $usePropel = null;
+
+    /** @var null|Tlog */
+    protected $logger = null;
+
+    /** @var array log messages */
+    protected $logs = [];
+
+    /** @var array */
+    protected $updatedVersions = [];
+
+    /** @var PDO  */
+    protected $connection = null;
+
+    /** @var string|null  */
+    protected $backupFile = null;
+
+    /** @var string */
+    protected $backupDir = 'local/backup/';
+
+    public function __construct($usePropel = true)
     {
+        $this->usePropel = $usePropel;
+
+        if ($this->usePropel) {
+            $this->logger = Tlog::getInstance();
+            $this->logger->setLevel(Tlog::DEBUG);
+        } else {
+            $this->logs = [];
+        }
+
+        $dbConfig = null;
+
+        $configPath = THELIA_ROOT . "/local/config/database.yml";
+
+        if (!file_exists($configPath)) {
+            throw new UpdateException("Thelia is not installed yet");
+        }
+
+        try {
+            $dbConfig = Yaml::parse($configPath);
+            $dbConfig = $dbConfig['database']['connection'];
+        } catch (ParseException $ex) {
+            throw new UpdateException("database.yml is not a valid file : " . $ex->getMessage());
+        }
+
+        try {
+            $this->connection = new \PDO(
+                $dbConfig['dsn'],
+                $dbConfig['user'],
+                $dbConfig['password']
+            );
+        } catch (\PDOException $ex) {
+            throw new UpdateException('Wrong connection information' . $ex->getMessage());
+        }
+
+    }
+
+    public function isLatestVersion($version = null)
+    {
+        if (null === $version) {
+            $version = $this->getCurrentVersion();
+        }
         $lastEntry = end(self::$version);
 
         return $lastEntry == $version;
@@ -51,50 +119,245 @@ class Update
 
     public function process()
     {
-        $logger = Tlog::getInstance();
-        $logger->setLevel(Tlog::DEBUG);
+        $this->updatedVersions = array();
 
-        $updatedVersions = array();
+        $currentVersion = $this->getCurrentVersion();
+        $this->log('debug', "start update process");
 
-        $currentVersion = ConfigQuery::read('thelia_version');
-        $logger->debug("start update process");
         if (true === $this->isLatestVersion($currentVersion)) {
-            $logger->debug("You already have the latest version. No update available");
+            $this->log('debug', "You already have the latest version. No update available");
             throw new UpToDateException('You already have the latest version. No update available');
         }
 
         $index = array_search($currentVersion, self::$version);
-        $con = Propel::getServiceContainer()->getWriteConnection(ProductTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-        $logger->debug("begin transaction");
-        $database = new Database($con->getWrappedConnection());
+
+        $this->connection->beginTransaction();
+
+        $database = new Database($this->connection);
+        $version = null;
+
         try {
             $size = count(self::$version);
+
             for ($i = ++$index; $i < $size; $i++) {
-                $this->updateToVersion(self::$version[$i], $database, $logger);
-                $updatedVersions[] = self::$version[$i];
+                $version = self::$version[$i];
+                $this->updateToVersion($version, $database);
+                $this->updatedVersions[] = $version;
             }
-            $con->commit();
-            $logger->debug('update successfully');
-        } catch (PropelException $e) {
-            $con->rollBack();
-            $logger->error(sprintf('error during update process with message : %s', $e->getMessage()));
-            throw $e;
+
+            $this->connection->commit();
+            $this->log('debug', 'update successfully');
+        } catch (\Exception $e) {
+            $this->connection->rollBack();
+
+            $this->log('error', sprintf('error during update process with message : %s', $e->getMessage()));
+
+            $ex = new UpdateException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $ex->setVersion($version);
+            throw $ex;
         }
+        $this->log('debug', 'end of update processing');
 
-        $logger->debug('end of update processing');
-
-        return $updatedVersions;
+        return $this->updatedVersions;
     }
 
-    protected function updateToVersion($version, Database $database, Tlog $logger)
+
+    /**
+     * Backup current DB to file local/backup/update.sql
+     *
+     * @return bool if it succeeds, false otherwise
+     */
+    public function backupDb()
     {
-        if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
-            $logger->debug(sprintf('inserting file %s', $version.'$sql'));
-            $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version.'.sql'));
-            $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
+        $database = new Database($this->connection);
+
+        $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
+
+        $fs = new Filesystem();
+
+        try {
+            $this->log('debug', sprintf('Backup database to file : %s', $this->backupFile));
+
+            // test if backup dir exists
+            if (!$fs->exists(THELIA_ROOT . $this->backupDir)) {
+                $fs->mkdir(THELIA_ROOT . $this->backupDir);
+            }
+
+            // test if backup file already exists
+            if ($fs->exists($this->backupFile)) {
+                // remove file
+                $fs->remove($this->backupFile);
+            }
+
+            $database->backupDb($this->backupFile);
+        } catch (\Exception $ex) {
+            $this->log('error', sprintf('error during backup process with message : %s', $ex->getMessage()));
+            return false;
         }
 
-        ConfigQuery::write('thelia_version', $version);
+        return true;
+    }
+
+    /**
+     * Restores file local/backup/update.sql to current DB
+     *
+     * @return bool if it succeeds, false otherwise
+     */
+    public function restoreDb()
+    {
+        $database = new Database($this->connection);
+
+        try {
+            $this->log('debug', sprintf('Restore database with file : %s', $this->backupFile));
+
+            if (!file_exists($this->backupFile)) {
+                return false;
+            }
+
+            $database->restoreDb($this->backupFile);
+        } catch (\Exception $ex) {
+            $this->log('error', sprintf('error during restore process with message : %s', $ex->getMessage()));
+            print $ex->getMessage();
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getBackupFile()
+    {
+        return $this->backupFile;
+    }
+
+    public function getLogs()
+    {
+        return $this->logs;
+    }
+
+    protected function log($level, $message)
+    {
+        if ($this->usePropel) {
+            switch ($level) {
+                case 'debug':
+                    $this->logger->debug($message);
+                    break;
+                case 'info':
+                    $this->logger->info($message);
+                    break;
+                case 'notice':
+                    $this->logger->notice($message);
+                    break;
+                case 'warning':
+                    $this->logger->warning($message);
+                    break;
+                case 'error':
+                    $this->logger->error($message);
+                    break;
+                case 'critical':
+                    $this->logger->critical($message);
+                    break;
+            }
+        } else {
+            $this->logs[] = [$level, $message];
+        }
+    }
+
+    protected function updateToVersion($version, Database $database)
+    {
+        // sql update
+        $filename = sprintf(
+            "%s%s%s",
+            THELIA_ROOT,
+            str_replace('/', DS, self::SQL_DIR),
+            $version . '.sql'
+        );
+
+        if (file_exists($filename)) {
+            $this->log('debug', sprintf('inserting file %s', $version . '.sql'));
+            $database->insertSql(null, [$filename]);
+            $this->log('debug', sprintf('end inserting file %s', $version . '.sql'));
+        }
+
+        // php update
+        $filename = sprintf(
+            "%s%s%s",
+            THELIA_ROOT,
+            str_replace('/', DS, self::PHP_DIR),
+            $version . '.php'
+        );
+
+        if (file_exists($filename)) {
+            $this->log('debug', sprintf('executing file %s', $version . '.php'));
+            include_once $filename;
+            $this->log('debug', sprintf('end executing file %s', $version . '.php'));
+        }
+
+        $this->setCurrentVersion($version);
+    }
+
+    public function getCurrentVersion()
+    {
+        $currentVersion = null;
+
+        if (null !== $this->connection) {
+            try {
+                $stmt = $this->connection->prepare('SELECT value from config where name = ? LIMIT 1');
+                $stmt->execute(['thelia_version']);
+                if (false !== $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $currentVersion = $row['value'];
+                }
+            } catch (PDOException $e) {
+                $this->log('error', sprintf('Error retrieving current version : %s', $e->getMessage()));
+
+                throw $e;
+            }
+        }
+
+        return $currentVersion;
+    }
+
+    public function setCurrentVersion($version)
+    {
+        $currentVersion = null;
+
+        if (null !== $this->connection) {
+            try {
+                $stmt = $this->connection->prepare('UPDATE config set value = ? where name = ?');
+                $stmt->execute([$version, 'thelia_version']);
+            } catch (PDOException $e) {
+                $this->log('error', sprintf('Error setting current version : %s', $e->getMessage()));
+
+                throw $e;
+            }
+        }
+    }
+
+    public function getLatestVersion()
+    {
+        return end(self::$version);
+    }
+
+    public function getVersions()
+    {
+        return self::$version;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedVersions()
+    {
+        return $this->updatedVersions;
+    }
+
+    /**
+     * @param array $updatedVersions
+     */
+    public function setUpdatedVersions($updatedVersions)
+    {
+        $this->updatedVersions = $updatedVersions;
     }
 }

@@ -10,10 +10,9 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-?>
-<?php
-    $step = 1;
-    include("header.php");
+$step = 1;
+include("header.php");
+
 ?>
 					<div class="well">
                         <div class="clearfix">

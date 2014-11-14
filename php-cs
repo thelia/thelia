@@ -18,6 +18,6 @@ php-cs-fixer fix core/lib/Thelia/Model/Tools --level=psr2
 php-cs-fixer fix core/lib/Thelia/Module/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Rewriting/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/TaxEngine/ --level=psr2
-php-cs-fixer fix core/lib/Thelia/Tests --level=psr2
+php-cs-fixer fix tests/phpunit/Thelia/Tests/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Tools/ --level=psr2
 php-cs-fixer fix core/lib/Thelia/Type/ --level=psr2
