@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <fullnamespace>VirtualProductControl\VirtualProductControl</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Virtual Product Controller</title>
+        <description>Check if a virtual product delivery module is enabled if at least one product is virtual</description>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Contôle de produit virtuel</title>
+        <description>Vérifie qu'un module de livraison pour produit virtuel soit activé si des produits virtuels existent</description>
+    </descriptive>
+    <version>1.0</version>
+    <author>
+        <name>Manuel Raynaud</name>
+        <email>manu@thelia.net</email>
+    </author>
+    <type>classic</type>
+    <thelia>2.1.0</thelia>
+    <stability>other</stability>
+</module>
