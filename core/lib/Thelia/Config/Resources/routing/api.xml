@@ -208,4 +208,30 @@
     </route>
 
     <!-- end attribute av route -->
+
+    <!-- country route -->
+
+    <route id="api.country.list" path="/api/countries" methods="get">
+        <default key="_controller">Thelia:Api\Country:list</default>
+    </route>
+
+    <route id="api.country.get" path="/api/countries/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Country:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end country route -->
+
+    <!-- tax route -->
+
+    <route id="api.taxes.list" path="/api/taxes" methods="get">
+        <default key="_controller">Thelia:Api\Tax:list</default>
+    </route>
+
+    <route id="api.taxes.get" path="/api/taxes/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Tax:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end tax route -->
 </routes>
