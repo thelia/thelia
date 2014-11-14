@@ -113,7 +113,6 @@ class ProductSaleElementsType extends AbstractTheliaType
             ->add("isnew", "checkbox")
             ->add("isdefault", "checkbox")
             ->add("use_exchange_rate", "checkbox")
-            ->add("default_pse", "checkbox")
 
             // Only on create
             ->add("product_id", "product_id", array(

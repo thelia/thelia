@@ -65,9 +65,11 @@ class CategoryControllerTest extends ApiTestCase
     {
         $client = static::createClient();
 
+        $category = CategoryQuery::create()->findOne();
+
         $client->request(
             'GET',
-            '/api/categories/1?sign='.$this->getSignParameter(''),
+            '/api/categories/'.$category->getId().'?sign='.$this->getSignParameter(''),
             [],
             [],
             $this->getServerParameters()

@@ -54,8 +54,6 @@ class ProductSaleElementsController extends BaseApiController
      * @return JsonResponse
      *
      * List a product pses
-     * @Route("/api/pse/product/{productId}", requirements={"productId" = "\d+"})
-     * @Method({"GET"})
      */
     public function listAction($productId)
     {
@@ -86,8 +84,6 @@ class ProductSaleElementsController extends BaseApiController
      * @return JsonResponse
      *
      * Get a pse details
-     * @Route("/api/pse/{pseId}", requirements={"pseId" = "\d+"}))
-     * @Method({"GET"})
      */
     public function getPseAction($pseId)
     {
@@ -125,8 +121,6 @@ class ProductSaleElementsController extends BaseApiController
      * @return JsonResponse
      *
      * Create product sale elements
-     * @Route("/api/pse")
-     * @Method({"POST"})
      */
     public function createAction()
     {
@@ -191,8 +185,6 @@ class ProductSaleElementsController extends BaseApiController
      * @return JsonResponse
      *
      * Create product sale elements
-     * @Route("/api/pse/{pseId}", requirements={"pseId" = "\d+"}))
-     * @Method({"PUT"})
      */
     public function updateAction()
     {
@@ -263,8 +255,6 @@ class ProductSaleElementsController extends BaseApiController
      * @return JsonResponse|\Thelia\Core\HttpFoundation\Response
      *
      * Delete a pse
-     * @Route("/api/pse", requirements={"pseId" = "\d+"}))
-     * @Method({"DELETE"})
      */
     public function deleteAction($pseId)
     {

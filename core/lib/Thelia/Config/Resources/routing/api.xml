@@ -237,14 +237,40 @@
 
     <!-- tax route -->
 
-    <route id="api.languages.list" path="/api/languages" methods="get">
+    <route id="api.language.list" path="/api/languages" methods="get">
         <default key="_controller">Thelia:Api\Lang:list</default>
     </route>
 
-    <route id="api.languages.get" path="/api/languages/{entityId}" methods="get">
+    <route id="api.language.get" path="/api/languages/{entityId}" methods="get">
         <default key="_controller">Thelia:Api\Lang:get</default>
         <requirement key="entityId">\d+</requirement>
     </route>
 
     <!-- end tax route -->
+
+    <!-- brand route -->
+
+    <route id="api.brand.list" path="/api/brands" methods="get">
+        <default key="_controller">Thelia:Api\Brand:list</default>
+    </route>
+
+    <route id="api.brand.get" path="/api/brands/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Brand:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end brand route -->
+
+    <!-- currency route -->
+
+    <route id="api.currency.list" path="/api/currencies" methods="get">
+        <default key="_controller">Thelia:Api\Currency:list</default>
+    </route>
+
+    <route id="api.currency.get" path="/api/currencies/{entityId}" methods="get">
+        <default key="_controller">Thelia:Api\Currency:get</default>
+        <requirement key="entityId">\d+</requirement>
+    </route>
+
+    <!-- end currency route -->
 </routes>
