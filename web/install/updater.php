@@ -10,6 +10,8 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Thelia\Install\Exception\UpdateException;
 
 $context = 'update';
@@ -172,7 +174,39 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
                         <?php } ?>
                     </ul>
                 <?php
+                } else {
+
+                    $finder = new Finder();
+                    $fs = new Filesystem();
+                    $hasDeleteError = false;
+
+                    // try to clear cache
+                    $finder->files()->in(THELIA_CACHE_DIR);
+
+                    foreach ($finder as $file) {
+                        try {
+                            $fs->remove($file);
+                        } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
+                            $hasDeleteError = true;
+                        }
+                    }
+
+                    if ($hasDeleteError) { ?>
+                        <div class="alert alert-danger"><p><?php
+                            echo $trans->trans('Cache directory has not been cleared. Please manually delete content of cache directory.');
+                        ?></p></div>
+                    <?php } else { ?>
+                        <div class="alert alert-success"><p><?php
+                            echo $trans->trans('Cache directory has been cleared');
+                            ?></p></div>
+                    <?php } ?>
+
+                    <div class="alert alert-success"><p><?php
+                        echo $trans->trans('The update wizard directory will be removed');
+                    ?></p></div><?php
+
                 }
+
             }
         }
         ?>
@@ -182,3 +216,11 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
 
 include("footer.php");
 
+// Remove the update wizard
+if (null === $updateError) {
+    try {
+        $fs->remove(THELIA_WEB_DIR . DS . 'install');
+    } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
+        ;
+    }
+}
