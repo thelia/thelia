@@ -167,7 +167,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 (16, 'HookSocial', 1, 1, 13, 'HookSocial\\HookSocial', NOW(), NOW()),
 (17, 'HookProductsNew', 1, 1, 14, 'HookProductsNew\\HookProductsNew', NOW(), NOW()),
 (18, 'HookProductsOffer', 1, 1, 15, 'HookProductsOffer\\HookProductsOffer', NOW(), NOW()),
-(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW())
+(19, 'TheliaSmarty', 1, 1, 16, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
+(20, 'VirtualProductControl', 1, 1, 17, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW())
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
@@ -208,7 +209,9 @@ INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 ('18', 'en_US',  'Products offer block', NULL,  NULL,  NULL),
 ('18', 'fr_FR',  'Bloc promotions', NULL,  NULL,  NULL),
 ('19', 'en_US',  '>Smarty template engine integration', NULL,  NULL,  NULL),
-('19', 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL)
+('19', 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL),
+(20, 'en_US',  'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL),
+(20, 'fr_FR',  'Contôle de produit virtuel', 'Vérifie qu''un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
 ;
 
 
@@ -399,6 +402,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (184, 'content.sidebar-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (185, 'order-delivery.extra', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 (186, 'order-delivery.javascript', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(187, 'account.order-details-virtual', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -704,6 +708,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1301, 'sale.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1302, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1303, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(1304, 'main.before-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1305, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1116,6 +1122,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (185, 'en_US', 'Delivery choice - extra area', '', ''),
 (186, 'fr_FR', 'Choix du transporteur - javascript', '', ''),
 (186, 'en_US', 'Delivery choice - javascript', '', ''),
+(187, 'fr_FR', 'Compte - Détails des produits virtuels achetés', '', ''),
+(187, 'en_US', 'Account - Details if virtual products are present', '', ''),
 (1000, 'en_US', 'Category - content', '', ''),
 (1000, 'fr_FR', 'Catégorie - contenu', '', ''),
 (1001, 'en_US', 'Content - content', '', ''),
@@ -1724,6 +1732,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (1302, 'fr_FR', 'Promotions - JavaScript', '', ''),
 (1303, 'en_US', 'Product - at the bottom of a product combination', '', ''),
 (1303, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', ''),
+(1304, 'en_US', 'Layout - Before the main content', '', ''),
+(1304, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
+(1305, 'en_US', 'Admin layout - After the main content', '', ''),
+(1305, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
 
 (2001, 'fr_FR', 'Facture - CSS', '', ''),
 (2001, 'en_US', 'Invoice - CSS', '', ''),

@@ -50,7 +50,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
   (@max_id+15, 'sales.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
   (@max_id+16, 'product.combinations-row', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
   (@max_id+17, 'main.before-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-  (@max_id+18, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+  (@max_id+18, 'main.after-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+  (@max_id+19, 'account.order-details-virtual', 1, 1, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -88,8 +89,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', ''),
   (@max_id+17, 'en_US', 'Layout - Before the main content', '', ''),
   (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
-  (@max_id+18, 'en_US', 'Layout - After the main content', '', ''),
-  (@max_id+18, 'fr_FR', 'Layout - Après le contenu principal', '', '')
+  (@max_id+18, 'en_US', 'Admin layout - After the main content', '', ''),
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
+  (@max_id+19, 'en_US', 'Account - Details if virtual products are present', '', ''),
+  (@max_id+19, 'fr_FR', 'Compte - Détails des produits virtuels achetés', '', '')
 ;
 
 # ======================================================================================================================
@@ -120,7 +123,7 @@ SELECT @max_classic_position := IFNULL(MAX(`position`),0) FROM `module` WHERE `t
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
 (@max_id+1, 'TheliaSmarty', 1, 1, @max_classic_position+1, 'TheliaSmarty\\TheliaSmarty', NOW(), NOW()),
-(@max_id+2, 'VirtualProductControl', 1, 1, @max_classic_position+2, 'VirtualProductControl\VirtualProductControl', NOW(), NOW())
+(@max_id+2, 'VirtualProductControl', 1, 1, @max_classic_position+2, 'VirtualProductControl\\VirtualProductControl', NOW(), NOW())
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
