@@ -592,6 +592,12 @@ final class TheliaEvents
     const ADMINISTRATOR_DELETE                    = "action.deleteAdministrator";
     const ADMINISTRATOR_UPDATEPASSWORD          = 'action.generatePassword';
 
+    // -- Api management ---------------------------------------------
+
+    const API_CREATE                            = 'action.createApi';
+    const API_DELETE                            = 'action.deleteApi';
+    const API_UPDATE                            = 'action.updateApi';
+
     // -- Mailing System management ---------------------------------------------
 
     const MAILING_SYSTEM_UPDATE                    = "action.updateMailingSystem";
@@ -852,4 +858,16 @@ final class TheliaEvents
 
     const FORM_BEFORE_BUILD = "thelia.form.before_build";
     const FORM_AFTER_BUILD = "thelia.form.after_build";
+
+    // -- Customer Title ----------------------------------------
+
+    const CUSTOMER_TITLE_BEFORE_CREATE = "action.title.before_create";
+    const CUSTOMER_TITLE_CREATE = "action.title.create";
+    const CUSTOMER_TITLE_AFTER_CREATE = "action.title.after_create";
+
+    const CUSTOMER_TITLE_BEFORE_UPDATE = "action.title.before_update";
+    const CUSTOMER_TITLE_UPDATE = "action.title.update";
+    const CUSTOMER_TITLE_AFTER_UPDATE = "action.title.after_update";
+
+    const CUSTOMER_TITLE_DELETE = "action.title.delete";
 }

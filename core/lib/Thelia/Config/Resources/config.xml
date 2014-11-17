@@ -155,6 +155,11 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="controller.listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
+            <argument type="service" id="thelia.securityContext"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Archive builders -->
 
         <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">

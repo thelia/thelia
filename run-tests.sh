@@ -10,7 +10,7 @@ echo "backup DB"
 mysqldump -h localhost -u $DB_USER thelia >../thelia.sql
 
 echo "phpunit"
-phpunit
+./bin/phpunit
 
 echo "restore DB"
 mysql -h localhost -u $DB_USER thelia <../thelia.sql
@@ -25,5 +25,4 @@ php Thelia cache:clear --env=prod
 echo "CasperJS"
 cd ../casperjs
 export DISPLAY=:99.0
-
-./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url="http://localhost:8000/index.php/" --thelia2_screenshot_path="../thelia/tests/functionnal/casperjs/screenshot/"
+./bin/casperjs test ../thelia/tests/functionnal/casperjs/exe/front/ --pre=../thelia/tests/functionnal/casperjs/conf/local.js --verbose --thelia2_base_url="http://localhost:8000/index.php/" --thelia2_screenshot_path="../thelia/tests/functionnal/casperjs/screenshot/"

@@ -19,7 +19,6 @@ use Thelia\Core\Translation\Translator;
 
 trait FolderBreadcrumbTrait
 {
-
     public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $folderId)
     {
         $translator = Translator::getInstance();

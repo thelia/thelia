@@ -2,12 +2,10 @@
 
 namespace Thelia\Model;
 
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Role\Role;
 
+use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
@@ -26,42 +24,7 @@ use Thelia\Model\Tools\ModelEventDispatcherTrait;
 class Admin extends BaseAdmin implements UserInterface
 {
     use ModelEventDispatcherTrait;
-
-    /**
-     * Retrieve all permissions for the current admin
-     *
-     * @return array|string
-     */
-    public function getPermissions()
-    {
-        $profileId = $this->getProfileId();
-
-        if (null === $profileId || 0 === $profileId) {
-            return AdminResources::SUPERADMINISTRATOR;
-        }
-
-        $userResourcePermissionsQuery = ProfileResourceQuery::create()
-            ->joinResource("resource", Criteria::LEFT_JOIN)
-            ->withColumn('resource.code', 'code')
-            ->filterByProfileId($profileId)
-            ->find();
-
-        $userModulePermissionsQuery = ProfileModuleQuery::create()
-            ->joinModule("module", Criteria::LEFT_JOIN)
-            ->withColumn('module.code', 'code')
-            ->filterByProfileId($profileId)
-            ->find();
-
-        $userPermissions = array();
-        foreach ($userResourcePermissionsQuery as $userResourcePermission) {
-            $userPermissions[$userResourcePermission->getVirtualColumn('code')] = new AccessManager($userResourcePermission->getAccess());
-        }
-        foreach ($userModulePermissionsQuery as $userModulePermission) {
-            $userPermissions['module'][strtolower($userModulePermission->getVirtualColumn('code'))] = new AccessManager($userModulePermission->getAccess());
-        }
-
-        return $userPermissions;
-    }
+    use UserPermissionsTrait;
 
     /**
      * {@inheritDoc}

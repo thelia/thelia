@@ -257,7 +257,6 @@ class OrderExport extends ExportHandler
      */
     public function buildDataSet(Lang $lang)
     {
-
         $query = $this->getQuery($lang);
 
         $dataSet = $query

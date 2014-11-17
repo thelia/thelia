@@ -77,6 +77,8 @@ class Thelia extends Kernel
         );
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setAdapterClass('thelia', 'mysql');
+        $serviceContainer->setDefaultDatasource('thelia');
+
         $manager = new ConnectionManagerSingle();
         $manager->setConfiguration($definePropel->getConfig());
         $serviceContainer->setConnectionManager('thelia', $manager);

@@ -15,6 +15,7 @@ namespace Thelia\Core\EventListener;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -96,6 +97,20 @@ class RequestListener implements EventSubscriberInterface
         // Check admin remember me token
         if (null === $session->getAdminUser()) {
             $this->getRememberMeAdmin($request, $session);
+        }
+    }
+
+    public function jsonBody(GetResponseEvent $event)
+    {
+        $request = $event->getRequest();
+        if (!count($request->request->all()) && in_array($request->getMethod(), array('POST', 'PUT', 'PATCH', 'DELETE'))) {
+            if ('json' == $request->getFormat($request->headers->get('Content-Type'))) {
+                $content = $request->getContent();
+                if (!empty($content)) {
+                    $data = json_decode($content, true);
+                    $request->request = new ParameterBag($data);
+                }
+            }
         }
     }
 
@@ -236,7 +251,8 @@ class RequestListener implements EventSubscriberInterface
         return [
             KernelEvents::REQUEST => [
                 ["registerValidatorTranslator", 128],
-                ["rememberMeLoader", 128]
+                ["rememberMeLoader", 128],
+                ['jsonBody', 128]
             ],
             KernelEvents::TERMINATE => [
                 ["registerPreviousUrl", 128]

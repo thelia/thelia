@@ -35,7 +35,7 @@ abstract class BaseI18nLoop extends BaseLoop
     {
         $args = parent::getDefaultArgs();
 
-        $args[] = Argument::createIntTypeArgument('lang');
+        $args[] = Argument::createAnyTypeArgument('lang');
 
         return $args;
     }

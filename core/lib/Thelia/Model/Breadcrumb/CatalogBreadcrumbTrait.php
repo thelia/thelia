@@ -19,7 +19,6 @@ use Thelia\Core\Translation\Translator;
 
 trait CatalogBreadcrumbTrait
 {
-
     public function getBaseBreadcrumb(Router $router, ContainerInterface $container, $categoryId)
     {
         $translator = Translator::getInstance();

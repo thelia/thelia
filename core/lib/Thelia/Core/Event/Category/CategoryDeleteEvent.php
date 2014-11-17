@@ -14,19 +14,21 @@ namespace Thelia\Core\Event\Category;
 
 class CategoryDeleteEvent extends CategoryEvent
 {
-    public function __construct($category_id)
+    protected $categoryId;
+
+    public function __construct($categoryId)
     {
-        $this->category_id = $category_id;
+        $this->categoryId = $categoryId;
     }
 
     public function getCategoryId()
     {
-        return $this->category_id;
+        return $this->categoryId;
     }
 
-    public function setCategoryId($category_id)
+    public function setCategoryId($categoryId)
     {
-        $this->category_id = $category_id;
+        $this->categoryId = $categoryId;
 
         return $this;
     }

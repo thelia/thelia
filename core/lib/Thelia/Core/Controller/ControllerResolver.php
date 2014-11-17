@@ -16,8 +16,6 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseController
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Psr\Log\LoggerInterface;
-use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Exception\AdminAccessDenied;
 
 /**
  * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
@@ -81,15 +79,6 @@ class ControllerResolver extends BaseControllerResolver
         $controller = new $class();
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
-        }
-
-        //check if an admin is logged in
-        if ($controller instanceof BaseAdminController) {
-            $securityContext = $this->container->get('thelia.securityContext');
-            $request = $this->container->get('request');
-            if (false === $securityContext->hasAdminUser() && $request->attributes->get('not-logged') != 1) {
-                throw new AdminAccessDenied();
-            }
         }
 
         return array($controller, $method);

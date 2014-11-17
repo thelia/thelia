@@ -69,7 +69,8 @@ class ProductModificationForm extends ProductCreationForm
                 Translator::getInstance()->trans(
                     "A product with reference %ref already exists. Please choose another reference.",
                     array('%ref' => $value)
-                ));
+                )
+            );
         }
     }
 

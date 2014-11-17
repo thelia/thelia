@@ -186,6 +186,16 @@ try {
 
     echo "Creating customers\n";
 
+    //API
+
+    $api = new Thelia\Model\Api();
+
+    $api
+        ->setProfileId(null)
+        ->setApiKey('79E95BD784CADA0C9A578282E')
+        ->setLabel("test")
+        ->save();
+
     //customer
     $customer = new Thelia\Model\Customer();
     $customer->createOrUpdate(

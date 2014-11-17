@@ -39,7 +39,7 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
 
         $taxRule->save();
 
-        $event->setTaxRule($taxRule);
+        $event->setTaxRule($taxRule)->setId($taxRule->getId());
     }
 
     /**
@@ -66,7 +66,9 @@ class TaxRule extends BaseAction implements EventSubscriberInterface
     public function updateTaxes(TaxRuleEvent $event)
     {
         if (null !== $taxRule = TaxRuleQuery::create()->findPk($event->getId())) {
-            $taxList = json_decode($event->getTaxList(), true);
+            if (!is_array($taxList = $event->getTaxList())) {
+                $taxList = json_decode($taxList, true);
+            }
 
             /* clean the current tax rule for the countries */
             TaxRuleCountryQuery::create()

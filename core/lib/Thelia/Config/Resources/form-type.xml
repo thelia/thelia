@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <services>
+        <!-- Composed form types -->
+        <service id="thelia.form.type.standard_fields" class="Thelia\Core\Form\Type\StandardFieldsType">
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.product_sale_elements" class="Thelia\Core\Form\Type\ProductSaleElementsType">
+            <argument type="service" id="thelia.form.type.field.product_id" />
+            <argument type="service" id="thelia.form.type.field.product_sale_elements_id" />
+
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.customer_title" class="Thelia\Core\Form\Type\CustomerTitleType">
+            <argument type="service" id="thelia.form.type.field.customer_title_id" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.customer_title_i18n" class="Thelia\Core\Form\Type\CustomerTitleI18nType">
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.tax_rule" class="Thelia\Core\Form\Type\TaxRuleType">
+            <argument type="service" id="thelia.form.type.field.tax_rule_id" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.tax_rule_i18n" class="Thelia\Core\Form\Type\TaxRuleI18nType">
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.image" class="Thelia\Core\Form\Type\ImageType">
+            <tag name="thelia.form.type" />
+        </service>
+
+        <!-- Unique field type -->
+        <service id="thelia.form.type.field.product_id" class="Thelia\Core\Form\Type\Field\ProductIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.product_sale_elements_id" class="Thelia\Core\Form\Type\Field\ProductSaleElementsIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.currency_id" class="Thelia\Core\Form\Type\Field\CurrencyIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.tax_rule_id" class="Thelia\Core\Form\Type\Field\TaxRuleIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.attribute_av" class="Thelia\Core\Form\Type\Field\AttributeAvIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.customer_title_id" class="Thelia\Core\Form\Type\Field\CustomerTitleIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.country_id" class="Thelia\Core\Form\Type\Field\CountryIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.tax_id" class="Thelia\Core\Form\Type\Field\TaxIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.customer_id" class="Thelia\Core\Form\Type\Field\CustomerIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.lang_id" class="Thelia\Core\Form\Type\Field\LangIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+    </services>
+
+</config>

@@ -3,6 +3,7 @@ local/config/config_db.php
 local/config/build
 local/config/database.yml
 local/config/database.yml.sample.save
+local/config/key
 core/vendor
 local/config/runtime-conf.xml
 cache/*
@@ -63,4 +64,3 @@ config.codekit
 
 # Ignore casperjs screenshots
 tests/functionnal/casperjs/screenshot/
-

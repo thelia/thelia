@@ -118,4 +118,8 @@ final class AdminResources
     const TOOLS = "admin.tools";
 
     const SALES = "admin.sales";
+
+    const API = "admin.configuration.api";
+
+    const TITLE = "admin.customer.title";
 }

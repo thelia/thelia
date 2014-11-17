@@ -145,4 +145,52 @@ class ProductCreateEvent extends ProductEvent
 
         return $this;
     }
+
+    /**
+     * This method is an alias of setBasePrice and used by the event when binding a form
+     *
+     * @param float $price price for this new product
+     * @return $this
+     * @see setBasePrice
+     */
+    public function setPrice($price)
+    {
+        return $this->setBasePrice($price);
+    }
+
+    /**
+     * This method is an alias of setBaseWeight and used by the event when binding a form
+     *
+     * @param float $weight
+     * @return $this
+     * @see setBaseWeight
+     */
+    public function setWeight($weight)
+    {
+        return $this->setBaseWeight($weight);
+    }
+
+    /**
+     * This method is an alias of setCurrencyId and used by the event when binding a form
+     *
+     * @param $currencyId
+     * @return mixed
+     * @see setCurrencyId
+     */
+    public function setCurrency($currencyId)
+    {
+        return $this->setCurrencyId($currencyId);
+    }
+
+    /**
+     * This method is an alias of setCurrencyId and used by the event when binding a form
+     *
+     * @param $taxRuleId
+     * @return ProductCreateEvent
+     * @see setTaxRuleId
+     */
+    public function setTaxRule($taxRuleId)
+    {
+        return $this->setTaxRuleId($taxRuleId);
+    }
 }

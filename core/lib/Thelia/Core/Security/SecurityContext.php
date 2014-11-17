@@ -104,25 +104,9 @@ class SecurityContext
         return false;
     }
 
-    /**
-    * Checks if the current user is allowed
-    *
-    * @return Boolean
-    */
-    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
+    final public function isUserGranted(array $roles, array $resources, array $modules, array $accesses, UserInterface $user)
     {
-        // Find a user which matches the required roles.
-        $user = $this->getCustomerUser();
-
         if (! $this->hasRequiredRole($user, $roles)) {
-            $user = $this->getAdminUser();
-
-            if (! $this->hasRequiredRole($user, $roles)) {
-                $user = null;
-            }
-        }
-
-        if (null === $user) {
             return false;
         }
 
@@ -181,6 +165,31 @@ class SecurityContext
         }
 
         return true;
+    }
+
+    /**
+    * Checks if the current user is allowed
+    *
+    * @return Boolean
+    */
+    final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
+    {
+        // Find a user which matches the required roles.
+        $user = $this->getCustomerUser();
+
+        if (! $this->hasRequiredRole($user, $roles)) {
+            $user = $this->getAdminUser();
+
+            if (! $this->hasRequiredRole($user, $roles)) {
+                $user = null;
+            }
+        }
+
+        if (null === $user) {
+            return false;
+        } else {
+            return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
+        }
     }
 
     /**

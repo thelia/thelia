@@ -36,6 +36,10 @@ use Thelia\Model\Map\ProfileTableMap;
  * @method     ChildProfileQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildProfileQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method     ChildProfileQuery leftJoinApi($relationAlias = null) Adds a LEFT JOIN clause to the query using the Api relation
+ * @method     ChildProfileQuery rightJoinApi($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Api relation
+ * @method     ChildProfileQuery innerJoinApi($relationAlias = null) Adds a INNER JOIN clause to the query using the Api relation
+ *
  * @method     ChildProfileQuery leftJoinAdmin($relationAlias = null) Adds a LEFT JOIN clause to the query using the Admin relation
  * @method     ChildProfileQuery rightJoinAdmin($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Admin relation
  * @method     ChildProfileQuery innerJoinAdmin($relationAlias = null) Adds a INNER JOIN clause to the query using the Admin relation
@@ -395,6 +399,79 @@ abstract class ProfileQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProfileTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Api object
+     *
+     * @param \Thelia\Model\Api|ObjectCollection $api  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProfileQuery The current query, for fluid interface
+     */
+    public function filterByApi($api, $comparison = null)
+    {
+        if ($api instanceof \Thelia\Model\Api) {
+            return $this
+                ->addUsingAlias(ProfileTableMap::ID, $api->getProfileId(), $comparison);
+        } elseif ($api instanceof ObjectCollection) {
+            return $this
+                ->useApiQuery()
+                ->filterByPrimaryKeys($api->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByApi() only accepts arguments of type \Thelia\Model\Api or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Api relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProfileQuery The current query, for fluid interface
+     */
+    public function joinApi($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Api');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Api');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Api relation Api object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ApiQuery A secondary query class using the current class as primary query
+     */
+    public function useApiQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinApi($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Api', '\Thelia\Model\ApiQuery');
     }
 
     /**

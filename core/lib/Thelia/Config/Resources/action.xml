@@ -198,6 +198,13 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
+        <service id="thelia.action.api" class="Thelia\Action\Api">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.customer_title" class="Thelia\Action\CustomerTitle">
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>

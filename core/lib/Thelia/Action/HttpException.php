@@ -15,19 +15,20 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Template\TemplateHelper;
+use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 
 /**
  *
  * Class HttpException
  * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Manuel Raynaud  <manu@thelia.net>
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {
@@ -48,12 +49,12 @@ class HttpException extends BaseAction implements EventSubscriberInterface
             $this->display404($event);
         }
 
-        if ($exception instanceof AccessDeniedHttpException) {
-            $this->display403($event);
-        }
-
         if ($exception instanceof AdminAccessDenied) {
             $this->displayAdminGeneralError($event);
+        }
+
+        if ($exception instanceof BaseHttpException && null === $event->getResponse()) {
+            $this->displayException($event);
         }
     }
 
@@ -87,9 +88,11 @@ class HttpException extends BaseAction implements EventSubscriberInterface
         $event->setResponse($response);
     }
 
-    protected function display403(GetResponseForExceptionEvent $event)
+    protected function displayException(GetResponseForExceptionEvent $event)
     {
-        $event->setResponse(new Response("You don't have access to this resources", 403));
+        /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
+        $exception = $event->getException();
+        $event->setResponse(new Response($exception->getMessage(), $exception->getStatusCode(), $exception->getHeaders()));
     }
 
     /**
