@@ -45,7 +45,6 @@ use Thelia\Model\Order;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 
-
 /**
  * Class OrderController
  * @package Thelia\Controller\Front
@@ -145,7 +144,7 @@ class OrderController extends BaseFrontController
             }
 
             /* check that the delivery module fetches the delivery address area */
-            if(AreaDeliveryModuleQuery::create()
+            if (AreaDeliveryModuleQuery::create()
                 ->filterByAreaId($deliveryAddress->getCountry()->getAreaId())
                 ->filterByDeliveryModuleId($deliveryModuleId)
                 ->count() == 0) {
@@ -266,10 +265,10 @@ class OrderController extends BaseFrontController
         $this->checkCartNotEmpty();
         
         /* check stock not empty */
-        if(true === ConfigQuery::checkAvailableStock()) {
-          if (null !== $response = $this->checkStockNotEmpty()) {
-            return $response;
-          } 
+        if (true === ConfigQuery::checkAvailableStock()) {
+            if (null !== $response = $this->checkStockNotEmpty()) {
+                return $response;
+            }
         }
         
         /* check delivery address and module */
@@ -355,8 +354,8 @@ class OrderController extends BaseFrontController
                     "Received failed order id does not belong to the current customer",
                     [],
                     Front::MESSAGE_DOMAIN
-                )
-                , TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
+                ),
+                TheliaProcessException::PLACED_ORDER_ID_BAD_CURRENT_CUSTOMER,
                 $failedOrder
             );
         }
@@ -408,11 +407,11 @@ class OrderController extends BaseFrontController
     public function downloadVirtualProduct($order_product_id)
     {
 
-        if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)){
+        if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
 
             $order = $orderProduct->getOrder();
 
-            if ($order->isPaid()){
+            if ($order->isPaid()) {
 
                 // check customer
                 $this->checkOrderCustomer($order->getId());
@@ -488,16 +487,19 @@ class OrderController extends BaseFrontController
     
     private function checkStockNotEmpty()
     {
-        $cart = $this->getSession()->getCart();
+        $cart = $this->getSession()->getSessionCart($this->getDispatcher());
         $cartItems = $cart->getCartItems();
         $flagQuantity = 0;
         foreach ($cartItems as $cartItem) {
-          $pse = $cartItem->getProductSaleElements();
-          if($pse->getQuantity() <=0 ) $flagQuantity = 1;
+            $pse = $cartItem->getProductSaleElements();
+            if ($pse->getQuantity() <= 0) {
+                $flagQuantity = 1;
+            }
         }
         if ($flagQuantity == 1) {
             return $this->generateRedirectFromRoute('cart.view');
+        } else {
+            return null;
         }
     }
-    
 }

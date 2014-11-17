@@ -1,4 +1,6 @@
 #2.1.0-alpha2
+- Update Process :
+    - update command has been removed and replaced by a php script and a web wizard. Read the UPDATE.md file
 - Templating :
     - Smarty is now a dedicated Module and no more present in the core of Thelia
     - All the template logic works now with abstracted class or interface, so it is possible to create a new Module for
@@ -10,15 +12,18 @@ parser's function and block with theirs arguments.
         - thelia.parser : the class that implements ParserInterface
         - thelia.parser.helper : the class that implements ParserHelperInterface
         - thelia.parser.asset.resolver : the class that implements AssetResolverInterface
-
+- Routing :
+    - new notation ```a:b:c``` => ```Foo:Bar:Baz``` will execute ```Foo\Controller\BarController::BazAction``` method
 - Module :
     - New schema for modules
     - Module installation from back office
     - Dependency check to Thelia version and other modules during installation, activation, deactivation and deletion
-    - update command has been removed and replaced by a php script and a web wizard.
 - Smarty :
-    - new plugin `flash` to support symfony flash message.
-- Loop : new method addOutputFields in order to add custom fields in an overridden loop
+    - new plugin ```flash``` to support symfony flash message.
+    - new plugin ```default_locale```. This function is used for forcing the usage of a specific locale in all your template. Useful for email and pdf. eg : ```{default_locale locale="en_US"}```
+    - function ```intl``` has a new argument : ```locale```. If used, this locale will be used instead of session's locale
+- Loop : 
+    - new method addOutputFields in order to add custom fields in an overridden loop
 - Tests:
     - Move tests from ```core/lib/Thelia/Tests``` to ```tests/phpunit/Thelia/Tests```
     - Update PHPUnit from 4.1.3 to 4.1.6
@@ -26,6 +31,11 @@ parser's function and block with theirs arguments.
     - Update from 2.3.* to 2.3.21
 - REST API:
     - Implement the first version of the REST API. You can find the documentation [here](http://doc.thelia.net/en/documentation/api/authentication.html)
+    
+## DEPRECATED
+
+- ```\Thelia\Core\HttpFoundation\Session\Session::getCart``` is deprecated. Use ```getSessionCart``` instead.
+- ```\Thelia\Cart\CartTrait``` trait is deprecated. Use ```\Thelia\Core\HttpFoundation\Session\Session::getSessionCart``` for retrieving a valid cart.
 
 #2.1.0-alpha1
 - Added sale management feature
