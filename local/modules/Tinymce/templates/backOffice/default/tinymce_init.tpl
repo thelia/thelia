@@ -40,7 +40,7 @@
         //force_p_newlines : true,
 
         relative_urls : false,
-        document_base_url : "{url path="/media"}",
+        document_base_url : "{url path="/"}",
 
         // Styles (CSS or LESS) available in the editor could be defined in assets/css/editor.less file.
         {stylesheets file='assets/css/editor.less' filters='less' source='Tinymce'}
