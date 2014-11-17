@@ -51,20 +51,22 @@
             <div class="col-md-4">
 
                 {form_field form=$form field='default_category'}
-                    <div class="form-group {if $error}has-error{/if}">
+                    <div class="form-group {if $error}has-error{/if}" id="category_change">
 
                         <label for="{$label_attr.for}" class="control-label">
-                            {$label} :
+                            {$label} : <button type="button" class="btn btn-xs btn-primary" data-toggle="modal" data-target="#category_changeModal">{intl l="(edit)"}</button>
                         </label>
 
-                        <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                              <option value="0">{intl l="Top level"}</option>
-
-                              {loop name="cat-parent" type="category-tree" category="0" visible="*" product="0"}
-                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY == $ID}selected="selected"{/if}>{$TITLE}</option>
+                        <input type="hidden" id="{$label_attr.for}" name="{$name}" value="{$DEFAULT_CATEGORY}">
+                        {if $DEFAULT_CATEGORY eq 0}
+                            {$default_category_title={intl l="Top level"}}
+                        {else}
+                            {loop name="default_category-title" type="category" id=$DEFAULT_CATEGORY visible="*" backend_context="1"}
+                                {$default_category_title=$TITLE}
                               {/loop}
 
-                        </select>
+                        {/if}
+                        <p>{$default_category_title}</p>
                         <span class="help-block">{intl l='You can attach this product to more categories in the details tab.'}</span>
                      </div>
                 {/form_field}
@@ -107,3 +109,4 @@
     </form>
     {/form}
 </div>
+{include file='includes/confirmation-modal.html' id="category_changeModal" title="{intl l="Select a category..."}" message=" "}

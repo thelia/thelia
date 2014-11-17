@@ -1,0 +1,28 @@
+{*
+
+Category list
+
+Parameters:
+    categoryExlude          = Category exclude id (if from category-edit => current category)
+    categorySelected        = Category selected id (if from category-edit => parent category, form product-edit => default category)
+
+*}
+{default_translation_domain domain='bo.default'}
+
+{assign categoryExlude {$smarty.post.categoryExlude}}
+{assign categorySelected {$smarty.post.categorySelected}}
+
+{ifloop rel="category-tree-ajax"}
+    <div class="form-group">
+        <select id="category-list-ajax" name="category-list-ajax" class="form-control">
+            <option value="0">{intl l="Top level"}</option>
+        {loop name="category-tree-ajax" type="category-tree" category="0" visible="*"}
+            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $categorySelected == $ID}selected="selected"{/if} {if $categoryExlude == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+        {/loop}
+        </select>
+    </div>
+{/ifloop}
+
+{elseloop rel="category-tree-ajax"}
+<div class="alert alert-info">{intl l='No categories found'}</div>
+{/elseloop}

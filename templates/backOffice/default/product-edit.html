@@ -177,6 +177,20 @@ $(function() {
     // Load active tab
     $('.nav-tabs a[href="#{$current_tab}"]').trigger("click");
 
+    // Ajax category list
+    $('#category_changeModal').on('show.bs.modal', function(event) {
+        var data={ 'categorySelected':$('#category_change input').val() };
+        $(this).find('.modal-footer a').addClass('disabled');
+        $(this)
+            .find('.modal-body').append('<div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>')
+            .load('{url path="/admin/includes/category-list-ajax"}', data, function(){
+                $('#category_changeModal .modal-footer a').removeClass('disabled').click(function() {
+                    $('#category_change input').val($('#category-list-ajax').val());
+                    $('#general form').submit();
+                })
+            });
+    });
+
     // -- Product prices management tab ---------------------------------------
 
 	// Load value on attribute selection
