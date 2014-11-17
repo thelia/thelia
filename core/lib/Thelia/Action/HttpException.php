@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
  * Class HttpException
  * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- * @author Manuel Raynaud  <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud  <manu@thelia.net>
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {

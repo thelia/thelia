@@ -17,7 +17,7 @@ use Thelia\Model\ApiQuery;
 /**
  * Class ApiTestCase
  * @package Thelia\Tests
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ApiTestCase extends WebTestCase
 {

@@ -31,7 +31,7 @@ use Thelia\Tools\URL;
 /**
  * Class ApiController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ApiController extends BaseAdminController
 {

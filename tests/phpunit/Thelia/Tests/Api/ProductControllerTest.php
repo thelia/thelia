@@ -21,7 +21,7 @@ use Thelia\Tests\ApiTestCase;
 /**
  * Class ProductControllerTest
  * @package Thelia\Tests\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ProductControllerTest extends ApiTestCase
 {

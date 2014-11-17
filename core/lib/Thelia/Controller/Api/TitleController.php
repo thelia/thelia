@@ -31,7 +31,7 @@ use Thelia\Model\Map\CustomerTitleTableMap;
  * Class TitleController
  * @package Thelia\Controller\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class TitleController extends AbstractCrudApiController
 {

@@ -21,7 +21,7 @@ use Thelia\Model\Api;
 /**
  * Class BaseApiController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class BaseApiController extends BaseController
 {

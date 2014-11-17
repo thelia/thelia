@@ -30,7 +30,7 @@ use Thelia\Model\ProductQuery;
 /**
  * Class ProductController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ProductController extends BaseApiController
 {

@@ -18,7 +18,7 @@ use Thelia\Form\CustomerUpdateForm as BaseCustomerUpdateForm;
 /**
  * Class CustomerUpdateForm
  * @package Thelia\Form\Api\Customer
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CustomerUpdateForm extends BaseCustomerUpdateForm
 {

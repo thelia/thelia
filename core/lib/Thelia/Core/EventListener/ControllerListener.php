@@ -27,7 +27,7 @@ use Thelia\Model\ApiQuery;
 /**
  * Class ControllerListener
  * @package Thelia\Core\EventListener
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ControllerListener implements EventSubscriberInterface
 {

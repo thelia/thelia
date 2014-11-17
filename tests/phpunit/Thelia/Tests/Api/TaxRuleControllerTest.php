@@ -22,7 +22,7 @@ use Thelia\Tests\ApiTestCase;
  * Class TaxRuleControllerTest
  * @package Thelia\Tests\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author manuel raynaud <mraynaud@openstudio.fr>
+ * @author manuel raynaud <manu@thelia.net>
  */
 class TaxRuleControllerTest extends ApiTestCase
 {

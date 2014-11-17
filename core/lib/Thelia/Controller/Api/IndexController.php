@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * Class IndexController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class IndexController extends BaseApiController
 {

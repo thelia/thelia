@@ -20,7 +20,7 @@ use Thelia\Model\ProfileQuery;
 /**
  * Class ApiCreateForm
  * @package Thelia\Form\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ApiCreateForm extends BaseForm
 {

@@ -24,7 +24,7 @@ use Thelia\Model\CustomerQuery;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerController extends AbstractCrudApiController

@@ -18,7 +18,7 @@ use Thelia\Model\Api;
 /**
  * Class ApiDeleteEvent
  * @package Thelia\Core\Event\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class ApiDeleteEvent extends ActionEvent
 {

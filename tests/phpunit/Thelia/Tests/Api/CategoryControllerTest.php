@@ -19,7 +19,7 @@ use Thelia\Tests\ApiTestCase;
 /**
  * Class CategoryControllerTest
  * @package Thelia\Tests\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CategoryControllerTest extends ApiTestCase
 {

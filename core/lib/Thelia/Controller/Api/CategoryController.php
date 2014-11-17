@@ -25,7 +25,7 @@ use Thelia\Model\CategoryQuery;
 /**
  * Class CategoryController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class CategoryController extends AbstractCrudApiController
 {

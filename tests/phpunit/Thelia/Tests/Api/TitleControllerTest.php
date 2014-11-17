@@ -19,7 +19,7 @@ use Thelia\Tests\ApiTestCase;
  * Class TitleControllerTest
  * @package Thelia\Tests\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Manuel Raynaud <manu@thelia.net>
  */
 class TitleControllerTest extends ApiTestCase
 {
