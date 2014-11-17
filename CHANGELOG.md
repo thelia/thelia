@@ -24,7 +24,8 @@ parser's function and block with theirs arguments.
     - Update PHPUnit from 4.1.3 to 4.1.6
 - Symfony components:
     - Update from 2.3.* to 2.3.21
-
+- REST API:
+    - Implement the first version of the REST API. You can find the documentation [here](http://doc.thelia.net/en/documentation/api/authentication.html)
 
 #2.1.0-alpha1
 - Added sale management feature
