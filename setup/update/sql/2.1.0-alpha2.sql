@@ -23,12 +23,12 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 2, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
 (@max_id + 2, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
 (@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
-(@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL)
+(@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
 (@max_id + 4, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL),
 (@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
 ;
 
-DELETE `config` WHERE `name`='currency_rate_update_url';
+DELETE FROM `config` WHERE `name`='currency_rate_update_url';
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
