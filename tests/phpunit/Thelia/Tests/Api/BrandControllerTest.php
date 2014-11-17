@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Api;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 use Thelia\Tests\ApiTestCase;
@@ -96,7 +97,7 @@ class BrandControllerTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        $brand = BrandQuery::create()->findOne();
+        $brand = $this->getBrand();
 
         $client->request(
             'GET',
@@ -116,7 +117,7 @@ class BrandControllerTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        $brand = BrandQuery::create()->findOne();
+        $brand = $this->getBrand("fr_FR");
 
         $client->request(
             'GET',
@@ -134,5 +135,25 @@ class BrandControllerTest extends ApiTestCase
         $firstResult = $content[0];
 
         $this->assertEquals('fr_FR', $firstResult['LOCALE'], 'the returned locale must be fr_FR');
+    }
+
+    protected function getBrand($locale = 'en_US')
+    {
+        $brand = BrandQuery::create()
+            ->joinBrandI18n("brand_i18n_join", Criteria::INNER_JOIN)
+            ->addJoinCondition('brand_i18n_join', "locale = ?", $locale, null, \PDO::PARAM_STR)
+            ->findOne()
+        ;
+
+        if (null === $brand) {
+            $this->markTestSkipped(
+                sprintf(
+                    "You must have at least one brand with an i18n that has the '%s' locale",
+                    $locale
+                )
+            );
+        }
+
+        return $brand;
     }
 }

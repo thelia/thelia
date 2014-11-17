@@ -13,6 +13,7 @@
 namespace Thelia\Tests\Api;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\ApiTestCase;
 
@@ -23,6 +24,15 @@ use Thelia\Tests\ApiTestCase;
  */
 class CategoryControllerTest extends ApiTestCase
 {
+    protected function setUp()
+    {
+        if (CategoryQuery::create()->count() === 0) {
+            $category = new Category();
+
+            $category->save();
+        }
+    }
+
     public function testListAction()
     {
         $client = static::createClient();
@@ -65,7 +75,7 @@ class CategoryControllerTest extends ApiTestCase
     {
         $client = static::createClient();
 
-        $category = CategoryQuery::create()->findOne();
+        $category = $this->getCategory();
 
         $client->request(
             'GET',
@@ -205,5 +215,25 @@ class CategoryControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(204, $client->getResponse()->getStatusCode(), 'HTTP status code muse be 204');
+    }
+
+    protected function getCategory($locale = 'en_US')
+    {
+        $category = CategoryQuery::create()
+            ->joinCategoryI18n("category_i18n_join", Criteria::INNER_JOIN)
+            ->addJoinCondition('category_i18n_join', "locale = ?", $locale, null, \PDO::PARAM_STR)
+            ->findOne()
+        ;
+
+        if (null === $category) {
+            $this->markTestSkipped(
+                sprintf(
+                    "You must have at least one category with an i18n that has the '%s' locale",
+                    $locale
+                )
+            );
+        }
+
+        return $category;
     }
 }
