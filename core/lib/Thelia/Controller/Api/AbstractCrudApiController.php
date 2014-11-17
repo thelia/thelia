@@ -128,6 +128,10 @@ abstract class AbstractCrudApiController extends BaseApiController
         $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
         $request = $this->getRequest();
 
+        if ($request->query->has('id')) {
+            $request->query->remove('id');
+        }
+
         $params = array_merge(
             $this->defaultLoopArgs,
             $request->query->all()

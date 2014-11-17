@@ -65,6 +65,10 @@ class ProductSaleElementsController extends BaseApiController
 
         $request = $this->getRequest();
 
+        if ($request->query->has('id')) {
+            $request->query->remove('id');
+        }
+
         $params = array_merge(
             array(
                 "limit" => 10,
