@@ -1,6 +1,6 @@
 # 2.1.0-beta1
 
--
+- Autoload : the autoloader can be cached with Apc or XCache. See new index.php file.
 
 # 2.1.0-alpha2
 - Update Process :
