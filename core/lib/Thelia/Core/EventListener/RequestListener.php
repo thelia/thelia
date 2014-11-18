@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\Customer\CustomerLoginEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\Authentication\AdminTokenAuthenticator;
@@ -108,6 +109,20 @@ class RequestListener implements EventSubscriberInterface
                 $content = $request->getContent();
                 if (!empty($content)) {
                     $data = json_decode($content, true);
+
+                    if (null === $data) {
+                        $event->setResponse(
+                            new JsonResponse(["error" => "The given data is not a valid json"], 400)
+                        );
+
+                        $event->stopPropagation();
+
+                        return;
+                    } elseif (!is_array($data)) {
+                        // This case happens for string like: "Foo", that json_decode returns as valid json
+                        $data = [$data];
+                    }
+
                     $request->request = new ParameterBag($data);
                 }
             }

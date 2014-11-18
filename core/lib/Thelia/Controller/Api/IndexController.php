@@ -13,6 +13,7 @@
 namespace Thelia\Controller\Api;
 
 use Symfony\Component\HttpFoundation\Response;
+use Thelia\Core\HttpFoundation\JsonResponse;
 
 /**
  *
