@@ -110,7 +110,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function deleteItem(CartEvent $event)
     {
-        if (null !== $cartItemId = $event->getCartItem()) {
+        if (null !== $cartItemId = $event->getCartItemId()) {
             $cart = $event->getCart();
             CartItemQuery::create()
                 ->filterByCartId($cart->getId())
@@ -140,7 +140,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function changeItem(CartEvent $event)
     {
-        if ((null !== $cartItemId = $event->getCartItem()) && (null !== $quantity = $event->getQuantity())) {
+        if ((null !== $cartItemId = $event->getCartItemId()) && (null !== $quantity = $event->getQuantity())) {
             $cart = $event->getCart();
 
             $cartItem = CartItemQuery::create()
