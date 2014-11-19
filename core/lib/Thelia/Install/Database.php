@@ -146,7 +146,6 @@ class Database
      */
     public function backupDb($filename, $tables = '*')
     {
-
         $data = [];
 
         // get all of the tables
@@ -166,8 +165,6 @@ class Database
         $data[] = "\n\n";
 
         foreach ($tables as $table) {
-
-
             $result = $this->connection->prepare('SELECT * FROM ' . $table);
             $result->execute();
             $fieldCount = $result->columnCount();

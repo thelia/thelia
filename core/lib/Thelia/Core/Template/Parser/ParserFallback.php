@@ -20,7 +20,6 @@ use Thelia\Core\Template\TemplateDefinition;
  */
 class ParserFallback implements ParserInterface
 {
-
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
     {
         $this->throwException();

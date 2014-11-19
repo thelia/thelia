@@ -21,7 +21,6 @@ use Thelia\Core\Template\ParserHelperInterface;
  */
 class ParserHelperFallback implements ParserHelperInterface
 {
-
     /**
      * Parse a string and get all parser's function and block with theirs arguments.
      *

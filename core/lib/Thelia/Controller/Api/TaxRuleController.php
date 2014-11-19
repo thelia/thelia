@@ -181,7 +181,7 @@ class TaxRuleController extends AbstractCrudApiController
             $value = $data["i18n"][$key];
             $data["i18n"][$value["locale"]] = $value;
 
-            unset ($data["i18n"][$key]);
+            unset($data["i18n"][$key]);
         }
 
         $persistentI18n = $this->getI18nPersistentData($data["id"]);

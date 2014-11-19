@@ -53,7 +53,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('position','position_reverse','id', 'id_reverse', 'alpha', 'alpha_reverse'))
+                    new Type\EnumListType(array('position', 'position_reverse', 'id', 'id_reverse', 'alpha', 'alpha_reverse'))
                 ),
                 'position'
             )
@@ -113,7 +113,6 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         $need_count_child = $this->getNeedCountChild();
 
         foreach ($results as $result) {
-
             $row = array(
                 "ID" => $result->getId(),
                 "TITLE" => $result->getVirtualColumn('i18n_TITLE'),

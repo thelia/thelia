@@ -13,7 +13,6 @@
 
 namespace Thelia\Install\Exception;
 
-
 /**
  * Class UpdateException
  * @package Thelia\Install\Exception

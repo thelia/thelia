@@ -23,5 +23,4 @@ use TheliaSmarty\Template\AbstractSmartyPlugin as BaseAbstractSmartyPlugin;
  */
 abstract class AbstractSmartyPlugin extends BaseAbstractSmartyPlugin
 {
-
 }

@@ -129,7 +129,7 @@ class TranslationsController extends BaseAdminController
 
                     // Modules translations files are in the cache, and are not always
                     // updated. Force a reload of the files to get last changes.
-                    if (! empty ($domain)) {
+                    if (! empty($domain)) {
                         $this->loadTranslation($i18n_directory, $domain);
                     }
 

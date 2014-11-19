@@ -23,5 +23,4 @@ use TheliaSmarty\Template\SmartyPluginDescriptor as BaseSmartyPluginDescriptor;
  */
 class SmartyPluginDescriptor extends BaseSmartyPluginDescriptor
 {
-
 }

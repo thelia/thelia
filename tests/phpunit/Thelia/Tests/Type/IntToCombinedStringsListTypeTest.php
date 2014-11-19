@@ -35,7 +35,7 @@ class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
             $type->getFormattedValue('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'),
             array(
                 1 => array(
-                    "values" => array('foo','bar','fooo','baar'),
+                    "values" => array('foo', 'bar', 'fooo', 'baar'),
                     "expression" => 'foo&bar|(fooo&baar)',
                 ),
                 4 => array(
@@ -43,7 +43,7 @@ class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
                     "expression" => '*',
                 ),
                 67 => array(
-                    "values" => array('foooo','baaar'),
+                    "values" => array('foooo', 'baaar'),
                     "expression" => '(foooo&baaar)',
                 ),
             )

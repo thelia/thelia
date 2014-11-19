@@ -214,7 +214,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $updatedContent = ContentQuery::create()->findPk($content->getId());
 
-        $this->assertEquals($newPosition, $updatedContent->getPosition(),sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
+        $this->assertEquals($newPosition, $updatedContent->getPosition(), sprintf("new position is %d, new position expected is %d for content %d", $newPosition, $updatedContent->getPosition(), $updatedContent->getId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
@@ -236,7 +236,7 @@ class ContentTest extends TestCaseWithURLToolSetup
 
         $updatedContent = ContentQuery::create()->findPk($content->getId());
 
-        $this->assertEquals(1, $updatedContent->getPosition(),sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getId()));
+        $this->assertEquals(1, $updatedContent->getPosition(), sprintf("new position is 1, new position expected is %d for content %d", $updatedContent->getPosition(), $updatedContent->getId()));
     }
 
     public function testAddFolderToContent()

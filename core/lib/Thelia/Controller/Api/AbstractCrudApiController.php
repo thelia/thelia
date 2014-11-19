@@ -317,7 +317,6 @@ abstract class AbstractCrudApiController extends BaseApiController
             }
 
             $con->commit();
-
         } catch (HttpException $e) {
             $con->rollBack();
 

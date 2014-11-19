@@ -167,7 +167,6 @@ class ProductSaleElementsController extends BaseApiController
             }
 
             $con->commit();
-
         } catch (\Exception $e) {
             $con->rollBack();
 
@@ -229,7 +228,6 @@ class ProductSaleElementsController extends BaseApiController
             }
 
             $con->commit();
-
         } catch (\Exception $e) {
             $con->rollBack();
 
@@ -388,7 +386,7 @@ class ProductSaleElementsController extends BaseApiController
         $data = array();
 
         foreach ($event->getData()["pse"] as $entry) {
-             $productSaleElementIds[$entry["id"]] = $entry;
+            $productSaleElementIds[$entry["id"]] = $entry;
         }
 
         $productSaleElements = ProductSaleElementsQuery::create()
