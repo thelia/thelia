@@ -182,6 +182,9 @@ class SmartyAssetsManager
                 self::$assetsDirectory,
                 $templateName
             );
+        } else {
+            // Log the problem
+            Tlog::getInstance()->addError("Failed to find asset source file " . $params['file']);
         }
 
         return $assetUrl;

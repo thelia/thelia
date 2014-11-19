@@ -53,7 +53,11 @@
                                                         <label class="control-label">{intl l="Preview"} : </label>
                                                         <p>
                                                             <a href="{$ORIGINAL_IMAGE_URL}" alt="{$TITLE}" target="_blank">
-                                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                                                                {if $PROCESSING_ERROR}
+                                                                    <img src="http://placehold.it/580x580&text={intl l='Image+file+not+found'}" alt="{$TITLE}" class="img-thumbnail">
+                                                                {else}
+                                                                    <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-thumbnail">
+                                                                {/if}
                                                             </a>
                                                         </p>
                                                     </div>
