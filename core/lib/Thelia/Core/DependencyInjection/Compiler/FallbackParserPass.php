@@ -23,7 +23,6 @@ use Symfony\Component\DependencyInjection\Definition;
  */
 class FallbackParserPass implements CompilerPassInterface
 {
-
     /**
      * You can modify the container here before it is dumped to PHP code.
      *

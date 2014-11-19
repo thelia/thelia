@@ -105,7 +105,6 @@ class Update
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
-
     }
 
     public function isLatestVersion($version = null)

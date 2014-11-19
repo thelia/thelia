@@ -12,7 +12,6 @@
 
 namespace Thelia\Files\Exception;
 
-
 /**
  * Class ProcessFileException
  * @package Thelia\Files\Exception
@@ -20,5 +19,4 @@ namespace Thelia\Files\Exception;
  */
 class ProcessFileException extends \RuntimeException
 {
-
 }

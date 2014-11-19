@@ -12,7 +12,6 @@
 
 namespace Thelia\Files;
 
-
 /**
  * Class FileConfiguration
  * @package Thelia\Files
@@ -20,7 +19,6 @@ namespace Thelia\Files;
  */
 class FileConfiguration
 {
-
     public static function getImageConfig()
     {
         return [

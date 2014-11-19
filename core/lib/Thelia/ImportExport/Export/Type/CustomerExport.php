@@ -189,7 +189,7 @@ class CustomerExport extends ExportHandler
             $currentCustomer = &$results[$i];
 
             $currentCustomerId = $currentCustomer[CustomerTableMap::ID];
-            unset ($currentCustomer[CustomerTableMap::ID]);
+            unset($currentCustomer[CustomerTableMap::ID]);
 
             if ($currentCustomerId === $previousCustomerId) {
                 $currentCustomer["title_TITLE"] = "";

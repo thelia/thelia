@@ -254,7 +254,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals($newPosition, $updatedFolder->getPosition(),sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals($newPosition, $updatedFolder->getPosition(), sprintf("new position is %d, new position expected is %d for folder %d", $newPosition, $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     public function testUpdatePositionWithSpecificPosition()
@@ -276,7 +276,7 @@ class FolderTest extends TestCaseWithURLToolSetup
 
         $updatedFolder = FolderQuery::create()->findPk($folder->getId());
 
-        $this->assertEquals(1, $updatedFolder->getPosition(),sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
+        $this->assertEquals(1, $updatedFolder->getPosition(), sprintf("new position is 1, new position expected is %d for folder %d", $updatedFolder->getPosition(), $updatedFolder->getId()));
     }
 
     /**

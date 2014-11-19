@@ -169,7 +169,7 @@ class XMLFormatter extends AbstractFormatter
     public function getValue($name, array &$data)
     {
         $value = $data[$name];
-        unset ($data[$name]);
+        unset($data[$name]);
 
         return $value;
     }

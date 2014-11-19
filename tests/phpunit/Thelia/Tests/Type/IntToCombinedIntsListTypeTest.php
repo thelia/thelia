@@ -35,7 +35,7 @@ class IntToCombinedIntsListTypeTest extends \PHPUnit_Framework_TestCase
             $type->getFormattedValue('1: 2 & 5 | (6 &7), 4: *, 67: (1 & 9)'),
             array(
                 1 => array(
-                    "values" => array(2,5,6,7),
+                    "values" => array(2, 5, 6, 7),
                     "expression" => '2&5|(6&7)',
                 ),
                 4 => array(
@@ -43,7 +43,7 @@ class IntToCombinedIntsListTypeTest extends \PHPUnit_Framework_TestCase
                     "expression" => '*',
                 ),
                 67 => array(
-                    "values" => array(1,9),
+                    "values" => array(1, 9),
                     "expression" => '(1&9)',
                 ),
             )

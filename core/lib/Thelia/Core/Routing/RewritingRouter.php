@@ -189,7 +189,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 $request->query->set($parameter, $value);
             }
 
-            return array (
+            return array(
                 '_controller' => 'Thelia\\Controller\\Front\\DefaultController::noAction',
                 '_route' => 'rewrite',
                 '_rewritten' => true,

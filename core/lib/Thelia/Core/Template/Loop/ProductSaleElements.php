@@ -61,7 +61,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('quantity','quantity_reverse','min_price', 'max_price', 'promo', 'new', 'random'))
+                    new Type\EnumListType(array('quantity', 'quantity_reverse', 'min_price', 'max_price', 'promo', 'new', 'random'))
                 ),
                 'random'
             )

@@ -65,7 +65,6 @@ class CustomerTitle extends BaseAction implements EventSubscriberInterface
                 "You must set the customer title before its update"
             );
         }
-
     }
 
     protected function createOrUpdate(CustomerTitleEvent $event, CustomerTitleModel $customerTitle)

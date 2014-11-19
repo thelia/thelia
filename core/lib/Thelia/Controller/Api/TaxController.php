@@ -56,7 +56,6 @@ class TaxController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-
     }
 
     /**
@@ -67,7 +66,6 @@ class TaxController extends AbstractCrudApiController
      */
     protected function getUpdateForm(array $data = array())
     {
-
     }
 
     /**
@@ -80,7 +78,6 @@ class TaxController extends AbstractCrudApiController
      */
     protected function extractObjectFromEvent(Event $event)
     {
-
     }
 
     /**
@@ -91,7 +88,6 @@ class TaxController extends AbstractCrudApiController
      */
     protected function getCreationEvent(array &$data)
     {
-
     }
 
     /**
@@ -102,7 +98,6 @@ class TaxController extends AbstractCrudApiController
      */
     protected function getUpdateEvent(array &$data)
     {
-
     }
 
     /**
@@ -113,6 +108,5 @@ class TaxController extends AbstractCrudApiController
      */
     protected function getDeleteEvent($entityId)
     {
-
     }
 }

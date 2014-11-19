@@ -102,7 +102,7 @@ class OrderQuery extends BaseOrderQuery
         $query = self::create('o')
             ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
             ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-            ->filterByStatusId([2,3,4], Criteria::IN)
+            ->filterByStatusId([2, 3, 4], Criteria::IN)
             ->innerJoinOrderProduct()
             ->addJoinObject($orderTaxJoin)
 
@@ -128,7 +128,7 @@ class OrderQuery extends BaseOrderQuery
      *
      * @return int
      */
-    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = array(1,2,3,4))
+    public static function getOrderStats(\DateTime $startDate, \DateTime $endDate, $status = array(1, 2, 3, 4))
     {
         return self::create()
             ->filterByStatusId($status, Criteria::IN)

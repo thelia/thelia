@@ -1784,7 +1784,7 @@ class ProductController extends AbstractSeoCrudController
 
             if ($localMatch === $countEntries) {
                 $status = true;
-                unset ($line);
+                unset($line);
                 break;
             }
         }

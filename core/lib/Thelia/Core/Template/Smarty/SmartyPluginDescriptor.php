@@ -10,32 +10,17 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
+namespace Thelia\Core\Template\Smarty;
 
-namespace Thelia\Install\Exception;
+use TheliaSmarty\Template\SmartyPluginDescriptor as BaseSmartyPluginDescriptor;
 
 /**
- * Class UpdateException
- * @package Thelia\Install\Exception
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class SmartyPluginDescriptpor
+ * @package Thelia\Core\Template\Smarty
+ * @author Manuel Raynaud <manu@thelia.net>
+ *
+ * @deprecated this class is now present in module TheliaSmarty and will be removed in Thelia 2.3
  */
-class UpdateException extends \RuntimeException
+class SmartyPluginDescriptor extends BaseSmartyPluginDescriptor
 {
-    /** @var string the version that has failed  */
-    protected $version = null;
-
-    /**
-     * @return string
-     */
-    public function getVersion()
-    {
-        return $this->version;
-    }
-
-    /**
-     * @param string $version
-     */
-    public function setVersion($version)
-    {
-        $this->version = $version;
-    }
 }
