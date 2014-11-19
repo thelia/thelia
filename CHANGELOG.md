@@ -31,6 +31,9 @@ parser's function and block with theirs arguments.
     - Update from 2.3.* to 2.3.21
 - REST API:
     - Implement the first version of the REST API. You can find the documentation [here](http://doc.thelia.net/en/documentation/api/authentication.html)
+- Forms: New implementation of Symfony form component that now handles form types, form extensions and form type extensions
+    - You can use the tags ```thelia.form.type```, ```thelia.form.extension``` and ```thelia.form.type_extension``` to declare yours
+    - Implementation of many form types for thelia, see the namespace Thelia\Core\Form\Type
     
 ## DEPRECATED
 
