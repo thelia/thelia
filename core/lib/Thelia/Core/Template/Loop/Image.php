@@ -308,7 +308,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $addRow = true;
 
-            $returnErroredImages = $this->getBackendContext() || $this->getIgnoreProcessingErrors();
+            $returnErroredImages = $this->getBackendContext() || ! $this->getIgnoreProcessingErrors();
 
             try {
                 // Dispatch image processing event
