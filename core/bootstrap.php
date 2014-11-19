@@ -34,3 +34,5 @@ if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_M
         header('Location: '.$request->getUriForPath('/install'));
     }
 }
+
+return $loader;
