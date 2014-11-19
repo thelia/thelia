@@ -776,4 +776,6 @@ return array(
     'update form' => 'update form',
     'value table header' => 'value table header',
     'value table row' => 'value table row',
+    'Confirm Email Address' => 'Confirm Email Address',
+    'Email confirmation is not the same as email field' => 'Email confirmation is not the same as email field',
 );

@@ -304,14 +304,6 @@
 
 {block name="after-javascript-include"}
 {hook name="register.after-javascript-include"}
-<script>
-    $(document).ready(function(){
-        $("#email_confirm").on('paste', function(e){
-          e.value=""; 
-          return false; 
-        });
-    });
-</script>
 {/block}
 
 {block name="javascript-initialization"}

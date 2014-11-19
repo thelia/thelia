@@ -57,7 +57,6 @@ class CustomerCreateForm extends AddressCreateForm
             // Add Confirm Email address
             ->add("email_confirm", "email", array(
                 "constraints" => array(
-                    new Constraints\NotBlank(),
                     new Constraints\Email(),
                     new Constraints\Callback(array(
                         "methods" => array(

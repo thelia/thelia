@@ -776,4 +776,6 @@ return array(
     'update form' => 'formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
+    'Confirm Email Address' => 'Confirmation Adresse mail',
+    'Email confirmation is not the same as email field' => 'l\'adresse mail de confirmation n\'est pas la même que le champ adresse mail',
 );
