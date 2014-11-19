@@ -93,6 +93,19 @@
                             </div>
                         </div><!--/.form-group-->
                         {/form_field}
+                        {form_field form=$form field="email_confirm"}
+                        <div class="form-group group-email{if $error} has-error{/if}">
+                            <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+
+                            <div class="control-input">
+                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder confirm email"}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                {if $error }
+                                    <span class="help-block">{$message}</span>
+                                    {assign var="error_focus" value="true"}
+                                {/if}
+                            </div>
+                        </div><!--/.form-group-->
+                        {/form_field}
                         {form_field form=$form field="phone"}
                             <div class="form-group group-phone{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
