@@ -39,24 +39,4 @@ class ApiSendJsonTest extends ApiTestCase
 
         $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
-
-    public function testSendNotArrayJson()
-    {
-        $data = "\"this is not an array json\"";
-
-        $client = static::createClient();
-        $servers = $this->getServerParameters($data);
-        $servers['CONTENT_TYPE'] = 'application/json';
-        $client->request(
-            'POST',
-            '/api/products?sign='.$this->getSignParameter($data),
-            [],
-            [],
-            $servers,
-            $data
-        );
-
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertEquals("[\"this is not an array json\"]", $client->getResponse()->getContent());
-    }
 }
