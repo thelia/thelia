@@ -26,6 +26,8 @@ class CartEvent extends ActionEvent
     protected $product;
     protected $cartItem;
 
+    protected $cartItemId;
+
     public function __construct(Cart $cart)
     {
         $this->cart = $cart;
@@ -54,7 +56,7 @@ class CartEvent extends ActionEvent
      * @param  CartItem  $cartItem
      * @return CartEvent
      */
-    public function setCartItem($cartItem)
+    public function setCartItem(CartItem $cartItem)
     {
         $this->cartItem = $cartItem;
 
@@ -67,6 +69,25 @@ class CartEvent extends ActionEvent
     public function getCartItem()
     {
         return $this->cartItem;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCartItemId()
+    {
+        return $this->cartItemId;
+    }
+
+    /**
+     * @param mixed $cartItemId
+     * @return $this
+     */
+    public function setCartItemId($cartItemId)
+    {
+        $this->cartItemId = $cartItemId;
+
+        return $this;
     }
 
     /**

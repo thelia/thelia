@@ -53,8 +53,21 @@ class ModelCriteriaTools
             $requestedLocaleJoin->addExplicitCondition($search->getTableMap()->getName(), $foreignKey, null, $foreignTable . '_i18n', 'ID', $requestedLocaleI18nAlias);
             $requestedLocaleJoin->setJoinType($forceReturn === false ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN);
 
+            $defaultLocaleJoin = new Join();
+            $defaultLocaleJoin->addExplicitCondition(
+                $search->getTableMap()->getName(),
+                $foreignKey,
+                null,
+                $foreignTable . '_i18n',
+                'ID',
+                $defaultLocaleI18nAlias
+            );
+
             $search->addJoinObject($requestedLocaleJoin, $requestedLocaleI18nAlias)
                 ->addJoinCondition($requestedLocaleI18nAlias, '`' . $requestedLocaleI18nAlias . '`.LOCALE = ?', $requestedLocale, null, \PDO::PARAM_STR);
+
+            $search->addJoinObject($defaultLocaleJoin, $defaultLocaleI18nAlias)
+                ->addJoinCondition($defaultLocaleI18nAlias, '`' . $defaultLocaleI18nAlias . '`.LOCALE <> ?', $requestedLocale, null, \PDO::PARAM_STR);
 
             $search->withColumn('NOT ISNULL(`' . $requestedLocaleI18nAlias . '`.`ID`)', $aliasPrefix . 'IS_TRANSLATED');
 

@@ -19,24 +19,55 @@ class CurrencyEvent extends ActionEvent
 {
     protected $currency = null;
 
+    protected $currencyId;
+
     public function __construct(Currency $currency = null)
     {
         $this->currency = $currency;
     }
 
+    /**
+     * @return bool
+     */
     public function hasCurrency()
     {
         return ! is_null($this->currency);
     }
 
+    /**
+     * @return null|Currency
+     */
     public function getCurrency()
     {
         return $this->currency;
     }
 
-    public function setCurrency($currency)
+    /**
+     * @param Currency $currency
+     * @return $this
+     */
+    public function setCurrency(Currency $currency)
     {
         $this->currency = $currency;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrencyId()
+    {
+        return $this->currencyId;
+    }
+
+    /**
+     * @param mixed $currencyId
+     * @return $this
+     */
+    public function setCurrencyId($currencyId)
+    {
+        $this->currencyId = $currencyId;
 
         return $this;
     }

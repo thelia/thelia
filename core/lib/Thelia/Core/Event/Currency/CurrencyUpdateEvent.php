@@ -14,24 +14,11 @@ namespace Thelia\Core\Event\Currency;
 
 class CurrencyUpdateEvent extends CurrencyCreateEvent
 {
-    protected $currency_id;
     protected $is_default;
 
-    public function __construct($currency_id)
+    public function __construct($currencyId)
     {
-        $this->setCurrencyId($currency_id);
-    }
-
-    public function getCurrencyId()
-    {
-        return $this->currency_id;
-    }
-
-    public function setCurrencyId($currency_id)
-    {
-        $this->currency_id = $currency_id;
-
-        return $this;
+        $this->setCurrencyId($currencyId);
     }
 
     public function getIsDefault()

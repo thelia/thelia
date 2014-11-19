@@ -10,12 +10,33 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Currency;
+namespace Thelia\Tests\Api;
 
-class CurrencyDeleteEvent extends CurrencyEvent
+use Thelia\Tests\ApiTestCase;
+
+/**
+ * Class ApiSendJsonTest
+ * @package Thelia\Tests\Api
+ * @author Benjamin Perche <bperche@openstudio.fr>
+ */
+class ApiSendJsonTest extends ApiTestCase
 {
-    public function __construct($currencyId)
+    public function testSendNotValidJson()
     {
-        $this->setCurrencyId($currencyId);
+        $data = "this is not a valid json";
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/products?sign='.$this->getSignParameter($data),
+            [],
+            [],
+            $servers,
+            $data
+        );
+
+        $this->assertEquals(400, $client->getResponse()->getStatusCode());
     }
 }

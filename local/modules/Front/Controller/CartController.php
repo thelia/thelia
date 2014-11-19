@@ -86,7 +86,7 @@ class CartController extends BaseFrontController
     public function changeItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
         $cartEvent->setQuantity($this->getRequest()->get("quantity"));
 
         try {
@@ -114,7 +114,7 @@ class CartController extends BaseFrontController
     public function deleteItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
 
         try {
 
