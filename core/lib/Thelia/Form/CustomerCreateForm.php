@@ -54,6 +54,23 @@ class CustomerCreateForm extends AddressCreateForm
                     "for" => "email"
                 )
             ))
+            // Add Confirm Email address
+            ->add("email_confirm", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            array($this,
+                                "verifyEmailField")
+                        )
+                    ))
+                ),
+                "label" => Translator::getInstance()->trans("Confirm Email Address"),
+                "label_attr" => array(
+                    "for" => "email_confirm"
+                )
+            ))
             // Add Login Information
             ->add("password", "password", array(
                 "constraints" => array(
@@ -105,6 +122,15 @@ class CustomerCreateForm extends AddressCreateForm
         }
     }
 
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if ($data["email"] != $data["email_confirm"]) {
+            $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
+        }
+    }
+    
     public function getName()
     {
         return "thelia_customer_create";
