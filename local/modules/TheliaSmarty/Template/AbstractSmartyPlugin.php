@@ -12,7 +12,6 @@
 
 namespace TheliaSmarty\Template;
 
-use Thelia\Core\Template\Smarty\an;
 
 /**
  *
