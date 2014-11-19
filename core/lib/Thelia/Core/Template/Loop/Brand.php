@@ -177,8 +177,6 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $a = $search->find();
-
         return $search;
     }
 

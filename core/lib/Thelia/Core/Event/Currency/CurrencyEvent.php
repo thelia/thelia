@@ -71,6 +71,4 @@ class CurrencyEvent extends ActionEvent
 
         return $this;
     }
-
-
 }

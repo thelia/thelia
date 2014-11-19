@@ -114,7 +114,7 @@ abstract class AbstractCrudApiController extends BaseApiController
         ]);
 
         $this->modules = $modules;
-        $this->defaultLoopArgs = $defaultLoopArgs ?: ["limit" => 10, "offset" => 0];
+        $this->defaultLoopArgs = $defaultLoopArgs ?: ["limit" => 10, "offset" => 0, "visible" => "*"];
         $this->idParameterName = $idParameterName;
     }
 
