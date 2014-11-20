@@ -14,6 +14,7 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\Exception\AuthorizationException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Core\Security\SecurityContext;
@@ -51,19 +52,33 @@ class Security extends AbstractSmartyPlugin
         $accesses = $this->explode($this->getParam($params, 'access'));
 
         if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
-            $ex = new AuthenticationException(
-                sprintf(
-                    "User not granted for roles '%s', to access resources '%s' with %s.",
-                    implode(',', $roles),
-                    implode(',', $resources),
-                    implode(',', $accesses)
-                )
-            );
+            if (! $this->securityContext->hasLoggedInUser()) {
+                // The current user is not logged-in.
+                $ex = new AuthenticationException(
+                    sprintf(
+                        "User not granted for roles '%s', to access resources '%s' with %s.",
+                        implode(',', $roles),
+                        implode(',', $resources),
+                        implode(',', $accesses)
+                    )
+                );
 
-            $loginTpl = $this->getParam($params, 'login_tpl');
+                $loginTpl = $this->getParam($params, 'login_tpl');
 
-            if (null != $loginTpl) {
-                $ex->setLoginTemplate($loginTpl);
+                if (null != $loginTpl) {
+                    $ex->setLoginTemplate($loginTpl);
+                }
+            }
+            else {
+                // We have a logged-in user, who do not have the proper permission. Issue an AuthorizationException.
+                $ex = new AuthorizationException(
+                    sprintf(
+                        "User not granted for roles '%s', to access resources '%s' with %s.",
+                        implode(',', $roles),
+                        implode(',', $resources),
+                        implode(',', $accesses)
+                    )
+                );
             }
 
             throw $ex;
