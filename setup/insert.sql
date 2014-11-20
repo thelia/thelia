@@ -146,7 +146,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (33, 'fr_FR', 'Autoriser un stock négatif sur les produits (1) ou pas (0, défaut)', NULL, NULL, NULL),
 (34, 'fr_FR', 'Utiliser un cookie persistant pour memoriser le panier du client', NULL, NULL, NULL),
 (35, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
-(36, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL)
+(36, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
 (37, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL)
 ;
 
