@@ -776,4 +776,5 @@ return array(
     'update form' => 'update form',
     'value table header' => 'value table header',
     'value table row' => 'value table row',
+    'Main address' => 'Main address',
 );
