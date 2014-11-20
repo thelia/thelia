@@ -12,8 +12,6 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use Thelia\Core\Template\Smarty\Plugins\an;
-use Thelia\Core\Template\Smarty\Plugins\unknown;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
