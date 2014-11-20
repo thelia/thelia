@@ -13,7 +13,11 @@ Parameters:
         {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders" visible="*"}
             <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
                 <a href="{url path="/admin/image/type/$imageType/$ID/update"}" title="{intl l='Update this image'}" class="thumbnail">
-                    <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                    {if $PROCESSING_ERROR}
+                        <img src="http://placehold.it/200x100&text={intl l='Image+file+not+found'}" alt="{$TITLE}">
+                    {else}
+                        <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                    {/if}
                 </a>
 
                 <div class="btn-group" >

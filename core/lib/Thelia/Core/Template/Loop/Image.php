@@ -80,7 +80,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('content'),
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
-            Argument::createBooleanTypeArgument('force_return', true)
+            Argument::createBooleanTypeArgument('force_return', true),
+            Argument::createBooleanTypeArgument('ignore_processing_errors', true)
         );
 
         // Add possible image sources
@@ -281,7 +282,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $source_filepath = sprintf(
                 "%s%s/%s/%s",
                 THELIA_ROOT,
-                ConfigQuery::read('images_library_path', 'local/media/images'),
+                ConfigQuery::read('images_library_path', 'local'.DS.'media'.DS.'images'),
                 $this->objectType,
                 $result->getFile()
             );
@@ -289,35 +290,56 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $event->setSourceFilepath($source_filepath);
             $event->setCacheSubdirectory($this->objectType);
 
+            $loopResultRow = new LoopResultRow($result);
+
+            $loopResultRow
+                ->set("ID", $result->getId())
+                ->set("LOCALE", $this->locale)
+                ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
+                ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("VISIBLE", $result->getVisible())
+                ->set("POSITION", $result->getPosition())
+                ->set("OBJECT_TYPE", $this->objectType)
+                ->set("OBJECT_ID", $this->objectId)
+            ;
+
+            $addRow = true;
+
+            $returnErroredImages = $this->getBackendContext() || ! $this->getIgnoreProcessingErrors();
+
             try {
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-                $loopResultRow = new LoopResultRow($result);
-
                 $loopResultRow
-                    ->set("ID", $result->getId())
-                    ->set("LOCALE", $this->locale)
-                    ->set("IMAGE_FILE", $result->getFile())
                     ->set("IMAGE_URL", $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
-                    ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
-                    ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
-                    ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
-                    ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
-                    ->set("POSTSCRIPTUM", $result->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                    ->set("VISIBLE", $result->getVisible())
-                    ->set("POSITION", $result->getPosition())
-                    ->set("OBJECT_TYPE", $this->objectType)
-                    ->set("OBJECT_ID", $this->objectId)
+                    ->set("PROCESSING_ERROR", false)
                 ;
-                $this->addOutputFields($loopResultRow, $result);
-
-                $loopResult->addRow($loopResultRow);
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
                 Tlog::getInstance()->addError(sprintf("Failed to process image in image loop: %s", $ex->getMessage()));
+
+                if ($returnErroredImages) {
+                    $loopResultRow
+                        ->set("IMAGE_URL", '')
+                        ->set("ORIGINAL_IMAGE_URL", '')
+                        ->set("IMAGE_PATH", '')
+                        ->set("PROCESSING_ERROR", true)
+                    ;
+                } else {
+                    $addRow = false;
+                }
+            }
+
+            if ($addRow) {
+                $this->addOutputFields($loopResultRow, $result);
+
+                $loopResult->addRow($loopResultRow);
             }
         }
 
