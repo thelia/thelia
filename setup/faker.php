@@ -20,7 +20,7 @@ require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", false);
 $thelia->boot();
-
+$thelia->getContainer()->get('thelia.translator');
 // The default faker is en_US
 $faker = Faker\Factory::create('en_US');
 

@@ -776,4 +776,5 @@ return array(
     'update form' => 'formulaire de modification',
     'value table header' => 'colonne tableau valeur',
     'value table row' => 'ligne tableau valeurs',
+    'Main address' => 'Adresse principale',
 );

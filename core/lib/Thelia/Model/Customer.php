@@ -17,6 +17,7 @@ use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Core\Security\Role\Role;
 use Thelia\Core\Event\Customer\CustomerEvent;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -102,7 +103,7 @@ class Customer extends BaseCustomer implements UserInterface
                 $address = new Address();
 
                 $address
-                    ->setLabel("default")
+                    ->setLabel(Translator::getInstance()->trans("Main address"))
                     ->setCompany($company)
                     ->setTitleId($titleId)
                     ->setFirstname($firstname)
