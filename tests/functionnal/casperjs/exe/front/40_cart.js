@@ -23,6 +23,14 @@ casper.test.begin('Cart', 5, function suite(test) {
             test.assertExists("#pse-submit", "Add to cart button exists");
             this.capture(screenshot_dir + 'front/40_product.png');
             this.echo("Submit add to cart");
+
+            var isDisabled = this.evaluate(function() {
+                return document.querySelector("#pse-submit").hasAttribute('disabled');
+            });
+            
+            if (isDisabled) {
+                this.skipTest("This product doesn't have any quantity")
+            }
             this.click("#pse-submit");
         },
         function(){
