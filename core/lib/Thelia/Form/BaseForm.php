@@ -114,6 +114,19 @@ abstract class BaseForm
             $this->initFormWithRequest($type, $data, $options);
         }
 
+        if (!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
+            $this->formFactoryBuilder
+                ->addExtension(
+                    new CsrfExtension(
+                        new SessionCsrfProvider(
+                            $this->getRequest()->getSession(),
+                            isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
+                        )
+                    )
+                )
+            ;
+        }
+
         $this->formBuilder = $this->formFactoryBuilder
             ->addExtension(new ValidatorExtension($this->validatorBuilder->getValidator()))
             ->getFormFactory()
@@ -184,7 +197,8 @@ abstract class BaseForm
         $this->validatorBuilder = Validation::createValidatorBuilder();
 
         $this->formFactoryBuilder =  Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension());
+            ->addExtension(new HttpFoundationExtension())
+        ;
 
         $this->translator = Translator::getInstance();
 
