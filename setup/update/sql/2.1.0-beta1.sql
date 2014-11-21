@@ -35,6 +35,6 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 ;
 
 -- Hide the session_config.handlers configuration variable
-UPDATE `config` SET `secured`=1, `hidden`=1 where `name`='session_config.handlers'
+UPDATE `config` SET `secured`=1, `hidden`=1 where `name`='session_config.handlers';
 
 SET FOREIGN_KEY_CHECKS = 1;
