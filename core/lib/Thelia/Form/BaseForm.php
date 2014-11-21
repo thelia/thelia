@@ -378,10 +378,14 @@ abstract class BaseForm
      */
     protected function trans($id, $parameters = [], $domain = null, $locale = null)
     {
+        if ($domain === null) {
+            $domain = ($this->defaultDomain !== null) ? $this->defaultDomain : 'core';
+        }
+
         return $this->translator->trans(
             $id,
             $parameters,
-            ($domain === null && $this->defaultDomain !== null) ? $this->defaultDomain : $domain,
+            $domain,
             $locale
         );
     }
