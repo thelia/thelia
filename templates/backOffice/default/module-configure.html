@@ -6,8 +6,9 @@
 
 {block name="page-title"}{intl l='Modules'}{/block}
 
-{block name="check-resource"}admin.module{/block}
-{block name="check-access"}view{/block}
+{block name="check-auth"}
+    {check_auth role="ADMIN" module=$module_code access="view" login_tpl="/admin/login"}
+{/block}
 
 {block name="main-content"}
 <div class="modules-configure">
