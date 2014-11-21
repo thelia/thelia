@@ -16,8 +16,10 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Validator\ValidatorBuilder;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tests\Resources\Form\Type\TestType;
 
@@ -79,7 +81,10 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $container->set("request", new Request());
+        $request = new Request();
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $container->set("request", $request);
         $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
 
         $container->set("event_dispatcher", new EventDispatcher());
