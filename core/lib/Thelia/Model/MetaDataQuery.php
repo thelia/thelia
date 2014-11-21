@@ -18,12 +18,13 @@ class MetaDataQuery extends BaseMetaDataQuery
 {
     /**
      *
+     * @param string $metaKey    the meta Key
      * @param string $elementKey the element Key : product, category, ...
      * @param int    $elementId  the element id
      *
-     * @return array all meta data affected to this element
+     * @return mixed the value affected to this element
      */
-    public static function getVal($metaKey, $elementKey, $elementId)
+    public static function getVal($metaKey, $elementKey, $elementId, $default = null)
     {
         $out = null;
 
@@ -32,9 +33,12 @@ class MetaDataQuery extends BaseMetaDataQuery
             ->filterByElementKey($elementKey)
             ->filterByElementId($elementId)
             ->findOne();
+
         if (null !== $data) {
             /** @var MetaData $data */
             $out = $data->getValue();
+        } else {
+            $out = $default;
         }
 
         return $out;
@@ -65,6 +69,32 @@ class MetaDataQuery extends BaseMetaDataQuery
         }
 
         return $out;
+    }
+
+    /**
+     * Add or update the MetaData element
+     *
+     * @param string $metaKey    the meta Key
+     * @param string $elementKey the element Key : product, category, ...
+     * @param int    $elementId  the element id
+     */
+    public static function setVal($metaKey, $elementKey, $elementId, $value)
+    {
+        $data = self::create()
+            ->filterByMetaKey($metaKey)
+            ->filterByElementKey($elementKey)
+            ->filterByElementId($elementId)
+            ->findOne()
+        ;
+
+        if (null === $data) {
+            $data = new MetaData();
+            $data->setMetaKey($metaKey);
+            $data->setElementKey($elementKey);
+            $data->setElementId($elementId);
+        }
+
+        $data->save();
     }
 }
 // MetaDataQuery
