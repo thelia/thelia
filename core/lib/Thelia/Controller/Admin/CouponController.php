@@ -481,7 +481,7 @@ class CouponController extends BaseAdminController
     protected function validateCreateOrUpdateForm($eventToDispatch, $log, $action, Coupon $model = null)
     {
         // Create the form from the request
-        $couponForm = new CouponCreationForm($this->getRequest());
+        $couponForm = $this->getForm($action, $model);
         $response = null;
         $message = false;
         try {
@@ -804,5 +804,18 @@ class CouponController extends BaseAdminController
     protected function getDefaultDateFormat()
     {
         return LangQuery::create()->findOneByByDefault(true)->getDateFormat();
+    }
+
+    protected function getForm($action, $coupon)
+    {
+        $options["validation_groups"] = ["Default", $action];
+
+        $data = array();
+
+        if (null !== $coupon) {
+            $data["code"] = $coupon->getCode();
+        }
+
+        return new CouponCreationForm($this->getRequest(), "form", $data, $options);
     }
 }
