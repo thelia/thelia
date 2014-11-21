@@ -71,6 +71,13 @@ abstract class BaseForm
      */
     protected $translator;
 
+    /**
+     * The default translation domain
+     * @var string|null
+     */
+    protected $defaultDomain = null;
+
+
     private $view = null;
 
     /**
@@ -353,6 +360,34 @@ abstract class BaseForm
     public function hasContainer()
     {
         return $this->container !== null;
+    }
+
+    /**
+     * Translates the given message.
+     *
+     * @param string $id         The message id (may also be an object that can be cast to string)
+     * @param array  $parameters An array of parameters for the message
+     * @param string $domain     The domain for the message
+     * @param string $locale     The locale
+     *
+     * @throws \InvalidArgumentException If the locale contains invalid characters
+     *
+     * @return string The translated string
+     *
+     * @api
+     */
+    protected function trans($id, $parameters = [], $domain = null, $locale = null)
+    {
+        if ($domain === null) {
+            $domain = ($this->defaultDomain !== null) ? $this->defaultDomain : 'core';
+        }
+
+        return $this->translator->trans(
+            $id,
+            $parameters,
+            $domain,
+            $locale
+        );
     }
 
     /**
