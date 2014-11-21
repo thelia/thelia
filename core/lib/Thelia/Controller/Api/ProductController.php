@@ -54,20 +54,25 @@ class ProductController extends BaseApiController
         return JsonResponse::create($this->baseProductSearch($params));
     }
 
-    public function getProductAction($product_id)
+    public function getProductAction($productId)
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::VIEW);
         $request = $this->getRequest();
 
         $params = array_merge(
             $request->query->all(),
-            ['id' => $product_id]
+            ['id' => $productId]
         );
 
         $results = $this->baseProductSearch($params);
 
         if ($results->isEmpty()) {
-            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $product_id));
+            return JsonResponse::create(
+                array(
+                    'error' => sprintf('product with id %d not found', $productId)
+                ),
+                404
+            );
         }
 
         return JsonResponse::create($results);
@@ -78,7 +83,6 @@ class ProductController extends BaseApiController
         $productLoop = new Product($this->getContainer());
         $productLoop->initializeArgs($params);
 
-        $paginate = 0;
         return $productLoop->exec($paginate);
     }
 
@@ -115,18 +119,18 @@ class ProductController extends BaseApiController
         }
     }
 
-    public function updateAction($product_id)
+    public function updateAction($productId)
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE);
 
-        $this->checkProductExists($product_id);
+        $this->checkProductExists($productId);
 
         $request = $this->getRequest();
 
         $form = new ProductModificationForm(
             $request,
             'form',
-            ['id' => $product_id],
+            ['id' => $productId],
             [
                 'csrf_protection' => false,
                 'method' => 'PUT'
@@ -134,13 +138,13 @@ class ProductController extends BaseApiController
         );
 
         $data = $request->request->all();
-        $data['id'] = $product_id;
+        $data['id'] = $productId;
         $request->request->add($data);
 
         try {
             $updateForm = $this->validateForm($form);
 
-            $event = new ProductUpdateEvent($product_id);
+            $event = new ProductUpdateEvent($productId);
             $event->bindForm($updateForm);
 
             $this->dispatch(TheliaEvents::PRODUCT_UPDATE, $event);
@@ -151,14 +155,14 @@ class ProductController extends BaseApiController
         }
     }
 
-    public function deleteAction($product_id)
+    public function deleteAction($productId)
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::DELETE);
 
-        $this->checkProductExists($product_id);
+        $this->checkProductExists($productId);
 
         try {
-            $event = new ProductDeleteEvent($product_id);
+            $event = new ProductDeleteEvent($productId);
 
             $this->dispatch(TheliaEvents::PRODUCT_DELETE, $event);
             return Response::create('', 204);
@@ -168,16 +172,18 @@ class ProductController extends BaseApiController
     }
 
     /**
-     * @param $product_id
+     * @param $productId
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    protected function checkProductExists($product_id)
+    protected function checkProductExists($productId)
     {
         $product = ProductQuery::create()
-            ->findPk($product_id);
+            ->findPk($productId);
 
         if (null === $product) {
-            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $product_id));
+            throw new HttpException(404, sprintf('{"error": "product with id %d not found"}', $productId), null, [
+                "Content-Type" => "application/json"
+            ]);
         }
     }
 }

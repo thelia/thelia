@@ -99,7 +99,12 @@ class ImageController extends BaseApiController
         $results = $imageLoop->exec($paginate);
 
         if ($results->isEmpty()) {
-            throw new HttpException(404, sprintf('{"error": "Image with id %d not found"}', $imageId));
+            return JsonResponse::create(
+                array(
+                    'error' => sprintf('image with id %d not found', $imageId)
+                ),
+                404
+            );
         }
 
         return JsonResponse::create($results);
@@ -252,7 +257,7 @@ class ImageController extends BaseApiController
         $errors = $this->processImage($fileController, $file, $entityId, $entity, $config);
 
         if (!empty($errors)) {
-            throw new HttpException(500, json_encode($errors));
+            throw new HttpException(500, json_encode($errors), null, ["Content-Type" => "application/json"]);
         }
     }
 
@@ -318,7 +323,12 @@ class ImageController extends BaseApiController
         $entityModel = $search->findPk($entityId);
 
         if (null === $entityModel) {
-            throw new HttpException(404, sprintf('{"error": "%s with id %d not found"}', $entity, $entityId));
+            throw new HttpException(
+                404,
+                sprintf('{"error": "%s with id %d not found"}', $entity, $entityId),
+                null,
+                ["Content-Type" => "application/json"]
+            );
         }
 
         return $entityModel;
@@ -339,7 +349,12 @@ class ImageController extends BaseApiController
         $imageModel = $search->findPk($imageId);
 
         if (null === $imageModel) {
-            throw new HttpException(404, sprintf('{"error": "image with id %d not found"}', $imageId));
+            throw new HttpException(
+                404,
+                sprintf('{"error": "image with id %d not found"}', $imageId),
+                null,
+                ["Content-Type" => "application/json"]
+            );
         }
 
         return $imageModel;

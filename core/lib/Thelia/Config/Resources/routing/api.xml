@@ -63,23 +63,23 @@
         <default key="_controller">Thelia:Api\Product:list</default>
     </route>
 
-    <route id="api.product.get" path="/api/products/{product_id}" methods="get">
+    <route id="api.product.get" path="/api/products/{productId}" methods="get">
         <default key="_controller">Thelia:Api\Product:getProduct</default>
-        <requirement key="product_id">\d+</requirement>
+        <requirement key="productId">\d+</requirement>
     </route>
 
-    <route id="api.product.update" path="/api/products/{product_id}" methods="put">
+    <route id="api.product.update" path="/api/products/{productId}" methods="put">
         <default key="_controller">Thelia:Api\Product:update</default>
-        <requirement key="product_id">\d+</requirement>
+        <requirement key="productId">\d+</requirement>
     </route>
 
     <route id="api.product.create" path="/api/products" methods="post">
         <default key="_controller">Thelia:Api\Product:create</default>
     </route>
 
-    <route id="api.product.delete" path="/api/products/{product_id}" methods="delete">
+    <route id="api.product.delete" path="/api/products/{productId}" methods="delete">
         <default key="_controller">Thelia:Api\Product:delete</default>
-        <requirement key="product_id">\d+</requirement>
+        <requirement key="productId">\d+</requirement>
     </route>
     <!-- end product route -->
 
