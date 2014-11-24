@@ -100,6 +100,7 @@ class Database
      * @param  string                          $sql  SQL query
      * @param  array                           $args SQL request parameters (PDO style)
      * @throws \RuntimeException|\PDOException if something goes wrong.
+     * @return \PDOStatement
      */
     public function execute($sql, $args = array())
     {
@@ -114,6 +115,8 @@ class Database
         if ($success === false || $stmt->errorCode() != 0) {
             throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args, 1).", error:".print_r($stmt->errorInfo(), 1));
         }
+
+        return $stmt;
     }
 
     /**
@@ -177,15 +180,13 @@ class Database
                 continue;
             }
 
-            $result = $this->connection->prepare('SELECT * FROM `' . $table . '`');
-            $result->execute();
+            $result = $this->execute('SELECT * FROM `' . $table . '`');
 
             $fieldCount = $result->columnCount();
 
             $data[] = 'DROP TABLE `' . $table . '`;';
 
-            $resultStruct = $this->connection->prepare('SHOW CREATE TABLE `' . $table . '`');
-            $resultStruct->execute();
+            $resultStruct = $this->execute('SHOW CREATE TABLE `' . $table . '`');
 
             $rowStruct = $resultStruct->fetch(PDO::FETCH_NUM);
 
