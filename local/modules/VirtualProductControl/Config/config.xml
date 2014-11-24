@@ -7,6 +7,8 @@
 
     <hooks>
         <hook id="virtualproductcontrol.hook" class="VirtualProductControl\Hook\VirtualProductHook" scope="request">
+            <argument type="service" id="thelia.securityContext" />
+
             <tag name="hook.event_listener" event="main.before-content" type="backoffice"/>
         </hook>
     </hooks>

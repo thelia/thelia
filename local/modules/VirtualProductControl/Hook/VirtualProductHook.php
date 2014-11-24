@@ -14,6 +14,9 @@ namespace VirtualProductControl\Hook;
 
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\ProductQuery;
 
@@ -24,21 +27,36 @@ use Thelia\Model\ProductQuery;
  */
 class VirtualProductHook extends BaseHook
 {
+    /**
+     * @var SecurityContext
+     */
+    protected $securityContext;
+
+    public function __construct(SecurityContext $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     public function onMainBeforeContent(HookRenderEvent $event)
     {
-        $products = ProductQuery::create()
-            ->filterByVirtual(1)
-            ->filterByVisible(1)
-            ->count();
+        if ($this->securityContext->isGranted(
+            ["ADMIN"],
+            [AdminResources::PRODUCT],
+            [],
+            [AccessManager::VIEW]
+        )) {
+            $products = ProductQuery::create()
+                ->filterByVirtual(1)
+                ->filterByVisible(1)
+                ->count();
 
-        if ($products > 0) {
-            $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery();
+            if ($products > 0) {
+                $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery();
 
-            if (false === $deliveryModule) {
-                $event->add($this->render('virtual-delivery-warning.html'));
+                if (false === $deliveryModule) {
+                    $event->add($this->render('virtual-delivery-warning.html'));
+                }
             }
         }
-
     }
 }
