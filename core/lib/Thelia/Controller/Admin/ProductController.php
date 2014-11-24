@@ -85,6 +85,7 @@ use Thelia\Form\ProductCombinationGenerationForm;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  * Manages products
@@ -1693,10 +1694,10 @@ class ProductController extends AbstractSeoCrudController
          * Compute documents with the associated loop
          */
         $documentLoop = new Document($this->container);
-        // select only not visible documents
+
         $documentLoop->initializeArgs([
             "product" => $pse->getProductId(),
-            "visible" => 0
+            "visible" => BooleanOrBothType::ANY, // Do not restrict on visibility for single association
         ]);
 
         $documents = $documentLoop
@@ -1740,8 +1741,10 @@ class ProductController extends AbstractSeoCrudController
          * Compute documents with the associated loop
          */
         $documentLoop = new Document($this->container);
+        // select only not visible documents
         $documentLoop->initializeArgs([
             "product" => $pse->getProductId(),
+            "visible" => 0,
         ]);
 
         $documents = $documentLoop

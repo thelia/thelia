@@ -90,10 +90,15 @@ class SendMail implements EventSubscriberInterface
                 $this->mailer->send($instance);
 
                 Tlog::getInstance()->debug("Virtual product download message sent to customer ".$customer->getEmail());
-            }
-            else {
+            } else {
                 $customer = $order->getCustomer();
-                Tlog::getInstance()->debug("Virtual product download message no contact email customer_id", $customer->getId());
+
+                Tlog::getInstance()->debug(
+                    "Virtual product download message no contact email for customer id '{customer_id}'",
+                    [
+                        "customer_id" => $customer->getId()
+                    ]
+                );
             }
         }
     }
