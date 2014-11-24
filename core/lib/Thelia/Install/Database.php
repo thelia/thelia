@@ -17,6 +17,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ServiceContainer\ServiceContainerInterface;
+use Thelia\Log\Tlog;
 
 /**
  * Class Database
@@ -165,8 +166,20 @@ class Database
         $data[] = "\n\n";
 
         foreach ($tables as $table) {
-            $result = $this->connection->prepare('SELECT * FROM ' . $table);
+            if (!preg_match("/^[\w_\-]+$/", $table)) {
+                Tlog::getInstance()->alert(
+                    sprintf(
+                        "Attempt to backup the db with this invalid table name: '%s'",
+                        $table
+                    )
+                );
+
+                continue;
+            }
+
+            $result = $this->connection->prepare('SELECT * FROM `' . $table . '`');
             $result->execute();
+
             $fieldCount = $result->columnCount();
 
             $data[] = 'DROP TABLE `' . $table . '`;';
