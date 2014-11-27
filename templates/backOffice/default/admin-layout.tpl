@@ -1,7 +1,7 @@
 {* -- By default, check admin login ----------------------------------------- *}
 
 {block name="check-auth"}
-    {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
+    {check_auth role="ADMIN" resource="{block name="check-resource"}{/block}" module="{block name="check-module"}{/block}" access="{block name="check-access"}{/block}" login_tpl="/admin/login"}
 {/block}
 
 {block name="no-return-functions"}{/block}
