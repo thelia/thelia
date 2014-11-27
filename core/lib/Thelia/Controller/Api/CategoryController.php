@@ -116,6 +116,7 @@ class CategoryController extends AbstractCrudApiController
             ->setLocale($data['locale'])
             ->setParent($data['parent'])
             ->setTitle($data['title'])
+            ->setVisible($data['visible'])
             ->setChapo($data['chapo'])
             ->setDescription($data['description'])
             ->setPostscriptum($data['postscriptum']);
