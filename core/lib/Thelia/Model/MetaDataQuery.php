@@ -94,6 +94,8 @@ class MetaDataQuery extends BaseMetaDataQuery
             $data->setElementId($elementId);
         }
 
+        $data->setValue($value);
+
         $data->save();
     }
 }
