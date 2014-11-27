@@ -44,6 +44,9 @@
     <div class="main layout-col-2-left">
         {hook name="content.main-top" content="$content_id"}
         <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">
+
+            {hook name="content.content-top" content="$content_id"}
+
             {loop name="blog.content" type="content" id=$content_id limit="1"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}
@@ -73,12 +76,16 @@
                    </small>
                 {/if}                
             {/loop}
+
+            {hook name="content.content-bottom" content="$content_id"}
+
         </article>
-        {hook name="content.main-bottom" content="$content_id"}
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/asides/articles.html"}
         </aside>
+
+        {hook name="content.main-bottom" content="$content_id"}
     </div><!-- /.layout -->
     {hook name="content.bottom" content="$content_id"}
 {else}

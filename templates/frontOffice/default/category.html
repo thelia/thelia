@@ -58,6 +58,8 @@
 
         <article class="col-main {$smarty.get.mode|default:"grid"}" role="main">
 
+            {hook name="category.content-top" category="$category_id"}
+
             {if #category_display_detail# && $category_id}
             <section class="category-description">
                 {loop name="category.description" type="category" id={$category_id} limit="1" }
@@ -166,12 +168,16 @@
                     {intl l="No products available in this category"}
                 </div>
             {/elseloop}
-            {hook name="category.main-bottom" category="$category_id"}
+
+            {hook name="category.content-bottom" category="$category_id"}
+
         </article>
 
         <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/menu.html"}
         </aside>
+
+        {hook name="category.main-bottom" category="$category_id"}
 
     </div>
     {hook name="category.bottom" category="$category_id"}
