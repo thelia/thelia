@@ -71,7 +71,7 @@ class TlogDestinationPopup extends AbstractTlogDestination
         $content = "";
         $count = 1;
 
-        foreach ($this->_logs as $line) {
+        foreach ($this->logs as $line) {
             $content .= "<div class=\"".($count++ % 2 ? "paire" : "impaire")."\">".htmlspecialchars($line)."</div>";
         }
 

@@ -28,18 +28,18 @@ class FeatureAvCreationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Title *"),
                 "label_attr" => array(
                     "for" => "title"
-                ))
-            )
+                )
+            ))
             ->add("locale", "text", array(
                 "constraints" => array(
                     new NotBlank()
-                ))
-            )
+                )
+            ))
             ->add("feature_id", "hidden", array(
                 "constraints" => array(
                         new NotBlank()
-                ))
-            )
+                )
+            ))
         ;
     }
 

@@ -16,4 +16,5 @@ use Thelia\Model\Base\OrderProductAttributeCombinationQuery as BaseOrderProductA
  */
 class OrderProductAttributeCombinationQuery extends BaseOrderProductAttributeCombinationQuery
 {
-} // OrderProductAttributeCombinationQuery
+}
+// OrderProductAttributeCombinationQuery

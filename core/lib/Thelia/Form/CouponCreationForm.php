@@ -123,12 +123,10 @@ class CouponCreationForm extends BaseForm
             ->add(
                 'shortDescription',
                 'text'
-
             )
             ->add(
                 'description',
                 'textarea'
-
             )
             ->add(
                 'type',
