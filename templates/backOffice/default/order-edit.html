@@ -355,52 +355,58 @@
                                                             </div>
                                                         </caption>
                                                         <tbody>
-                                                        {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
-                                                            <tr data-field-class="js-title" data-value="{$TITLE}">
-                                                                <th>{intl l="Title"}</th>
-                                                                <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-company">
-                                                                <th>{intl l="Company"}</th>
-                                                                <td>{$COMPANY}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-firstname">
-                                                                <th>{intl l="Firstname"}</th>
-                                                                <td>{$FIRSTNAME}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-lastname">
-                                                                <th>{intl l="Lastname"}</th>
-                                                                <td>{$LASTNAME}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-address1">
-                                                                <th>{intl l="Street address"}</th>
-                                                                <td>{$ADDRESS1}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-address2">
-                                                                <th>{intl l="Additional address"}</th>
-                                                                <td>{$ADDRESS2}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-address3">
-                                                                <th>{intl l="Additional address"}</th>
-                                                                <td>{$ADDRESS3}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-zipcode">
-                                                                <th>{intl l="Zip code"}</th>
-                                                                <td>{$ZIPCODE}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-city">
-                                                                <th>{intl l="City"}</th>
-                                                                <td>{$CITY}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-country" data-value="{$COUNTRY}">
-                                                                <th>{intl l="Country"}</th>
-                                                                <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
-                                                            </tr>
-                                                            <tr data-field-class="js-phone">
-                                                                <th>{intl l="Phone"}</th>
-                                                                <td>{$PHONE}</td>
-                                                            </tr>
-                                                        {/loop}
+                                                        {ifhook rel="order-edit.bill-delivery-address"}
+                                                            {* delivery module can customize the delivery address *}
+                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order="{$order_id}"}
+                                                        {/ifhook}
+                                                        {elsehook rel="order-edit.bill-delivery-address"}
+                                                            {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
+                                                                <tr data-field-class="js-title" data-value="{$TITLE}">
+                                                                    <th>{intl l="Title"}</th>
+                                                                    <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-company">
+                                                                    <th>{intl l="Company"}</th>
+                                                                    <td>{$COMPANY}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-firstname">
+                                                                    <th>{intl l="Firstname"}</th>
+                                                                    <td>{$FIRSTNAME}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-lastname">
+                                                                    <th>{intl l="Lastname"}</th>
+                                                                    <td>{$LASTNAME}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address1">
+                                                                    <th>{intl l="Street address"}</th>
+                                                                    <td>{$ADDRESS1}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address2">
+                                                                    <th>{intl l="Additional address"}</th>
+                                                                    <td>{$ADDRESS2}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-address3">
+                                                                    <th>{intl l="Additional address"}</th>
+                                                                    <td>{$ADDRESS3}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-zipcode">
+                                                                    <th>{intl l="Zip code"}</th>
+                                                                    <td>{$ZIPCODE}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-city">
+                                                                    <th>{intl l="City"}</th>
+                                                                    <td>{$CITY}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-country" data-value="{$COUNTRY}">
+                                                                    <th>{intl l="Country"}</th>
+                                                                    <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-phone">
+                                                                    <th>{intl l="Phone"}</th>
+                                                                    <td>{$PHONE}</td>
+                                                                </tr>
+                                                            {/loop}
+                                                        {/elsehook}
                                                         </tbody>
                                                     </table>
                                                 </div>

@@ -37,11 +37,40 @@
 	            <div class="row">
 	                <div class="col-md-12">
 
+                        {hookblock name="folder.tab" id="{$folder_id}" fields="id,title,href,content"}
+
+                            {capture "folder_tab_tab"}
+                                {forhook rel="folder.tab"}
+                                <li>
+                                    <a href="#{$id}"
+                                        {if $href}data-href="{$href}"{/if}
+                                        data-toggle="tab">{$title}
+                                    </a>
+                                </li>
+                                {/forhook}
+                            {/capture}
+
+                            {capture "folder_tab_content"}
+                                {forhook rel="folder.tab"}
+                                <div class="tab-pane fade" id="{$id}">
+                                    {if $href}
+                                        {* ajax *}
+                                        <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                    {else}
+                                        {$content nofilter}
+                                    {/if}
+                                </div>
+                                {/forhook}
+                            {/capture}
+
+                        {/hookblock}
+
 						<ul class="nav nav-tabs" id="tabbed-menu">
 		                    <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
                             <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
 		                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
 		                    <li><a href="#documents" data-toggle="tab">{intl l="Documents"}</a></li>
+                            {$smarty.capture.folder_tab_tab nofilter}
 		                    <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
 		 				</ul>
 
@@ -145,6 +174,8 @@
                                 {include file='includes/document-upload-form.html' documentType='folder' parentId=$ID}
 		                    </div>
 
+                            {$smarty.capture.folder_tab_content nofilter}
+
 		                    <div class="tab-pane fade" id="modules">
                                 <div class="form-container">
                                     {include
@@ -183,6 +214,17 @@
 
     <script>
         $(function() {
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function(ev) {
+                    if($this.data('callback')) {
+                        eval($this.data('callback') + '();');
+                    }
+                });
+
+            });
+
             $.imageUploadManager.initImageDropZone();
             $.documentUploadManager.initDocumentDropZone();
 

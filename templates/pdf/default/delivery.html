@@ -188,7 +188,7 @@
         <tr>
             <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
         </tr>
-        {hookblock name="delivery.information" order="{$order_id}"}
+        {hookblock name="delivery.information" order="{$order_id}" fields="title,value"}
         {forhook rel="delivery.information"}
         <tr>
             <td><h3>{$title} : <span>{$value}</span></h3></td>
