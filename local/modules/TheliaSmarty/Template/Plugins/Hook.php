@@ -182,6 +182,13 @@ class Hook extends AbstractSmartyPlugin
     {
         $hookName = $this->getParam($params, 'name');
         $module   = intval($this->getParam($params, 'module', 0));
+        // explicit definition of variable that can be returned
+        $fields   = preg_replace(
+            '|[^a-zA-Z0-9,\-_]|',
+            '',
+            $this->getParam($params, 'fields', '')
+        );
+        $fields = ('' !== $fields) ? explode(",", $fields) : [];
 
         if (!$repeat) {
             if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
@@ -194,7 +201,7 @@ class Hook extends AbstractSmartyPlugin
 
         $type = $smarty->getTemplateDefinition()->getType();
 
-        $event = new HookRenderBlockEvent($hookName, $params);
+        $event = new HookRenderBlockEvent($hookName, $params, $fields);
 
         $event->setArguments($this->getArgumentsFromParams($params));
 
@@ -396,7 +403,7 @@ class Hook extends AbstractSmartyPlugin
     protected function getArgumentsFromParams($params)
     {
         $args     = array();
-        $excludes = array("name", "before", "separator", "after");
+        $excludes = array("name", "before", "separator", "after", "fields");
 
         if (is_array($params)) {
             foreach ($params as $key => $value) {

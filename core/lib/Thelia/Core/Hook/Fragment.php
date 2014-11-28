@@ -59,4 +59,19 @@ class Fragment
     {
         return array_keys($this->data);
     }
+
+    public function filter(array $fields, $default = null)
+    {
+        if (empty($fields)) {
+            return;
+        }
+
+        $data = [];
+
+        foreach ($fields as $field) {
+            $data[$field] = (array_key_exists($field, $this->data)) ? $this->data[$field] : $default;
+        }
+
+        $this->data = $data;
+    }
 }
