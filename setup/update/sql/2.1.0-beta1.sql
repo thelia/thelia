@@ -39,6 +39,8 @@ UPDATE `config` SET `secured`=1, `hidden`=1 where `name`='session_config.handler
 
 -- Hooks
 
+-- front hooks
+
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`)
@@ -101,6 +103,35 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 18, 'fr_FR', 'Page des marques - en bas de la sidebar', '', ''),
 (@max_id + 18, 'en_US', 'Brands page - at the bottom of the sidebar', '', '')
 ;
+
+-- admin hooks
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'category.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 2, 'product.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 3, 'folder.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 4, 'content.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 5, 'brand.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 6, 'order-edit.bill-delivery-address', 2, 1, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'fr_FR', 'Catégorie - Onglet', '', ''),
+(@max_id + 1, 'en_US', 'Category - Tab', '', ''),
+(@max_id + 2, 'fr_FR', 'Produit - Onglet', '', ''),
+(@max_id + 2, 'en_US', 'Product - Tab', '', ''),
+(@max_id + 3, 'fr_FR', 'Dossier - Onglet', '', ''),
+(@max_id + 3, 'en_US', 'Folder - Tab', '', ''),
+(@max_id + 4, 'fr_FR', 'Contenu - Onglet', '', ''),
+(@max_id + 4, 'en_US', 'Content - Tab', '', ''),
+(@max_id + 5, 'fr_FR', 'Marque - Onglet', '', ''),
+(@max_id + 5, 'en_US', 'Brand - Tab', '', ''),
+(@max_id + 6, 'fr_FR', 'Modification commande - adresse de livraison', '', ''),
+(@max_id + 6, 'en_US', 'Order edit - delivery address', '', '')
+;
+
 
 SET FOREIGN_KEY_CHECKS = 1;
 
