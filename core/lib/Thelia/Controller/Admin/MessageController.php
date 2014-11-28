@@ -12,6 +12,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -194,5 +196,43 @@ class MessageController extends AbstractCrudController
     protected function redirectToListTemplate()
     {
         return $this->generateRedirectFromRoute('admin.configuration.messages.default');
+    }
+
+    public function previewAction($messageId, $html = true)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MESSAGE, [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        if (null === $message = MessageQuery::create()->findPk($messageId)) {
+            $this->pageNotFound();
+        }
+
+        $parser = $this->getParser(TemplateHelper::getInstance()->getActiveMailTemplate());
+
+        foreach ($this->getRequest()->query->all() as $key => $value) {
+            $parser->assign($key, $value);
+        }
+
+        if ($html) {
+            $content = $message->getHtmlMessageBody($parser);
+        } else {
+            $content = $message->getTextMessageBody($parser);
+        }
+
+        return new Response($content);
+    }
+
+    public function previewAsHtmlAction($messageId)
+    {
+        return $this->previewAction($messageId);
+    }
+
+    public function previewAsTextAction($messageId)
+    {
+        $response = $this->previewAction($messageId, false);
+        $response->headers->add(["Content-Type" => "text/plain"]);
+
+        return $response;
     }
 }

@@ -1426,6 +1426,17 @@
         <requirement key="sale_id">\d+</requirement>
     </route>
 
+    <!-- Preview message -->
+    <route id="admin.email.preview_html" path="/admin/message/preview/{messageId}" methods="get">
+        <default key="_controller">Thelia:Admin\Message:previewAsHtml</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
+    <route id="admin.email.preview_text" path="/admin/message/preview/text/{messageId}" methods="get">
+        <default key="_controller">Thelia:Admin\Message:previewAsText</default>
+        <requirement key="messageId">\d+</requirement>
+    </route>
+
     <!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
