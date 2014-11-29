@@ -98,10 +98,10 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     public function validatorProvider()
     {
         return [
-            ['Module1', '\Thelia\Exception\ModuleException', 'The module requires a version of Thelia'],
-            ['Module2', '\Thelia\Exception\ModuleException', 'The module requires this activated modules'],
-            ['Module3', '\Thelia\Exception\FileNotFoundException', 'Module should have a module.xml in the Config directory'],
-            ['Module4', '\Thelia\Exception\FileNotFoundException', 'Module should have a config.xml in the Config directory'],
+            ['Module1', '\Thelia\Exception\ModuleException', 'The module Module1 requires Thelia'],
+            ['Module2', '\Thelia\Exception\ModuleException', 'To activate module Module2, the following modules should be activated first'],
+            ['Module3', '\Thelia\Exception\FileNotFoundException', 'Module Module3 should have a module.xml in the Config directory'],
+            ['Module4', '\Thelia\Exception\FileNotFoundException', 'Module Module4 should have a config.xml in the Config directory'],
             ['Module5', '\Thelia\Module\Exception\InvalidXmlDocumentException', null],
         ];
     }
