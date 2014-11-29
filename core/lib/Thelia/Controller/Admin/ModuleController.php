@@ -13,14 +13,14 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
-use Thelia\Core\Security\Resource\AdminResources;
-
-use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
@@ -28,7 +28,6 @@ use Thelia\Form\ModuleModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
-use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
  * Class ModuleController
@@ -201,7 +200,7 @@ class ModuleController extends AbstractCrudController
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
         } catch (Exception $ex) {
-            Tlog::getInstance()->addError("Failed to list modules:", $ex);
+            Tlog::getInstance()->addError("Failed to get modules list:", $ex);
         }
 
         return $this->renderList();
@@ -313,7 +312,6 @@ class ModuleController extends AbstractCrudController
 
         $newModule        = null;
         $moduleDefinition = null;
-        $message          = false;
 
         $moduleInstall = new ModuleInstallForm($this->getRequest());
 
