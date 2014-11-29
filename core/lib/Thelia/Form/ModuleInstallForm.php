@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Exception;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -86,7 +87,30 @@ class ModuleInstallForm extends BaseForm
                     );
                 }
 
-                $this->modulePath = sprintf('%s/%s', $modulePath, $moduleFiles['directories'][0]);
+                $moduleDirectory = $moduleFiles['directories'][0];
+
+                // Check for a trailing "-master" suffix, which means this is a GitHub packaged module
+                // In this case, remove the suffix to get the proper module name.
+                if (substr($moduleDirectory, -7) == '-master') {
+                    $fixedModuleDirectory = preg_replace("/\-master$/", '', $moduleDirectory);
+
+                    // Rename the directory to give it the proper module name
+                    if (! rename($modulePath.DS.$moduleDirectory, $modulePath.DS.$fixedModuleDirectory)) {
+                        throw new IOException(
+                            Translator::getInstance()->trans(
+                                "Failed to rename directory %src into %dest",
+                                [
+                                    '%src' => $modulePath.DS.$moduleDirectory,
+                                    '%dest' => $modulePath.DS.$fixedModuleDirectory
+                                ]
+                            )
+                        );
+                    }
+
+                    $moduleDirectory = $fixedModuleDirectory;
+                }
+
+                $this->modulePath = sprintf('%s/%s', $modulePath, $moduleDirectory);
 
                 $moduleValidator = new ModuleValidator($this->modulePath);
 
