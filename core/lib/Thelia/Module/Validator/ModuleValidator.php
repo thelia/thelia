@@ -164,7 +164,8 @@ class ModuleValidator
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
                 $this->getTranslator()->trans(
-                    "The module definition has not been initialized."
+                    "The %name module definition has not been initialized.",
+                    [ '%name' => $this->moduleCode ]
                 )
             );
         }
@@ -230,7 +231,8 @@ class ModuleValidator
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
                 $this->getTranslator()->trans(
-                    "The module descriptor has not been initialized."
+                    "The %name module descriptor has not been initialized.",
+                    [ '%name' => $this->moduleCode ]
                 )
             );
         }
@@ -266,8 +268,11 @@ class ModuleValidator
             if (!Version::test(Thelia::THELIA_VERSION, $this->moduleDefinition->getTheliaVersion(), false, ">=")) {
                 throw new ModuleException(
                     $this->getTranslator()->trans(
-                        "The module requires a version of Thelia >= %version",
-                        ['%version' => $this->moduleDefinition->getVersion()]
+                        "The module %name requires Thelia %version or newer",
+                        [
+                            '%name' => $this->moduleCode,
+                            '%version' => $this->moduleDefinition->getVersion()
+                        ]
                     )
                 );
             }
