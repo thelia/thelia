@@ -34,7 +34,6 @@ class ModuleManagement
 
     /** @var ModuleDescriptorValidator $descriptorValidator */
     protected $descriptorValidator;
-    protected $errors;
 
     public function __construct()
     {
@@ -47,22 +46,23 @@ class ModuleManagement
 
         $finder
             ->name('module.xml')
-            ->in($this->baseModuleDir . '/*/Config');
+            ->in($this->baseModuleDir . '*'.DS.'Config');
 
-        $this->errors = [];
+        $errors = [];
 
         foreach ($finder as $file) {
             try {
                 $this->updateModule($file);
             } catch (\Exception $ex) {
-                $this->errors[] = $ex;
+                // Guess module code
+                $moduleCode = basename(dirname(dirname($file)));
+
+                $errors[$moduleCode] = $ex;
             }
         }
 
-        if (count($this->errors) > 0) {
-            $ex = new InvalidModuleException("");
-            $ex->setErrors($this->errors);
-            throw $ex;
+        if (count($errors) > 0) {
+            throw new InvalidModuleException($errors);
         }
     }
 
