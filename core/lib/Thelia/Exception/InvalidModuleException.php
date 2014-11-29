@@ -12,22 +12,19 @@
 
 namespace Thelia\Exception;
 
-use OutOfBoundsException;
-
 /**
  * Class InvalidModuleException
  * @package Thelia\Exception
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class InvalidModuleException extends OutOfBoundsException
+class InvalidModuleException extends \RuntimeException
 {
     protected $errors = [];
 
-    /**
-     * @param array $errors
-     */
-    public function setErrors($errors)
+    public function __construct(array $errors = [])
     {
+        parent::__construct();
+
         $this->errors = $errors;
     }
 
