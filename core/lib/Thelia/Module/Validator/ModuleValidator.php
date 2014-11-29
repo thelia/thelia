@@ -51,9 +51,13 @@ class ModuleValidator
     /** @var array array of errors */
     protected $errors = [];
 
+    protected $moduleCode;
+
     public function __construct($modulePath = null)
     {
         $this->modulePath = $modulePath;
+
+        $this->moduleCode = basename($this->modulePath);
     }
 
     /**
@@ -178,21 +182,30 @@ class ModuleValidator
     {
         if (false === file_exists($this->modulePath)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans("Module directory doesn't exist.")
+                $this->getTranslator()->trans(
+                    "Module %name directory doesn't exists.",
+                    [ '%name' => $this->moduleCode]
+                )
             );
         }
 
         $path = sprintf("%s/Config/module.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans("Module should have a module.xml in the Config directory.")
+                $this->getTranslator()->trans(
+                    "Module %name should have a module.xml in the Config directory.",
+                    [ '%name' => $this->moduleCode]
+                )
             );
         }
 
         $path = sprintf("%s/Config/config.xml", $this->modulePath);
         if (false === file_exists($path)) {
             throw new FileNotFoundException(
-                $this->getTranslator()->trans("Module should have a config.xml in the Config directory.")
+                $this->getTranslator()->trans(
+                    "Module %name should have a config.xml in the Config directory.",
+                    [ '%name' => $this->moduleCode]
+                )
             );
         }
     }
@@ -224,7 +237,7 @@ class ModuleValidator
 
         $moduleDefinition = new ModuleDefinition();
 
-        $moduleDefinition->setCode(basename($this->modulePath));
+        $moduleDefinition->setCode($this->moduleCode);
         $moduleDefinition->setNamespace((string)$this->moduleDescriptor->fullnamespace);
         $moduleDefinition->setVersion((string)$this->moduleDescriptor->version);
 
@@ -270,7 +283,8 @@ class ModuleValidator
             if (version_compare($module->getVersion(), $this->moduleDefinition->getVersion(), '>=')) {
                 throw new ModuleException(
                     $this->getTranslator()->trans(
-                        "The module is already installed in the same or greater version."
+                        "The module %name is already installed in the same or greater version.",
+                        [ '%name' => $this->moduleCode]
                     )
                 );
             }
@@ -312,8 +326,8 @@ class ModuleValidator
 
         if (count($errors) > 0) {
             $errorsMessage = $this->getTranslator()->trans(
-                'The module requires this activated modules : %modules',
-                ['%modules' => implode(', ', $errors)]
+                'To activate module %name, the following modules should be activated first: %modules',
+                ['%name' => $this->moduleCode, '%modules' => implode(', ', $errors)]
             );
 
             throw new ModuleException($errorsMessage);
