@@ -157,8 +157,11 @@ class Module extends BaseAction implements EventSubscriberInterface
                     );
                 }
 
-                // check for modules that depend of this one
-                $this->checkDeactivation($module);
+                // If module is activated, check if we can deactivate it
+                if ($module->getActivate()) {
+                    // check for modules that depend of this one
+                    $this->checkDeactivation($module);
+                }
 
                 try {
                     $instance = $module->createInstance();
