@@ -13,10 +13,8 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
