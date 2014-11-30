@@ -15,7 +15,7 @@ fragment uses the following additional variables :
     {include file="forms/$field_template/form-field-attributes-renderer.html"}
 {/capture}
 
-{if empty($value)}
+{if empty($value) && ! empty($field_value)}
     {$value = $field_value}
 {/if}
 
@@ -107,16 +107,16 @@ fragment uses the following additional variables :
             {elseif $type == 'money'}
 
                 <div class="input-group">
-                    <input type="number" {$attributes nofilter} />
+                    <input type="number" step="any" {$attributes nofilter} />
                     <span class="input-group-addon">{loop name="input.addon" type="currency" default_only="true"}{$SYMBOL}{/loop}</span>
                 </div>
 
             {else}
 
-                {$text_types = ['text', 'password', 'number', 'money', 'integer', 'time', 'date', 'datetime', 'email', 'url', 'file']}
+                {$text_types = ['text', 'password', 'number', 'integer', 'time', 'date', 'datetime', 'email', 'url', 'file']}
 
                 {if in_array($type, $text_types)}
-                    {if $type == 'integer' || $type == 'money'}{$type='number'}{/if}
+                    {if $type == 'integer'}{$type='number'}{/if}
 
                     <input type="{$type}" {$attributes nofilter} />
                 {else}

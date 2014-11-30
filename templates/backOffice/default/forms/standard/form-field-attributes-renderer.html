@@ -9,7 +9,7 @@ In addition to the standard form_field block output, this fragment uses the foll
 *}
 
 {* Use the optionnal $field_value parameter if no value is defined *}
-{if empty($value)}
+{if empty($value) && ! empty($field_value)}
     {$value = $field_value}
 {/if}
 
