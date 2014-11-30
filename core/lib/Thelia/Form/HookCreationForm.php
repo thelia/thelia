@@ -30,16 +30,15 @@ class HookCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Hook code *"),
+                "label" => Translator::getInstance()->trans("Hook code"),
                 "label_attr" => array(
                     "for" => "code"
                 )
             ))
-            ->add("locale", "text", array(
+            ->add("locale", "hidden", array(
                 "constraints" => array(
                     new NotBlank()
-                ),
-                "label_attr" => array("for" => "locale_create")
+                )
             ))
             ->add("type", "choice", array(
                 "choices" => array(
@@ -59,11 +58,13 @@ class HookCreationForm extends BaseForm
             ->add("native", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Native"),
                 "label_attr" => array(
-                    "for" => "native"
+                    "for" => "native",
+                    "help" => Translator::getInstance()->trans("Core hook of Thelia.")
                 )
             ))
             ->add("active", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Active"),
+                "required" => false,
                 "label_attr" => array(
                     "for" => "active"
                 )
@@ -72,7 +73,7 @@ class HookCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-                "label" => Translator::getInstance()->trans("Hook title *"),
+                "label" => Translator::getInstance()->trans("Hook title"),
                 "label_attr" => array(
                     "for" => "title"
                 )
