@@ -64,19 +64,6 @@ class ModuleHookModificationForm extends BaseForm
         return $choices;
     }
 
-    /**
-     *
-     * Verify if method has a valid signature. See RegisterListenersPass::isValidHookMethod for implementing this verification
-     *
-     * @param $value
-     * @param  ExecutionContextInterface $context
-     * @return bool
-     */
-    public function verifyMethod($value, ExecutionContextInterface $context)
-    {
-        return true;
-    }
-
     public function getName()
     {
         return "thelia_module_hook_modification";

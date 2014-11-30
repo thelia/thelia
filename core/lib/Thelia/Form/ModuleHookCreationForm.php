@@ -15,6 +15,7 @@ namespace Thelia\Form;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -91,7 +92,7 @@ class ModuleHookCreationForm extends BaseForm
                     "label_attr" => array(
                         "for" => "method",
                         "help" => Translator::getInstance()->trans(
-                            "The service id that will handle the hook (defined in the config.xml file of the module)."
+                            "The method name that will handle the hook event."
                         )
                     )
                 )
@@ -122,6 +123,20 @@ class ModuleHookCreationForm extends BaseForm
         }
 
         return $choices;
+    }
+
+    /**
+     *
+     * Check if method has a valid signature.
+     * See RegisterListenersPass::isValidHookMethod for implementing this verification
+     *
+     * @param $value
+     * @param  ExecutionContextInterface $context
+     * @return bool
+     */
+    public function verifyMethod($value, ExecutionContextInterface $context)
+    {
+        return true;
     }
 
     public function getName()
