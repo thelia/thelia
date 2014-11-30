@@ -55,7 +55,7 @@ class HookCreationForm extends BaseForm
                     "for" => "type"
                 )
             ))
-            ->add("native", "checkbox", array(
+            ->add("native", "hidden", array(
                 "label" => Translator::getInstance()->trans("Native"),
                 "label_attr" => array(
                     "for" => "native",

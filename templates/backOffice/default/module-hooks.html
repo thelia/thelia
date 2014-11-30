@@ -171,27 +171,10 @@
 
     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-    {form_field form=$form field='module_id'}
-    <div class="form-group {if $error}has-error{/if}">
-        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-        <select name="{$name}" id="{$label_attr.for}" class="form-control">
-            {foreach $choices as $choice}
-            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
-            {/foreach}
-        </select>
-    </div>
-    {/form_field}
-
-    {form_field form=$form field='hook_id'}
-    <div class="form-group {if $error}has-error{/if}">
-        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-        <select name="{$name}" id="{$label_attr.for}" class="form-control">
-            {foreach $choices as $choice}
-            <option value="{$choice->value}" {if !$form_error && $choice->value == $ESCAPED_TYPE || $form_error && $choice->value == $value}selected="selected" {/if}>{$choice->label}</option>
-            {/foreach}
-        </select>
-    </div>
-    {/form_field}
+    {render_form_field form=$form field="module_id"}
+    {render_form_field form=$form field="hook_id"}
+    {render_form_field form=$form field="classname"}
+    {render_form_field form=$form field="method"}
 
     {hook name="module-hook.create-form" location="module_hook_create_form" }
 
@@ -204,7 +187,7 @@ dialog_id    = "add_module_hook_dialog"
 dialog_title = {intl l="Add a module to a hook"}
 dialog_body  = {$smarty.capture.module_hook_creation_dialog nofilter}
 
-dialog_ok_label     = {intl l="Graft this module"}
+dialog_ok_label     = {intl l="Put module in hook"}
 dialog_cancel_label = {intl l="Cancel"}
 
 form_action        = {url path='/admin/module-hooks/create'}

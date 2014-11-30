@@ -40,29 +40,9 @@ class ModuleHookModificationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Hook"),
                 "label_attr" => array("for" => "locale_create")
             ))
-            ->add("classname", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Service ID"),
-                "label_attr" => array(
-                    "for" => "classname"
-                )
-            ))
-            ->add("method", "text", array(
-                "label" => Translator::getInstance()->trans("Method Name"),
-                "constraints" => array(
-                    new NotBlank(),
-                    new Callback(array("methods" => array(
-                        array($this, "verifyMethod")
-                    )))
-                ),
-                "label_attr" => array(
-                    "for" => "method"
-                )
-            ))
             ->add("active", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Active"),
+                "required" => false,
                 "label_attr" => array(
                     "for" => "active"
                 )
