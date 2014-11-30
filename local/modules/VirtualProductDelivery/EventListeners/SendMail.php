@@ -22,8 +22,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Module\PaymentModuleInterface;
-
 
 /**
  * Class SendMail
@@ -53,11 +51,11 @@ class SendMail implements EventSubscriberInterface
             ->findOne();
 
         if ($order->hasVirtualProduct() && $event->getStatus() == $paidStatusId) {
-
             $contact_email = ConfigQuery::read('store_email');
 
-            if ($contact_email) {
+            $customer = $order->getCustomer();
 
+            if ($contact_email) {
                 $message = MessageQuery::create()
                     ->filterByName('mail_virtualproduct')
                     ->findOne();
@@ -67,7 +65,6 @@ class SendMail implements EventSubscriberInterface
                 }
 
                 $order = $event->getOrder();
-                $customer = $order->getCustomer();
 
                 $this->parser->assign('customer_id', $customer->getId());
                 $this->parser->assign('order_id', $order->getId());
@@ -84,16 +81,16 @@ class SendMail implements EventSubscriberInterface
                 ;
 
                 // Build subject and body
-
                 $message->buildMessage($this->parser, $instance);
 
                 $this->mailer->send($instance);
 
                 Tlog::getInstance()->debug("Virtual product download message sent to customer ".$customer->getEmail());
-            }
-            else {
-                $customer = $order->getCustomer();
-                Tlog::getInstance()->debug("Virtual product download message no contact email customer_id", $customer->getId());
+            } else {
+                Tlog::getInstance()->addDebug(
+                    "Virtual product download: store contact email is not defined. Customer ID:",
+                    $customer->getId()
+                );
             }
         }
     }
