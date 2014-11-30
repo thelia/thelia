@@ -32,17 +32,24 @@ class HookModificationForm extends HookCreationForm
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
             ->add("by_module", "checkbox", array(
                 "label" => Translator::getInstance()->trans("By Module"),
+                "required" => false,
                 "label_attr" => array(
-                    "for" => "by_module"
+                    "for" => "by_module",
+                    "help" => Translator::getInstance()->trans(
+                        "This hook is specific to a module (delivery/payment modules)."
+                    )
                 )
             ))
             ->add("block", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Hook block"),
+                "required" => false,
                 "label_attr" => array(
-                    "for" => "block"
+                    "for" => "block",
+                    "help" => Translator::getInstance()->trans(
+                        "If checked, this hook will be used by a hook block. If not, by hook function."
+                    )
                 )
             ))
-
         ;
 
         // Add standard description fields, excluding title and locale, which a re defined in parent class
