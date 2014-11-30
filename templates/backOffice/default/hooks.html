@@ -224,9 +224,7 @@
 
         {render_form_field form=$form field='code'}
         {render_form_field form=$form field='type'}
-        {*
-           {render_form_field form=$form field='native'}
-        *}
+        {render_form_field form=$form field='native' value="0"}
         {render_form_field form=$form field='active'}
 
         {hook name="hook.create-form" location="hook_create_form" }

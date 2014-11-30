@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
@@ -30,25 +31,71 @@ class ModuleHookCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("module_id", "choice", array(
-                "choices" => $this->getModuleChoices(),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Module"),
-                "label_attr" => array(
-                    "for" => "module_id"
+            ->add(
+                "module_id",
+                "choice",
+                array(
+                    "choices" => $this->getModuleChoices(),
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Module"),
+                    "label_attr" => array(
+                        "for" => "module_id"
+                    )
                 )
-            ))
-            ->add("hook_id", "choice", array(
-                "choices" => $this->getHookChoices(),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Hook"),
-                "label_attr" => array("for" => "locale_create")
-            ))
-        ;
+            )
+            ->add(
+                "hook_id",
+                "choice",
+                array(
+                    "choices" => $this->getHookChoices(),
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Hook"),
+                    "label_attr" => array("for" => "locale_create")
+                )
+            )
+            ->add(
+                "classname",
+                "text",
+                array(
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => Translator::getInstance()->trans("Service ID"),
+                    "label_attr" => array(
+                        "for" => "classname",
+                        "help" => Translator::getInstance()->trans(
+                            "The service id that will handle the hook (defined in the config.xml file of the module)."
+                        )
+                    )
+                )
+            )
+            ->add(
+                "method",
+                "text",
+                array(
+                    "label" => Translator::getInstance()->trans("Method Name"),
+                    "constraints" => array(
+                        new NotBlank(),
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyMethod")
+                                )
+                            )
+                        )
+                    ),
+                    "label_attr" => array(
+                        "for" => "method",
+                        "help" => Translator::getInstance()->trans(
+                            "The service id that will handle the hook (defined in the config.xml file of the module)."
+                        )
+                    )
+                )
+            );
     }
 
     protected function getModuleChoices()
