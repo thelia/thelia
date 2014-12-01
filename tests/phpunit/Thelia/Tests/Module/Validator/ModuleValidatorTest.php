@@ -31,12 +31,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $moduleChequePath = THELIA_MODULE_DIR . "Cheque";
 
-        $moduleValidator = new ModuleValidator($moduleChequePath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load module
-        $moduleValidator->load();
+        $moduleValidator = new ModuleValidator($moduleChequePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
@@ -58,12 +53,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $modulePath = THELIA_MODULE_DIR . "VirtualProductDelivery";
 
-        $moduleValidator = new ModuleValidator($modulePath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load module
-        $moduleValidator->load();
+        $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
@@ -116,11 +106,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $exception = null;
 
         try {
-            $moduleValidator = new ModuleValidator($modulePath);
-
-            $moduleValidator->setTranslator($this->getStubTranslator("opiopi"));
-
-            $moduleValidator->load();
+            $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator("opiopi"));
 
             $moduleValidator->validate(true);
         } catch (\Exception $ex) {
@@ -160,12 +146,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $moduleChuckNorrisPath = THELIA_MODULE_DIR . "ChuckNorris";
 
-        $moduleValidator = new ModuleValidator($moduleChuckNorrisPath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load
-        $moduleValidator->load();
+        new ModuleValidator($moduleChuckNorrisPath, $this->getStubTranslator());
     }
 
 
