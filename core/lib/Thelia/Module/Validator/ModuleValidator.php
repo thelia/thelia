@@ -34,9 +34,6 @@ class ModuleValidator
 {
     protected $modulePath;
 
-    /** @var bool */
-    protected $isLoaded = false;
-
     /** @var ModuleDescriptorValidator */
     protected $moduleDescriptor;
 
@@ -53,11 +50,23 @@ class ModuleValidator
 
     protected $moduleCode;
 
-    public function __construct($modulePath = null)
+    /**
+     * @param string $modulePath the path of the module directory
+     * @param \Thelia\Core\Translation\Translator $translator FOR UNIT TEST PURPOSE ONLY
+     */
+    public function __construct($modulePath = null, $translator = null)
     {
+        $this->translator = $translator;
+
         $this->modulePath = $modulePath;
 
         $this->moduleCode = basename($this->modulePath);
+
+        $this->checkDirectoryStructure();
+
+        $this->loadModuleDescriptor();
+
+        $this->loadModuleDefinition();
     }
 
     /**
@@ -110,14 +119,6 @@ class ModuleValidator
     }
 
     /**
-     * @param \Thelia\Core\Translation\Translator $translator
-     */
-    public function setTranslator($translator)
-    {
-        $this->translator = $translator;
-    }
-
-    /**
      * @return \Thelia\Core\Translation\Translator
      */
     public function getTranslator()
@@ -127,23 +128,6 @@ class ModuleValidator
         }
 
         return $this->translator;
-    }
-
-
-    /**
-     * Loads the module description and configuration.
-     *
-     * @throws FileNotFoundException if modules does not exist or not contains module.xml or config.xml
-     */
-    public function load()
-    {
-        $this->checkDirectoryStructure();
-
-        $this->loadModuleDescriptor();
-
-        $this->loadModuleDefinition();
-
-        $this->isLoaded = true;
     }
 
     /**
@@ -157,10 +141,6 @@ class ModuleValidator
      */
     public function validate($checkCurrentVersion = true)
     {
-        if (false === $this->isLoaded) {
-            $this->load();
-        }
-
         if (null === $this->moduleDescriptor) {
             throw new \Exception(
                 $this->getTranslator()->trans(
@@ -239,8 +219,26 @@ class ModuleValidator
 
         $moduleDefinition = new ModuleDefinition();
 
-        $moduleDefinition->setCode($this->moduleCode);
-        $moduleDefinition->setNamespace((string)$this->moduleDescriptor->fullnamespace);
+        // Try to guess the proper module name, using the descriptor information.
+        $fullnamespace = trim((string)$this->moduleDescriptor->fullnamespace);
+
+        $namespaceComponents = explode("\\", $fullnamespace);
+
+        if (! isset($namespaceComponents[0])) {
+            throw new ModuleException(
+                $this->getTranslator()->trans(
+                    "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
+                    [
+                        '%name' => $this->moduleCode,
+                        '%val' => $fullnamespace
+                    ]
+                )
+            );
+        }
+
+        // Assume the module code is the first component of the declared namespace
+        $moduleDefinition->setCode($namespaceComponents[0]);
+        $moduleDefinition->setNamespace($fullnamespace);
         $moduleDefinition->setVersion((string)$this->moduleDescriptor->version);
 
         $this->getModuleLanguages($moduleDefinition);
@@ -362,9 +360,9 @@ class ModuleValidator
 
         /** @var Module $module */
         foreach ($modules as $module) {
-            $validator = new ModuleValidator($module->getAbsoluteBaseDir());
             try {
-                $validator->load();
+                $validator = new ModuleValidator($module->getAbsoluteBaseDir());
+
                 $definition = $validator->getModuleDefinition();
                 $dependencies = $definition->getDependencies();
 
