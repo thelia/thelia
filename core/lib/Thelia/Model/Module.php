@@ -84,7 +84,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getBaseDir()
     {
@@ -92,7 +92,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getAbsoluteBaseDir()
     {
@@ -100,7 +100,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's config directory path, relative to THELIA_MODULE_DIR
      */
     public function getConfigPath()
     {
@@ -108,7 +108,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config absolute directory path
+     * @return string the module's config absolute directory path
      */
     public function getAbsoluteConfigPath()
     {
@@ -116,7 +116,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's i18N directory path, relative to THELIA_MODULE_DIR
      */
     public function getI18nPath()
     {
@@ -124,7 +124,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N absolute directory path
+     * @return string the module's i18N absolute directory path
      */
     public function getAbsoluteI18nPath()
     {
@@ -132,7 +132,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes absolute directory path
+     * @return string the module's AdminIncludes absolute directory path
      */
     public function getAbsoluteAdminIncludesPath()
     {
@@ -140,7 +140,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes i18N absolute directory path
+     * @return string the module's AdminIncludes i18N absolute directory path
      */
     public function getAbsoluteAdminIncludesI18nPath()
     {
@@ -223,6 +223,8 @@ class Module extends BaseModule
 
     /**
      * Calculate next position relative to module type
+     *
+     * @param ModuleQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {
