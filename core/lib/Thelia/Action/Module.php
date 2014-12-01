@@ -76,7 +76,7 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function checkToggleActivation(ModuleToggleActivationEvent $event)
     {
-        if (true === $event->noCheck) {
+        if (true === $event->isNoCheck()) {
             return;
         }
 
@@ -98,6 +98,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      * Check if module can be activated : supported version of Thelia, module dependencies.
      *
      * @param \Thelia\Model\Module $module
+     * @throws Exception if activation fails.
      * @return bool true if the module can be activated, otherwise false
      */
     private function checkActivation($module)
@@ -122,15 +123,18 @@ class Module extends BaseAction implements EventSubscriberInterface
     private function checkDeactivation($module)
     {
         $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
-        $moduleValidator->load();
 
         $modules = $moduleValidator->getModulesDependOf();
 
         if (count($modules) > 0) {
             $moduleList = implode(', ', array_column($modules, 'code'));
             $message = (count($modules) == 1)
-                ? Translator::getInstance()->trans('%s has dependency to module %s. You have to deactivate this module before.')
-                : Translator::getInstance()->trans('%s have dependencies to module %s. You have to deactivate these modules before.')
+                ? Translator::getInstance()->trans(
+                    '%s has dependency to module %s. You have to deactivate this module before.'
+                )
+                : Translator::getInstance()->trans(
+                    '%s have dependencies to module %s. You have to deactivate these modules before.'
+                )
             ;
 
             throw new ModuleException(
@@ -151,7 +155,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
                         Translator::getInstance()->trans(
-                            'Cannot instanciante module "%name%": the namespace is null. Maybe the model is not loaded ?',
+                            'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?',
                             ['%name%' => $module->getCode()]
                         )
                     );
@@ -245,7 +249,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // deactivate
                 $toggleEvent = new ModuleToggleActivationEvent($oldModule);
                 // disable the check of the module because it's already done
-                $toggleEvent->noCheck = true;
+                $toggleEvent->setNoCheck(true);
                 $toggleEvent->setDispatcher($dispatcher);
 
                 $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
@@ -285,8 +289,8 @@ class Module extends BaseAction implements EventSubscriberInterface
 
         // activate if old was activated
         if ($activated) {
-            $toggleEvent = new ModuleToggleActivationEvent($module);
-            $toggleEvent->noCheck = true;
+            $toggleEvent = new ModuleToggleActivationEvent($module->getId());
+            $toggleEvent->setNoCheck(true);
             $toggleEvent->setDispatcher($dispatcher);
 
             $dispatcher->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $toggleEvent);
@@ -319,7 +323,7 @@ class Module extends BaseAction implements EventSubscriberInterface
             );
         }
 
-        $paymentModuleInstance = $paymentModule->getModuleInstance($this->container);
+        $paymentModuleInstance = $paymentModule->getPaymentModuleInstance($this->container);
 
         $response = $paymentModuleInstance->pay($order);
 
@@ -350,24 +354,7 @@ class Module extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @inheritdoc
      */
     public static function getSubscribedEvents()
     {
