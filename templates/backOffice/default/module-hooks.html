@@ -211,7 +211,7 @@ form_error_message = $form_error_message
     dialog_title    = {intl l="Remove a module from a hook"}
     dialog_message  = {intl l="Do you really want to remove this module ?"}
 
-    form_action         = {url path='/admin/module-hooks/delete'}
+    form_action         = {token_url path='/admin/module-hooks/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}
 }
 
