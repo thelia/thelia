@@ -54,7 +54,6 @@ class SitemapController extends BaseFrontController {
      */
     public function generateAction()
     {
-
         /** @var Request $request */
         $request = $this->getRequest();
 

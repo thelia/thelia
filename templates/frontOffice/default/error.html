@@ -1,0 +1,36 @@
+{extends file="layout.tpl"}
+
+{block name="body-class"}page-error{/block}
+
+{block name="main-content"}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="alert alert-warning">
+                    <h3>{intl l='An error occurred'}</h3>
+
+                    <p>
+                        {intl
+                            l="We're sorry but an error occured. Please try to contact the site <a href='mailto:%mail'>administrator</a>"
+                            mail={config key='store_email'}
+                        }
+                    </p>
+
+                    <br/>
+
+                    <button class="btn btn-default btn-primary btn-error-go-back">
+                        {intl l="Go back to the previous page"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+    $(".btn-error-go-back").click(function() {
+        history.back();
+    });
+    </script>
+{/block}

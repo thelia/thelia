@@ -68,7 +68,10 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('form_firewall_active', '1', 0, 0, NOW(), NOW()),
 
-('allow_slash_ended_uri', 1, 0, 0, NOW(), NOW());
+('allow_slash_ended_uri', 1, 0, 0, NOW(), NOW()),
+('error_message.show', '1', 0, 0, NOW(), NOW()),
+('error_message.page_name', 'error.html', 0, 0, NOW(), NOW())
+;
 
 
 
@@ -3217,6 +3220,8 @@ SELECT @bf_attempts := `id` FROM `config` WHERE `name` =  'form_firewall_brutefo
 SELECT @attempts := `id` FROM `config` WHERE `name` =  'form_firewall_attempts';
 SELECT @active := `id` FROM `config` WHERE `name` =  'form_firewall_active';
 SELECT @slash_ended_uri := `id` FROM `config` WHERE `name` =  'allow_slash_ended_uri';
+SELECT @error_message_show := `id` FROM `config` WHERE `name` =  'error_message.show';
+SELECT @error_message_page := `id` FROM `config` WHERE `name` =  'error_message.page_name';
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
@@ -3246,5 +3251,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
   (@slash_ended_uri, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL),
-  (@slash_ended_uri, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
+  (@slash_ended_uri, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
+  (@error_message_show, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
+  (@error_message_show, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
+  (@error_message_page, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
+  (@error_message_page, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL)
 ;
