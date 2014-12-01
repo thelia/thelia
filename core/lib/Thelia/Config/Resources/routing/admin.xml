@@ -1084,7 +1084,7 @@
 
     <route id="admin.module.toggle-activation" path="/admin/module/toggle-activation/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::toggleActivationAction</default>
-        <requirement key="module_hook_id">\d+</requirement>
+        <requirement key="module_id">\d+</requirement>
     </route>
 
     <route id="admin.module.delete" path="/admin/module/delete">
