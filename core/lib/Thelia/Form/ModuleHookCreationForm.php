@@ -40,7 +40,7 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => Translator::getInstance()->trans("Module"),
+                    "label" => $this->trans("Module"),
                     "label_attr" => array(
                         "for" => "module_id"
                     )
@@ -54,7 +54,7 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => Translator::getInstance()->trans("Hook"),
+                    "label" => $this->trans("Hook"),
                     "label_attr" => array("for" => "locale_create")
                 )
             )
@@ -65,10 +65,10 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => Translator::getInstance()->trans("Service ID"),
+                    "label" => $this->trans("Service ID"),
                     "label_attr" => array(
                         "for" => "classname",
-                        "help" => Translator::getInstance()->trans(
+                        "help" => $this->trans(
                             "The service id that will handle the hook (defined in the config.xml file of the module)."
                         )
                     )
@@ -78,7 +78,7 @@ class ModuleHookCreationForm extends BaseForm
                 "method",
                 "text",
                 array(
-                    "label" => Translator::getInstance()->trans("Method Name"),
+                    "label" => $this->trans("Method Name"),
                     "constraints" => array(
                         new NotBlank(),
                         new Callback(
@@ -91,7 +91,7 @@ class ModuleHookCreationForm extends BaseForm
                     ),
                     "label_attr" => array(
                         "for" => "method",
-                        "help" => Translator::getInstance()->trans(
+                        "help" => $this->trans(
                             "The method name that will handle the hook event."
                         )
                     )
