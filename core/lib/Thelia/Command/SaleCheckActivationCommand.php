@@ -34,9 +34,7 @@ class SaleCheckActivationCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $dispatcher = $this->getContainer()->get('event_dispatcher');
-
-            $dispatcher->dispatch(
+            $this->getDispatcher()->dispatch(
                 TheliaEvents::CHECK_SALE_ACTIVATION_EVENT,
                 new SaleActiveStatusCheckEvent()
             );

@@ -15,6 +15,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Thelia\Core\Translation\Translator;
 
 /**
  * Command.
@@ -46,5 +47,19 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    public function getDispatcher()
+    {
+        // Initialize Thelia translator, if not already done.
+        if (null !== $this->container) {
+            try {
+                Translator::getInstance();
+            } catch (\Exception $ex) {
+                $this->container->get('thelia.translator');
+            }
+        }
+
+        return $this->container->get('event_dispatcher');
     }
 }

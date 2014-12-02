@@ -68,10 +68,7 @@ class AdminUpdatePasswordCommand extends ContainerAwareCommand
         $event = new AdministratorUpdatePasswordEvent($admin);
         $event->setPassword($password);
 
-        $this->
-            getContainer()
-            ->get('event_dispatcher')
-            ->dispatch(TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD, $event);
+        $this->getDispatcher()->dispatch(TheliaEvents::ADMINISTRATOR_UPDATEPASSWORD, $event);
 
         $output->writeln(array(
             '',
