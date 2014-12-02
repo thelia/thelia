@@ -43,7 +43,15 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
         $currency = CurrencyQuery::create()->filterByCode('EUR')->findOne();
 
         // Find a product
-        $this->freeProduct = ProductQuery::create()->findOne();
+        $this->freeProduct = ProductQuery::create()
+            ->joinProductSaleElements("pse_join")
+            ->addJoinCondition("pse_join", "is_default = ?", 1, null, \PDO::PARAM_INT)
+            ->findOne()
+        ;
+
+        if (null === $this->freeProduct) {
+            $this->markTestSkipped("You can't run this test as there's no product with associated product_sale_elements");
+        }
 
         $this->originalPrice = $this->freeProduct->getDefaultSaleElements()->getPricesByCurrency($currency)->getPrice();
         $this->originalPromo = $this->freeProduct->getDefaultSaleElements()->getPromo();
@@ -432,6 +440,8 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        $this->freeProduct->getDefaultSaleElements()->setPromo($this->originalPromo)->save();
+        if (null !== $this->freeProduct) {
+            $this->freeProduct->getDefaultSaleElements()->setPromo($this->originalPromo)->save();
+        }
     }
 }
