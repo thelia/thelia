@@ -60,10 +60,6 @@ class Thelia extends Kernel
         }
 
         $this->initPropel();
-
-        if ($this->isDebug()) {
-            Tlog::getInstance()->setLevel(Tlog::DEBUG);
-        }
     }
 
     public static function isInstalled()
@@ -98,6 +94,9 @@ class Thelia extends Kernel
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
 
         if ($this->isDebug()) {
+            // In debug mode, we have to initialize Tlog at this point, as this class uses Propel
+            Tlog::getInstance()->setLevel(Tlog::DEBUG);
+
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
