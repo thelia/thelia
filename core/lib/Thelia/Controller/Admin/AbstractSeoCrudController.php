@@ -43,11 +43,12 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      * @param string $visibilityToggleEventIdentifier the dispatched visibility toggle TheliaEvent identifier, or null if the object has no visible options. Example: TheliaEvents::MESSAGE_TOGGLE_VISIBILITY
      * @param string $changePositionEventIdentifier   the dispatched position change TheliaEvent identifier, or null if the object has no position. Example: TheliaEvents::MESSAGE_UPDATE_POSITION
      * @param string $updateSeoEventIdentifier        the dispatched update SEO change TheliaEvent identifier, or null if the object has no SEO. Example: TheliaEvents::MESSAGE_UPDATE_SEO
-    */
+     * @param string $moduleCode The module code for ACL
+     */
     public function __construct(
         $objectName,
-        $defaultListOrder = null,
-        $orderRequestParameterName = null,
+        $defaultListOrder,
+        $orderRequestParameterName,
         $resourceCode,
         $createEventIdentifier,
         $updateEventIdentifier,

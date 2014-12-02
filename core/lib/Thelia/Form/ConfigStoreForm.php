@@ -26,7 +26,8 @@ class ConfigStoreForm extends BaseForm
         $this->formBuilder
             ->add(
                 'store_name',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::getStoreName(),
                     'constraints' => [new Constraints\NotBlank()],
                     'label'       => $tr->trans('Store name'),
@@ -37,7 +38,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_description',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::getStoreDescription(),
                     'required' => false,
                     'label'    => $tr->trans('Store description'),
@@ -48,7 +50,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_email',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::getStoreEmail(),
                     'constraints' => [
                         new Constraints\NotBlank(),
@@ -65,7 +68,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_notification_emails',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::read('store_notification_emails'),
                     'constraints' => [
                         new Constraints\NotBlank(),
@@ -86,7 +90,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_business_id',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::read('store_business_id'),
                     'label'    => $tr->trans('Business ID'),
                     'required' => false,
@@ -97,7 +102,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_phone',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::read('store_phone'),
                     'label'    => $tr->trans('Phone'),
                     'required' => false,
@@ -108,7 +114,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_fax',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::read('store_fax'),
                     'label'    => $tr->trans('Fax'),
                     'required' => false,
@@ -119,7 +126,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address1',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::read('store_address1'),
                     'constraints' => [
                         new Constraints\NotBlank()
@@ -132,7 +140,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address2',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::read('store_address2'),
                     'required' => false,
                     'attr'     => [
@@ -142,7 +151,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_address3',
-                'text', [
+                'text',
+                [
                     'data'     => ConfigQuery::read('store_address3'),
                     'required' => false,
                     'attr'     => [
@@ -152,7 +162,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_zipcode',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::read('store_zipcode'),
                     'constraints' => [
                         new Constraints\NotBlank()
@@ -165,7 +176,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_city',
-                'text', [
+                'text',
+                [
                     'data'        => ConfigQuery::read('store_city'),
                     'constraints' => [
                         new Constraints\NotBlank()
@@ -178,7 +190,8 @@ class ConfigStoreForm extends BaseForm
             )
             ->add(
                 'store_country',
-                'integer', [
+                'integer',
+                [
                     'data'        => ConfigQuery::read('store_country'),
                     'constraints' => [
                         new Constraints\NotBlank()

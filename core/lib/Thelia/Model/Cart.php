@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,8 +23,16 @@ class Cart extends BaseCart
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function duplicate($token, Customer $customer = null, Currency $currency = null, EventDispatcherInterface $dispatcher)
-    {
+    public function duplicate(
+        $token,
+        Customer $customer = null,
+        Currency $currency = null,
+        EventDispatcherInterface $dispatcher = null
+    ) {
+        if (!$dispatcher) {
+            return false;
+        }
+
         $cartItems = $this->getCartItems();
 
         $cart = new Cart();

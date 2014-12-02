@@ -22,28 +22,25 @@ class AttributeCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add("title", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ],
-                    "label"       => Translator::getInstance()->trans("Title *"),
-                    "label_attr"  => [
-                        "for" => "title"
-                    ]
+                "constraints" => [
+                    new NotBlank()
+                ],
+                "label"       => Translator::getInstance()->trans("Title *"),
+                "label_attr"  => [
+                    "for" => "title"
                 ]
-            )
+            ])
             ->add("locale", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ]
+                "constraints" => [
+                    new NotBlank()
                 ]
-            )
+            ])
             ->add("add_to_all", "checkbox", [
-                    "label"      => Translator::getInstance()->trans("Add to all product templates"),
-                    "label_attr" => [
-                        "for" => "add_to_all"
-                    ]
+                "label"      => Translator::getInstance()->trans("Add to all product templates"),
+                "label_attr" => [
+                    "for" => "add_to_all"
                 ]
-            );
+            ]);
     }
 
     public function getName()

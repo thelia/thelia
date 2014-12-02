@@ -59,7 +59,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
     public function write(&$res)
     {
-        $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->_logs)));
+        $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->logs)));
 
         $this->insertAfterBody($res, $block);
     }

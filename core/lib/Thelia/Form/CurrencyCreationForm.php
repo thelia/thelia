@@ -24,51 +24,46 @@ class CurrencyCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add("name", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ],
-                    "label"       => Translator::getInstance()->trans('Name *'),
-                    "label_attr"  => [
-                        "for" => "name"
-                    ]
+                "constraints" => [
+                    new NotBlank()
+                ],
+                "label"       => Translator::getInstance()->trans('Name *'),
+                "label_attr"  => [
+                    "for" => "name"
                 ]
-            )
+            ])
             ->add("locale", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ]
+                "constraints" => [
+                    new NotBlank()
                 ]
-            )
+            ])
             ->add("symbol", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ],
-                    "label"       => Translator::getInstance()->trans('Symbol *'),
-                    "label_attr"  => [
-                        "for" => "symbol"
-                    ]
+                "constraints" => [
+                    new NotBlank()
+                ],
+                "label"       => Translator::getInstance()->trans('Symbol *'),
+                "label_attr"  => [
+                    "for" => "symbol"
                 ]
-            )
+            ])
             ->add("rate", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ],
-                    "label"       => Translator::getInstance()->trans('Rate from &euro; *'),
-                    "label_attr"  => [
-                        "for" => "rate"
-                    ]
+                "constraints" => [
+                    new NotBlank()
+                ],
+                "label"       => Translator::getInstance()->trans('Rate from &euro; *'),
+                "label_attr"  => [
+                    "for" => "rate"
                 ]
-            )
+            ])
             ->add("code", "text", [
-                    "constraints" => [
-                        new NotBlank()
-                    ],
-                    "label"       => Translator::getInstance()->trans('ISO 4217 code *'),
-                    "label_attr"  => [
-                        "for" => "iso_4217_code"
-                    ]
+                "constraints" => [
+                    new NotBlank()
+                ],
+                "label"       => Translator::getInstance()->trans('ISO 4217 code *'),
+                "label_attr"  => [
+                    "for" => "iso_4217_code"
                 ]
-            )
+            ])
         ;
     }
 

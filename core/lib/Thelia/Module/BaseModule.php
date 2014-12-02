@@ -57,7 +57,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     protected $request = null;
 
     // Do no use this attribute directly, use getModuleModel() instead.
-    private $_moduleModel = null;
+    private $moduleModel = null;
 
     public function activate($moduleModel = null)
     {
@@ -318,15 +318,15 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      */
     public function getModuleModel()
     {
-        if (null === $this->_moduleModel) {
-            $this->_moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
+        if (null === $this->moduleModel) {
+            $this->moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
 
-            if (null === $this->_moduleModel) {
+            if (null === $this->moduleModel) {
                 throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
             }
         }
 
-        return $this->_moduleModel;
+        return $this->moduleModel;
     }
 
 

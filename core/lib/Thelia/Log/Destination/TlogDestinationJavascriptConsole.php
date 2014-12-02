@@ -30,7 +30,7 @@ class TlogDestinationJavascriptConsole extends AbstractTlogDestination
     {
         $content = '<script>try {'."\n";
 
-        foreach ($this->_logs as $line) {
+        foreach ($this->logs as $line) {
             $content .= "console.log('".str_replace("'", "\\'", str_replace(array("\r\n", "\r", "\n"), '\\n', $line))."');\n";
         }
 
