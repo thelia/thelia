@@ -24,6 +24,7 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
+use Propel\Runtime\ServiceContainer\StandardServiceContainer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Debug\Debug;
@@ -42,6 +43,7 @@ use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Log\Tlog;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -79,15 +81,22 @@ class Thelia extends Kernel
             new DatabaseConfiguration(),
             Yaml::parse(THELIA_CONF_DIR . 'database.yml')
         );
+
+        /** @var StandardServiceContainer $serviceContainer */
         $serviceContainer = Propel::getServiceContainer();
-        $serviceContainer->setAdapterClass('thelia', 'mysql');
         $serviceContainer->setDefaultDatasource('thelia');
 
         $manager = new ConnectionManagerSingle();
         $manager->setConfiguration($definePropel->getConfig());
+        $manager->setName('thelia');
+
         $serviceContainer->setConnectionManager('thelia', $manager);
-        $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+        $serviceContainer->setAdapterClass('thelia', 'mysql');
+
+        /** @var ConnectionWrapper $con */
+        $con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
         $con->setAttribute(ConnectionWrapper::PROPEL_ATTR_CACHE_PREPARES, true);
+
         if ($this->isDebug()) {
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
