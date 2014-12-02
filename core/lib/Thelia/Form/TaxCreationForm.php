@@ -31,9 +31,11 @@ class TaxCreationForm extends BaseForm
 
     protected $taxEngine = null;
 
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array(), TaxEngine $taxEngine = null)
+    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
     {
-        $this->taxEngine = $taxEngine;
+        $this->taxEngine = $options["tax_engine"];
+
+        unset($options["tax_engine"]);
 
         parent::__construct($request, $type, $data, $options);
     }

@@ -47,6 +47,13 @@
                         <p>{intl l="you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not."}</p>
                     </div>
 
+
+                    {if $general_error}
+                        <div class="alert alert-danger">
+                            {$general_error}
+                        </div>
+                    {/if}
+
                     <div class="general-block-decorator">
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed table-left-aligned">
@@ -339,8 +346,8 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     dialog_title    = {intl l="Delete tax rule"}
     dialog_message  = {intl l="Do you really want to delete this tax rule ?"}
 
-form_action         = {token_url path='/admin/configuration/taxes_rules/delete'}
-form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
+    form_action         = {token_url path='/admin/configuration/taxes_rules/delete'}
+    form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
 
 {/block}

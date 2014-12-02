@@ -566,30 +566,53 @@ abstract class AbstractCrudController extends BaseAdminController
             return $response;
         }
 
-        // Check token
-        $this->getTokenProvider()->checkToken(
-            $this->getRequest()->query->get("_token")
+        try {
+            // Check token
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get("_token")
+            );
+
+            // Get the currency id, and dispatch the delet request
+            $deleteEvent = $this->getDeleteEvent();
+
+            $this->dispatch($this->deleteEventIdentifier, $deleteEvent);
+
+            if (null !== $deletedObject = $this->getObjectFromEvent($deleteEvent)) {
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::DELETE,
+                    sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject))
+                );
+            }
+
+            $response = $this->performAdditionalDeleteAction($deleteEvent);
+
+            if ($response == null) {
+                return $this->redirectToListTemplate();
+            } else {
+                return $response;
+            }
+        } catch (\Exception $e) {
+            return $this->renderAfterDeleteError($e);
+        }
+    }
+
+    /**
+     * @param \Exception $e
+     * @return \Thelia\Core\HttpFoundation\Response
+     */
+    protected function renderAfterDeleteError(\Exception $e)
+    {
+        $errorMessage = sprintf(
+            "Unable to delete '%s'. Error message: %s",
+            $this->objectName,
+            $e->getMessage()
         );
 
-        // Get the currency id, and dispatch the delet request
-        $deleteEvent = $this->getDeleteEvent();
+        $this->getParserContext()
+            ->setGeneralError($errorMessage)
+        ;
 
-        $this->dispatch($this->deleteEventIdentifier, $deleteEvent);
-
-        if (null !== $deletedObject = $this->getObjectFromEvent($deleteEvent)) {
-            $this->adminLogAppend(
-                $this->resourceCode,
-                AccessManager::DELETE,
-                sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject))
-            );
-        }
-
-        $response = $this->performAdditionalDeleteAction($deleteEvent);
-
-        if ($response == null) {
-            return $this->redirectToListTemplate();
-        } else {
-            return $response;
-        }
+        return $this->defaultAction();
     }
 }

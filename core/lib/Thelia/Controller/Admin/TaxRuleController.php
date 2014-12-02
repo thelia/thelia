@@ -48,7 +48,7 @@ class TaxRuleController extends AbstractCrudController
         //
         // So we create an instance of TaxCreationForm here (we have the container), and put it in the ParserContext.
         // This way, the Form plugin will use this instance, instead on creating it.
-        $taxCreationForm = new TaxCreationForm($this->getRequest(), 'form', array(), array(), $this->container->get('thelia.taxEngine'));
+        $taxCreationForm = new TaxCreationForm($this->getRequest(), 'form', array(), array("tax_engine" => $this->container->get('thelia.taxEngine')));
 
         $this->getParserContext()->addForm($taxCreationForm);
 
