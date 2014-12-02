@@ -1,0 +1,6 @@
+database:
+  connection:
+    driver: mysql
+    user: theliasvn
+    password: honolulu
+    dsn: mysql:host=localhost;dbname=thelia2
