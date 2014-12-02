@@ -224,7 +224,7 @@ class ModuleValidator
 
         $namespaceComponents = explode("\\", $fullnamespace);
 
-        if (isset($namespaceComponents[0]) && ! empty($namespaceComponents[0])) {
+        if (! isset($namespaceComponents[0]) || empty($namespaceComponents[0])) {
             throw new ModuleException(
                 $this->getTranslator()->trans(
                     "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
