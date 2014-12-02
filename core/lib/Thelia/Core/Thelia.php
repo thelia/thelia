@@ -58,6 +58,10 @@ class Thelia extends Kernel
         }
 
         $this->initPropel();
+
+        if ($debug) {
+            Tlog::getInstance()->setLevel(Tlog::DEBUG);
+        }
     }
 
     public static function isInstalled()
