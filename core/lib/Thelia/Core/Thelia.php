@@ -59,7 +59,7 @@ class Thelia extends Kernel
 
         $this->initPropel();
 
-        if ($debug) {
+        if ($this->isDebug()) {
             Tlog::getInstance()->setLevel(Tlog::DEBUG);
         }
     }
