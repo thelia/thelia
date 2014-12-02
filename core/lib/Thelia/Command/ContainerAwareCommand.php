@@ -51,15 +51,15 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
 
     public function getDispatcher()
     {
+        $container = $this->getContainer();
+
         // Initialize Thelia translator, if not already done.
-        if (null !== $this->container) {
-            try {
-                Translator::getInstance();
-            } catch (\Exception $ex) {
-                $this->container->get('thelia.translator');
-            }
+        try {
+            Translator::getInstance();
+        } catch (\Exception $ex) {
+            $this->container->get('thelia.translator');
         }
 
-        return $this->container->get('event_dispatcher');
+        return $container->get('event_dispatcher');
     }
 }
