@@ -272,7 +272,8 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         // move new module
-        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, basename($event->getModulePath()));
+        $modulePath = sprintf('%s%s', THELIA_MODULE_DIR, $event->getModuleDefinition()->getCode());
+
         try {
             $fs->mirror($event->getModulePath(), $modulePath);
         } catch (IOException $ex) {
