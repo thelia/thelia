@@ -83,7 +83,10 @@ class BaseFrontController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template that should be used
-        $parser->setTemplateDefinition($template ?: TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $parser->setTemplateDefinition(
+            $template ?: TemplateHelper::getInstance()->getActiveFrontTemplate(),
+            $this->useFallbackTemplate
+        );
 
         return $parser;
     }

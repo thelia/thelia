@@ -193,7 +193,10 @@ class BaseAdminController extends BaseController
         $parser = $this->container->get("thelia.parser");
 
         // Define the template that should be used
-        $parser->setTemplateDefinition($template ?: TemplateHelper::getInstance()->getActiveAdminTemplate());
+        $parser->setTemplateDefinition(
+            $template ?: TemplateHelper::getInstance()->getActiveAdminTemplate(),
+            $this->useFallbackTemplate
+        );
 
         return $parser;
     }
