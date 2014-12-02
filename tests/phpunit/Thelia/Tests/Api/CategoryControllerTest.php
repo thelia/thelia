@@ -110,7 +110,7 @@ class CategoryControllerTest extends ApiTestCase
         $category = [
             'title' => 'test en',
             'locale' => 'en_US',
-            'visible' => 1,
+            'visible' => 0,
             'parent' => 0
         ];
 
@@ -133,6 +133,7 @@ class CategoryControllerTest extends ApiTestCase
         $content = json_decode($client->getResponse()->getContent(), true);
 
         $this->assertEquals('en_US', $content[0]['LOCALE']);
+        $this->assertEquals(0, $content[0]['VISIBLE']);
     }
 
     public function testCreateFr()
@@ -196,6 +197,9 @@ class CategoryControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(201, $client->getResponse()->getStatusCode(), 'HTTP status code must be 204');
+
+        $results = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals(1, $results[0]["VISIBLE"]);
     }
 
     public function testDeleteAction()
