@@ -48,7 +48,7 @@ class ModuleValidator
     /** @var array array of errors */
     protected $errors = [];
 
-    protected $moduleCode;
+    protected $moduleDirName;
 
     /**
      * @param string $modulePath the path of the module directory
@@ -60,7 +60,7 @@ class ModuleValidator
 
         $this->modulePath = $modulePath;
 
-        $this->moduleCode = basename($this->modulePath);
+        $this->moduleDirName = basename($this->modulePath);
 
         $this->checkDirectoryStructure();
 
@@ -145,7 +145,7 @@ class ModuleValidator
             throw new \Exception(
                 $this->getTranslator()->trans(
                     "The %name module definition has not been initialized.",
-                    [ '%name' => $this->moduleCode ]
+                    [ '%name' => $this->moduleDirName ]
                 )
             );
         }
@@ -165,7 +165,7 @@ class ModuleValidator
             throw new FileNotFoundException(
                 $this->getTranslator()->trans(
                     "Module %name directory doesn't exists.",
-                    [ '%name' => $this->moduleCode]
+                    [ '%name' => $this->moduleDirName]
                 )
             );
         }
@@ -175,7 +175,7 @@ class ModuleValidator
             throw new FileNotFoundException(
                 $this->getTranslator()->trans(
                     "Module %name should have a module.xml in the Config directory.",
-                    [ '%name' => $this->moduleCode]
+                    [ '%name' => $this->moduleDirName]
                 )
             );
         }
@@ -185,7 +185,7 @@ class ModuleValidator
             throw new FileNotFoundException(
                 $this->getTranslator()->trans(
                     "Module %name should have a config.xml in the Config directory.",
-                    [ '%name' => $this->moduleCode]
+                    [ '%name' => $this->moduleDirName]
                 )
             );
         }
@@ -212,7 +212,7 @@ class ModuleValidator
             throw new \Exception(
                 $this->getTranslator()->trans(
                     "The %name module descriptor has not been initialized.",
-                    [ '%name' => $this->moduleCode ]
+                    [ '%name' => $this->moduleDirName ]
                 )
             );
         }
@@ -224,12 +224,12 @@ class ModuleValidator
 
         $namespaceComponents = explode("\\", $fullnamespace);
 
-        if (! isset($namespaceComponents[0])) {
+        if (isset($namespaceComponents[0]) && ! empty($namespaceComponents[0])) {
             throw new ModuleException(
                 $this->getTranslator()->trans(
                     "Unable to get module code from the fullnamespace element of the module descriptor: '%val'",
                     [
-                        '%name' => $this->moduleCode,
+                        '%name' => $this->moduleDirName,
                         '%val' => $fullnamespace
                     ]
                 )
@@ -268,7 +268,7 @@ class ModuleValidator
                     $this->getTranslator()->trans(
                         "The module %name requires Thelia %version or newer",
                         [
-                            '%name' => $this->moduleCode,
+                            '%name' => $this->moduleDirName,
                             '%version' => $this->moduleDefinition->getVersion()
                         ]
                     )
@@ -287,7 +287,7 @@ class ModuleValidator
                 throw new ModuleException(
                     $this->getTranslator()->trans(
                         "The module %name is already installed in the same or greater version.",
-                        [ '%name' => $this->moduleCode]
+                        [ '%name' => $this->moduleDirName]
                     )
                 );
             }
@@ -330,7 +330,7 @@ class ModuleValidator
         if (count($errors) > 0) {
             $errorsMessage = $this->getTranslator()->trans(
                 'To activate module %name, the following modules should be activated first: %modules',
-                ['%name' => $this->moduleCode, '%modules' => implode(', ', $errors)]
+                ['%name' => $this->moduleDirName, '%modules' => implode(', ', $errors)]
             );
 
             throw new ModuleException($errorsMessage);
