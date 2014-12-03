@@ -26,122 +26,208 @@
 		<div class="row">
 			<div class="col-md-12 general-block-decorator">
 				<div class="row">
+                    <div class="col-md-12 ">
+                        <div class="title">
+                            {intl l='Edit mailing template "%name"' name={$NAME}}
+                        </div>
 
-					<div class="col-md-12 title title-without-tabs">
-					   {intl l='Edit mailing template "%name"' name={$NAME}}
-					</div>
+                        <ul class="nav nav-tabs" id="tabbed-menu">
+                            <li class="active"><a href="#data" data-toggle="tab">{intl l="Message data"}</a></li>
+                            <li><a href="#preview" data-toggle="tab">{intl l="Preview"}</a></li>
+                        </ul>
 
-                    <div class="form-container">
-                         <div class="col-md-12">
-						    {form name="thelia.admin.message.modification"}
-						    <form method="POST" action="{url path='/admin/configuration/messages/save'}" {form_enctype form=$form}>
+                        <div class="tab-content">
+                            <div class="tab-pane fade in active" id="data">
 
-                                {* Be sure to get the message ID, even if the form could not be validated *}
-                                <input type="hidden" name="message_id" value="{$message_id}" />
+                                <div class="form-container">
+                                     <div class="col-md-12">
+                                        {form name="thelia.admin.message.modification"}
+                                        <form method="POST" action="{url path='/admin/configuration/messages/save'}" {form_enctype form=$form}>
 
-                                {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/messages'}"}
+                                            {* Be sure to get the message ID, even if the form could not be validated *}
+                                            <input type="hidden" name="message_id" value="{$message_id}" />
 
-						        {form_hidden_fields form=$form exclude="success_url,locale"}
+                                            {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/messages'}"}
 
-                                {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/messages'}"}
-                                {render_form_field form=$form field='locale' value="{$edit_language_locale}"}
+                                            {form_hidden_fields form=$form exclude="success_url,locale"}
 
-					            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                                            {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/messages'}"}
+                                            {render_form_field form=$form field='locale' value="{$edit_language_locale}"}
 
-                                {render_form_field form=$form field='name'}
-                                {render_form_field form=$form field='secured'}
-								{render_form_field form=$form field='title'}
-                                {render_form_field form=$form field='subject'}
+                                            {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+
+                                            {render_form_field form=$form field='name'}
+                                            {render_form_field form=$form field='secured'}
+                                            {render_form_field form=$form field='title'}
+                                            {render_form_field form=$form field='subject'}
 
 
-                                <div class="panel panel-default">
-                                    <div class="panel-heading"><h3 class="panel-title">{intl l="HTML version of this message"}</h3></div>
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><h3 class="panel-title">{intl l="HTML version of this message"}</h3></div>
 
-                                    <div class="panel-body">
-	                                    <div class="row">
-		                                    <div class="col-md-6">
-                                            {custom_render_form_field form=$form field='html_layout_file_name'}
-                                                <select {form_field_attributes form=$form field='html_layout_file_name'}>
-                                                    <option value="">{intl l='Use default layout'}</option>
-                                                    {foreach $layout_list as $layout}
-                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
-                                                    {/foreach}
-                                                </select>
-			                                {/custom_render_form_field}
-			                                </div>
+                                                <div class="panel-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                        {custom_render_form_field form=$form field='html_layout_file_name'}
+                                                            <select {form_field_attributes form=$form field='html_layout_file_name'}>
+                                                                <option value="">{intl l='Use default layout'}</option>
+                                                                {foreach $layout_list as $layout}
+                                                                    <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+                                                                {/foreach}
+                                                            </select>
+                                                        {/custom_render_form_field}
+                                                        </div>
 
-			                                <div class="col-md-6">
-                                            {custom_render_form_field form=$form field='html_template_file_name'}
-                                                <select data-toggle-textarea="html_message" {form_field_attributes form=$form field='html_template_file_name' extra_class="textarea-toggle"}>
-                                                    <option value="">{intl l='Use HTML message defined below'}</option>
-                                                    {foreach $html_template_list as $template}
-                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
-                                                    {/foreach}
-                                                </select>
-                                                {if ! empty($value)}{$disable_html='readonly="true"'}{/if}
-                                            {/custom_render_form_field}
-			                                </div>
-                                        </div>
+                                                        <div class="col-md-6">
+                                                        {custom_render_form_field form=$form field='html_template_file_name'}
+                                                            <select data-toggle-textarea="html_message" {form_field_attributes form=$form field='html_template_file_name' extra_class="textarea-toggle"}>
+                                                                <option value="">{intl l='Use HTML message defined below'}</option>
+                                                                {foreach $html_template_list as $template}
+                                                                    <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
+                                                                {/foreach}
+                                                            </select>
+                                                            {if ! empty($value)}{$disable_html='readonly="true"'}{/if}
+                                                        {/custom_render_form_field}
+                                                        </div>
+                                                    </div>
 
-                                        <div class="row">
-											<div class="col-md-12">
-												{custom_render_form_field form=$form field='html_message'}
-												    <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value}</textarea>
-                                                    <div id="{$name}" style="height: 500px;">{$value}</div>
-												{/custom_render_form_field}
-											</div>
-										</div>
-                                    </div>
-                                </div>
-
-                                <div class="panel panel-default">
-                                    <div class="panel-heading"><h3 class="panel-title">{intl l="Text version of this message"}</h3></div>
-
-                                    <div class="panel-body">
-                                        <div class="row">
-		                                    <div class="col-md-6">
-                                            {custom_render_form_field form=$form field='text_layout_file_name'}
-                                                <select {form_field_attributes form=$form field='text_layout_file_name'}>
-                                                    <option value="">{intl l='Use default layout'}</option>
-                                                    {foreach $layout_list as $layout}
-                                                        <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
-                                                    {/foreach}
-                                                </select>
-                                            {/custom_render_form_field}
-		                                    </div>
-
-		                                    <div class="col-md-6">
-                                                {custom_render_form_field form=$form field='text_template_file_name'}
-			                                        <select data-toggle-textarea="text_message" {form_field_attributes form=$form field='text_template_file_name' extra_class='textarea-toggle'}>
-			                                            <option value="">{intl l='Use Text message defined below'}</option>
-	                                                    {foreach $text_template_list as $template}
-	                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
-	                                                    {/foreach}
-			                                        </select>
-			                                        {if ! empty($value)}{$disable_text='readonly="true"'}{/if}
-			                                    {/custom_render_form_field}
-		                                    </div>
-		                                </div>
-
-                                        <div class="row">
-	                                        <div class="col-md-12">
-                                                {custom_render_form_field form=$form field='text_message'}
-                                                <textarea {$disable_html} {form_field_attributes form=$form field='text_message' extra_class="fixedfont"}>{$value}</textarea>
-                                                <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            {custom_render_form_field form=$form field='html_message'}
+                                                                <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value}</textarea>
+                                                                <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                            {/custom_render_form_field}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            {/custom_render_form_field}
-			                            </div>
+
+                                            <div class="panel panel-default">
+                                                <div class="panel-heading"><h3 class="panel-title">{intl l="Text version of this message"}</h3></div>
+
+                                                <div class="panel-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                        {custom_render_form_field form=$form field='text_layout_file_name'}
+                                                            <select {form_field_attributes form=$form field='text_layout_file_name'}>
+                                                                <option value="">{intl l='Use default layout'}</option>
+                                                                {foreach $layout_list as $layout}
+                                                                    <option value="{$layout}" {if $layout == $value}selected="selected"{/if}>{$layout}</option>
+                                                                {/foreach}
+                                                            </select>
+                                                        {/custom_render_form_field}
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            {custom_render_form_field form=$form field='text_template_file_name'}
+                                                                <select data-toggle-textarea="text_message" {form_field_attributes form=$form field='text_template_file_name' extra_class='textarea-toggle'}>
+                                                                    <option value="">{intl l='Use Text message defined below'}</option>
+                                                                    {foreach $text_template_list as $template}
+                                                                        <option value="{$template}" {if $template == $value}selected="selected"{/if}>{$template}</option>
+                                                                    {/foreach}
+                                                                </select>
+                                                                {if ! empty($value)}{$disable_text='readonly="true"'}{/if}
+                                                            {/custom_render_form_field}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            {custom_render_form_field form=$form field='text_message'}
+                                                            <textarea {$disable_html} {form_field_attributes form=$form field='text_message' extra_class="fixedfont"}>{$value}</textarea>
+                                                            <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                        </div>
+                                                        {/custom_render_form_field}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                            </div>
+
+                                        </form>
+                                        {/form}
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <p>{intl l='Message created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                            </div>
+
+                            <div class="tab-pane fade" id="preview">
+
+                                <br/>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button class="btn btn-default btn-primary preview-button" data-url="{url path='/admin/message/preview/'}{$ID}">
+                                            {intl l="Preview HTML"}
+                                        </button>
+
+                                        <button class="btn btn-default preview-button" data-url="{url path='/admin/message/preview/text/'}{$ID}">
+                                            {intl l="Preview text"}
+                                        </button>
+                                    </div>
                                 </div>
 
-							</form>
-							{/form}
-						</div>
-					</div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped" id="url-variable-table">
+                                        <caption class="clearfix">
+                                            {intl l="Variables to inject"}
+
+                                            <div class="pull-right">
+                                                <a href="#" class="url-variable-table-add">
+                                                    <i class="glyphicon glyphicon-plus"></i>
+                                                </a>
+                                            </div>
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    {intl l='Name'}
+                                                </th>
+
+                                                <th>
+                                                    {intl l='Value'}
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr class='url-variable'>
+                                                <td>
+                                                    <input type='text' class='url-variable-key form-control' />
+                                                </td>
+
+                                                <td>
+                                                    <input type='text' class='url-variable-value form-control' />
+                                                </td>
+                                            </tr>
+
+                                            <tr class='url-variable'>
+                                                <td>
+                                                    <input type='text' class='url-variable-key form-control' />
+                                                </td>
+
+                                                <td>
+                                                    <input type='text' class='url-variable-value form-control' />
+                                                </td>
+                                            </tr>
+
+                                            <tr class='url-variable'>
+                                                <td>
+                                                    <input type='text' class='url-variable-key form-control' />
+                                                </td>
+
+                                                <td>
+                                                    <input type='text' class='url-variable-value form-control' />
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div><!--/tab-content-->
+                    </div>
 				</div>
 			</div>
 
@@ -158,6 +244,20 @@
         </div>
         {/elseloop}
 
+    </div>
+</div>
+
+<div id="preview-modal" class="modal  fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+            </div>
+        </div>
     </div>
 </div>
 {/block}
@@ -197,6 +297,35 @@
         });
 
         $('select.textarea-toggle').change();
+
+        $('.preview-button').click(function(){
+            var url = $(this).data("url");
+            url += "?";
+
+            $('.url-variable').each(function(){
+                var key = $('.url-variable-key', $(this)).val();
+                var value = $('.url-variable-value', $(this)).val();
+
+                if (key != '' && value != '') {
+                    url += key + '=' + value + '&';
+                }
+            });
+
+
+            $(".modal-body", "#preview-modal").html(
+                    $("<iframe frameborder=0 height='"+$(window).innerHeight()+"px' width='100%' src='"+url+"'/>")
+
+            );
+
+            $("#preview-modal").modal("show");
+        });
+
+        $('.url-variable-table-add').click(function() {
+            var $line = $("<tr class='url-variable'><td><input type='text' class='url-variable-key form-control' /></td>" +
+            "<td><input type='text' class='url-variable-value form-control' /></td></tr>");
+
+            $("tbody", '#url-variable-table').prepend($line);
+        });
 
     })(jQuery);
 </script>
