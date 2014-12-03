@@ -25,6 +25,11 @@ class ModuleToggleActivationEvent extends ModuleEvent
     protected $module_id;
 
     /**
+     * @var bool
+     */
+    protected $noCheck;
+
+    /**
      * @param int $module_id
      */
     public function __construct($module_id)
@@ -50,5 +55,24 @@ class ModuleToggleActivationEvent extends ModuleEvent
     public function getModuleId()
     {
         return $this->module_id;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNoCheck()
+    {
+        return $this->noCheck;
+    }
+
+    /**
+     * @param boolean $noCheck
+     * @return $this;
+     */
+    public function setNoCheck($noCheck)
+    {
+        $this->noCheck = $noCheck;
+
+        return $this;
     }
 }

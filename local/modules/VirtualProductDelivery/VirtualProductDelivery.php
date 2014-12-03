@@ -78,8 +78,7 @@ class VirtualProductDelivery extends AbstractDeliveryModule
         $basePath = __DIR__ . '/Config/message/%s.xml';
         $languages = LangQuery::create()->find();
 
-        foreach ($languages as $language){
-
+        foreach ($languages as $language) {
             $locale = $language->getLocale();
 
             $message->setLocale($locale);
@@ -87,18 +86,16 @@ class VirtualProductDelivery extends AbstractDeliveryModule
             $path = sprintf($basePath, $language->getLocale());
             if (file_exists($path) && is_readable($path)) {
                 $dom = new SimpleXMLElement(file_get_contents($path));
-                if ($dom){
-                    $message->setTitle( (string) $dom->title);
-                    $message->setSubject( (string) $dom->subject);
-                    $message->setTextMessage( (string) $dom->text);
-                    $message->setHtmlMessage( (string) $dom->html);
+                if ($dom) {
+                    $message->setTitle((string) $dom->title);
+                    $message->setSubject((string) $dom->subject);
+                    $message->setTextMessage((string) $dom->text);
+                    $message->setHtmlMessage((string) $dom->html);
                 }
             }
-
         }
 
         $message->save();
-
     }
-
 }
+

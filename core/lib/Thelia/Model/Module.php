@@ -9,6 +9,7 @@ use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
 {
@@ -84,7 +85,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getBaseDir()
     {
@@ -92,7 +93,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's base directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */
     public function getAbsoluteBaseDir()
     {
@@ -100,7 +101,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's config directory path, relative to THELIA_MODULE_DIR
      */
     public function getConfigPath()
     {
@@ -108,7 +109,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's config absolute directory path
+     * @return string the module's config absolute directory path
      */
     public function getAbsoluteConfigPath()
     {
@@ -116,7 +117,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N directory path, relative to THELIA_MODULE_DIR
+     * @return string the module's i18N directory path, relative to THELIA_MODULE_DIR
      */
     public function getI18nPath()
     {
@@ -124,7 +125,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's i18N absolute directory path
+     * @return string the module's i18N absolute directory path
      */
     public function getAbsoluteI18nPath()
     {
@@ -132,7 +133,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes absolute directory path
+     * @return string the module's AdminIncludes absolute directory path
      */
     public function getAbsoluteAdminIncludesPath()
     {
@@ -140,7 +141,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return the module's AdminIncludes i18N absolute directory path
+     * @return string the module's AdminIncludes i18N absolute directory path
      */
     public function getAbsoluteAdminIncludesI18nPath()
     {
@@ -211,8 +212,24 @@ class Module extends BaseModule
 
         return $instance;
     }
+
     /**
-     * @return BaseModule a new module instance.
+     * @param  ContainerInterface        $container the Thelia container
+     * @return PaymentModuleInterface    a payment module instance
+     * @throws \InvalidArgumentException if the module is not found or not a payment module
+     */
+    public function getPaymentModuleInstance(ContainerInterface $container)
+    {
+        $instance = $this->getModuleInstance($container);
+
+        if (! $instance instanceof PaymentModuleInterface) {
+            throw new \InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
+        }
+
+        return $instance;
+    }
+    /**
+     * @return \Thelia\Module\BaseModule a new module instance.
      */
     public function createInstance()
     {
@@ -223,6 +240,8 @@ class Module extends BaseModule
 
     /**
      * Calculate next position relative to module type
+     *
+     * @param ModuleQuery $query
      */
     protected function addCriteriaToPositionQuery($query)
     {

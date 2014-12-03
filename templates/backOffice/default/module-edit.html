@@ -45,9 +45,7 @@
 
                     {form_hidden_fields form=$form}
 
-                    {form_field form=$form field='success_url'}
-                        <input type="hidden" name="{$name}" value="{url path="/admin/modules"}" />
-                    {/form_field}
+                    {render_form_field form=$form field="success_url" value={url path="/admin/modules"}}
 
                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 

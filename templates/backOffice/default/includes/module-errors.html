@@ -6,9 +6,9 @@
         </div>
 
         <div class="form-container">
-            {foreach $module_errors as $module_error}
+            {foreach $module_errors as $module_code => $module_error}
             <div class="alert alert-warning">
-                {$module_error->getMessage()} <a href="#" class="module-error-more">{intl l="more..."}</a>
+                {intl l="Module %mod: %error" mod=$module_code error=$module_error->getMessage()}. <a href="#" class="module-error-more">{intl l="Click to view details."}</a>
                 <div class="more hidden"><br><pre><code>{$module_error}</code></pre></div>
             </div>
             {/foreach}

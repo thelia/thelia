@@ -72,10 +72,7 @@ class CacheClear extends ContainerAwareCommand
 
         try {
             $cacheEvent = new CacheEvent($dir);
-            $this->
-                getContainer()
-                ->get('event_dispatcher')
-                ->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+            $this->getDispatcher()->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
         } catch (\UnexpectedValueException $e) {
             // throws same exception code for does not exist and permission denied ...
             if (!file_exists($dir)) {

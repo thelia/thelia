@@ -31,12 +31,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $moduleChequePath = THELIA_MODULE_DIR . "Cheque";
 
-        $moduleValidator = new ModuleValidator($moduleChequePath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load module
-        $moduleValidator->load();
+        $moduleValidator = new ModuleValidator($moduleChequePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
@@ -58,12 +53,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $modulePath = THELIA_MODULE_DIR . "VirtualProductDelivery";
 
-        $moduleValidator = new ModuleValidator($modulePath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load module
-        $moduleValidator->load();
+        $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator());
 
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
@@ -98,10 +88,10 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     public function validatorProvider()
     {
         return [
-            ['Module1', '\Thelia\Exception\ModuleException', 'The module requires a version of Thelia'],
-            ['Module2', '\Thelia\Exception\ModuleException', 'The module requires this activated modules'],
-            ['Module3', '\Thelia\Exception\FileNotFoundException', 'Module should have a module.xml in the Config directory'],
-            ['Module4', '\Thelia\Exception\FileNotFoundException', 'Module should have a config.xml in the Config directory'],
+            ['Module1', '\Thelia\Exception\ModuleException', 'The module Module1 requires Thelia'],
+            ['Module2', '\Thelia\Exception\ModuleException', 'To activate module Module2, the following modules should be activated first'],
+            ['Module3', '\Thelia\Exception\FileNotFoundException', 'Module Module3 should have a module.xml in the Config directory'],
+            ['Module4', '\Thelia\Exception\FileNotFoundException', 'Module Module4 should have a config.xml in the Config directory'],
             ['Module5', '\Thelia\Module\Exception\InvalidXmlDocumentException', null],
         ];
     }
@@ -116,11 +106,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $exception = null;
 
         try {
-            $moduleValidator = new ModuleValidator($modulePath);
-
-            $moduleValidator->setTranslator($this->getStubTranslator("opiopi"));
-
-            $moduleValidator->load();
+            $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator("opiopi"));
 
             $moduleValidator->validate(true);
         } catch (\Exception $ex) {
@@ -160,12 +146,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
     {
         $moduleChuckNorrisPath = THELIA_MODULE_DIR . "ChuckNorris";
 
-        $moduleValidator = new ModuleValidator($moduleChuckNorrisPath);
-
-        $moduleValidator->setTranslator($this->getStubTranslator());
-
-        // load
-        $moduleValidator->load();
+        new ModuleValidator($moduleChuckNorrisPath, $this->getStubTranslator());
     }
 
 

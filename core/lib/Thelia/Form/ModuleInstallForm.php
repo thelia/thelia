@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Exception;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -86,7 +87,9 @@ class ModuleInstallForm extends BaseForm
                     );
                 }
 
-                $this->modulePath = sprintf('%s/%s', $modulePath, $moduleFiles['directories'][0]);
+                $moduleDirectory = $moduleFiles['directories'][0];
+
+                $this->modulePath = sprintf('%s/%s', $modulePath, $moduleDirectory);
 
                 $moduleValidator = new ModuleValidator($this->modulePath);
 

@@ -13,7 +13,9 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -30,25 +32,71 @@ class ModuleHookCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("module_id", "choice", array(
-                "choices" => $this->getModuleChoices(),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Module"),
-                "label_attr" => array(
-                    "for" => "module_id"
+            ->add(
+                "module_id",
+                "choice",
+                array(
+                    "choices" => $this->getModuleChoices(),
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => $this->trans("Module"),
+                    "label_attr" => array(
+                        "for" => "module_id"
+                    )
                 )
-            ))
-            ->add("hook_id", "choice", array(
-                "choices" => $this->getHookChoices(),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Hook"),
-                "label_attr" => array("for" => "locale_create")
-            ))
-        ;
+            )
+            ->add(
+                "hook_id",
+                "choice",
+                array(
+                    "choices" => $this->getHookChoices(),
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => $this->trans("Hook"),
+                    "label_attr" => array("for" => "locale_create")
+                )
+            )
+            ->add(
+                "classname",
+                "text",
+                array(
+                    "constraints" => array(
+                        new NotBlank()
+                    ),
+                    "label" => $this->trans("Service ID"),
+                    "label_attr" => array(
+                        "for" => "classname",
+                        "help" => $this->trans(
+                            "The service id that will handle the hook (defined in the config.xml file of the module)."
+                        )
+                    )
+                )
+            )
+            ->add(
+                "method",
+                "text",
+                array(
+                    "label" => $this->trans("Method Name"),
+                    "constraints" => array(
+                        new NotBlank(),
+                        new Callback(
+                            array(
+                                "methods" => array(
+                                    array($this, "verifyMethod")
+                                )
+                            )
+                        )
+                    ),
+                    "label_attr" => array(
+                        "for" => "method",
+                        "help" => $this->trans(
+                            "The method name that will handle the hook event."
+                        )
+                    )
+                )
+            );
     }
 
     protected function getModuleChoices()
@@ -75,6 +123,20 @@ class ModuleHookCreationForm extends BaseForm
         }
 
         return $choices;
+    }
+
+    /**
+     *
+     * Check if method has a valid signature.
+     * See RegisterListenersPass::isValidHookMethod for implementing this verification
+     *
+     * @param $value
+     * @param  ExecutionContextInterface $context
+     * @return bool
+     */
+    public function verifyMethod($value, ExecutionContextInterface $context)
+    {
+        return true;
     }
 
     public function getName()

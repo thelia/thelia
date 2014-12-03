@@ -13,10 +13,8 @@
 namespace Thelia\Form;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -40,29 +38,9 @@ class ModuleHookModificationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Hook"),
                 "label_attr" => array("for" => "locale_create")
             ))
-            ->add("classname", "text", array(
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Service ID"),
-                "label_attr" => array(
-                    "for" => "classname"
-                )
-            ))
-            ->add("method", "text", array(
-                "label" => Translator::getInstance()->trans("Method Name"),
-                "constraints" => array(
-                    new NotBlank(),
-                    new Callback(array("methods" => array(
-                        array($this, "verifyMethod")
-                    )))
-                ),
-                "label_attr" => array(
-                    "for" => "method"
-                )
-            ))
             ->add("active", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Active"),
+                "required" => false,
                 "label_attr" => array(
                     "for" => "active"
                 )
@@ -82,19 +60,6 @@ class ModuleHookModificationForm extends BaseForm
         }
 
         return $choices;
-    }
-
-    /**
-     *
-     * Verify if method has a valid signature. See RegisterListenersPass::isValidHookMethod for implementing this verification
-     *
-     * @param $value
-     * @param  ExecutionContextInterface $context
-     * @return bool
-     */
-    public function verifyMethod($value, ExecutionContextInterface $context)
-    {
-        return true;
     }
 
     public function getName()
