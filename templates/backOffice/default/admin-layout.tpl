@@ -425,7 +425,7 @@
             <p>{intl l='&copy; Thelia 2013'}
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
             - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
-            - <a href="#" target="_blank">{intl l='Thelia contributions'}</a>
+            - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
             </p>
 
             {hook name="main.in-footer" location="in_footer" }

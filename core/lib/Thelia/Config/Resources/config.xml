@@ -160,6 +160,14 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="error.listener" class="Thelia\Core\EventListener\ErrorListener" scope="request">
+            <argument>%kernel.environment%</argument>
+            <argument type="service" id="thelia.parser"/>
+            <argument type="service" id="thelia.securityContext"/>
+
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <!-- Archive builders -->
 
         <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">

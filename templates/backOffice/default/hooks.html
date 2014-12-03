@@ -261,7 +261,7 @@ dialog_id       = "delete_dialog"
 dialog_title    = {intl l="Delete hook"}
 dialog_message  = {intl l="Do you really want to delete this hook ?"}
 
-form_action         = {url path='/admin/hooks/delete'}
+form_action         = {token_url path='/admin/hooks/delete'}
 form_content        = {$smarty.capture.delete_dialog nofilter}
 }
 

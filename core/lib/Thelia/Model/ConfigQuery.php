@@ -256,5 +256,28 @@ class ConfigQuery extends BaseConfigQuery
 
         return $majorVersion.'.'.$minorVersion.'.'.$releaseVersion;
     }
+
+    public static function isShowingErrorMessage()
+    {
+        return (bool) static::read("error_message.show", false);
+    }
+
+    /**
+     * @param bool $v
+     */
+    public static function setShowingErrorMessage($v)
+    {
+        static::write("error_message.show", (int) (@(bool) $v));
+    }
+
+    public static function getErrorMessagePageName()
+    {
+        return static::read("error_message.page_name");
+    }
+
+    public static function setErrorMessagePageName($v)
+    {
+        static::write("error_message.page_name", $v);
+    }
 }
 // ConfigQuery

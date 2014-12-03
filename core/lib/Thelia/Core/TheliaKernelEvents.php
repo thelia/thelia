@@ -20,4 +20,9 @@ namespace Thelia\Core;
 final class TheliaKernelEvents
 {
     const SESSION = "thelia_kernel.session";
+
+
+    // -- Kernel Error Message Handle ---------------------------
+
+    const THELIA_HANDLE_ERROR = "thelia_kernel.handle_error";
 }

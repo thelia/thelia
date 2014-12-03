@@ -33,6 +33,7 @@ use Thelia\Model\AdminLog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;
+use Thelia\Tools\RememberMeTrait;
 
 /**
  * Class RequestListener
@@ -41,7 +42,7 @@ use Thelia\Model\LangQuery;
  */
 class RequestListener implements EventSubscriberInterface
 {
-    use \Thelia\Tools\RememberMeTrait;
+    use RememberMeTrait;
 
     /**
      * @var \Thelia\Core\Translation\Translator
