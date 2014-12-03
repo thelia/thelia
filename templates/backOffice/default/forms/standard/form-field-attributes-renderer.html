@@ -8,8 +8,11 @@ In addition to the standard form_field block output, this fragment uses the foll
 - field_extra_class : an extra class to add to the input class (see form-field-attributes-standard-renderer.html)
 *}
 
-{* Use the optionnal $field_value parameter if no value is defined *}
-{if empty($value) && ! empty($field_value)}
+{*
+Use the optionnal $field_value parameter if no value is defined
+ Do not use empty(), as empty(0), empty("0") are true
+*}
+{if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
     {$value = $field_value}
 {/if}
 

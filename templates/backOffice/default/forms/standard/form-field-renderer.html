@@ -15,7 +15,11 @@ fragment uses the following additional variables :
     {include file="forms/$field_template/form-field-attributes-renderer.html"}
 {/capture}
 
-{if empty($value) && ! empty($field_value)}
+{*
+Use the optionnal $field_value parameter if no value is defined
+ Do not use empty(), as empty(0), empty("0") are true
+*}
+{if ($value == '' || $value == null) && isset($field_value) && $field_value !== '' && $field_value !== null}
     {$value = $field_value}
 {/if}
 
