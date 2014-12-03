@@ -4,6 +4,7 @@
 - Update : add missing API table creation
 - The default Tlog level is now TLog::ERROR instead of Tlog::DEBUG
 - Add error message pages instead of white pages. But you can disable them by setting 0 into the config variable "error_message.show".
+- Front Office Template: new page to display the details of an order
 
 # 2.1.0-alpha2
 - Update Process :
