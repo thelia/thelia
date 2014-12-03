@@ -1,0 +1,312 @@
+{extends file="layout.tpl"}
+
+{* Security *}
+{block name="no-return-functions" prepend}
+{check_auth role="CUSTOMER" login_tpl="login"}
+{/block}
+
+{* Breadcrumb *}
+{block name='no-return-functions' append}
+{$breadcrumbs = [
+['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
+['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/$order_id"}]
+]}
+{/block}
+
+{block name="body-class"}page-account-order{/block}
+
+{block name="main-content"}
+<div class="main">
+
+    {loop name="order" type="order" customer="current" id="$order_id" limit="1" }
+
+    {$payment_id=$PAYMENT_MODULE}
+    {$delivery_id=$DELIVERY_MODULE}
+    {$status=$STATUS}
+    {loop name="currency.order" type="currency" id=$CURRENCY}
+        {assign "orderCurrency" $SYMBOL}
+    {/loop}
+
+    <article class="col-main" role="main" aria-labelledby="main-label">
+
+        <h1 id="main-label" class="page-header">{intl l="Order details %ref" ref="$REF"}</h1>
+
+        {hook name="account-order.top" order="{$order_id}"}
+
+        {* Infos *}
+        <dl class="order-information dl-horizontal">
+            <dt>{intl l="REF"}</dt>
+            <dd>{$REF}</dd>
+
+            <dt>{intl l="Created"}</dt>
+            <dd>{format_date date=$CREATE_DATE output="datetime"}</dd>
+
+            <dt>{intl l="Status"}</dt>
+            <dd>{loop type="order-status" name="order_status" id=$STATUS}{$TITLE}{/loop}</dd>
+
+            {if $STATUS >= 2}
+                <dt>{intl l="Invoice date"}</dt>
+                <dd>{format_date date=$INVOICE_DATE output="date"}</dd>
+
+                {if $INVOICE_REF}
+                <dt>{intl l="Invoice REF"}</dt>
+                <dd>{$INVOICE_REF}</dd>
+                {/if}
+
+                <dt>{intl l="PDF invoice"}</dt>
+                <dd><a href="{url path="/account/order/pdf/invoice/$ID"}">{intl l="Download"}</a></dd>
+            {/if}
+            {if $DELIVERY_REF}
+                <dt>{intl l="Delivery REF"}</dt>
+                <dd>{$DELIVERY_REF}</dd>
+            {/if}
+            <dt>{intl l="Customer Number"}</dt>
+            <dd>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</dd>
+
+            {hookblock name="account-order.information" order="{$order_id}" fields="title,value"}
+            {forhook rel="account-order.information"}
+                <dt>{$title}</dt>
+                <dd>{$value}</dd>
+            {/forhook}
+            {/hookblock}
+        </dl>
+
+        {hook name="account-order.after-information" order="{$order_id}"}
+
+        {* Addresses *}
+        <div id="order-addresses" class="row">
+            <div class="col-md-6 col-sm-12">
+                <div class="panel">
+                    <div class="panel-heading">{intl l="Delivery"}</div>
+                    <div class="panel-body">
+                        <h4>{intl l="Module"}</h4>
+                        {ifhook rel="account-order.delivery-information"}
+                            {hook name="account-order.delivery-information" module="{$delivery_id}" order="{$order_id}"}
+                        {/ifhook}
+                        {elsehook rel="account-order.delivery-information"}
+                            <p>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</p>
+                        {/elsehook}
+
+                        <h4>{intl l="Address"}</h4>
+
+                        {ifhook rel="account-order.delivery-address"}
+                            {* delivery module can customize the delivery address *}
+                            {hook name="account-order.delivery-address" module="{$delivery_id}" order="{$order_id}"}
+                        {/ifhook}
+                        {elsehook rel="account-order.delivery-address"}
+                            {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                                {loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                                {$ZIPCODE} {$CITY}<br/>
+                                {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                            {/loop}
+                        {/elsehook}
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="panel">
+                    <div class="panel-heading">{intl l="Billing"}</div>
+                    <div class="panel-body">
+                        <h4>{intl l="Module"}</h4>
+                        {ifhook rel="account-order.invoice-information"}
+                            {hook name="account-order.invoice-information" module="{$payment_id}" order="{$order_id}"}
+                        {/ifhook}
+                        {elsehook rel="account-order.invoice-information"}
+                            <p>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</p>
+                            {if $TRANSACTION_REF}
+                            <p>{intl l="Transaction REF : %ref" ref=$TRANSACTION_REF}</p>
+                            {/if}
+                        {/elsehook}
+
+                        <h4>{intl l="Address"}</h4>
+
+                        {ifhook rel="account-order.invoice-address"}
+                            {* payment module can customize the delivery address *}
+                            {hook name="account-order.invoice-address" module="{$payment_id}" order="{$order_id}"}
+                        {/ifhook}
+                        {elsehook rel="account-order.invoice-address"}
+                            {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                                {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
+                                {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
+                                {$ZIPCODE} {$CITY}<br/>
+                                {loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                            {/loop}
+                        {/elsehook}
+
+                        {hook name="account-order.invoice-address-bottom" module="{$delivery_id}" order="{$order_id}"}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {hook name="account-order.after-addresses" order="{$order_id}"}
+
+        {* products *}
+        <table class="table table-order order-products">
+            <thead>
+                <tr>
+                    <th class="product">
+                        <span class="hidden-xs">{intl l="Product Name"}</span>
+                        <span class="visible-xs">{intl l="Name"}</span>
+                    </th>
+                    <th class="unitprice">
+                        <span class="hidden-xs">{intl l="Unit Price"}</span>
+                        <span class="visible-xs">{intl l="Price"}</span>
+                    </th>
+                    <th class="unitprice">
+                        <span class="hidden-xs">{intl l="Unit Price Tax"}</span>
+                        <span class="visible-xs">{intl l="Price"}</span>
+                    </th>
+                    <th class="unitprice">
+                        <span class="hidden-xs">{intl l="Unit Taxed Price"}</span>
+                        <span class="visible-xs">{intl l="Taxed Price"}</span>
+                    </th>
+                    <th class="qty">
+                        <span class="hidden-xs">{intl l="Quantity"}</span>
+                        <span class="visible-xs">{intl l="Qty"}</span>
+                    </th>
+                    <th class="subprice">
+                        <span class="hidden-xs">{intl l="Total"}</span>
+                        <span class="visible-xs">{intl l="Total"}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {ifhook rel="account-order.products-top"}
+            <tr>
+                <td class="products-top" colspan="6">
+                    {hook name="account-order.products-top" order="{$order_id}"}
+                </td>
+            </tr>
+            {/ifhook}
+
+            {loop type="order_product" name="order-products" order=$ID}
+                {if $WAS_IN_PROMO == 1}
+                    {assign "realPrice" $PROMO_PRICE}
+                    {assign "realTax" $PROMO_PRICE_TAX}
+                    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                {else}
+                    {assign "realPrice" $PRICE}
+                    {assign "realTax" $PRICE_TAX}
+                    {assign "realTaxedPrice" $TAXED_PRICE}
+                {/if}
+
+                {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
+
+                <tr>
+                    <td class="product">
+                        <p>{$TITLE}</p>
+                        {ifloop rel="combinations"}
+                        <p>
+                        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                            {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
+                        {/loop}
+                        </p>
+                        {/ifloop}
+                    </td>
+                    <td class="unitprice"><p>{format_money number=$realPrice symbol=$orderCurrency}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realTax symbol=$orderCurrency}</p></td>
+                    <td class="unitprice"><p>{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
+                    <td class="qty"><p>{$QUANTITY}</p></td>
+                    <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
+                </tr>
+                {ifhook rel="account-order.product"}
+                <tr>
+                    <td class="product-extra" colspan="6">
+                        {hook name="account-order.product" order="{$order_id}" product="{$ID}"}
+                    </td>
+                </tr>
+                {/ifhook}
+            {/loop}
+
+            {ifhook rel="account-order.products-bottom"}
+            <tr>
+                <td class="products-bottom" colspan="6">
+                    {hook name="account-order.products-bottom" order="{$order_id}"}
+                </td>
+            </tr>
+            {/ifhook}
+
+            </tbody>
+        </table>
+
+        {hook name="account-order.after-products" order="{$order_id}"}
+
+        <div class="row">
+            <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
+                <table class="table order-total table-order table-order-total">
+                    <tfoot>
+                        {if $DISCOUNT}
+                        <tr>
+                            <td><p>{intl l="Discount"}</p></td>
+                            <td><p>{format_money number=$DISCOUNT symbol=$orderCurrency}</p></td>
+                        </tr>
+                        {/if}
+                        <tr>
+                            <td><p>{intl l="Total without tax"}</p></td>
+                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
+                        </tr>
+                        {strip}
+                            {capture name="tax"}
+                                {foreach $taxes as $name=>$prices}
+                                    {assign var="_price_taxe_" value="0"}
+                                    {foreach $prices as $price}
+                                        {$_price_taxe_= $_price_taxe_ + $price}
+                                    {/foreach}
+                                    {if $_price_taxe_ != 0}
+                                    <tr>
+                                        <td><p>{$name}</p></td>
+                                        <td><P>{format_money number=$_price_taxe_ symbol=$orderCurrency}</P></td>
+                                    </tr>
+                                    {/if}
+                                {/foreach}
+                            {/capture}
+                        {/strip}
+                        {if $smarty.capture.tax ne ""}
+                            <tr>
+                                <td><p>{intl l="Tax"}</p></td>
+                                <td><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
+                            </tr>
+                            {$smarty.capture.tax nofilter}
+                        {/if}
+                        <tr>
+                            <td><p>{intl l="Total with tax"}</p></td>
+                            <td><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrency}</P></td>
+                        </tr>
+                        <tr>
+                            <td><p>{intl l="Postage"}</p></td>
+                            <td><p>{format_money number=$POSTAGE symbol=$orderCurrency}</p></td>
+                        </tr>
+                        <tr>
+                            <td><h3>{intl l="Total"}</h3></td>
+                            <td><h3>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</h3></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        {hook name="account-order.bottom" order="{$order_id}"}
+
+    </article>
+
+    {/loop}
+
+</div>
+{/block}
+
+{block name="stylesheet"}
+{hook name="account-order.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="account-order.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="account-order.javascript-initialization"}
+{/block}

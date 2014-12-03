@@ -388,6 +388,14 @@ class OrderController extends BaseFrontController
         return $order;
     }
 
+
+    public function viewAction($order_id)
+    {
+        $this->checkOrderCustomer($order_id);
+
+        return $this->render('account-order', ['order_id' => $order_id]);
+    }
+
     public function generateInvoicePdf($order_id)
     {
         $this->checkOrderCustomer($order_id);
