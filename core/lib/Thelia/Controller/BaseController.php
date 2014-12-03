@@ -64,6 +64,9 @@ abstract class BaseController extends ContainerAware
 
     protected static $formDefinition;
 
+    /** @var bool Fallback on default template when setting the templateDefinition */
+    protected $useFallbackTemplate = false;
+
     /**
      * Return an empty response (after an ajax request, for example)
      * @param  int                                  $status

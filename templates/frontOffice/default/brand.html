@@ -47,6 +47,7 @@
 {/block}
 
 {block name="main-content"}
+{hook name="brand.top" brand="$brand_id"}
     {if $brand_id}
     <div class="main layout-col-2-left">
         {$limit={$smarty.get.limit|default:8}}
@@ -54,7 +55,12 @@
         {$product_order={$smarty.get.order|default:'alpha'}}
         {$mode=$smarty.get.mode|default:'grid'}
 
+        {hook name="brand.main-top" brand="$brand_id"}
+
         <article class="col-main {$mode}" role="main" aria-labelledby="main-label">
+
+            {hook name="brand.content-top" brand="$brand_id"}
+
             {loop name="brand.info" type="brand" id=$brand_id limit="1"}
                 <section class="brand-description">
                     <h1 id="main-label" class="page-header">{$TITLE}</h1>
@@ -159,6 +165,7 @@
                     </div>
                 {/elseloop}
 
+                {hook name="brand.content-bottom" brand="$brand_id"}
             {/loop}
         </article>
 
@@ -166,10 +173,14 @@
             {include file="includes/brand-menu.html"}
         </aside>
 
+        {hook name="brand.main-bottom" brand="$brand_id"}
+
     </div><!-- /.layout -->
     {else}
     <div class="main" id="brands">
+        {hook name="brand.main-top"}
         <div class="col-main brands" role="main" aria-labelledby="main-label">
+            {hook name="brand.content-top"}
             {ifloop rel="brands"}
             <ul>
                 {loop name="brands" type="brand"}
@@ -200,7 +211,22 @@
             {elseloop rel="brand_logo"}
 
             {/elseloop}
+            {hook name="brand.content-bottom"}
         </div>
+        {hook name="brand.main-bottom"}
     </div>
     {/if}
+    {hook name="brand.bottom" brand="$brand_id"}
+{/block}
+
+{block name="stylesheet"}
+{hook name="brand.stylesheet"}
+{/block}
+
+{block name="after-javascript-include"}
+{hook name="brand.after-javascript-include"}
+{/block}
+
+{block name="javascript-initialization"}
+{hook name="brand.javascript-initialization"}
 {/block}

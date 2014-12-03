@@ -172,7 +172,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <section class="footer-block">
         <div class="container">
             <div class="blocks block-col-4">
-                {hookblock name="main.footer-body"}
+                {hookblock name="main.footer-body"  fields="id,class,title,content"}
                     {forhook rel="main.footer-body"}
                     <div class="col">
                         <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">

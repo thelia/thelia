@@ -25,10 +25,14 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     /** @var  FragmentBag $fragmentBag */
     protected $fragmentBag;
 
-    public function __construct($code, array $arguments = array())
+    /** @var array fields that can be added, if empty array any fields can be added */
+    protected $fields = [];
+
+    public function __construct($code, array $arguments = [], array $fields = [])
     {
         parent::__construct($code, $arguments);
         $this->fragmentBag = new FragmentBag();
+        $this->fields = $fields;
     }
 
     /**
@@ -39,7 +43,9 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
      */
     public function add($data)
     {
-        $this->fragmentBag->add($data);
+        $fragment = new Fragment($data);
+
+        $this->addFragment($fragment);
 
         return $this;
     }
@@ -52,6 +58,9 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
      */
     public function addFragment(Fragment $fragment)
     {
+        if (!empty($this->fields)) {
+            $fragment->filter($this->fields);
+        }
         $this->fragmentBag->addFragment($fragment);
 
         return $this;
@@ -65,5 +74,21 @@ class HookRenderBlockEvent extends BaseHookRenderEvent
     public function get()
     {
         return $this->fragmentBag;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
+    /**
+     * @param array $fields
+     */
+    public function setFields(array $fields)
+    {
+        $this->fields = $fields;
     }
 }

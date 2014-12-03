@@ -46,6 +46,9 @@
     <div class="main">
         {hook name="folder.main-top" folder="$folder_id"}
         <div class="col-main contents-list" role="main" aria-labelledby="main-label">
+
+        {hook name="folder.content-top" folder="$folder_id"}
+
         {if $folder_id}
             {loop name="folder" type="folder" id=$folder_id limit="1"}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
@@ -134,6 +137,9 @@
             </ul>
             {/ifloop}
         {/if}
+
+        {hook name="folder.content-bottom" folder="$folder_id"}
+
         </div>
         {hook name="folder.main-bottom" folder="$folder_id"}
     </div>

@@ -39,6 +39,34 @@
                     <div class="row">
                         <div class="col-md-12">
 
+                            {hookblock name="product.tab" id="{$product_id}" fields="id,title,href,content"}
+
+                                {capture "product_tab_tab"}
+                                    {forhook rel="product.tab"}
+                                    <li>
+                                        <a href="#{$id}"
+                                            {if $href}data-href="{$href}"{/if}
+                                            data-toggle="tab">{$title}
+                                        </a>
+                                    </li>
+                                    {/forhook}
+                                {/capture}
+
+                                {capture "product_tab_content"}
+                                    {forhook rel="product.tab"}
+                                    <div class="tab-pane fade" id="{$id}">
+                                        {if $href}
+                                            {* ajax *}
+                                            <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                        {else}
+                                            {$content nofilter}
+                                        {/if}
+                                    </div>
+                                    {/forhook}
+                                {/capture}
+
+                            {/hookblock}
+
                             <ul class="nav nav-tabs" id="tabbed-menu">
                                 <li><a href="#general" data-toggle="tab" data-trigger="#virtual_field::change">{intl l="General"}</a></li>
                                 <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
@@ -72,6 +100,7 @@
                                         {intl l="Documents"}
                                     </a>
                                 </li>
+                                {$smarty.capture.product_tab_tab nofilter}
                                 <li><a href="#modules" data-toggle="tab">{intl l="Modules"}</a></li>
                             </ul>
 
@@ -113,6 +142,8 @@
                                     <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
                                 </div>
 
+                                {$smarty.capture.product_tab_content nofilter}
+
                                 <div class="tab-pane fade" id="modules">
                                     <div class="form-container">
                                         {include
@@ -124,7 +155,7 @@
                                         }
                                     </div>
                                     {* ugly fix : {hook name="product.tab-content"} *}
-                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit"}
+                                    {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit" id="{$product_id}" view="product"}
                                 </div>
 
                              </div>

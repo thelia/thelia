@@ -265,7 +265,7 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * @param TemplateDefinition $templateDefinition
      */
-    public function setTemplateDefinition(TemplateDefinition $templateDefinition)
+    public function setTemplateDefinition(TemplateDefinition $templateDefinition, $useFallback = false)
     {
         $this->templateDefinition = $templateDefinition;
 
@@ -285,11 +285,26 @@ class SmartyParser extends Smarty implements ParserInterface
             true
         );
 
+        $type = $templateDefinition->getType();
+        $name = $templateDefinition->getName();
+
         /* do not pass array directly to addTemplateDir since we cant control on keys */
-        if (isset($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()])) {
-            foreach ($this->templateDirectories[$templateDefinition->getType()][$templateDefinition->getName()] as $key => $directory) {
+        if (isset($this->templateDirectories[$type][$name])) {
+            foreach ($this->templateDirectories[$type][$name] as $key => $directory) {
                 $this->addTemplateDir($directory, $key);
                 $this->addConfigDir($directory . DS . 'configs', $key);
+            }
+        }
+
+        // fallback on default template
+        if ($useFallback && 'default' !== $name) {
+            if (isset($this->templateDirectories[$type]['default'])) {
+                foreach ($this->templateDirectories[$type]['default'] as $key => $directory) {
+                    if (null === $this->getTemplateDir($key)) {
+                        $this->addTemplateDir($directory, $key);
+                        $this->addConfigDir($directory . DS . 'configs', $key);
+                    }
+                }
             }
         }
     }

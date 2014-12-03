@@ -285,7 +285,7 @@
             {/strip}
 
             <section id="product-tabs">
-                {hookblock name="product.additional" product="{product attr="id"}"}
+                {hookblock name="product.additional" product="{product attr="id"}" fields="id,class,title,content"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
