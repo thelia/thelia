@@ -70,7 +70,23 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 15, 'brand.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 16, 'brand.sidebar-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 17, 'brand.sidebar-body', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id + 18, 'brand.sidebar-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(@max_id + 18, 'brand.sidebar-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 19, 'account-order.top', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 20, 'account-order.information', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 21, 'account-order.after-information', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 22, 'account-order.delivery-information', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 23, 'account-order.delivery-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 24, 'account-order.invoice-information', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 25, 'account-order.invoice-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 26, 'account-order.after-addresses', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 27, 'account-order.products-top', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 28, 'account-order.product-extra', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 29, 'account-order.products-bottom', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 30, 'account-order.after-products', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 31, 'account-order.bottom', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 32, 'account-order.stylesheet', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 33, 'account-order.after-javascript-include', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 34, 'account-order.javascript-initialization', 1,  0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
@@ -109,8 +125,41 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 17, 'fr_FR', 'Page des marques - le corps de la sidebar', '', ''),
 (@max_id + 17, 'en_US', 'Brands page - the body of the sidebar', '', ''),
 (@max_id + 18, 'fr_FR', 'Page des marques - en bas de la sidebar', '', ''),
-(@max_id + 18, 'en_US', 'Brands page - at the bottom of the sidebar', '', '')
+(@max_id + 18, 'en_US', 'Brands page - at the bottom of the sidebar', '', ''),
+(@max_id + 19, 'fr_FR', 'Détail d\'une commande - en haut', '', ''),
+(@max_id + 19, 'en_US', 'Order details - at the top', '', ''),
+(@max_id + 20, 'fr_FR', 'Détail d\'une commande - informations additionnelles', '', ''),
+(@max_id + 20, 'en_US', 'Order details - additional information', '', ''),
+(@max_id + 21, 'fr_FR', 'Détail d\'une commande - après les informations générales', '', ''),
+(@max_id + 21, 'en_US', 'Order details - after global information', '', ''),
+(@max_id + 22, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour l\'expédition', '', ''),
+(@max_id + 22, 'en_US', 'Order details - additional delivery information', '', ''),
+(@max_id + 23, 'fr_FR', 'Détail d\'une commande - adresse de livraison', '', ''),
+(@max_id + 23, 'en_US', 'Order details - delivery address', '', ''),
+(@max_id + 24, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour la facturation', '', ''),
+(@max_id + 24, 'en_US', 'Order details - additional invoice information', '', ''),
+(@max_id + 25, 'fr_FR', 'Détail d\'une commande - adresse de facturation', '', ''),
+(@max_id + 25, 'en_US', 'Order details - invoice address', '', ''),
+(@max_id + 26, 'fr_FR', 'Détail d\'une commande - Après les adresses', '', ''),
+(@max_id + 26, 'en_US', 'Order details - after addresses', '', ''),
+(@max_id + 27, 'fr_FR', 'Détail d\'une commande - avant la liste des produits', '', ''),
+(@max_id + 27, 'en_US', 'Order details - before products list', '', ''),
+(@max_id + 28, 'fr_FR', 'Détail d\'une commande - informations additionnelles pour un produit', '', ''),
+(@max_id + 28, 'en_US', 'Order details - additional product information', '', ''),
+(@max_id + 29, 'fr_FR', 'Détail d\'une commande - après la liste des produits', '', ''),
+(@max_id + 29, 'en_US', 'Order details - after products list', '', ''),
+(@max_id + 30, 'fr_FR', 'Détail d\'une commande - Après les produits', '', ''),
+(@max_id + 30, 'en_US', 'Order details - after products', '', ''),
+(@max_id + 31, 'fr_FR', 'Détail d\'une commande - en bas', '', ''),
+(@max_id + 31, 'en_US', 'Order details - at the bottom', '', ''),
+(@max_id + 32, 'fr_FR', 'Détail d\'une commande - feuille de style CSS', '', ''),
+(@max_id + 32, 'en_US', 'Order details - CSS stylesheet', '', ''),
+(@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion des javascript', '', ''),
+(@max_id + 33, 'en_US', 'Order details - after javascript include', '', ''),
+(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du javascript', '', ''),
+(@max_id + 34, 'en_US', 'Order details - javascript initialization', '', '')
 ;
+
 
 -- admin hooks
 
