@@ -200,7 +200,7 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "hook_creation_dialog"}
 
-        {form_hidden_fields form=$form exclude="locale"}
+        {form_hidden_fields form=$form exclude="locale,native"}
 
         {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
         {render_form_field form=$form field="success_url" value={url path="/admin/hook/update/_ID_"}}
