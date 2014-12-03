@@ -29,13 +29,10 @@ $trustedIp = array(
 $request = Request::createFromGlobals();
 $thelia = new Thelia("dev", true);
 
-if ( false === in_array($request->getClientIp(), $trustedIp)) {
+if (false === in_array($request->getClientIp(), $trustedIp)) {
     $response = Response::create('Forbidden', 403)->send();
     $thelia->terminate($request, $response);
 } else {
     $response = $thelia->handle($request)->prepare($request)->send();
     $thelia->terminate($request, $response);
-
 }
-
-

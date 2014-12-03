@@ -1,0 +1,75 @@
+{
+    "name": "thelia/core",
+    "description": "Core of Thelia ecommerce CMS.",
+    "license": "LGPL-3.0+",
+    "homepage": "http://thelia.net/",
+    "support": {
+        "forum": "http://thelia.net/forum",
+        "wiki": "http://doc.thelia.net"
+    },
+    "require": {
+        "php": ">=5.4",
+        "ircmaxell/password-compat": "1.0.*",
+        "propel/propel": "dev-master#793aea6b762d9a72b083bfc49c74c574f67650c8",
+        "psr/log": "1.0",
+        "symfony/config": "2.3.*",
+        "symfony/console": "2.3.*",
+        "symfony/dependency-injection": "2.3.*",
+        "symfony/event-dispatcher": "2.3.*",
+        "symfony/http-kernel": "2.3.*",
+        "symfony/routing": "2.3.*",
+        "symfony/filesystem": "2.3.*",
+        "symfony/yaml": "2.3.*",
+        "symfony/translation": "2.3.*",
+        "symfony-cmf/routing": "~1.0",
+        "symfony/validator": "2.3.*",
+        "kriswallsmith/assetic": "1.2.*@dev",
+        "leafo/lessphp": "0.4.*",
+        "ptachoire/cssembed": "1.0.*",
+        "doctrine/cache": "v1.3.0",
+        "simplepie/simplepie": "1.3.*",
+        "imagine/imagine": "v0.5.0",
+        "symfony/icu": "1.0",
+        "swiftmailer/swiftmailer": "5.2.*",
+        "symfony/serializer": "2.3.*",
+        "ensepar/html2pdf": "1.0.1",
+        "symfony/finder": "2.3.*",
+        "symfony/browser-kit": "2.3.*",
+        "symfony/http-foundation": "2.3.*",
+        "symfony/form": "2.3.*",
+        "stack/builder": "1.0.*",
+        "thelia/currency-converter": "~1.0",
+        "smarty/smarty": "v3.1.19",
+        "symfony/class-loader": "2.3.*",
+        "maximebf/debugbar": "dev-master"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Thelia\\": "lib/Thelia/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "smarty/smarty",
+                "version": "3.1.19",
+                "dist": {
+                    "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "http://smarty-php.googlecode.com/svn/",
+                    "type": "svn",
+                    "reference": "tags/Smarty_3_1_19/distribution/"
+                },
+                "autoload": {
+                    "classmap": [
+                        "libs/"
+                    ]
+                }
+            }
+        }
+    ]
+}

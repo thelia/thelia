@@ -14,7 +14,7 @@
  * Thelia essential definitions
  */
 
-$loader = require __DIR__ . "/vendor/autoload.php";
+$loader = require __DIR__ . DS . "vendor" . DS . "autoload.php";
 
 define("DS", DIRECTORY_SEPARATOR);
 
