@@ -24,7 +24,6 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
-use Propel\Runtime\ServiceContainer\StandardServiceContainer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Debug\Debug;
@@ -78,7 +77,7 @@ class Thelia extends Kernel
             Yaml::parse(THELIA_CONF_DIR . 'database.yml')
         );
 
-        /** @var StandardServiceContainer $serviceContainer */
+        /** @var \Propel\Runtime\ServiceContainer\StandardServiceContainer $serviceContainer */
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setDefaultDatasource('thelia');
 
