@@ -169,7 +169,7 @@
                                     <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
                                     <td>
                                         <a href="{url path="/account/order/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
-                                        {if $VIRTUAL}
+                                        {if $STATUS >=2 && $VIRTUAL}
                                         <a href="#" class="btn btn-virtual-details btn-order-details" data-order="{$ID}" title="{intl l="Download files"}"><span class="glyphicon glyphicon-download"></span> {intl l="Download files"}</a>
                                         {/if}
                                     </td>
