@@ -14,6 +14,7 @@ namespace Thelia\Model\Tools;
 
 use Thelia\Core\Event\GenerateRewrittenUrlEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\RewritingArgumentQuery;
 use Thelia\Model\RewritingUrlQuery;
@@ -167,18 +168,18 @@ trait UrlRewritingTrait
 
                     if ($resolver->locale != $locale) {
                         /* it is an url related to this product for another locale */
-                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                        throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
                     if (count($resolver->otherParameters) > 0) {
                         /* it is an url related to this product but with more arguments */
-                        throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                        throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                     }
 
                     /* here it must be a deprecated url */
                 } else {
                     /* already related to another object */
-                    throw new UrlRewritingException('URL_ALREADY_EXISTS', UrlRewritingException::URL_ALREADY_EXISTS);
+                    throw new UrlRewritingException(Translator::getInstance()->trans('URL_ALREADY_EXISTS'), UrlRewritingException::URL_ALREADY_EXISTS);
                 }
             }
         } catch (UrlRewritingException $e) {
