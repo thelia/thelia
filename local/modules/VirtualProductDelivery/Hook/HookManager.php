@@ -41,4 +41,19 @@ class HookManager extends BaseHook
             );
         }
     }
+
+    public function onAccountOrderAfterProducts(HookRenderEvent $event)
+    {
+        $orderId = $event->getArgument('order');
+
+        if (null !== $orderId) {
+            $render = $this->render(
+                'account-order-after-products.html',
+                [
+                    "order_id" => $orderId
+                ]
+            );
+            $event->add($render);
+        }
+    }
 }
