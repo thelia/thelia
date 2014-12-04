@@ -102,7 +102,7 @@
                                                     {form_hidden_fields form=$form}
 
                                                     {form_field form=$form field='success_url'}
-                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update{$ID}"}"/>
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update/{$ID}"}"/>
                                                     {/form_field}
 
                                                     {form_field form=$form field='locale'}
@@ -174,6 +174,7 @@
                                             form = $form
                                             formAction = "{url path='/admin/content/seo/save'}"
                                             closeUrl = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                            success_url = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
                                             current_id = $content_id
                                             }
                                         {/form}
