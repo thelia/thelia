@@ -151,11 +151,30 @@
                     <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
                         <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
                         <ul class="pagination">
-                            <li{if $product_page le 1} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a></li>
+                            {if $product_page le 1}
+                                <li class="disabled">
+                                    <span class="prev"><i class="icon-prev"></i></span>
+                                </li>
+                            {/else}
+                                <li>
+                                    <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a>
+                                </li>
+                            {/if}
+
                             {pageloop rel="product_list"}
-                                <li{if $PAGE eq $CURRENT} class="active"{/if}><a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a></li>
+                                <li{if $PAGE eq $CURRENT} class="active"{/if}>
+                                    <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a>
+                                </li>
                                 {if $PAGE eq $LAST}
-                                    <li{if $CURRENT eq $LAST} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$NEXT} }"  title="{intl l="Next"}" class="next"><i class="icon-next"></i></a></li>
+                                    {if $CURRENT eq $LAST}
+                                        <li class="disabled">
+                                            <span class="next"><i class="icon-next"></i></span>
+                                        </li>
+                                    {else}
+                                        <li>
+                                            <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
+                                        </li>
+                                    {/if}
                                 {/if}
                             {/pageloop}
                         </ul>
