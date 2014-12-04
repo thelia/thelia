@@ -157,10 +157,6 @@
                         <span class="visible-xs">{intl l="Price"}</span>
                     </th>
                     <th class="unitprice">
-                        <span class="hidden-xs">{intl l="Unit Price Tax"}</span>
-                        <span class="visible-xs">{intl l="Price"}</span>
-                    </th>
-                    <th class="unitprice">
                         <span class="hidden-xs">{intl l="Unit Taxed Price"}</span>
                         <span class="visible-xs">{intl l="Taxed Price"}</span>
                     </th>
@@ -178,7 +174,7 @@
 
             {ifhook rel="account-order.products-top"}
             <tr>
-                <td class="products-top" colspan="6">
+                <td class="products-top" colspan="5">
                     {hook name="account-order.products-top" order="{$order_id}"}
                 </td>
             </tr>
@@ -209,14 +205,13 @@
                         {/ifloop}
                     </td>
                     <td class="unitprice"><p>{format_money number=$realPrice symbol=$orderCurrency}</p></td>
-                    <td class="unitprice"><p>{format_money number=$realTax symbol=$orderCurrency}</p></td>
                     <td class="unitprice"><p>{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
                     <td class="qty"><p>{$QUANTITY}</p></td>
                     <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
                 </tr>
                 {ifhook rel="account-order.product"}
                 <tr>
-                    <td class="product-extra" colspan="6">
+                    <td class="product-extra" colspan="5">
                         {hook name="account-order.product" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
                     </td>
                 </tr>
@@ -225,7 +220,7 @@
 
             {ifhook rel="account-order.products-bottom"}
             <tr>
-                <td class="products-bottom" colspan="6">
+                <td class="products-bottom" colspan="5">
                     {hook name="account-order.products-bottom" order="{$order_id}"}
                 </td>
             </tr>
