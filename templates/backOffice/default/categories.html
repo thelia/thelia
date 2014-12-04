@@ -290,7 +290,7 @@
                          </thead>
 
                          <tbody>
-                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page limit=#max_displayed_products#}
+                         {loop name="product_list" type="product" visible="*" category_default=$category_id order=$product_order page=$page backend_context="on" limit=#max_displayed_products#}
                          <tr>
                              <td>{$ID}</td>
 
