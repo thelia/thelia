@@ -87,7 +87,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                             'manual', 'manual_reverse',
                             'created', 'created_reverse',
                             'updated', 'updated_reverse',
-                            'ref',
+                            'ref', 'ref_reverse',
                             'promo',
                             'new',
                             'random',
@@ -961,6 +961,9 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     break;
                 case "ref":
                     $search->orderByRef(Criteria::ASC);
+                    break;
+                case "ref_reverse":
+                    $search->orderByRef(Criteria::DESC);
                     break;
                 case "promo":
                     if ($complex) {
