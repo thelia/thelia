@@ -16,7 +16,7 @@
 
         {form_hidden_fields form=$form}
 
-        {render_form_field form=$form field="success_url"}
+        {render_form_field form=$form field="success_url" value="{$success_url}"}
 
         {* Display error message if exist *}
         {include file='includes/notifications.html' message=$form_error_message}
