@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -21,6 +22,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\Map\OrderProductTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Type\BooleanOrBothType;
 
@@ -56,6 +59,21 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             ->withColumn('SUM(`opt`.AMOUNT)', 'TOTAL_TAX')
             ->withColumn('SUM(`opt`.PROMO_AMOUNT)', 'TOTAL_PROMO_TAX')
             ->groupById();
+
+
+        // new join to get the product id if it exists
+        $pseJoin = new Join(
+            OrderProductTableMap::PRODUCT_SALE_ELEMENTS_ID,
+            ProductSaleElementsTableMap::ID,
+            Criteria::LEFT_JOIN
+        );
+        $search
+            ->addJoinObject($pseJoin)
+            ->addAsColumn(
+                "product_id",
+                ProductSaleElementsTableMap::PRODUCT_ID
+            )
+        ;
 
         $order = $this->getOrder();
 
@@ -95,6 +113,8 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 
             $loopResultRow->set("ID", $orderProduct->getId())
                 ->set("REF", $orderProduct->getProductRef())
+                ->set("PRODUCT_ID", $orderProduct->getVirtualColumn('product_id'))
+                ->set("PRODUCT_SALE_ELEMENTS_ID", $orderProduct->getProductSaleElementsId())
                 ->set("PRODUCT_SALE_ELEMENTS_REF", $orderProduct->getProductSaleElementsRef())
                 ->set("WAS_NEW", $orderProduct->getWasNew() === 1 ? 1 : 0)
                 ->set("WAS_IN_PROMO", $orderProduct->getWasInPromo() === 1 ? 1 : 0)
