@@ -7,7 +7,6 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 (6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0,  NOW(), NOW());
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('session_config.handlers', 'Symfony\\Component\\HttpFoundation\\Session\\Storage\\Handler\\NativeFileSessionHandler', 1, 1, NOW(), NOW()),
 ('check-available-stock', '1', 0, 0, NOW(), NOW()),
 ('active-front-template', 'default', 0, 0, NOW(), NOW()),
 ('active-admin-template', 'default', 0, 0, NOW(), NOW()),
@@ -68,7 +67,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
 ('form_firewall_active', '1', 0, 0, NOW(), NOW()),
 
-('allow_slash_ended_uri', 1, 0, 0, NOW(), NOW()),
+('allow_slash_ended_uri', '1', 0, 0, NOW(), NOW()),
 ('error_message.show', '1', 0, 0, NOW(), NOW()),
 ('error_message.page_name', 'error.html', 0, 0, NOW(), NOW())
 ;

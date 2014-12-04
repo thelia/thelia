@@ -5,6 +5,8 @@ UPDATE `config` SET `value`='1' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='beta1' WHERE `name`='thelia_extra_version';
 
+DELETE FROM `config` WHERE `name`='session_config.handlers';
+
 CREATE TABLE `api`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
