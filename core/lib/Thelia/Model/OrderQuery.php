@@ -100,27 +100,35 @@ class OrderQuery extends BaseOrderQuery
         $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
         $orderTaxJoin->setJoinType(Criteria::INNER_JOIN);
 
-        $query = self::create('o')
-            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
-            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
-            ->filterByStatusId([2,3,4], Criteria::IN)
+
+        $query = self::baseSaleStats($startDate, $endDate, 'o')
             ->innerJoinOrderProduct()
             ->addJoinObject($orderTaxJoin)
-
+            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL')
+            ->select('TOTAL')
         ;
+        $amount = $query->findOne();
 
         if ($includeShipping) {
-            $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)) + `order`.postage )", 'TOTAL');
-        } else {
-            $query->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL');
+            $query = self::baseSaleStats($startDate, $endDate)
+                ->withColumn("SUM(`order`.postage)", 'POSTAGE')
+                ->select('POSTAGE')
+            ;
+
+            $amount += $query->findOne();
         }
-
-        $query->select('TOTAL');
-
-        $amount = $query->findOne();
 
         return null === $amount ? 0 : round($amount, 2);
     }
+
+    protected static function baseSaleStats(\DateTime $startDate, \DateTime $endDate, $modelAlias = null)
+    {
+        return self::create($modelAlias)
+            ->filterByCreatedAt(sprintf("%s 00:00:00", $startDate->format('Y-m-d')), Criteria::GREATER_EQUAL)
+            ->filterByCreatedAt(sprintf("%s 23:59:59", $endDate->format('Y-m-d')), Criteria::LESS_EQUAL)
+            ->filterByStatusId([2, 3, 4], Criteria::IN);
+    }
+
 
     /**
      * @param \DateTime $startDate
