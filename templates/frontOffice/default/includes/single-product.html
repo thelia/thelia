@@ -74,6 +74,9 @@
                         {form_hidden_fields form=$form}
                         <input type="hidden" name="view" value="product">
                         <input type="hidden" name="product_id" value="{$product_id}">
+                        {form_field form=$form field="append"}
+                            <input type="hidden" name="{$name}" value="1">
+                        {/form_field}
 
                         {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
