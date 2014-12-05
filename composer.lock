@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3b6c080143953c8cb5038d3fa93039bf",
+    "hash": "6d249fcc201dbd89db3318a33b0b176e",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -2118,78 +2118,6 @@
             "time": "2014-11-10 08:09:40"
         },
         {
-            "name": "thelia/hooktest-module",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thelia/HookTest-module.git",
-                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thelia/HookTest-module/zipball/24a0d4c62614adb08083cbb85605989ef9c25c43",
-                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43",
-                "shasum": ""
-            },
-            "require": {
-                "thelia/installer": "1.0"
-            },
-            "type": "thelia-module",
-            "extra": {
-                "installer-name": "HookTest"
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "time": "2014-09-01 10:27:45"
-        },
-        {
-            "name": "thelia/installer",
-            "version": "1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thelia/installer.git",
-                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thelia/installer/zipball/02d1276fb8de0f50c3c654ea4c08b899414dbc04",
-                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "1.0.0"
-            },
-            "require-dev": {
-                "composer/composer": "1.0.*@dev"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Thelia\\Composer\\TheliaInstallerPlugin"
-            },
-            "autoload": {
-                "psr-0": {
-                    "Thelia\\Composer": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL V3"
-            ],
-            "authors": [
-                {
-                    "name": "Manuel Raynaud",
-                    "email": "raynaud.manu@gmail.com",
-                    "homepage": "https://github.com/lunika"
-                }
-            ],
-            "description": "custom installer for Thelia.",
-            "keywords": [
-                "Thelia",
-                "Thelia-module",
-                "Thelia-template"
-            ],
-            "time": "2014-09-01 10:26:56"
-        },
-        {
             "name": "thelia/math-tools",
             "version": "1.0",
             "source": {
@@ -2927,6 +2855,30 @@
             "time": "2014-03-07 15:35:33"
         },
         {
+            "name": "thelia/hooktest-module",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/HookTest-module.git",
+                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/HookTest-module/zipball/24a0d4c62614adb08083cbb85605989ef9c25c43",
+                "reference": "24a0d4c62614adb08083cbb85605989ef9c25c43",
+                "shasum": ""
+            },
+            "require": {
+                "thelia/installer": "1.0"
+            },
+            "type": "thelia-module",
+            "extra": {
+                "installer-name": "HookTest"
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2014-09-01 10:27:45"
+        },
+        {
             "name": "thelia/hooktest-template",
             "version": "1.0",
             "source": {
@@ -2949,6 +2901,54 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "time": "2014-09-01 10:45:00"
+        },
+        {
+            "name": "thelia/installer",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/installer.git",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/installer/zipball/02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "reference": "02d1276fb8de0f50c3c654ea4c08b899414dbc04",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "1.0.0"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Thelia\\Composer\\TheliaInstallerPlugin"
+            },
+            "autoload": {
+                "psr-0": {
+                    "Thelia\\Composer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL V3"
+            ],
+            "authors": [
+                {
+                    "name": "Manuel Raynaud",
+                    "email": "raynaud.manu@gmail.com",
+                    "homepage": "https://github.com/lunika"
+                }
+            ],
+            "description": "custom installer for Thelia.",
+            "keywords": [
+                "Thelia",
+                "Thelia-module",
+                "Thelia-template"
+            ],
+            "time": "2014-09-01 10:26:56"
         }
     ],
     "aliases": [],
