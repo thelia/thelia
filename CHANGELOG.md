@@ -6,7 +6,7 @@
 - Add error message pages instead of white pages. But you can disable them by setting 0 into the config variable "error_message.show".
 - Front Office Template: new page to display the details of an order
 - email can be previewed in the back office
-- some smarty classes are still present in the core of thelia for not breaking backward compatibility. Those classes will be deleted in version 2.3 : 
+- some smarty classes are still present in the core of thelia not to break backward compatibility. Those classes will be deleted in version 2.3 : 
     * Thelia\Core\Template\Smarty\AbstractSmartyPlugin
     * Thelia\Core\Template\Smarty\SmartyPluginDescriptor
 - the default address label is now translated
@@ -17,7 +17,7 @@
     * error_message.page_name : Filename of the error page. Default : error.html
 - All cs issues are fixed, Thelia is now fully PSR2 compliant
 - Allow possibility to upload a module with github suffix (eg : paypal-master.zip)
-- Added a fallback for template to use the default template. it's usefull for modules that are used on a website that doesn't use the default template
+- Added a fallback for template to use the default template. it's useful for modules that are used on a website that doesn't use the default template
 
 # 2.1.0-alpha2
 - Update Process :
@@ -73,7 +73,7 @@ parser's function and block with theirs arguments.
 - Added `new`, `promo` and `default` parameters to `product_sale_elements` loop
 - Added `store_notification_emails`, which contains the recipients of shop notification (such as order placed)
 - Added admin notification e-mail for order placed
-- Improved other emails (specially text versions)
+- Improved other emails (specially text versions) 
 - Added ORDER_SEND_NOTIFICATION_EMAIL event
 - class-loader component is removed, it was not used anymore.
 - Updating stock when changing order : canceled status
