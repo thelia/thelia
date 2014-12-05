@@ -168,36 +168,9 @@
                                     <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
                                     <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
                                     <td>
-                                    {if $STATUS >=2}
-                                        <a href="{url path="/account/order/pdf/invoice/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref as pdf document" ref={$REF}}"><span class="icon-cloud-download"></span> {intl l="Order details"}</a>
-                                        {if $VIRTUAL}
-                                        <a href="#" class="btn btn-virtual-details btn-order-details" data-order="{$ID}" title="{intl l="Download files"}"><span class="glyphicon glyphicon-download"></span> {intl l="Download files"}</a>
-                                        {/if}
-                                    {/if}
+                                        <a href="{url path="/account/order/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
                                     </td>
                                 </tr>
-                                    {if $STATUS >=2 && $VIRTUAL}
-                                    <tr id="virtual-product-{$ID}" class="hide">
-                                        <td colspan="5">
-                                            <table class="table table-condensed table-order-products" summary="{intl l="List of downloadable files"}">
-                                                <thead>
-                                                    <tr>
-                                                        <th>{intl l="File"}</th>
-                                                        <th>{intl l="Download"}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {loop name="virtual.order.products" type="order_product" virtual="1" order={$ID}}
-                                                    <tr>
-                                                        <td>{$TITLE}</td>
-                                                        <td><a href="{url path="/account/download/$ID"}" class="btn"><span class="glyphicon glyphicon-download"></span> {intl l="Download"}</a></td>
-                                                    </tr>
-                                                    {/loop}
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                    {/if}
                                 {/loop}
                                 </tbody>
                             </table>
@@ -226,20 +199,5 @@
 {/block}
 
 {block name="javascript-initialization"}
-<script type="text/javascript">
-(function ($) {
-
-    $(document).ready(function () {
-
-        $('.btn-virtual-details').on('click', function(ev){
-            ev.preventDefault();
-            var $tr = $('#virtual-product-' + $(this).data('order'));
-            $tr.toggleClass('hide');
-        })
-
-    });
-
-})(jQuery);
-</script>
 {hook name="account.javascript-initialization"}
 {/block}

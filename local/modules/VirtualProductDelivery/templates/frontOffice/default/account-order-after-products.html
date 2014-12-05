@@ -1,0 +1,24 @@
+{loop type="order" name="virtual.order" id="$order_id" limit="1"}
+{if $STATUS >=2 && $VIRTUAL}
+    <table class="table table-condensed table-order" summary="{intl l="List of downloadable files" d='virtualproductdelivery.fo.default'}">
+        <thead>
+            <tr>
+                <th>{intl l="File" d='virtualproductdelivery.fo.default'}</th>
+                <th>{intl l="Download" d='virtualproductdelivery.fo.default'}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {loop name="virtual.order.products" type="order_product" virtual="1" order={$ID}}
+            <tr>
+                <td>{$TITLE}</td>
+                <td>
+                    <a href="{url path="/account/download/$ID"}" class="btn">
+                    <span class="glyphicon glyphicon-download"></span> {intl l="Download" d='virtualproductdelivery.fo.default'}
+                    </a>
+                </td>
+            </tr>
+            {/loop}
+        </tbody>
+    </table>
+{/if}
+{/loop}
