@@ -30,6 +30,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Exception\TheliaProcessException;
@@ -448,32 +449,13 @@ class OrderController extends BaseFrontController
                 // check customer
                 $this->checkOrderCustomer($order->getId());
 
-                if ($orderProduct->getVirtualDocument()) {
-                    // try to get the file
-                    $path = THELIA_ROOT
-                        . ConfigQuery::read('documents_library_path', 'local/media/documents')
-                        . DS . "product" . DS
-                        . $orderProduct->getVirtualDocument();
+                $virtualProductEvent = new VirtualProductOrderDownloadResponseEvent($orderProduct);
+                $this->getDispatcher()->dispatch(
+                    TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE,
+                    $virtualProductEvent
+                );
 
-                    if (!is_file($path) || !is_readable($path)) {
-                        throw new \ErrorException(
-                            $this->getTranslator()->trans(
-                                "The file [%file] does not exist",
-                                [
-                                    "%file" => $order_product_id
-                                ]
-                            )
-                        );
-                    }
-
-                    $data = file_get_contents($path);
-
-                    $mime = MimeTypeGuesser::getInstance()
-                        ->guess($path)
-                    ;
-
-                    return new Response($data, 200, ["Content-Type" => $mime]);
-                }
+                return $virtualProductEvent->getResponse();
             }
         }
 
