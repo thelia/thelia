@@ -43,7 +43,7 @@ class ModuleConfigQuery extends BaseModuleConfigQuery
             $value = $configValue->getValue();
         }
 
-        return $value == null ? $defaultValue : $value;
+        return $value === null ? $defaultValue : $value;
     }
 
     /**
