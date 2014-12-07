@@ -1,25 +1,5 @@
 #!/usr/bin/env php
 <?php
 
-if (php_sapi_name() != 'cli') {
-    throw new \Exception('this script can only be launched with cli sapi');
-}
-set_time_limit(0);
-
-// allow cache to be cleared by php client or web
-umask(0002);
-
-require __DIR__ . '/core/bootstrap.php';
-
-use Thelia\Core\Thelia;
-use Thelia\Core\Application;
-use Thelia\Command\Output\TheliaConsoleOutput;
-use Symfony\Component\Console\Input\ArgvInput;
-
-$input = new ArgvInput();
-$env = $input->getParameterOption(array('--env', '-e'), getenv('THELIA_ENV') ?: 'dev');
-$debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--no-debug', '')) && $env !== 'prod';
-
-$thelia = new Thelia($env, $debug);
-$application = new Application($thelia);
-$application->run($input, new TheliaConsoleOutput());
+$bootstrapFile = __DIR__ . "/core/vendor/autoload.php";
+include __DIR__ . "/core/Thelia";

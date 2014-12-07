@@ -18,7 +18,7 @@ use Thelia\Core\HttpFoundation\Request;
 //use Symfony\Component\DependencyInjection;
 
 $env = 'prod';
-$loader = require __DIR__ . '/../core/bootstrap.php';
+$loader = require __DIR__ . '/../core/vendor/autoload.php';
 
 // Enable APC for autoloading to improve performance.
 // You should change the ApcClassLoader first argument to a unique prefix

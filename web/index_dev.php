@@ -18,7 +18,7 @@ use Thelia\Core\HttpKernel\HttpCache\HttpCache;
 //use Symfony\Component\DependencyInjection;
 
 $env = 'dev';
-require __DIR__ . '/../core/bootstrap.php';
+require __DIR__ . '/../core/vendor/autoload.php';
 
 // List of allowed IP
 $trustedIp = array(

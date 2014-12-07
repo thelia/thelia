@@ -41,13 +41,26 @@
         "thelia/currency-converter": "~1.0",
         "smarty/smarty": "v3.1.19",
         "symfony/class-loader": "2.3.*",
+        "symfony/options-resolver": "2.5.*",
         "maximebf/debugbar": "dev-master"
     },
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*",
+        "fzaninotto/faker": "1.5.x-dev",
+        "thelia/hooktest-module": "~1.0",
+        "thelia/hooktest-template": "~1.0"
+    },
+    "bin": [
+        "Thelia"
+    ],
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "Thelia\\": "lib/Thelia/"
-        }
+        },
+        "files": [
+            "bootstrap.php"
+        ]
     },
     "repositories": [
         {

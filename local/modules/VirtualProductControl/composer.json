@@ -1,0 +1,10 @@
+{
+    "name": "thelia/virtual-product-control-module",
+    "type": "thelia-module",
+    "require": {
+        "thelia/installer": "1.0"
+    },
+    "extra": {
+        "installer-name": "VirtualProductControl"
+    }
+}
