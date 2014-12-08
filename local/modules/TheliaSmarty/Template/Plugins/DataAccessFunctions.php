@@ -100,9 +100,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $productId = $this->request->get('product_id');
 
         if ($productId !== null) {
-            if (null !== $search = ProductQuery::create()->filterByPrimaryKey($productId)) {
-                return $this->dataAccessWithI18n("Product", $params, $search);
-            }
+            return $this->dataAccessWithI18n(
+                "Product",
+                $params,
+                ProductQuery::create()->filterByPrimaryKey($productId)
+            );
         }
 
         return '';
@@ -130,9 +132,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         if ($categoryId !== null) {
-            if (null !== $search = CategoryQuery::create()->filterByPrimaryKey($categoryId)) {
-                return $this->dataAccessWithI18n("Category", $params, $search);
-            }
+            return $this->dataAccessWithI18n(
+                "Category",
+                $params,
+                CategoryQuery::create()->filterByPrimaryKey($categoryId)
+            );
         }
 
         return '';
@@ -150,9 +154,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $contentId = $this->request->get('content_id');
 
         if ($contentId !== null) {
-            if (null !== $search = ContentQuery::create()->filterByPrimaryKey($contentId)) {
-                return $this->dataAccessWithI18n("Content", $params, $search);
-            }
+            return $this->dataAccessWithI18n(
+                "Content",
+                $params,
+                ContentQuery::create()->filterByPrimaryKey($contentId)
+            );
         }
 
         return '';
@@ -180,9 +186,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         if ($folderId !== null) {
-            if (null !== $search = FolderQuery::create()->filterByPrimaryKey($folderId)) {
-                return $this->dataAccessWithI18n("Folder", $params, $search);
-            }
+            return $this->dataAccessWithI18n(
+                "Folder",
+                $params,
+                FolderQuery::create()->filterByPrimaryKey($folderId)
+            );
         }
 
         return '';
@@ -210,9 +218,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         }
 
         if ($brandId !== null) {
-            if (null !== $search = BrandQuery::create()->filterByPrimaryKey($brandId)) {
-                return $this->dataAccessWithI18n("Brand", $params, $search);
-            }
+            return $this->dataAccessWithI18n(
+                "Brand",
+                $params,
+                BrandQuery::create()->filterByPrimaryKey($brandId)
+            );
         }
 
         return '';
@@ -231,9 +241,12 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $currency = $this->request->getSession()->getCurrency();
 
         if ($currency) {
-            $currencyQuery = CurrencyQuery::create()->filterByPrimaryKey($currency->getId());
-
-            return $this->dataAccessWithI18n("Currency", $params, $currencyQuery, array("NAME"));
+            return $this->dataAccessWithI18n(
+                "Currency",
+                $params,
+                CurrencyQuery::create()->filterByPrimaryKey($currency->getId()),
+                array("NAME")
+            );
         }
 
         return '';
@@ -250,9 +263,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         switch ($params["ask"]) {
             case "default":
-                $defaultCountry = CountryQuery::create()->filterByByDefault(1)->limit(1);
-
-                return $this->dataAccessWithI18n("defaultCountry", $params, $defaultCountry);
+                return $this->dataAccessWithI18n(
+                    "defaultCountry",
+                    $params,
+                    CountryQuery::create()->filterByByDefault(1)->limit(1)
+                );
         }
 
         return '';
