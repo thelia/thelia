@@ -74,7 +74,8 @@ class Thelia extends Kernel
 
         $definePropel = new DefinePropel(
             new DatabaseConfiguration(),
-            Yaml::parse(THELIA_CONF_DIR . 'database.yml')
+            Yaml::parse(THELIA_CONF_DIR . 'database.yml'),
+            $this->getEnvParameters()
         );
 
         /** @var \Propel\Runtime\ServiceContainer\StandardServiceContainer $serviceContainer */
