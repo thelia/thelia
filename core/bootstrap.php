@@ -13,17 +13,42 @@
 /**
  * Thelia essential definitions
  */
-define('DS'                  , DIRECTORY_SEPARATOR);
-define('THELIA_ROOT'         , rtrim(realpath(dirname(__DIR__)), DS) . DS);
-define('THELIA_LOCAL_DIR'    , THELIA_ROOT . 'local' . DS);
-define('THELIA_CONF_DIR'     , THELIA_LOCAL_DIR . 'config' . DS);
-define('THELIA_MODULE_DIR'   , THELIA_LOCAL_DIR . 'modules' . DS);
-define('THELIA_WEB_DIR'      , THELIA_ROOT . 'web' . DS);
-define('THELIA_CACHE_DIR'    , THELIA_ROOT . 'cache' . DS);
-define('THELIA_LOG_DIR'      , THELIA_ROOT . 'log' . DS);
-define('THELIA_TEMPLATE_DIR' , THELIA_ROOT . 'templates' . DS);
 
 $loader = require __DIR__ . "/vendor/autoload.php";
+
+define("DS", DIRECTORY_SEPARATOR);
+
+if (!defined('THELIA_ROOT')) {
+    define('THELIA_ROOT', rtrim(realpath(dirname(__DIR__)), DS) . DS);
+}
+
+if (!defined('THELIA_LOCAL_DIR')) {
+    define('THELIA_LOCAL_DIR', THELIA_ROOT . 'local' . DS);
+}
+
+if (!defined('THELIA_CONF_DIR')) {
+    define('THELIA_CONF_DIR', THELIA_LOCAL_DIR . 'config' . DS);
+}
+
+if (!defined('THELIA_MODULE_DIR')) {
+    define('THELIA_MODULE_DIR', THELIA_LOCAL_DIR . 'modules' . DS);
+}
+
+if (!defined('THELIA_WEB_DIR')) {
+    define('THELIA_WEB_DIR', THELIA_ROOT . 'web' . DS);
+}
+
+if (!defined('THELIA_CACHE_DIR')) {
+    define('THELIA_CACHE_DIR', THELIA_ROOT . 'cache' . DS);
+}
+
+if (!defined('THELIA_LOG_DIR')) {
+    define('THELIA_LOG_DIR', THELIA_ROOT . 'log' . DS);
+}
+
+if (!defined('THELIA_TEMPLATE_DIR')) {
+    define('THELIA_TEMPLATE_DIR', THELIA_ROOT . 'templates' . DS);
+}
 
 if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_MODE')) {
     $sapi = php_sapi_name();
