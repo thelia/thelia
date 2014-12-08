@@ -26,161 +26,163 @@
             <div id="errorStock" class="alert alert-warning" style="display:none;">{intl l="We apologize but some of the ordered products are not available any more."}</div>
             {hook name="cart.top"}
 
-            <table class="table table-cart">
-                <colgroup>
-                    <col width="150">
-                    <col>
-                    <col width="150">
-                    <col width="150">
-                    <col width="150">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th class="image">&nbsp;</th>
-                    <th class="product">
-                        <span class="hidden-xs">{intl l="Product Name"}</span>
-                        <span class="visible-xs">{intl l="Name"}</span>
-                    </th>
-                    <th class="unitprice">
-                        <span class="hidden-xs">{intl l="Unit Price incl. taxes"}</span>
-                        <span class="visible-xs">{intl l="Price"}</span>
-                    </th>
-                    <th class="qty">
-                        <span class="hidden-xs">{intl l="Quantity"}</span>
-                        <span class="visible-xs">{intl l="Qty"}</span>
-                    </th>
-                    <th class="subprice">
-                        <span class="hidden-xs">{intl l="Total incl. taxes"}</span>
-                        <span class="visible-xs">{intl l="Total"}</span>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                    {loop type="cart" name="cartloop"}
+            <div class="table-responsive">
+                <table class="table table-cart">
+                    <colgroup>
+                        <col width="150">
+                        <col>
+                        <col width="150">
+                        <col width="150">
+                        <col width="150">
+                    </colgroup>
+                    <thead>
                     <tr>
-                        <td class="image">
-                            {ifloop rel='product-image'}
-                            <a href="{$PRODUCT_URL}" class="thumbnail">
-                                {assign "cart_count" $LOOP_COUNT}
-                                {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
-                                {/loop}
-                            </a>
-                            {/ifloop}
-                        </td>
-                        <td class="product" >
-                            <h3 class="name"><a href="{$PRODUCT_URL}">{$TITLE}</a></h3>
-                            <div class="product-options">
-                                <dl class="dl-horizontal">
-                                    <dt>{intl l="Available"} :</dt>
-                                    {if $STOCK > 0}
-                                        <dd>{intl l="In Stock"}</dd>
-                                    {else}
-                                        {$errorStock="TRUE"}
-                                        <dd>{intl l="Out of Stock"}</dd>
-                                    {/if}
-                                    <dt>{intl l="No."}</dt>
-                                    <dd>{$REF}</dd>
-                                    {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
-                                        <dt>{$ATTRIBUTE_TITLE}</dt>
-                                        <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
+                        <th class="image">&nbsp;</th>
+                        <th class="product">
+                            <span class="hidden-xs">{intl l="Product Name"}</span>
+                            <span class="visible-xs">{intl l="Name"}</span>
+                        </th>
+                        <th class="unitprice">
+                            <span class="hidden-xs">{intl l="Unit Price incl. taxes"}</span>
+                            <span class="visible-xs">{intl l="Price"}</span>
+                        </th>
+                        <th class="qty">
+                            <span class="hidden-xs">{intl l="Quantity"}</span>
+                            <span class="visible-xs">{intl l="Qty"}</span>
+                        </th>
+                        <th class="subprice">
+                            <span class="hidden-xs">{intl l="Total incl. taxes"}</span>
+                            <span class="visible-xs">{intl l="Total"}</span>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {loop type="cart" name="cartloop"}
+                        <tr>
+                            <td class="image">
+                                {ifloop rel='product-image'}
+                                <a href="{$PRODUCT_URL}" class="thumbnail">
+                                    {assign "cart_count" $LOOP_COUNT}
+                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                        <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
                                     {/loop}
-                                </dl>
-                            </div>
-                            <a href="{token_url path="/cart/delete/$ITEM_ID"}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
-                        </td>
-                        <td class="unitprice">
-                            {if $IS_PROMO == 1}
-                                {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
-                            {else}
-                                {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                            {/if}
-                        </td>
-                        <td class="qty">
-                            <div class="form-group group-qty">
-                                <form action="{token_url path="/cart/update"}" class="form-inline" method="post">
-                                    <input type="hidden" name="cart_item" value="{$ITEM_ID}">
-                                    <div class="form-group">
-                                        {if $STOCK <= 500}
-                                            <select name="quantity" class="form-control" >
-                                                {for $will=1 to $STOCK}
-                                                    <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
-                                                {/for}
-                                            </select>
+                                </a>
+                                {/ifloop}
+                            </td>
+                            <td class="product" >
+                                <h3 class="name"><a href="{$PRODUCT_URL}">{$TITLE}</a></h3>
+                                <div class="product-options">
+                                    <dl class="dl-horizontal">
+                                        <dt>{intl l="Available"} :</dt>
+                                        {if $STOCK > 0}
+                                            <dd>{intl l="In Stock"}</dd>
                                         {else}
-                                            <input name="quantity" class="form-control" type="number" min="1" max="{$STOCK}" value ="{$QUANTITY}">
+                                            {$errorStock="TRUE"}
+                                            <dd>{intl l="Out of Stock"}</dd>
                                         {/if}
+                                        <dt>{intl l="No."}</dt>
+                                        <dd>{$REF}</dd>
+                                        {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                                            <dt>{$ATTRIBUTE_TITLE}</dt>
+                                            <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
+                                        {/loop}
+                                    </dl>
+                                </div>
+                                <a href="{token_url path="/cart/delete/$ITEM_ID"}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
+                            </td>
+                            <td class="unitprice">
+                                {if $IS_PROMO == 1}
+                                    {assign "real_price" $PROMO_TAXED_PRICE}
+                                    <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                    <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
+                                {else}
+                                    {assign "real_price" $TAXED_PRICE}
+                                    <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                {/if}
+                            </td>
+                            <td class="qty">
+                                <div class="form-group group-qty">
+                                    <form action="{token_url path="/cart/update"}" class="form-inline" method="post">
+                                        <input type="hidden" name="cart_item" value="{$ITEM_ID}">
+                                        <div class="form-group">
+                                            {if $STOCK <= 500}
+                                                <select name="quantity" class="form-control" >
+                                                    {for $will=1 to $STOCK}
+                                                        <option {if $QUANTITY == $will}selected="selected"{/if}>{$will}</option>
+                                                    {/for}
+                                                </select>
+                                            {else}
+                                                <input name="quantity" class="form-control" type="number" min="1" max="{$STOCK}" value ="{$QUANTITY}">
+                                            {/if}
+                                        </div>
+                                        <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update">{intl l="+"}</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="subprice">
+                                <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                            </td>
+                        </tr>
+                        {/loop}
+                        {if {cart attr="is_virtual"} != 1}
+                        {postage}
+                        {assign var="postageAmount" value=$postage }
+                        <tr>
+                            <td class="product" colspan="2">
+                                <form action="{url path="/cart/country"}" class="form-inline" method="post">
+                                    <h3>
+                                        {intl l="Estimated shipping "}
+                                        {if $is_customizable == false}
+                                            {loop type="country" name="countryLoop" id="$country_id"}
+                                            {intl l="for"} {$TITLE}
+                                            {/loop}
+                                        {/if}
+                                    </h3>
+                                    {if $is_customizable}
+                                    <div>
+                                        <label for="cart-country">{intl l="Select your country:"}</label>
+                                        <select id="cart-country" name="country">
+                                        {loop type="country" name="countryLoop" with_area="true"}
+                                            <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
+                                        {/loop}
+                                        </select>
+                                        <a class="btn btn-change-country" href="#"><i class="icon-refresh"></i> {intl l="update"}</a>
                                     </div>
-                                    <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update">{intl l="+"}</button>
+                                    {/if}
+                                    {if $delivery_id != 0 }
+                                    <div>
+                                        {intl l="with:"} {loop type="delivery" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
+                                    </div>
+                                    {else}
+                                    <div class="alert alert-danger">
+                                        {intl l="No deliveries available for this cart and this country"}
+                                    </div>
+                                    {/if}
                                 </form>
+                            </td>
+                            <td class="unitprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
+                            <td class="qty">-</td>
+                            <td class="subprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
+                        </tr>
+                        {/postage}
+                        {else}
+                        {assign var="postageAmount" value=0 }
+                        {/if}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="3" class="empty">&nbsp;</td>
+                        <th class="total">{intl l="Total incl. taxes"}</th>
+                        <td class="total">
+                            <div class="total-price">
+                                {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
+                                <span class="price">{format_money number=$totalAmount symbol={currency attr="symbol"}}</span>
                             </div>
                         </td>
-                        <td class="subprice">
-                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
-                        </td>
                     </tr>
-                    {/loop}
-                    {if {cart attr="is_virtual"} != 1}
-                    {postage}
-                    {assign var="postageAmount" value=$postage }
-                    <tr>
-                        <td class="product" colspan="2">
-                            <form action="{url path="/cart/country"}" class="form-inline" method="post">
-                                <h3>
-                                    {intl l="Estimated shipping "}
-                                    {if $is_customizable == false}
-                                        {loop type="country" name="countryLoop" id="$country_id"}
-                                        {intl l="for"} {$TITLE}
-                                        {/loop}
-                                    {/if}
-                                </h3>
-                                {if $is_customizable}
-                                <div>
-                                    <label for="cart-country">{intl l="Select your country:"}</label>
-                                    <select id="cart-country" name="country">
-                                    {loop type="country" name="countryLoop" with_area="true"}
-                                        <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
-                                    {/loop}
-                                    </select>
-                                    <a class="btn btn-change-country" href="#"><i class="icon-refresh"></i> {intl l="update"}</a>
-                                </div>
-                                {/if}
-                                {if $delivery_id != 0 }
-                                <div>
-                                    {intl l="with:"} {loop type="delivery" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
-                                </div>
-                                {else}
-                                <div class="alert alert-danger">
-                                    {intl l="No deliveries available for this cart and this country"}
-                                </div>
-                                {/if}
-                            </form>
-                        </td>
-                        <td class="unitprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
-                        <td class="qty">-</td>
-                        <td class="subprice">{format_money number=$postage symbol={currency attr="symbol"}}</td>
-                    </tr>
-                    {/postage}
-                    {else}
-                    {assign var="postageAmount" value=0 }
-                    {/if}
-                </tbody>
-                <tfoot>
-                <tr>
-                    <td colspan="3" class="empty">&nbsp;</td>
-                    <th class="total">{intl l="Total incl. taxes"}</th>
-                    <td class="total">
-                        <div class="total-price">
-                            {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
-                            <span class="price">{format_money number=$totalAmount symbol={currency attr="symbol"}}</span>
-                        </div>
-                    </td>
-                </tr>
-                </tfoot>
-            </table>
+                    </tfoot>
+                </table>
+            </div>
 
             <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping"><span>{intl l="Continue Shopping"}</span></a>
             <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
