@@ -438,6 +438,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (218, 'account-order.stylesheet', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (219, 'account-order.after-javascript-include', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (220, 'account-order.javascript-initialization', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1231,6 +1232,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (219, 'en_US', 'Order details - after javascript include', '', ''),
 (220, 'fr_FR', 'Détail d\'une commande - initialisation du javascript', '', ''),
 (220, 'en_US', 'Order details - javascript initialization', '', ''),
+(221, 'fr_FR', 'Compte client - informations additionnelles', '', ''),
+(221, 'en_US', 'Customer account - additional information', '', ''),
 
 (1000, 'en_US', 'Category - content', '', ''),
 (1000, 'fr_FR', 'Catégorie - contenu', '', ''),
