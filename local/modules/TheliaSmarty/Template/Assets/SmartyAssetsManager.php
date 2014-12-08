@@ -33,13 +33,17 @@ class SmartyAssetsManager
     /**
      * Creates a new SmartyAssetsManager instance
      *
-     * @param AssetManagerInterface  $assetsManager             an asset manager instance
-     * @param AssetResolverInterface $assetsResolver            an asset resolver instance
-     * @param string                 $web_root                  the disk path to the web root (with final /)
-     * @param string                 $path_relative_to_web_root the path (relative to web root) where the assets will be generated
+     * @param AssetManagerInterface  $assetsManager   an asset manager instance
+     * @param AssetResolverInterface $assetsResolver  an asset resolver instance
+     * @param string $web_root the disk path to the web root (with final /)
+     * @param string $path_relative_to_web_root the path (relative to web root) where the assets will be generated
      */
-    public function __construct(AssetManagerInterface $assetsManager, AssetResolverInterface $assetsResolver, $web_root, $path_relative_to_web_root)
-    {
+    public function __construct(
+        AssetManagerInterface $assetsManager,
+        AssetResolverInterface $assetsResolver,
+        $web_root,
+        $path_relative_to_web_root
+    ) {
         $this->web_root = $web_root;
         $this->path_relative_to_web_root = $path_relative_to_web_root;
 
@@ -77,8 +81,11 @@ class SmartyAssetsManager
      * @param string $assets_directory the assets directory in the template
      * @param \TheliaSmarty\Template\SmartyParser $smartyParser the current parser.
      */
-    protected function prepareTemplateAssets(TemplateDefinition $templateDefinition, $assets_directory, SmartyParser $smartyParser)
-    {
+    protected function prepareTemplateAssets(
+        TemplateDefinition $templateDefinition,
+        $assets_directory,
+        SmartyParser $smartyParser
+    ) {
         // Get the registered template directories for the current template path
         $templateDirectories = $smartyParser->getTemplateDirectories($templateDefinition->getType());
 
@@ -91,7 +98,8 @@ class SmartyAssetsManager
                 $asset_dir_absolute_path = realpath($tpl_path);
 
                 if (false !== $asset_dir_absolute_path) {
-                    // If we're processing template assets (not module assets), we will use the $assets_directory as the assets parent dir.
+                    // If we're processing template assets (not module assets),
+                    // we will use the $assets_directory as the assets parent dir.
                     if (SmartyParser::TEMPLATE_ASSETS_KEY == $key && ! null !== $assets_directory) {
                         $assetsWebDir = SmartyParser::TEMPLATE_ASSETS_KEY . DS . $assets_directory;
                     } else {
@@ -135,7 +143,15 @@ class SmartyAssetsManager
     {
         $assetUrl = "";
 
-        $file         = $params['file'];
+        $file = $params['file'];
+
+        // The 'file' parameter is mandatory
+        if (empty($file)) {
+            throw new \InvalidArgumentException(
+                "The 'file' parameter is missing in an asset directive (type is '$assetType')"
+            );
+        }
+
         $assetOrigin  = isset($params['source']) ? $params['source'] : SmartyParser::TEMPLATE_ASSETS_KEY;
         $filters      = isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
@@ -150,7 +166,8 @@ class SmartyAssetsManager
             // We have to be sure that this external template assets have been properly prepared.
             // We will assume the following:
             //   1) this template have the same type as the current template,
-            //   2) this template assets have the same structure as the current template (which is in self::$assetsDirectory)
+            //   2) this template assets have the same structure as the current template
+            //     (which is in self::$assetsDirectory)
             $currentTemplate = $smartyParser->getTemplateDefinition();
 
             $templateDefinition = new TemplateDefinition(
@@ -190,19 +207,38 @@ class SmartyAssetsManager
         return $assetUrl;
     }
 
-    public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)
-    {
+    public function processSmartyPluginCall(
+        $assetType,
+        $params,
+        $content,
+        \Smarty_Internal_Template $template,
+        &$repeat
+    ) {
         // Opening tag (first call only)
         if ($repeat) {
-            $url = "";
+            $url = '';
             try {
                 $url = $this->computeAssetUrl($assetType, $params, $template);
+
+                if (empty($url)) {
+                    Tlog::getInstance()->addWarning(
+                        sprintf("Failed to get real path of asset %s without exception", $params['file'])
+                    );
+                }
             } catch (\Exception $ex) {
-                Tlog::getInstance()->addWarning("Failed to get real path of " . $params['file'] . ", exception: " . $ex->getMessage());
+                Tlog::getInstance()->addWarning(
+                    sprintf(
+                        "Failed to get real path of asset %s with exception: %s",
+                        $params['file'],
+                        $ex->getMessage()
+                    )
+                );
             }
             $template->assign('asset_url', $url);
         } elseif (isset($content)) {
             return $content;
         }
+
+        return null;
     }
 }
