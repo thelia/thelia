@@ -13,26 +13,29 @@ namespace Thelia\Config;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class DefinePropel
 {
-    private $processorConfig;
+    private $parameterBag;
 
-    public function __construct(ConfigurationInterface $configuration, array $propelConf)
+    public function __construct(ConfigurationInterface $configuration, array $propelConf, array $envParameters)
     {
+        $this->parameterBag = new ParameterBag($envParameters);
         $processor = new Processor();
-        $this->processorConfig = $processor->processConfiguration($configuration, $propelConf);
+        $processorConfig = $processor->processConfiguration($configuration, $propelConf);
+        $this->parameterBag->add($processorConfig["connection"]);
+        $this->parameterBag->resolve();
     }
 
     public function getConfig()
     {
-        $connection = $this->processorConfig["connection"];
 
         return array(
-            "dsn" => $connection["dsn"],
-            "user" => $connection["user"],
-            "password" => $connection["password"],
-            "classname" => $connection["classname"],
+            "dsn" => $this->parameterBag->get("dsn"),
+            "user" => $this->parameterBag->get("user"),
+            "password" => $this->parameterBag->get("password"),
+            "classname" => $this->parameterBag->get("classname"),
             'options' => array(
                 \PDO::MYSQL_ATTR_INIT_COMMAND => array('value' =>'SET NAMES \'UTF8\''))
         );
