@@ -24,11 +24,9 @@ class OrderProductQuery extends BaseOrderProductQuery
         $orderStatus = array(2, 3, 4),
         $customerId = null
     ) {
-
         $query = self::create('op');
 
         if (null !== $customerId || null !== $startDate || null !== $endDate || count($orderStatus) > 0) {
-
             $subQuery = $query->useOrderQuery();
 
             if (null !== $customerId) {
