@@ -449,7 +449,21 @@ class OrderController extends BaseFrontController
                         ->guess($path)
                     ;
 
-                    return new Response($data, 200, ["Content-Type" => $mime]);
+                    $response = new Response();
+                    
+                    // Forcing file download instead of file execution
+                    // Set headers
+                    $response->headers->set('Cache-Control', 'private');
+                    $response->headers->set('Content-type', $mime);
+                    $response->headers->set('Content-Disposition', 'attachment; filename="' . basename($path) . '";');
+                    $response->headers->set('Content-length', filesize($path));
+
+                    // Send headers before outputting anything
+                    $response->sendHeaders();
+                    
+                    $response->setContent(readfile($path));
+                    
+                    return $response;
                 }
             }
         }
