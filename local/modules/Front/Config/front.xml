@@ -83,6 +83,11 @@
         <requirement key="order_id">\d+</requirement>
     </route>
 
+    <route id="customer.order.details" path="/account/order/{order_id}">
+        <default key="_controller">Front\Controller\OrderController::orderDetails</default>
+        <requirement key="order_id">\d+</requirement>
+    </route>
+
     <route id="customer.order.pdf.delivery" path="/account/order/pdf/delivery/{order_id}">
         <default key="_controller">Front\Controller\OrderController::generateDeliveryPdf</default>
         <requirement key="order_id">\d+</requirement>
