@@ -26,7 +26,7 @@ use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
@@ -37,6 +37,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\OrderDelivery;
 use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
+use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
@@ -44,6 +45,7 @@ use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
+use Thelia\Module\AbstractDeliveryModule;
 
 /**
  * Class OrderController
@@ -73,18 +75,17 @@ class OrderController extends BaseFrontController
                 ->findOne();
 
             if (null !== $deliveryAddress) {
-
                 $deliveryModule = ModuleQuery::create()->retrieveVirtualProductDelivery($this->container);
 
                 if (false === $deliveryModule) {
                     Tlog::getInstance()->error(
                         $this->getTranslator()->trans(
-                            "To enabled the virtual product functionality, the module VirtualProductDelivery should be activated",
+                            "To enable the virtual product feature, the VirtualProductDelivery module should be activated",
                             [],
                             Front::MESSAGE_DOMAIN
                         )
                     );
-                } else if (count($deliveryModule) == 1) {
+                } elseif (count($deliveryModule) == 1) {
                     return $this->registerVirtualProductDelivery($deliveryModule[0], $deliveryAddress);
                 }
             }
@@ -93,6 +94,11 @@ class OrderController extends BaseFrontController
         return $this->render('order-delivery');
     }
 
+    /**
+     * @param AbstractDeliveryModule $moduleInstance
+     * @param Address $deliveryAddress
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     private function registerVirtualProductDelivery($moduleInstance, $deliveryAddress)
     {
         /* get postage amount */
@@ -158,7 +164,7 @@ class OrderController extends BaseFrontController
             }
 
             /* get postage amount */
-            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+            $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
             $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
 
@@ -174,15 +180,25 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.invoice");
 
         } catch (FormValidationException $e) {
-            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans(
+                "Please check your input: %s",
+                ['%s' => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans(
+                "Sorry, an error occured: %s",
+                ['%s' => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage())
+            );
 
             $orderDelivery->setErrorMessage($message);
 
@@ -191,7 +207,6 @@ class OrderController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
-
     }
 
     /**
@@ -236,15 +251,25 @@ class OrderController extends BaseFrontController
             return $this->generateRedirectFromRoute("order.payment.process");
 
         } catch (FormValidationException $e) {
-            $message = $this->getTranslator()->trans("Please check your input: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans(
+                "Please check your input: %s",
+                ['%s' => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         } catch (PropelException $e) {
             $this->getParserContext()->setGeneralError($e->getMessage());
         } catch (\Exception $e) {
-            $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()], Front::MESSAGE_DOMAIN);
+            $message = $this->getTranslator()->trans(
+                "Sorry, an error occured: %s",
+                ['%s' => $e->getMessage()],
+                Front::MESSAGE_DOMAIN
+            );
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during order payment process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf("Error during order payment process : %s. Exception was %s", $message, $e->getMessage())
+            );
 
             $orderPayment->setErrorMessage($message);
 
@@ -253,7 +278,6 @@ class OrderController extends BaseFrontController
                 ->setGeneralError($message)
             ;
         }
-
     }
 
     public function pay()
@@ -284,12 +308,15 @@ class OrderController extends BaseFrontController
         $placedOrder = $orderEvent->getPlacedOrder();
 
         if (null !== $placedOrder && null !== $placedOrder->getId()) {
-
             /* order has been placed */
             if ($orderEvent->hasResponse()) {
                 return $orderEvent->getResponse();
             } else {
-                return $this->generateRedirectFromRoute('order.placed', [], ['order_id' => $orderEvent->getPlacedOrder()->getId()]);
+                return $this->generateRedirectFromRoute(
+                    'order.placed',
+                    [],
+                    ['order_id' => $orderEvent->getPlacedOrder()->getId()]
+                );
             }
         } else {
             /* order has not been placed */
@@ -334,6 +361,7 @@ class OrderController extends BaseFrontController
 
         $this->getParserContext()->set("placed_order_id", $placedOrder->getId());
     }
+
 
     public function orderFailed($order_id, $message)
     {
@@ -411,21 +439,23 @@ class OrderController extends BaseFrontController
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
+    public function orderDetails($order_id)
+    {
+        $this->checkOrderCustomer($order_id);
+
+        return $this->render('account-order', [ 'order_id' => $order_id ]);
+    }
 
     public function downloadVirtualProduct($order_product_id)
     {
-
         if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
-
             $order = $orderProduct->getOrder();
 
             if ($order->isPaid()) {
-
                 // check customer
                 $this->checkOrderCustomer($order->getId());
 
                 if ($orderProduct->getVirtualDocument()) {
-
                     // try to get the file
                     $path = THELIA_ROOT
                         . ConfigQuery::read('documents_library_path', 'local/media/documents')
