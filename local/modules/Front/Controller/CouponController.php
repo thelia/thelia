@@ -44,7 +44,8 @@ class CouponController extends BaseFrontController
     /**
      * Clear all coupons.
      */
-    public function clearAllCouponsAction() {
+    public function clearAllCouponsAction()
+    {
         // Dispatch Event to the Action
         $this->getDispatcher()->dispatch(TheliaEvents::COUPON_CLEAR_ALL);
     }
@@ -69,7 +70,9 @@ class CouponController extends BaseFrontController
                 $message = true;
                 throw new \Exception(
                     $this->getTranslator()->trans(
-                        'Coupon code can\'t be empty', [], Front::MESSAGE_DOMAIN
+                        'Coupon code can\'t be empty',
+                        [],
+                        Front::MESSAGE_DOMAIN
                     )
                 );
             }
@@ -87,8 +90,7 @@ class CouponController extends BaseFrontController
                 $deliveryAddress = AddressQuery::create()->findPk($order->getChoosenDeliveryAddress());
 
                 if (null !== $deliveryModule && null !== $deliveryAddress) {
-
-                    $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+                    $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
                     $orderEvent = new OrderEvent($order);
 
@@ -98,8 +100,7 @@ class CouponController extends BaseFrontController
                         $orderEvent->setPostage($postage);
 
                         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
-                    }
-                    catch (DeliveryException $ex) {
+                    } catch (DeliveryException $ex) {
                         // The postage has been chosen, but changes dues to coupon causes an exception.
                         // Reset the postage data in the order
                         $orderEvent->setDeliveryModule(0);
@@ -128,7 +129,9 @@ class CouponController extends BaseFrontController
         }
 
         if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage()));
+            Tlog::getInstance()->error(
+                sprintf("Error during order delivery process : %s. Exception was %s", $message, $e->getMessage())
+            );
 
             $couponCodeForm->setErrorMessage($message);
 
