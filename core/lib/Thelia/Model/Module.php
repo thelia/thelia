@@ -9,6 +9,7 @@ use Thelia\Model\Base\Module as BaseModule;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
 use Thelia\Module\BaseModuleInterface;
+use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\PaymentModuleInterface;
 
 class Module extends BaseModule
@@ -208,6 +209,22 @@ class Module extends BaseModule
 
         if ($instance == null) {
             throw new \InvalidArgumentException(sprintf('Undefined module in container: "%s"', $this->getCode()));
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param  ContainerInterface        $container the Thelia container
+     * @return DeliveryModuleInterface   a module instance
+     * @throws \InvalidArgumentException if the module could not be found in the container/
+     */
+    public function getDeliveryModuleInstance(ContainerInterface $container)
+    {
+        $instance = $this->getModuleInstance($container);
+
+        if (! $instance instanceof DeliveryModuleInterface) {
+            throw new \InvalidArgumentException(sprintf('Module "%s" is not a payment module', $this->getCode()));
         }
 
         return $instance;
