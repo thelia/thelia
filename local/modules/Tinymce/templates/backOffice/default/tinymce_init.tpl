@@ -19,7 +19,7 @@
             "advlist autolink link image lists charmap print preview hr anchor pagebreak",
             "searchreplace wordcount visualblocks visualchars insertdatetime media nonbreaking",
             "table contextmenu directionality emoticons paste textcolor responsivefilemanager",
-            "fullscreen code youtube"
+            "fullscreen code youtube importcss"
         ],
 
         // See available controls at http://www.tinymce.com/wiki.php/Controls
@@ -44,7 +44,8 @@
 
         // Styles (CSS or LESS) available in the editor could be defined in assets/css/editor.less file.
         {stylesheets file='assets/css/editor.less' filters='less' source='Tinymce'}
-        content_css: "{$asset_url}"
+        content_css: "{$asset_url}",
+        importcss_append: true
         {/stylesheets}
     });
 </script>
