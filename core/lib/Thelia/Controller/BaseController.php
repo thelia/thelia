@@ -320,13 +320,13 @@ abstract class BaseController extends ContainerAware
                     $e->getMessage()
                 )
             );
-
-            throw new TheliaProcessException(
-                $this->getTranslator()->trans(
-                    "We're sorry, this PDF invoice is not available at the moment."
-                )
-            );
         }
+
+        throw new TheliaProcessException(
+            $this->getTranslator()->trans(
+                "We're sorry, this PDF invoice is not available at the moment."
+            )
+        );
     }
 
     /**
