@@ -9,6 +9,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Map\OrderProductTaxTableMap;
 use Thelia\Model\Base\Order as BaseOrder;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
+use Thelia\TaxEngine\Calculator;
 
 class Order extends BaseOrder
 {
@@ -20,7 +21,8 @@ class Order extends BaseOrder
     protected $disableVersioning = false;
 
     /**
-     * @param null $choosenDeliveryAddress
+     * @param Address $choosenDeliveryAddress
+     * @return $this
      */
     public function setChoosenDeliveryAddress($choosenDeliveryAddress)
     {
@@ -30,7 +32,8 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param boolean $disableVersionning
+     * @param boolean $disableVersioning
+     * @return $this
      */
     public function setDisableVersioning($disableVersioning)
     {
@@ -54,7 +57,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return null
+     * @return Address
      */
     public function getChoosenDeliveryAddress()
     {
@@ -62,7 +65,8 @@ class Order extends BaseOrder
     }
 
     /**
-     * @param null $choosenInvoiceAddress
+     * @param Address $choosenInvoiceAddress
+     * @return $this
      */
     public function setChoosenInvoiceAddress($choosenInvoiceAddress)
     {
@@ -72,7 +76,7 @@ class Order extends BaseOrder
     }
 
     /**
-     * @return null
+     * @return Address
      */
     public function getChoosenInvoiceAddress()
     {
@@ -143,7 +147,8 @@ class Order extends BaseOrder
 
             $taxAmount = $taxAmountQuery->filterByOrderProductId($orderProduct->getId(), Criteria::EQUAL)
                 ->findOne();
-            $amount += ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice()) * $orderProduct->getQuantity();
+            $price = ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
+            $amount += $price * $orderProduct->getQuantity();
             $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();
         }
 
@@ -180,7 +185,7 @@ class Order extends BaseOrder
         $countryQuery = new CountryQuery();
         $country = $countryQuery->findOneByByDefault(true);
         // get calculator for this tax / country
-        $calculator = new \Thelia\TaxEngine\Calculator();
+        $calculator = new Calculator();
         $calculator->loadTaxRuleWithoutProduct($taxRule, $country);
         // return untaxed price
         return round($calculator->getUntaxedPrice($this->getPostage()), 2);
@@ -231,11 +236,17 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PAID
      *
+     * @param bool $exact if true, the method will chek if the current status is exactly OrderStatus::CODE_PAID.
+     * if false, it will check if the order has been paid, whatever the current status is. The default is false.
      * @return bool true if this order is PAID, false otherwise.
      */
-    public function isPaid()
+    public function isPaid($exact = false)
     {
-        return $this->hasStatusHelper(OrderStatus::CODE_PAID);
+        return $this->hasStatusHelper(
+            $exact ?
+            OrderStatus::CODE_PAID :
+            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
+        );
     }
 
     /**
@@ -305,13 +316,18 @@ class Order extends BaseOrder
     }
 
     /**
-     * Check if the current status of this order is $statusCode
+     * Check if the current status of this order is $statusCode or, if $statusCode is an array, if the current
+     * status is in the $statusCode array.
      *
-     * @param  string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
+     * @param  string|array $statusCode the status code, one of OrderStatus::CODE_xxx constants.
      * @return bool   true if this order have the provided status, false otherwise.
      */
     public function hasStatusHelper($statusCode)
     {
-        return $this->getOrderStatus()->getCode() == $statusCode;
+        if (is_array($statusCode)) {
+            return in_array($this->getOrderStatus()->getCode(), $statusCode);
+        } else {
+            return $this->getOrderStatus()->getCode() == $statusCode;
+        }
     }
 }
