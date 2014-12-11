@@ -41,9 +41,21 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
         // the path to process
+        $current = $this->getParam($params, 'current', false);
         $path  = $this->getParam($params, 'path', null);
         $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
         $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+
+        if ($current) {
+            $path = $this->request->getPathInfo();
+            unset($params["current"]); // Delete the current param, so it isn't included in the url
+
+            // Then build the query variables
+            $params = array_merge(
+                $this->request->query->all(),
+                $params
+            );
+        }
 
         if ($file !== null) {
             $path = $file;
