@@ -27,6 +27,7 @@ use Symfony\Component\Routing\Router;
 
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\FirewallForm;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
@@ -209,6 +210,7 @@ abstract class BaseController extends ContainerAware
             $errors .= $error->getMessage() . ', ';
         }
 
+        /** @var Form $child */
         foreach ($form->all() as $child) {
             if (!$child->isValid()) {
                 $fieldName = $child->getConfig()->getOption('label', $child->getName());
@@ -319,6 +321,12 @@ abstract class BaseController extends ContainerAware
                 )
             );
         }
+
+        throw new TheliaProcessException(
+            $this->getTranslator()->trans(
+                "We're sorry, this PDF invoice is not available at the moment."
+            )
+        );
     }
 
     /**
@@ -580,7 +588,7 @@ abstract class BaseController extends ContainerAware
     /**
      * Render the given template, and returns the result as an Http Response.
      *
-     * @param $templateName the complete template name, with extension
+     * @param string $templateName the complete template name, with extension
      * @param  array                                $args   the template arguments
      * @param  int                                  $status http code status
      * @return \Thelia\Core\HttpFoundation\Response
@@ -590,7 +598,7 @@ abstract class BaseController extends ContainerAware
     /**
      * Render the given template, and returns the result as a string.
      *
-     * @param $templateName the complete template name, with extension
+     * @param string $templateName the complete template name, with extension
      * @param array $args        the template arguments
      * @param null  $templateDir
      *

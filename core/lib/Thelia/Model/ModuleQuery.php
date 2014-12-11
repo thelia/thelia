@@ -76,7 +76,7 @@ class ModuleQuery extends BaseModuleQuery
         /** @var \Thelia\Model\Module $module */
         foreach ($modules as $module) {
             if (null !== $container) {
-                $instance = $module->getModuleInstance($container);
+                $instance = $module->getDeliveryModuleInstance($container);
             } else {
                 $instance = $module->createInstance();
             }

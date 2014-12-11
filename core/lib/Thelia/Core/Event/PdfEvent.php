@@ -31,7 +31,7 @@ class PdfEvent extends ActionEvent
     protected $marges;
 
     /**
-     * @param $content              html content to transform into pdf
+     * @param string $content     html content to transform into pdf
      * @param string $orientation page orientation, same as TCPDF
      * @param string $format      The format used for pages, same as TCPDF
      * @param string $lang        Lang : fr, en, it...

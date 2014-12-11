@@ -161,13 +161,9 @@ class CartPostage extends AbstractSmartyPlugin
             ->find();
         ;
 
+        /** @var \Thelia\Model\Module $deliveryModule */
         foreach ($deliveryModules as $deliveryModule) {
-            /** @var DeliveryModuleInterface $moduleInstance */
-            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
-
-            if (false === $moduleInstance instanceof DeliveryModuleInterface) {
-                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
-            }
+            $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
             try {
                 // Check if module is valid, by calling isValidDelivery(),

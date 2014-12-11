@@ -44,7 +44,7 @@
             <dt>{intl l="Status"}</dt>
             <dd>{loop type="order-status" name="order_status" id=$STATUS}{$TITLE}{/loop}</dd>
 
-            {if $STATUS >= 2}
+            {if $IS_PAID}
                 <dt>{intl l="Invoice date"}</dt>
                 <dd>{format_date date=$INVOICE_DATE output="date"}</dd>
 

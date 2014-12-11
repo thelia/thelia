@@ -65,18 +65,15 @@ class Delivery extends BaseSpecificModule
             }
 
             /** @var DeliveryModuleInterface $moduleInstance */
-            $moduleInstance = $deliveryModule->getModuleInstance($this->container);
+            $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-            if (true === $virtual && false === $moduleInstance->handleVirtualProductDelivery() && false === $this->getBackendContext()) {
+            if (true === $virtual
+                && false === $moduleInstance->handleVirtualProductDelivery()
+                && false === $this->getBackendContext()) {
                 continue;
             }
 
             $loopResultRow = new LoopResultRow($deliveryModule);
-
-
-            if (false === $moduleInstance instanceof DeliveryModuleInterface) {
-                throw new \RuntimeException(sprintf("delivery module %s is not a Thelia\Module\DeliveryModuleInterface", $deliveryModule->getCode()));
-            }
 
             try {
                 // Check if module is valid, by calling isValidDelivery(),
