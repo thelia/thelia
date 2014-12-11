@@ -3,6 +3,8 @@
 - config : 
     - environment variable can be used in the database.yml file. See [https://github.com/thelia/thelia/pull/968](https://github.com/thelia/thelia/pull/968)
     - Allow other projects to override thelia directories constants by using composer "autoload"["file"] entries
+- smarty:
+    - Add the "current" argument on smarty "url" function that allows you to get the same page but with differant url parameters
 
 # 2.1.0-beta1
 
