@@ -439,13 +439,6 @@ class OrderController extends BaseFrontController
         return $this->generateOrderPdf($order_id, ConfigQuery::read('pdf_delivery_file', 'delivery'));
     }
 
-    public function orderDetails($order_id)
-    {
-        $this->checkOrderCustomer($order_id);
-
-        return $this->render('account-order', [ 'order_id' => $order_id ]);
-    }
-
     public function downloadVirtualProduct($order_product_id)
     {
         if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
