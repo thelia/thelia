@@ -14,6 +14,7 @@ namespace Thelia\Core\EventListener;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
@@ -57,40 +58,49 @@ class RequestListener implements EventSubscriberInterface
     }
 
     /**
-     * Save the previous URL in session which is based on the referer header of the request
+     * Save the previous URL in session which is based on the referer header or the request, or
+     * the _previous_url request attribute, if defined.
      *
-     * @param GetResponseEvent $event
+     * If the value of _previous_url is "dont-save", the current referrer is not saved.
+     *
+     * @param \Symfony\Component\HttpKernel\Event\PostResponseEvent $event
      */
-    public function registerPreviousUrl(GetResponseEvent $event)
+    public function registerPreviousUrl(PostResponseEvent $event)
     {
-
         $request = $event->getRequest();
 
-        // set previous URL
-        if (null !== $referer = $request->headers->get('referer')) {
+        $referrer = $request->attributes->get('_previous_url', null);
 
+        if (null !== $referrer) {
+            // A previous URL (or the keyword 'dont-save') has been specified.
+            if ('dont-save' == $referrer) {
+                // We should not save the current URL as the previous URL
+                $referrer = null;
+            }
+        } else {
+            // The current URL will become the previous URL
+            $referrer = $request->getUri();
+        }
+
+        // Set previous URL, if defined
+        if (null !== $referrer) {
             $session = $request->getSession();
 
             if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
-
-                $components = parse_url($referer);
+                $components = parse_url($referrer);
                 $lang = LangQuery::create()
                     ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
                     ->findOne();
 
                 if (null !== $lang) {
-                    $session->setReturnToUrl($referer);
+                    $session->setReturnToUrl($referrer);
                 }
-
             } else {
-
-                if ( false !== strpos($referer, $request->getSchemeAndHttpHost())) {
-                    $session->setReturnToUrl($referer);
+                if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
+                    $session->setReturnToUrl($referrer);
                 }
-
             }
         }
-
     }
 
     /**
@@ -116,10 +126,12 @@ class RequestListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array(
-                array("registerValidatorTranslator", 128),
-                array("registerPreviousUrl", 128)
-            )
+            KernelEvents::REQUEST => [
+                ["registerValidatorTranslator", 128]
+            ],
+            KernelEvents::TERMINATE => [
+                ["registerPreviousUrl", 128]
+            ]
         );
     }
 }
