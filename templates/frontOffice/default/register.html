@@ -9,6 +9,8 @@
 {/block}
 
 {block name="main-content"}
+    {* This page should not replace the current previous URL *}
+    {set_previous_url ignore_current="1"}
     <div class="main">
 
         <article class="col-main" role="main" aria-labelledby="main-label">

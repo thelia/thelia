@@ -1,3 +1,6 @@
+# 2.0.5
+- add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
+
 #2.0.4
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
