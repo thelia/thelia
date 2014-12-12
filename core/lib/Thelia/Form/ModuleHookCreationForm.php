@@ -29,6 +29,9 @@ use Thelia\Model\ModuleQuery;
  */
 class ModuleHookCreationForm extends BaseForm
 {
+    /** @var Translator */
+    protected $translator;
+
     protected function buildForm()
     {
         $this->formBuilder
@@ -40,7 +43,7 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => $this->trans("Module"),
+                    "label" => Translator::getInstance()->trans("Module"),
                     "label_attr" => array(
                         "for" => "module_id"
                     )
@@ -54,7 +57,7 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => $this->trans("Hook"),
+                    "label" => Translator::getInstance()->trans("Hook"),
                     "label_attr" => array("for" => "locale_create")
                 )
             )
@@ -65,10 +68,10 @@ class ModuleHookCreationForm extends BaseForm
                     "constraints" => array(
                         new NotBlank()
                     ),
-                    "label" => $this->trans("Service ID"),
+                    "label" => Translator::getInstance()->trans("Service ID"),
                     "label_attr" => array(
                         "for" => "classname",
-                        "help" => $this->trans(
+                        "help" => Translator::getInstance()->trans(
                             "The service id that will handle the hook (defined in the config.xml file of the module)."
                         )
                     )
@@ -78,7 +81,7 @@ class ModuleHookCreationForm extends BaseForm
                 "method",
                 "text",
                 array(
-                    "label" => $this->trans("Method Name"),
+                    "label" => Translator::getInstance()->trans("Method Name"),
                     "constraints" => array(
                         new NotBlank(),
                         new Callback(
@@ -91,12 +94,21 @@ class ModuleHookCreationForm extends BaseForm
                     ),
                     "label_attr" => array(
                         "for" => "method",
-                        "help" => $this->trans(
+                        "help" => Translator::getInstance()->trans(
                             "The method name that will handle the hook event."
                         )
                     )
                 )
             );
+    }
+
+    protected function trans($id, $parameters = [])
+    {
+        if (null === $this->translator) {
+            $this->translator = Translator::getInstance();
+        }
+
+        return $this->translator->trans($id, $parameters);
     }
 
     protected function getModuleChoices()
