@@ -16,17 +16,24 @@ namespace Thelia\Core\Event\Product;
 use Thelia\Core\Event\ActionEvent;
 
 /**
+ * This event allow modules to get information on a virtual product :
+ *
+ * - download path if a file is attached to the product sale element
+ * - use stock or not
+ * - the pse is a virtual product ? As (virtual) product can have only some PSE
+ *      really virtual.
+ *
  * Class VirtualProductCreateEvent
  * @package Thelia\Core\Event\Product
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
 class VirtualProductOrderHandleEvent extends ActionEvent
 {
-    /** @var  int the producrt sale element id*/
+    /** @var  int the product sale element id*/
     protected $pseId;
 
     /** @var  int the order id */
-    protected $order;
+    protected $orderId;
 
     /** @var  string the path of the file */
     protected $path;
@@ -37,26 +44,26 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /** @var  bool use the stock for this virtual product */
     protected $useStock = false;
 
-    public function __construct($order, $pseId)
+    public function __construct($orderId, $pseId)
     {
-        $this->order = $order;
+        $this->orderId = $orderId;
         $this->pseId = $pseId;
     }
 
     /**
      * @return int
      */
-    public function getOrder()
+    public function getOrderId()
     {
-        return $this->order;
+        return $this->orderId;
     }
 
     /**
-     * @param int $order
+     * @param int $orderId
      */
-    public function setOrder($order)
+    public function setOrderId($orderId)
     {
-        $this->order = $order;
+        $this->orderId = $orderId;
 
         return $this;
     }

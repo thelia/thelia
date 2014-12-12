@@ -15,6 +15,7 @@ namespace Thelia\Core\Event\Product;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\OrderProduct;
+use Thelia\Core\HttpFoundation\Response;
 
 /**
  * Class VirtualProductOrderDownloadResponseEvent
@@ -26,13 +27,13 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     /** @var OrderProduct */
     protected $orderProduct;
 
-    /**@var \Thelia\Core\HttpFoundation\Response */
+    /**@var Response */
     protected $response;
 
     /**
-     * @param $productOrder
+     * @param OrderProduct $productOrder
      */
-    public function __construct($orderProduct)
+    public function __construct(OrderProduct $orderProduct)
     {
         $this->orderProduct = $orderProduct;
     }
@@ -48,7 +49,7 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     /**
      * @param OrderProduct $orderProduct
      */
-    public function setOrderProduct($orderProduct)
+    public function setOrderProduct(OrderProduct $orderProduct)
     {
         $this->orderProduct = $orderProduct;
 
@@ -56,7 +57,7 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return Response
      */
     public function getResponse()
     {
@@ -64,9 +65,9 @@ class VirtualProductOrderDownloadResponseEvent extends ActionEvent
     }
 
     /**
-     * @param \Thelia\Core\HttpFoundation\Response $response
+     * @param Response $response
      */
-    public function setResponse($response)
+    public function setResponse(Response $response)
     {
         $this->response = $response;
 

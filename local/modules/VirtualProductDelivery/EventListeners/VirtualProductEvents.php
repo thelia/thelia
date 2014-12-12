@@ -55,7 +55,6 @@ class VirtualProductEvents implements EventSubscriberInterface
         $orderProduct = $event->getOrderProduct();
 
         if ($orderProduct->getVirtualDocument()) {
-
             // try to get the file
             $path = THELIA_ROOT
                 . ConfigQuery::read('documents_library_path', 'local/media/documents')

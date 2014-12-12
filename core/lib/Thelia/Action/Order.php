@@ -227,25 +227,26 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             // get the virtual document path
             $virtualDocumentEvent = new VirtualProductOrderHandleEvent($placedOrder, $pse->getId());
-            $checkStock = true;
+            // essentially used for virtual product. modules that handles virtual product can
+            // allow the use of stock even for virtual products
+            $useStock = true;
             $virtual = 0;
 
             // if the product is virtual, dispatch an event to collect information
             if ($product->getVirtual() === 1) {
                 $dispatcher->dispatch(TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE, $virtualDocumentEvent);
-                $checkStock = $virtualDocumentEvent->isUseStock();
+                $useStock = $virtualDocumentEvent->isUseStock();
                 $virtual = $virtualDocumentEvent->isVirtual() ? 1 : 0;
             }
 
             /* check still in stock */
-
             if ($cartItem->getQuantity() > $pse->getQuantity()
                     && true === ConfigQuery::checkAvailableStock()
-                    && $checkStock) {
+                    && $useStock) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
-            if ($checkStock) {
+            if ($useStock) {
                 /* decrease stock for non virtual product */
                 $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
