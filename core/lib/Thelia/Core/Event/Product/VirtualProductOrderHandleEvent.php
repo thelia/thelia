@@ -14,6 +14,7 @@
 namespace Thelia\Core\Event\Product;
 
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Model\Order;
 
 /**
  * This event allow modules to get information on a virtual product :
@@ -32,8 +33,8 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /** @var  int the product sale element id*/
     protected $pseId;
 
-    /** @var  int the order id */
-    protected $orderId;
+    /** @var  Order the order */
+    protected $order;
 
     /** @var  string the path of the file */
     protected $path;
@@ -44,26 +45,26 @@ class VirtualProductOrderHandleEvent extends ActionEvent
     /** @var  bool use the stock for this virtual product */
     protected $useStock = false;
 
-    public function __construct($orderId, $pseId)
+    public function __construct(Order $order, $pseId)
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
         $this->pseId = $pseId;
     }
 
     /**
-     * @return int
+     * @return Order
      */
-    public function getOrderId()
+    public function getOrder()
     {
-        return $this->orderId;
+        return $this->order;
     }
 
     /**
-     * @param int $orderId
+     * @param Order $order
      */
-    public function setOrderId($orderId)
+    public function setOrder($order)
     {
-        $this->orderId = $orderId;
+        $this->order = $order;
 
         return $this;
     }
