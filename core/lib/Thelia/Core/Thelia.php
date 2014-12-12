@@ -24,8 +24,10 @@ namespace Thelia\Core;
 use Propel\Runtime\Connection\ConnectionManagerSingle;
 use Propel\Runtime\Connection\ConnectionWrapper;
 use Propel\Runtime\Propel;
+use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Debug\Debug;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -72,18 +74,12 @@ class Thelia extends Kernel
             return ;
         }
 
-        $definePropel = new DefinePropel(
-            new DatabaseConfiguration(),
-            Yaml::parse(THELIA_CONF_DIR . 'database.yml'),
-            $this->getEnvParameters()
-        );
-
         /** @var \Propel\Runtime\ServiceContainer\StandardServiceContainer $serviceContainer */
         $serviceContainer = Propel::getServiceContainer();
         $serviceContainer->setDefaultDatasource('thelia');
 
         $manager = new ConnectionManagerSingle();
-        $manager->setConfiguration($definePropel->getConfig());
+        $manager->setConfiguration($this->getPropelConfig());
         $manager->setName('thelia');
 
         $serviceContainer->setConnectionManager('thelia', $manager);
@@ -100,6 +96,43 @@ class Thelia extends Kernel
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
             $con->useDebug(true);
         }
+    }
+
+    /**
+     *
+     * process the configuration and create a cache.
+     *
+     * @return array configuration for propel
+     */
+    protected function getPropelConfig()
+    {
+        $cachePath = $this->getCacheDir() . DS . 'PropelConfig.php';
+
+        $cache = new ConfigCache($cachePath, $this->debug);
+
+        if (!$cache->isFresh()) {
+            $file = THELIA_CONF_DIR . 'database.yml';
+
+            $definePropel = new DefinePropel(
+                new DatabaseConfiguration(),
+                Yaml::parse($file),
+                $this->getEnvParameters()
+            );
+
+            $resource = [
+                new FileResource($file)
+            ];
+
+            $config = $definePropel->getConfig();
+
+            $code = sprintf("<?php return %s;", var_export($config, true));
+
+            $cache->write($code, $resource);
+        }
+
+        $config = require $cachePath;
+
+        return $config;
     }
 
     /**
