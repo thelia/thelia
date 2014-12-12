@@ -19,6 +19,7 @@ use Thelia\Core\Event\Order\OrderAddressEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Order\OrderManualEvent;
 use Thelia\Core\Event\Order\OrderPaymentEvent;
+use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
@@ -224,14 +225,28 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             $pse = $cartItem->getProductSaleElements();
 
+            // get the virtual document path
+            $virtualDocumentEvent = new VirtualProductOrderHandleEvent($placedOrder, $pse->getId());
+            // essentially used for virtual product. modules that handles virtual product can
+            // allow the use of stock even for virtual products
+            $useStock = true;
+            $virtual = 0;
+
+            // if the product is virtual, dispatch an event to collect information
+            if ($product->getVirtual() === 1) {
+                $dispatcher->dispatch(TheliaEvents::VIRTUAL_PRODUCT_ORDER_HANDLE, $virtualDocumentEvent);
+                $useStock = $virtualDocumentEvent->isUseStock();
+                $virtual = $virtualDocumentEvent->isVirtual() ? 1 : 0;
+            }
+
             /* check still in stock */
             if ($cartItem->getQuantity() > $pse->getQuantity()
                     && true === ConfigQuery::checkAvailableStock()
-                    && 0 === $product->getVirtual()) {
+                    && $useStock) {
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
-            if (0 === $product->getVirtual()) {
+            if ($useStock) {
                 /* decrease stock for non virtual product */
                 $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
@@ -258,18 +273,6 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $lang->getLocale()
             );
 
-            // get the virtual document path
-            $virtualDocumentPath = null;
-            if ($product->getVirtual() === 1) {
-                // try to find the associated document
-                if (null !== $documentId = MetaDataQuery::getVal('virtual', MetaDataModel::PSE_KEY, $pse->getId())) {
-                    $productDocument = ProductDocumentQuery::create()->findPk($documentId);
-                    if (null !== $productDocument) {
-                        $virtualDocumentPath = $productDocument->getFile();
-                    }
-                }
-            }
-
             $orderProduct = new OrderProduct();
             $orderProduct
                 ->setOrderId($placedOrder->getId())
@@ -280,8 +283,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setChapo($productI18n->getChapo())
                 ->setDescription($productI18n->getDescription())
                 ->setPostscriptum($productI18n->getPostscriptum())
-                ->setVirtual($product->getVirtual())
-                ->setVirtualDocument($virtualDocumentPath)
+                ->setVirtual($virtual)
+                ->setVirtualDocument($virtualDocumentEvent->getPath())
                 ->setQuantity($cartItem->getQuantity())
                 ->setPrice($cartItem->getPrice())
                 ->setPromoPrice($cartItem->getPromoPrice())

@@ -272,6 +272,10 @@ final class TheliaEvents
 
     const PRODUCT_ADD_CATEGORY    = "action.addProductCategory";
     const PRODUCT_REMOVE_CATEGORY = "action.deleteProductCategory";
+
+    const VIRTUAL_PRODUCT_ORDER_HANDLE = "action.virtualProduct.handleOrder";
+    const VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE = "action.virtualProduct.downloadResponse";
+
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
