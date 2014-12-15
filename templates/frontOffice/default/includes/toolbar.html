@@ -38,8 +38,8 @@
     </div><!-- /.sorter -->
     {else}
         {if $amount > $limit}
-        <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
-            <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
+        <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}">
+            <strong id="pagination-label-{$toolbar}" class="pagination-label">{intl l="Pagination"}</strong>
             <ul class="pagination">
                 <li{if $product_page le 1} class="disabled"{/if}><a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a></li>
                 {pageloop rel="product_list"}
