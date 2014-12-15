@@ -49,6 +49,7 @@
 
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
+                                        {render_form_field form=$form field="module_id"}
                                         {render_form_field form=$form field="hook_id"}
                                         {render_form_field form=$form field="active"}
                                     </div>
