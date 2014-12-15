@@ -15,5 +15,9 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 1, 'en_US', 'Customer account - additional information', '', '')
 ;
 
+-- back hooks
+
+UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';
+
 
 SET FOREIGN_KEY_CHECKS = 1;

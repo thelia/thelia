@@ -24,10 +24,12 @@ use Thelia\Model\HookQuery;
  * @package Thelia\Form
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHookModificationForm extends BaseForm
+class ModuleHookModificationForm extends ModuleHookCreationForm
 {
     protected function buildForm()
     {
+        parent::buildForm();
+
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
             ->add("hook_id", "choice", array(

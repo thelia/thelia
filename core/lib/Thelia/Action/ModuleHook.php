@@ -124,6 +124,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             // todo: test if classname and method exists
             $moduleHook
                 ->setHookId($event->getHookId())
+                ->setModuleId($event->getModuleHookId())
                 ->setClassname($event->getClassname())
                 ->setMethod($event->getMethod())
                 ->setActive($event->getActive())
