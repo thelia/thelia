@@ -33,6 +33,7 @@ use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\OrderDelivery;
@@ -455,7 +456,13 @@ class OrderController extends BaseFrontController
                     $virtualProductEvent
                 );
 
-                return $virtualProductEvent->getResponse();
+                $response = $virtualProductEvent->getResponse();
+
+                if (!$response instanceof BaseResponse) {
+                    throw new \RuntimeException('A Response must be added in the event TheliaEvents::VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE');
+                }
+
+                return $response;
             }
         }
 

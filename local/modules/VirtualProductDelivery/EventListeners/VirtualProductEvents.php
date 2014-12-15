@@ -14,7 +14,9 @@
 namespace VirtualProductDelivery\EventListeners;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderHandleEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -72,13 +74,10 @@ class VirtualProductEvents implements EventSubscriberInterface
                 );
             }
 
-            $data = file_get_contents($path);
+            $response = new BinaryFileResponse($path);
+            $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+            $event->setResponse($response);
 
-            $mime = MimeTypeGuesser::getInstance()
-                ->guess($path)
-            ;
-
-            $event->setResponse(new Response($data, 200, ["Content-Type" => $mime]));
         }
     }
 
