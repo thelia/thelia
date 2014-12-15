@@ -63,6 +63,7 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \SimplePie_Item $item */
         foreach ($loopResult->getResultDataCollection() as $item) {
             $loopResultRow = new LoopResultRow();
 
