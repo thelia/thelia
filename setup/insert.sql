@@ -676,7 +676,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1233, 'coupon.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1234, 'coupon.list-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1235, 'module.configuration', 2, 1, 0, 1, 1, 1, NOW(), NOW()),
-(1236, 'module.config-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1236, 'module.config-js', 2, 1, 0, 1, 1, 1, NOW(), NOW()),
 (1237, 'message.edit-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1238, 'image.edit-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1239, 'attributes.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
