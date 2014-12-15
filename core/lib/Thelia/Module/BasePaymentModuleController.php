@@ -41,7 +41,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
     abstract protected function getModuleCode();
 
     /**
-     * Initialize a module-specific logger.
+     * Returns the module-specific logger, initializing it if required.
      *
      * @return Tlog a Tlog instance
      */
@@ -61,10 +61,19 @@ abstract class BasePaymentModuleController extends BaseFrontController
     }
 
     /**
+     * @return string The path to the module's log file.
+     */
+    protected function getLogFilePath()
+    {
+        return sprintf(THELIA_ROOT."log".DS."%s.log", strtolower($this->getModuleCode()));
+    }
+
+    /**
      * Process the confirmation of an order. This method should be  called
      * once the module has performed the required checks to confirm a valid payment.
      *
      * @param int $order_id the order ID
+     * @throws \Exception
      */
     public function confirmPayment($order_id)
     {
@@ -149,7 +158,9 @@ abstract class BasePaymentModuleController extends BaseFrontController
     protected function getOrder($order_id)
     {
         if (null == $order = OrderQuery::create()->findPk($order_id)) {
-            $this->getLog()->addError($this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $order_id)));
+            $this->getLog()->addError(
+                $this->getTranslator()->trans("Unknown order ID:  %id", array('%id' => $order_id))
+            );
         }
 
         return $order;
