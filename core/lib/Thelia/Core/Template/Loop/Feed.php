@@ -46,7 +46,9 @@ class Feed extends BaseLoop implements ArraySearchLoopInterface
             }
         }
 
-        $feed = new \SimplePie($this->getUrl(), THELIA_ROOT . 'cache/feeds');
+        $feed = new \SimplePie();
+        $feed->set_feed_url($this->getUrl());
+        $feed->set_cache_location(THELIA_ROOT . 'cache/feeds');
 
         $feed->init();
 
