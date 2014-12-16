@@ -50,7 +50,7 @@ abstract class BasePaymentModuleController extends BaseFrontController
         if ($this->log == null) {
             $this->log = Tlog::getNewInstance();
 
-            $logFilePath = sprintf(THELIA_ROOT."log".DS."%s.log", strtolower($this->getModuleCode()));
+            $logFilePath = $this->getLogFilePath();
 
             $this->log->setPrefix("#LEVEL: #DATE #HOUR: ");
             $this->log->setDestinations("\\Thelia\\Log\\Destination\\TlogDestinationFile");
