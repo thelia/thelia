@@ -8,7 +8,7 @@ return array(
     '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Promiňеу!</strong> Nemáme žádný způsob doručení vaší objednávku.',
     'A problem occured' => 'Nastal problém',
-    'A summary of your order email has been sent to the following address' => 'E-mail se souhrnem objednávky byl odeslán na následující adresu',
+    'A summary of your order has been sent to the following address' => 'E-mail se souhrnem objednávky byl odeslán na následující adresu',
     'Account' => 'Účet',
     'Add a new address' => 'Přidat novou adresu',
     'Add to cart' => 'Přidat do košíku',

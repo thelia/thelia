@@ -7,7 +7,7 @@ return array(
     '+ View All' => '+ Visualizza tutti',
     '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Siamo dispiacenti!</strong> Non siamo in grado di darvi un metodo di consegna per il vostro ordine.',
-    'A summary of your order email has been sent to the following address' => 'Un riassunto del tuo ordine è stato inviato a quest\'indirizzo',
+    'A summary of your order has been sent to the following address' => 'Un riassunto del tuo ordine è stato inviato a quest\'indirizzo',
     'Account' => 'Conto',
     'Add a new address' => 'Aggiungere un nuovo indirizzo',
     'Add to cart' => 'Aggiungi al carrello',

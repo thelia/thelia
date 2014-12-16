@@ -8,7 +8,7 @@ return array(
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.',
     'A new password has been sent to your e-mail address. Please check your mailbox.' => 'A new password has been sent to your e-mail address. Please check your mailbox.',
     'A problem occured' => 'A problem occured',
-    'A summary of your order email has been sent to the following address' => 'A summary of your order email has been sent to the following address',
+    'A summary of your order has been sent to the following address' => 'A summary of your order has been sent to the following address',
     'Account' => 'Account',
     'Add a new address' => 'Add a new address',
     'Add to cart' => 'Add to cart',
