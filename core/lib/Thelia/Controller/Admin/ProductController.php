@@ -145,7 +145,7 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getUpdateForm()
     {
-        return new ProductModificationForm($this->getRequest());
+        return new ProductModificationForm($this->getRequest(), "form", [], [], $this->container);
     }
 
     protected function getCreationEvent($formData)
@@ -366,7 +366,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Setup the object form
-        return new ProductModificationForm($this->getRequest(), "form", $data);
+        return new ProductModificationForm($this->getRequest(), "form", $data, [], $this->container);
     }
 
     /**

@@ -97,21 +97,23 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param mixed $object
      */
     abstract protected function hydrateObjectForm($object);
 
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param mixed $formData
+     * @return \Thelia\Core\Event\ActionEvent
      */
     abstract protected function getCreationEvent($formData);
 
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param mixed $formData
+     * @return \Thelia\Core\Event\ActionEvent
      */
     abstract protected function getUpdateEvent($formData);
 
@@ -123,14 +125,14 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
-     * @param unknown $event
+     * @param mixed $event
      */
     abstract protected function eventContainsObject($event);
 
     /**
      * Get the created object from an event.
      *
-     * @param unknown $event
+     * @param mixed $event
      */
     abstract protected function getObjectFromEvent($event);
 
@@ -142,21 +144,21 @@ abstract class AbstractCrudController extends BaseAdminController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param mixed $object
      */
     abstract protected function getObjectLabel($object);
 
     /**
      * Returns the object ID from the object
      *
-     * @param unknown $object
+     * @param mixed $object
      */
     abstract protected function getObjectId($object);
 
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
+     * @param mixed $currentOrder, if any, null otherwise.
      */
     abstract protected function renderListTemplate($currentOrder);
 
@@ -304,6 +306,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $createEvent = $this->getCreationEvent($data);
+            $createEvent->bindForm($form);
 
             // Dispatch Create Event
             $this->dispatch($this->createEventIdentifier, $createEvent);
@@ -405,6 +408,7 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Create a new event object with the modified fields
             $changeEvent = $this->getUpdateEvent($data);
+            $changeEvent->bindForm($form);
 
             // Dispatch Update Event
             $this->dispatch($this->updateEventIdentifier, $changeEvent);
