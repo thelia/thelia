@@ -752,6 +752,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1309, 'content.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
 (1310, 'brand.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
 (1311, 'order-edit.bill-delivery-address', 2, 1, 0, 1, 1, 1, NOW(), NOW()),
+(1312, 'product.modification.form_top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1313, 'product.modification.form_bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1859,6 +1861,10 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (1310, 'en_US', 'Brand - Tab', '', ''),
 (1311, 'fr_FR', 'Modification commande - adresse de livraison', '', ''),
 (1311, 'en_US', 'Order edit - delivery address', '', ''),
+(1312, 'fr_FR', 'Page produit - En haut du formulaire', '', ''),
+(1312, 'en_US', 'Product page - On the top of the form', '', ''),
+(1313, 'fr_FR', 'Page produit - En bas du formulaire', '', ''),
+(1313, 'en_US', 'Product page - On the bottom of the form', '', ''),
 
 (2001, 'fr_FR', 'Facture - CSS', '', ''),
 (2001, 'en_US', 'Invoice - CSS', '', ''),

@@ -27,9 +27,11 @@ if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
 require __DIR__ . '/../core/bootstrap.php';
-
 $thelia = new Thelia\Core\Thelia("dev", true);
 $thelia->boot();
+
+// Load the translator
+$thelia->getContainer()->get("thelia.translator");
 
 $faker = Faker\Factory::create();
 // Intialize URL management

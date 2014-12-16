@@ -11,6 +11,8 @@
             close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
         }
 
+        {hook name="product.modification.form_top" form=$form}
+
         {* Be sure to get the product ID, even if the form could not be validated*}
         <input type="hidden" name="page" value="{$page}" />
         <input type="hidden" name="product_id" value="{$product_id}">
@@ -132,6 +134,8 @@
                 {/form_field}
             </div>
         </div>
+
+        {hook name="product.modification.form_bottom" form=$form}
 
         {include
             file = "includes/inner-form-toolbar.html"
