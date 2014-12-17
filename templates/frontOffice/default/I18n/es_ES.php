@@ -5,7 +5,7 @@ return array(
     '%nb Items' => '%nb artículos',
     '+ View All' => '+ Ver todo',
     '404' => '404',
-    'A summary of your order email has been sent to the following address' => 'Un resumen de tu pedido ha sido enviado a la siguiente dirección de correo',
+    'A summary of your order has been sent to the following address' => 'Un resumen de tu pedido ha sido enviado a la siguiente dirección de correo',
     'Account' => 'Cuenta',
     'Add a new address' => 'Añadir una nueva dirección',
     'Add to cart' => 'Añadir al carrito',

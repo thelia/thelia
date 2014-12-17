@@ -8,7 +8,7 @@ return array(
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Désolé !</strong>Nous ne pouvons pas trouver de mode de livraison pour votre commande.',
     'A new password has been sent to your e-mail address. Please check your mailbox.' => 'Un nouveau mot de passe vient d\'être envoyé à votre adresse e-mail. Merci de vérifier votre boite de réception.',
     'A problem occured' => 'Un problème est survenu',
-    'A summary of your order email has been sent to the following address' => 'Un récapitulatif de commande vous a été envoyé par e-mail à l\'adresse suivante : ',
+    'A summary of your order has been sent to the following address' => 'Un récapitulatif de commande vous a été envoyé par e-mail à l\'adresse suivante : ',
     'Account' => 'Mon compte',
     'Add a new address' => 'Ajouter une nouvelle adresse',
     'Add to cart' => 'Ajouter au panier',

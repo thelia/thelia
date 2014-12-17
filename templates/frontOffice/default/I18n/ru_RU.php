@@ -8,7 +8,7 @@ return array(
     '404' => '404',
     '<strong>Sorry!</strong> We are not able to give you a delivery method for your order.' => '<strong>Сожалеем!</strong> Мы не можем Вам предложить способы доставки для вашего заказа.',
     'A problem occured' => 'Возникла проблема',
-    'A summary of your order email has been sent to the following address' => 'Информация о заказе была отправлен на следующий адрес',
+    'A summary of your order has been sent to the following address' => 'Информация о заказе была отправлен на следующий адрес',
     'Account' => 'Учетная запись',
     'Add a new address' => 'Добавить новый адрес',
     'Add to cart' => 'Добавить в корзину',
