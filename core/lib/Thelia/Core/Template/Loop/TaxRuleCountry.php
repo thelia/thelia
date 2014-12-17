@@ -88,7 +88,7 @@ class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
                 $search->addJoinObject($originalCountryJoin, 's_to_o');
                 $search->where('`origin`.`COUNTRY_ID`' . Criteria::EQUAL . '?', $country, \PDO::PARAM_INT);
 
-                $search->having('COUNT(*)=?', $this->taxCountForOriginCountry, \PDO::PARAM_INT);
+                //$search->having('COUNT(*)=?', $this->taxCountForOriginCountry, \PDO::PARAM_INT);
 
                 $search->filterByTaxRuleId($taxRule);
 
