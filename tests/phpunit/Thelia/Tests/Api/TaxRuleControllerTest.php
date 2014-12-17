@@ -16,6 +16,7 @@ use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\TaxTableMap;
 use Thelia\Model\TaxQuery;
+use Thelia\Model\TaxRuleQuery;
 use Thelia\Tests\ApiTestCase;
 
 /**
@@ -26,6 +27,18 @@ use Thelia\Tests\ApiTestCase;
  */
 class TaxRuleControllerTest extends ApiTestCase
 {
+
+    protected static $defaultId;
+
+    public static function setUpBeforeClass()
+    {
+        $taxRule = TaxRuleQuery::create()
+            ->filterByIsDefault(1)
+            ->findOne();
+
+        self::$defaultId = $taxRule->getId();
+    }
+
     public function testListAction()
     {
         $client = static::createClient();
@@ -232,6 +245,7 @@ class TaxRuleControllerTest extends ApiTestCase
         $response = $client->getResponse();
 
         $this->assertEquals(204, $response->getStatusCode());
+
     }
 
     public function testCreateTaxRuleWithInvalidData()
@@ -276,5 +290,12 @@ class TaxRuleControllerTest extends ApiTestCase
         $response = $client->getResponse();
 
         $this->assertEquals(500, $response->getStatusCode());
+    }
+
+    public static function tearDownAfterClass()
+    {
+        TaxRuleQuery::create()
+            ->filterById(self::$defaultId)
+            ->update(array('IsDefault' => true));
     }
 }

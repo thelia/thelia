@@ -71,4 +71,15 @@ class Cheque extends BaseModule implements PaymentModuleInterface
 
         parent::destroy($con, $deleteModuleData);
     }
+
+    /**
+     * if you want, you can manage stock in your module instead of order process.
+     * Return false if you want to manage yourself the stock
+     *
+     * @return bool
+     */
+    public function manageStockOnCreation()
+    {
+        return true;
+    }
 }

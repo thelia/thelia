@@ -92,4 +92,12 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
             )
         );
     }
+
+    /**
+     * @inherited
+     */
+    public function manageStockOnCreation()
+    {
+        return true;
+    }
 }

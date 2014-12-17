@@ -41,4 +41,13 @@ interface PaymentModuleInterface extends BaseModuleInterface
      * @return boolean
      */
     public function isValidPayment();
+
+
+    /**
+     * if you want, you can manage stock in your module instead of order process.
+     * Return false if you want to manage yourself the stock
+     *
+     * @return bool
+     */
+    public function manageStockOnCreation();
 }
