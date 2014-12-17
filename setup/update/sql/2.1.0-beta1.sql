@@ -7,7 +7,7 @@ UPDATE `config` SET `value`='beta1' WHERE `name`='thelia_extra_version';
 
 DELETE FROM `config` WHERE `name`='session_config.handlers';
 
-CREATE TABLE `api`
+CREATE TABLE IF NOT EXISTS `api`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `label` VARCHAR(255),
