@@ -141,4 +141,17 @@ class Argument
             $empty
         );
     }
+
+    public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\EnumListType($entries)
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
 }
