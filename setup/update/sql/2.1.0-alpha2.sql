@@ -111,7 +111,7 @@ ALTER TABLE `module`
 ;
 
 UPDATE `country` SET `isoalpha2` = 'BH' WHERE `isoalpha3` = 'BHR';
-UPDATE `country` SET `isoalpha2` = 'BG' WHERE `isoalpha3` = 'MDG';
+UPDATE `country` SET `isoalpha2` = 'MG' WHERE `isoalpha3` = 'MDG';
 
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `module`;
