@@ -1,5 +1,5 @@
 {
-    "name": "thelia/thelia-smarty-module",
+    "name": "thelia/smarty-module",
     "type": "thelia-module",
     "require": {
         "thelia/installer": "~1.1"

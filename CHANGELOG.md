@@ -8,6 +8,7 @@
 - new method ```manageStockOnCreation``` in PaymentModuleInterface. If return false, the stock will be decreased on paid status instead of order creation.
 - Thelia:
     - Split Thelia on multiple repositories to allow a better version management with composer. For creating a new project, see [https://github.com/thelia/thelia-project]
+    - Extract all the default modules into other repositories
 
 # 2.1.0-beta1
 
