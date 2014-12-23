@@ -75,8 +75,8 @@ class Database
         if (null === $extraSqlFiles) {
             $sql = array_merge(
                 $sql,
-                $this->prepareSql(file_get_contents(THELIA_ROOT . '/setup/thelia.sql')),
-                $this->prepareSql(file_get_contents(THELIA_ROOT . '/setup/insert.sql'))
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'thelia.sql')),
+                $this->prepareSql(file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql'))
             );
         } else {
             foreach ($extraSqlFiles as $fileToInsert) {
