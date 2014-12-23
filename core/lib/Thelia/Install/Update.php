@@ -28,9 +28,9 @@ use Thelia\Log\Tlog;
  */
 class Update
 {
-    const SQL_DIR = 'setup/update/sql/';
+    const SQL_DIR = 'update/sql/';
 
-    const PHP_DIR = 'setup/update/php/';
+    const PHP_DIR = 'update/php/';
 
     protected static $version = array(
         '0' => '2.0.0-beta1',
@@ -271,7 +271,7 @@ class Update
         // sql update
         $filename = sprintf(
             "%s%s%s",
-            THELIA_ROOT,
+            THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::SQL_DIR),
             $version . '.sql'
         );
@@ -285,7 +285,7 @@ class Update
         // php update
         $filename = sprintf(
             "%s%s%s",
-            THELIA_ROOT,
+            THELIA_SETUP_DIRECTORY,
             str_replace('/', DS, self::PHP_DIR),
             $version . '.php'
         );
