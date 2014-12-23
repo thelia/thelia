@@ -45,7 +45,7 @@ interface PaymentModuleInterface extends BaseModuleInterface
 
     /**
      * if you want, you can manage stock in your module instead of order process.
-     * Return false if you want to manage yourself the stock
+     * Return false to decrease the stock when order status switch to pay
      *
      * @return bool
      */

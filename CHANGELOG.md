@@ -5,6 +5,7 @@
     - Allow other projects to override thelia directories constants by using composer "autoload"["file"] entries
 - smarty:
     - Add the "current" argument on smarty "url" function that allows you to get the same page but with differant url parameters
+- new method ```manageStockOnCreation``` in PaymentModuleInterface. If return false, the stock will be decreased on paid status instead of order creation.
 
 # 2.1.0-beta1
 
