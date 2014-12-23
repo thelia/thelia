@@ -27,7 +27,6 @@ use Thelia\Tests\ApiTestCase;
  */
 class TaxRuleControllerTest extends ApiTestCase
 {
-
     protected static $defaultId;
 
     public static function setUpBeforeClass()
@@ -245,7 +244,6 @@ class TaxRuleControllerTest extends ApiTestCase
         $response = $client->getResponse();
 
         $this->assertEquals(204, $response->getStatusCode());
-
     }
 
     public function testCreateTaxRuleWithInvalidData()

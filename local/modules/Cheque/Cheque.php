@@ -80,6 +80,6 @@ class Cheque extends BaseModule implements PaymentModuleInterface
      */
     public function manageStockOnCreation()
     {
-        return true;
+        return false;
     }
 }
