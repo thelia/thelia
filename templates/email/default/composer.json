@@ -2,7 +2,7 @@
     "name": "thelia/email-default-template",
     "type": "thelia-email-template",
     "require": {
-        "thelia/installer": "1.0"
+        "thelia/installer": "1.1"
     },
     "extra": {
         "installer-name": "default"
