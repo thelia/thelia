@@ -228,5 +228,4 @@ class PdfEvent extends ActionEvent
         $this->fontName = $fontName;
         return $this;
     }
-
 }

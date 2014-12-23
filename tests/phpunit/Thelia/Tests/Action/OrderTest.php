@@ -262,7 +262,12 @@ class OrderTest extends \PHPUnit_Framework_TestCase
 
         /* define payment module in container */
         $paymentModuleClass = $paymentModule->getFullNamespace();
-        $this->container->set(sprintf('module.%s', $paymentModule->getCode()), new $paymentModuleClass());
+
+        /** @var \Thelia\Module\PaymentModuleInterface $paymentInstance */
+        $paymentInstance = new $paymentModuleClass();
+        $this->container->set(sprintf('module.%s', $paymentModule->getCode()), $paymentInstance);
+        $manageStock = $paymentInstance->manageStockOnCreation();
+
 
         $this->orderEvent->getOrder()->setChoosenDeliveryAddress($validDeliveryAddress->getId());
         $this->orderEvent->getOrder()->setChoosenInvoiceAddress($validInvoiceAddress->getId());
@@ -353,19 +358,28 @@ class OrderTest extends \PHPUnit_Framework_TestCase
                 $orderProduct->getOrderProductAttributeCombinations()->count()
             );
 
-            if ($orderProduct->getVirtual()) {
+            if ($manageStock) {
+                if ($orderProduct->getVirtual()) {
+                    /* check same stock*/
+                    $this->assertEquals(
+                        $itemsStock[$index],
+                        $cartItem->getProductSaleElements()->getQuantity()
+                    );
+                } else {
+                    /* check stock decrease */
+                    $this->assertEquals(
+                        $itemsStock[$index] - $orderProduct->getQuantity(),
+                        $cartItem->getProductSaleElements()->getQuantity()
+                    );
+                }
+            } else {
                 /* check same stock*/
                 $this->assertEquals(
                     $itemsStock[$index],
                     $cartItem->getProductSaleElements()->getQuantity()
                 );
-            } else {
-                /* check stock decrease */
-                $this->assertEquals(
-                    $itemsStock[$index] - $orderProduct->getQuantity(),
-                    $cartItem->getProductSaleElements()->getQuantity()
-                );
             }
+
 
             /* check tax */
             $orderProductTaxList = $orderProduct->getOrderProductTaxes();

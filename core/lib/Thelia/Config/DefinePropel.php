@@ -30,7 +30,6 @@ class DefinePropel
 
     public function getConfig()
     {
-
         return array(
             "dsn" => $this->parameterBag->get("dsn"),
             "user" => $this->parameterBag->get("user"),

@@ -34,6 +34,7 @@ use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\MetaDataQuery;
+use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\Order as ModelOrder;
 use Thelia\Model\OrderAddress;
@@ -143,8 +144,27 @@ class Order extends BaseAction implements EventSubscriberInterface
         $event->setOrder($order);
     }
 
-    protected function createOrder(EventDispatcherInterface $dispatcher, ModelOrder $sessionOrder, CurrencyModel $currency, LangModel $lang, CartModel $cart, UserInterface $customer)
-    {
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     * @param ModelOrder $sessionOrder
+     * @param CurrencyModel $currency
+     * @param LangModel $lang
+     * @param CartModel $cart
+     * @param UserInterface $customer
+     * @param bool $manageStock decrement stock when order is created if true
+     * @return ModelOrder
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    protected function createOrder(
+        EventDispatcherInterface $dispatcher,
+        ModelOrder $sessionOrder,
+        CurrencyModel $currency,
+        LangModel $lang,
+        CartModel $cart,
+        UserInterface $customer,
+        $manageStock
+    ) {
         $con = Propel::getConnection(
             OrderTableMap::DATABASE_NAME
         );
@@ -246,7 +266,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 throw new TheliaProcessException("Not enough stock", TheliaProcessException::CART_ITEM_NOT_ENOUGH_STOCK, $cartItem);
             }
 
-            if ($useStock) {
+            if ($useStock && $manageStock) {
                 /* decrease stock for non virtual product */
                 $allowNegativeStock = intval(ConfigQuery::read('allow_negative_stock', 0));
                 $newStock = $pse->getQuantity() - $cartItem->getQuantity();
@@ -346,7 +366,8 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getCurrency(),
                 $event->getLang(),
                 $event->getCart(),
-                $event->getCustomer()
+                $event->getCustomer(),
+                true
             )
         );
 
@@ -363,6 +384,11 @@ class Order extends BaseAction implements EventSubscriberInterface
         $session = $this->getSession();
 
         $dispatcher = $event->getDispatcher();
+        $order = $event->getOrder();
+        $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
+
+        /** @var \Thelia\Module\PaymentModuleInterface $paymentModuleInstance */
+        $paymentModuleInstance = $paymentModule->createInstance();
 
         $placedOrder = $this->createOrder(
             $event->getDispatcher(),
@@ -370,7 +396,8 @@ class Order extends BaseAction implements EventSubscriberInterface
             $session->getCurrency(),
             $session->getLang(),
             $session->getSessionCart($dispatcher),
-            $this->securityContext->getCustomerUser()
+            $this->securityContext->getCustomerUser(),
+            $paymentModuleInstance->manageStockOnCreation()
         );
 
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_BEFORE_PAYMENT, new OrderEvent($placedOrder));
@@ -392,7 +419,7 @@ class Order extends BaseAction implements EventSubscriberInterface
     /**
      * @param OrderEvent $event
      */
-    public function orderBeforePayement(OrderEvent $event)
+    public function orderBeforePayment(OrderEvent $event)
     {
         $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
 
@@ -454,15 +481,11 @@ class Order extends BaseAction implements EventSubscriberInterface
     public function updateStatus(OrderEvent $event)
     {
         $order = $event->getOrder();
-        $status = $event->getStatus();
+        $newStatus = $event->getStatus();
 
-        $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
+        $this->updateQuantity($order, $newStatus);
 
-        if ($status == $canceledStatus || $order->getStatusId() == $canceledStatus) {
-            $this->updateQuantity($event->getOrder(), $status, $canceledStatus);
-        }
-
-        $order->setStatusId($status);
+        $order->setStatusId($newStatus);
         $order->save();
 
         $event->setOrder($order);
@@ -470,11 +493,65 @@ class Order extends BaseAction implements EventSubscriberInterface
 
     /**
      * @param  ModelOrder                               $order
-     * @param $status
+     * @param $newStatus
      * @param $canceledStatus
      * @throws \Thelia\Exception\TheliaProcessException
      */
-    public function updateQuantity(ModelOrder $order, $status, $canceledStatus)
+    public function updateQuantity(ModelOrder $order, $newStatus)
+    {
+        $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
+        $paidStatus = OrderStatusQuery::getPaidStatus()->getId();
+        if ($newStatus == $canceledStatus || $order->isCancelled()) {
+            $this->updateQuantityForCanceledOrder($order, $newStatus, $canceledStatus);
+        } elseif ($paidStatus == $newStatus && $order->isNotPaid() && $order->getVersion() == 1) {
+            $this->updateQuantityForPaidOrder($order);
+        }
+    }
+
+    /**
+     * @param ModelOrder $order
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    protected function updateQuantityForPaidOrder(ModelOrder $order)
+    {
+        $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
+
+        /** @var \Thelia\Module\PaymentModuleInterface $paymentModuleInstance */
+        $paymentModuleInstance = $paymentModule->createInstance();
+
+        if (false === $paymentModuleInstance->manageStockOnCreation()) {
+            $orderProductList = $order->getOrderProducts();
+
+            /** @var OrderProduct  $orderProduct */
+            foreach ($orderProductList as $orderProduct) {
+                $productSaleElementsId = $orderProduct->getProductSaleElementsId();
+
+                /** @var ProductSaleElements $productSaleElements */
+                if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
+                    /* check still in stock */
+                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+                        throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock");
+                    }
+
+                    $productSaleElements->setQuantity($productSaleElements->getQuantity() - $orderProduct->getQuantity());
+
+                    $productSaleElements->save();
+                }
+            }
+        }
+    }
+
+    /**
+     * Update product quantity if new status is canceled or if old status is canceled.
+     *
+     * @param ModelOrder $order
+     * @param $newStatus
+     * @param $canceledStatus
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    protected function updateQuantityForCanceledOrder(ModelOrder $order, $newStatus, $canceledStatus)
     {
         $orderProductList = $order->getOrderProducts();
 
@@ -484,7 +561,7 @@ class Order extends BaseAction implements EventSubscriberInterface
 
             /** @var ProductSaleElements $productSaleElements */
             if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                if ($status == $canceledStatus) {
+                if ($newStatus == $canceledStatus) {
                     $productSaleElements->setQuantity($productSaleElements->getQuantity() + $orderProduct->getQuantity());
                 } else {
                     /* check still in stock */
@@ -568,7 +645,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             TheliaEvents::ORDER_SET_PAYMENT_MODULE => array("setPaymentModule", 128),
             TheliaEvents::ORDER_PAY => array("create", 128),
             TheliaEvents::ORDER_CART_CLEAR => array("orderCartClear", 128),
-            TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayement", 128),
+            TheliaEvents::ORDER_BEFORE_PAYMENT => array("orderBeforePayment", 128),
             TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL => array("sendConfirmationEmail", 128),
             TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL => array("sendNotificationEmail", 128),
             TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
