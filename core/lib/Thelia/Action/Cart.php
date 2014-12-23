@@ -293,7 +293,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addDebug("Customer " . $customer->getId() . " is logged in");
 
                     // A customer is logged in.
-                    if ($cart->getCustomerId() != $customer->getId()) {
+                    if (null === $cart->getCustomerId()) {
+                        // The cart created by the customer when it was not yet logged in
+                        // is assigned to it after login.
+                        $cart->setCustomerId($customer->getId())->save();
+
+                        Tlog::getInstance()->addDebug(
+                            sprintf(
+                                "Cart customer is null. No duplication, the cart is assigned to customer (%s).",
+                                $cart->getCustomerId()
+                            )
+                        );
+                    } elseif ($cart->getCustomerId() != $customer->getId()) {
                         Tlog::getInstance()->addDebug("Cart customer (".$cart->getCustomerId().") <> current customer -> duplication");
 
                         // The cart does not belongs to the current customer
