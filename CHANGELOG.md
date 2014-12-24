@@ -14,6 +14,10 @@
         - thelia type support render_form_field
 - loop `product_sale_elements` : added `ref` argument and implemented `SearchLoopInterface`
 - Updated `hasVirtualProduct`  in `Order` model to not test the presence of filename, as modules could implement the process differently
+- new method ```Thelia\Model\Module::getDeliveryModuleInstance()``` return the delivery module instance for the current record.
+- 'freesans' is now the default font of PDF documents
+- Anonymous cart is no longer duplicated on customer login
+
 
 # 2.1.0-beta1
 
