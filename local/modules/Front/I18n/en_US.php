@@ -14,8 +14,9 @@ return array(
     'Received placed order id does not belong to the current customer' => 'Received placed order id does not belong to the current customer',
     'Sorry, an error occured: %s' => 'Sorry, an error occured: %s',
     'Sorry, an error occurred: %message' => 'Sorry, an error occurred: %message',
-    'The file [%file] does not exist' => 'The file [%file] does not exist',
-    'To enabled the virtual product functionality, the module VirtualProductDelivery should be activated' => 'To enabled the virtual product functionality, the module VirtualProductDelivery should be activated',
+    'Sorry, an error occurred: %s' => 'Sorry, an error occurred: %s',
+    'Thanks for signing up! We\'ll keep you posted whenever we have any new updates.' => 'Thanks for signing up! We\'ll keep you posted whenever we have any new updates.',
+    'To enable the virtual product feature, the VirtualProductDelivery module should be activated' => 'To enable the virtual product feature, the VirtualProductDelivery module should be activated',
     'Wrong email or password. Please try again' => 'Wrong email or password. Please try again',
     'You\'re currently logged in. Please log out before requesting a new password.' => 'You\'re currently logged in. Please log out before requesting a new password.',
 );
