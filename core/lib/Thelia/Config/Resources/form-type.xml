@@ -40,6 +40,11 @@
         </service>
 
         <!-- Unique field type -->
+        <service id="thelia.form.type.field.category_id" class="Thelia\Core\Form\Type\Field\CategoryIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
         <service id="thelia.form.type.field.product_id" class="Thelia\Core\Form\Type\Field\ProductIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />
@@ -50,7 +55,22 @@
             <tag name="thelia.form.type" />
         </service>
 
+        <service id="thelia.form.type.field.folder_id" class="Thelia\Core\Form\Type\Field\FolderIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.content_id" class="Thelia\Core\Form\Type\Field\ContentIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
         <service id="thelia.form.type.field.currency_id" class="Thelia\Core\Form\Type\Field\CurrencyIdType">
+            <argument type="service" id="thelia.translator" />
+            <tag name="thelia.form.type" />
+        </service>
+
+        <service id="thelia.form.type.field.area_id" class="Thelia\Core\Form\Type\Field\AreaIdType">
             <argument type="service" id="thelia.translator" />
             <tag name="thelia.form.type" />
         </service>
