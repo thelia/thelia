@@ -207,11 +207,11 @@ class Thelia extends Kernel
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . "/../Config/Resources"));
         $finder = Finder::create()
             ->name('*.xml')
             ->depth(0)
-            ->in(THELIA_ROOT . "/core/lib/Thelia/Config/Resources");
+            ->in(__DIR__ . "/../Config/Resources");
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
@@ -427,7 +427,7 @@ class Thelia extends Kernel
         $parameters = parent::getKernelParameters();
 
         $parameters["thelia.root_dir"] = THELIA_ROOT;
-        $parameters["thelia.core_dir"] = THELIA_ROOT . "core/lib/Thelia";
+        $parameters["thelia.core_dir"] = dirname(__DIR__); // This class is in core/lib/Thelia/Core.
         $parameters["thelia.module_dir"] = THELIA_MODULE_DIR;
 
         return $parameters;

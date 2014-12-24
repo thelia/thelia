@@ -1,6 +1,9 @@
 Readme
 ======
 
+## Warning
+### This is the development repository of Thelia. If you want to create a project, please take a look at [thelia/thelia-project](https://github.com/thelia/thelia-project)
+
 Thelia
 ------
 [![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia) [![License](https://poser.pugx.org/thelia/thelia/license.png)](https://packagist.org/packages/thelia/thelia) [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/thelia/thelia/badges/quality-score.png?s=61e3e04a69bffd71c29b08e5392080317a546716)](https://scrutinizer-ci.com/g/thelia/thelia/)
@@ -88,7 +91,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.0.4 (or 2.1.0-alpha2)
+$ git checkout 2.0.4 (or 2.1.0-beta1)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -96,7 +99,7 @@ $ php composer.phar install
 ### Using composer for both download and dependencies
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.0.4 (or 2.1.0-alpha2)
+$ php composer.phar create-project thelia/thelia path/ 2.0.4 (or 2.1.0-beta1)
 ```
 
 ## Install it

@@ -55,10 +55,19 @@
         "bin-dir": "bin"
     },
     "autoload": {
+        "psr-4": {
+            "Thelia\\": "core/lib/Thelia"
+        },
         "psr-0": {
-            "": "local/modules/",
-            "Thelia": "core/lib/",
-            "Thelia\\Tests" : "tests/phpunit/"
+            "": "local/modules/"
+        },
+        "files": [
+            "core/bootstrap.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Thelia\\Tests\\" : "tests/phpunit/Thelia/Tests"
         }
     },
     "extra": {

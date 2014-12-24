@@ -1,0 +1,10 @@
+{
+    "name": "thelia/config",
+    "type": "thelia-local",
+    "require": {
+        "thelia/installer": "~1.1"
+    },
+    "extra": {
+        "installer-name": "config"
+    }
+}

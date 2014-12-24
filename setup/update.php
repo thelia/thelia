@@ -32,7 +32,35 @@ define('THELIA_CACHE_DIR', THELIA_ROOT . 'cache' . DS);
 define('THELIA_LOG_DIR', THELIA_ROOT . 'log' . DS);
 define('THELIA_TEMPLATE_DIR', THELIA_ROOT . 'templates' . DS);
 
-$loader = require __DIR__ . "/../core/vendor/autoload.php";
+$bootstrapToggle = false;
+$bootstraped = false;
+
+// Autoload bootstrap
+
+foreach ($argv as $arg) {
+    if ($arg === '-b') {
+        $bootstrapToggle = true;
+
+        continue;
+    }
+
+    if ($bootstrapToggle) {
+        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+
+        $bootstraped = true;
+    }
+}
+
+if (!$bootstraped) {
+    if (isset($bootstrapFile)) {
+        require $bootstrapFile;
+    } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
+        require $file;
+    } else {
+        echo "No autoload file found. Please use the -b argument to include yours";
+        exit(1);
+    }
+}
 
 if (php_sapi_name() != 'cli') {
     echo 'this script can only be launched with cli sapi' . PHP_EOL;

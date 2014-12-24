@@ -14,8 +14,6 @@
  * Thelia essential definitions
  */
 
-$loader = require __DIR__ . "/vendor/autoload.php";
-
 define("DS", DIRECTORY_SEPARATOR);
 
 if (!defined('THELIA_ROOT')) {
@@ -50,6 +48,10 @@ if (!defined('THELIA_TEMPLATE_DIR')) {
     define('THELIA_TEMPLATE_DIR', THELIA_ROOT . 'templates' . DS);
 }
 
+if (!defined('THELIA_SETUP_DIRECTORY')) {
+    define('THELIA_SETUP_DIRECTORY', THELIA_ROOT . 'setup' . DS);
+}
+
 if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_MODE')) {
     $sapi = php_sapi_name();
     if (substr($sapi, 0, 3) == 'cli') {
@@ -59,5 +61,3 @@ if (!file_exists(THELIA_CONF_DIR . 'database.yml') && !defined('THELIA_INSTALL_M
         header('Location: '.$request->getUriForPath('/install'));
     }
 }
-
-return $loader;
