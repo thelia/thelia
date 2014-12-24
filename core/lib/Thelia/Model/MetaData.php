@@ -19,6 +19,7 @@ class MetaData extends BaseMetaData
     const CONTENT_KEY = 'content';
 
     const ORDER_KEY = 'order';
+    const ORDER_PRODUCT_KEY = 'order_product';
 
     const MODULE_KEY = 'module';
 
