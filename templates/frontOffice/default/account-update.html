@@ -91,7 +91,7 @@
                             <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 
                             <div class="control-input">
-                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder email"}" value="{$smarty.get.email|default:$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder email"}" value="{$smarty.get.email|default:$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if} disabled>
                                 {if $error }
                                     <span class="help-block">{$message}</span>
                                     {assign var="error_focus" value="true"}
