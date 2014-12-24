@@ -201,7 +201,6 @@ class Order extends BaseOrder
         $virtualProductCount = OrderProductQuery::create()
             ->filterByOrderId($this->getId())
             ->filterByVirtual(1, Criteria::EQUAL)
-            ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
             ->count();
 
         return ($virtualProductCount !== 0);

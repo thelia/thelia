@@ -17,6 +17,7 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Exception\TaxEngineException;
@@ -36,7 +37,7 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
+class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
     protected $timestampable = true;
 
@@ -52,6 +53,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             Argument::createBooleanTypeArgument('promo'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('default'),
+            Argument::createAnyTypeArgument('ref'),
             new Argument(
                 'attribute_availability',
                 new TypeCollection(
@@ -61,7 +63,14 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('quantity', 'quantity_reverse', 'min_price', 'max_price', 'promo', 'new', 'random'))
+                    new Type\EnumListType(
+                        array(
+                            'quantity', 'quantity_reverse',
+                            'min_price', 'max_price',
+                            'promo', 'new',
+                            'random'
+                        )
+                    )
                 ),
                 'random'
             )
@@ -73,16 +82,23 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         $search = ProductSaleElementsQuery::create();
 
         $id = $this->getId();
+        $product = $this->getProduct();
+        $ref = $this->getRef();
 
         if (! is_null($id)) {
             $search->filterById($id, Criteria::IN);
+        } elseif (! is_null($product)) {
+            $search->filterByProductId($product, Criteria::EQUAL);
+        } elseif (! is_null($ref)) {
+            $search->filterByRef($ref, Criteria::EQUAL);
         } else {
-            $product = $this->getProduct();
+            $searchTerm = $this->getArgValue('search_term');
+            $searchIn   = $this->getArgValue('search_in');
 
-            if (! is_null($product)) {
-                $search->filterByProductId($product, Criteria::EQUAL);
-            } else {
-                throw new \InvalidArgumentException("Either 'id' or 'product' argument should be present");
+            if (null === $searchTerm || null === $searchIn) {
+                throw new \InvalidArgumentException(
+                    "Either 'id', 'product', 'ref', 'search_term/search_in' argument should be present"
+                );
             }
         }
 
@@ -225,5 +241,20 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface
         }
 
         return $loopResult;
+    }
+
+    /**
+     * @return array of available field to search in
+     */
+    public function getSearchIn()
+    {
+        return [
+            "ref",
+        ];
+    }
+
+    public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
+    {
+        $search->filterByRef($searchTerm, $searchCriteria);
     }
 }

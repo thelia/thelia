@@ -118,11 +118,20 @@ Use the optionnal $field_value parameter if no value is defined
             {else}
 
                 {$text_types = ['text', 'password', 'number', 'integer', 'time', 'date', 'datetime', 'email', 'url', 'file']}
+                {$thelia_types = ['country_id', 'currency_id', 'customer_id', 'customer_title_id', 'lang_id', 'category_id', 'product_id', 'product_sale_elements_id', 'folder_id', 'content_id', 'tax_id', 'tax_rule_id']}
 
                 {if in_array($type, $text_types)}
                     {if $type == 'integer'}{$type='number'}{/if}
 
                     <input type="{$type}" {$attributes nofilter} />
+                {elseif in_array($type, $thelia_types)}
+                    {if $attr and empty($attr.autocomplete)}
+                    <input type="number" {$attributes nofilter} />
+                    {else}
+                        {* You should implement the auto completion *}
+                        <input type="hidden" {$attributes nofilter} />
+                        <input type="text" data-widget="{$type}" data-rel="#{$label_attr.for}" class="form-control" />
+                    {/if}
                 {else}
                     <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type=$type}</div>
                 {/if}
