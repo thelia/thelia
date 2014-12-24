@@ -9,6 +9,11 @@
 - Thelia:
     - Split Thelia on multiple repositories to allow a better version management with composer. For creating a new project, see [https://github.com/thelia/thelia-project]
     - Extract all the default modules into other repositories
+    - Field type :
+        - added area_id, category_id, folder_id, content_id
+        - thelia type support render_form_field
+- loop `product_sale_elements` : added `ref` argument and implemented `SearchLoopInterface`
+- Updated `hasVirtualProduct`  in `Order` model to not test the presence of filename, as modules could implement the process differently
 
 # 2.1.0-beta1
 
