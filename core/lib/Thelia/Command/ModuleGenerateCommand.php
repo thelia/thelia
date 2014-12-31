@@ -92,7 +92,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         $fs = new Filesystem();
 
         try {
-            $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, THELIA_ROOT . "/core/lib/Thelia/Command/Skeleton/Module/");
+            $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, __DIR__ . "/Skeleton/Module/");
 
             // config.xml file
             $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml";
