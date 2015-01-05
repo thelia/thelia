@@ -85,6 +85,57 @@ class Module extends BaseModule
         return $this->getTranslationDomain(). '.fo.' . $templateName;
     }
 
+    public function getAbsolutePdfTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteTemplateBasePath(),
+            TemplateDefinition::PDF_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getAbsolutePdfI18nTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteI18nPath(),
+            TemplateDefinition::PDF_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getPdfTemplateTranslationDomain($templateName)
+    {
+        return $this->getTranslationDomain(). '.pdf.' . $templateName;
+    }
+
+
+    public function getAbsoluteEmailTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteTemplateBasePath(),
+            TemplateDefinition::EMAIL_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getAbsoluteEmailI18nTemplatePath($subdir)
+    {
+        return sprintf(
+            "%s".DS."%s".DS."%s",
+            $this->getAbsoluteI18nPath(),
+            TemplateDefinition::EMAIL_SUBDIR,
+            $subdir
+        );
+    }
+
+    public function getEmailTemplateTranslationDomain($templateName)
+    {
+        return $this->getTranslationDomain(). '.email.' . $templateName;
+    }
+
     /**
      * @return string the module's base directory path, relative to THELIA_MODULE_DIR
      */

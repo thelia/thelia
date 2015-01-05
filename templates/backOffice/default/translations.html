@@ -151,6 +151,20 @@
                                                         {/foreach}
                                                     {/if}
 
+                                                    {if $email_templates != ''}
+                                                        {foreach explode(',', $email_templates) as $template}
+                                                            {$option_value = "email.{$template}"}
+                                                            <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Email template "{$template}"</option>
+                                                        {/foreach}
+                                                    {/if}
+
+                                                    {if $pdf_templates != ''}
+                                                        {foreach explode(',', $pdf_templates) as $template}
+                                                            {$option_value = "pdf.{$template}"}
+                                                            <option value="{$option_value}" {if $module_part == $option_value}selected="selected"{/if}>Pdf template "{$template}"</option>
+                                                        {/foreach}
+                                                    {/if}
+
                                                 </select>
                                             </div>
                                         </div>

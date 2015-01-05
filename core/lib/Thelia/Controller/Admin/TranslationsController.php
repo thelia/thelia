@@ -120,6 +120,14 @@ class TranslationsController extends BaseAdminController
                             $directory = $module->getAbsoluteFrontOfficeTemplatePath($subdir);
                             $domain = $module->getFrontOfficeTemplateTranslationDomain($subdir);
                             $i18n_directory = $module->getAbsoluteFrontOfficeI18nTemplatePath($subdir);
+                        } elseif ($type == 'email') {
+                            $directory = $module->getAbsoluteEmailTemplatePath($subdir);
+                            $domain = $module->getEmailTemplateTranslationDomain($subdir);
+                            $i18n_directory = $module->getAbsoluteEmailI18nTemplatePath($subdir);
+                        } elseif ($type == 'pdf') {
+                            $directory = $module->getAbsolutePdfTemplatePath($subdir);
+                            $domain = $module->getPdfTemplateTranslationDomain($subdir);
+                            $i18n_directory = $module->getAbsolutePdfI18nTemplatePath($subdir);
                         } else {
                             throw new \InvalidArgumentException("Undefined module template type: '$type'.");
                         }
@@ -139,6 +147,12 @@ class TranslationsController extends BaseAdminController
 
                     $templateArguments['front_office_templates'] =
                         implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
+
+                    $templateArguments['email_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::EMAIL));
+
+                    $templateArguments['pdf_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::PDF));
 
                     // Check if we have admin-include files
                     try {
