@@ -263,7 +263,7 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-                    $this->getModuleTranslationDirectories($module, $translationDirs);
+                    $this->loadModuleTranslationDirectories($module, $translationDirs);
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
@@ -293,7 +293,7 @@ class Thelia extends Kernel
         }
     }
 
-    private function getModuleTranslationDirectories(Module $module, array &$translationDirs)
+    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs)
     {
         // Core module translation
         if (is_dir($dir = $module->getAbsoluteI18nPath())) {
