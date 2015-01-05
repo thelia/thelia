@@ -339,6 +339,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 return $order->getUntaxedPostage();
             case 'postage':
                 return $order->getPostage();
+            case 'postage_tax':
+                return $order->getPostageTax();
             case 'discount':
                 return $order->getDiscount();
             case 'delivery_address':

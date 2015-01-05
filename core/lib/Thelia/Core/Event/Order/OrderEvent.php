@@ -25,6 +25,8 @@ class OrderEvent extends ActionEvent
     protected $deliveryModule = null;
     protected $paymentModule = null;
     protected $postage = null;
+    protected $postageTax = 0.0;
+    protected $postageTaxRuleTitle = null;
     protected $ref = null;
     protected $status = null;
     protected $deliveryRef = null;
@@ -252,5 +254,41 @@ class OrderEvent extends ActionEvent
     public function hasResponse()
     {
         return null !== $this->response;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPostageTax()
+    {
+        return $this->postageTax;
+    }
+
+    /**
+     * @param null $postageTax
+     */
+    public function setPostageTax($postageTax)
+    {
+        $this->postageTax = $postageTax;
+
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getPostageTaxRuleTitle()
+    {
+        return $this->postageTaxRuleTitle;
+    }
+
+    /**
+     * @param null $postageTaxRuleTitle
+     */
+    public function setPostageTaxRuleTitle($postageTaxRuleTitle)
+    {
+        $this->postageTaxRuleTitle = $postageTaxRuleTitle;
+
+        return $this;
     }
 }

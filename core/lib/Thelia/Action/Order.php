@@ -32,8 +32,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
-use Thelia\Model\MetaData as MetaDataModel;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order as OrderModel;
 use Thelia\Model\Order as ModelOrder;
@@ -42,7 +40,6 @@ use Thelia\Model\OrderProduct;
 use Thelia\Model\OrderProductAttributeCombination;
 use Thelia\Model\OrderProductTax;
 use Thelia\Model\OrderStatusQuery;
-use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery;
@@ -103,6 +100,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         // Reset postage cost if the delivery module had been removed
         if ($deliveryModuleId <= 0) {
             $order->setPostage(0);
+            $order->setPostageTax(0);
+            $order->setPostageTaxRuleTitle(null);
         }
 
         $event->setOrder($order);
@@ -116,6 +115,8 @@ class Order extends BaseAction implements EventSubscriberInterface
         $order = $event->getOrder();
 
         $order->setPostage($event->getPostage());
+        $order->setPostageTax($event->getPostageTax());
+        $order->setPostageTaxRuleTitle($event->getPostageTaxRuleTitle());
 
         $event->setOrder($order);
     }

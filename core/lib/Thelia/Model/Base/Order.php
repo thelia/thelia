@@ -156,6 +156,19 @@ abstract class Order implements ActiveRecordInterface
     protected $postage;
 
     /**
+     * The value for the postage_tax field.
+     * Note: this column has a database default value of: 0
+     * @var        double
+     */
+    protected $postage_tax;
+
+    /**
+     * The value for the postage_tax_rule_title field.
+     * @var        string
+     */
+    protected $postage_tax_rule_title;
+
+    /**
      * The value for the payment_module_id field.
      * @var        int
      */
@@ -321,6 +334,7 @@ abstract class Order implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->postage_tax = 0;
         $this->version = 0;
     }
 
@@ -734,6 +748,28 @@ abstract class Order implements ActiveRecordInterface
     {
 
         return $this->postage;
+    }
+
+    /**
+     * Get the [postage_tax] column value.
+     *
+     * @return   double
+     */
+    public function getPostageTax()
+    {
+
+        return $this->postage_tax;
+    }
+
+    /**
+     * Get the [postage_tax_rule_title] column value.
+     *
+     * @return   string
+     */
+    public function getPostageTaxRuleTitle()
+    {
+
+        return $this->postage_tax_rule_title;
     }
 
     /**
@@ -1163,6 +1199,48 @@ abstract class Order implements ActiveRecordInterface
     } // setPostage()
 
     /**
+     * Set the value of [postage_tax] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setPostageTax($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->postage_tax !== $v) {
+            $this->postage_tax = $v;
+            $this->modifiedColumns[OrderTableMap::POSTAGE_TAX] = true;
+        }
+
+
+        return $this;
+    } // setPostageTax()
+
+    /**
+     * Set the value of [postage_tax_rule_title] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\Order The current object (for fluent API support)
+     */
+    public function setPostageTaxRuleTitle($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->postage_tax_rule_title !== $v) {
+            $this->postage_tax_rule_title = $v;
+            $this->modifiedColumns[OrderTableMap::POSTAGE_TAX_RULE_TITLE] = true;
+        }
+
+
+        return $this;
+    } // setPostageTaxRuleTitle()
+
+    /**
      * Set the value of [payment_module_id] column.
      *
      * @param      int $v new value
@@ -1402,6 +1480,10 @@ abstract class Order implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->postage_tax !== 0) {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
@@ -1475,43 +1557,49 @@ abstract class Order implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postage = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PostageTax', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postage_tax = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('PostageTaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->postage_tax_rule_title = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('PaymentModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->payment_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('DeliveryModuleId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->delivery_module_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('StatusId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->status_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('LangId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lang_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 17 + $startcol : OrderTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->cart_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 18 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 19 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 20 + $startcol : OrderTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 21 + $startcol : OrderTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 23 + $startcol : OrderTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 22 + $startcol : OrderTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 24 + $startcol : OrderTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -1521,7 +1609,7 @@ abstract class Order implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 23; // 23 = OrderTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 25; // 25 = OrderTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Order object", 0, $e);
@@ -1953,6 +2041,12 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) {
             $modifiedColumns[':p' . $index++]  = '`POSTAGE`';
         }
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX)) {
+            $modifiedColumns[':p' . $index++]  = '`POSTAGE_TAX`';
+        }
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX_RULE_TITLE)) {
+            $modifiedColumns[':p' . $index++]  = '`POSTAGE_TAX_RULE_TITLE`';
+        }
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) {
             $modifiedColumns[':p' . $index++]  = '`PAYMENT_MODULE_ID`';
         }
@@ -2032,6 +2126,12 @@ abstract class Order implements ActiveRecordInterface
                         break;
                     case '`POSTAGE`':
                         $stmt->bindValue($identifier, $this->postage, PDO::PARAM_STR);
+                        break;
+                    case '`POSTAGE_TAX`':
+                        $stmt->bindValue($identifier, $this->postage_tax, PDO::PARAM_STR);
+                        break;
+                    case '`POSTAGE_TAX_RULE_TITLE`':
+                        $stmt->bindValue($identifier, $this->postage_tax_rule_title, PDO::PARAM_STR);
                         break;
                     case '`PAYMENT_MODULE_ID`':
                         $stmt->bindValue($identifier, $this->payment_module_id, PDO::PARAM_INT);
@@ -2165,33 +2265,39 @@ abstract class Order implements ActiveRecordInterface
                 return $this->getPostage();
                 break;
             case 13:
-                return $this->getPaymentModuleId();
+                return $this->getPostageTax();
                 break;
             case 14:
-                return $this->getDeliveryModuleId();
+                return $this->getPostageTaxRuleTitle();
                 break;
             case 15:
-                return $this->getStatusId();
+                return $this->getPaymentModuleId();
                 break;
             case 16:
-                return $this->getLangId();
+                return $this->getDeliveryModuleId();
                 break;
             case 17:
-                return $this->getCartId();
+                return $this->getStatusId();
                 break;
             case 18:
-                return $this->getCreatedAt();
+                return $this->getLangId();
                 break;
             case 19:
-                return $this->getUpdatedAt();
+                return $this->getCartId();
                 break;
             case 20:
-                return $this->getVersion();
+                return $this->getCreatedAt();
                 break;
             case 21:
-                return $this->getVersionCreatedAt();
+                return $this->getUpdatedAt();
                 break;
             case 22:
+                return $this->getVersion();
+                break;
+            case 23:
+                return $this->getVersionCreatedAt();
+                break;
+            case 24:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -2236,16 +2342,18 @@ abstract class Order implements ActiveRecordInterface
             $keys[10] => $this->getInvoiceRef(),
             $keys[11] => $this->getDiscount(),
             $keys[12] => $this->getPostage(),
-            $keys[13] => $this->getPaymentModuleId(),
-            $keys[14] => $this->getDeliveryModuleId(),
-            $keys[15] => $this->getStatusId(),
-            $keys[16] => $this->getLangId(),
-            $keys[17] => $this->getCartId(),
-            $keys[18] => $this->getCreatedAt(),
-            $keys[19] => $this->getUpdatedAt(),
-            $keys[20] => $this->getVersion(),
-            $keys[21] => $this->getVersionCreatedAt(),
-            $keys[22] => $this->getVersionCreatedBy(),
+            $keys[13] => $this->getPostageTax(),
+            $keys[14] => $this->getPostageTaxRuleTitle(),
+            $keys[15] => $this->getPaymentModuleId(),
+            $keys[16] => $this->getDeliveryModuleId(),
+            $keys[17] => $this->getStatusId(),
+            $keys[18] => $this->getLangId(),
+            $keys[19] => $this->getCartId(),
+            $keys[20] => $this->getCreatedAt(),
+            $keys[21] => $this->getUpdatedAt(),
+            $keys[22] => $this->getVersion(),
+            $keys[23] => $this->getVersionCreatedAt(),
+            $keys[24] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -2363,33 +2471,39 @@ abstract class Order implements ActiveRecordInterface
                 $this->setPostage($value);
                 break;
             case 13:
-                $this->setPaymentModuleId($value);
+                $this->setPostageTax($value);
                 break;
             case 14:
-                $this->setDeliveryModuleId($value);
+                $this->setPostageTaxRuleTitle($value);
                 break;
             case 15:
-                $this->setStatusId($value);
+                $this->setPaymentModuleId($value);
                 break;
             case 16:
-                $this->setLangId($value);
+                $this->setDeliveryModuleId($value);
                 break;
             case 17:
-                $this->setCartId($value);
+                $this->setStatusId($value);
                 break;
             case 18:
-                $this->setCreatedAt($value);
+                $this->setLangId($value);
                 break;
             case 19:
-                $this->setUpdatedAt($value);
+                $this->setCartId($value);
                 break;
             case 20:
-                $this->setVersion($value);
+                $this->setCreatedAt($value);
                 break;
             case 21:
-                $this->setVersionCreatedAt($value);
+                $this->setUpdatedAt($value);
                 break;
             case 22:
+                $this->setVersion($value);
+                break;
+            case 23:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 24:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -2429,16 +2543,18 @@ abstract class Order implements ActiveRecordInterface
         if (array_key_exists($keys[10], $arr)) $this->setInvoiceRef($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setPostage($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setPaymentModuleId($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setDeliveryModuleId($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setStatusId($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setLangId($arr[$keys[16]]);
-        if (array_key_exists($keys[17], $arr)) $this->setCartId($arr[$keys[17]]);
-        if (array_key_exists($keys[18], $arr)) $this->setCreatedAt($arr[$keys[18]]);
-        if (array_key_exists($keys[19], $arr)) $this->setUpdatedAt($arr[$keys[19]]);
-        if (array_key_exists($keys[20], $arr)) $this->setVersion($arr[$keys[20]]);
-        if (array_key_exists($keys[21], $arr)) $this->setVersionCreatedAt($arr[$keys[21]]);
-        if (array_key_exists($keys[22], $arr)) $this->setVersionCreatedBy($arr[$keys[22]]);
+        if (array_key_exists($keys[13], $arr)) $this->setPostageTax($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPostageTaxRuleTitle($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setPaymentModuleId($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setDeliveryModuleId($arr[$keys[16]]);
+        if (array_key_exists($keys[17], $arr)) $this->setStatusId($arr[$keys[17]]);
+        if (array_key_exists($keys[18], $arr)) $this->setLangId($arr[$keys[18]]);
+        if (array_key_exists($keys[19], $arr)) $this->setCartId($arr[$keys[19]]);
+        if (array_key_exists($keys[20], $arr)) $this->setCreatedAt($arr[$keys[20]]);
+        if (array_key_exists($keys[21], $arr)) $this->setUpdatedAt($arr[$keys[21]]);
+        if (array_key_exists($keys[22], $arr)) $this->setVersion($arr[$keys[22]]);
+        if (array_key_exists($keys[23], $arr)) $this->setVersionCreatedAt($arr[$keys[23]]);
+        if (array_key_exists($keys[24], $arr)) $this->setVersionCreatedBy($arr[$keys[24]]);
     }
 
     /**
@@ -2463,6 +2579,8 @@ abstract class Order implements ActiveRecordInterface
         if ($this->isColumnModified(OrderTableMap::INVOICE_REF)) $criteria->add(OrderTableMap::INVOICE_REF, $this->invoice_ref);
         if ($this->isColumnModified(OrderTableMap::DISCOUNT)) $criteria->add(OrderTableMap::DISCOUNT, $this->discount);
         if ($this->isColumnModified(OrderTableMap::POSTAGE)) $criteria->add(OrderTableMap::POSTAGE, $this->postage);
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX)) $criteria->add(OrderTableMap::POSTAGE_TAX, $this->postage_tax);
+        if ($this->isColumnModified(OrderTableMap::POSTAGE_TAX_RULE_TITLE)) $criteria->add(OrderTableMap::POSTAGE_TAX_RULE_TITLE, $this->postage_tax_rule_title);
         if ($this->isColumnModified(OrderTableMap::PAYMENT_MODULE_ID)) $criteria->add(OrderTableMap::PAYMENT_MODULE_ID, $this->payment_module_id);
         if ($this->isColumnModified(OrderTableMap::DELIVERY_MODULE_ID)) $criteria->add(OrderTableMap::DELIVERY_MODULE_ID, $this->delivery_module_id);
         if ($this->isColumnModified(OrderTableMap::STATUS_ID)) $criteria->add(OrderTableMap::STATUS_ID, $this->status_id);
@@ -2548,6 +2666,8 @@ abstract class Order implements ActiveRecordInterface
         $copyObj->setInvoiceRef($this->getInvoiceRef());
         $copyObj->setDiscount($this->getDiscount());
         $copyObj->setPostage($this->getPostage());
+        $copyObj->setPostageTax($this->getPostageTax());
+        $copyObj->setPostageTaxRuleTitle($this->getPostageTaxRuleTitle());
         $copyObj->setPaymentModuleId($this->getPaymentModuleId());
         $copyObj->setDeliveryModuleId($this->getDeliveryModuleId());
         $copyObj->setStatusId($this->getStatusId());
@@ -3768,6 +3888,8 @@ abstract class Order implements ActiveRecordInterface
         $this->invoice_ref = null;
         $this->discount = null;
         $this->postage = null;
+        $this->postage_tax = null;
+        $this->postage_tax_rule_title = null;
         $this->payment_module_id = null;
         $this->delivery_module_id = null;
         $this->status_id = null;
@@ -3918,6 +4040,8 @@ abstract class Order implements ActiveRecordInterface
         $version->setInvoiceRef($this->getInvoiceRef());
         $version->setDiscount($this->getDiscount());
         $version->setPostage($this->getPostage());
+        $version->setPostageTax($this->getPostageTax());
+        $version->setPostageTaxRuleTitle($this->getPostageTaxRuleTitle());
         $version->setPaymentModuleId($this->getPaymentModuleId());
         $version->setDeliveryModuleId($this->getDeliveryModuleId());
         $version->setStatusId($this->getStatusId());
@@ -3981,6 +4105,8 @@ abstract class Order implements ActiveRecordInterface
         $this->setInvoiceRef($version->getInvoiceRef());
         $this->setDiscount($version->getDiscount());
         $this->setPostage($version->getPostage());
+        $this->setPostageTax($version->getPostageTax());
+        $this->setPostageTaxRuleTitle($version->getPostageTaxRuleTitle());
         $this->setPaymentModuleId($version->getPaymentModuleId());
         $this->setDeliveryModuleId($version->getDeliveryModuleId());
         $this->setStatusId($version->getStatusId());

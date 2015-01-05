@@ -13,6 +13,7 @@
 namespace Thelia\Module;
 
 use Thelia\Model\Country;
+use Thelia\Model\OrderPostage;
 use Thelia\Module\Exception\DeliveryException;
 
 interface DeliveryModuleInterface extends BaseModuleInterface
@@ -35,7 +36,7 @@ interface DeliveryModuleInterface extends BaseModuleInterface
      *
      * @param Country $country the country to deliver to.
      *
-     * @return float             the delivery price
+     * @return OrderPostage|float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
      */
     public function getPostage(Country $country);

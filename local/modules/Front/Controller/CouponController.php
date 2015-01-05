@@ -32,6 +32,7 @@ use Thelia\Form\CouponCode;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
+use Thelia\Model\OrderPostage;
 use Thelia\Module\Exception\DeliveryException;
 
 /**
@@ -95,9 +96,13 @@ class CouponController extends BaseFrontController
                     $orderEvent = new OrderEvent($order);
 
                     try {
-                        $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+                        $postage = OrderPostage::loadFromPostage(
+                            $moduleInstance->getPostage($deliveryAddress->getCountry())
+                        );
 
-                        $orderEvent->setPostage($postage);
+                        $orderEvent->setPostage($postage->getAmount());
+                        $orderEvent->setPostageTax($postage->getAmountTax());
+                        $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
                         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_POSTAGE, $orderEvent);
                     } catch (DeliveryException $ex) {

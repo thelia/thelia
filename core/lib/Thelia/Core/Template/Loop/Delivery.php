@@ -18,6 +18,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Module;
+use Thelia\Model\OrderPostage;
 use Thelia\Module\BaseModule;
 use Thelia\Module\DeliveryModuleInterface;
 use Thelia\Module\Exception\DeliveryException;
@@ -80,7 +81,7 @@ class Delivery extends BaseSpecificModule
                 // or catching a DeliveryException.
 
                 if ($moduleInstance->isValidDelivery($country)) {
-                    $postage = $moduleInstance->getPostage($country);
+                    $postage = OrderPostage::loadFromPostage($moduleInstance->getPostage($country));
 
                     $loopResultRow
                         ->set('ID', $deliveryModule->getId())
@@ -88,7 +89,10 @@ class Delivery extends BaseSpecificModule
                         ->set('CHAPO', $deliveryModule->getVirtualColumn('i18n_CHAPO'))
                         ->set('DESCRIPTION', $deliveryModule->getVirtualColumn('i18n_DESCRIPTION'))
                         ->set('POSTSCRIPTUM', $deliveryModule->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                        ->set('POSTAGE', $postage)
+                        ->set('POSTAGE', $postage->getAmount())
+                        ->set('POSTAGE_TAX', $postage->getAmountTax())
+                        ->set('POSTAGE_UNTAXED', $postage->getAmount() - $postage->getAmountTax())
+                        ->set('POSTAGE_TAX_RULE_TITLE', $postage->getTaxRuleTitle())
                     ;
                     $this->addOutputFields($loopResultRow, $deliveryModule);
 
