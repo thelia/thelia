@@ -394,7 +394,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
                     if ($feature_value != '*') {
-                        $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FREE_TEXT_VALUE = ?", $feature_value, null, \PDO::PARAM_STR);
                     }
                 }
 
