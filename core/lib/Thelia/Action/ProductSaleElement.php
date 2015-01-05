@@ -56,7 +56,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             if ($salesElement == null) {
                 // Create a new default product sale element
-                $salesElement = $event->getProduct()->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+                $salesElement = $event->getProduct()->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), false);
             } else {
                 // This (new) one is the default
                 $salesElement->setIsDefault(true)->save($con);
