@@ -51,8 +51,12 @@
                                                 <div class="col-sm-6">
                                                     <select class="js-update-order-status" name="status_id" data-toggle="selectpicker">
                                                     {loop type="order-status" name="all-status"}
-                                                    {assign "orderStatusLabel" "order_$CODE"}
-                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label label-{#$orderStatusLabel#}'>{$TITLE}</span>">{$TITLE}</option>
+                                                        {assign "orderStatusLabel" "order_$CODE"}
+                                                        {$orderStatusLabel={#$orderStatusLabel#}}
+                                                        {if empty($orderStatusLabel)}
+                                                            {$orderStatusLabel="default"}
+                                                        {/if}
+                                                        <option {if $ID == $orderStatusId}selected="selected" {/if} value="{$ID}" data-content="<span class='label label-{$orderStatusLabel}'>{$TITLE}</span>">{$TITLE}</option>
                                                     {/loop}
                                                     </select>
                                                 </div>
@@ -171,7 +175,10 @@
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Postage"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$POSTAGE symbol=$orderCurrency}</strong></td>
+                                                        <td class="text-right">
+                                                            <strong>{format_money number=$POSTAGE symbol=$orderCurrency}</strong>
+                                                            <em title="{intl l='Taxes'}">({format_money number=$POSTAGE_TAX symbol=$orderCurrency})</em>
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
@@ -419,7 +426,7 @@
 
                                     <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
                                         {* ugly fix : {hook name="order.tab-content"} *}
-                                        {include file="includes/module-tab-content.html" hook="order.tab-content" location="order-edit"}
+                                        {include file="includes/module-tab-content.html" hook="order.tab-content" location="order-edit" id=$order_id view="order-edit"}
                                     </div>
                                 </div>
                             {/loop}

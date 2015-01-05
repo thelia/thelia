@@ -23,14 +23,4 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 3, 'en_US', 'Product page - On the bottom of the form', '', '')
 ;
 
--- back hooks
-
-UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';
-
-UPDATE `config` SET `value`='2.1.0-beta2' WHERE `name`='thelia_version';
-UPDATE `config` SET `value`='1' WHERE `name`='thelia_minus_version';
-UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
-UPDATE `config` SET `value`='beta2' WHERE `name`='thelia_extra_version';
-
-
 SET FOREIGN_KEY_CHECKS = 1;

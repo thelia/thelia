@@ -593,6 +593,8 @@
     <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
     <column name="discount" type="FLOAT" />
     <column name="postage" required="true" type="FLOAT" />
+    <column name="postage_tax" required="true" type="FLOAT" defaultValue="0" />
+    <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
     <column name="payment_module_id" required="true" type="INTEGER" />
     <column name="delivery_module_id" required="true" type="INTEGER" />
     <column name="status_id" required="true" type="INTEGER" />

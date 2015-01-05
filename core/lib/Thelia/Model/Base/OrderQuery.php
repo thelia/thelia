@@ -34,6 +34,8 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery orderByInvoiceRef($order = Criteria::ASC) Order by the invoice_ref column
  * @method     ChildOrderQuery orderByDiscount($order = Criteria::ASC) Order by the discount column
  * @method     ChildOrderQuery orderByPostage($order = Criteria::ASC) Order by the postage column
+ * @method     ChildOrderQuery orderByPostageTax($order = Criteria::ASC) Order by the postage_tax column
+ * @method     ChildOrderQuery orderByPostageTaxRuleTitle($order = Criteria::ASC) Order by the postage_tax_rule_title column
  * @method     ChildOrderQuery orderByPaymentModuleId($order = Criteria::ASC) Order by the payment_module_id column
  * @method     ChildOrderQuery orderByDeliveryModuleId($order = Criteria::ASC) Order by the delivery_module_id column
  * @method     ChildOrderQuery orderByStatusId($order = Criteria::ASC) Order by the status_id column
@@ -58,6 +60,8 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrderQuery groupByInvoiceRef() Group by the invoice_ref column
  * @method     ChildOrderQuery groupByDiscount() Group by the discount column
  * @method     ChildOrderQuery groupByPostage() Group by the postage column
+ * @method     ChildOrderQuery groupByPostageTax() Group by the postage_tax column
+ * @method     ChildOrderQuery groupByPostageTaxRuleTitle() Group by the postage_tax_rule_title column
  * @method     ChildOrderQuery groupByPaymentModuleId() Group by the payment_module_id column
  * @method     ChildOrderQuery groupByDeliveryModuleId() Group by the delivery_module_id column
  * @method     ChildOrderQuery groupByStatusId() Group by the status_id column
@@ -137,6 +141,8 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
  * @method     ChildOrder findOneByDiscount(double $discount) Return the first ChildOrder filtered by the discount column
  * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
+ * @method     ChildOrder findOneByPostageTax(double $postage_tax) Return the first ChildOrder filtered by the postage_tax column
+ * @method     ChildOrder findOneByPostageTaxRuleTitle(string $postage_tax_rule_title) Return the first ChildOrder filtered by the postage_tax_rule_title column
  * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
  * @method     ChildOrder findOneByStatusId(int $status_id) Return the first ChildOrder filtered by the status_id column
@@ -161,6 +167,8 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
  * @method     array findByDiscount(double $discount) Return ChildOrder objects filtered by the discount column
  * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
+ * @method     array findByPostageTax(double $postage_tax) Return ChildOrder objects filtered by the postage_tax column
+ * @method     array findByPostageTaxRuleTitle(string $postage_tax_rule_title) Return ChildOrder objects filtered by the postage_tax_rule_title column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
  * @method     array findByStatusId(int $status_id) Return ChildOrder objects filtered by the status_id column
@@ -266,7 +274,7 @@ abstract class OrderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `INVOICE_ORDER_ADDRESS_ID`, `DELIVERY_ORDER_ADDRESS_ID`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION_REF`, `DELIVERY_REF`, `INVOICE_REF`, `DISCOUNT`, `POSTAGE`, `POSTAGE_TAX`, `POSTAGE_TAX_RULE_TITLE`, `PAYMENT_MODULE_ID`, `DELIVERY_MODULE_ID`, `STATUS_ID`, `LANG_ID`, `CART_ID`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `order` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -848,6 +856,76 @@ abstract class OrderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderTableMap::POSTAGE, $postage, $comparison);
+    }
+
+    /**
+     * Filter the query on the postage_tax column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPostageTax(1234); // WHERE postage_tax = 1234
+     * $query->filterByPostageTax(array(12, 34)); // WHERE postage_tax IN (12, 34)
+     * $query->filterByPostageTax(array('min' => 12)); // WHERE postage_tax > 12
+     * </code>
+     *
+     * @param     mixed $postageTax The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByPostageTax($postageTax = null, $comparison = null)
+    {
+        if (is_array($postageTax)) {
+            $useMinMax = false;
+            if (isset($postageTax['min'])) {
+                $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($postageTax['max'])) {
+                $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::POSTAGE_TAX, $postageTax, $comparison);
+    }
+
+    /**
+     * Filter the query on the postage_tax_rule_title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPostageTaxRuleTitle('fooValue');   // WHERE postage_tax_rule_title = 'fooValue'
+     * $query->filterByPostageTaxRuleTitle('%fooValue%'); // WHERE postage_tax_rule_title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $postageTaxRuleTitle The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderQuery The current query, for fluid interface
+     */
+    public function filterByPostageTaxRuleTitle($postageTaxRuleTitle = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($postageTaxRuleTitle)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $postageTaxRuleTitle)) {
+                $postageTaxRuleTitle = str_replace('*', '%', $postageTaxRuleTitle);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderTableMap::POSTAGE_TAX_RULE_TITLE, $postageTaxRuleTitle, $comparison);
     }
 
     /**

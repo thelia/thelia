@@ -14,6 +14,7 @@ namespace TheliaSmarty\Template\Plugins;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Model\OrderPostage;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Model\AddressQuery;
@@ -44,8 +45,14 @@ class CartPostage extends AbstractSmartyPlugin
     /** @var integer $deliveryId the id of the cheapest delivery  */
     protected $deliveryId = null;
 
-    /** @var float $postage the postage amount */
+    /** @var float $postage the postage amount with taxes */
     protected $postage = null;
+
+    /** @var float $postageTax the postage tax amount */
+    protected $postageTax = null;
+
+    /** @var string $postageTaxRuleTitle the postage tax rule title */
+    protected $postageTaxRuleTitle = null;
 
     /** @var boolean $isCustomizable indicate if customer can change the country */
     protected $isCustomizable = true;
@@ -89,6 +96,8 @@ class CartPostage extends AbstractSmartyPlugin
         $template->assign('country_id', $this->countryId);
         $template->assign('delivery_id', $this->deliveryId);
         $template->assign('postage', $this->postage ?: 0.0);
+        $template->assign('postage_tax', $this->postageTax ?: 0.0);
+        $template->assign('postage_title', $this->postageTaxRuleTitle ?: 0.0);
         $template->assign('is_customizable', $this->isCustomizable);
     }
 
@@ -169,9 +178,14 @@ class CartPostage extends AbstractSmartyPlugin
                 // Check if module is valid, by calling isValidDelivery(),
                 // or catching a DeliveryException.
                 if ($moduleInstance->isValidDelivery($country)) {
-                    $postage = $moduleInstance->getPostage($country);
-                    if (null === $this->postage || $this->postage > $postage) {
-                        $this->postage = $postage;
+                    $postage = OrderPostage::loadFromPostage(
+                        $moduleInstance->getPostage($country)
+                    );
+
+                    if (null === $this->postage || $this->postage > $postage->getAmount()) {
+                        $this->postage = $postage->getAmount();
+                        $this->postageTax = $postage->getAmountTax();
+                        $this->postageTaxRuleTitle = $postage->getTaxRuleTitle();
                         $this->deliveryId = $deliveryModule->getId();
                     }
                 }

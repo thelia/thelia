@@ -167,6 +167,7 @@ class Order extends BaseOrder
 
         if (false !== $includePostage) {
             $total += $this->getPostage();
+            $tax += $this->getPostageTax();
         }
 
         return $total;
@@ -178,17 +179,23 @@ class Order extends BaseOrder
      */
     public function getUntaxedPostage()
     {
-        // get default tax rule
-        $taxRuleQuery = new TaxRuleQuery();
-        $taxRule = $taxRuleQuery->findOneByIsDefault(true);
-        // get default country
-        $countryQuery = new CountryQuery();
-        $country = $countryQuery->findOneByByDefault(true);
-        // get calculator for this tax / country
-        $calculator = new Calculator();
-        $calculator->loadTaxRuleWithoutProduct($taxRule, $country);
-        // return untaxed price
-        return round($calculator->getUntaxedPrice($this->getPostage()), 2);
+        if (0 == $this->getPostageTax()) {
+            // get default tax rule
+            $taxRuleQuery = new TaxRuleQuery();
+            $taxRule = $taxRuleQuery->findOneByIsDefault(true);
+            // get default country
+            $countryQuery = new CountryQuery();
+            $country = $countryQuery->findOneByByDefault(true);
+            // get calculator for this tax / country
+            $calculator = new Calculator();
+            $calculator->loadTaxRuleWithoutProduct($taxRule, $country);
+            // return untaxed price
+            $untaxedPostage =  round($calculator->getUntaxedPrice($this->getPostage()), 2);
+        } else {
+            $untaxedPostage =  round($this->getPostage() - $this->getPostageTax(), 2);
+        }
+
+        return $untaxedPostage;
     }
 
     /**
@@ -201,7 +208,8 @@ class Order extends BaseOrder
         $virtualProductCount = OrderProductQuery::create()
             ->filterByOrderId($this->getId())
             ->filterByVirtual(1, Criteria::EQUAL)
-            ->count();
+            ->count()
+        ;
 
         return ($virtualProductCount !== 0);
     }

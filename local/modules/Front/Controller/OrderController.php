@@ -25,14 +25,12 @@ namespace Front\Controller;
 use Front\Front;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
@@ -45,6 +43,7 @@ use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\Order;
+use Thelia\Model\OrderPostage;
 use Thelia\Model\OrderProductQuery;
 use Thelia\Model\OrderQuery;
 use Thelia\Module\AbstractDeliveryModule;
@@ -105,12 +104,16 @@ class OrderController extends BaseFrontController
     {
         /* get postage amount */
         $deliveryModule = $moduleInstance->getModuleModel();
-        $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+        $postage = OrderPostage::loadFromPostage(
+            $moduleInstance->getPostage($deliveryAddress->getCountry())
+        );
 
         $orderEvent = $this->getOrderEvent();
         $orderEvent->setDeliveryAddress($deliveryAddress->getId());
         $orderEvent->setDeliveryModule($deliveryModule->getId());
-        $orderEvent->setPostage($postage);
+        $orderEvent->setPostage($postage->getAmount());
+        $orderEvent->setPostageTax($postage->getAmountTax());
+        $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
 
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
         $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);
@@ -168,12 +171,17 @@ class OrderController extends BaseFrontController
             /* get postage amount */
             $moduleInstance = $deliveryModule->getDeliveryModuleInstance($this->container);
 
-            $postage = $moduleInstance->getPostage($deliveryAddress->getCountry());
+            $postage = OrderPostage::loadFromPostage(
+                $moduleInstance->getPostage($deliveryAddress->getCountry())
+            );
 
             $orderEvent = $this->getOrderEvent();
             $orderEvent->setDeliveryAddress($deliveryAddressId);
             $orderEvent->setDeliveryModule($deliveryModuleId);
-            $orderEvent->setPostage($postage);
+            $orderEvent->setPostage($postage->getAmount());
+            $orderEvent->setPostageTax($postage->getAmountTax());
+            $orderEvent->setPostageTaxRuleTitle($postage->getTaxRuleTitle());
+
 
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_ADDRESS, $orderEvent);
             $this->getDispatcher()->dispatch(TheliaEvents::ORDER_SET_DELIVERY_MODULE, $orderEvent);

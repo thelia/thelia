@@ -429,7 +429,11 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         $amount = $with_tax ? $cart->getTaxedAmount($country, $with_discount) : $cart->getTotalAmount($with_discount);
 
         if ($with_postage) {
-            $amount += $order->getPostage();
+            if ($with_tax) {
+                $amount += $order->getPostage();
+            } else {
+                $amount += $order->getPostage() - $order->getPostageTax();
+            }
         }
 
         return $amount;
