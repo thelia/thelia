@@ -287,6 +287,10 @@
 
 {hook name="invoice.after-products" order="{$order_id}"}
 
+    {if $POSTAGE_TAX_RULE_TITLE}
+        {$taxes[$POSTAGE_TAX_RULE_TITLE][] = $POSTAGE_TAX}
+    {/if}
+
     <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
         <col style="width: 60%; padding: 1mm;" />
         <col style="width: 40%; padding: 1mm;" />
@@ -343,7 +347,7 @@
                     {/if}
                     <tr>
                         <td class="table-3-1"><p>{intl l="Total with tax"}</p></td>
-                        <td class="table-3-1 align-right"><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrency}</P></td>
+                        <td class="table-3-1 align-right"><P>{format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE_UNTAXED} symbol=$orderCurrency}</P></td>
                     </tr>
                     <tr>
                         <td class="table-3-1"><p>{intl l="Postage"}</p></td>

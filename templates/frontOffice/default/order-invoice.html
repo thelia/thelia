@@ -189,7 +189,7 @@
                                 <th>{intl l="Total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}} symbol={currency attr="symbol"}}</span>
                                     </div>
                                 </td>
                             </tr>
