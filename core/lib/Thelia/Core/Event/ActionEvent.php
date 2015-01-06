@@ -49,7 +49,16 @@ abstract class ActionEvent extends Event
         foreach ($fields as $field) {
             $functionName = sprintf("set%s", Container::camelize($field->getName()));
             if (method_exists($this, $functionName)) {
-                $this->{$functionName}($field->getData());
+                $getFunctionName = sprintf("get%s", Container::camelize($field->getName()));
+                if (method_exists($this, $getFunctionName)) {
+                    if (null === $this->{$getFunctionName}()) {
+                        $this->{$functionName}($field->getData());
+                    }
+                } else {
+                    $this->{$functionName}($field->getData());
+                }
+
+
             } else {
                 $this->{$field->getName()} = $field->getData();
             }
