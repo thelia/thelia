@@ -72,7 +72,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="coupon.update-js" location="coupon-update-js" }
+    {hook name="coupon.update-js" location="coupon-update-js" coupon_id={$couponId} }
 
     {hook name="wysiwyg.js" location="wysiwyg-coupon-update-js" }
 {/block}

@@ -335,7 +335,7 @@
                     </div>
                 </div>
 
-            {hook name="customer.edit" location="customer-edit" }
+            {hook name="customer.edit" location="customer-edit" customer_id=$customer_id}
 
     		{/loop}
 
@@ -361,7 +361,7 @@
 
         {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
 
-        {hook name="customer.address-create-form" location="customer_address_create_form" }
+        {hook name="customer.address-create-form" location="customer_address_create_form" customer_id=$customer_id page=$page}
 
     {/capture}
 
@@ -393,7 +393,7 @@
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
 	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
-            {hook name="customer.address-update-form" location="customer_address_update_form" }
+            {hook name="customer.address-update-form" location="customer_address_update_form" customer_id=$customer_id page=$page}
 	    {/capture}
 
 	    {include
@@ -442,7 +442,7 @@
     <input type="hidden" name="customer_id" value="{$customer_id}">
     <input type="hidden" name="page" value="{$page}">
 
-    {hook name="customer.address-delete-form" location="customer_address_delete_form" }
+    {hook name="customer.address-delete-form" location="customer_address_delete_form" customer_id=$customer_id page=$page}
 {/capture}
 
 {include

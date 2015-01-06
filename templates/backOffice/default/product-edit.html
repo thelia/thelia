@@ -155,7 +155,7 @@
                                         current_tab = "modules"
                                         }
                                     </div>
-                                    {* ugly fix : {hook name="product.tab-content"} *}
+                                    {* ugly fix : {hook name="product.tab-content" id="{$product_id}" view="product"} *}
                                     {include file="includes/module-tab-content.html" hook="product.tab-content" location="product-edit" id="{$product_id}" view="product"}
                                 </div>
 
@@ -590,7 +590,7 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="product.edit-js" location="product-edit-js" }
+    {hook name="product.edit-js" location="product-edit-js" product_id={$product_id} }
 
     {hook name="wysiwyg.js" location="wysiwyg-product-edit-js" }
 {/block}

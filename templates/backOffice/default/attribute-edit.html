@@ -120,7 +120,7 @@
     				                                        }
     				                                    </th>
 
-    				                                    {hook name="attributes-value.table-header" location="attributes_value_table_header" }
+    				                                    {hook name="attributes-value.table-header" location="attributes_value_table_header"  attribute_id=$attribute_id}
 
     				                                    <th class="actions">{intl l="Actions"}</th>
     				                                </tr>
@@ -148,7 +148,7 @@
     				                                        }
     				                                    </td>
 
-    				                                    {hook name="attributes-value.table-row" location="attributes_value_table_row" }
+    				                                    {hook name="attributes-value.table-row" location="attributes_value_table_row" attribute_id=$attribute_id}
 
     				                                    <td class="actions">
     				                                        <div class="btn-group">
@@ -264,7 +264,7 @@
     <input type="hidden" name="attribute_id" value="{$attribute_id}" />
     <input type="hidden" name="attributeav_id" id="value_delete_id" value="" />
 
-    {hook name="attribute.id-delete-form" location="attribute_id_delete_form" }
+    {hook name="attribute.id-delete-form" location="attribute_id_delete_form" attribute_id=$attribute_id}
 {/capture}
 
 {include
@@ -326,5 +326,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="attribute.edit-js" location="attribute-edit-js" }
+    {hook name="attribute.edit-js" location="attribute-edit-js" attribute_id=$attribute_id}
 {/block}

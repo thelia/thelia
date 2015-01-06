@@ -187,7 +187,7 @@
                                     current_tab = "modules"
                                     }
                                 </div>
-                                {* ugly fix : {hook name="folder.tab-content"} *}
+                                {* ugly fix : {hook name="folder.tab-content" id="{$folder_id}" view="folder"} *}
                                 {include file="includes/module-tab-content.html" hook="folder.tab-content" location="folder-edit" id="{$folder_id}" view="folder"}
 		                    </div>
 		                 </div>
@@ -283,7 +283,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="folder.edit-js" location="folder-edit-js" }
+    {hook name="folder.edit-js" location="folder-edit-js" folder_id={$folder_id} }
 
     {hook name="wysiwyg.js" location="wysiwyg-folder-edit-js" }
 {/block}

@@ -17,7 +17,7 @@
             </ul>
         </div>
 
-        {module_include location='api_top'}
+        {hook name="api.top" location='api_top'}
 
         <div class="row">
             <div class="col-md-12">
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        {module_include location='api_bottom'}
+        {hook name="api.bottom" location='api_bottom'}
 
     </div>
 </div>
@@ -147,7 +147,7 @@
     {capture "api_delete_dialog"}
         <input type="hidden" name="api_id" id="api_delete_id" value="" />
 
-        {module_include location='administrator_delete_form'}
+        {hook name="api.delete-form" location='api_delete_form'}
 
     {/capture}
 

@@ -306,7 +306,7 @@
                                         current_tab = "modules"
                                         }
                                     </div>
-                                    {* ugly fix : {hook name="category.tab-content"} *}
+                                    {* ugly fix : {hook name="category.tab-content" id="{$category_id}" view="category"} *}
                                     {include file="includes/module-tab-content.html" hook="category.tab-content" location="category-edit" id="{$category_id}" view="category"}
                                 </div>
                              </div>
@@ -436,7 +436,7 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="category.edit-js" location="category-edit-js" }
+    {hook name="category.edit-js" location="category-edit-js" category_id=$category_id}
 
     {hook name="wysiwyg.js" location="wysiwyg-category-edit-js" }
 {/block}

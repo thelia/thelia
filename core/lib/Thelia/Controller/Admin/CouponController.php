@@ -251,6 +251,8 @@ class CouponController extends BaseAdminController
 
         $args['dateFormat'] = $this->getDefaultDateFormat();
 
+        $args['couponId'] = $couponId;
+
         return $this->render('coupon-update', $args);
     }
 

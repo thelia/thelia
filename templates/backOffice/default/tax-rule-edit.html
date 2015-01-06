@@ -253,7 +253,7 @@
 
         {/form_field}
 
-        {hook name="taxes.update-form" location="tax_list_update_form" }
+        {hook name="taxes.update-form" location="tax_list_update_form" tax_rule_id={$tax_rule_id} }
 
     {/capture}
 
@@ -431,5 +431,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="tax-rule.edit-js" location="tax-rule-edit-js" }
+    {hook name="tax-rule.edit-js" location="tax-rule-edit-js" tax_rule_id={$tax_rule_id} }
 {/block}

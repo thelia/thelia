@@ -114,7 +114,7 @@
                                         </a>
                                     </td>
 
-                                    {hook name="folders.row" location="folder_list_row" }
+                                    {hook name="folders.row" location="folder_list_row" folder_id={$ID} }
 
                                     <td>
                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
