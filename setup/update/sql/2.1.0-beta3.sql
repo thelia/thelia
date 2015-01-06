@@ -6,6 +6,9 @@ UPDATE `config` SET `value`='1' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='beta3' WHERE `name`='thelia_extra_version';
 
+
+UPDATE `config` SET `value`='1' WHERE `name`='cart.use_persistent_cookie';
+
 -- Order
 
 ALTER TABLE `order` ADD `postage_tax` FLOAT DEFAULT 0 NOT NULL AFTER `postage` ;
