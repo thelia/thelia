@@ -1,3 +1,9 @@
+# 2.1.0-beta3
+
+- abilities to translate email and pdf templates in modules
+-  support of taxes for postage amount
+
+
 # 2.1.0-beta2
 
 - config : 

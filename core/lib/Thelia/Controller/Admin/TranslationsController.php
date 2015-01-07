@@ -109,19 +109,33 @@ class TranslationsController extends BaseAdminController
                         $i18n_directory = $module->getAbsoluteAdminIncludesI18nPath();
                         $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
                     } elseif (! empty($module_part)) {
-                        // Front or back office template, form of $module_part is [bo|fo].subdir-name
+                        // Front, back, pdf or email office template,
+                        // form of $module_part is [bo|fo|pdf|email].subdir-name
                         list($type, $subdir) = explode('.', $module_part);
 
-                        if ($type == 'bo') {
-                            $directory = $module->getAbsoluteBackOfficeTemplatePath($subdir);
-                            $domain = $module->getBackOfficeTemplateTranslationDomain($subdir);
-                            $i18n_directory = $module->getAbsoluteBackOfficeI18nTemplatePath($subdir);
-                        } elseif ($type == 'fo') {
-                            $directory = $module->getAbsoluteFrontOfficeTemplatePath($subdir);
-                            $domain = $module->getFrontOfficeTemplateTranslationDomain($subdir);
-                            $i18n_directory = $module->getAbsoluteFrontOfficeI18nTemplatePath($subdir);
-                        } else {
-                            throw new \InvalidArgumentException("Undefined module template type: '$type'.");
+                        switch ($type) {
+                            case 'bo':
+                                $directory = $module->getAbsoluteBackOfficeTemplatePath($subdir);
+                                $domain = $module->getBackOfficeTemplateTranslationDomain($subdir);
+                                $i18n_directory = $module->getAbsoluteBackOfficeI18nTemplatePath($subdir);
+                                break;
+                            case 'fo':
+                                $directory = $module->getAbsoluteFrontOfficeTemplatePath($subdir);
+                                $domain = $module->getFrontOfficeTemplateTranslationDomain($subdir);
+                                $i18n_directory = $module->getAbsoluteFrontOfficeI18nTemplatePath($subdir);
+                                break;
+                            case 'email':
+                                $directory = $module->getAbsoluteEmailTemplatePath($subdir);
+                                $domain = $module->getEmailTemplateTranslationDomain($subdir);
+                                $i18n_directory = $module->getAbsoluteEmailI18nTemplatePath($subdir);
+                                break;
+                            case 'pdf':
+                                $directory = $module->getAbsolutePdfTemplatePath($subdir);
+                                $domain = $module->getPdfTemplateTranslationDomain($subdir);
+                                $i18n_directory = $module->getAbsolutePdfI18nTemplatePath($subdir);
+                                break;
+                            default:
+                                throw new \InvalidArgumentException("Undefined module template type: '$type'.");
                         }
 
                         $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
@@ -139,6 +153,12 @@ class TranslationsController extends BaseAdminController
 
                     $templateArguments['front_office_templates'] =
                         implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::FRONT_OFFICE));
+
+                    $templateArguments['email_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::EMAIL));
+
+                    $templateArguments['pdf_templates'] =
+                        implode(',', $this->getModuleTemplateNames($module, TemplateDefinition::PDF));
 
                     // Check if we have admin-include files
                     try {

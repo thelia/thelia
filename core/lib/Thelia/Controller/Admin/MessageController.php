@@ -19,11 +19,14 @@ use Thelia\Core\Event\Message\MessageDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
+use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Model\MessageQuery;
 use Thelia\Form\MessageModificationForm;
 use Thelia\Form\MessageCreationForm;
 use Symfony\Component\Finder\Finder;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\Module;
+use Thelia\Model\ModuleQuery;
 
 /**
  * Manages messages sent by mail
@@ -168,6 +171,30 @@ class MessageController extends AbstractCrudController
 
         foreach ($finder as $file) {
             $list[] = $file->getBasename();
+        }
+
+        // Add modules templates
+        $modules = ModuleQuery::getActivated();
+        /** @var Module $module */
+        foreach ($modules as $module) {
+
+            $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
+
+            if (file_exists($dir)) {
+                $finder = Finder::create()
+                    ->files()
+                    ->in($dir)
+                    ->ignoreDotFiles(true)
+                    ->sortByName()
+                    ->name("*.$requiredExtension");
+
+                foreach ($finder as $file) {
+                    $fileName = $file->getBasename();
+                    if (!in_array($fileName, $list)) {
+                        $list[] = $fileName;
+                    }
+                }
+            }
         }
 
         return $list;

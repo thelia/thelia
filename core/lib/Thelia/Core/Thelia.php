@@ -263,39 +263,7 @@ class Thelia extends Kernel
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-                    // Core module translation
-                    if (is_dir($dir = $module->getAbsoluteI18nPath())) {
-                        $translationDirs[$module->getTranslationDomain()] = $dir;
-                    }
-
-                    // Admin includes translation
-                    if (is_dir($dir = $module->getAbsoluteAdminIncludesI18nPath())) {
-                        $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
-                    }
-
-                    // Module back-office template, if any
-                    $templates =
-                        TemplateHelper::getInstance()->getList(
-                            TemplateDefinition::BACK_OFFICE,
-                            $module->getAbsoluteTemplateBasePath()
-                        );
-
-                    foreach ($templates as $template) {
-                        $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
-                            $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
-                    }
-
-                    // Module front-office template, if any
-                    $templates =
-                        TemplateHelper::getInstance()->getList(
-                            TemplateDefinition::FRONT_OFFICE,
-                            $module->getAbsoluteTemplateBasePath()
-                        );
-
-                    foreach ($templates as $template) {
-                        $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
-                            $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
-                    }
+                    $this->loadModuleTranslationDirectories($module, $translationDirs);
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
@@ -322,6 +290,67 @@ class Thelia extends Kernel
             if ($translationDirs) {
                 $this->loadTranslation($container, $translationDirs);
             }
+        }
+    }
+
+    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs)
+    {
+        // Core module translation
+        if (is_dir($dir = $module->getAbsoluteI18nPath())) {
+            $translationDirs[$module->getTranslationDomain()] = $dir;
+        }
+
+        // Admin includes translation
+        if (is_dir($dir = $module->getAbsoluteAdminIncludesI18nPath())) {
+            $translationDirs[$module->getAdminIncludesTranslationDomain()] = $dir;
+        }
+
+        // Module back-office template, if any
+        $templates =
+            TemplateHelper::getInstance()->getList(
+                TemplateDefinition::BACK_OFFICE,
+                $module->getAbsoluteTemplateBasePath()
+            );
+
+        foreach ($templates as $template) {
+            $translationDirs[$module->getBackOfficeTemplateTranslationDomain($template->getName())] =
+                $module->getAbsoluteBackOfficeI18nTemplatePath($template->getName());
+        }
+
+        // Module front-office template, if any
+        $templates =
+            TemplateHelper::getInstance()->getList(
+                TemplateDefinition::FRONT_OFFICE,
+                $module->getAbsoluteTemplateBasePath()
+            );
+
+        foreach ($templates as $template) {
+            $translationDirs[$module->getFrontOfficeTemplateTranslationDomain($template->getName())] =
+                $module->getAbsoluteFrontOfficeI18nTemplatePath($template->getName());
+        }
+
+        // Module pdf template, if any
+        $templates =
+            TemplateHelper::getInstance()->getList(
+                TemplateDefinition::PDF,
+                $module->getAbsoluteTemplateBasePath()
+            );
+
+        foreach ($templates as $template) {
+            $translationDirs[$module->getPdfTemplateTranslationDomain($template->getName())] =
+                $module->getAbsolutePdfI18nTemplatePath($template->getName());
+        }
+
+        // Module email template, if any
+        $templates =
+            TemplateHelper::getInstance()->getList(
+                TemplateDefinition::EMAIL,
+                $module->getAbsoluteTemplateBasePath()
+            );
+
+        foreach ($templates as $template) {
+            $translationDirs[$module->getEmailTemplateTranslationDomain($template->getName())] =
+                $module->getAbsoluteEmailI18nTemplatePath($template->getName());
         }
     }
 
