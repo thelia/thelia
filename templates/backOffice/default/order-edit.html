@@ -364,7 +364,7 @@
                                                         <tbody>
                                                         {ifhook rel="order-edit.bill-delivery-address"}
                                                             {* delivery module can customize the delivery address *}
-                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order="{$order_id}"}
+                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id="{$order_id}"}
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
                                                             {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
@@ -607,5 +607,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="order.edit-js" location="order-edit-js" }
+    {hook name="order.edit-js" location="order-edit-js" order_id={$order_id} }
 {/block}

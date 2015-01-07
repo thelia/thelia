@@ -67,7 +67,7 @@
                                            {/if}
                                            </td>
 
-        	                                {hook name="messages.table-row" location="messages_table_row" }
+        	                                {hook name="messages.table-row" location="messages_table_row" message_id={$ID} }
 
         	                                <td class="actions">
         	                                    {if ! $SECURED}

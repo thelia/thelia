@@ -97,7 +97,7 @@
                                             </td>
                                         {/elseloop}
                                     </tbody>
-                                    {hook name="shipping-configuration.edit" location="shipping-configuration-edit" }
+                                    {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
                                 </table>
                             </div>
                         </div>
@@ -157,5 +157,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" }
+    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" area_id={$area_id} }
 {/block}

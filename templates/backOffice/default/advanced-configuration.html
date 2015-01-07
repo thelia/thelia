@@ -69,8 +69,13 @@
                             {/form}
                         </div>
                     </div>
+                    {hook name="advanced-configuration" location="advanced-configuration"}
                 </div>
             </div>
         </div>
     </div>
+{/block}
+
+{block name="javascript-last-call"}
+    {hook name="advanced-configuration.js" location="advanced-configuration-js" }
 {/block}

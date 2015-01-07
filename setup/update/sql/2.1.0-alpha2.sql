@@ -10,7 +10,7 @@ UPDATE `config` SET `name`='form_firewall_active' WHERE `name`='from_firewall_ac
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-(@max_id + 1, 'cart.use_persistent_cookie', '0', 0, 0, NOW(), NOW()),
+(@max_id + 1, 'cart.use_persistent_cookie', '1', 0, 0, NOW(), NOW()),
 (@max_id + 2, 'cart.cookie_name', 'thelia_cart', 0, 0, NOW(), NOW()),
 (@max_id + 3, 'cart.cookie_lifetime', '31536060', 0, 0, NOW(), NOW()),
 (@max_id + 4, 'allow_slash_ended_uri', 1, 0, 0, NOW(), NOW())

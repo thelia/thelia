@@ -75,7 +75,7 @@
                                             {intl l="There are no shipping zones attached to this module."}
                                         {/elseloop}
                                     </td>
-                                    {hook name="shipping-zones.table-row" location="shipping_zones_table_row" }
+                                    {hook name="shipping-zones.table-row" location="shipping_zones_table_row" module_id={$ID} }
 
                                     <td class="text-center">
                                         <div class="btn-group">

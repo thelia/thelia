@@ -45,6 +45,7 @@
                                     <th>{intl l="Last Name"}</th>
                                     <th>{intl l="Locale"}</th>
                                     <th>{intl l="Profile"}</th>
+                                    {hook name="adminisrators.header" location="administrator_list_header" }
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
@@ -78,6 +79,7 @@
                                             {intl l='Superadministrator'}
                                         {/if}
                                     </td>
+                                    {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
                                     <td>
                                         <div class="btn-group">
                                             {* if admin is current admin :

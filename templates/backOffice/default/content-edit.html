@@ -204,7 +204,7 @@
                                             current_tab = "modules"
                                             }
                                         </div>
-                                        {* ugly fix : {hook name="content.tab-content"} *}
+                                        {* ugly fix : {hook name="content.tab-content" id="{$content_id}" view="content"} *}
                                         {include file="includes/module-tab-content.html" hook="content.tab-content" location="content-edit" id="{$content_id}" view="content"}
                                     </div>
                                 </div>
@@ -325,7 +325,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="content.edit-js" location="content-edit-js" }
+    {hook name="content.edit-js" location="content-edit-js" content_id={$content_id} }
 
     {hook name="wysiwyg.js" location="wysiwyg-content-edit-js" }
 {/block}

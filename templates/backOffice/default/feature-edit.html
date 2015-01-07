@@ -148,7 +148,7 @@
     				                                        }
     				                                    </td>
 
-    				                                    {hook name="features-value.table-row" location="features_value_table_row" }
+    				                                    {hook name="features-value.table-row" location="features_value_table_row" feature_id={$feature_id} }
 
     				                                    <td class="actions">
     				                                        <div class="btn-group">
@@ -239,7 +239,7 @@
             </div>
         {/form_field}
 
-        {hook name="feature.value-create-form" location="feature_value_create_form" }
+        {hook name="feature.value-create-form" location="feature_value_create_form" feature_id={$feature_id} }
 
     {/capture}
 
@@ -324,5 +324,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="feature.edit-js" location="feature-edit-js" }
+    {hook name="feature.edit-js" location="feature-edit-js" feature_id={$feature_id} }
 {/block}

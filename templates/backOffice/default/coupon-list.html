@@ -151,7 +151,7 @@
                                             {/if}
                                         </td>
 
-                                        {hook name="coupon.table-row" location="coupon_table_row" }
+                                        {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
                                         <td class="text-center">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}

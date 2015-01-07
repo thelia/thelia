@@ -137,7 +137,7 @@
             {form_field form=$form field='area_id'}
                 <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
             {/form_field}
-            {hook name="zone.delete-form" location="zone_delete_form" }
+            {hook name="zone.delete-form" location="zone_delete_form" module_id={$delivery_module_id} }
         {/form}
     {/capture}
 
@@ -171,5 +171,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-zones.edit-js" location="shipping-zones-edit-js" }
+    {hook name="shipping-zones.edit-js" location="shipping-zones-edit-js" module_id={$delivery_module_id} }
 {/block}

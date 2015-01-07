@@ -133,7 +133,7 @@
 		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
 		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
                                         {* *}
-		                                {hook name="orders.table-row" location="orders_table_row" }
+		                                {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
                                         <td>
 		                                    <div class="btn-group">

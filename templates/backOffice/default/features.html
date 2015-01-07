@@ -101,7 +101,7 @@
                                             }
                                         </td>
 
-                                        {hook name="features.table-row" location="features_table_row" }
+                                        {hook name="features.table-row" location="features_table_row" feature_id={$ID} }
 
                                         <td class="actions">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}

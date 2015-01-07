@@ -114,7 +114,7 @@
                                           </a>
                                      </td>
 
-                                     {hook name="categories.row" location="category_list_row" }
+                                     {hook name="categories.row" location="category_list_row" category_id={$ID} }
 
                                      <td>
                                          {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
@@ -309,7 +309,7 @@
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
-                             {hook name="products.row" location="product_list_row" }
+                             {hook name="products.row" location="product_list_row" product_id={$ID} }
 
                              <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
 
