@@ -70,7 +70,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate
 
         $output->renderBlock(array(
             '',
-            'Sql generated successfuly',
+            'Sql generated successfully',
             'File available in your module config directory',
             ''
         ), 'bg=green;fg=black');
