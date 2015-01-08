@@ -22,7 +22,6 @@ use Thelia\Model\FolderQuery;
  */
 class FolderIdType extends AbstractIdType
 {
-
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      *

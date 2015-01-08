@@ -14,7 +14,7 @@ echo -e "\n\033[01;34m[INFO] Activating Hook Test Module\033[00m\n"
 php Thelia module:activate HookTest
 
 echo -e "\n\033[01;34m[INFO] Running unit tests\033[00m\n"
-phpunit $*
+./bin/phpunit
 
 echo -e "\n\033[01;34m[INFO] Desactivating Hook Test Module\033[00m\n"
 php Thelia module:deactivate HookTest

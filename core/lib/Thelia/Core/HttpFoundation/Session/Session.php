@@ -213,6 +213,10 @@ class Session extends BaseSession
 
             $cartEvent = new CartRestoreEvent();
 
+            if (null !== $cart) {
+                $cartEvent->setCart($cart);
+            }
+
             $dispatcher->dispatch(TheliaEvents::CART_RESTORE_CURRENT, $cartEvent);
 
             if (null === $cart = $cartEvent->getCart()) {
@@ -276,10 +280,9 @@ class Session extends BaseSession
     {
         $customer = $this->getCustomerUser();
 
-        return (null === $customer && $cart->getCustomerId() !== null)
-               ||
-               (null !== $customer && $cart->getCustomerId() == $customer->getId())
-        ;
+        return (null !== $customer && $cart->getCustomerId() == $customer->getId())
+            ||
+        (null === $customer && $cart->getCustomerId() === null);
     }
 
     // -- Order ------------------------------------------------------------------

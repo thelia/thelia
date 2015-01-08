@@ -22,7 +22,6 @@ use Thelia\Model\ContentQuery;
  */
 class ContentIdType extends AbstractIdType
 {
-
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      *

@@ -21,7 +21,6 @@ use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Log\Tlog;
 use Thelia\Model\Base\CustomerQuery;
 use Thelia\Model\Base\ProductSaleElementsQuery;
 use Thelia\Model\Currency as CurrencyModel;
@@ -276,66 +275,116 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function restoreCurrentCart(CartRestoreEvent $cartRestoreEvent)
     {
         $cookieName = ConfigQuery::read("cart.cookie_name", 'thelia_cart');
+        $persistentCookie = ConfigQuery::read("cart.use_persistent_cookie", 1);
 
         $cart = null;
 
-        if ($this->request->cookies->has($cookieName)) {
-            // The cart cookie exists -> get the cart token
-            $token = $this->request->cookies->get($cookieName);
-
-            Tlog::getInstance()->addDebug("Cookie $cookieName is in the request, value: $token");
-
-            // Check if a cart exists for this token
-            if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
-                Tlog::getInstance()->addDebug("Cart has been found in the database");
-
-                if (null !== $customer = $this->session->getCustomerUser()) {
-                    Tlog::getInstance()->addDebug("Customer " . $customer->getId() . " is logged in");
-
-                    // A customer is logged in.
-                    if (null === $cart->getCustomerId()) {
-                        // The cart created by the customer when it was not yet logged in
-                        // is assigned to it after login.
-                        $cart->setCustomerId($customer->getId())->save();
-
-                        Tlog::getInstance()->addDebug(
-                            sprintf(
-                                "Cart customer is null. No duplication, the cart is assigned to customer (%s).",
-                                $cart->getCustomerId()
-                            )
-                        );
-                    } elseif ($cart->getCustomerId() != $customer->getId()) {
-                        Tlog::getInstance()->addDebug("Cart customer (".$cart->getCustomerId().") <> current customer -> duplication");
-
-                        // The cart does not belongs to the current customer
-                        // -> clone it to create a new cart.
-                        $cart = $this->duplicateCart(
-                            $cartRestoreEvent->getDispatcher(),
-                            $cart,
-                            CustomerQuery::create()->findPk($customer->getId())
-                        );
-                    }
-                } elseif ($cart->getCustomerId() != null) {
-                    Tlog::getInstance()->addDebug("No customer logged in, but customer defined in cart (".$cart->getCustomerId().") -> duplication");
-
-                    // Just duplicate the current cart, without assigning a customer ID.
-                    $cart = $this->duplicateCart($cartRestoreEvent->getDispatcher(), $cart);
-                }
-            }
+        if ($this->request->cookies->has($cookieName) && $persistentCookie) {
+            $cart = $this->managePersistentCart($cartRestoreEvent, $cookieName);
+        } elseif (!$persistentCookie) {
+            $cart = $this->manageNonPersistentCookie($cartRestoreEvent);
         }
 
         // Still no cart ? Create a new one.
         if (null === $cart) {
-            Tlog::getInstance()->addDebug("No cart found, creating a new one.");
-
-            $cartCreateEvent = new CartCreateEvent();
-
-            $cartRestoreEvent->getDispatcher()->dispatch(TheliaEvents::CART_CREATE_NEW, $cartCreateEvent);
-
-            $cart = $cartCreateEvent->getCart();
+            $cart = $this->dispatchNewCart($cartRestoreEvent->getDispatcher());
         }
 
         $cartRestoreEvent->setCart($cart);
+    }
+
+    /**
+     * The cart token is not saved in a cookie, if the cart is present in session, we just change the customer id
+     * if needed or create duplicate the current cart if the customer is not the same as customer already present in
+     * the cart.
+     *
+     * @param CartRestoreEvent $cartRestoreEvent
+     * @return CartModel
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    private function manageNonPersistentCookie(CartRestoreEvent $cartRestoreEvent)
+    {
+        $cart = $cartRestoreEvent->getCart();
+
+        if (null === $cart) {
+            $cart = $cart = $this->dispatchNewCart($cartRestoreEvent->getDispatcher());
+        } else {
+            if (null !== $customer = $this->session->getCustomerUser()) {
+                // A customer is logged in.
+                if (null === $cart->getCustomerId()) {
+                    // The cart created by the customer when it was not yet logged in
+                    // is assigned to it after login.
+                    $cart->setCustomerId($customer->getId())->save();
+                } elseif ($cart->getCustomerId() != $customer->getId()) {
+                    // The cart does not belongs to the current customer
+                    // -> clone it to create a new cart.
+                    $cart = $this->duplicateCart(
+                        $cartRestoreEvent->getDispatcher(),
+                        $cart,
+                        CustomerQuery::create()->findPk($customer->getId())
+                    );
+                }
+            } else {
+                $cart->setCustomerId(null)->save();
+            }
+        }
+
+        return $cart;
+    }
+
+    /**
+     *
+     * The cart token is saved in a cookie so we try to retrieve it. Then the customer is checked.
+     *
+     * @param CartRestoreEvent $cartRestoreEvent
+     * @param $cookieName
+     * @return CartModel
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
+    private function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName)
+    {
+        // The cart cookie exists -> get the cart token
+        $token = $this->request->cookies->get($cookieName);
+
+        // Check if a cart exists for this token
+        if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
+            if (null !== $customer = $this->session->getCustomerUser()) {
+                // A customer is logged in.
+                if (null === $cart->getCustomerId()) {
+                    // The cart created by the customer when it was not yet logged in
+                    // is assigned to it after login.
+                    $cart->setCustomerId($customer->getId())->save();
+                } elseif ($cart->getCustomerId() != $customer->getId()) {
+                    // The cart does not belongs to the current customer
+                    // -> clone it to create a new cart.
+                    $cart = $this->duplicateCart(
+                        $cartRestoreEvent->getDispatcher(),
+                        $cart,
+                        CustomerQuery::create()->findPk($customer->getId())
+                    );
+                }
+            } elseif ($cart->getCustomerId() != null) {
+                // Just duplicate the current cart, without assigning a customer ID.
+                $cart = $this->duplicateCart($cartRestoreEvent->getDispatcher(), $cart);
+            }
+        }
+
+        return $cart;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     * @return CartModel
+     */
+    protected function dispatchNewCart(EventDispatcherInterface $dispatcher)
+    {
+        $cartCreateEvent = new CartCreateEvent();
+
+        $dispatcher->dispatch(TheliaEvents::CART_CREATE_NEW, $cartCreateEvent);
+
+        return $cartCreateEvent->getCart();
     }
 
     /**

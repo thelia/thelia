@@ -57,8 +57,6 @@ abstract class ActionEvent extends Event
                 } else {
                     $this->{$functionName}($field->getData());
                 }
-
-
             } else {
                 $this->{$field->getName()} = $field->getData();
             }

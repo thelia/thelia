@@ -177,7 +177,6 @@ class MessageController extends AbstractCrudController
         $modules = ModuleQuery::getActivated();
         /** @var Module $module */
         foreach ($modules as $module) {
-
             $dir = $module->getAbsoluteTemplateBasePath() . DS . TemplateDefinition::EMAIL_SUBDIR . DS . 'default';
 
             if (file_exists($dir)) {
