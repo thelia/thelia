@@ -202,7 +202,7 @@ abstract class BaseController extends ContainerAware
      * @param  \Symfony\Component\Form\Form $form
      * @return string                       the error string
      */
-    private function getErrorMessages(Form $form)
+    protected function getErrorMessages(Form $form)
     {
         $errors = '';
 
