@@ -221,18 +221,26 @@ class Sale extends BaseAction implements EventSubscriberInterface
 
             try {
                 // Disable all promo flag on sale's currently selected products,
-                // to reset promo statsu of the products that have been removed from the selection.
+                // to reset promo status of the products that have been removed from the selection.
                 $sale->setActive(false);
 
-                $event->getDispatcher()->dispatch(
-                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                    new ProductSaleStatusUpdateEvent($sale)
-                );
+                $now = new \DateTime();
+                $startDate = $event->getStartDate();
+                $endDate = $event->getEndDate();
+
+                $update = ($startDate <= $now && $now <= $endDate);
+
+                if ($update) {
+                    $event->getDispatcher()->dispatch(
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                        new ProductSaleStatusUpdateEvent($sale)
+                    );
+                }
 
                 $sale
                     ->setActive($event->getActive())
-                    ->setStartDate($event->getStartDate())
-                    ->setEndDate($event->getEndDate())
+                    ->setStartDate($startDate)
+                    ->setEndDate($endDate)
                     ->setPriceOffsetType($event->getPriceOffsetType())
                     ->setDisplayInitialPrice($event->getDisplayInitialPrice())
                     ->setLocale($event->getLocale())
@@ -289,11 +297,14 @@ class Sale extends BaseAction implements EventSubscriberInterface
                     }
                 }
 
-                // Update related products sale status
-                $event->getDispatcher()->dispatch(
-                    TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
-                    new ProductSaleStatusUpdateEvent($sale)
-                );
+
+                if ($update) {
+                    // Update related products sale status
+                    $event->getDispatcher()->dispatch(
+                        TheliaEvents::UPDATE_PRODUCT_SALE_STATUS,
+                        new ProductSaleStatusUpdateEvent($sale)
+                    );
+                }
 
                 $con->commit();
             } catch (PropelException $e) {
