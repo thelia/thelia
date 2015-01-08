@@ -67,7 +67,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
 
         $output->renderBlock(array(
            '',
-           'Model generated successfuly',
+           'Model generated successfully',
            ''
         ), 'bg=green;fg=black');
 
