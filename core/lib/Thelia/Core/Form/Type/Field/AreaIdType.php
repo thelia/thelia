@@ -22,7 +22,6 @@ use Thelia\Model\AreaQuery;
  */
 class AreaIdType extends AbstractIdType
 {
-
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      *

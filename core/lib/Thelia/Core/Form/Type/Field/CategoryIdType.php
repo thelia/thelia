@@ -22,7 +22,6 @@ use Thelia\Model\CategoryQuery;
  */
 class CategoryIdType extends AbstractIdType
 {
-
     /**
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      *
