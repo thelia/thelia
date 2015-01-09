@@ -19,7 +19,3 @@ before_script:
   - php setup/faker.php
   - php Thelia module:activate Colissimo
   - php Thelia module:activate Cheque
-
-matrix:
-  allow_failures:
-    - php: 5.6

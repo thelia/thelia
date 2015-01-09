@@ -8,6 +8,7 @@
 - fix product add to cart
 - fix form firewall variable name
 - add more module includes in order-edit.html
+- do not allow failure anymore on travis php5.6
 
 #2.0.4
 - Updating stock when changing order : canceled status
