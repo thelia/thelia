@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Event\Sale;
 
+use Propel\Runtime\Util\PropelDateTime;
+
 /**
  * Class SaleUpdateEvent
  * @package Thelia\Core\Event\Sale
@@ -140,18 +142,18 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  \DateTime       $endDate
+     * @param  mixed $endDate string, integer (timestamp), or \DateTime value.
      * @return SaleUpdateEvent $this
      */
     public function setEndDate($endDate)
     {
-        $this->endDate = $endDate;
+        $this->endDate = PropelDateTime::newInstance($endDate, null, '\DateTime');
 
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return null|\DateTime
      */
     public function getEndDate()
     {
@@ -178,18 +180,18 @@ class SaleUpdateEvent extends SaleCreateEvent
     }
 
     /**
-     * @param  \DateTime       $startDate
+     * @param  mixed $startDate string, integer (timestamp), or \DateTime value.
      * @return SaleUpdateEvent $this
      */
     public function setStartDate($startDate)
     {
-        $this->startDate = $startDate;
+        $this->startDate = PropelDateTime::newInstance($startDate, null, '\DateTime');
 
         return $this;
     }
 
     /**
-     * @return \DateTime
+     * @return null|\DateTime
      */
     public function getStartDate()
     {
