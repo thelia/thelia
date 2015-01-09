@@ -130,6 +130,31 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
 
+# 2.0.5
+- add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
+- 'freesans' is now the default font of PDF documents
+- fix bug with cart foreign key constraint #926
+- fix typo with '}' #999
+- add missing 'admin.search' resource
+- add default translation for '/ajax/mini-cart'
+- fix product add to cart
+- fix form firewall variable name
+- add more module includes in order-edit.html
+- do not allow failure anymore on travis php5.6
+
+#2.0.4
+- Updating stock when changing order : canceled status
+- order table is versionnable now.
+- product_sale_elements_id is added to order_product table.
+
+#2.0.3
+- Fix js syntax in order-delivery template
+- price are now save without any round.
+ /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
+- change Argument type for ref parameter in Product loop
+- Fix export template
+- [Tinymce]fix invisible thumb in file manager
+
 #2.0.4
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
