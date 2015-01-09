@@ -16,6 +16,6 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max_id + 1, 'en_US', 'search'),
-(@max_id + 1, 'fr_FR', 'Recherche'),
+(@max_id + 1, 'fr_FR', 'Recherche');
 
 SET FOREIGN_KEY_CHECKS = 1;
