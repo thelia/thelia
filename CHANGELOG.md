@@ -1,7 +1,11 @@
-# 2.1.0-beta3
+# 2.1.0
 
 - abilities to translate email and pdf templates in modules
 - support of taxes for postage amount
+- sales modify price on update only if the sale is currently active
+- cart can be used without thelia cart cookie. Set cart.use_persistent_cookie to 0 in your config variable panel.
+- hook contains more information like the id of the current object you are working on.
+- fix module skeleton location
 
 
 # 2.1.0-beta2
