@@ -38,6 +38,7 @@ class Update
         '9' => '2.0.3-beta2',
         '10' => '2.0.3',
         '11' => '2.0.4',
+        '12' => '2.0.5',
     );
 
     protected function isLatestVersion($version)
