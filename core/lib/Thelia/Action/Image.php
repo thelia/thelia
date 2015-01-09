@@ -336,7 +336,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
         $driver = ConfigQuery::read("imagine_graphic_driver", "gd");
 
         switch ($driver) {
-            case 'imagik':
+            case 'imagick':
                 $image = new \Imagine\Imagick\Imagine();
                 break;
 
