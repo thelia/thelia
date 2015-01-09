@@ -47,7 +47,7 @@ use Thelia\Model\ModuleQuery;
 class Thelia extends Kernel
 {
 
-    const THELIA_VERSION = '2.0.4';
+    const THELIA_VERSION = '2.0.5';
 
     public function init()
     {
