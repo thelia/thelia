@@ -14,9 +14,7 @@ namespace Thelia\ImportExport\Export\Type;
 
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\Model\CustomerQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\Map\CustomerTableMap;
 use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Model\NewsletterQuery;
 
@@ -43,17 +41,7 @@ class MailingExport extends ExportHandler
             ->toArray()
         ;
 
-        $customers = CustomerQuery::create()
-            ->select([
-                CustomerTableMap::EMAIL,
-                CustomerTableMap::LASTNAME,
-                CustomerTableMap::FIRSTNAME,
-            ])
-            ->find()
-            ->toArray()
-        ;
-
-        return $customers + $newsletter;
+        return $newsletter;
     }
 
     protected function getAliases()
@@ -64,13 +52,8 @@ class MailingExport extends ExportHandler
 
         return [
             NewsletterTableMap::EMAIL       => $email,
-            CustomerTableMap::EMAIL         => $email,
-
             NewsletterTableMap::LASTNAME    => $lastName,
-            CustomerTableMap::LASTNAME      => $lastName,
-
             NewsletterTableMap::FIRSTNAME   => $firstName,
-            CustomerTableMap::FIRSTNAME     => $firstName,
         ];
     }
 
