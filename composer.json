@@ -3,6 +3,12 @@
     "description": "Thelia is an ecommerce CMS.",
     "license": "LGPL-3.0+",
     "homepage": "http://thelia.net/",
+    "keywords": [
+        "ecommerce",
+        "cms",
+        "cms ecommerce",
+        "ecommerce cms"
+    ],
     "support": {
         "forum": "http://thelia.net/forum",
         "wiki": "http://doc.thelia.net"
@@ -72,7 +78,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1.0-dev"
+            "dev-master": "2.1-dev"
         }
     },
     "repositories": [

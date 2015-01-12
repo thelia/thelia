@@ -2087,8 +2087,7 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max_id+8, 'admin.hooks', NOW(), NOW()),
 (@max_id+9, 'admin.import', NOW(), NOW()),
 (@max_id+10, 'admin.modules', NOW(), NOW()),
-(@max_id+11, 'admin.profile', NOW(), NOW()),
-(@max_id+12, 'admin.search', NOW(), NOW())
+(@max_id+11, 'admin.profile', NOW(), NOW())
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
@@ -2113,9 +2112,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+10, 'en_US', 'Modules management'),
   (@max_id+10, 'fr_FR', 'Gestion des modules'),
   (@max_id+11, 'en_US', 'Administration profiles management'),
-  (@max_id+11, 'fr_FR', 'Gestion des profils d''administration'),
-  (@max_id+12, 'en_US', 'Back-office search function'),
-  (@max_id+12, 'fr_FR', 'Fonction de recherche dans l''administration')
+  (@max_id+11, 'fr_FR', 'Gestion des profils d''administration')
 ;
 
 # ======================================================================================================================

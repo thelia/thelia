@@ -14,7 +14,9 @@
  * Thelia essential definitions
  */
 
-define("DS", DIRECTORY_SEPARATOR);
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
 
 if (!defined('THELIA_ROOT')) {
     define('THELIA_ROOT', rtrim(realpath(dirname(__DIR__)), DS) . DS);
