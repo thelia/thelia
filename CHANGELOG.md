@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Fix update process from Thelia 2.0.* to 2.1.*
+
 # 2.1.0
 
 - abilities to translate email and pdf templates in modules

@@ -45,7 +45,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
+        require __DIR__ . DS . $arg;
 
         $bootstraped = true;
     }
