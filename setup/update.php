@@ -22,16 +22,6 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-define('DS', DIRECTORY_SEPARATOR);
-define('THELIA_ROOT', rtrim(realpath(dirname(__DIR__)), DS) . DS);
-define('THELIA_LOCAL_DIR', THELIA_ROOT . 'local' . DS);
-define('THELIA_CONF_DIR', THELIA_LOCAL_DIR . 'config' . DS);
-define('THELIA_MODULE_DIR', THELIA_LOCAL_DIR . 'modules' . DS);
-define('THELIA_WEB_DIR', THELIA_ROOT . 'web' . DS);
-define('THELIA_CACHE_DIR', THELIA_ROOT . 'cache' . DS);
-define('THELIA_LOG_DIR', THELIA_ROOT . 'log' . DS);
-define('THELIA_TEMPLATE_DIR', THELIA_ROOT . 'templates' . DS);
-
 $bootstrapToggle = false;
 $bootstraped = false;
 
@@ -45,7 +35,7 @@ foreach ($argv as $arg) {
     }
 
     if ($bootstrapToggle) {
-        require __DIR__ . DS . $arg;
+        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
 
         $bootstraped = true;
     }
@@ -56,6 +46,9 @@ if (!$bootstraped) {
         require $bootstrapFile;
     } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
         require $file;
+    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+        // Here we are on a thelia/thelia-project
+       require $file;
     } else {
         echo "No autoload file found. Please use the -b argument to include yours";
         exit(1);
