@@ -69,14 +69,16 @@ abstract class BaseLoop
      */
     public function __construct(ContainerInterface $container)
     {
-        $this->checkInterface();
-
         $this->container = $container;
+
+        $this->translator = $container->get("thelia.translator");
+
+        $this->checkInterface();
 
         $this->request = $container->get('request');
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
-        $this->translator = $container->get("thelia.translator");
+
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
