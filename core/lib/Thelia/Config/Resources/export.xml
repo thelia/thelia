@@ -31,11 +31,11 @@
         <export id="thelia.export.mailing" category_id="thelia.export.customer" class="Thelia\ImportExport\Export\Type\MailingExport">
             <export_descriptive locale="fr_FR">
                 <title>Mailing</title>
-                <description>Exporter le nom, prénom et adresse mail des clients inscrits et des abonnées à la newsletter</description>
+                <description>Exporter le nom, prénom et adresse mail des abonnés à la newsletter</description>
             </export_descriptive>
             <export_descriptive locale="en_US">
                 <title>Mailing</title>
-                <description>Export the last name, first name and email address of the customers and the newsletter subscribers</description>
+                <description>Export the last name, first name and email address of the newsletter subscribers</description>
             </export_descriptive>
         </export>
 
