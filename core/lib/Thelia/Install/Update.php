@@ -13,6 +13,7 @@
 namespace Thelia\Install;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
+use Thelia\Core\Thelia;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -56,7 +57,7 @@ class Update
 
         $updatedVersions = array();
 
-        $currentVersion = ConfigQuery::read('thelia_version');
+        $currentVersion = Thelia::THELIA_VERSION;
         $logger->debug("start update process");
         if (true === $this->isLatestVersion($currentVersion)) {
             $logger->debug("You already have the latest version. No update available");
@@ -87,7 +88,7 @@ class Update
         return $updatedVersions;
     }
 
-    protected function updateToVersion($version, Database $database,Tlog $logger)
+    protected function updateToVersion($version, Database $database, Tlog $logger)
     {
         if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
             $logger->debug(sprintf('inserting file %s', $version.'$sql'));
