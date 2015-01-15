@@ -17,6 +17,7 @@ use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use Thelia\Core\Thelia;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
@@ -305,23 +306,7 @@ class Update
 
     public function getCurrentVersion()
     {
-        $currentVersion = null;
-
-        if (null !== $this->connection) {
-            try {
-                $stmt = $this->connection->prepare('SELECT value from config where name = ? LIMIT 1');
-                $stmt->execute(['thelia_version']);
-                if (false !== $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $currentVersion = $row['value'];
-                }
-            } catch (PDOException $e) {
-                $this->log('error', sprintf('Error retrieving current version : %s', $e->getMessage()));
-
-                throw $e;
-            }
-        }
-
-        return $currentVersion;
+        return Thelia::THELIA_VERSION;
     }
 
     public function setCurrentVersion($version)
