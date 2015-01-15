@@ -541,6 +541,9 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::updateAction</default>
         <requirement key="couponId">\d+</requirement>
     </route>
+    <route id="admin.coupon.delete" path="/admin/coupon/delete">
+        <default key="_controller">Thelia\Controller\Admin\CouponController::deleteAction</default>
+    </route>
     <route id="admin.coupon.draw.inputs.ajax" path="/admin/coupon/draw/inputs/{couponServiceId}">
         <default key="_controller">Thelia\Controller\Admin\CouponController::getBackOfficeInputsAjaxAction</default>
         <requirement key="couponServiceId">.*</requirement>

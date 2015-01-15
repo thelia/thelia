@@ -153,9 +153,14 @@
 
                                         {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
-                                        <td class="text-center">
+                                        <td class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                            {/loop}
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
+                                                <a title="{intl l='Delete this coupon'}" class="btn btn-default btn-xs delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </a>
                                             {/loop}
                                         </td>
                                     </tr>
@@ -172,6 +177,23 @@
 
     </div> <!-- #wrapper -->
 
+    {* DELETE MODAL *}
+    {capture "delete_dialog"}
+        <input type="hidden" name="coupon_id" id="coupon_delete_id" value="" />
+
+        {hook name="coupon.delete-form" }
+    {/capture}
+
+    {include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_coupon"
+    dialog_title    = {intl l="Delete coupon"}
+    dialog_message  = {intl l="Do you really want to delete this coupon ?"}
+
+    form_action         = {token_url path='/admin/coupon/delete'}
+    form_content        = {$smarty.capture.delete_dialog nofilter}
+    }
 </div>
 
 {/block}
@@ -202,6 +224,14 @@
     {javascripts file='assets/js/main.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+
+    <script>
+        $(document).ready(function() {
+            $(".delete_coupon_btn").click(function() {
+                $("#coupon_delete_id").val($(this).data("id"));
+            });
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}

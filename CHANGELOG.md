@@ -1,3 +1,7 @@
+# 2.1.2
+
+- Add the possibility to delete a coupon from the backoffice.
+
 # 2.1.1
 
 - Fix update process from Thelia 2.0.* to 2.1.*

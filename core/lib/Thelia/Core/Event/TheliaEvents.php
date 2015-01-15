@@ -490,6 +490,11 @@ final class TheliaEvents
     const AFTER_UPDATE_COUPON    = "action.after_update_coupon";
 
     /**
+     * Sent when deleting a Coupon
+     */
+    const COUPON_DELETE = "action.delete_coupon";
+
+    /**
      * Sent when attempting to use a Coupon
      */
     const COUPON_CONSUME    = "action.consume_coupon";
