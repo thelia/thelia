@@ -68,10 +68,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
         }
 
         $search = CategoryQuery::create();
-
-        $this->configureI18nProcessing($search, array(
-                    'TITLE'
-                ));
+        $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterByParent($parent);
 
