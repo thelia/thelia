@@ -37,7 +37,7 @@ class ProductTaxedPricesExportTest extends \PHPUnit_Framework_TestCase
         $data = $handler->buildData($lang)->getData();
 
         foreach ($data as $line) {
-            $product = ProductSaleElementsQuery::create()->findOneByRef($line["ref"]);
+            $product = ProductSaleElementsQuery::create()->findPk($line["id"]);
             $currency = CurrencyQuery::create()->findOneByCode($line["currency"]);
 
             $this->assertNotNull($product);

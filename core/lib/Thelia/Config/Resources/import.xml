@@ -20,10 +20,10 @@
                 <title>Importez votre stock</title>
                 <description>
                     <![CDATA[
-                    Your file must have the following columns to work:
+                    Votre fichier doit avoir les colonnes suivantes :
                     <ul>
-                        <li>ref: The reference of your product Attribute Combinations </li>
-                        <li>stock: The quantity of product you have </li>
+                        <li>id: L'id de la déclinaison de produit</li>
+                        <li>stock: La quantité de la déclinaison </li>
                     </ul>
                     ]]>
                 </description>
@@ -34,7 +34,7 @@
                     <![CDATA[
                     Your file must have the following columns to work:
                     <ul>
-                        <li>ref: The reference of your product attribute combinations </li>
+                        <li>id: The id of your product sale elements </li>
                         <li>stock: The quantity of product you have </li>
                     </ul>
                     It can have the column "ean" that defines the product's EAN code.
@@ -50,7 +50,7 @@
                     <![CDATA[
                     Votre fichier doit avoir les colonnes suivantes:
                     <ul>
-                        <li>ref: La reférénce de votre déclinaison de combinaison de produit</li>
+                        <li>id: L'id de la déclinaison de produit</li>
                         <li>price: Le prix Hors-Taxes de votre déclinaison de combinaison de produit</li>
                     </ul>
                     Il peut aussi optionnellement avoir ces colonnes:
@@ -68,7 +68,7 @@
                     <![CDATA[
                     Your file must have the following columns:
                     <ul>
-                        <li>ref: The reference of the product attribute combinations</li>
+                        <li>id: The id of your product sale elements </li>
                         <li>price: The price excluding taxes of the product attribute combinations</li>
                     </ul>
                     It may also optionally have those columns:

@@ -66,13 +66,13 @@ class ProductPricesImport extends ImportHandler
         while (null !== $row = $data->popRow()) {
             $this->checkMandatoryColumns($row);
 
-            $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
+            $obj = ProductSaleElementsQuery::create()->findPk($row["id"]);
 
             if ($obj === null) {
                 $errorMessage = $translator->trans(
-                    "The product sale element reference %ref doesn't exist",
+                    "The product sale element id %id doesn't exist",
                     [
-                        "%ref" => $row["ref"]
+                        "%id" => $row["id"]
                     ]
                 );
 
@@ -129,6 +129,6 @@ class ProductPricesImport extends ImportHandler
      */
     protected function getMandatoryColumns()
     {
-        return ["ref", "price"];
+        return ["id", "price"];
     }
 }
