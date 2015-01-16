@@ -66,7 +66,7 @@ class ProductPricesImportTest extends ControllerTestBase
         foreach ($query as $pse) {
             $entry = [];
 
-            $entry["ref"]   = $pse->getRef();
+            $entry["id"]   = $pse->getId();
 
             /**
              * Be sure to get a different value.
@@ -101,7 +101,7 @@ class ProductPricesImportTest extends ControllerTestBase
                 [
                     "price" => $entry->getPricesByCurrency($currency)->getPrice(),
                     "promo_price" => $entry->getPricesByCurrency($currency)->getPromoPrice(),
-                    "ref" => $entry->getRef()
+                    "id" => $entry->getId()
                 ]
             );
         }

@@ -33,7 +33,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
 
         $data = $export->buildData(Lang::getDefaultLanguage());
 
-        $keys = ["attributes","currency","ean","price","product_id","promo","promo_price","ref","title"];
+        $keys = ["attributes","currency","ean","id","price","product_id","promo","promo_price","title"];
 
         $rawData = $data->getData();
 
@@ -56,7 +56,7 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($keys, $rowKeys);
 
             $pse = ProductSaleElementsQuery::create()
-                ->findOneByRef($row["ref"])
+                ->findPk($row["id"])
             ;
 
             $this->assertNotNull($pse);
@@ -67,8 +67,9 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
             $this->assertNotNull($currency);
 
             $price = $pse->getPricesByCurrency($currency);
-            $this->assertEquals($price->getPrice(), $row["price"]);
-            $this->assertEquals($price->getPromoPrice(), $row["promo_price"]);
+            // The substr is a patch for php 5.4 float round
+            $this->assertEquals(substr($price->getPrice(), 0, strlen($row["price"])), $row["price"]);
+            $this->assertEquals(substr($price->getPromoPrice(), 0, strlen($row["promo_price"])), $row["promo_price"]);
             $this->assertEquals($pse->getProduct()->getTitle(), $row["title"]);
 
             $attributeCombinations = $pse->getAttributeCombinations();
