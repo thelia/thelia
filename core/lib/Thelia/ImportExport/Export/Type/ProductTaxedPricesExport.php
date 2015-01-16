@@ -76,7 +76,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
 
         $productSaleElements = ProductSaleElementsQuery::create()
             ->find()
-            ->toKeyIndex("Ref")
+            ->toKeyIndex("Id")
         ;
 
         $currencies = CurrencyQuery::create()
@@ -86,7 +86,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
 
         foreach ($dataSet as &$line) {
             /** @var \Thelia\Model\ProductSaleElements $pse */
-            $pse = $productSaleElements[$line["product_sale_elements_REF"]];
+            $pse = $productSaleElements[$line["product_sale_elements_ID"]];
 
             $pricesTools = $pse->getPricesByCurrency($currencies[$line["currency_CODE"]]);
             $line["price_PRICE"] = $pricesTools->getPrice();
