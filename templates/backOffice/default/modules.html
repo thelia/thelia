@@ -39,10 +39,10 @@
 
             <div class="col-md-12">
             {if $error_message}<div class="alert alert-danger">{$error_message}</div>{/if}
-
-            {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
+                
             {include file="includes/module-block.html" module_type="2" caption_title={intl l='Delivery modules'}}
             {include file="includes/module-block.html" module_type="3" caption_title={intl l='Payment modules'}}
+            {include file="includes/module-block.html" module_type="1" caption_title={intl l='Classic modules'}}
 
             </div>
 
@@ -121,6 +121,13 @@
 
     <script>
         $(document).ready(function() {
+
+            $("#module-install").on("submit", function(event) {
+                var $loader = $('<div class="loader"></div>');
+                $('body').append($loader);
+                $loader.show();
+            });
+
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
 
