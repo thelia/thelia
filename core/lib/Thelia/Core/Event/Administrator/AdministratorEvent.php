@@ -110,6 +110,10 @@ class AdministratorEvent extends ActionEvent
 
     public function setProfile($profile)
     {
+        if (0 === $profile) {
+            $profile = null;
+        }
+
         $this->profile = $profile;
 
         return $this;
