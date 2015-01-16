@@ -7,7 +7,7 @@
 
         <div class="form-container">
             {form name="thelia.admin.module.install"}
-            <form method="POST" action="{url path='/admin/module/install'}" {form_enctype form=$form}>
+            <form method="POST" action="{url path='/admin/module/install'}" {form_enctype form=$form} id="module-install">
                 {form_hidden_fields form=$form}
 
                 {form_field form=$form field='success_url'}

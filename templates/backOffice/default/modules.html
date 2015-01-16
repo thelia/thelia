@@ -121,6 +121,13 @@
 
     <script>
         $(document).ready(function() {
+
+            $("#module-install").on("submit", function(event) {
+                var $loader = $('<div class="loader"></div>');
+                $('body').append($loader);
+                $loader.show();
+            });
+
            var url_management = "{url path="/admin/module/toggle-activation/"}";
            $(".module-activation").on("switch-change", function(e, data){
 
