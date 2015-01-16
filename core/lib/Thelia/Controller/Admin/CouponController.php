@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Condition\Implementation\ConditionInterface;
+use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -819,5 +820,46 @@ class CouponController extends BaseAdminController
         }
 
         return new CouponCreationForm($this->getRequest(), "form", $data, $options);
+    }
+
+    public function deleteAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth(AdminResources::COUPON, [], AccessManager::DELETE)) {
+            return $response;
+        }
+
+        try {
+            // Check token
+            $this->getTokenProvider()->checkToken(
+                $this->getRequest()->query->get("_token")
+            );
+
+            // Retrieve coupon
+            $coupon = CouponQuery::create()
+                ->findPk($couponId = $this->getRequest()->request->get("coupon_id"))
+            ;
+            $deleteEvent = new CouponDeleteEvent($couponId, $coupon);
+
+            $this->dispatch(TheliaEvents::COUPON_DELETE, $deleteEvent);
+
+            if (null !== $deletedObject = $deleteEvent->getCoupon()) {
+                $this->adminLogAppend(
+                    AdminResources::COUPON,
+                    AccessManager::DELETE,
+                    sprintf("Coupon %s (ID %s) deleted", $deletedObject->getCode(), $deletedObject->getId())
+                );
+            }
+
+            return $response = RedirectResponse::create(
+                URL::getInstance()->absoluteUrl($this->getRoute('admin.coupon.list'))
+            );
+        } catch (\Exception $e) {
+            $this->getParserContext()
+                ->setGeneralError($e->getMessage())
+            ;
+
+            return $this->browseAction();
+        }
     }
 }

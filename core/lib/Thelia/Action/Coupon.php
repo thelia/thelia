@@ -21,6 +21,7 @@ use Thelia\Condition\Implementation\ConditionInterface;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Coupon\CouponCreateOrUpdateEvent;
+use Thelia\Core\Event\Coupon\CouponDeleteEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
@@ -100,6 +101,24 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         $coupon = $event->getCouponModel();
 
         $this->createOrUpdate($coupon, $event);
+    }
+
+    public function delete(CouponDeleteEvent $event)
+    {
+        $coupon = $event->getCoupon();
+
+        if (null === $coupon) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "The coupon id '%d' doesn't exist",
+                    $event->getCouponId()
+                )
+            );
+        }
+
+        $coupon->delete();
+
+        $event->setCoupon(null);
     }
 
     /**
@@ -385,6 +404,7 @@ class Coupon extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::COUPON_CREATE => array("create", 128),
             TheliaEvents::COUPON_UPDATE => array("update", 128),
+            TheliaEvents::COUPON_DELETE => array("delete", 128),
             TheliaEvents::COUPON_CONSUME => array("consume", 128),
             TheliaEvents::COUPON_CLEAR_ALL => array("clearAllCoupons", 128),
             TheliaEvents::COUPON_CONDITION_UPDATE => array("updateCondition", 128),
