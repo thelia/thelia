@@ -3,6 +3,8 @@
 - Add the possibility to delete a coupon from the backoffice.
 - module list is now reversed. Delivery modules appear first, then payment and finally classic modules.
 - display a loader when a module is uploaded
+- Add module code ($CODE variable) into payment loop outputs
+- Add the 'images-folter' tag into module.xml file to deploy the modules images
 
 # 2.1.1
 

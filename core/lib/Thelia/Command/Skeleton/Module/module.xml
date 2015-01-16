@@ -15,6 +15,7 @@
         <title>Module généré autromatiquement - editez le fichier module.xml</title>
     </descriptive>
     <!-- <logo></logo> -->
+    <!--<images-folder>images</images-folder>-->
     <languages>
         <language>en_US</language>
         <language>fr_FR</language>

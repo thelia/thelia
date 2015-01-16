@@ -101,6 +101,13 @@ class ModuleManagement
                 ->setCategory((string)$content->type)
                 ->save($con);
 
+            if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
+                /** @var \Thelia\Module\BaseModule $moduleInstance */
+                $moduleInstance = $reflected->newInstance();
+                $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
+                $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
+            }
+
             $this->saveDescription($module, $content, $con);
 
             $con->commit();
