@@ -5,19 +5,23 @@ use Thelia\Model\ConfigQuery;
 
 $env = 'prod';
 
-require __DIR__ . '/../../../../../../../../core/bootstrap.php';
+require __DIR__ . '/../../../../../../../../core/vendor/autoload.php';
 
+/** @var Request $request */
 $request = Request::createFromGlobals();
 
 $thelia = new Thelia($env, false);
 
 $thelia->boot();
 
-$eventDispatcher = $thelia->getContainer()->get('event_dispatcher');
-$thelia->getContainer()->get('thelia.translator');
-$thelia->getContainer()->get('thelia.url.manager');
-$thelia->getContainer()->enterScope('request');
-$thelia->getContainer()->set('request', $request, 'request');
+/** @var \Symfony\Component\DependencyInjection\ContainerInterface $container */
+$container = $thelia->getContainer();
+
+$eventDispatcher = $container->get('event_dispatcher');
+$container->get('thelia.translator');
+$container->get('thelia.url.manager');
+$container->enterScope('request');
+$container->set('request', $request, 'request');
 $event = new \Thelia\Core\Event\SessionEvent(THELIA_CACHE_DIR . $env, false, $env);
 
 $eventDispatcher->dispatch(\Thelia\Core\TheliaKernelEvents::SESSION, $event);
@@ -26,7 +30,7 @@ $session->start();
 $request->setSession($session);
 
 /** @var \Thelia\Core\Security\SecurityContext $securityContext */
-$securityContext = $thelia->getContainer()->get('thelia.securityContext');
+$securityContext = $container->get('thelia.securityContext');
 
 // We just check the current user has the ADMIN role.
 $isGranted = $securityContext->isGranted(['ADMIN'], [], [], []);
