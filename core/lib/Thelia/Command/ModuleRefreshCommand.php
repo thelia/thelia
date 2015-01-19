@@ -14,6 +14,7 @@ namespace Thelia\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Thelia\Exception\InvalidModuleException;
 use Thelia\Module\ModuleManagement;
 
 /**
@@ -37,8 +38,14 @@ class ModuleRefreshCommand extends ContainerAwareCommand
         try {
             $moduleManagement = new ModuleManagement;
             $moduleManagement->updateModules($this->getContainer());
+        } catch (InvalidModuleException $ime) {
+            throw new \RuntimeException(
+                sprintf('One or more modules could not be refreshed : %s', $ime->getErrorsAsString("\n"))
+            );
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf('Refresh modules list fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()));
+            throw new \RuntimeException(
+                sprintf('Refresh modules list fail with Exception : [%d] %s', $e->getCode(), $e->getMessage())
+            );
         }
 
         if (method_exists($output, 'renderBlock')) {
