@@ -36,7 +36,7 @@ class ModuleRefreshCommand extends ContainerAwareCommand
     {
         try {
             $moduleManagement = new ModuleManagement;
-            $moduleManagement->updateModules();
+            $moduleManagement->updateModules($this->getContainer());
         } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Refresh modules list fail with Exception : [%d] %s', $e->getCode(), $e->getMessage()));
         }
