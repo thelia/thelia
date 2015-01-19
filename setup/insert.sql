@@ -151,7 +151,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'Carousel', 1, 1, 1, 'Carousel\\Carousel', NOW(), NOW()),
+(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', NOW(), NOW()),
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
