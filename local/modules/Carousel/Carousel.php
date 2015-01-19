@@ -29,6 +29,8 @@ class Carousel extends BaseModule
 
             $this->setConfigValue('is_initialized', true);
         }
+
+        return true;
     }
 
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
