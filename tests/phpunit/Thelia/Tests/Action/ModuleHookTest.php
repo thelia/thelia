@@ -73,7 +73,7 @@ class ModuleHookTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($event->hasModuleHook());
 
         $this->assertEquals($event->getHookId(), $createdModuleHook->getHookId());
-        $this->assertEquals($event->getModuleId(), $createdModuleHook->getHookId());
+        $this->assertEquals($event->getModuleId(), $createdModuleHook->getModuleId());
 
         return $createdModuleHook;
     }
