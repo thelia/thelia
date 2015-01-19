@@ -40,7 +40,7 @@ class ModuleRefreshCommandTest extends PHPUnit_Framework_TestCase
     public function testModuleRefreshCommand()
     {
         $moduleManagement = new ModuleManagement;
-        $moduleManagement->updateModules();
+        $moduleManagement->updateModules($this->getContainer());
 
         $module = ModuleQuery::create()->filterByType(1)->orderByPosition(Criteria::DESC)->findOne();
 
