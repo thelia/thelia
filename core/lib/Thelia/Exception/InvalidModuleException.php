@@ -35,4 +35,16 @@ class InvalidModuleException extends \RuntimeException
     {
         return $this->errors;
     }
+
+    public function getErrorsAsString($separator = "\n")
+    {
+        $message = '';
+
+        /** @var \Exception $error */
+        foreach ($this->errors as $error) {
+            $message .= $error->getMessage() . $separator;
+        }
+
+        return rtrim($message, $separator);
+    }
 }
