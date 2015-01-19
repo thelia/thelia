@@ -96,7 +96,8 @@ class ModuleManagement
 
             $action = 'install';
         } elseif ($version !== $module->getVersion()) {
-            $previousVersion = $module->getVersion();
+            $currentVersion = $module->getVersion();
+            $newVersion = $module->getVersion();
             $action = 'update';
         } else {
             $action = 'none';
@@ -124,7 +125,7 @@ class ModuleManagement
             if ($action == 'install') {
                 $instance->install($con);
             } elseif ($action == 'update') {
-                $instance->update($previousVersion, $con);
+                $instance->update($currentVersion, $version, $con);
             }
 
             $con->commit();
