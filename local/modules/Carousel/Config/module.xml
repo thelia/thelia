@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+    <fullnamespace>Carousel\Carousel</fullnamespace>
+    <descriptive locale="en_US">
+        <title>An image carousel</title>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Un carrousel d'images</title>
+    </descriptive>
+    <version>0.9</version>
+    <author>
+        <name>Manuel Raynaud, Franck Allimant</name>
+        <email>manu@thelia.net, franck@cqfdev.fr</email>
+    </author>
+    <type>classic</type>
+    <thelia>2.1.0</thelia>
+    <stability>beta</stability>
+</module>

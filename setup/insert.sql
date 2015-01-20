@@ -151,7 +151,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
-(1, 'TheliaDebugBar', 1, 1, 1, 'TheliaDebugBar\\TheliaDebugBar', NOW(), NOW()),
+(1, 'Carousel', 1, 0, 1, 'Carousel\\Carousel', NOW(), NOW()),
 (2, 'Colissimo', 2, 0, 1, 'Colissimo\\Colissimo', NOW(), NOW()),
 (3, 'Cheque', 3, 0, 1, 'Cheque\\Cheque', NOW(), NOW()),
 (4, 'Front', 1, 1, 2, 'Front\\Front', NOW(), NOW()),
@@ -174,8 +174,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-('1',  'en_US',  'Debug bar', NULL,  NULL,  NULL),
-('1',  'fr_FR',  'Debug bar', NULL,  NULL,  NULL),
+('1',  'en_US',  'An image carousel on your home page', NULL,  NULL,  NULL),
+('1',  'fr_FR',  'Un carrousel d''images sur votre parge d''acueil', NULL,  NULL,  NULL),
 ('2',  'en_US',  '72h delivery', NULL,  NULL,  NULL),
 ('2',  'fr_FR',  'Livraison par colissimo en 72h', NULL,  NULL,  NULL),
 ('3',  'en_US',  'Pay by cheque', NULL,  NULL,  NULL),
