@@ -48,9 +48,17 @@ class BaseAdminController extends BaseController
      * @param string $action
      * @param string $message
      */
-    public function adminLogAppend($resource, $action, $message)
+    public function adminLogAppend($resource, $action, $message, $resourceId = null)
     {
-        AdminLog::append($resource, $action, $message, $this->getRequest(), $this->getSecurityContext()->getAdminUser());
+        AdminLog::append(
+            $resource,
+            $action,
+            $message,
+            $this->getRequest(),
+            $this->getSecurityContext()->getAdminUser(),
+            true,
+            $resourceId
+        );
     }
 
     /**

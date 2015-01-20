@@ -482,7 +482,13 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(
                 AdminResources::retrieve($parentType),
                 AccessManager::UPDATE,
-                sprintf('%s with Ref %s (ID %d) modified', ucfirst($objectType), $fileUpdated->getTitle(), $fileUpdated->getId())
+                sprintf(
+                    '%s with Ref %s (ID %d) modified',
+                    ucfirst($objectType),
+                    $fileUpdated->getTitle(),
+                    $fileUpdated->getId()
+                ),
+                $fileUpdated->getId()
             );
 
             if ($this->getRequest()->get('save_mode') == 'close') {
@@ -618,7 +624,8 @@ class FileController extends BaseAdminController
                         '%id%' => $fileDeleteEvent->getFileToDelete()->getId(),
                         '%parentId%' => $fileDeleteEvent->getFileToDelete()->getParentId(),
                     )
-                )
+                ),
+                $fileDeleteEvent->getFileToDelete()->getId()
             );
         } catch (\Exception $e) {
             $message = $this->getTranslator()->trans(
@@ -634,7 +641,8 @@ class FileController extends BaseAdminController
             $this->adminLogAppend(
                 AdminResources::retrieve($parentType),
                 AccessManager::UPDATE,
-                $message
+                $message,
+                $fileDeleteEvent->getFileToDelete()->getId()
             );
         }
 

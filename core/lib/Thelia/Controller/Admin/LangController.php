@@ -115,7 +115,17 @@ class LangController extends BaseAdminController
             }
 
             $changedObject = $event->getLang();
-            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+            $this->adminLogAppend(
+                AdminResources::LANGUAGE,
+                AccessManager::UPDATE,
+                sprintf(
+                    "%s %s (ID %s) modified",
+                    'Lang',
+                    $changedObject->getTitle(),
+                    $changedObject->getId()
+                ),
+                $changedObject->getId()
+            );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (\Exception $ex) {
@@ -164,7 +174,17 @@ class LangController extends BaseAdminController
             }
 
             $changedObject = $event->getLang();
-            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", 'Lang', $changedObject->getTitle(), $changedObject->getId()));
+            $this->adminLogAppend(
+                AdminResources::LANGUAGE,
+                AccessManager::UPDATE,
+                sprintf(
+                    "%s %s (ID %s) modified",
+                    'Lang',
+                    $changedObject->getTitle(),
+                    $changedObject->getId()
+                ),
+                $changedObject->getId()
+            );
         } catch (\Exception $e) {
             Tlog::getInstance()->error(sprintf("Error on changing default languages with message : %s", $e->getMessage()));
             $error = $e->getMessage();
@@ -202,7 +222,17 @@ class LangController extends BaseAdminController
             }
 
             $createdObject = $createEvent->getLang();
-            $this->adminLogAppend(AdminResources::LANGUAGE, AccessManager::CREATE, sprintf("%s %s (ID %s) created", 'Lang', $createdObject->getTitle(), $createdObject->getId()));
+            $this->adminLogAppend(
+                AdminResources::LANGUAGE,
+                AccessManager::CREATE,
+                sprintf(
+                    "%s %s (ID %s) created",
+                    'Lang',
+                    $createdObject->getTitle(),
+                    $createdObject->getId()
+                ),
+                $createdObject->getId()
+            );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.languages');
         } catch (FormValidationException $ex) {

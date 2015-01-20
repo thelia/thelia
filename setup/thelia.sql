@@ -1202,6 +1202,7 @@ CREATE TABLE `admin_log`
     `admin_firstname` VARCHAR(255),
     `admin_lastname` VARCHAR(255),
     `resource` VARCHAR(255),
+    `resource_id` INTEGER,
     `action` VARCHAR(255),
     `message` TEXT,
     `request` LONGTEXT,

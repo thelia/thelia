@@ -17,4 +17,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@maxHookId + 1, 'en_US', 'Coupon page - in deletion form', '', '')
 ;
 
+
+ALTER TABLE `admin_log` ADD `resource_id` INTEGER AFTER `resource` ;
+
+
 SET FOREIGN_KEY_CHECKS = 1;

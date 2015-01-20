@@ -1016,6 +1016,7 @@
     <column name="admin_firstname" size="255" type="VARCHAR" />
     <column name="admin_lastname" size="255" type="VARCHAR" />
     <column name="resource" size="255" type="VARCHAR" />
+    <column name="resource_id" required="false" type="INTEGER" />
     <column name="action" size="255" type="VARCHAR" />
     <column name="message" type="LONGVARCHAR" />
     <column name="request" type="CLOB" />

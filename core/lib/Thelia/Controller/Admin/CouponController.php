@@ -506,7 +506,8 @@ class CouponController extends BaseAdminController
                     'Coupon %s (ID ) ' . $log,
                     $couponEvent->getTitle(),
                     $couponEvent->getCouponModel()->getId()
-                )
+                ),
+                $couponEvent->getCouponModel()->getId()
             );
 
             if ($this->getRequest()->get('save_mode') == 'stay') {
@@ -800,7 +801,8 @@ class CouponController extends BaseAdminController
                 'Coupon %s (ID %s) conditions updated',
                 $couponEvent->getCouponModel()->getTitle(),
                 $couponEvent->getCouponModel()->getType()
-            )
+            ),
+            $couponEvent->getCouponModel()->getId()
         );
     }
 
@@ -847,7 +849,12 @@ class CouponController extends BaseAdminController
                 $this->adminLogAppend(
                     AdminResources::COUPON,
                     AccessManager::DELETE,
-                    sprintf("Coupon %s (ID %s) deleted", $deletedObject->getCode(), $deletedObject->getId())
+                    sprintf(
+                        "Coupon %s (ID %s) deleted",
+                        $deletedObject->getCode(),
+                        $deletedObject->getId()
+                    ),
+                    $deletedObject->getId()
                 );
             }
 
