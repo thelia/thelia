@@ -34,6 +34,11 @@
                         <xs:documentation>The path to the logo of the module (for example myModule.png). The recommended size is 128x128.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
+                <xs:element type="xs:string" minOccurs="0" maxOccurs="1" name="images-folder">
+                    <xs:annotation>
+                        <xs:documentation>The folder that contains the images to deploy.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="languages" minOccurs="1" maxOccurs="1">
                     <xs:annotation>
                         <xs:documentation>Module languages supported : fr_FR, en_US, ...</xs:documentation>
