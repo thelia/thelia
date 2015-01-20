@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use SplFileInfo;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Model\Map\ModuleTableMap;
@@ -40,7 +41,7 @@ class ModuleManagement
         $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
-    public function updateModules()
+    public function updateModules(ContainerInterface $container)
     {
         $finder = new Finder();
 
@@ -52,7 +53,7 @@ class ModuleManagement
 
         foreach ($finder as $file) {
             try {
-                $this->updateModule($file);
+                $this->updateModule($file, $container);
             } catch (\Exception $ex) {
                 // Guess module code
                 $moduleCode = basename(dirname(dirname($file)));
@@ -67,35 +68,48 @@ class ModuleManagement
     }
 
     /**
+     * Update module information, and invoke install() for new modules (e.g. modules
+     * just discovered), or update() modules for which version number ha changed.
      *
-     *
-     * @param SplFileInfo $file
+     * @param SplFileInfo $file the module.xml file descriptor
+     * @param ContainerInterface $container the container
      *
      * @return Module
      *
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateModule($file)
+    public function updateModule($file, ContainerInterface $container)
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content   = $descriptorValidator->getDescriptor($file->getRealPath());
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code      = basename(dirname($reflected->getFileName()));
+        $version   = (string)$content->version;
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
+
         if (null === $module) {
             $module = new Module();
             $module->setActivate(0);
+
+            $action = 'install';
+        } elseif ($version !== $module->getVersion()) {
+            $currentVersion = $module->getVersion();
+            $newVersion = $module->getVersion();
+            $action = 'update';
+        } else {
+            $action = 'none';
         }
 
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
         $con->beginTransaction();
+
         try {
             $module
                 ->setCode($code)
-                ->setVersion((string)$content->version)
+                ->setVersion($version)
                 ->setFullNamespace((string)$content->fullnamespace)
                 ->setType($this->getModuleType($reflected))
                 ->setCategory((string)$content->type)
@@ -103,10 +117,21 @@ class ModuleManagement
 
             $this->saveDescription($module, $content, $con);
 
+            // Tell the module to install() or update()
+            $instance = $module->createInstance();
+
+            $instance->setContainer($container);
+
+            if ($action == 'install') {
+                $instance->install($con);
+            } elseif ($action == 'update') {
+                $instance->update($currentVersion, $version, $con);
+            }
+
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (PropelException $ex) {
             $con->rollBack();
-            throw $e;
+            throw $ex;
         }
 
         return $module;

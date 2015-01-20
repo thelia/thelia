@@ -286,7 +286,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         $moduleDescriptorFile = sprintf('%s%s%s%s%s', $modulePath, DS, 'Config', DS, 'module.xml');
         $moduleManagement = new ModuleManagement();
         $file = new SplFileInfo($moduleDescriptorFile);
-        $module = $moduleManagement->updateModule($file);
+        $module = $moduleManagement->updateModule($file, $this->container);
 
         // activate if old was activated
         if ($activated) {

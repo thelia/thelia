@@ -188,7 +188,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     {
         if (is_array($titles)) {
             foreach ($titles as $locale => $title) {
-                $moduleI18n = ModuleI18nQuery::create()->filterById($module->getId())->filterByLocale($locale)->findOne();
+                $moduleI18n = ModuleI18nQuery::create()
+                    ->filterById($module->getId())->filterByLocale($locale)
+                    ->findOne();
+
                 if (null === $moduleI18n) {
                     $moduleI18n = new ModuleI18n();
                     $moduleI18n
@@ -279,12 +282,18 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                     $image->setPosition($imagePosition);
                     $image->save($con);
 
-                    $imageDirectory = sprintf("%s/../../../../local/media/images/module", __DIR__);
+                    $imageDirectory = THELIA_LOCAL_DIR . "media/images/module";
                     $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
                     while (file_exists($imageDirectory . '/' . $imageFileName)) {
-                        $imageFileName = sprintf("%s-%d-%d-%s", $module->getCode(), $image->getId(), $increment, $fileName);
+                        $imageFileName = sprintf(
+                            "%s-%d-%d-%s",
+                            $module->getCode(),
+                            $image->getId(),
+                            $increment,
+                            $fileName
+                        );
                         $increment++;
                     }
 
@@ -293,13 +302,19 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                     if (! is_dir($imageDirectory)) {
                         if (! @mkdir($imageDirectory, 0777, true)) {
                             $con->rollBack();
-                            throw new ModuleException(sprintf("Cannot create directory : %s", $imageDirectory), ModuleException::CODE_NOT_FOUND);
+                            throw new ModuleException(
+                                sprintf("Cannot create directory : %s", $imageDirectory),
+                                ModuleException::CODE_NOT_FOUND
+                            );
                         }
                     }
 
                     if (! @copy($filePath, $imagePath)) {
                         $con->rollBack();
-                        throw new ModuleException(sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath), ModuleException::CODE_NOT_FOUND);
+                        throw new ModuleException(
+                            sprintf("Cannot copy file : %s to : %s", $filePath, $imagePath),
+                            ModuleException::CODE_NOT_FOUND
+                        );
                     }
 
                     $image->setFile($imageFileName);
@@ -322,7 +337,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $this->moduleModel = ModuleQuery::create()->findOneByCode($this->getCode());
 
             if (null === $this->moduleModel) {
-                throw new ModuleException(sprintf("Module Code `%s` not found", $this->getCode()), ModuleException::CODE_NOT_FOUND);
+                throw new ModuleException(
+                    sprintf("Module Code `%s` not found", $this->getCode()),
+                    ModuleException::CODE_NOT_FOUND
+                );
             }
         }
 
@@ -344,7 +362,10 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
 
         if (! isset(self::$moduleIds[$code])) {
             if (null === $module = ModuleQuery::create()->findOneByCode($code)) {
-                throw new ModuleException(sprintf("Module Code `%s` not found", $code), ModuleException::CODE_NOT_FOUND);
+                throw new ModuleException(
+                    sprintf("Module Code `%s` not found", $code),
+                    ModuleException::CODE_NOT_FOUND
+                );
             }
 
             self::$moduleIds[$code] = $module->getId();
@@ -447,7 +468,8 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *  - arrays
      *  - one or many instance(s) of \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface
      *
-     * in the first case, your array must contains 2 indexes. The first is the compiler instance and the second the compilerPass type.
+     * in the first case, your array must contains 2 indexes.
+     * The first is the compiler instance and the second the compilerPass type.
      * Example :
      * return array(
      *  array(
@@ -480,12 +502,23 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     }
 
     /**
-     * This method is called when the plugin is installed for the first time, using
-     * zip upload method.
+     * This method is called when the plugin is installed for the first time
      *
      * @param ConnectionInterface $con
      */
-    public function install(ConnectionInterface $con = null)
+    public function install(ConnectionInterface $con)
+    {
+        // Override this method to do something useful.
+    }
+
+    /**
+     * This method is called when a newer version of the plugin is installed
+     *
+     * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
+     * @param string $newVersion the new module version, as defined in the module.xml file
+     * @param ConnectionInterface $con
+     */
+    public function update($currentVersion, $newVersion, ConnectionInterface $con)
     {
         // Override this method to do something useful.
     }
@@ -497,7 +530,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *
      * @return bool true to continue module activation, false to prevent it.
      */
-    public function preActivation(ConnectionInterface $con = null)
+    public function preActivation(ConnectionInterface $con)
     {
         // Override this method to do something useful.
         return true;
@@ -508,7 +541,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *
      * @param ConnectionInterface $con
      */
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con)
     {
         // Override this method to do something useful.
     }
@@ -519,13 +552,13 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * @param  ConnectionInterface $con
      * @return bool                true to continue module de-activation, false to prevent it.
      */
-    public function preDeactivation(ConnectionInterface $con = null)
+    public function preDeactivation(ConnectionInterface $con)
     {
         // Override this method to do something useful.
         return true;
     }
 
-    public function postDeactivation(ConnectionInterface $con = null)
+    public function postDeactivation(ConnectionInterface $con)
     {
         // Override this method to do something useful.
     }
@@ -537,7 +570,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * @param ConnectionInterface $con
      * @param bool                $deleteModuleData if true, the module should remove all its data from the system.
      */
-    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con, $deleteModuleData = false)
     {
         // Override this method to do something useful.
     }
@@ -804,10 +837,5 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         }
 
         return $value;
-    }
-
-    public static function getModuleCategories()
-    {
-        return self::$moduleCategories;
     }
 }
