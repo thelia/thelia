@@ -36,7 +36,7 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $moduleDescriptor = $moduleValidator->getModuleDescriptor();
 
         $this->assertInstanceOf('SimpleXMLElement', $moduleDescriptor);
-        $this->assertEquals("2", $moduleValidator->getModuleVersion());
+        $this->assertEquals("1", $moduleValidator->getModuleVersion());
 
         $moduleDefinition = $moduleValidator->getModuleDefinition();
 
