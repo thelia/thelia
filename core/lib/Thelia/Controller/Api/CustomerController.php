@@ -120,7 +120,7 @@ class CustomerController extends AbstractCrudApiController
         $customer = CustomerQuery::create()->findPk($entityId);
 
         if (null === $customer) {
-            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $customer_id));
+            throw new HttpException(404, sprintf('{"error": "customer with id %d not found"}', $entityId));
         }
 
         return new CustomerEvent($customer);
