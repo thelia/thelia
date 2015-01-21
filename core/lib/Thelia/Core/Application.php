@@ -34,6 +34,8 @@ class Application extends BaseApplication
 
         parent::__construct("Thelia", Thelia::THELIA_VERSION);
 
+        $this->kernel->boot();
+
         $this->getDefinition()->addOption(new InputOption('--env', '-e', InputOption::VALUE_REQUIRED, 'The Environment name.', $kernel->getEnvironment()));
         $this->getDefinition()->addOption(new InputOption('--no-debug', null, InputOption::VALUE_NONE, 'Switches off debug mode.'));
     }
@@ -57,7 +59,7 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
-        $this->kernel->boot();
+
 
         $container = $this->kernel->getContainer();
 

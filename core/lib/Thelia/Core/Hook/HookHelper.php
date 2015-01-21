@@ -122,6 +122,7 @@ class HookHelper
                     if (in_array($ext, $allowed_exts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             foreach ($this->parserHelper->getFunctionsDefinition($content, array("hook", "hookblock")) as $hook) {
+                                $hook['file'] = $fileInfo->getFilename();
                                 $hooks[] = $hook;
                             }
                         }
@@ -147,15 +148,23 @@ class HookHelper
 
             $ret['code'] = $attributes['name'];
             $params      = explode(".", $attributes['name']);
+
             if (count($params) != 2) {
                 throw new \UnexpectedValueException("hook name should contain a . : " . $attributes['name']);
             }
+            unset($attributes['name']);
             $ret['context'] = $params[0];
             $ret['type']    = $params[1];
-            $ret['module']  = array_key_exists("module", $attributes);
+
+            $ret['module'] = false;
+            if (array_key_exists("module", $attributes)) {
+                $ret['module'] = true;
+                unset($attributes['module']);
+            }
 
             // vars
             if ($ret['block'] && array_key_exists("vars", $attributes)) {
+                unset($attributes['vars']);
                 $ret['vars'] = explode(",", $attributes['vars']);
             }
 
@@ -163,6 +172,8 @@ class HookHelper
             $contextTitle = $this->trans("context", $ret['context']) ? : $ret['context'];
             $typeTitle    = $this->trans("type", $ret['type']) ? : $ret['type'];
             $ret['title'] = sprintf("%s - %s", $contextTitle, $typeTitle);
+            $ret['file'] = $hook['file'];
+            $ret['attributes'] = $attributes;
         } else {
             throw new \UnexpectedValueException("The hook should have a name attribute.");
         }
