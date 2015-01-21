@@ -88,7 +88,7 @@ class ProductPricesExport extends ExportHandler
                     ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
                     ->addAsColumn("product_ID", ProductTableMap::ID)
                 ->endUse()
-                ->addAsColumn("product_sale_elements_REF", ProductSaleElementsTableMap::REF)
+                ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
                 ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
                 ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
             ->endUse()
@@ -107,7 +107,7 @@ class ProductPricesExport extends ExportHandler
                 )
             ->endUse()
             ->select([
-                "product_sale_elements_REF",
+                "product_sale_elements_ID",
                 "product_sale_elements_EAN_CODE",
                 "product_sale_elements_PROMO",
                 "price_PRICE",
@@ -116,7 +116,7 @@ class ProductPricesExport extends ExportHandler
                 "product_TITLE",
                 "attribute_av_i18n_ATTRIBUTES",
             ])
-            ->groupBy("product_sale_elements_REF")
+            ->groupBy("product_sale_elements_ID")
         ;
 
         return $query;
@@ -125,8 +125,8 @@ class ProductPricesExport extends ExportHandler
     public function getOrder()
     {
         return [
+            "id",
             "product_id",
-            "ref",
             "title",
             "attributes",
             "ean",
@@ -140,7 +140,7 @@ class ProductPricesExport extends ExportHandler
     protected function getAliases()
     {
         return [
-            "product_sale_elements_REF" => "ref",
+            "product_sale_elements_ID" => "id",
             "product_sale_elements_EAN_CODE" => "ean",
             "price_PRICE" => "price",
             "price_PROMO_PRICE" => "promo_price",
