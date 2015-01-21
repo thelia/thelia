@@ -18,7 +18,4 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 ;
 
 
-ALTER TABLE `admin_log` ADD `resource_id` INTEGER AFTER `resource` ;
-
-
 SET FOREIGN_KEY_CHECKS = 1;
