@@ -32,6 +32,9 @@
         <requirement key="customer_id">\d+</requirement>
     </route>
 
+    <route id="api.customer.checkLogin" path="/api/customers/checkLogin" methods="post">
+        <default key="_controller">Thelia:Api\Customer:checkLogin</default>
+    </route>
     <!-- end customer route -->
 
     <!-- title route -->

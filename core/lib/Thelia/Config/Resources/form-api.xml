@@ -10,6 +10,7 @@
         <!-- Forms for Customer -->
         <form name="thelia.api.customer.create" class="Thelia\Form\Api\Customer\CustomerCreateForm"/>
         <form name="thelia.api.customer.update" class="Thelia\Form\Api\Customer\CustomerUpdateForm"/>
+        <form name="thelia.api.customer.login" class="Thelia\Form\Api\Customer\CustomerLogin"/>
 
         <!-- Forms for Category -->
         <form name="thelia.api.category.create" class="Thelia\Form\Api\Category\CategoryCreationForm"/>
