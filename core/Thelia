@@ -50,4 +50,5 @@ $debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--
 
 $thelia = new Thelia($env, $debug);
 $application = new Application($thelia);
+$application->getContainer()->get('thelia.translator');
 $application->run($input, new TheliaConsoleOutput());
