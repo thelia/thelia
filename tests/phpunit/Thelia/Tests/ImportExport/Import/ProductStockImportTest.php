@@ -58,7 +58,7 @@ class ProductStockImportTest extends ControllerTestBase
         foreach ($query as $pse) {
             $entry = [];
 
-            $entry["ref"]   = $pse->getRef();
+            $entry["id"]   = $pse->getId();
             /**
              * Be sure to get a different value.
              */
