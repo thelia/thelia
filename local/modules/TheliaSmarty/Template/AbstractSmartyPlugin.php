@@ -91,7 +91,7 @@ abstract class AbstractSmartyPlugin
     }
 
     /**
-     * @return an array of SmartyPluginDescriptor
+     * @return SmartyPluginDescriptor[] an array of SmartyPluginDescriptor
      */
     abstract public function getPluginDescriptors();
 }
