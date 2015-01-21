@@ -1,3 +1,8 @@
+# 2.2.0
+
+- Add module code ($CODE variable) into payment loop outputs
+- Add the 'images-folder' tag into module.xml file to deploy the modules images
+
 # 2.1.2
 
 - Add the possibility to delete a coupon from the backoffice.
