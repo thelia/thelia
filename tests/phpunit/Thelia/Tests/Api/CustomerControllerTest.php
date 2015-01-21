@@ -19,6 +19,7 @@ use Thelia\Tests\ApiTestCase;
  * Class CustomerControllerTest
  * @package Thelia\Tests\Api
  * @author Manuel Raynaud <manu@thelia.net>
+ * @author Baptiste Cabarrou <bcabarrou@openstudio.fr>
  */
 class CustomerControllerTest extends ApiTestCase
 {
@@ -304,5 +305,86 @@ class CustomerControllerTest extends ApiTestCase
         );
 
         $this->assertEquals(500, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @covers \Thelia\Controller\Api\CustomerController::checkLoginAction
+     */
+    public function testCheckLogin()
+    {
+        $logins = [
+            'email'    => CustomerQuery::create()->findPk(1)->getEmail(),
+            'password' => 'azerty'
+        ];
+
+        $requestContent = json_encode($logins);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/customers/checkLogin?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @covers \Thelia\Controller\Api\CustomerController::checkLoginAction
+     */
+    public function testCheckLoginWithUnexistingEmail()
+    {
+        $logins = [
+            'email'    => 'test@exemple.com',
+            'password' => 'azerty'
+        ];
+
+        $requestContent = json_encode($logins);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/customers/checkLogin?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+    }
+
+    /**
+     * @covers \Thelia\Controller\Api\CustomerController::checkLoginAction
+     */
+    public function testCheckLoginWithWrongPassword()
+    {
+        $logins = [
+            'email'    => CustomerQuery::create()->findPk(1)->getEmail(),
+            'password' => 'notthis'
+        ];
+
+        $requestContent = json_encode($logins);
+
+        $client = static::createClient();
+        $servers = $this->getServerParameters();
+        $servers['CONTENT_TYPE'] = 'application/json';
+        $client->request(
+            'POST',
+            '/api/customers/checkLogin?&sign='.$this->getSignParameter($requestContent),
+            [],
+            [],
+            $servers,
+            $requestContent
+        );
+
+        $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 }

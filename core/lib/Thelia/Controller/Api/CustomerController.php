@@ -17,8 +17,15 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\Customer\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\JsonResponse;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
+use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Template\Loop\Customer;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -172,5 +179,37 @@ class CustomerController extends AbstractCrudApiController
         }
 
         return parent::deleteAction($entityId);
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response|JsonResponse
+     *
+     * Get a customer given its email and password.
+     * @author Baptiste Cabarrou <bcabarrou@openstudio.fr>
+     */
+    public function checkLoginAction()
+    {
+        $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
+
+        $request = $this->getRequest();
+        $customerLoginForm = $this->createForm("thelia.api.customer.login");
+
+        try {
+            $this->validateForm($customerLoginForm, "post");
+
+            $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+            /** @var UserInterface $customer */
+            $customer = $authenticator->getAuthentifiedUser();
+
+            return $this->getAction($customer->getId());
+        } catch (UsernameNotFoundException $e) {
+            return new JsonResponse(["error" => $e->getMessage()], 404);
+        } catch (WrongPasswordException $e) {
+            return new JsonResponse(["error" => $e->getMessage()], 404);
+        } catch (HttpException $e) {
+            return new JsonResponse(["error" => $e->getMessage()], $e->getStatusCode());
+        } catch (\Exception $e) {
+            return new JsonResponse(["error" => $e->getMessage()], 500);
+        }
     }
 }
