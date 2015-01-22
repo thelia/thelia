@@ -84,6 +84,8 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                             'code_reverse',
                             'title',
                             'title_reverse',
+                            'type',
+                            'type_reverse',
                             'manual',
                             'manual_reverse',
                             'enabled',
@@ -169,6 +171,12 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     break;
                 case "code_reverse":
                     $search->orderByCode(Criteria::DESC);
+                    break;
+                case "type":
+                    $search->orderByType(Criteria::ASC);
+                    break;
+                case "type_reverse":
+                    $search->orderByType(Criteria::DESC);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
