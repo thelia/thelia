@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Model\AdminLog;
 use Thelia\Model\AdminLogQuery;
 
 class AdminLogsController extends BaseAdminController
@@ -32,6 +33,7 @@ class AdminLogsController extends BaseAdminController
     {
         $entries = array();
 
+        /** @var AdminLog $entry */
         foreach (AdminLogQuery::getEntries(
             $this->getRequest()->request->get('admins', array()),
             $this->getRequest()->request->get('fromDate', null),
@@ -41,11 +43,12 @@ class AdminLogsController extends BaseAdminController
         ) as $entry) {
             $entries[] = array(
                 "head" => sprintf(
-                    "[%s][%s][%s:%s]",
+                    "[%s][%s][%s:%s%s]",
                     date('Y-m-d H:i:s', $entry->getCreatedAt()->getTimestamp()),
                     $entry->getAdminLogin(),
                     $entry->getResource(),
-                    $entry->getAction()
+                    $entry->getAction(),
+                    (null !== $entry->getResourceId()) ? ":" . $entry->getResourceId() : ""
                 ),
                 "data" => $entry->getMessage(),
             );

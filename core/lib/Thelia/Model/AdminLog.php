@@ -19,8 +19,15 @@ class AdminLog extends BaseAdminLog
      * @param UserInterface $adminUser
      * @param bool          $withRequestContent
      */
-    public static function append($resource, $action, $message, Request $request, UserInterface $adminUser = null, $withRequestContent = true)
-    {
+    public static function append(
+        $resource,
+        $action,
+        $message,
+        Request $request,
+        UserInterface $adminUser = null,
+        $withRequestContent = true,
+        $resourceId = null
+    ) {
         $log = new AdminLog();
 
         $log
@@ -28,6 +35,7 @@ class AdminLog extends BaseAdminLog
             ->setAdminFirstname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getFirstname() : '<no first name>')
             ->setAdminLastname($adminUser !== null && $adminUser instanceof Admin ? $adminUser->getLastname() : '<no last name>')
             ->setResource($resource)
+            ->setResourceId($resourceId)
             ->setAction($action)
             ->setMessage($message)
             ->setRequest($request->toString($withRequestContent));

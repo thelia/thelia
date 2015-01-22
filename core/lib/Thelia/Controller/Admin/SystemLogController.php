@@ -138,7 +138,11 @@ class SystemLogController extends BaseAdminController
             // Update active destinations list
             ConfigQuery::write(Tlog::VAR_DESTINATIONS, implode(';', $active_destinations));
 
-            $this->adminLogAppend(AdminResources::SYSTEM_LOG, AccessManager::UPDATE, "System log configuration changed");
+            $this->adminLogAppend(
+                AdminResources::SYSTEM_LOG,
+                AccessManager::UPDATE,
+                "System log configuration changed"
+            );
 
             $response = $this->generateRedirectFromRoute('admin.configuration.system-logs.default');
         } catch (\Exception $ex) {

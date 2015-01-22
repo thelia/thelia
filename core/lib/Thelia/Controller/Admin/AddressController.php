@@ -61,7 +61,16 @@ class AddressController extends AbstractCrudController
 
             $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $addressEvent);
 
-            $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("address %d for customer %d set as default address", $address_id, $address->getCustomerId()));
+            $this->adminLogAppend(
+                $this->resourceCode,
+                AccessManager::UPDATE,
+                sprintf(
+                    "address %d for customer %d set as default address",
+                    $address_id,
+                    $address->getCustomerId()
+                ),
+                $address_id
+            );
         } catch (\Exception $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during address setting as default with message %s", $e->getMessage()));
         }

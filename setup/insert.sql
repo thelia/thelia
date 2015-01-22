@@ -760,6 +760,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1317, 'api.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1318, 'api.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1319, 'coupon.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1320, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1883,6 +1885,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (1318, 'en_US', 'Api page - in deletion form', '', ''),
 (1319, 'fr_FR', 'Page coupon - formulaire de suppression', '', ''),
 (1319, 'en_US', 'Coupon page - in deletion form', '', ''),
+(1320, 'fr_FR', 'Commande- Onglet', '', ''),
+(1320, 'en_US', 'Order - Tab', '', ''),
 
 (2001, 'fr_FR', 'Facture - CSS', '', ''),
 (2001, 'en_US', 'Invoice - CSS', '', ''),

@@ -326,7 +326,17 @@ class ProfileController extends AbstractCrudController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::UPDATE,
+                    sprintf(
+                        "%s %s (ID %s) modified",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($changedObject),
+                        $this->getObjectId($changedObject)
+                    ),
+                    $this->getObjectId($changedObject)
+                );
             }
 
             if ($response == null) {
@@ -379,7 +389,17 @@ class ProfileController extends AbstractCrudController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::UPDATE,
+                    sprintf(
+                        "%s %s (ID %s) modified",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($changedObject),
+                        $this->getObjectId($changedObject)
+                    ),
+                    $this->getObjectId($changedObject)
+                );
             }
 
             if ($response == null) {

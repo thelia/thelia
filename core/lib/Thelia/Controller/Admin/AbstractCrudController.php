@@ -320,7 +320,17 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Log object creation
             if (null !== $createdObject = $this->getObjectFromEvent($createEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::CREATE, sprintf("%s %s (ID %s) created", ucfirst($this->objectName), $this->getObjectLabel($createdObject), $this->getObjectId($createdObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::CREATE,
+                    sprintf(
+                        "%s %s (ID %s) created",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($createdObject),
+                        $this->getObjectId($createdObject)
+                    ),
+                    $this->getObjectId($createdObject)
+                );
             }
 
             // Execute additional Action
@@ -422,7 +432,17 @@ abstract class AbstractCrudController extends BaseAdminController
 
             // Log object modification
             if (null !== $changedObject = $this->getObjectFromEvent($changeEvent)) {
-                $this->adminLogAppend($this->resourceCode, AccessManager::UPDATE, sprintf("%s %s (ID %s) modified", ucfirst($this->objectName), $this->getObjectLabel($changedObject), $this->getObjectId($changedObject)));
+                $this->adminLogAppend(
+                    $this->resourceCode,
+                    AccessManager::UPDATE,
+                    sprintf(
+                        "%s %s (ID %s) modified",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($changedObject),
+                        $this->getObjectId($changedObject)
+                    ),
+                    $this->getObjectId($changedObject)
+                );
             }
 
             // Execute additional Action
@@ -586,7 +606,13 @@ abstract class AbstractCrudController extends BaseAdminController
                 $this->adminLogAppend(
                     $this->resourceCode,
                     AccessManager::DELETE,
-                    sprintf("%s %s (ID %s) deleted", ucfirst($this->objectName), $this->getObjectLabel($deletedObject), $this->getObjectId($deletedObject))
+                    sprintf(
+                        "%s %s (ID %s) deleted",
+                        ucfirst($this->objectName),
+                        $this->getObjectLabel($deletedObject),
+                        $this->getObjectId($deletedObject)
+                    ),
+                    $this->getObjectId($deletedObject)
                 );
             }
 

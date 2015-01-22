@@ -85,6 +85,12 @@ abstract class AdminLog implements ActiveRecordInterface
     protected $resource;
 
     /**
+     * The value for the resource_id field.
+     * @var        int
+     */
+    protected $resource_id;
+
+    /**
      * The value for the action field.
      * @var        string
      */
@@ -436,6 +442,17 @@ abstract class AdminLog implements ActiveRecordInterface
     }
 
     /**
+     * Get the [resource_id] column value.
+     *
+     * @return   int
+     */
+    public function getResourceId()
+    {
+
+        return $this->resource_id;
+    }
+
+    /**
      * Get the [action] column value.
      *
      * @return   string
@@ -614,6 +631,27 @@ abstract class AdminLog implements ActiveRecordInterface
     } // setResource()
 
     /**
+     * Set the value of [resource_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\AdminLog The current object (for fluent API support)
+     */
+    public function setResourceId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->resource_id !== $v) {
+            $this->resource_id = $v;
+            $this->modifiedColumns[AdminLogTableMap::RESOURCE_ID] = true;
+        }
+
+
+        return $this;
+    } // setResourceId()
+
+    /**
      * Set the value of [action] column.
      *
      * @param      string $v new value
@@ -770,22 +808,25 @@ abstract class AdminLog implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AdminLogTableMap::translateFieldName('Resource', TableMap::TYPE_PHPNAME, $indexType)];
             $this->resource = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AdminLogTableMap::translateFieldName('Action', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AdminLogTableMap::translateFieldName('ResourceId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->resource_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminLogTableMap::translateFieldName('Action', TableMap::TYPE_PHPNAME, $indexType)];
             $this->action = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : AdminLogTableMap::translateFieldName('Message', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminLogTableMap::translateFieldName('Message', TableMap::TYPE_PHPNAME, $indexType)];
             $this->message = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : AdminLogTableMap::translateFieldName('Request', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminLogTableMap::translateFieldName('Request', TableMap::TYPE_PHPNAME, $indexType)];
             $this->request = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : AdminLogTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminLogTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : AdminLogTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : AdminLogTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -798,7 +839,7 @@ abstract class AdminLog implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = AdminLogTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 11; // 11 = AdminLogTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\AdminLog object", 0, $e);
@@ -1033,6 +1074,9 @@ abstract class AdminLog implements ActiveRecordInterface
         if ($this->isColumnModified(AdminLogTableMap::RESOURCE)) {
             $modifiedColumns[':p' . $index++]  = '`RESOURCE`';
         }
+        if ($this->isColumnModified(AdminLogTableMap::RESOURCE_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`RESOURCE_ID`';
+        }
         if ($this->isColumnModified(AdminLogTableMap::ACTION)) {
             $modifiedColumns[':p' . $index++]  = '`ACTION`';
         }
@@ -1073,6 +1117,9 @@ abstract class AdminLog implements ActiveRecordInterface
                         break;
                     case '`RESOURCE`':
                         $stmt->bindValue($identifier, $this->resource, PDO::PARAM_STR);
+                        break;
+                    case '`RESOURCE_ID`':
+                        $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
                         break;
                     case '`ACTION`':
                         $stmt->bindValue($identifier, $this->action, PDO::PARAM_STR);
@@ -1167,18 +1214,21 @@ abstract class AdminLog implements ActiveRecordInterface
                 return $this->getResource();
                 break;
             case 5:
-                return $this->getAction();
+                return $this->getResourceId();
                 break;
             case 6:
-                return $this->getMessage();
+                return $this->getAction();
                 break;
             case 7:
-                return $this->getRequest();
+                return $this->getMessage();
                 break;
             case 8:
-                return $this->getCreatedAt();
+                return $this->getRequest();
                 break;
             case 9:
+                return $this->getCreatedAt();
+                break;
+            case 10:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1214,11 +1264,12 @@ abstract class AdminLog implements ActiveRecordInterface
             $keys[2] => $this->getAdminFirstname(),
             $keys[3] => $this->getAdminLastname(),
             $keys[4] => $this->getResource(),
-            $keys[5] => $this->getAction(),
-            $keys[6] => $this->getMessage(),
-            $keys[7] => $this->getRequest(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
+            $keys[5] => $this->getResourceId(),
+            $keys[6] => $this->getAction(),
+            $keys[7] => $this->getMessage(),
+            $keys[8] => $this->getRequest(),
+            $keys[9] => $this->getCreatedAt(),
+            $keys[10] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1274,18 +1325,21 @@ abstract class AdminLog implements ActiveRecordInterface
                 $this->setResource($value);
                 break;
             case 5:
-                $this->setAction($value);
+                $this->setResourceId($value);
                 break;
             case 6:
-                $this->setMessage($value);
+                $this->setAction($value);
                 break;
             case 7:
-                $this->setRequest($value);
+                $this->setMessage($value);
                 break;
             case 8:
-                $this->setCreatedAt($value);
+                $this->setRequest($value);
                 break;
             case 9:
+                $this->setCreatedAt($value);
+                break;
+            case 10:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1317,11 +1371,12 @@ abstract class AdminLog implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setAdminFirstname($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setAdminLastname($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setResource($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setAction($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setMessage($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setRequest($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[5], $arr)) $this->setResourceId($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setAction($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setMessage($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setRequest($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setCreatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setUpdatedAt($arr[$keys[10]]);
     }
 
     /**
@@ -1338,6 +1393,7 @@ abstract class AdminLog implements ActiveRecordInterface
         if ($this->isColumnModified(AdminLogTableMap::ADMIN_FIRSTNAME)) $criteria->add(AdminLogTableMap::ADMIN_FIRSTNAME, $this->admin_firstname);
         if ($this->isColumnModified(AdminLogTableMap::ADMIN_LASTNAME)) $criteria->add(AdminLogTableMap::ADMIN_LASTNAME, $this->admin_lastname);
         if ($this->isColumnModified(AdminLogTableMap::RESOURCE)) $criteria->add(AdminLogTableMap::RESOURCE, $this->resource);
+        if ($this->isColumnModified(AdminLogTableMap::RESOURCE_ID)) $criteria->add(AdminLogTableMap::RESOURCE_ID, $this->resource_id);
         if ($this->isColumnModified(AdminLogTableMap::ACTION)) $criteria->add(AdminLogTableMap::ACTION, $this->action);
         if ($this->isColumnModified(AdminLogTableMap::MESSAGE)) $criteria->add(AdminLogTableMap::MESSAGE, $this->message);
         if ($this->isColumnModified(AdminLogTableMap::REQUEST)) $criteria->add(AdminLogTableMap::REQUEST, $this->request);
@@ -1410,6 +1466,7 @@ abstract class AdminLog implements ActiveRecordInterface
         $copyObj->setAdminFirstname($this->getAdminFirstname());
         $copyObj->setAdminLastname($this->getAdminLastname());
         $copyObj->setResource($this->getResource());
+        $copyObj->setResourceId($this->getResourceId());
         $copyObj->setAction($this->getAction());
         $copyObj->setMessage($this->getMessage());
         $copyObj->setRequest($this->getRequest());
@@ -1453,6 +1510,7 @@ abstract class AdminLog implements ActiveRecordInterface
         $this->admin_firstname = null;
         $this->admin_lastname = null;
         $this->resource = null;
+        $this->resource_id = null;
         $this->action = null;
         $this->message = null;
         $this->request = null;

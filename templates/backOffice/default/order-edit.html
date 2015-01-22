@@ -65,9 +65,40 @@
                                     </div>
                                 </div>
 
+                                {hookblock name="order.tab" id={$order_id} fields="id,title,href,content"}
+
+                                    {capture "order_tab_tab"}
+                                        {forhook rel="order.tab"}
+                                        <li {if $order_tab == $id}class="active"{/if}>
+                                            <a href="#{$id}"
+                                               {if $href}data-href="{$href}"{/if}
+                                               data-tab-name="{$id}"
+                                               data-toggle="tab">{$title}
+                                            </a>
+                                        </li>
+                                        {/forhook}
+                                    {/capture}
+
+                                    {capture "order_tab_content"}
+                                        {forhook rel="order.tab"}
+                                        <div class="tab-pane fade" id="{$id}">
+                                            {if $href}
+                                            {* ajax *}
+                                            <div class="text-center"><span class="loading">{intl l="Please wait, loading"}</span></div>
+                                            {else}
+                                            {$content nofilter}
+                                            {/if}
+                                        </div>
+                                        {/forhook}
+                                    {/capture}
+
+                                {/hookblock}
+
+
                                 <ul class="nav nav-tabs clearfix">
                                     <li {if $order_tab == 'cart'}class="active"{/if}><a href="#cart" data-tab-name="cart" data-toggle="tab"><span class="glyphicon glyphicon-shopping-cart"></span> {intl l="Ordered products"}</a></li>
                                     <li {if $order_tab == 'bill'}class="active"{/if}><a href="#bill" data-tab-name="bill" data-toggle="tab"><span class="glyphicon glyphicon-list-alt"></span> {intl l="Invoice and Delivery"}</a></li>
+                                    {$smarty.capture.folder_tab_tab nofilter}
                                     <li {if $order_tab == 'modules'}class="active"{/if}><a href="#modules" data-tab-name="modules" data-toggle="tab"><span class="glyphicon glyphicon-paperclip"></span> {intl l="Modules"}</a></li>
                                 </ul>
 
@@ -364,7 +395,7 @@
                                                         <tbody>
                                                         {ifhook rel="order-edit.bill-delivery-address"}
                                                             {* delivery module can customize the delivery address *}
-                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id="{$order_id}"}
+                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id={$order_id}}
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
                                                             {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
@@ -423,6 +454,8 @@
                                         {hook name="order-edit.bill-bottom" location="order-edit-bill-bottom" order_id=$order_id}
 
                                     </div> <!-- #bill -->
+
+                                    {$smarty.capture.order_tab_content nofilter}
 
                                     <div class="tab-pane fade {if $order_tab == 'modules'}active in{/if} clearfix" id="modules">
                                         {* ugly fix : {hook name="order.tab-content"} *}
@@ -575,31 +608,45 @@
     {/javascripts}
 
     <script type="text/javascript">
-        $(".js-update-order-status").change(function(e){
-            e.preventDefault();
-            $('#order-update-status-form').submit();
-        });
 
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            $(".js-current-tab").val($(e.target).data("tab-name"));
-        });
+        $(function() {
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function (ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function (ev) {
+                    if ($this.data('callback')) {
+                        eval($this.data('callback') + '();');
+                    }
+                });
 
-        $(".js-update-order-address").click(function(){
-            $(".js-order-address-id").val(
-                $(this).data("address-id")
-            );
+            });
 
-            $(this).parents('table').find('tr').each(function(k, v) {
-                if(!$(v).data('field-class')) {
-                    return true;
-                }
-                if($(v).data('value')) {
-                    var fieldValue = $(v).data('value');
-                } else {
-                    var fieldValue = $(v).children('td').text();
-                }
+            $(".js-update-order-status").change(function (e) {
+                e.preventDefault();
+                $('#order-update-status-form').submit();
+            });
 
-                $('.' + $(v).data('field-class')).val(fieldValue);
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                $(".js-current-tab").val($(e.target).data("tab-name"));
+            });
+
+            $(".js-update-order-address").click(function () {
+                $(".js-order-address-id").val(
+                        $(this).data("address-id")
+                );
+
+                $(this).parents('table').find('tr').each(function (k, v) {
+                    if (!$(v).data('field-class')) {
+                        return true;
+                    }
+                    if ($(v).data('value')) {
+                        var fieldValue = $(v).data('value');
+                    } else {
+                        var fieldValue = $(v).children('td').text();
+                    }
+
+                    $('.' + $(v).data('field-class')).val(fieldValue);
+                });
             });
         });
     </script>

@@ -17,4 +17,5 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@maxHookId + 1, 'en_US', 'Coupon page - in deletion form', '', '')
 ;
 
+
 SET FOREIGN_KEY_CHECKS = 1;

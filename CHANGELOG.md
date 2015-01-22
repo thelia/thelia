@@ -3,6 +3,7 @@
 - Add module code ($CODE variable) into payment loop outputs
 - Add the 'images-folder' tag into module.xml file to deploy the modules images
 - Add the 'module:list' command, that shows the modules state 
+- Update Admin Logs to add the resource ID when available.
 
 # 2.1.2
 
