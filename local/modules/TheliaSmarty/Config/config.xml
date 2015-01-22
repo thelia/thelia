@@ -66,6 +66,13 @@
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
+        <service id="smarty.plugin.render" class="TheliaSmarty\Template\Plugins\Render" scope="request">
+            <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request" />
+            <argument type="service" id="service_container" />
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
         <service id="smart.plugin.form" class="TheliaSmarty\Template\Plugins\Form" scope="request">
             <tag name="thelia.parser.register_plugin"/>
 
