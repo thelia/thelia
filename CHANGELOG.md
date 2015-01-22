@@ -4,6 +4,7 @@
 - module list is now reversed. Delivery modules appear first, then payment and finally classic modules.
 - display a loader when a module is uploaded
 - Change product prices export and import format to be compatible, now using product_sale_elements id as key to identify PSE.
+- Fix unused variable in ```Thelia\Controller\Api\CustomerController::getDeleteEvent```
 
 # 2.1.1
 
