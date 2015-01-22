@@ -10,6 +10,15 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
+// Check php version
+
+if (version_compare(phpversion(), "5.4", "<")) {
+    die(sprintf(
+        "Thelia needs at least php 5.4, but you are using php %s. Please upgrade before using Thelia.\n",
+        phpversion()
+    ));
+}
+
 /**
  * Thelia essential definitions
  */
