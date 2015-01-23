@@ -12,8 +12,6 @@ Thelia
 
 This is the new major version of Thelia.
 
-You can download this version and have a try or take a look at the  source code (or anything you wish, respecting LGPL).  See http://thelia.net/ web site for more information.
-
 A repository containing all thelia modules is available at this address : https://github.com/thelia-modules
 
 Requirements
@@ -33,17 +31,6 @@ Requirements
 * apache 2
 * mysql 5
 
-If you use Mac OSX, it still doesn't use php 5.4 as default php version... There are many solutions for you :
-
-* use [phpbrew](https://github.com/c9s/phpbrew)
-* use last MAMP version and put the php bin directory in your path:
-
-```bash
-export PATH=/Applications/MAMP/bin/php/php5.5.x/bin/:$PATH
-```
-
-* configure a complete development environment : http://php-osx.liip.ch/
-* use a virtual machine with vagrant and puppet : https://puphpet.com/
 
 ### MySQL 5.6
 
@@ -136,8 +123,6 @@ Documentation
 -------------
 
 Thelia documentation is available at http://doc.thelia.net
-
-The documentation is also in beta version and some part can be obsolete cause to some refactor.
 
 
 Roadmap
