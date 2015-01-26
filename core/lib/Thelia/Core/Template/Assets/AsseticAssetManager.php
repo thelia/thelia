@@ -17,6 +17,7 @@ use Assetic\FilterManager;
 use Assetic\Filter;
 use Assetic\Factory\AssetFactory;
 use Assetic\AssetWriter;
+use Thelia\Core\Template\Assets\Filter\LessDotPhpFilter;
 use Thelia\Model\ConfigQuery;
 use Thelia\Log\Tlog;
 use Symfony\Component\Filesystem\Filesystem;
@@ -213,7 +214,11 @@ class AsseticAssetManager implements AssetManagerInterface
 
                 switch ($filter_name) {
                     case 'less':
-                        $filterManager->set('less', new Filter\LessphpFilter());
+                        $filterManager->set('less', new LessDotPhpFilter());
+                        break;
+
+                    case 'less_legacy':
+                        $filterManager->set('less_legacy', new Filter\LessphpFilter());
                         break;
 
                     case 'sass':

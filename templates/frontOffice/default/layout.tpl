@@ -28,14 +28,15 @@ GNU General Public License : http://www.gnu.org/licenses/
 {block name="no-return-functions"}{/block}
 {assign var="store_name" value="{config key="store_name"}"}
 {assign var="store_description" value="{config key="store_description"}"}
+{assign var="lang_code" value={lang attr="code"}}
 {if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
 {if not $store_description}{assign var="store_description" value="$store_name"}{/if}
 
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
-<!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{lang attr="code"}"> <![endif]-->
-<!--[if IE 7 ]><html class="no-js oldie ie7" lang="{lang attr="code"}"> <![endif]-->
-<!--[if IE 8 ]><html class="no-js oldie ie8" lang="{lang attr="code"}"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html lang="{lang attr="code"}" class="no-js"> <!--<![endif]-->
+<!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{$lang_code}"> <![endif]-->
+<!--[if IE 7 ]><html class="no-js oldie ie7" lang="{$lang_code}"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js oldie ie8" lang="{$lang_code}"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="{$v}" class="no-js"> <!--<![endif]-->
 <head>
     {hook name="main.head-top"}
     {* Test if javascript is enabled *}
@@ -237,7 +238,10 @@ GNU General Public License : http://www.gnu.org/licenses/
 </script>
 
 <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
-<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{lang attr="code"}.js"></script>
+{* do no try to load messages_en, as this file does not exists *}
+{if $lang_code != 'en'}
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{$lang_code}.js"></script>
+{/if}
 
 
 {javascripts file='assets/js/bootstrap/bootstrap.js'}
