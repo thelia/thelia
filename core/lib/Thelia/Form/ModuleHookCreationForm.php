@@ -19,6 +19,7 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
+use Thelia\Model\Map\HookI18nTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -128,10 +129,13 @@ class ModuleHookCreationForm extends BaseForm
         $choices = array();
         $hooks = HookQuery::create()
             ->filterByActivate(true, Criteria::EQUAL)
+            ->joinWithI18n($this->translator->getLocale())
+            ->orderBy('HookI18n.title', Criteria::ASC)
             ->find();
+
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $choices[$hook->getId()] = $hook->getTitle();
+            $choices[$hook->getId()] = $hook->getTitle() . ' (code ' . $hook->getCode() . ')';
         }
 
         return $choices;
