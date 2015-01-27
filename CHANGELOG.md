@@ -1,10 +1,11 @@
-# 2.2.0
+# 2.2.0-alpha1
 
 - Add module code ($CODE variable) into payment loop outputs
 - Add the 'images-folder' tag into module.xml file to deploy the modules images
 - Add the 'module:list' command, that shows the modules state 
 - Update Admin Logs to add the resource ID when available.
 - Add render smarty function, that executes the controller given in the action parameter.
+- Allow modules to use document and image loop with the ```query_namespace``` argument
 
 # 2.1.2
 
