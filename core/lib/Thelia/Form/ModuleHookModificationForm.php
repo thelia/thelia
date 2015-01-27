@@ -32,14 +32,6 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
 
         $this->formBuilder
             ->add("id", "hidden", array("constraints" => array(new GreaterThan(array('value' => 0)))))
-            ->add("hook_id", "choice", array(
-                "choices" => $this->getHookChoices(),
-                "constraints" => array(
-                    new NotBlank()
-                ),
-                "label" => Translator::getInstance()->trans("Hook"),
-                "label_attr" => array("for" => "locale_create")
-            ))
             ->add("active", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
@@ -48,20 +40,6 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
                 )
             ))
         ;
-    }
-
-    protected function getHookChoices()
-    {
-        $choices = array();
-        $hooks = HookQuery::create()
-            ->filterByActivate(true, Criteria::EQUAL)
-            ->find();
-        /** @var Hook $hook */
-        foreach ($hooks as $hook) {
-            $choices[$hook->getId()] = $hook->getTitle();
-        }
-
-        return $choices;
     }
 
     public function getName()

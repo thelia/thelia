@@ -19,7 +19,6 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
-use Thelia\Model\Map\HookI18nTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -59,7 +58,7 @@ class ModuleHookCreationForm extends BaseForm
                         new NotBlank()
                     ),
                     "label" => Translator::getInstance()->trans("Hook"),
-                    "label_attr" => array("for" => "locale_create")
+                    "label_attr" => array("for" => "hook_id")
                 )
             )
             ->add(
