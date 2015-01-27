@@ -99,7 +99,7 @@
                     data-code="{$CODE}"
                     >
                     <div class="title title-without-tabs">
-                        {$ID}. {$TITLE}
+                        {$ID}. {$TITLE} (<span class="text-lowercase">{$CODE}</span>)
                         <div class="text-right pull-right">
                             <a class="btn btn-primary action-edit-hook-btn" href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
                                 <span class="glyphicon glyphicon-edit"></span>
@@ -169,8 +169,6 @@
     <input type="hidden" name="{$name}" value="{url path='/admin/module-hook/update/_ID_'}" />
     {/form_field}
 
-    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
     {render_form_field form=$form field="module_id"}
     {render_form_field form=$form field="hook_id"}
     {render_form_field form=$form field="classname"}
@@ -209,7 +207,7 @@ form_error_message = $form_error_message
 
     dialog_id       = "delete_module_dialog"
     dialog_title    = {intl l="Remove a module from a hook"}
-    dialog_message  = {intl l="Do you really want to remove this module ?"}
+    dialog_message  = {intl l="Do you really want to remove this module from this hook ?"}
 
     form_action         = {token_url path='/admin/module-hooks/delete'}
     form_content        = {$smarty.capture.delete_module_dialog nofilter}

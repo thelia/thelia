@@ -21,9 +21,12 @@ class ModuleHookCreateEvent extends ModuleHookEvent
 {
     protected $module_id;
     protected $hook_id;
+    protected $classname;
+    protected $method;
 
     /**
-     * @param mixed $hook_id
+     * @param int $hook_id
+     * @return $this
      */
     public function setHookId($hook_id)
     {
@@ -33,7 +36,7 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getHookId()
     {
@@ -41,7 +44,8 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @param mixed $module_id
+     * @param int $module_id
+     * @return $this
      */
     public function setModuleId($module_id)
     {
@@ -51,10 +55,48 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getModuleId()
     {
         return $this->module_id;
+    }
+
+    /**
+     * @param string $classname
+     * @return $this
+     */
+    public function setClassname($classname)
+    {
+        $this->classname = $classname;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassname()
+    {
+        return $this->classname;
+    }
+
+    /**
+     * @param string $method
+     * @return $this
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
     }
 }

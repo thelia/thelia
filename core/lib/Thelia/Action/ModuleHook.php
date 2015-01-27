@@ -106,10 +106,13 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
     {
         $moduleHook = new ModuleHookModel();
 
+        // todo: test if classname and method exists
         $moduleHook
             ->setModuleId($event->getModuleId())
             ->setHookId($event->getHookId())
             ->setActive(false)
+            ->setClassname($event->getClassname())
+            ->setMethod($event->getMethod())
             ->setModuleActive($this->isModuleActive($event->getModuleId()))
             ->setHookActive($this->isHookActive($event->getHookId()))
             ->setPosition($this->getLastPositionInHook($event->getHookId()))
@@ -124,7 +127,7 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             // todo: test if classname and method exists
             $moduleHook
                 ->setHookId($event->getHookId())
-                ->setModuleId($event->getModuleHookId())
+                ->setModuleId($event->getModuleId())
                 ->setClassname($event->getClassname())
                 ->setMethod($event->getMethod())
                 ->setActive($event->getActive())
