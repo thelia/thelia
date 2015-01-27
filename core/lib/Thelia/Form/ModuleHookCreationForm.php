@@ -58,7 +58,7 @@ class ModuleHookCreationForm extends BaseForm
                         new NotBlank()
                     ),
                     "label" => Translator::getInstance()->trans("Hook"),
-                    "label_attr" => array("for" => "locale_create")
+                    "label_attr" => array("for" => "hook_id")
                 )
             )
             ->add(
@@ -128,10 +128,13 @@ class ModuleHookCreationForm extends BaseForm
         $choices = array();
         $hooks = HookQuery::create()
             ->filterByActivate(true, Criteria::EQUAL)
+            ->joinWithI18n($this->translator->getLocale())
+            ->orderBy('HookI18n.title', Criteria::ASC)
             ->find();
+
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $choices[$hook->getId()] = $hook->getTitle();
+            $choices[$hook->getId()] = $hook->getTitle() . ' (code ' . $hook->getCode() . ')';
         }
 
         return $choices;

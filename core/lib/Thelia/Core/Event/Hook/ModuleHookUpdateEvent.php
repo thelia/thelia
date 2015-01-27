@@ -20,12 +20,11 @@ namespace Thelia\Core\Event\Hook;
 class ModuleHookUpdateEvent extends ModuleHookCreateEvent
 {
     protected $module_hook_id;
-    protected $classname;
-    protected $method;
     protected $active;
 
     /**
-     * @param mixed $module_hook_id
+     * @param int $module_hook_id
+     * @return $this
      */
     public function setModuleHookId($module_hook_id)
     {
@@ -35,7 +34,7 @@ class ModuleHookUpdateEvent extends ModuleHookCreateEvent
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getModuleHookId()
     {
@@ -43,7 +42,8 @@ class ModuleHookUpdateEvent extends ModuleHookCreateEvent
     }
 
     /**
-     * @param mixed $active
+     * @param bool $active
+     * @return $this
      */
     public function setActive($active)
     {
@@ -53,46 +53,10 @@ class ModuleHookUpdateEvent extends ModuleHookCreateEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getActive()
     {
         return $this->active;
-    }
-
-    /**
-     * @param mixed $classname
-     */
-    public function setClassname($classname)
-    {
-        $this->classname = $classname;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClassname()
-    {
-        return $this->classname;
-    }
-
-    /**
-     * @param mixed $method
-     */
-    public function setMethod($method)
-    {
-        $this->method = $method;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getMethod()
-    {
-        return $this->method;
     }
 }

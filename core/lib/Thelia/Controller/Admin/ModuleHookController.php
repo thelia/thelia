@@ -19,6 +19,7 @@ use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\ModuleHookCreationForm;
@@ -115,6 +116,7 @@ class ModuleHookController extends AbstractCrudController
      * Hydrate the update form for this object, before passing it to the update template
      *
      * @param ModuleHook $object
+     * @return ModuleHookModificationForm
      */
     protected function hydrateObjectForm($object)
     {
@@ -133,7 +135,8 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return ModuleHookCreateEvent
      */
     protected function getCreationEvent($formData)
     {
@@ -145,7 +148,8 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return ModuleHookUpdateEvent
      */
     protected function getUpdateEvent($formData)
     {
@@ -185,6 +189,7 @@ class ModuleHookController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param ModuleHookEvent $event
+     * @return bool
      */
     protected function eventContainsObject($event)
     {
@@ -195,6 +200,7 @@ class ModuleHookController extends AbstractCrudController
      * Get the created object from an event.
      *
      * @param ModuleHookEvent $event
+     * @return null|ModuleHook
      */
     protected function getObjectFromEvent($event)
     {
@@ -203,6 +209,7 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Load an existing object from the database
+     * @return null|ModuleHook
      */
     protected function getExistingObject()
     {
@@ -215,17 +222,27 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Returns the object label form the object event (name, title, etc.)
      *
-     * @param unknown $object
+     * @param ModuleHook $object
+     * @return string
      */
     protected function getObjectLabel($object)
     {
-        // TODO: Implement getObjectLabel() method.
+        try {
+            return sprintf(
+                "%s on %s",
+                $object->getModule()->getTitle(),
+                $object->getHook()->getTitle()
+            );
+        } catch (\Exception $ex) {
+            return "Undefined module hook";
+        }
     }
 
     /**
      * Returns the object ID from the object
      *
      * @param ModuleHook $object
+     * @return int
      */
     protected function getObjectId($object)
     {
@@ -235,7 +252,8 @@ class ModuleHookController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder , if any, null otherwise.
+     * @param string $currentOrder , if any, null otherwise.
+     * @return Response
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -247,12 +265,16 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Render the edition template
+     * @return Response
      */
     protected function renderEditionTemplate()
     {
         return $this->render('module-hook-edit', $this->getEditionArgument());
     }
 
+    /**
+     * @return array
+     */
     protected function getEditionArgument()
     {
         return [
@@ -262,6 +284,7 @@ class ModuleHookController extends AbstractCrudController
 
     /**
      * Redirect to the edition template
+     * @return Response
      */
     protected function redirectToEditionTemplate($request = null, $country = null)
     {
