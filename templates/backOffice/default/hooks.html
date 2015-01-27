@@ -220,8 +220,6 @@
             {/loop}
         {/custom_render_form_field}
 
-        {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-
         {render_form_field form=$form field='code'}
         {render_form_field form=$form field='type'}
         {render_form_field form=$form field='native' value="0"}
