@@ -77,13 +77,16 @@ class ImageEvent extends CachedFileEvent
      */
     protected $imageObject;
 
+    /** @var  bool */
+    protected $allowZoom;
+
     /**
      * @return boolean true if the required image is the original image (resize_mode and background_color are not significant)
      */
     public function isOriginalImage()
     {
         return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
-                && empty($this->effects) && empty($this->rotation) && empty($this->quality);
+        && empty($this->effects) && empty($this->rotation) && empty($this->quality);
     }
 
     /**
@@ -234,5 +237,24 @@ class ImageEvent extends CachedFileEvent
     public function getImageObject()
     {
         return $this->imageObject;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowZoom()
+    {
+        return $this->allowZoom;
+    }
+
+    /**
+     * @param bool $allowZoom
+     * @return $this
+     */
+    public function setAllowZoom($allowZoom)
+    {
+        $this->allowZoom = $allowZoom;
+
+        return $this;
     }
 }

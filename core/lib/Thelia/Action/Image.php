@@ -145,7 +145,15 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                     }
 
                     // Apply resize
-                    $image = $this->applyResize($imagine, $image, $event->getWidth(), $event->getHeight(), $event->getResizeMode(), $bg_color);
+                    $image = $this->applyResize(
+                        $imagine,
+                        $image,
+                        $event->getWidth(),
+                        $event->getHeight(),
+                        $event->getResizeMode(),
+                        $bg_color,
+                        $event->getAllowZoom()
+                    );
 
                     // Rotate if required
                     $rotation = intval($event->getRotation());
@@ -247,10 +255,18 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      * @param  int              $dest_height the required height
      * @param  int              $resize_mode the resize mode (crop / bands / keep image ratio)p
      * @param  string           $bg_color    the bg_color used for bands
+     * @param  bool             $allow_zoom  if true, image may be zoomed to matchrequired size. If false, image is not zoomed.
      * @return ImageInterface   the resized image.
      */
-    protected function applyResize(ImagineInterface $imagine, ImageInterface $image, $dest_width, $dest_height, $resize_mode, $bg_color)
-    {
+    protected function applyResize(
+        ImagineInterface $imagine,
+        ImageInterface $image,
+        $dest_width,
+        $dest_height,
+        $resize_mode,
+        $bg_color,
+        $allow_zoom = false
+    ) {
         if (! (is_null($dest_width) && is_null($dest_height))) {
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
@@ -273,43 +289,59 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $delta_x = $delta_y = $border_width = $border_height = 0;
 
             if ($width_diff > 1 && $height_diff > 1) {
-                $next_width = $width_orig;
-                $next_height = $height_orig;
+                $resize_width = $width_orig;
+                $resize_height = $height_orig;
 
-                $dest_width = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_width : $next_width);
-                $dest_height = ($resize_mode == self::EXACT_RATIO_WITH_BORDERS ? $dest_height : $next_height);
+                // When cropping, be sure to always generate an image which is
+                //  no smaller than the required size, zooming it if required.
+                if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
+                    if ($allow_zoom) {
+                        if ($width_diff > $height_diff) {
+                            $resize_width = $dest_width;
+                            $resize_height = intval($height_orig * $dest_width / $width_orig);
+                            $delta_y = ($resize_height - $dest_height) / 2;
+                        } else {
+                            $resize_height = $dest_height;
+                            $resize_width = intval(($width_orig * $resize_height) / $height_orig);
+                            $delta_x = ($resize_width - $dest_width) / 2;
+                        }
+                    } else {
+                        // No zoom : final image may be smaller than the required size.
+                        $dest_width = $resize_width;
+                        $dest_height = $resize_height;
+                    }
+                }
             } elseif ($width_diff > $height_diff) {
                 // Image height > image width
-
-                $next_height = $dest_height;
-                $next_width = intval(($width_orig * $next_height) / $height_orig);
+                $resize_height = $dest_height;
+                $resize_width = intval(($width_orig * $resize_height) / $height_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $next_width = $dest_width;
-                    $next_height = intval($height_orig * $dest_width / $width_orig);
-                    $delta_y = ($next_height - $dest_height) / 2;
+                    $resize_width = $dest_width;
+                    $resize_height = intval($height_orig * $dest_width / $width_orig);
+                    $delta_y = ($resize_height - $dest_height) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
-                    $dest_width = $next_width;
+                    $dest_width = $resize_width;
                 }
             } else {
                 // Image width > image height
-                $next_width = $dest_width;
-                $next_height = intval($height_orig * $dest_width / $width_orig);
+                $resize_width = $dest_width;
+                $resize_height = intval($height_orig * $dest_width / $width_orig);
 
                 if ($resize_mode == self::EXACT_RATIO_WITH_CROP) {
-                    $next_height = $dest_height;
-                    $next_width  = intval(($width_orig * $next_height) / $height_orig);
-                    $delta_x = ($next_width - $dest_width) / 2;
+                    $resize_height = $dest_height;
+                    $resize_width  = intval(($width_orig * $resize_height) / $height_orig);
+                    $delta_x = ($resize_width - $dest_width) / 2;
                 } elseif ($resize_mode != self::EXACT_RATIO_WITH_BORDERS) {
-                    $dest_height = $next_height;
+                    $dest_height = $resize_height;
                 }
             }
 
-            $image->resize(new Box($next_width, $next_height));
+            $image->resize(new Box($resize_width, $resize_height));
 
             if ($resize_mode == self::EXACT_RATIO_WITH_BORDERS) {
-                $border_width = intval(($dest_width - $next_width) / 2);
-                $border_height = intval(($dest_height - $next_height) / 2);
+                $border_width = intval(($dest_width - $resize_width) / 2);
+                $border_height = intval(($dest_height - $resize_height) / 2);
 
                 $canvas = new Box($dest_width, $dest_height);
 
