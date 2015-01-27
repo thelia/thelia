@@ -81,7 +81,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
-            Argument::createBooleanTypeArgument('ignore_processing_errors', true)
+            Argument::createBooleanTypeArgument('ignore_processing_errors', true),
+            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
         );
 
         // Add possible image sources
@@ -103,7 +104,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $object = ucfirst($source);
 
-        $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
+        $ns = $this->getQueryNamespace();
+
+        if ('\\' !== $ns[0]) {
+            $ns = '\\'.$ns;
+        }
+
+        $queryClass   = sprintf("%s\\%sImageQuery", $ns, $object);
         $filterMethod = sprintf("filterBy%sId", $object);
 
         // xxxImageQuery::create()
