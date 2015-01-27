@@ -5,6 +5,7 @@
 - display a loader when a module is uploaded
 - Change product prices export and import format to be compatible, now using product_sale_elements id as key to identify PSE.
 - Fix unused variable in ```Thelia\Controller\Api\CustomerController::getDeleteEvent```
+- Allow modules to use document and image loop with the ```query_namespace``` argument
 
 # 2.1.1
 
