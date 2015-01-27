@@ -67,7 +67,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('content'),
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
-            Argument::createBooleanTypeArgument('force_return', true)
+            Argument::createBooleanTypeArgument('force_return', true),
+            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
         );
 
         // Add possible document sources
@@ -89,7 +90,13 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     {
         $object = ucfirst($source);
 
-        $queryClass   = sprintf("\Thelia\Model\%sDocumentQuery", $object);
+        $ns = $this->getQueryNamespace();
+
+        if ('\\' !== $ns[0]) {
+            $ns = '\\'.$ns;
+        }
+
+        $queryClass   = sprintf("%s\\%sDocumentQuery", $ns, $object);
         $filterMethod = sprintf("filterBy%sId", $object);
 
         // xxxDocumentQuery::create()
