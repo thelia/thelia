@@ -21,6 +21,7 @@ php Thelia module:deactivate HookTest
 
 echo "Clearing cache"
 php Thelia cache:clear --env=prod
+rm -rf local/session/sess_*
 
 echo "CasperJS"
 cd ../casperjs

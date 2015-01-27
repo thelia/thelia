@@ -42,6 +42,7 @@ casper.test.begin('Login', 5, function suite(test) {
                 document.querySelector('#email').value = username;
                 document.querySelector('#password').disabled = false;
                 document.querySelector('#password').value = password;
+                document.querySelector('#remerber_me').checked = false;
             }, 'test@thelia.net', 'azerty');
 
             this.click('form#form-login button[type="submit"]');
@@ -73,6 +74,12 @@ casper.test.begin('Login', 5, function suite(test) {
         'a.login',
         function() {
             test.assertExists('a.login', 'Login button exists');
+
+            casper.evaluate(function(username, password) {
+                document.querySelector('#email-mini').value = username;
+                document.querySelector('#password-mini').value = password;
+            }, thelia_customer.email, thelia_customer.password);
+            this.click('form#form-login-mini button[type="submit"]');
         },
         function() {
             this.die('Login button not found');

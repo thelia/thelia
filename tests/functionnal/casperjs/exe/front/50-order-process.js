@@ -2,32 +2,10 @@ casper.test.comment('== Order process ==');
 
 casper.test.begin('Order process', 4, function suite(test) {
 
-    //first log in user
-    casper.start(thelia2_base_url, function() {
-        //login
-        casper.evaluate(function(username, password) {
-            document.querySelector('#email-mini').value = username;
-            document.querySelector('#password-mini').value = password;
-        }, thelia_customer.email, thelia_customer.password);
-
-        this.click('form#form-login-mini button[type="submit"]');
-    });
-
-    casper.waitForSelector(
-        'a.logout',
-        function(){
-            casper.test.comment('== Login successful ');
-        },
-        function(){
-            this.echo("Error message : " + this.getHTML('form#form-login .alert-danger'));
-            this.die("Login failed for customer : " + thelia_customer.email + ' / ' + thelia_customer.password);
-        }
-    );
-
-    casper.thenOpen(thelia2_base_url + "order/delivery", function() {
+    casper.start(thelia2_base_url + "order/delivery", function goToDelivery() {
 
         casper.waitForSelector(
-            '.footer-container',
+            '#delivery-module-list-block .radio',
             function() {
                 casper.test.comment('== Page loaded : ' + this.getCurrentUrl());
 
@@ -44,7 +22,12 @@ casper.test.begin('Order process', 4, function suite(test) {
 
                     this.click('form#form-cart-delivery button[type="submit"]');
                 }
-            }
+            },
+            function() {
+                test.assertElementCount("table.table-cart-mini tbody tr", 1, "cart contain 1 product");
+                this.die("impossible to load delivery methods");
+            },
+            thelia_default_timeout
         );
 
     });
