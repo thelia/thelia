@@ -592,7 +592,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/folders/update-position' folder_id='__ID__' position='__POS__'}";
 
                             // Perform subtitutions
                             url = url.replace('__ID__', $(this).data('id'))
@@ -611,7 +611,7 @@
                 placement   : 'left',
                 success     : function(response, newValue) {
                     // The URL template
-                    var url = "{url path='/admin/contents/update-position' content_id='__ID__' position='__POS__'}";
+                    var url = "{url noamp=1 path='/admin/content/update-position' content_id='__ID__' position='__POS__'}";
 
                     // Perform subtitutions
                     url = url.replace('__ID__', $(this).data('id'))
