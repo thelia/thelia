@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -82,7 +83,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
             Argument::createBooleanTypeArgument('ignore_processing_errors', true),
-            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model')
+            Argument::createAnyTypeArgument('query_namespace', 'Thelia\\Model'),
+            Argument::createBooleanTypeArgument('allow_zoom', false)
         );
 
         // Add possible image sources
@@ -170,7 +172,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $id = $this->getId();
 
             if (is_null($source_id) && is_null($id)) {
-                throw new \InvalidArgumentException("If 'source' argument is specified, 'id' or 'source_id' argument should be specified");
+                throw new \InvalidArgumentException(
+                    "If 'source' argument is specified, 'id' or 'source_id' argument should be specified"
+                );
             }
 
             $search = $this->createSearchQuery($source, $source_id);
@@ -196,7 +200,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if ($search == null) {
-            throw new \InvalidArgumentException(sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources)));
+            throw new \InvalidArgumentException(
+                sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources))
+            );
         }
 
         return $search;
@@ -243,6 +249,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
         $effects = $this->getEffects();
+
+        $event->setAllowZoom($this->getAllowZoom());
 
         if (! is_null($effects)) {
             $effects = explode(',', $effects);

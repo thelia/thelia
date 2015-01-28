@@ -6,6 +6,7 @@
 - Update Admin Logs to add the resource ID when available.
 - Add render smarty function, that executes the controller given in the action parameter.
 - Allow modules to use document and image loop with the ```query_namespace``` argument
+- Enable image zoom in image loop before cropping to guarantee that the resulting image will match the required size, even if the original image is smaller. This feature is active only if the ```allow_zoom``` parameter is true.
 
 # 2.1.2
 
