@@ -1,26 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
-      <parameter name="Engine" value="InnoDB"/>
-      <parameter name="Charset" value="utf8"/>
+    <parameter name="Engine" value="InnoDB"/>
+    <parameter name="Charset" value="utf8"/>
   </vendor>
-  <table name="api" namespace="Thelia\Model">
-      <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-      <column name="label" type="VARCHAR" size="255" />
-      <column name="api_key" type="VARCHAR" size="100" />
-      <column name="profile_id" type="INTEGER" />
-      <behavior name="timestampable" />
-      <index name="idx_api_profile_id">
-          <index-column name="profile_id" />
-      </index>
-      <foreign-key foreignTable="profile" name="fk_api_profile_id" onDelete="RESTRICT" onUpdate="RESTRICT">
-          <reference foreign="id" local="profile_id"/>
-      </foreign-key>
-  </table>
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="parent" type="INTEGER" />
+    <column defaultValue="0" name="parent" required="true" type="INTEGER" />
     <column name="visible" required="true" type="TINYINT" />
     <column name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -494,7 +480,7 @@
   </table>
   <table name="folder" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="parent" required="true" type="INTEGER" />
+    <column defaultValue="0" name="parent" required="true" type="INTEGER" />
     <column name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -593,7 +579,7 @@
     <column description="the invoice reference" name="invoice_ref" size="100" type="VARCHAR" />
     <column name="discount" type="FLOAT" />
     <column name="postage" required="true" type="FLOAT" />
-    <column name="postage_tax" required="true" type="FLOAT" defaultValue="0" />
+    <column defaultValue="0" name="postage_tax" required="true" type="FLOAT" />
     <column name="postage_tax_rule_title" size="255" type="VARCHAR" />
     <column name="payment_module_id" required="true" type="INTEGER" />
     <column name="delivery_module_id" required="true" type="INTEGER" />
@@ -776,9 +762,9 @@
   <table name="module" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="code" required="true" size="55" type="VARCHAR" />
-    <column name="version" type="VARCHAR" size="10" required="true" default="" />
+    <column name="version" required="true" size="10" type="VARCHAR" default="" />
     <column name="type" required="true" type="TINYINT" />
-    <column name="category" required="true" type="VARCHAR" size="50" default="classic" />
+    <column defaultValue="classic" name="category" required="true" size="50" type="VARCHAR" />
     <column name="activate" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -1016,7 +1002,7 @@
     <column name="admin_firstname" size="255" type="VARCHAR" />
     <column name="admin_lastname" size="255" type="VARCHAR" />
     <column name="resource" size="255" type="VARCHAR" />
-    <column name="resource_id" required="false" type="INTEGER" />
+    <column name="resource_id" type="INTEGER" />
     <column name="action" size="255" type="VARCHAR" />
     <column name="message" type="LONGVARCHAR" />
     <column name="request" type="CLOB" />
@@ -1812,6 +1798,19 @@
     <behavior name="i18n">
       <parameter name="i18n_columns" value="value" />
     </behavior>
+    <behavior name="timestampable" />
+  </table>
+  <table name="api" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="label" size="255" type="VARCHAR" />
+    <column name="api_key" size="100" type="VARCHAR" />
+    <column name="profile_id" type="INTEGER" />
+    <foreign-key foreignTable="profile" name="fk_api_profile_id">
+      <reference foreign="id" local="profile_id" />
+    </foreign-key>
+    <index name="idx_api_profile_id">
+      <index-column name="profile_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
 </database>

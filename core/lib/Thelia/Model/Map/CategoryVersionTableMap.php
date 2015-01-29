@@ -167,7 +167,7 @@ class CategoryVersionTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'category', 'ID', true, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
+        $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, 0);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

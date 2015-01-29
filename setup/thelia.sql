@@ -4,29 +4,6 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------------------------------------------------
--- api
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `api`;
-
-CREATE TABLE `api`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `label` VARCHAR(255),
-    `api_key` VARCHAR(100),
-    `profile_id` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_api_profile_id` (`profile_id`),
-    CONSTRAINT `fk_api_profile_id`
-        FOREIGN KEY (`profile_id`)
-        REFERENCES `profile` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE RESTRICT
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
 -- category
 -- ---------------------------------------------------------------------
 
@@ -35,7 +12,7 @@ DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
@@ -600,7 +577,7 @@ DROP TABLE IF EXISTS `folder`;
 CREATE TABLE `folder`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -2229,6 +2206,27 @@ CREATE TABLE `module_config`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- api
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `api`;
+
+CREATE TABLE `api`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `label` VARCHAR(255),
+    `api_key` VARCHAR(100),
+    `profile_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_api_profile_id` (`profile_id`),
+    CONSTRAINT `fk_api_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -3066,7 +3064,7 @@ DROP TABLE IF EXISTS `category_version`;
 CREATE TABLE `category_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
@@ -3154,7 +3152,7 @@ DROP TABLE IF EXISTS `folder_version`;
 CREATE TABLE `folder_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER NOT NULL,
+    `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
