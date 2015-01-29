@@ -7,6 +7,7 @@
 - Add render smarty function, that executes the controller given in the action parameter.
 - Allow modules to use document and image loop with the ```query_namespace``` argument
 - Enable image zoom in image loop before cropping to guarantee that the resulting image will match the required size, even if the original image is smaller. This feature is active only if the ```allow_zoom``` parameter is true.
+- When in development mode, an exception is thrown when an error occurs when processing assets, thus helping to diagnose missing files, LESS syntax errors, and the like.
 
 # 2.1.2
 
