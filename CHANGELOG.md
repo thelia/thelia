@@ -5,6 +5,7 @@
 - display a loader when a module is uploaded
 - Change product prices export and import format to be compatible, now using product_sale_elements id as key to identify PSE.
 - Fix unused variable in ```Thelia\Controller\Api\CustomerController::getDeleteEvent```
+- change default order for cart loop.
 
 # 2.1.1
 
@@ -22,7 +23,7 @@
 
 # 2.1.0-beta2
 
-- config : 
+- config :
     - environment variable can be used in the database.yml file. See [https://github.com/thelia/thelia/pull/968](https://github.com/thelia/thelia/pull/968)
     - Allow other projects to override thelia directories constants by using composer "autoload"["file"] entries
 - smarty:
@@ -49,12 +50,12 @@
 - Add error message pages instead of white pages. But you can disable them by setting 0 into the config variable "error_message.show".
 - Front Office Template: new page to display the details of an order
 - email can be previewed in the back office
-- some smarty classes are still present in the core of thelia not to break backward compatibility. Those classes will be deleted in version 2.3 : 
+- some smarty classes are still present in the core of thelia not to break backward compatibility. Those classes will be deleted in version 2.3 :
     * Thelia\Core\Template\Smarty\AbstractSmartyPlugin
     * Thelia\Core\Template\Smarty\SmartyPluginDescriptor
 - the default address label is now translated
 - fixed "strictly use the requested language"
-- new config variable : 
+- new config variable :
     * session_config.lifetime : Life time of the session cookie in the customer browser, in seconds
     * error_message.show : Show error message instead of a white page on a server error
     * error_message.page_name : Filename of the error page. Default : error.html
@@ -86,7 +87,7 @@ parser's function and block with theirs arguments.
     - new plugin ```flash``` to support symfony flash message.
     - new plugin ```default_locale```. This function is used for forcing the usage of a specific locale in all your template. Useful for email and pdf. eg : ```{default_locale locale="en_US"}```
     - function ```intl``` has a new argument : ```locale```. If used, this locale will be used instead of session's locale
-- Loop : 
+- Loop :
     - new method addOutputFields in order to add custom fields in an overridden loop
 - Tests:
     - Move tests from ```core/lib/Thelia/Tests``` to ```tests/phpunit/Thelia/Tests```
@@ -98,7 +99,7 @@ parser's function and block with theirs arguments.
 - Forms: New implementation of Symfony form component that now handles form types, form extensions and form type extensions
     - You can use the tags ```thelia.form.type```, ```thelia.form.extension``` and ```thelia.form.type_extension``` to declare yours
     - Implementation of many form types for thelia, see the namespace Thelia\Core\Form\Type
-    
+
 ## DEPRECATED
 
 - ```\Thelia\Core\HttpFoundation\Session\Session::getCart``` is deprecated. Use ```getSessionCart``` instead.
@@ -116,7 +117,7 @@ parser's function and block with theirs arguments.
 - Added `new`, `promo` and `default` parameters to `product_sale_elements` loop
 - Added `store_notification_emails`, which contains the recipients of shop notification (such as order placed)
 - Added admin notification e-mail for order placed
-- Improved other emails (specially text versions) 
+- Improved other emails (specially text versions)
 - Added ORDER_SEND_NOTIFICATION_EMAIL event
 - class-loader component is removed, it was not used anymore.
 - Updating stock when changing order : canceled status
