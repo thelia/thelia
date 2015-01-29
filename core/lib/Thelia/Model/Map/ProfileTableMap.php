@@ -161,10 +161,10 @@ class ProfileTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Api', '\\Thelia\\Model\\Api', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Apis');
         $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'RESTRICT', 'RESTRICT', 'Admins');
         $this->addRelation('ProfileResource', '\\Thelia\\Model\\ProfileResource', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'RESTRICT', 'ProfileResources');
         $this->addRelation('ProfileModule', '\\Thelia\\Model\\ProfileModule', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), 'CASCADE', 'CASCADE', 'ProfileModules');
+        $this->addRelation('Api', '\\Thelia\\Model\\Api', RelationMap::ONE_TO_MANY, array('id' => 'profile_id', ), null, null, 'Apis');
         $this->addRelation('ProfileI18n', '\\Thelia\\Model\\ProfileI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProfileI18ns');
         $this->addRelation('Resource', '\\Thelia\\Model\\Resource', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Resources');
     } // buildRelations()

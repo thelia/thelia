@@ -164,7 +164,7 @@ class ApiTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_ONE, array('profile_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_ONE, array('profile_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**

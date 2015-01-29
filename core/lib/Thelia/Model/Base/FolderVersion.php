@@ -63,6 +63,7 @@ abstract class FolderVersion implements ActiveRecordInterface
 
     /**
      * The value for the parent field.
+     * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $parent;
@@ -131,6 +132,7 @@ abstract class FolderVersion implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->parent = 0;
         $this->version = 0;
     }
 
@@ -723,6 +725,10 @@ abstract class FolderVersion implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->parent !== 0) {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
