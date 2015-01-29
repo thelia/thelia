@@ -333,4 +333,12 @@ class AsseticAssetManager implements AssetManagerInterface
 
         return rtrim($outputUrl, '/') . '/' . trim($outputRelativeWebPath, '/') . '/' . trim($assetFileDirectoryInAssetDirectory, '/') . '/' . ltrim($assetTargetFilename, '/');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function isDebugMode()
+    {
+        return $this->debugMode;
+    }
 }
