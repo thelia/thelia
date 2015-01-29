@@ -14,6 +14,7 @@ namespace TheliaSmarty\Template\Assets;
 
 use Thelia\Core\Template\Assets\AssetManagerInterface;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
+use Thelia\Exception\TheliaProcessException;
 use TheliaSmarty\Template\SmartyParser;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
@@ -201,7 +202,7 @@ class SmartyAssetsManager
             );
         } else {
             // Log the problem
-            Tlog::getInstance()->addError("Failed to find asset source file " . $params['file']);
+            throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
         }
 
         return $assetUrl;
@@ -221,9 +222,14 @@ class SmartyAssetsManager
                 $url = $this->computeAssetUrl($assetType, $params, $template);
 
                 if (empty($url)) {
-                    Tlog::getInstance()->addWarning(
-                        sprintf("Failed to get real path of asset %s without exception", $params['file'])
-                    );
+                    $message = sprintf("Failed to get real path of asset %s without exception", $params['file']);
+
+                    Tlog::getInstance()->addWarning($message);
+
+                    // In debug mode, throw exception
+                    if ($this->assetsManager->isDebugMode()) {
+                        throw new TheliaProcessException($message);
+                    }
                 }
             } catch (\Exception $ex) {
                 Tlog::getInstance()->addWarning(
@@ -233,6 +239,11 @@ class SmartyAssetsManager
                         $ex->getMessage()
                     )
                 );
+
+                // If we're in development mode, just retrow the exception, so that it will be displayed
+                if ($this->assetsManager->isDebugMode()) {
+                    throw $ex;
+                }
             }
             $template->assign('asset_url', $url);
         } elseif (isset($content)) {
