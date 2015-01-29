@@ -49,7 +49,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array('normal', 'reverse'))
+                    new Type\EnumListType(array('normal', 'reverse', 'random'))
                 ),
                 'normal'
             )
@@ -72,6 +72,10 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             switch ($order) {
                 case "reverse":
                     $returnArray = array_reverse($returnArray, false);
+                    break;
+
+                case "random":
+                    shuffle($returnArray);
                     break;
             }
         }
