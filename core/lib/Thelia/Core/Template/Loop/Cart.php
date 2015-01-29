@@ -49,9 +49,9 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
             new Argument(
                 'order',
                 new Type\TypeCollection(
-                    new Type\EnumListType(array('reverse'))
+                    new Type\EnumListType(array('normal', 'reverse'))
                 ),
-                'reverse'
+                'normal'
             )
         );
     }
