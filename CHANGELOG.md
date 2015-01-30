@@ -9,6 +9,7 @@
 - Enable image zoom in image loop before cropping to guarantee that the resulting image will match the required size, even if the original image is smaller. This feature is active only if the ```allow_zoom``` parameter is true.
 - When in development mode, an exception is thrown when an error occurs when processing assets, thus helping to diagnose missing files, LESS syntax errors, and the like.
 - Change default order for cart loop
+- New module_config SMarty function: {module_config module="module-code" key="parameter-name}
 
 # 2.1.2
 
