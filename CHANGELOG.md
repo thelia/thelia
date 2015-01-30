@@ -17,6 +17,8 @@
 - display a loader when a module is uploaded
 - Change product prices export and import format to be compatible, now using product_sale_elements id as key to identify PSE.
 - Fix unused variable in ```Thelia\Controller\Api\CustomerController::getDeleteEvent```
+- change default order for cart loop.
+- Add missing static keyword for ```Thelia\Core\HttpFoundation\JsonResponse::createError```
 
 # 2.1.1
 

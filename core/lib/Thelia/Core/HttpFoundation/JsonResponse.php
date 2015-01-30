@@ -23,7 +23,7 @@ use Thelia\Core\Translation\Translator;
  */
 class JsonResponse extends BaseJsonResponse
 {
-    public function createError($errorMessage, $statusCode = 500)
+    public static function createError($errorMessage, $statusCode = 500)
     {
         return new static(["error" => $errorMessage], $statusCode);
     }
