@@ -167,11 +167,6 @@
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
-    {javascripts file="assets/js/jquery/jquery.ui.ui.datepicker/i18n/jquery.ui.datepicker-{lang attr="locale"}.js" catchException="true"}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-
 
     <script type="text/javascript">
 
@@ -205,13 +200,13 @@
 
                 $('.js-admin:checked').each(function(k, v) {
                     admins.push($(v).data('id'));
-                })
+                });
                 $('.js-resource:checked').each(function(k, v) {
                     resources.push($(v).data('id'));
-                })
+                });
                 $('.js-module:checked').each(function(k, v) {
                     modules.push($(v).data('id'));
-                })
+                });
 
                 var fromDate = new Date( $('#from_date').datepicker( "getDate" ) );
                 var toDate = new Date( $('#to_date').datepicker( "getDate" ) );
