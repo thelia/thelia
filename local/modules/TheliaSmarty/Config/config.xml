@@ -40,10 +40,6 @@
             <argument type="service" id="thelia.parser.asset.resolver" />
         </service>
 
-        <service id="smarty.plugin.theliasyntax" class="TheliaSmarty\Template\Plugins\TheliaSyntax" >
-            <tag name="thelia.parser.register_plugin"/>
-        </service>
-
         <service id="smarty.plugin.format" class="TheliaSmarty\Template\Plugins\Format" scope="request">
             <argument type="service" id="request"/>
             <tag name="thelia.parser.register_plugin"/>
