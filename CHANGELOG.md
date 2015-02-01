@@ -1,3 +1,6 @@
+# 2.0.6
+- Do not register previous url on XmlHttpRequest
+
 # 2.0.5
 - add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
 - 'freesans' is now the default font of PDF documents

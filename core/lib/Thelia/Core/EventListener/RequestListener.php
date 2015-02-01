@@ -69,35 +69,37 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $referrer = $request->attributes->get('_previous_url', null);
+        if (!$request->isXmlHttpRequest()) {
+            $referrer = $request->attributes->get('_previous_url', null);
 
-        if (null !== $referrer) {
-            // A previous URL (or the keyword 'dont-save') has been specified.
-            if ('dont-save' == $referrer) {
-                // We should not save the current URL as the previous URL
-                $referrer = null;
-            }
-        } else {
-            // The current URL will become the previous URL
-            $referrer = $request->getUri();
-        }
-
-        // Set previous URL, if defined
-        if (null !== $referrer) {
-            $session = $request->getSession();
-
-            if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
-                $components = parse_url($referrer);
-                $lang = LangQuery::create()
-                    ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
-                    ->findOne();
-
-                if (null !== $lang) {
-                    $session->setReturnToUrl($referrer);
+            if (null !== $referrer) {
+                // A previous URL (or the keyword 'dont-save') has been specified.
+                if ('dont-save' == $referrer) {
+                    // We should not save the current URL as the previous URL
+                    $referrer = null;
                 }
             } else {
-                if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
-                    $session->setReturnToUrl($referrer);
+                // The current URL will become the previous URL
+                $referrer = $request->getUri();
+            }
+
+            // Set previous URL, if defined
+            if (null !== $referrer) {
+                $session = $request->getSession();
+
+                if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+                    $components = parse_url($referrer);
+                    $lang = LangQuery::create()
+                        ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
+                        ->findOne();
+
+                    if (null !== $lang) {
+                        $session->setReturnToUrl($referrer);
+                    }
+                } else {
+                    if (false !== strpos($referrer, $request->getSchemeAndHttpHost())) {
+                        $session->setReturnToUrl($referrer);
+                    }
                 }
             }
         }
