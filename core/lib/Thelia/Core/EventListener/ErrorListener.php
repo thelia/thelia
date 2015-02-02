@@ -13,10 +13,12 @@
 namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
@@ -82,6 +84,16 @@ class ErrorListener implements EventSubscriberInterface
         }
     }
 
+    public function authenticationException(GetResponseForExceptionEvent $event)
+    {
+        $exception = $event->getException();
+        if ($exception instanceof AuthenticationException) {
+            $event->setResponse(
+                RedirectResponse::create($exception->getLoginTemplate())
+            );
+        }
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -106,7 +118,8 @@ class ErrorListener implements EventSubscriberInterface
     {
         return array(
             KernelEvents::EXCEPTION => [
-                ["handleException", 0]
+                ["handleException", 0],
+                ['authenticationException', 100]
             ],
             TheliaKernelEvents::THELIA_HANDLE_ERROR => [
                 ["defaultErrorFallback", 0],
