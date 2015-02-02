@@ -78,9 +78,6 @@ class ViewListener implements EventSubscriberInterface
             }
         } catch (ResourceNotFoundException $e) {
             throw new NotFoundHttpException();
-        } catch (AuthenticationException $ex) {
-            // Redirect to the login template
-            $response = RedirectResponse::create($this->container->get('thelia.url.manager')->viewUrl($ex->getLoginTemplate()));
         } catch (OrderException $e) {
             switch ($e->getCode()) {
                 case OrderException::CART_EMPTY:
