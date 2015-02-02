@@ -282,7 +282,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
                     $image->setPosition($imagePosition);
                     $image->save($con);
 
-                    $imageDirectory = THELIA_LOCAL_DIR . "media/images/module";
+                    $imageDirectory = sprintf("%s/media/images/module", THELIA_LOCAL_DIR);
                     $imageFileName = sprintf("%s-%d-%s", $module->getCode(), $image->getId(), $fileName);
 
                     $increment = 0;
