@@ -118,7 +118,7 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::EXCEPTION => array("checkHttpException", 128),
+            KernelEvents::EXCEPTION => ["checkHttpException", 128],
         );
     }
 }

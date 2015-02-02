@@ -10,6 +10,7 @@
 - When in development mode, an exception is thrown when an error occurs when processing assets, thus helping to diagnose missing files, LESS syntax errors, and the like.
 - Change default order for cart loop
 - New module_config SMarty function: {module_config module="module-code" key="parameter-name}
+- Do not register previous url on XmlHttpRequest
 
 # 2.1.2
 
@@ -21,6 +22,8 @@
 - change default order for cart loop.
 - Add missing static keyword for ```Thelia\Core\HttpFoundation\JsonResponse::createError```
 - Do not register previous url on XmlHttpRequest
+- Fix deploy image directory destination
+- Fix redirect response if a AuthenticationException is catched
 
 # 2.1.1
 
