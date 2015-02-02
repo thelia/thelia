@@ -185,11 +185,11 @@
                                     </div>
 
                                     <div class="tab-pane fade" id="images">
-                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id}
+                                        {include file='includes/image-upload-form.html' imageType='content' parentId=$content_id resource="admin.content"}
                                     </div>
 
                                     <div class="tab-pane fade" id="documents">
-                                        {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id}
+                                        {include file='includes/document-upload-form.html' documentType='content' parentId=$content_id resource="admin.content"}
                                     </div>
 
                                     {$smarty.capture.content_tab_content nofilter}

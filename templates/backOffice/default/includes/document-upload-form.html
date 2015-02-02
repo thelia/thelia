@@ -4,6 +4,7 @@ A generic document upload form
 Parameters:
     documentType    = Document type (category, product, folder, content, module)
     parentId        = Document parent id, ex: category id
+    resource        = Document parent resource name
 
 *}
 
@@ -24,7 +25,11 @@ Parameters:
     </form>
 
     <div class="existing-document">
-        {include file='includes/document-upload-list-ajax.html'}
+        {include file='includes/document-upload-list-ajax.html'
+            documentType=$documentType
+            parentId=$parentId
+            resource=$resource
+        }
     </div>
 
 </div>

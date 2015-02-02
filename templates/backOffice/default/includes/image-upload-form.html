@@ -4,6 +4,7 @@ A generic image upload form
 Parameters:
     imageType       = Image type (category, product, folder, content, module)
     parentId        = Image parent id, ex: category id
+    resource        = Image parent resource name
 
 *}
 
@@ -24,7 +25,11 @@ Parameters:
     </form>
 
     <div class="existing-image">
-        {include file='includes/image-upload-list-ajax.html'}
+        {include file='includes/image-upload-list-ajax.html'
+            imageType=$imageType
+            parentId=$parentId
+            resource=$resource
+        }
     </div>
 
 </div>

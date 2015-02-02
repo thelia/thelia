@@ -168,11 +168,11 @@
                             </div>
 
 		                    <div class="tab-pane fade" id="images">
-                                {include file='includes/image-upload-form.html' imageType='folder' parentId=$ID}
+                                {include file='includes/image-upload-form.html' imageType='folder' parentId=$ID resource="admin.folder"}
 		                    </div>
 
 		                    <div class="tab-pane fade" id="documents">
-                                {include file='includes/document-upload-form.html' documentType='folder' parentId=$ID}
+                                {include file='includes/document-upload-form.html' documentType='folder' parentId=$ID  resource="admin.folder"}
 		                    </div>
 
                             {$smarty.capture.folder_tab_content nofilter}

@@ -5,11 +5,12 @@ A generic document upload form
 Parameters:
     documentType    = Document type (category, product, folder, content, module)
     parentId        = Document parent id, ex: category id
+    resource        = Document parent resource name
 
 *}
 {ifloop rel="document"}
     <ul id="js-sort-document" class="list-unstyled document-list">
-        {loop type="document" name="document" source="{$documentType}" order="manual" source_id="{$parentId}" visible="*"}
+        {loop type="document" name="document" source=$documentType order="manual" source_id=$parentId visible="*"}
             <li class="clearfix ui-state-default" data-sort-id="{$ID}">
                 <a href="{$DOCUMENT_PATH}" title="{$TITLE}" class="pull-left" target="_blank">{$TITLE}</a>
 
