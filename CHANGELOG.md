@@ -20,6 +20,7 @@
 - Fix unused variable in ```Thelia\Controller\Api\CustomerController::getDeleteEvent```
 - change default order for cart loop.
 - Add missing static keyword for ```Thelia\Core\HttpFoundation\JsonResponse::createError```
+- Do not register previous url on XmlHttpRequest
 
 # 2.1.1
 
@@ -160,6 +161,9 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
+
+# 2.0.6
+- Do not register previous url on XmlHttpRequest
 
 # 2.0.5
 - add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
