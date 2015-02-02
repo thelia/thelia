@@ -23,6 +23,7 @@
 - Add missing static keyword for ```Thelia\Core\HttpFoundation\JsonResponse::createError```
 - Do not register previous url on XmlHttpRequest
 - Fix deploy image directory destination
+- Fix redirect response if a AuthenticationException is catched
 
 # 2.1.1
 
