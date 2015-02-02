@@ -498,7 +498,7 @@
 
         {form_field form=$form field='title'}
             <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                 {loop type="lang" name="default-lang" default_only="1" backend_context="1"}
                     <div class="input-group">
                         <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Title'}">
