@@ -214,7 +214,7 @@ return array(
     'Home page' => 'Page d\'accueil',
     'Hook' => 'Hook',
     'Hook block' => 'Hook  bloc',
-    'Hook code' => 'Cocde du hook',
+    'Hook code' => 'Code du hook',
     'Hook create form' => 'Formulaire de création de hook',
     'Hook title' => 'Titre du hook',
     'Hooks' => 'Hooks',

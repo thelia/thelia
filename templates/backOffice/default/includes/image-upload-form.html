@@ -7,6 +7,8 @@ Parameters:
     resource        = Image parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
 
 <div class="image-manager" >
     <form action="{url path="/admin/image/type/$imageType/$parentId/save-ajax"}" method="post" class="dropzone" id="images-dropzone" enctype="multipart/form-data">

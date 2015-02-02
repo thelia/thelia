@@ -7,6 +7,8 @@ Parameters:
     resource        = Document parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
 
 <div class="document-manager" >
     <form action="{url path="/admin/document/type/$documentType/$parentId/save-ajax"}" method="post" class="dropzone" id="documents-dropzone" enctype="multipart/form-data">
@@ -41,3 +43,22 @@ Parameters:
     var documentListErrorMessage = "{intl l='Can\'t load documents, please refresh this page.'}";
     var documentReorderErrorMessage = "{intl l='Can\'t reorder documents, please refresh this page.'}";
 </script>
+
+
+<div class="modal fade" id="document_delete_dialog" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{intl l="delete document"}</h3>
+            </div>
+            <div class="modal-body">
+                {intl l="Do you really want to delete this document ?"}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true"><span class="glyphicon glyphicon-remove"></span>{intl l="No"}</button>
+                <button type="button" id="submit-delete-document" data-element-id="" class="btn btn-primary"><span class="glyphicon glyphicon-check"></span>{intl l="Yes"}</button>
+            </div>
+        </div>
+    </div>
+</div>

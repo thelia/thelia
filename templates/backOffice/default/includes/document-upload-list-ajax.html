@@ -8,6 +8,8 @@ Parameters:
     resource        = Document parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
 {ifloop rel="document"}
     <ul id="js-sort-document" class="list-unstyled document-list">
         {loop type="document" name="document" source=$documentType order="manual" source_id=$parentId visible="*"}
@@ -32,7 +34,7 @@ Parameters:
                     {/elseloop}
 
                     {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$documentType"}" access="DELETE"}
-                        <a class="document-delete-btn btn btn-default btn-xs" id="document-{$ID}" href="{url path="/admin/document/type/$documentType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
+                        <a class="document-delete-btn btn btn-default btn-xs" id="document-{$ID}" data-id="{$ID}" href="{url path="/admin/document/type/$documentType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
                     {/loop}
