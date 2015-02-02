@@ -8,6 +8,7 @@
 - change default order for cart loop.
 - Add missing static keyword for ```Thelia\Core\HttpFoundation\JsonResponse::createError```
 - Do not register previous url on XmlHttpRequest
+- Fix deploy image directory destination
 
 # 2.1.1
 
