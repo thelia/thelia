@@ -30,7 +30,7 @@ class FrontHook extends BaseHook {
             $event->add(array(
                 "id" => "links-footer-body",
                 "class" => "default",
-                "title" => $this->trans("Useful links", array(), "hooklinks.fo.default"),
+                "title" => $this->trans("Useful links", array(), "hooklinks"),
                 "content" => $content
             ));
         }

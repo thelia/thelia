@@ -30,7 +30,7 @@ class FrontHook extends BaseHook {
             $event->add(array(
                 "id" => "social-footer-body",
                 "class" => "social",
-                "title" => $this->trans("Follow us", array(), "hooksocial.fo.default"),
+                "title" => $this->trans("Follow us", array(), "hooksocial"),
                 "content" => $content
             ));
         }
