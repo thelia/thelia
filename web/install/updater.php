@@ -51,17 +51,8 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
 
             // Backup
             if ($backup) {
-                if (false === $update->backupDb()) {
-                    $continue = false ;
-                    ?>
-                    <div class="alert alert-danger">
-                        <p><?php
-                            echo $trans->trans(
-                                'Sorry, your database can\'t be backed up. Try to do it manually'
-                            );
-                            ?></p>
-                    </div><?php
-                } else {
+                try {
+                    $update->backupDb();
                     ?>
                     <div class="alert alert-success">
                     <p><?php
@@ -70,6 +61,16 @@ $backup = (isset($_GET['backup']) && $_GET['backup'] == 1);
                             [
                                 '%file' => $update->getBackupFile()
                             ]
+                        );
+                        ?></p>
+                    </div><?php
+                } catch (\Exception $e) {
+                    $continue = false ;
+                    ?>
+                    <div class="alert alert-danger">
+                    <p><?php
+                        echo $trans->trans(
+                            'Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage()
                         );
                         ?></p>
                     </div><?php

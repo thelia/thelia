@@ -178,6 +178,7 @@ class Update
         $database = new Database($this->connection);
 
         $this->backupFile = THELIA_ROOT . $this->backupDir . 'update.sql';
+        $backupDir = THELIA_ROOT . $this->backupDir;
 
         $fs = new Filesystem();
 
@@ -185,8 +186,12 @@ class Update
             $this->log('debug', sprintf('Backup database to file : %s', $this->backupFile));
 
             // test if backup dir exists
-            if (!$fs->exists(THELIA_ROOT . $this->backupDir)) {
-                $fs->mkdir(THELIA_ROOT . $this->backupDir);
+            if (!$fs->exists($backupDir)) {
+                $fs->mkdir($backupDir);
+            }
+
+            if (!is_writable($backupDir)) {
+                throw new \RuntimeException(sprintf('impossible to write in directory : %s', $backupDir));
             }
 
             // test if backup file already exists
@@ -198,10 +203,8 @@ class Update
             $database->backupDb($this->backupFile);
         } catch (\Exception $ex) {
             $this->log('error', sprintf('error during backup process with message : %s', $ex->getMessage()));
-            return false;
+            throw $ex;
         }
-
-        return true;
     }
 
     /**
