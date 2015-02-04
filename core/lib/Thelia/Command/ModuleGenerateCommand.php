@@ -123,6 +123,21 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 file_put_contents($filename, $readmeContent);
             }
 
+            // composer.json file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "composer.json";
+            if (!$fs->exists($filename)) {
+                $composerContent = file_get_contents($skeletonDir . "composer.json");
+
+                // generate composer module name
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $composerName);
+                $composerFinalName = strtolower(implode("-", $composerName[0]));
+
+                $composerContent = str_replace("%%MODULENAME%%", $this->module, $composerContent);
+                $composerContent = str_replace("%%COMPOSERNAME%%", $composerFinalName, $composerContent);
+
+                file_put_contents($filename, $composerContent);
+            }
+
             // module.xml file
             $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml";
             if (!$fs->exists($filename)) {
