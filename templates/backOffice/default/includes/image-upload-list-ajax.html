@@ -5,12 +5,15 @@ A generic image upload form
 Parameters:
     imageType       = Image type (category, product, folder, content, module)
     parentId        = Image parent id, ex: category id
+    resource        = Image parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
 
 {ifloop rel="image"}
     <ul id="js-sort-image" class="row list-unstyled">
-        {loop type="image" name="image" source="{$imageType}" order="manual" source_id="{$parentId}" width="200" height="100" resize_mode="borders" visible="*"}
+        {loop type="image" name="image" source=$imageType order="manual" source_id=$parentId width="200" height="100" resize_mode="borders" visible="*"}
             <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
                 <a href="{url path="/admin/image/type/$imageType/$ID/update"}" title="{intl l='Update this image'}" class="thumbnail">
                     {if $PROCESSING_ERROR}
@@ -22,15 +25,26 @@ Parameters:
 
                 <div class="btn-group" >
                     <a class="image-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
+
+                    {loop type="auth" name="can_change" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="UPDATE"}
                     <a class="image-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/image/type/$imageType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-eye-open"></span><span class="glyphicon glyphicon-eye-close"></span>
+                        <i class="glyphicon glyphicon-eye-open"></i><i class="glyphicon glyphicon-eye-close"></i>
                     </a>
                     <a class="image-update-btn btn btn-default btn-xs" href="{url path="/admin/image/type/$imageType/$ID/update"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-edit"></span>
+                        <i class="glyphicon glyphicon-edit"></i>
                     </a>
+                    {/loop}
+                    {elseloop rel="can_change"}
+                    <a class="btn btn-default btn-xs">
+                        <i class="glyphicon {if $VISIBLE}glyphicon-eye-open{else}glyphicon-eye-close{/if}"></i>
+                    </a>
+                    {/elseloop}
+
+                    {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$imageType"}" access="DELETE"}
                     <a class="image-delete-btn btn btn-default btn-xs" id="image-{$ID}" href="{url path="/admin/image/type/$imageType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-trash"></span>
+                        <i class="glyphicon glyphicon-trash"></i>
                     </a>
+                    {/loop}
                 </div>
             </li>
         {/loop}

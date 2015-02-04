@@ -102,6 +102,13 @@ try {
                 </select>
             </div>
             <div class="form-group">
+                <label for="shop_locale"><?php echo $trans->trans('Shop preferred locale :'); ?></label>
+                <select id="shop_locale" name="shop_locale" class="form-control" required>
+                    <option value="en_US">English</option>
+                    <option value="fr_FR">Français</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
                 <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="" required>
             </div>

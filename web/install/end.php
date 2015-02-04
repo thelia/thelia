@@ -58,6 +58,14 @@ try {
         \Thelia\Model\ConfigQuery::create()
             ->filterByName('url_site')
             ->update(array('Value' => $_POST['url_site']));
+
+        $lang = \Thelia\Model\LangQuery::create()
+            ->findOneByLocale(empty($_POST['shop_locale']) ? "en_US" : $_POST['shop_locale'])
+        ;
+
+        if (null !== $lang) {
+            $lang->toggleDefault();
+        }
     }
 
     //clean up cache directories

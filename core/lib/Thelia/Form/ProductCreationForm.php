@@ -35,7 +35,7 @@ class ProductCreationForm extends BaseForm
             ))
             ->add("title", "text", array(
                 "constraints" => array(new NotBlank()),
-                "label" => Translator::getInstance()->trans('Product title *'),
+                "label" => Translator::getInstance()->trans('Product title'),
                 "label_attr" => array("for" => "title")
             ))
             ->add("default_category", "integer", array(

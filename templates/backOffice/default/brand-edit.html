@@ -153,11 +153,11 @@
                                 </div>
 
                                  <div class="tab-pane fade" id="images">
-                                    {include file='includes/image-upload-form.html' imageType='brand' parentId=$brand_id}
+                                    {include file='includes/image-upload-form.html' imageType='brand' parentId=$brand_id resource="admin.brand"}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
-                                    {include file='includes/document-upload-form.html' documentType='brand' parentId=$brand_id}
+                                    {include file='includes/document-upload-form.html' documentType='brand' parentId=$brand_id resource="admin.brand"}
                                 </div>
 
                                 {$smarty.capture.brand_tab_content nofilter}
@@ -167,7 +167,7 @@
                                         {include
                                             file = "includes/inner-form-toolbar.html"
                                             hide_submit_buttons = true
-                                            page_url = {$pageUrl}
+                                            page_url = $pageUrl
                                             close_url = {$closeUrl}
                                             current_tab = "modules"
                                         }

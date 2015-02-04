@@ -1,5 +1,8 @@
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
+
 {loop type="product" name="product-info" id=$product_id}
-    <p>Select the attributes values of "{$TITLE}" that should be included in this sale operation.</p>
+    <p>{intl l="Select the attributes values of \"%title\" that should be included in this sale operation." title=$TITLE}</p>
 {/loop}
 
 <form>

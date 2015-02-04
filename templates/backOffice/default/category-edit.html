@@ -287,11 +287,11 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="images">
-                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID}
+                                    {include file='includes/image-upload-form.html' imageType='category' parentId=$ID resource="admin.category"}
                                 </div>
 
                                 <div class="tab-pane fade" id="documents">
-                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$ID}
+                                    {include file='includes/document-upload-form.html' documentType='category' parentId=$ID resource="admin.category"}
                                 </div>
 
                                 {$smarty.capture.category_tab_content nofilter}

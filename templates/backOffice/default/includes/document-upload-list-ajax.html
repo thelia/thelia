@@ -5,26 +5,39 @@ A generic document upload form
 Parameters:
     documentType    = Document type (category, product, folder, content, module)
     parentId        = Document parent id, ex: category id
+    resource        = Document parent resource name
 
 *}
+{* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
+{default_translation_domain domain='bo.default'}
 {ifloop rel="document"}
     <ul id="js-sort-document" class="list-unstyled document-list">
-        {loop type="document" name="document" source="{$documentType}" order="manual" source_id="{$parentId}" visible="*"}
+        {loop type="document" name="document" source=$documentType order="manual" source_id=$parentId visible="*"}
             <li class="clearfix ui-state-default" data-sort-id="{$ID}">
                 <a href="{$DOCUMENT_PATH}" title="{$TITLE}" class="pull-left" target="_blank">{$TITLE}</a>
 
 
                 <div class="btn-group pull-right">
                     <a class="document-update-btn btn btn-default btn-xs disabled js-sorted-position" href="#">{$POSITION}</a>
-                    <a class="document-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/document/type/$documentType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-eye-open"></span><span class="glyphicon glyphicon-eye-close"></span>
-                    </a>
-                    <a class="document-update-btn btn btn-default btn-xs" href="{url path="/admin/document/type/$documentType/$ID/update"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-edit"></span>
-                    </a>
-                    <a class="document-delete-btn btn btn-default btn-xs" href="{url path="/admin/document/type/$documentType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
-                        <span class="glyphicon glyphicon-trash"></span>
-                    </a>
+                    {loop type="auth" name="can_change" role="ADMIN" resource="{$resource|default:"admin.$documentType"}" access="UPDATE"}
+                        <a class="document-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/document/type/$documentType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
+                            <i class="glyphicon glyphicon-eye-open"></i><i class="glyphicon glyphicon-eye-close"></i>
+                        </a>
+                        <a class="document-update-btn btn btn-default btn-xs" href="{url path="/admin/document/type/$documentType/$ID/update"}" data-error-message="{intl l='Please retry'}">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </a>
+                    {/loop}
+                    {elseloop rel="can_change"}
+                        <a class="btn btn-default btn-xs">
+                            <i class="glyphicon {if $VISIBLE}glyphicon-eye-open{else}glyphicon-eye-close{/if}"></i>
+                        </a>
+                    {/elseloop}
+
+                    {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$documentType"}" access="DELETE"}
+                        <a class="document-delete-btn btn btn-default btn-xs" id="document-{$ID}" data-id="{$ID}" href="{url path="/admin/document/type/$documentType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </a>
+                    {/loop}
                 </div>
             </li>
         {/loop}

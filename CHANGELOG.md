@@ -11,6 +11,10 @@
 - Change default order for cart loop
 - New module_config SMarty function: {module_config module="module-code" key="parameter-name}
 - Do not register previous url on XmlHttpRequest
+- Add ACL on documents and images tabs.
+- Add confirmation modal on documents deletion
+- Add shop language choice on install wizard
+- Remove redundant * on product-edit
 
 # 2.1.2
 
