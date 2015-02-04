@@ -124,8 +124,11 @@ $updateError = null;
 try {
     // backup db
     if (true === $backup) {
-        if (false === $update->backupDb()) {
-            echo PHP_EOL . 'Sorry, your database can\'t be backed up. Try to do it manually.' . PHP_EOL;
+        try {
+            $update->backupDb();
+            echo sprintf(PHP_EOL . 'Your database has been backed up. The sql file : %s'. PHP_EOL, $update->getBackupFile());
+        } catch (\Exception $e) {
+            echo PHP_EOL . 'Sorry, your database can\'t be backed up. Reason : ' . $e->getMessage() . PHP_EOL;
             exit(4);
         }
     }
