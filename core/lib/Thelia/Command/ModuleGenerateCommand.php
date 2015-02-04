@@ -127,6 +127,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
                 $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+                $classContent = str_replace("%%DOMAINNAME%%", strtolower($this->module), $classContent);
 
                 file_put_contents($filename, $classContent);
             }
