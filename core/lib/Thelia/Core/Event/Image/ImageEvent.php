@@ -96,7 +96,7 @@ class ImageEvent extends CachedFileEvent
     {
         return md5(
             $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
-            . $this->rotation
+            . $this->rotation . $this->allowZoom
         );
     }
 
