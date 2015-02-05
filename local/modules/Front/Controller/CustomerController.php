@@ -324,6 +324,7 @@ class CustomerController extends BaseFrontController
             $customerProfileUpdateForm = new CustomerProfileUpdateForm($this->getRequest());
 
             try {
+                /** @var Customer $customer */
                 $customer = $this->getSecurityContext()->getCustomerUser();
                 $newsletterOldEmail = $customer->getEmail();
 
@@ -331,8 +332,13 @@ class CustomerController extends BaseFrontController
 
                 $customerChangeEvent = $this->createEventInstance($form->getData());
                 $customerChangeEvent->setCustomer($customer);
-                // We do not allow customer email modification
-                $customerChangeEvent->setEmailUpdateAllowed(false);
+
+                $configCustomerChangeEmail = intval(ConfigQuery::read('customer_change_email', 0));
+
+                if (!$configCustomerChangeEmail) {
+                    $customerChangeEvent->setEmailUpdateAllowed(false);
+                }
+
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
 
                 $updatedCustomer = $customerChangeEvent->getCustomer();
