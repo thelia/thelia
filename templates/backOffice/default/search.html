@@ -42,7 +42,9 @@
                                 <th>
                                     {intl l="firstname & lastname"}
                                 </th>
-
+                                <th>
+                                    {intl l="Email address"}
+                                </th>
                                 {hook name="customers.header" location="customer_list_header" }
 
                                 <th>
@@ -79,7 +81,9 @@
                                     <td class="object-title">
                                         {$FIRSTNAME} {$LASTNAME}
                                     </td>
-
+                                    <td>
+                                        {mailto address="{$EMAIL}" encode="hex"}
+                                    </td>
                                     {hook name="customers.row" location="customer_list_row" }
 
                                     <td>
