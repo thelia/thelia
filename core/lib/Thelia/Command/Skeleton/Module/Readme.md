@@ -9,6 +9,13 @@ Add a short description here. You can also add a screenshot if needed.
 * Copy the module into ```<thelia_root>/local/modules/``` directory and be sure that the name of the module is %%MODULENAME%%.
 * Activate it in your thelia administration panel
 
+### Composer
+
+Add it in your main thelia composer.json file
+
+```
+composer require your-vendor/%%COMOPOSERNAE%%-module:~1.0
+```
 
 ## Usage
 

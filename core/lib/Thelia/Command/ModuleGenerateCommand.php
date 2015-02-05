@@ -116,9 +116,11 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 // generate title for readme
                 preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $readmeTitle);
+                $composerFinalName = strtolower(implode("-", $readmeTitle[0]));
 
                 $readmeContent = str_replace("%%MODULENAME%%", $this->module, $readmeContent);
                 $readmeContent = str_replace("%%MODULENAMETITLE%%", implode(" ", $readmeTitle[0]), $readmeContent);
+                $readmeContent = str_replace("%%COMPOSERNAME%%", $composerFinalName, $readmeContent);
 
                 file_put_contents($filename, $readmeContent);
             }
