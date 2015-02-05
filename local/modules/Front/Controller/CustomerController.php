@@ -335,7 +335,9 @@ class CustomerController extends BaseFrontController
 
                 $configCustomerChangeEmail = intval(ConfigQuery::read('customer_change_email', 0));
 
-                if (!$configCustomerChangeEmail) {
+                if ($configCustomerChangeEmail) {
+                    $customerChangeEvent->setEmailUpdateAllowed(true);
+                } else {
                     $customerChangeEvent->setEmailUpdateAllowed(false);
                 }
 
