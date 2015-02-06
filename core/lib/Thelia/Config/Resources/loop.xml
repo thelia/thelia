@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <loops>
+        <!-- original loop -->
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
         <loop class="Thelia\Core\Template\Loop\Admin" name="admin"/>
@@ -66,6 +67,69 @@
         <loop class="Thelia\Core\Template\Loop\Export" name="export" />
         <loop class="Thelia\Core\Template\Loop\Sale" name="sale"/>
         <loop class="Thelia\Core\Template\Loop\ModuleConfig" name="module-config"/>
+
+        <!-- default loop -->
+        <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory.default"/>
+        <loop class="Thelia\Core\Template\Loop\Address" name="address.default"/>
+        <loop class="Thelia\Core\Template\Loop\Admin" name="admin.default"/>
+        <loop class="Thelia\Core\Template\Loop\Area" name="area.default"/>
+        <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content.default"/>
+        <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute.default"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability.default"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination.default"/>
+        <loop class="Thelia\Core\Template\Loop\Auth" name="auth.default"/>
+        <loop class="Thelia\Core\Template\Loop\Brand" name="brand.default"/>
+        <loop class="Thelia\Core\Template\Loop\Category" name="category.default"/>
+        <loop class="Thelia\Core\Template\Loop\Content" name="content.default"/>
+        <loop class="Thelia\Core\Template\Loop\Country" name="country.default"/>
+        <loop class="Thelia\Core\Template\Loop\Currency" name="currency.default"/>
+        <loop class="Thelia\Core\Template\Loop\Customer" name="customer.default"/>
+        <loop class="Thelia\Core\Template\Loop\Feature" name="feature.default"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability.default"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value.default"/>
+        <loop class="Thelia\Core\Template\Loop\Folder" name="folder.default"/>
+        <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path.default"/>
+        <loop class="Thelia\Core\Template\Loop\Module" name="module.default"/>
+        <loop class="Thelia\Core\Template\Loop\Hook" name="hook.default"/>
+        <loop class="Thelia\Core\Template\Loop\ModuleHook" name="module_hook.default"/>
+        <loop class="Thelia\Core\Template\Loop\Order" name="order.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductTax" name="order_product_tax.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderCoupon" name="order_coupon.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination.default"/>
+        <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status.default"/>
+        <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path.default"/>
+        <loop class="Thelia\Core\Template\Loop\Payment" name="payment.default"/>
+        <loop class="Thelia\Core\Template\Loop\Product" name="product.default"/>
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements.default"/>
+        <loop class="Thelia\Core\Template\Loop\Profile" name="profile.default"/>
+        <loop class="Thelia\Core\Template\Loop\Resource" name="resource.default"/>
+        <loop class="Thelia\Core\Template\Loop\Feed" name="feed.default"/>
+        <loop class="Thelia\Core\Template\Loop\Title" name="title.default"/>
+        <loop class="Thelia\Core\Template\Loop\Lang" name="lang.default"/>
+        <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree.default"/>
+        <loop class="Thelia\Core\Template\Loop\FolderTree" name="folder-tree.default"/>
+        <loop class="Thelia\Core\Template\Loop\Cart" name="cart.default"/>
+        <loop class="Thelia\Core\Template\Loop\Image" name="image.default"/>
+        <loop class="Thelia\Core\Template\Loop\Document" name="document.default"/>
+        <loop class="Thelia\Core\Template\Loop\Config" name="config.default"/>
+        <loop class="Thelia\Core\Template\Loop\Coupon" name="coupon.default"/>
+        <loop class="Thelia\Core\Template\Loop\Message" name="message.default"/>
+        <loop class="Thelia\Core\Template\Loop\Delivery" name="delivery.default"/>
+        <loop class="Thelia\Core\Template\Loop\ProductTemplate" name="product-template.default"/> <!--  This is product templates ;-) -->
+        <loop class="Thelia\Core\Template\Loop\Template" name="template.default"/>
+        <loop class="Thelia\Core\Template\Loop\Tax" name="tax.default"/>
+        <loop class="Thelia\Core\Template\Loop\TaxRule" name="tax-rule.default"/>
+        <loop class="Thelia\Core\Template\Loop\TaxRuleCountry" name="tax-rule-country.default"/>
+        <loop class="Thelia\Core\Template\Loop\Formatter" name="formatter" />
+        <loop class="Thelia\Core\Template\Loop\ArchiveBuilder" name="archive-builder" />
+        <loop class="Thelia\Core\Template\Loop\ImportCategory" name="import-category" />
+        <loop class="Thelia\Core\Template\Loop\ExportCategory" name="export-category" />
+        <loop class="Thelia\Core\Template\Loop\Import" name="import" />
+        <loop class="Thelia\Core\Template\Loop\Export" name="export" />
+        <loop class="Thelia\Core\Template\Loop\Sale" name="sale.default"/>
+        <loop class="Thelia\Core\Template\Loop\ModuleConfig" name="module-config.default"/>
     </loops>
 
 </config>
