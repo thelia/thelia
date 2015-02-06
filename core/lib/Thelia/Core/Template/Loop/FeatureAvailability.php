@@ -110,6 +110,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
             $loopResultRow->set("ID", $featureAv->getId())
                 ->set("IS_TRANSLATED", $featureAv->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
+                ->set("FEATURE_ID", $featureAv->getFeatureId())
                 ->set("TITLE", $featureAv->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $featureAv->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $featureAv->getVirtualColumn('i18n_DESCRIPTION'))
