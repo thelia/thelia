@@ -5,6 +5,18 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # SEO, remove the subdomain www in URL
+    # Exemple : http://www.yourdomain.com/contact redirect 301 to http://yourdomain.com/contact
+    # To activate uncomment the following two lines
+    #RewriteCond %{HTTP_HOST} ^www.yourdomain.com$
+    #RewriteRule ^(.*) http://yourdomain.com/$1 [QSA,L,R=301]
+
+    # SEO, add the subdomain www in URL
+    # Exemple : http://yourdomain.com/contact redirect 301 to http://www.yourdomain.com/contact
+    # To activate uncomment the following two lines
+    #RewriteCond %{HTTP_HOST} ^yourdomain.com$
+    #RewriteRule ^(.*) http://www.yourdomain.com/$1 [QSA,L,R=301]
+
     # SEO, to avoid duplicate content with index.php in url
     # Exemple : http://www.yourdomain.com/index.php/contact redirect 301 to http://www.yourdomain.com/contact
     RewriteCond %{THE_REQUEST} ^GET.*index\.php [NC]
