@@ -34,14 +34,17 @@ INSERT INTO  `order_status_i18n` VALUES
 
 ALTER TABLE `admin_log` ADD `resource_id` INTEGER AFTER `resource` ;
 
-INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('customer_change_email', '0', 0, 0, NOW(), NOW())
+-- new config
+
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
+
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'customer_change_email', '0', 0, 0, NOW(), NOW())
 ;
 
-SELECT @max := MAX(`id`) FROM `config`;
-
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max, 'en_US', 'Allow users to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
-(@max, 'fr_FR', 'Permettre aux utilisateurs de changer leurs email. 1 pour oui, 0 pour non', NULL, NULL, NULL);
+(@max_id + 1, 'en_US', 'Allow users to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 1, 'fr_FR', 'Permettre aux utilisateurs de changer leurs email. 1 pour oui, 0 pour non', NULL, NULL, NULL);
+
 
 SET FOREIGN_KEY_CHECKS = 1;
