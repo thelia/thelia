@@ -19,7 +19,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
-(@max_id + 1, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
+(@max_id + 1, 'fr_FR', 'Utiliser un cookie persistant pour memoriser le panier du client', NULL, NULL, NULL),
 (@max_id + 2, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
 (@max_id + 2, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
 (@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
