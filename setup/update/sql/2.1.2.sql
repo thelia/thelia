@@ -17,4 +17,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@maxHookId + 1, 'en_US', 'Coupon page - in deletion form', '', '')
 ;
 
+UPDATE `config_i18n` SET `title`='Utiliser un cookie persistant pour memoriser le panier du client' WHERE `locale`='fr_FR' AND `id`=(SELECT`id` FROM `config` WHERE `name`='cart.use_persistent_cookie');
+
 SET FOREIGN_KEY_CHECKS = 1;
