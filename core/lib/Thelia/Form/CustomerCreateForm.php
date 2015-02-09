@@ -86,6 +86,23 @@ class CustomerCreateForm extends AddressCreateForm
                 ),
                 "required" => false
             ));
+
+        //confirm email
+        if (intval(ConfigQuery::read("customer_confirm_email", 0))) {
+            $this->formBuilder->add("email_confirm", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array("methods" => array(
+                        array($this, "verifyEmailField")
+                    )))
+                ),
+                "label" => Translator::getInstance()->trans("Confirm Email Address"),
+                "label_attr" => array(
+                    "for" => "email_confirm"
+                )
+            ));
+        }
     }
 
     public function verifyPasswordField($value, ExecutionContextInterface $context)
@@ -94,6 +111,15 @@ class CustomerCreateForm extends AddressCreateForm
 
         if ($data["password"] != $data["password_confirm"]) {
             $context->addViolation(Translator::getInstance()->trans("password confirmation is not the same as password field"));
+        }
+    }
+
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if ($data["email"] != $data["email_confirm"]) {
+            $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
         }
     }
 
