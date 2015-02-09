@@ -109,6 +109,36 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 );
             }
 
+            // Readme.md file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Readme.md";
+            if (!$fs->exists($filename)) {
+                $readmeContent = file_get_contents($skeletonDir . "Readme.md");
+
+                // generate title for readme
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $readmeTitle);
+                $composerFinalName = strtolower(implode("-", $readmeTitle[0]));
+
+                $readmeContent = str_replace("%%MODULENAME%%", $this->module, $readmeContent);
+                $readmeContent = str_replace("%%MODULENAMETITLE%%", implode(" ", $readmeTitle[0]), $readmeContent);
+                $readmeContent = str_replace("%%COMPOSERNAME%%", $composerFinalName, $readmeContent);
+
+                file_put_contents($filename, $readmeContent);
+            }
+
+            // composer.json file
+            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "composer.json";
+            if (!$fs->exists($filename)) {
+                $composerContent = file_get_contents($skeletonDir . "composer.json");
+
+                // generate composer module name
+                preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $this->module, $composerName);
+
+                $composerContent = str_replace("%%MODULENAME%%", $this->module, $composerContent);
+                $composerContent = str_replace("%%COMPOSERNAME%%", strtolower(implode("-", $composerName[0])), $composerContent);
+
+                file_put_contents($filename, $composerContent);
+            }
+
             // module.xml file
             $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "module.xml";
             if (!$fs->exists($filename)) {
@@ -127,6 +157,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
                 $classContent = str_replace("%%CLASSNAME%%", $this->module, $classContent);
                 $classContent = str_replace("%%NAMESPACE%%", $this->module, $classContent);
+                $classContent = str_replace("%%DOMAINNAME%%", strtolower($this->module), $classContent);
 
                 file_put_contents($filename, $classContent);
             }
