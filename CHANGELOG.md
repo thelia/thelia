@@ -16,6 +16,7 @@
 - Add shop language choice on install wizard
 - Remove redundant * on product-edit
 - Add the possibility for customers to change their email, backoffice configuration variables customer_change_email
+- Add confirmation email for customers, backoffice configuration variables customer_confirm_email
 
 # 2.1.2
 
