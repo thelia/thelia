@@ -252,6 +252,7 @@ class CustomerController extends BaseFrontController
             'firstname'    => $customer->getFirstName(),
             'lastname'     => $customer->getLastName(),
             'email'        => $customer->getEmail(),
+            'email_confirm'        => $customer->getEmail(),
             'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
