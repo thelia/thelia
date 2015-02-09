@@ -87,11 +87,17 @@
                             </div><!--/.form-group-->
                         {/form_field}
                         {form_field form=$form field="email"}
+
+                        {assign var="customer_change_email" value={config key="customer_change_email"}}
+
                         <div class="form-group group-email {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 
                             <div class="control-input">
-                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder email"}" value="{$smarty.get.email|default:$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if} disabled>
+                                <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder email"}" value="{$smarty.get.email|default:$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if} {if !$customer_change_email}disabled{/if}>
+                                {if !$customer_change_email}
+                                    <div class="alert alert-info" role="alert">{intl l="If you want to change your email, please contact us."} <strong><a href="{url path="/contact"}" title="{intl l="Contact page"}">{intl l="Contact page"}</a></strong></div>
+                                {/if}
                                 {if $error }
                                     <span class="help-block">{$message}</span>
                                     {assign var="error_focus" value="true"}
