@@ -18,6 +18,8 @@
 - Add parameter "page_param_name" for template admin pagination.html. if "page_param_name" is empty, then the name of the parameter is "page"
 - Add "Refunded" order status
 - Add environment specific config file loading in modules
+- Add the possibility for customers to change their email, backoffice configuration variables customer_change_email
+- Add confirmation email for customers, backoffice configuration variables customer_confirm_email
 
 # 2.1.2
 
