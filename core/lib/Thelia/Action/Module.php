@@ -153,11 +153,28 @@ class Module extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
+
             try {
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
                         Translator::getInstance()->trans(
                             'Cannot instantiate module "%name%": the namespace is null. Maybe the model is not loaded ?',
+                            ['%name%' => $module->getCode()]
+                        )
+                    );
+                }
+
+                // If the module is referenced by an order, display a meaningful error
+                // instead of 'delete cannot delete' caused by a constraint violation.
+                // FIXME: we hav to find a way to delete modules used by order.
+                if (
+                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                    ||
+                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                ) {
+                    throw new \LogicException(
+                        Translator::getInstance()->trans(
+                            'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
                             ['%name%' => $module->getCode()]
                         )
                     );
@@ -196,22 +213,6 @@ class Module extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
                             'Module "%name%" directory was not found',
-                            ['%name%' => $module->getCode()]
-                        )
-                    );
-                }
-
-                // If the module is referenced by an order, display a meaningful error
-                // instead of 'delete cannot delete' caused by a constraint violation.
-                // FIXME: we hav to find a way to delete modules used by order.
-                if (
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
-                    ||
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
-                ) {
-                    throw new \LogicException(
-                        Translator::getInstance()->trans(
-                            'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
                             ['%name%' => $module->getCode()]
                         )
                     );
