@@ -97,7 +97,6 @@ class ModuleManagement
             $action = 'install';
         } elseif ($version !== $module->getVersion()) {
             $currentVersion = $module->getVersion();
-            $newVersion = $module->getVersion();
             $action = 'update';
         } else {
             $action = 'none';
@@ -115,14 +114,18 @@ class ModuleManagement
                 ->setCategory((string)$content->type)
                 ->save($con);
 
-            if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
-                /** @var \Thelia\Module\BaseModule $moduleInstance */
-                $moduleInstance = $reflected->newInstance();
-                $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
-                $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
-            }
+            // Update the module images, title and description when the module is installed, but not after
+            // as these data may have been modified byt the administrator
+            if ('install' === $action) {
+                $this->saveDescription($module, $content, $con);
 
-            $this->saveDescription($module, $content, $con);
+                if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
+                    /** @var \Thelia\Module\BaseModule $moduleInstance */
+                    $moduleInstance = $reflected->newInstance();
+                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
+                    $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
+                }
+            }
 
             // Tell the module to install() or update()
             $instance = $module->createInstance();
