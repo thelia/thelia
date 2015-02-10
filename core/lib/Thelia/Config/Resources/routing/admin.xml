@@ -16,10 +16,6 @@
         <default key="_controller">Thelia\Controller\Admin\HomeController::defaultAction</default>
     </route>
 
-    <route id="admin.home.latestVersion" path="/admin/latest-thelia-version">
-        <default key="_controller">Thelia\Controller\Admin\HomeController::getLatestTheliaVersion</default>
-    </route>
-
     <route id="admin.home.stats" path="/admin/home/stats">
         <default key="_controller">Thelia\Controller\Admin\HomeController::loadStatsAjaxAction</default>
     </route>

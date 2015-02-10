@@ -447,9 +447,16 @@ jQuery(function($){
     {/literal}
 
     // Get the latest Thelia version
-    $('#latest-thelia-version').load("{url path='/admin/latest-thelia-version'}", function(response, status, xhr) {
-        if (status == "error")
-            $('#latest-thelia-version').text("Unavailable");
+    $.ajax({
+        url: "http://thelia.net/version.php",
+        beforeSend: function (jqXHR) {
+            jqXHR.setRequestHeader("Thelia-Version", "{$THELIA_VERSION}");
+        },
+        crossDomain: true
+    }).done(function(data) {
+        $('#latest-thelia-version').text(data);
+    }).fail(function() {
+        $('#latest-thelia-version').text("Unavailable");
     });
 
     // Grid setup

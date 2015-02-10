@@ -32,42 +32,6 @@ class HomeController extends BaseAdminController
         return $this->render('home');
     }
 
-    /**
-     * Get the latest available Thelia version from the Thelia web site.
-     *
-     * @return \Thelia\Core\HttpFoundation\Response the response
-     */
-    public function getLatestTheliaVersion()
-    {
-        if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
-            return $response;
-        }
-
-        $context = [
-            'http' => [
-                'method' => 'GET',
-                'header' => "User-Agent: Thelia version ".Thelia::THELIA_VERSION."\r\n".
-                    "Referer: ".$this->getRequest()->getSchemeAndHttpHost()."\r\n".
-                    "Accept-Language: ".$this->getRequest()->getSession()->getLang()->getCode()."\r\n"
-            ]
-        ];
-
-        // get the latest version
-        $version = @file_get_contents(
-            "http://thelia.net/version.php",
-            false,
-            stream_context_create($context)
-        );
-
-        if ($version === false) {
-            $version = $this->getTranslator()->trans("Not found");
-        } elseif (! preg_match("/^[0-9.]*$/", $version)) {
-            $version = $this->getTranslator()->trans("Unavailable");
-        }
-
-        return Response::create($version);
-    }
-
     public function loadStatsAjaxAction()
     {
         if (null !== $response = $this->checkAuth(self::RESOURCE_CODE, array(), AccessManager::VIEW)) {
