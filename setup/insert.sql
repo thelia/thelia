@@ -69,7 +69,10 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 ('allow_slash_ended_uri', '1', 0, 0, NOW(), NOW()),
 ('error_message.show', '1', 0, 0, NOW(), NOW()),
-('error_message.page_name', 'error.html', 0, 0, NOW(), NOW())
+('error_message.page_name', 'error.html', 0, 0, NOW(), NOW()),
+
+('customer_change_email', '0', 0, 0, NOW(), NOW()),
+('customer_confirm_email', '1', 0, 0, NOW(), NOW())
 ;
 
 
@@ -111,6 +114,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (34, 'en_US', 'Name of the cart cookie', NULL, NULL, NULL),
 (35, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
 (36, 'en_US', 'Life time of the session cookie in the customer browser, in seconds', NULL, NULL, NULL),
+(37, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
+(38, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
 
 (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l''ignorer (0) lors de l''affichage et la modification des quantités commandées', NULL, NULL, NULL),
 (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
@@ -147,7 +152,9 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (33, 'fr_FR', 'Utiliser un cookie persistant pour memoriser le panier du client', NULL, NULL, NULL),
 (34, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
 (35, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
-(36, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL)
+(36, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL),
+(37, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+(38, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
