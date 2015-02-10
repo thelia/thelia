@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Log\Tlog;
 use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
 use Thelia\Module\BaseModule;
 
@@ -75,14 +76,18 @@ class ModuleQuery extends BaseModuleQuery
 
         /** @var \Thelia\Model\Module $module */
         foreach ($modules as $module) {
-            if (null !== $container) {
-                $instance = $module->getDeliveryModuleInstance($container);
-            } else {
-                $instance = $module->createInstance();
-            }
+            try {
+                if (null !== $container) {
+                    $instance = $module->getDeliveryModuleInstance($container);
+                } else {
+                    $instance = $module->createInstance();
+                }
 
-            if (true === $instance->handleVirtualProductDelivery()) {
-                $result[] = $instance;
+                if (true === $instance->handleVirtualProductDelivery()) {
+                    $result[] = $instance;
+                }
+            } catch (\Exception $ex) {
+                Tlog::getInstance()->addError("Failed to instantiate module ".$module->getCode(), $ex);
             }
         }
 
