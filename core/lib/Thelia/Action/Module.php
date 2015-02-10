@@ -153,7 +153,6 @@ class Module extends BaseAction implements EventSubscriberInterface
         $con->beginTransaction();
 
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
-
             try {
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
