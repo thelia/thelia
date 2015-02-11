@@ -88,6 +88,13 @@ class ModuleManagement
         if (null === $module) {
             $module = new Module();
             $module->setActivate(0);
+
+            $action = 'install';
+        } elseif ($version !== $module->getVersion()) {
+            $currentVersion = $module->getVersion();
+            $action = 'update';
+        } else {
+            $action = 'none';
         }
 
         $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
@@ -101,7 +108,29 @@ class ModuleManagement
                 ->setCategory((string)$content->type)
                 ->save($con);
 
-            $this->saveDescription($module, $content, $con);
+            // Update the module images, title and description when the module is installed, but not after
+            // as these data may have been modified byt the administrator
+            if ('install' === $action) {
+                $this->saveDescription($module, $content, $con);
+
+                if (isset($content->{"images-folder"}) && !$module->isModuleImageDeployed($con)) {
+                    /** @var \Thelia\Module\BaseModule $moduleInstance */
+                    $moduleInstance = $reflected->newInstance();
+                    $imagesFolder = THELIA_MODULE_DIR . $code . DS . (string) $content->{"images-folder"};
+                    $moduleInstance->deployImageFolder($module, $imagesFolder, $con);
+                }
+            }
+
+            // Tell the module to install() or update()
+            $instance = $module->createInstance();
+
+            $instance->setContainer($container);
+
+            if ($action == 'install') {
+                $instance->install($con);
+            } elseif ($action == 'update') {
+                $instance->update($currentVersion, $version, $con);
+            }
 
             $con->commit();
         } catch (PropelException $e) {
