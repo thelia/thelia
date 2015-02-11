@@ -18,6 +18,7 @@ use Propel\Runtime\Propel;
 use SplFileInfo;
 use Symfony\Component\Finder\Finder;
 use Thelia\Exception\InvalidModuleException;
+use Thelia\Log\Tlog;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -133,7 +134,9 @@ class ModuleManagement
             }
 
             $con->commit();
-        } catch (PropelException $e) {
+        } catch (\Exception $ex) {
+            Tlog::getInstance()->addError("Failed to update module ".$module->getCode(), $ex);
+
             $con->rollBack();
             throw $e;
         }
