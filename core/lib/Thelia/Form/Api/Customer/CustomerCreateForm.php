@@ -27,6 +27,7 @@ class CustomerCreateForm extends BaseCustomerCreateForm
         parent::buildForm();
 
         $this->formBuilder
+            ->remove('email_confirm')
             ->remove('password_confirm')
             ->remove('agreed')
             ->add('lang', 'integer', [
