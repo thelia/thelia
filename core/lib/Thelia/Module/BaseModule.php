@@ -491,6 +491,18 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
     }
 
     /**
+     * This method is called when a newer version of the plugin is installed
+     *
+     * @param string $currentVersion the current (installed) module version, as defined in the module.xml file
+     * @param string $newVersion the new module version, as defined in the module.xml file
+     * @param ConnectionInterface $con
+     */
+    public function update($currentVersion, $newVersion, ConnectionInterface $con)
+    {
+        // Override this method to do something useful.
+    }
+
+    /**
      * This method is called before the module activation, and may prevent it by returning false.
      *
      * @param ConnectionInterface $con

@@ -196,7 +196,7 @@ class ModuleController extends AbstractCrudController
 
         try {
             $moduleManagement = new ModuleManagement();
-            $moduleManagement->updateModules();
+            $moduleManagement->updateModules($this->getContainer());
         } catch (InvalidModuleException $ex) {
             $this->moduleErrors = $ex->getErrors();
         } catch (Exception $ex) {
