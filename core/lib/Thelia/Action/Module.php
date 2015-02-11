@@ -29,8 +29,10 @@ use Thelia\Core\Event\Order\OrderPaymentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Exception\FileNotFoundException;
 use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\OrderQuery;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\BaseModule;
@@ -147,10 +149,10 @@ class Module extends BaseAction implements EventSubscriberInterface
 
     public function delete(ModuleDeleteEvent $event)
     {
-        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
-            $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
-            $con->beginTransaction();
+        $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
+        $con->beginTransaction();
 
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId(), $con)) {
             try {
                 if (null === $module->getFullNamespace()) {
                     throw new \LogicException(
@@ -161,14 +163,31 @@ class Module extends BaseAction implements EventSubscriberInterface
                     );
                 }
 
-                // If module is activated, check if we can deactivate it
-                if ($module->getActivate()) {
-                    // check for modules that depend of this one
-                    $this->checkDeactivation($module);
+                // If the module is referenced by an order, display a meaningful error
+                // instead of 'delete cannot delete' caused by a constraint violation.
+                // FIXME: we hav to find a way to delete modules used by order.
+                if (
+                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                    ||
+                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                ) {
+                    throw new \LogicException(
+                        Translator::getInstance()->trans(
+                            'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
+                            ['%name%' => $module->getCode()]
+                        )
+                    );
                 }
 
                 try {
+                    // First, try to create an instance
                     $instance = $module->createInstance();
+
+                    // Then, if module is activated, check if we can deactivate it
+                    if ($module->getActivate()) {
+                        // check for modules that depend of this one
+                        $this->checkDeactivation($module);
+                    }
 
                     $instance->setContainer($this->container);
 
@@ -184,6 +203,15 @@ class Module extends BaseAction implements EventSubscriberInterface
                     Tlog::getInstance()->addWarning(
                         Translator::getInstance()->trans(
                             'Failed to create instance of module "%name%" when trying to delete module. Module directory has probably been deleted',
+                            ['%name%' => $module->getCode()]
+                        )
+                    );
+                } catch (FileNotFoundException $fnfe) {
+                    // The module directory has been deleted.
+                    // Log a warning, and delete the database entry.
+                    Tlog::getInstance()->addWarning(
+                        Translator::getInstance()->trans(
+                            'Module "%name%" directory was not found',
                             ['%name%' => $module->getCode()]
                         )
                     );
