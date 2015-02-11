@@ -17,9 +17,15 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Event\LoopOverridesEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
+use Thelia\Core\Template\Element\Overrides\ArgDefinitionOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ArgInitializationOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ParseOverrideInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Translation\Translator;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
@@ -57,6 +63,7 @@ abstract class BaseLoop
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
+    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection  */
     protected $args;
 
     protected $countable = true;
@@ -69,6 +76,12 @@ abstract class BaseLoop
     private static $cacheLoopResult = [];
     private static $cacheCount = [];
 
+    private static $cacheOverride = false;
+
+    private static $overrideArgDefinition = [];
+    private static $overrideArgInitialization = [];
+    private static $overrideBuilder = [];
+    private static $overrideParse = [];
     /**
      * Create a new Loop
      *
@@ -86,8 +99,21 @@ abstract class BaseLoop
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
 
+        if (false === self::$cacheOverride) {
+
+            $event = new LoopOverridesEvent($this);
+            $this->dispatcher->dispatch(TheliaEvents::LOOP_OVERRIDES, $event);
+
+            self::$overrideArgDefinition = $event->getArgDefinition();
+            self::$overrideArgInitialization = $event->getArgInitialization();
+            self::$overrideBuilder = $event->getBuilder();
+            self::$overrideParse = $event->getParser();
+
+            self::$cacheOverride = true;
+        }
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+        $this->overrideArgDefinitions();
     }
 
     /**
@@ -105,15 +131,20 @@ abstract class BaseLoop
         ];
 
         if (true === $this->countable) {
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createIntTypeArgument('offset', 0),
                     Argument::createIntTypeArgument('page'),
                     Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-                ]);
+                ]
+            );
         }
 
         if ($this instanceof SearchLoopInterface) {
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createAnyTypeArgument('search_term'),
                     new Argument(
                         'search_in',
@@ -124,18 +155,45 @@ abstract class BaseLoop
                     new Argument(
                         'search_mode',
                         new TypeCollection(
-                            new EnumType([
-                                SearchLoopInterface::MODE_ANY_WORD,
-                                SearchLoopInterface::MODE_SENTENCE,
-                                SearchLoopInterface::MODE_STRICT_SENTENCE,
-                            ])
+                            new EnumType(
+                                [
+                                    SearchLoopInterface::MODE_ANY_WORD,
+                                    SearchLoopInterface::MODE_SENTENCE,
+                                    SearchLoopInterface::MODE_STRICT_SENTENCE,
+                                ]
+                            )
                         ),
                         SearchLoopInterface::MODE_STRICT_SENTENCE
                     )
-                ]);
+                ]
+            );
         }
 
         return $defaultArgs;
+    }
+
+    /**
+     * @return ArgumentCollection
+     */
+    public function getArgs()
+    {
+        return $this->args;
+    }
+
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**
@@ -176,6 +234,7 @@ abstract class BaseLoop
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
 
+        $nameValuePairs = $this->overrideArgInitialization($nameValuePairs);
         $this->args->rewind();
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
@@ -393,6 +452,7 @@ abstract class BaseLoop
         $count = 0;
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->buildModelCriteria();
+            $searchModelCriteria = $this->overrideBuilder($searchModelCriteria);
             if (null === $searchModelCriteria) {
                 $count = 0;
             } else {
@@ -400,6 +460,7 @@ abstract class BaseLoop
             }
         } elseif ($this instanceof ArraySearchLoopInterface) {
             $searchArray = $this->buildArray();
+            $searchArray = $this->overrideBuilder($searchArray);
             if (null === $searchArray) {
                 $count = 0;
             } else {
@@ -432,6 +493,7 @@ abstract class BaseLoop
         if ($this instanceof PropelSearchLoopInterface) {
             $searchModelCriteria = $this->buildModelCriteria();
 
+            $searchModelCriteria = $this->overrideBuilder($searchModelCriteria);
             if (null !== $searchModelCriteria) {
                 $results = $this->search(
                     $searchModelCriteria,
@@ -441,6 +503,7 @@ abstract class BaseLoop
         } elseif ($this instanceof ArraySearchLoopInterface) {
             $searchArray = $this->buildArray();
 
+            $searchArray = $this->overrideBuilder($searchArray);
             if (null !== $searchArray) {
                 $results = $this->searchArray($searchArray);
             }
@@ -572,5 +635,54 @@ abstract class BaseLoop
      */
     protected function addOutputFields(LoopResultRow $loopResultRow, $item)
     {
+        $this->overrideParseResults($loopResultRow, $item);
+    }
+
+    protected function overrideArgDefinitions()
+    {
+        /** @var ArgDefinitionOverrideInterface $override */
+        foreach (self::$overrideArgDefinition as $override) {
+            if (null !== $args = $override->getDefinitions($this)) {
+                $this->args->addArguments($args, true);
+            }
+        }
+    }
+
+    protected function overrideArgInitialization(array $nameValuePairs)
+    {
+        $args = [];
+
+        /** @var ArgInitializationOverrideInterface $override */
+        foreach (self::$overrideArgInitialization as $override) {
+            $args = array_merge(
+                $args,
+                $override->initialize($this, $nameValuePairs)
+            );
+        }
+
+        if (!empty($args)) {
+            $nameValuePairs = array_merge($nameValuePairs, $args);
+        }
+
+        return $nameValuePairs;
+    }
+
+    protected function overrideBuilder($search)
+    {
+        foreach (self::$overrideBuilder as $override) {
+            $search = $override->build($this, $search);
+        }
+
+        return $search;
+    }
+
+    protected function overrideParseResults(LoopResultRow $loopResultRow, $item)
+    {
+        /** @var ParseOverrideInterface $override */
+        foreach (self::$overrideParse as $override) {
+            $loopResultRow = $override->parse($this, $loopResultRow, $item);
+        }
+
+        return $loopResultRow;
     }
 }
