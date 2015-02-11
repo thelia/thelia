@@ -40,5 +40,10 @@ class OrderStatusQuery extends BaseOrderStatusQuery
     {
         return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_CANCELED);
     }
+
+    public static function getRefundedStatus()
+    {
+        return OrderStatusQuery::create()->findOneByCode(OrderStatus::CODE_REFUNDED);
+    }
 }
 // OrderStatusQuery

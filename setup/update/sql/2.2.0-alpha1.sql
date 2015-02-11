@@ -19,6 +19,16 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
   (@max_id + 1, 'en_US', 'Order - Tab', '', '')
 ;
 
+SELECT @max_id := MAX(`id`) FROM `order_status`;
+
+INSERT INTO `order_status` VALUES
+  (@max_id + 1, "refunded", NOW(), NOW())
+;
+
+INSERT INTO  `order_status_i18n` VALUES
+  (@max_id + 1, "en_US", "Refunded", "", "", ""),
+  (@max_id + 1, "fr_FR", "Remboursée", "", "", "")
+;
 
 -- new column in admin_log
 
