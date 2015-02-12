@@ -87,6 +87,23 @@ class ModuleGenerateCommand extends BaseModuleGenerate
         }
     }
 
+    protected function copyConfigFile($filename, $skeletonDir, Filesystem $fs)
+    {
+        $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . $filename;
+        if (!$fs->exists($filename)) {
+            $configContent = file_get_contents($skeletonDir . "config.xml");
+
+            $configContent = str_replace("%%CLASSNAME%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE%%", $this->module, $configContent);
+            $configContent = str_replace("%%NAMESPACE_LOWER%%", strtolower($this->module), $configContent);
+
+            file_put_contents(
+                $filename,
+                $configContent
+            );
+        }
+    }
+
     private function createFiles()
     {
         $fs = new Filesystem();
@@ -95,19 +112,10 @@ class ModuleGenerateCommand extends BaseModuleGenerate
             $skeletonDir = str_replace("/", DIRECTORY_SEPARATOR, __DIR__ . "/Skeleton/Module/");
 
             // config.xml file
-            $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Config" . DIRECTORY_SEPARATOR . "config.xml";
-            if (!$fs->exists($filename)) {
-                $configContent = file_get_contents($skeletonDir . "config.xml");
-
-                $configContent = str_replace("%%CLASSNAME%%", $this->module, $configContent);
-                $configContent = str_replace("%%NAMESPACE%%", $this->module, $configContent);
-                $configContent = str_replace("%%NAMESPACE_LOWER%%", strtolower($this->module), $configContent);
-
-                file_put_contents(
-                    $filename,
-                    $configContent
-                );
-            }
+            $this->copyConfigFile("config.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_prod.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_dev.xml", $skeletonDir, $fs);
+            $this->copyConfigFile("config_test.xml", $skeletonDir, $fs);
 
             // Readme.md file
             $filename = $this->moduleDirectory . DIRECTORY_SEPARATOR . "Readme.md";

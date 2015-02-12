@@ -17,6 +17,7 @@
 - Remove redundant * on product-edit
 - Add parameter "page_param_name" for template admin pagination.html. if "page_param_name" is empty, then the name of the parameter is "page"
 - Add "Refunded" order status
+- Add environment specific config file loading in modules
 
 # 2.1.2
 
