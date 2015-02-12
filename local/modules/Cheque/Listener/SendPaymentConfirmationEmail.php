@@ -56,7 +56,7 @@ class SendPaymentConfirmationEmail extends BaseAction implements EventSubscriber
     {
         if ($event->getOrder()->getPaymentModuleId() === Cheque::getModuleId()) {
 
-            if ($event->getOrder()->isPaid()) {
+            if ($event->getOrder()->isPaid(true)) {
 
                 $order = $event->getOrder();
 
