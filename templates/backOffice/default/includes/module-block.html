@@ -128,7 +128,7 @@
                             {ifloop rel="area-attached"}
                                 {$zones=""}
                                 {loop name="area-attached" type="area" module_id=$ID}
-                                    {$zones="{$zones}, {$NAME}"}
+                                    {$zones="`$zones`, `$NAME`"}
                                     {$zone_count=$LOOP_TOTAL}
                                 {/loop}
                                 {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count=$zone_count  zones={$zones|ltrim:', '}}}
@@ -141,14 +141,14 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs" id="config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
                         <div class="btn-group">
                             {if $EXISTS}
 
                                 {if $CONFIGURABLE == 1}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs" id="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
                                     {/loop}
                                 {/if}
 
