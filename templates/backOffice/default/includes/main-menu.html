@@ -1,7 +1,7 @@
 {hook name="main.before-top-menu" location="before_top_menu" }
 
-<nav id="main-navbar" role="navigation">
-    <button type="button" id="main-navbar-collapse">
+<nav id="main-navbar" class="open" role="navigation">
+    <button type="button" class="active" id="main-navbar-collapse">
         <span></span>
     </button>
 
@@ -13,14 +13,14 @@
         {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
             {ifhook rel="main.top-menu-customer"}
                 {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
-                    <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
+                    <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
-                        <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">
+                        <a data-toggle="collapse" href="#collapse-customer" {if $admin_current_location != 'customer'}class="collapsed"{/if}>
                             <span class="icon-customers"></span>
                             <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
                         </a>
 
-                        <ul class="dropdown-menu" role="menu">
+                        <ul id="collapse-customer" class="collapse {if $admin_current_location == 'customer'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-customer"}
                                 <li role="menuitem">
                                     <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -43,17 +43,17 @@
         {/loop}
 
         {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-            <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
+            <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <a data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
                     <span class="icon-orders"></span>
                     <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
                 </a>
 
-                <ul class="dropdown-menu" role="menu">
+                <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
 
                     <li role="menuitem">
-                        <a class="clearfix" data-target="{url path='admin/orders'}" href="{url path='admin/orders'}">
+                        <a class="clearfix" href="{url path='admin/orders'}">
                             <span class="pull-left">{intl l="All orders"}</span>
                             <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
                         </a>
@@ -84,14 +84,14 @@
         {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
             {ifhook rel="main.top-menu-catalog"}
                 {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
-                    <li class="dropdown {if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+                    <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
-                        <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">
+                        <a data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
                             <span class="icon-catalog"></span>
                             <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
                         </a>
 
-                        <ul class="dropdown-menu" role="menu">
+                        <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-catalog"}
                                 <li role="menuitem">
                                     <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -116,14 +116,14 @@
         {loop name="menu-auth-content" type="auth" role="ADMIN" resource="admin.folder"  access="VIEW"}
             {ifhook rel="main.top-menu-content"}
                 {hookblock name="main.top-menu-content" fields="id,class,url,title"}
-                    <li class="dropdown {if $admin_current_location == 'content'}active{/if}" id="contents_menu">
+                    <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
-                        <a href="{url path='/admin/folders'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">
+                        <a data-toggle="collapse" href="#collapse-content" {if $admin_current_location != 'content'}class="collapsed"{/if}>
                             <span class="icon-records"></span>
                             <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
                         </a>
 
-                        <ul class="dropdown-menu" role="menu">
+                        <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-content"}
                                 <li role="menuitem">
                                     <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -146,13 +146,13 @@
         {/loop}
 
         {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
-            <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
+                <a data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
                     <span class="icon-tools"></span>
                     <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
                 </a>
 
-                <ul class="dropdown-menu" role="menu">
+                <ul id="collapse-tools" class="collapse {if $admin_current_location == 'tools'}in{/if}" role="menu">
                     {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
                         <li role="menuitem"><a href="{url path='/admin/coupon'}">{intl l="Coupons"}</a></li>
                     {/loop}
@@ -190,13 +190,13 @@
         {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
             {ifhook rel="main.top-menu-modules"}
                 {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
-                    <li class="dropdown {if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                        <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">
+                    <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                        <a data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
                             <span class="icon-modules"></span>
                             <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
                         </a>
 
-                        <ul class="dropdown-menu" role="menu">
+                        <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-modules"}
                                 <li role="menuitem">
                                     <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
@@ -221,13 +221,13 @@
         {loop name="menu-auth-config" type="auth" role="ADMIN" resource="admin.configuration"  access="VIEW"}
             {ifhook rel="main.top-menu-configuration"}
                 {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
-                    <li class="dropdown {if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                        <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">
+                    <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
+                        <a data-toggle="collapse" href="#collapse-configuration" {if $admin_current_location != 'configuration'}class="collapsed"{/if}>
                             <span class="icon-configuration"></span>
                             <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
                         </a>
 
-                        <ul class="dropdown-menu" role="menu">
+                        <ul id="collapse-configuration" class="collapse {if $admin_current_location == 'configuration'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-configuration"}
                                 <li role="menuitem">
                                     <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
