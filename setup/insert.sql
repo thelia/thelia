@@ -3096,7 +3096,8 @@ INSERT INTO `order_status`(`id`, `code`, `created_at`, `updated_at`) VALUES
 (2, 'paid', NOW(), NOW()),
 (3, 'processing', NOW(), NOW()),
 (4, 'sent', NOW(), NOW()),
-(5, 'canceled', NOW(), NOW());
+(5, 'canceled', NOW(), NOW()),
+(6, 'refunded', NOW(), NOW());
 
 INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Not paid', '', '', ''),
@@ -3108,7 +3109,9 @@ INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`
 (4, 'en_US', 'Sent', '', '', ''),
 (4, 'fr_FR', 'Envoyée', '', '', ''),
 (5, 'en_US', 'Canceled', '', '', ''),
-(5, 'fr_FR', 'Annulée', '', '', '');
+(5, 'fr_FR', 'Annulée', '', '', ''),
+(6, 'en_US', 'Refunded', '', '', ''),
+(6, 'fr_FR', 'Remboursée', '', '', '');
 
 /**
 generated with command : php Thelia thelia:generate-resources --output sql

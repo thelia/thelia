@@ -16,6 +16,7 @@
 - Add shop language choice on install wizard
 - Remove redundant * on product-edit
 - Add parameter "page_param_name" for template admin pagination.html. if "page_param_name" is empty, then the name of the parameter is "page"
+- Add "Refunded" order status
 
 # 2.1.2
 

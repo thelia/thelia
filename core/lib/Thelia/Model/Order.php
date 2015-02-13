@@ -311,6 +311,24 @@ class Order extends BaseOrder
     }
 
     /**
+     * Set the status of the current order to REFUNDED
+     */
+    public function setRefunded()
+    {
+        $this->setStatusHelper(OrderStatus::CODE_REFUNDED);
+    }
+
+    /**
+     * Check if the current status of this order is REFUNDED
+     *
+     * @return bool true if this order is CANCELED, false otherwise.
+     */
+    public function isRefunded()
+    {
+        return $this->hasStatusHelper(OrderStatus::CODE_REFUNDED);
+    }
+
+    /**
      * Set the status of the current order to the provided status
      *
      * @param string $statusCode the status code, one of OrderStatus::CODE_xxx constants.
