@@ -13,6 +13,7 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -73,11 +74,24 @@ class CustomerUpdateForm extends BaseForm
             ))
             ->add("email", "email", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
+                    new Constraints\NotBlank(),
+                    new Constraints\Email()
                 ),
                 "label" => Translator::getInstance()->trans("Email address"),
                 "label_attr" => array(
                     "for" => "email"
+                )
+            ))
+            ->add("email_confirm", "email", array(
+                "constraints" => array(
+                    new Constraints\Email(),
+                    new Constraints\Callback(array("methods" => array(
+                        array($this, "verifyEmailField")
+                    )))
+                ),
+                "label" => Translator::getInstance()->trans("Confirm Email address"),
+                "label_attr" => array(
+                    "for" => "email_confirm"
                 )
             ))
             ->add("password", "text", array(
@@ -178,5 +192,14 @@ class CustomerUpdateForm extends BaseForm
     public function getName()
     {
         return "thelia_customer_update";
+    }
+
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if (isset($data["email_confirm"]) && $data["email"] != $data["email_confirm"]) {
+            $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
+        }
     }
 }

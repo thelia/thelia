@@ -53,6 +53,7 @@ casper.test.begin('Register', 15, function suite(test) {
             'thelia_customer_create[firstname]': 'thelia',
             'thelia_customer_create[lastname]': 'thelia',
             'thelia_customer_create[email]': 'test@thelia.net',
+            'thelia_customer_create[email_confirm]': 'test@thelia.net',
             'thelia_customer_create[phone]': '',
             'thelia_customer_create[cellphone]': '',
             'thelia_customer_create[company]': 'OpenStudio',
@@ -82,6 +83,7 @@ casper.test.begin('Register', 15, function suite(test) {
 
             this.fill('form#form-register', {
                 'thelia_customer_create[email]': newEmail,
+                'thelia_customer_create[email_confirm]': newEmail,
                 'thelia_customer_create[password]': 'thelia',
                 'thelia_customer_create[password_confirm]': 'thelia'
             }, false);
