@@ -228,14 +228,27 @@
                  * Managment of navigation toggle
                  */
                 var $menuLeft = $('#main-navbar'),
-                    $showLeftPush = $('#main-navbar-collapse'),
-                    $body = $('body');
+                        $showLeftPush = $('#main-navbar-collapse'),
+                        $body = $('body');
 
 
                 $showLeftPush.on('click', function() {
                     $showLeftPush.toggleClass('active');
                     $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
+                });
+
+                /**
+                 * Block bootstrap collapse effect on mini navigation
+                 */
+                $('[data-toggle="collapse"]', $menuLeft).each(function() {
+                    var $link = $(this);
+
+                    $link.on('click', $menuLeft, function() {
+                        if (!$menuLeft.hasClass('open')) {
+                            return false;
+                        }
+                    });
                 });
 
                 /**
