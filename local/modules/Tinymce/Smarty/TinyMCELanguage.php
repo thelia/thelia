@@ -15,7 +15,7 @@ namespace Tinymce\Smarty;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\Lang;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
@@ -30,7 +30,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
             $this->locale = $request->getSession()->getLang()->getLocale();
         } else {
             $this->locale = Lang::getDefaultLanguage()->getLocale();
-        } 
+        }
     }
 
     public function guessTinyMCELanguage($params, \Smarty_Internal_Template $template)
@@ -44,7 +44,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
 
         // Find the best matching language
         /** @var SplFileInfo $file */
-        foreach($files as $file) {
+        foreach ($files as $file) {
             $lang = str_replace('.js', '', $file->getFilename());
 
             if ($lang == $this->locale || $lang == $miniLocale) {
@@ -53,7 +53,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
         }
 
         return '';
-     }
+    }
 
     /**
      * Define the various smarty plugins hendled by this class
@@ -63,7 +63,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new \TheliaSmarty\Template\SmartyPluginDescriptor('function', 'tinymce_lang', $this, 'guessTinyMCELanguage'),
+            new SmartyPluginDescriptor('function', 'tinymce_lang', $this, 'guessTinyMCELanguage'),
         );
     }
 }
