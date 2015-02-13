@@ -319,12 +319,11 @@
                                             <td colspan="7">
                                                 {include
                                                 file = "includes/pagination.html"
-
+                                                page_param_name = "order_page"
                                                 loop_ref       = "order-list"
                                                 max_page_count = 10
-                                                page_url       = "{url path="/admin/customer/update" customer_id=$customer_id}"
+                                                page_url       = "{url path="/admin/customer/update" customer_id=$customer_id page=$page}"
                                                 }
-
                                             </td>
                                         </tr>
                                         </tfoot>
