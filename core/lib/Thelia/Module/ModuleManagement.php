@@ -16,6 +16,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use SplFileInfo;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Thelia\Exception\InvalidModuleException;
 use Thelia\Log\Tlog;
@@ -41,7 +42,7 @@ class ModuleManagement
         $this->baseModuleDir = THELIA_MODULE_DIR;
     }
 
-    public function updateModules()
+    public function updateModules(ContainerInterface $container)
     {
         $finder = new Finder();
 
@@ -53,7 +54,7 @@ class ModuleManagement
 
         foreach ($finder as $file) {
             try {
-                $this->updateModule($file);
+                $this->updateModule($file, $container);
             } catch (\Exception $ex) {
                 // Guess module code
                 $moduleCode = basename(dirname(dirname($file)));
@@ -77,13 +78,14 @@ class ModuleManagement
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function updateModule($file)
+    public function updateModule($file, ContainerInterface $container)
     {
         $descriptorValidator = $this->getDescriptorValidator();
 
         $content   = $descriptorValidator->getDescriptor($file->getRealPath());
         $reflected = new \ReflectionClass((string)$content->fullnamespace);
         $code      = basename(dirname($reflected->getFileName()));
+        $version = (string)$content->version;
 
         $module = ModuleQuery::create()->filterByCode($code)->findOne();
         if (null === $module) {
@@ -138,7 +140,7 @@ class ModuleManagement
             Tlog::getInstance()->addError("Failed to update module ".$module->getCode(), $ex);
 
             $con->rollBack();
-            throw $e;
+            throw $ex;
         }
 
         return $module;
