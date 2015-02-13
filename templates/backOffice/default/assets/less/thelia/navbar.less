@@ -8,7 +8,7 @@
 
 // Base class and wrapper
 .navbar {
-    margin-bottom: 0;
+    /*margin-bottom: 0;
     .dropdown-menu {
       > li {
         > a > .label {
@@ -19,34 +19,123 @@
     }
   .navbar-nav > li:hover{
     background-color: @active-menu;
-  }
+  }*/
 }
 
 // Inner for background effects
 // Gradient is applied to its own element because overflow visible is not honored by IE when filter is present
 .navbar-inner {
-    border-top: none;
+    /*border-top: none;
     border-radius: 0;
 
     .container{
         width: 1170px;
-    }
+    }*/
 }
 
 // Navbar button for toggling navbar items in responsive layouts
 // These definitions need to come after '.navbar .btn'
 .navbar .btn {
-	.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
+	//.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
 }
 
 .navbar-default .navbar-toggle .icon-bar{
-	background-color: @btn-primary-color;
+	//background-color: @btn-primary-color;
 }
 
 .navbar-form{
-	padding: 0;
+	//padding: 0;
 }
 
 .navbar-form-xs {
-    margin: 8px 0;
+    //margin: 8px 0;
+}
+
+#main-navbar {
+    background: @gray-dark;
+    position: fixed;
+    width: 240px;
+    height: 100%;
+    left: -240px;
+    top: 0;
+    z-index: 1000;
+    .transition(all 0.3s ease);
+    border-right: 1px solid @gray;
+    
+    &.open {
+        left: 0;
+    }
+
+    #main-navbar-collapse {
+        position: absolute;
+        left: 239px;
+        top: 35px;
+        cursor: pointer;
+        padding: 14px 30px 19px 8px;
+        background: @gray-dark;
+        border: 1px solid @gray;
+        border-radius: 0 5px 5px 0;
+        border-left-color: @gray-dark;
+
+        span {
+            &,
+            &:before,
+            &:after {
+                cursor: pointer;
+                border-radius: 1px;
+                height: 3px;
+                width: 20px;
+                background: white;
+                position: absolute;
+                display: block;
+                content: '';
+                .transition(all 0.3s ease-in-out);
+            }
+
+            &:before {
+                top: -6px;
+            }
+
+            &:after {
+                bottom: -6px;
+            }
+        }
+
+        &.active {
+            span {
+                background: none;
+
+                &:before,
+                &:after {
+                    top: 0;
+                }
+
+                &:before {
+                    transform: rotate(45deg);
+                }
+
+                &:after {
+                    transform: rotate(-45deg);
+                }
+            }
+        }
+    }
+
+    ul {
+        a {
+            display: block;
+            padding: 17px;
+            color: #fff;
+            font-size: @font-size-base;
+            .transition(all 0.3s);
+            border-bottom: 1px solid @gray;
+            font-weight: normal;
+            
+            &:hover,
+            &:focus {
+                text-decoration: none;
+                background: @gray;
+            }
+        }
+    }
 }
