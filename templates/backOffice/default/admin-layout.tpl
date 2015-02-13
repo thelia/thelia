@@ -106,6 +106,16 @@
                                      </ul>
                                 </div>
 
+                                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
+                                    <form class="navbar-form pull-right hidden-xs" action="{url path='/admin/search'}">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                                        </div>
+                                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
+                                    </form>
+                                {/loop}
+
+
                                 {hook name="main.topbar-bottom" }
 
                             </div>

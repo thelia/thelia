@@ -5,23 +5,9 @@
         <span></span>
     </button>
 
-    {*
-                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                <form class="navbar-form-xs col-xs-8 visible-xs" action="{url path='/admin/search'}">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                        <span class="input-group-btn">
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                        </span>
-                    </div>
-
-                </form>
-                {/loop}
-    *}
-
     <ul class="list-unstyled">
         <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
-            <a href="{url path='/admin/home'}">{intl l="Home"}</a>
+            <a href="{url path='/admin/home'}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
         </li>
 
         {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
@@ -29,7 +15,10 @@
                 {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
                     <li class="dropdown {if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
-                        <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Customers"} <span class="caret"></span></a>
+                        <a href="{url path='/admin/customers'}" data-target="{url path='/admin/customers'}" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-customers"></span>
+                            <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
+                        </a>
 
                         <ul class="dropdown-menu" role="menu">
                             {forhook rel="main.top-menu-customer"}
@@ -45,7 +34,10 @@
             {/ifhook}
             {elsehook rel="main.top-menu-customer"}
                 <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
-                    <a href="{url path='/admin/customers'}" >{intl l="Customers"}</a>
+                    <a href="{url path='/admin/customers'}">
+                        <span class="icon-customers"></span>
+                        <span class="item-text">{intl l="Customers"}</span>
+                    </a>
                 </li>
             {/elsehook}
         {/loop}
@@ -53,7 +45,10 @@
         {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
             <li class="dropdown {if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Orders"} <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="icon-orders"></span>
+                    <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
+                </a>
 
                 <ul class="dropdown-menu" role="menu">
 
@@ -91,7 +86,10 @@
                 {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
                     <li class="dropdown {if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
-                        <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Catalog"} <span class="caret"></span></a>
+                        <a href="{url path='/admin/catalog'}" data-target="{url path='/admin/catalog'}" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-catalog"></span>
+                            <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
+                        </a>
 
                         <ul class="dropdown-menu" role="menu">
                             {forhook rel="main.top-menu-catalog"}
@@ -107,7 +105,10 @@
             {/ifhook}
             {elsehook rel="main.top-menu-catalog"}
                 <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
-                    <a href="{url path='/admin/catalog'}">{intl l="Catalog"}</a>
+                    <a href="{url path='/admin/catalog'}">
+                        <span class="icon-catalog"></span>
+                        <span class="item-text">{intl l="Catalog"}</span>
+                    </a>
                 </li>
             {/elsehook}
         {/loop}
@@ -117,7 +118,10 @@
                 {hookblock name="main.top-menu-content" fields="id,class,url,title"}
                     <li class="dropdown {if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
-                        <a href="{url path='/admin/folders'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Folders"} <span class="caret"></span></a>
+                        <a href="{url path='/admin/folders'}" data-target="{url path='/admin/contents'}" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-records"></span>
+                            <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
+                        </a>
 
                         <ul class="dropdown-menu" role="menu">
                             {forhook rel="main.top-menu-content"}
@@ -133,14 +137,20 @@
             {/ifhook}
             {elsehook rel="main.top-menu-content"}
                 <li class="{if $admin_current_location == 'folder'}active{/if}" id="contents_menu">
-                    <a href="{url path='/admin/folders'}" >{intl l="Folders"}</a>
+                    <a href="{url path='/admin/folders'}">
+                        <span class="icon-records"></span>
+                        <span class="item-text">{intl l="Folders"}</span>
+                    </a>
                 </li>
             {/elsehook}
         {/loop}
 
         {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
             <li class="dropdown {if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{intl l="Tools"} <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <span class="icon-tools"></span>
+                    <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
+                </a>
 
                 <ul class="dropdown-menu" role="menu">
                     {loop name="auth-coupon" type="auth" role="ADMIN" resource="admin.coupon"  access="VIEW"}
@@ -181,7 +191,10 @@
             {ifhook rel="main.top-menu-modules"}
                 {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
                     <li class="dropdown {if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                        <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Modules"}<span class="caret"></span></a>
+                        <a href="{url path='/admin/modules'}" data-target="{url path='/admin/modules'}" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-modules"></span>
+                            <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
+                        </a>
 
                         <ul class="dropdown-menu" role="menu">
                             {forhook rel="main.top-menu-modules"}
@@ -197,7 +210,10 @@
             {/ifhook}
             {elsehook rel="main.top-menu-modules"}
                 <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                    <a href="{url path='/admin/modules'}" >{intl l="Modules"}</a>
+                    <a href="{url path='/admin/modules'}">
+                        <span class="icon-modules"></span>
+                        <span class="item-text">{intl l="Modules"}</span>
+                    </a>
                 </li>
             {/elsehook}
         {/loop}
@@ -206,7 +222,10 @@
             {ifhook rel="main.top-menu-configuration"}
                 {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
                     <li class="dropdown {if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                        <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">{intl l="Configuration"}<span class="caret"></span></a>
+                        <a href="{url path='/admin/configuration'}" data-target="{url path='/admin/configuration'}" class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="icon-configuration"></span>
+                            <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
+                        </a>
 
                         <ul class="dropdown-menu" role="menu">
                             {forhook rel="main.top-menu-configuration"}
@@ -222,7 +241,10 @@
             {/ifhook}
             {elsehook rel="main.top-menu-configuration"}
                 <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                    <a href="{url path='/admin/configuration'}" >{intl l="Configuration"}</a>
+                    <a href="{url path='/admin/configuration'}">
+                        <span class="icon-configuration"></span>
+                        <span class="item-text">{intl l="Configuration"}</span>
+                    </a>
                 </li>
             {/elsehook}
         {/loop}
@@ -231,18 +253,6 @@
         {hook name="main.in-top-menu-items" location="in_top_menu_items" }
 
     </ul>
-
-    {*
-    {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-        <form class="navbar-form pull-right hidden-xs" action="{url path='/admin/search'}">
-            <div class="form-group">
-                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-            </div>
-            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-        </form>
-    {/loop}
-    *}
-
 
 </nav>
 
