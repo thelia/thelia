@@ -143,9 +143,9 @@
                })
                .success(function() {
             	   if (is_checked)
-            		   $('#config-btn-' + module_id).removeClass('disabled');
+            		   $('.config-btn-' + module_id).removeClass('disabled');
             	   else
-                       $('#config-btn-' + module_id).addClass('disabled');
+                       $('.config-btn-' + module_id).addClass('disabled');
 
                })
                .fail(function(jqXHR, textStatus, errorThrown){
