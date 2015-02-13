@@ -1,7 +1,7 @@
 {hook name="main.before-top-menu" location="before_top_menu" }
 
-<nav id="main-navbar" class="open" role="navigation">
-    <button type="button" class="active" id="main-navbar-collapse">
+<nav id="main-navbar" class="closed" role="navigation">
+    <button type="button" id="main-navbar-collapse">
         <span></span>
     </button>
 
@@ -43,64 +43,64 @@
         {/loop}
 
         {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
-            <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
+        <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-                <a data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
-                    <span class="icon-orders"></span>
-                    <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
-                </a>
+            <a data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
+                <span class="icon-orders"></span>
+                <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
+            </a>
 
-                <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
+            <ul id="collapse-orders" class="collapse {if $admin_current_location == 'order'}in{/if}" role="menu">
 
+                <li role="menuitem">
+                    <a class="clearfix" href="{url path='admin/orders'}">
+                        <span class="pull-left">{intl l="All orders"}</span>
+                        <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                    </a>
+                </li>
+
+                {loop name="order-status-list" type="order-status"}
+                    {assign "orderStatusLabel" "order_$CODE"}
                     <li role="menuitem">
-                        <a class="clearfix" href="{url path='admin/orders'}">
-                            <span class="pull-left">{intl l="All orders"}</span>
-                            <span class="label label-default pull-right">{count type="order" customer="*" backend_context="1"}</span>
+                        <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
+                            <span class="pull-left">{$TITLE}</span>
+                            <span class="label label-{#$orderStatusLabel#|default:${"order_$CODE"}} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
                         </a>
                     </li>
+                {/loop}
+                {hookblock name="main.top-menu-order" fields="id,class,url,title"}
+                    {forhook rel="main.top-menu-order"}
+                        <li role="menuitem">
+                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                {$title}
+                            </a>
+                        </li>
+                    {/forhook}
+                {/hookblock}
+            </ul>
+        </li>
+        {/loop}
 
-                    {loop name="order-status-list" type="order-status"}
-                        {assign "orderStatusLabel" "order_$CODE"}
-                            <li role="menuitem">
-                                <a class="clearfix" data-target="{url path="admin/orders/$LABEL"}" href="{url path="admin/orders" status={$ID}}">
-                                    <span class="pull-left">{$TITLE}</span>
-                                    <span class="label label-{#$orderStatusLabel#|default:${"order_$CODE"}} pull-right">{count type="order" customer="*" backend_context="1" status={$ID}}</span>
-                                </a>
-                            </li>
-                    {/loop}
-                    {hookblock name="main.top-menu-order" fields="id,class,url,title"}
-                        {forhook rel="main.top-menu-order"}
+        {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
+            {ifhook rel="main.top-menu-catalog"}
+                {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
+                <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
+
+                    <a data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
+                        <span class="icon-catalog"></span>
+                        <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
+                    </a>
+
+                    <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
+                        {forhook rel="main.top-menu-catalog"}
                             <li role="menuitem">
                                 <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
                                     {$title}
                                 </a>
                             </li>
                         {/forhook}
-                    {/hookblock}
-                </ul>
-            </li>
-        {/loop}
-
-        {loop name="menu-auth-catalog" type="auth" role="ADMIN" resource="admin.category" access="VIEW"}
-            {ifhook rel="main.top-menu-catalog"}
-                {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
-                    <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
-
-                        <a data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
-                            <span class="icon-catalog"></span>
-                            <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
-                        </a>
-
-                        <ul id="collapse-catalog" class="collapse {if $admin_current_location == 'catalog'}in{/if}" role="menu">
-                            {forhook rel="main.top-menu-catalog"}
-                                <li role="menuitem">
-                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                        {$title}
-                                    </a>
-                                </li>
-                            {/forhook}
-                        </ul>
-                    </li>
+                    </ul>
+                </li>
                 {/hookblock}
             {/ifhook}
             {elsehook rel="main.top-menu-catalog"}
@@ -125,11 +125,11 @@
 
                         <ul id="collapse-content" class="collapse {if $admin_current_location == 'content'}in{/if}" role="menu">
                             {forhook rel="main.top-menu-content"}
-                                <li role="menuitem">
-                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                        {$title}
-                                    </a>
-                                </li>
+                            <li role="menuitem">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
                             {/forhook}
                         </ul>
                     </li>
@@ -182,7 +182,6 @@
                             </li>
                         {/forhook}
                     {/hookblock}
-
                 </ul>
             </li>
         {/loop}
@@ -190,22 +189,22 @@
         {loop name="menu-auth-modules" type="auth" role="ADMIN" resource="admin.module"  access="VIEW"}
             {ifhook rel="main.top-menu-modules"}
                 {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
-                    <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                        <a data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
-                            <span class="icon-modules"></span>
-                            <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
-                        </a>
+                <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
+                    <a data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
+                        <span class="icon-modules"></span>
+                        <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
+                    </a>
 
-                        <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
-                            {forhook rel="main.top-menu-modules"}
-                                <li role="menuitem">
-                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
-                                        {$title}
-                                    </a>
-                                </li>
-                            {/forhook}
-                        </ul>
-                    </li>
+                    <ul id="collapse-modules" class="collapse {if $admin_current_location == 'modules'}in{/if}" role="menu">
+                        {forhook rel="main.top-menu-modules"}
+                            <li role="menuitem">
+                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                    {$title}
+                                </a>
+                            </li>
+                        {/forhook}
+                    </ul>
+                </li>
                 {/hookblock}
             {/ifhook}
             {elsehook rel="main.top-menu-modules"}
