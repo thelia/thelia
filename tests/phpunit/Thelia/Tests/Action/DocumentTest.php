@@ -190,7 +190,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $document = new Document($this->getFileManager());
 
         // mock cache configuration.
-        $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
+        $config = ConfigQuery::create()->filterByName(Document::CONFIG_DELIVERY_MODE)->findOne();
 
         if ($config != null) {
             $oldval = $config->getValue();
@@ -221,7 +221,7 @@ class DocumentTest extends \Thelia\Tests\TestCaseWithURLToolSetup
         $document = new Document($this->getFileManager());
 
         // mock cache configuration.
-        $config = ConfigQuery::create()->filterByName('original_document_delivery_mode')->findOne();
+        $config = ConfigQuery::create()->filterByName(Document::CONFIG_DELIVERY_MODE)->findOne();
 
         if ($config != null) {
             $oldval = $config->getValue();
