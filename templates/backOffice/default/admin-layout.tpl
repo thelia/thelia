@@ -107,7 +107,7 @@
                                 </div>
 
                                 {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                                    <form class="navbar-form pull-right hidden-xs" action="{url path='/admin/search'}">
+                                    <form class="navbar-form pull-right hidden-xs hidden-sm" action="{url path='/admin/search'}">
                                         <div class="form-group">
                                             <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
                                         </div>
@@ -243,23 +243,16 @@
                     var $link = $(this);
 
                     $link.on('click', $menuLeft, function() {
-                        if (!$menuLeft.hasClass('open')) {
+                        if (!$menuLeft.hasClass('open') && $(window).innerWidth > 991) {
                             return false;
                         }
                     });
                 });
 
-                /**
-                 * Block bootstrap collapse effect on mini navigation
-                 */
-                $('[data-toggle="collapse"]', $menuLeft).each(function() {
-                    var $link = $(this);
-
-                    $link.on('click', $menuLeft, function() {
-                        if (!$menuLeft.hasClass('open')) {
-                            return false;
-                        }
-                    });
+                var $showTop = $('#main-navbar-collapse-mobile');
+                $showTop.on('click', function() {
+                    $showTop.toggleClass('active');
+                    $menuLeft.toggleClass('open').toggleClass('closed');
                 });
             });
         })(jQuery);
