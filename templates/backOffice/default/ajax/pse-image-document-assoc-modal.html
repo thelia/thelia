@@ -32,7 +32,7 @@
                                         {if $item.is_associated}
                                             <i class='glyphicon glyphicon-ok product-pse-image-join-glyphicon'></i>
                                         {/if}
-                                        <img data-id='{$item.id}' class='img-responsive do-associate {if $item.is_associated}is-associated{/if}' src='{$item.url}' alt='{$item.title}' />
+                                        <img data-id='{$item.id}' class='img-responsive do-associate {if $item.is_associated}is-associated{/if}' src='{$item.url nofilter}' alt='{$item.title}' />
                                     </div>
                                 </div>
 

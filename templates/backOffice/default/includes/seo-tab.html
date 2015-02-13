@@ -16,14 +16,14 @@
 
         {form_hidden_fields form=$form}
 
-        {render_form_field form=$form field="success_url" value="{$success_url}"}
+        {render_form_field form=$form field="success_url" value="{$success_url nofilter}"}
 
         {* Display error message if exist *}
         {include file='includes/notifications.html' message=$form_error_message type="danger"}
 
         {custom_render_form_field form=$form field='url'}
             <div class="input-group">
-                <span class="input-group-addon">{$url_language|default:{config key="url_site"}}/</span>
+                <span class="input-group-addon">{$url_language|default:{config key="url_site"} nofilter}/</span>
                 <input type="text" {form_field_attributes form=$form field='url'}>
             </div>
         {/custom_render_form_field}

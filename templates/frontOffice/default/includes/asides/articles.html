@@ -9,7 +9,7 @@
         <nav class="nav-categories">
             <ul id="category" class="accordion">
                 {loop name="blog.article"  type="content" current_folder="yes" exclude="{content attr="id"}"}
-                    <li><a href="{$URL}">{$TITLE}</a></li>
+                    <li><a href="{$URL nofilter}">{$TITLE}</a></li>
                 {/loop}
             </ul>
         </nav>

@@ -2,7 +2,7 @@
 {default_translation_domain domain='bo.default'}
 
 {form name="thelia.import"}
-<form action="{$URL}" method="post" {form_enctype form=$form}>
+<form action="{$URL nofilter}" method="post" {form_enctype form=$form}>
     {form_hidden_fields form=$form}
     <div class="modal fade" id="real-import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label" aria-hidden="true">
         <div class="modal-dialog">

@@ -18,7 +18,7 @@
                     <tr>
                         <td class="image">
                             {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="60"}
-                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                             {/loop}
                         </td>
                         <td class="product">

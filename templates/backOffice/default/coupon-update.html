@@ -47,12 +47,12 @@
         $(function($){
 
             // Url alowing to get coupon inputs
-            $.couponManager.urlAjaxSaveConditions = '{$urlAjaxSaveConditions}';
-            $.couponManager.urlAjaxDeleteConditions = '{$urlAjaxDeleteConditions}';
-            $.couponManager.urlAjaxGetConditionSummaries = '{$urlAjaxGetConditionSummaries}';
-            $.couponManager.urlAjaxAdminCouponDrawInputs = '{$urlAjaxAdminCouponDrawInputs}';
-            $.couponManager.urlAjaxGetConditionInputFromServiceId = '{$urlAjaxGetConditionInputFromServiceId}';
-            $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '{$urlAjaxGetConditionInputFromConditionInterface}';
+            $.couponManager.urlAjaxSaveConditions = '{$urlAjaxSaveConditions nofilter}';
+            $.couponManager.urlAjaxDeleteConditions = '{$urlAjaxDeleteConditions nofilter}';
+            $.couponManager.urlAjaxGetConditionSummaries = '{$urlAjaxGetConditionSummaries nofilter}';
+            $.couponManager.urlAjaxAdminCouponDrawInputs = '{$urlAjaxAdminCouponDrawInputs nofilter}';
+            $.couponManager.urlAjaxGetConditionInputFromServiceId = '{$urlAjaxGetConditionInputFromServiceId nofilter}';
+            $.couponManager.urlAjaxGetConditionInputFromConditionInterface = '{$urlAjaxGetConditionInputFromConditionInterface nofilter}';
             $.couponManager.intlPleaseRetry = '{intl l='Something goes wrong, please try again' js=1}';
             $.couponManager.intlPleaseSelectAnotherCondition = '{intl l='Please select another condition' js=1}';
             $.couponManager.intlDoYouReallyWantToSetCouponAvailableForEveryOne = '{intl l='Do you really want to set this coupon available to everyone ?' js=1}';

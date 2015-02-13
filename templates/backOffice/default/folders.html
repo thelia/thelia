@@ -104,7 +104,7 @@
 
                                     <td>
                                         {loop type="image" name="folder_image" source="folder" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path='admin/folders' parent=$OBJECT_ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL}" alt="{$TITLE}" /></a>
+                                            <a href="{url path='admin/folders' parent=$OBJECT_ID}" title="{intl l='Browse this folder'}"><img class="img-thumbnail" src="{$IMAGE_URL nofilter}" alt="{$TITLE}" /></a>
                                         {/loop}
                                     </td>
 
@@ -266,7 +266,7 @@
                                     <td>
                                         {loop type="image" name="folder_image" source="content" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
                                             <a href="{url path="admin/content/update/$OBJECT_ID"}" title="{intl l='Edit this content'}">
-                                                <img src="{$IMAGE_URL}" alt="{$TITLE}" />
+                                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                             </a>
                                         {/loop}
 

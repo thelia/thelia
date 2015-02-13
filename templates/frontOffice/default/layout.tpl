@@ -208,7 +208,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                         {$folder_information={config key="information_folder_id"}}
                         {if $folder_information}
                             {loop name="footer_links" type="content" folder=$folder_information}
-                                <li><a href="{$URL}">{$TITLE}</a></li>
+                                <li><a href="{$URL nofilter}">{$TITLE}</a></li>
                             {/loop}
                         {/if}
                         <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>

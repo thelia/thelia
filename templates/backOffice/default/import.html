@@ -56,17 +56,17 @@
                                         <thead>
                                             <tr>
                                                 <th class="col-md-1">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=id{if $import_order == "id"}_reverse{/if}">
                                                         {intl l="ID"}
                                                     </a>
                                                 </th>
                                                 <th class="col-md-8">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=alpha{if $import_order == "alpha"}_reverse{/if}">
                                                         {intl l="Name"}
                                                     </a>
                                                 </th>
                                                 <th class="col-md-2">
-                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
+                                                    <a href="{url path="/admin/import"}?{if $url_category}{$url_category nofilter}&{/if}import_order=manual{if $import_order == "manual"}_reverse{/if}">
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>
@@ -82,7 +82,7 @@
                                                     {$ID}
                                                 </td>
                                                 <td>
-                                                    <a href="#category_{$category_title}" class="btn-show-import-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
+                                                    <a href="#category_{$category_title}" class="btn-show-import-modal" data-id="{$ID}" data-url="{$URL nofilter}">{$TITLE}</a>
                                                 </td>
                                                 <td>
                                                     {admin_position_block
@@ -97,7 +97,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL}" title="{intl l="Do this import"}">
+                                                        <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this import"}">
                                                             <span class="glyphicon glyphicon-open"></span>
                                                         </a>
                                                     </div>
