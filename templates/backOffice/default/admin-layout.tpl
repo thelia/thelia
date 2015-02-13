@@ -56,7 +56,7 @@
     <![endif]-->
 </head>
 
-<body>
+<body class="push-to-right">
 	{* display top bar only if admin is connected *}
 
 	{loop name="top-bar-auth" type="auth" role="ADMIN"}
@@ -222,26 +222,34 @@
                     });
                 }
 
+                /**
+                 * Managment of navigation toggle
+                 */
                 var $menuLeft = $('#main-navbar'),
                     $showLeftPush = $('#main-navbar-collapse'),
                     $body = $('body');
 
 
                 $showLeftPush.on('click', function() {
-                    $(this).toggleClass('active' );
+                    $showLeftPush.toggleClass('active');
                     $body.toggleClass('push-to-right');
-                    $menuLeft.toggleClass('open');
-                    disableOther('showLeftPush');
+                    $menuLeft.toggleClass('open').toggleClass('closed');
+                });
+
+                /**
+                 * Block bootstrap collapse effect on mini navigation
+                 */
+                $('[data-toggle="collapse"]', $menuLeft).each(function() {
+                    var $link = $(this);
+
+                    $link.on('click', $menuLeft, function() {
+                        if (!$menuLeft.hasClass('open')) {
+                            return false;
+                        }
+                    });
                 });
             });
         })(jQuery);
-
-        function disableOther( button ) {
-
-            if( button !== 'showLeftPush' ) {
-                $showLeftPush.toggleClass('disabled');
-            }
-        }
     </script>
 
 	{* Modules scripts are included now *}

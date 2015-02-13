@@ -60,12 +60,12 @@
     top: 0;
     z-index: 1000;
     .transition(all 0.3s ease);
-    //border-right: 1px solid @gray;
     padding-top: 50px;
 
-    ul > li {
-        > a {
+    > ul > li {
+        position: relative;
 
+        > a {
             text-align: right;
 
             .item-text {
@@ -84,8 +84,10 @@
     &.open {
         left: 0;
 
-        ul > li > a {
-            text-align: left;
+        ul > li {
+            > a {
+                text-align: left;
+            }
         }
 
         .item-text {
@@ -93,56 +95,23 @@
         }
     }
 
-    #main-navbar-collapse {
-        position: absolute;
-        left: 239px;
-        top: 65px;
-        cursor: pointer;
-        padding: 14px 30px 19px 8px;
-        background: #26272B;
-        border: 1px solid @gray;
-        border-radius: 0 5px 5px 0;
-        border-left-color: @gray-dark;
-
-        span {
-            &,
-            &:before,
-            &:after {
-                cursor: pointer;
-                border-radius: 1px;
-                height: 3px;
-                width: 20px;
-                background: white;
-                position: absolute;
-                display: block;
-                content: '';
-                .transition(all 0.3s ease-in-out);
-            }
-
-            &:before {
-                top: -6px;
-            }
-
-            &:after {
-                bottom: -6px;
-            }
+    &.closed {
+        .collapse {
+            position: absolute;
+            top: 0;
+            right: 0px;
+            width: 240px;
+            .opacity(0);
+            .transition(all 0.3s ease);
+            display: block;
         }
 
-        &.active {
-            span {
-                background: none;
-
-                &:before,
-                &:after {
-                    top: 0;
-                }
-
-                &:before {
-                    transform: rotate(45deg);
-                }
-
-                &:after {
-                    transform: rotate(-45deg);
+        ul > li {
+            &:hover {
+                .collapse {
+                    height: auto !important;
+                    right: -240px;
+                    .opacity(1);
                 }
             }
         }
@@ -157,7 +126,7 @@
             .transition(all 0.3s);
             border-bottom: 1px solid @gray;
             font-weight: normal;
-            
+
             &:hover,
             &:focus {
                 text-decoration: none;
@@ -167,11 +136,103 @@
             [class^="icon-"], [class*=" icon-"] {
                 margin-right: 10px;
             }
+
+            &.collapsed {
+                .caret {
+                    .rotate(0deg);
+                }
+            }
+
+            .caret {
+                .rotate(-180deg);
+                .transition(all 0.3s ease-in);
+            }
         }
 
         li:first-child {
             a {
                 border-top: 1px solid @gray;
+            }
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            background: #000;
+
+            a {
+                font-size: @font-size-base - 1;
+
+                &:hover,
+                &:focus {
+                    background: #333;
+                }
+            }
+
+            li {
+                display: inline;
+                width: 100%;
+
+                &:first-child {
+                    a {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+    }
+}
+
+#main-navbar-collapse {
+    position: absolute;
+    left: 239px;
+    top: 65px;
+    cursor: pointer;
+    padding: 14px 30px 19px 8px;
+    background: #26272B;
+    border: 1px solid @gray;
+    border-radius: 0 5px 5px 0;
+    border-left-color: @gray-dark;
+
+    span {
+        &,
+        &:before,
+        &:after {
+            cursor: pointer;
+            border-radius: 1px;
+            height: 3px;
+            width: 20px;
+            background: white;
+            position: absolute;
+            display: block;
+            content: '';
+            .transition(all 0.3s ease-in-out);
+        }
+
+        &:before {
+            top: -6px;
+        }
+
+        &:after {
+            bottom: -6px;
+        }
+    }
+
+    &.active {
+        span {
+            background: none;
+
+            &:before,
+            &:after {
+                top: 0;
+            }
+
+            &:before {
+                transform: rotate(45deg);
+            }
+
+            &:after {
+                transform: rotate(-45deg);
             }
         }
     }
