@@ -28,6 +28,7 @@
 - Do not register previous url on XmlHttpRequest
 - Fix deploy image directory destination
 - Fix redirect response if a AuthenticationException is catched
+- The PaymentModule log default level is now INFO instead of ERROR
 
 # 2.1.1
 
