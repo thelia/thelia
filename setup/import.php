@@ -51,6 +51,9 @@ if (!$bootstraped) {
         require $bootstrapFile;
     } elseif (is_file($file = __DIR__ . '/../core/vendor/autoload.php')) {
         require $file;
+    } elseif (is_file($file = __DIR__ . '/../../bootstrap.php')) {
+        // Here we are on a thelia/thelia-project
+        require $file;
     } else {
         echo "No autoload file found. Please use the -b argument to include yours";
         exit(1);
