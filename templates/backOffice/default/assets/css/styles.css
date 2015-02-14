@@ -1287,3 +1287,4 @@ ul.document-list>li{padding:5px;line-height:1.428571429;border-top:1px solid #dd
 .product-pse-image-container{position:relative;width:100px;height:75px}.product-pse-image-container>.is-associated{box-shadow:0 0 5px 0 #f39922}
 .product-pse-image-container>img{cursor:pointer}
 .product-pse-image-join-glyphicon{position:absolute;right:0;color:#f39922}
+#orders_menu .dropdown-menu{min-width: 230px;}
