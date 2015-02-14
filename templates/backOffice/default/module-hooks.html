@@ -101,10 +101,14 @@
                     <div class="title title-without-tabs">
                         {$ID}. {$TITLE} (<span class="text-lowercase">{$CODE}</span>)
                         <div class="text-right pull-right">
+                            <a class="btn btn-primary action-btn add-to-hook-btn" title="{intl l='Add a new module to this hook'}" data-hook-id="{$ID}" href="#add_module_hook_dialog" data-toggle="modal">
+                                <span class="glyphicon glyphicon-plus-sign"></span>
+                            </a>
+
                             <a class="btn btn-primary action-edit-hook-btn" href="{url path="/admin/hook/update/{$ID}" }" title="{intl l='Change this hook'}">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </a>
-                            <a class="btn btn-primary action-info-btn" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
+                            <a class="btn btn-info action-info-btn" data-target="#hook-info-{$ID}" title="{intl l='Information on this hook'}" href="#hook-info-{$ID}">
                                 <span class="glyphicon glyphicon-info-sign"></span>
                             </a>
                         </div>
@@ -171,26 +175,35 @@
 
     {render_form_field form=$form field="module_id"}
     {render_form_field form=$form field="hook_id"}
-    {render_form_field form=$form field="classname"}
-    {render_form_field form=$form field="method"}
+
+    {custom_render_form_field form=$form field='classname'}
+        <select {form_field_attributes form=$form field='classname'} >
+        </select>
+    {/custom_render_form_field}
+
+
+    {custom_render_form_field form=$form field='method'}
+        <select {form_field_attributes form=$form field='method'} >
+        </select>
+    {/custom_render_form_field}
 
     {hook name="module-hook.create-form" location="module_hook_create_form" }
 
 {/capture}
 
 {include
-file = "includes/generic-create-dialog.html"
+    file = "includes/generic-create-dialog.html"
 
-dialog_id    = "add_module_hook_dialog"
-dialog_title = {intl l="Add a module to a hook"}
-dialog_body  = {$smarty.capture.module_hook_creation_dialog nofilter}
+    dialog_id    = "add_module_hook_dialog"
+    dialog_title = {intl l="Add a module to a hook"}
+    dialog_body  = {$smarty.capture.module_hook_creation_dialog nofilter}
 
-dialog_ok_label     = {intl l="Put module in hook"}
-dialog_cancel_label = {intl l="Cancel"}
+    dialog_ok_label     = {intl l="Put module in hook"}
+    dialog_cancel_label = {intl l="Cancel"}
 
-form_action        = {url path='/admin/module-hooks/create'}
-form_enctype       = {form_enctype form=$form}
-form_error_message = $form_error_message
+    form_action        = {url path='/admin/module-hooks/create'}
+    form_enctype       = {form_enctype form=$form}
+    form_error_message = $form_error_message
 }
 {/form}
 
@@ -402,8 +415,23 @@ form_error_message = $form_error_message
 
             filterProcess();
         });
-    </script>
 
+        // Pre-select hook name in creation dialog when "Add to this Hook" button is clicked
+        $('.add-to-hook-btn').click(function(ev) {
+            $('#hook_id').val($(this).data('hook-id'));
+        });
+
+        // Force getting the classname for the current module
+        $('#add_module_hook_dialog').on('show.bs.modal', function() {
+            $("#module_id").change();
+        });
+
+        // We do not have current values for classname and method selects
+        var currentClassname = "";
+        var currentMethod = "";
+
+        {include file="includes/hook-edition.js.inc"}
+    </script>
 {/block}
 
 {block name="javascript-last-call"}

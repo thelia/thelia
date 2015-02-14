@@ -144,6 +144,7 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                     ->set("MODULE_ID", $moduleHook->getModuleId())
                     ->set("MODULE_TITLE", $moduleHook->getModule()->getTitle())
                     ->set("CLASSNAME", $moduleHook->getClassname())
+                    ->set("METHOD", $moduleHook->getMethod())
                     ->set("ACTIVE", $moduleHook->getActive())
                     ->set("HOOK_ACTIVE", $moduleHook->getHookActive())
                     ->set("MODULE_ACTIVE", $moduleHook->getModuleActive())

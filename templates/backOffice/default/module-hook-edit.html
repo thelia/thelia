@@ -54,8 +54,17 @@
                                         {render_form_field form=$form field="active"}
                                     </div>
                                     <div class="col-md-6">
-                                        {render_form_field form=$form field="classname"}
-                                        {render_form_field form=$form field="method"}
+
+                                        {custom_render_form_field form=$form field='classname'}
+                                            <select {form_field_attributes form=$form field='classname'} >
+                                            </select>
+                                        {/custom_render_form_field}
+
+
+                                        {custom_render_form_field form=$form field='method'}
+                                            <select {form_field_attributes form=$form field='method'} >
+                                            </select>
+                                        {/custom_render_form_field}
                                     </div>
                                 </div>
                             </form>
@@ -80,6 +89,22 @@
         </div>
     </div>
 </div>
+{/block}
+
+{block name="javascript-initialization"}
+    <script>
+        (function($) {
+            // Declare current values for classname and method selects
+            {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+                var currentClassname = "{$CLASSNAME}";
+                var currentMethod = "{$METHOD}";
+            {/loop}
+
+            {include file="includes/hook-edition.js.inc"}
+
+            $('#module_id').change();
+        })(jQuery);
+    </script>
 {/block}
 
 {block name="javascript-last-call"}

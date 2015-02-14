@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Thelia\Core\Hook\HookDefinition;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Log\Tlog;
+use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\HookQuery;
 use Thelia\Model\ModuleHookQuery;
@@ -183,17 +184,25 @@ class RegisterListenersPass implements CompilerPassInterface
             ->findOne();
 
         if (null === $moduleHook) {
-            // hook for module doesn't exist, we add it with default registered values
-            $moduleHook = new ModuleHook();
-            $moduleHook->setHook($hook)
-                ->setModuleId($module)
-                ->setClassname($id)
-                ->setMethod($event['method'])
-                ->setActive($active)
-                ->setHookActive(true)
-                ->setModuleActive(true)
-                ->setPosition(ModuleHook::MAX_POSITION)
-                ->save();
+            // Assign the module to the hook only if it has not been "deleted"
+            $ignoreCount = IgnoredModuleHookQuery::create()
+                ->filterByHook($hook)
+                ->filterByModuleId($module)
+                ->count();
+
+            if (0 === $ignoreCount) {
+                // hook for module doesn't exist, we add it with default registered values
+                $moduleHook = new ModuleHook();
+                $moduleHook->setHook($hook)
+                    ->setModuleId($module)
+                    ->setClassname($id)
+                    ->setMethod($event['method'])
+                    ->setActive($active)
+                    ->setHookActive(true)
+                    ->setModuleActive(true)
+                    ->setPosition(ModuleHook::MAX_POSITION)
+                    ->save();
+            }
         }
     }
 

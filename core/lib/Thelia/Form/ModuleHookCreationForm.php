@@ -17,8 +17,10 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Base\ModuleHookQuery;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
+use Thelia\Model\IgnoredModuleHookQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -45,7 +47,10 @@ class ModuleHookCreationForm extends BaseForm
                     ),
                     "label" => Translator::getInstance()->trans("Module"),
                     "label_attr" => array(
-                        "for" => "module_id"
+                        "for" => "module_id",
+                        "help" => Translator::getInstance()->trans(
+                            "Only hookable modules are displayed in this menu."
+                        )
                     )
                 )
             )
@@ -115,10 +120,19 @@ class ModuleHookCreationForm extends BaseForm
     {
         $choices = array();
         $modules = ModuleQuery::getActivated();
+
         /** @var Module $module */
         foreach ($modules as $module) {
-            $choices[$module->getId()] = $module->getTitle();
+            // Check if module defines a hook ID
+            if (ModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
+                ||
+                IgnoredModuleHookQuery::create()->filterByModuleId($module->getId())->count() > 0
+            ) {
+                $choices[$module->getId()] = $module->getTitle();
+            }
         }
+
+        asort($choices);
 
         return $choices;
     }
