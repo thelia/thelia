@@ -1,3 +1,4 @@
+{default_translation_domain domain='email.default'}
 {intl l="Hello,"}
 
 {intl l="Your account at %store_name has been changed by one of our managers." store_name={config key="store_name"}}.
