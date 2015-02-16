@@ -94,7 +94,7 @@
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             {custom_render_form_field form=$form field='html_message'}
-                                                                <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value}</textarea>
+                                                                <textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
                                                                 <div id="{$name}" style="height: 500px;">{$value}</div>
                                                             {/custom_render_form_field}
                                                         </div>
