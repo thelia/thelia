@@ -41,6 +41,12 @@ use Thelia\Tools\URL;
  */
 class Document extends BaseCachedFile implements EventSubscriberInterface
 {
+
+    /**
+     * @var string Config key for document delivery mode
+     */
+    const CONFIG_DELIVERY_MODE = 'original_document_delivery_mode';
+
     /**
      * @return string root of the document cache directory in web space
      */
@@ -78,7 +84,7 @@ class Document extends BaseCachedFile implements EventSubscriberInterface
                 throw new DocumentException(sprintf("Source document file %s does not exists.", $sourceFile));
             }
 
-            $mode = ConfigQuery::read('original_document_delivery_mode', 'symlink');
+            $mode = ConfigQuery::read(self::CONFIG_DELIVERY_MODE, 'symlink');
 
             if ($mode == 'symlink') {
                 if (false == symlink($sourceFile, $originalDocumentPathInCache)) {
