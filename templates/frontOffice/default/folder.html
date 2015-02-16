@@ -30,7 +30,7 @@
     {if $folder_id}
         {$breadcrumbs = []}
         {loop name="folder_path" type="folder-path" folder=$folder_id}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
         {/loop}
     {/if}
 {/block}
@@ -71,16 +71,16 @@
                                     <li class="item">
                                         <article>
                                             {ifloop rel="content_thumbnail"}
-                                            <a href="{$URL}" tabindex="-1" class="content-image">
+                                            <a href="{$URL nofilter}" tabindex="-1" class="content-image">
                                                 {loop name="content_thumbnail" type="image" width="369" height="247" content=$ID limit="1"}
-                                                    <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                                 {/loop}
                                                 <span class="mask"></span>
                                             </a>
                                             {/ifloop}
 
                                             <div class="content-info">
-                                                <h3 class="name"><a href="{$URL}">{$TITLE}</a></h3>
+                                                <h3 class="name"><a href="{$URL nofilter}">{$TITLE}</a></h3>
 
                                                 {if $CHAPO}
                                                 <div class="short-description">
@@ -105,7 +105,7 @@
                 <div class="documents">
                     <ul>
                     {loop name="blog.document"  type="document" folder="{$ID}"}
-                    <li><a href="{$DOCUMENT_URL}" target="_blank">{$TITLE}</a></li>
+                    <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>
                 </div>    
@@ -124,7 +124,7 @@
                 <li class="item">
                     <article>
                         <div class="content-info">
-                            <h2 class="name"><a href="{$URL}">{$TITLE}</a></h2>
+                            <h2 class="name"><a href="{$URL nofilter}">{$TITLE}</a></h2>
                             {if $CHAPO}
                             <div class="short-description">
                                 {$CHAPO}

@@ -61,16 +61,16 @@
                         <tr>
                             <td class="image">
                                 {ifloop rel='product-image'}
-                                <a href="{$PRODUCT_URL}" class="thumbnail">
+                                <a href="{$PRODUCT_URL nofilter}" class="thumbnail">
                                     {assign "cart_count" $LOOP_COUNT}
                                     {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                        <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
+                                        <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
                                     {/loop}
                                 </a>
                                 {/ifloop}
                             </td>
                             <td class="product" >
-                                <h3 class="name"><a href="{$PRODUCT_URL}">{$TITLE}</a></h3>
+                                <h3 class="name"><a href="{$PRODUCT_URL nofilter}">{$TITLE}</a></h3>
                                 <div class="product-options">
                                     <dl class="dl-horizontal">
                                         <dt>{intl l="Available"} :</dt>

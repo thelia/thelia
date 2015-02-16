@@ -42,7 +42,7 @@
                             </div>
 
                             <div class="panel-body">
-                                <form action="{$gateway_url}" method="post" id="payement_gateway_form">
+                                <form action="{$gateway_url nofilter}" method="post" id="payement_gateway_form">
                                     {foreach from=$payment_form_data key='name' item='value'}
                                         <input type="hidden" name="{$name}" value="{$value}" />
                                     {/foreach}

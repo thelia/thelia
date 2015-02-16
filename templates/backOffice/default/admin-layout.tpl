@@ -170,7 +170,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-customer"}
                                         <li role="menuitem">
-                                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                            <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                 {$title}
                                             </a>
                                         </li>
@@ -212,7 +212,7 @@
                                         {hookblock name="main.top-menu-order" fields="id,class,url,title"}
                                         {forhook rel="main.top-menu-order"}
                                             <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                     {$title}
                                                 </a>
                                             </li>
@@ -232,7 +232,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-catalog"}
                                             <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                     {$title}
                                                 </a>
                                             </li>
@@ -258,7 +258,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-content"}
                                             <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                     {$title}
                                                 </a>
                                             </li>
@@ -303,7 +303,7 @@
                                         {hookblock name="main.top-menu-tools" fields="id,class,url,title"}
                                             {forhook rel="main.top-menu-tools"}
                                                 <li role="menuitem">
-                                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                    <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                         {$title}
                                                     </a>
                                                 </li>
@@ -323,7 +323,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-modules"}
                                             <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                     {$title}
                                                 </a>
                                             </li>
@@ -348,7 +348,7 @@
                                     <ul class="dropdown-menu" role="menu">
                                         {forhook rel="main.top-menu-configuration"}
                                             <li role="menuitem">
-                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url}" href="{$url}">
+                                                <a {if $id}id="{$id}" {/if} class="{$class}" data-target="{$url nofilter}" href="{$url nofilter}">
                                                     {$title}
                                                 </a>
                                             </li>

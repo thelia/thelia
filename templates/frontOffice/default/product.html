@@ -29,9 +29,9 @@
     {$breadcrumbs = []}
     {loop type="product" name="product_breadcrumb" id=$product_id limit="1" with_prev_next_info="1"}
         {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
         {/loop}
-        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
     {/loop}
 {/block}
 
@@ -67,7 +67,7 @@
                 {ifloop rel="image.main"}
                 <figure class="product-image">
                     {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="borders" limit="1"}
-                        <img src="{$IMAGE_URL}" alt="{$TITLE}" class="img-responsive" itemprop="image" data-toggle="magnify">
+                        <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-responsive" itemprop="image" data-toggle="magnify">
                     {/loop}
                 </figure>
                 {/ifloop}
@@ -79,9 +79,9 @@
                             <ul>
                                 {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" limit="5"}
                                 <li>
-                                    <a href="{$IMAGE_URL}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
+                                    <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
                                         {loop type="image" name="image.thumbs" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
-                                            <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                            <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                         {/loop}
                                     </a>
                                 </li>
@@ -93,9 +93,9 @@
                             <ul>
                                 {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" offset="5"}
                                     <li>
-                                        <a href="{$IMAGE_URL}" class="thumbnail">
+                                        <a href="{$IMAGE_URL nofilter}" class="thumbnail">
                                             {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
-                                                <img src="{$IMAGE_URL}" alt="{$TITLE}">
+                                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                             {/loop}
                                         </a>
                                     </li>
@@ -121,7 +121,7 @@
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: <span id="pse-ref">{$REF}</span></span>{/if}
 
                     {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
-                        <p><a href="{$URL}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
+                        <p><a href="{$URL nofilter}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
                     {/loop}
 
                     {if $POSTSCRIPTUM}<div class="short-description">
@@ -259,10 +259,10 @@
             {strip}
                 {capture "brand_info"}
                     {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
-                        <p><strong><a href="{$URL}">{$TITLE}</a></strong></p>
+                        <p><strong><a href="{$URL nofilter}">{$TITLE}</a></strong></p>
 
                         {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
-                            <p><a href="{$URL}"><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></a></p>
+                            <p><a href="{$URL nofilter}"><img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$TITLE}"></a></p>
                         {/loop}
 
                         {if $CHAPO}
@@ -358,12 +358,12 @@
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
                 {loop type="product" name="prev_product" id="{$PREVIOUS}"}
-                    <li class="previous"><a href="{$URL}">{intl l="Previous product"}</a></li>
+                    <li class="previous"><a href="{$URL nofilter}">{intl l="Previous product"}</a></li>
                 {/loop}
             {/if}
             {if $HAS_NEXT == 1}
                 {loop type="product" name="next_product" id="{$NEXT}"}
-                    <li class="next"><a href="{$URL}">{intl l="Next product"}</a></li>
+                    <li class="next"><a href="{$URL nofilter}">{intl l="Next product"}</a></li>
                 {/loop}
             {/if}
         </ul>

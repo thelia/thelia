@@ -35,7 +35,7 @@
 
                         <div class="col-md-5 actions">
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/categories/update' category_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous category'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                            <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview category page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                            <a  href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview category page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                             <a {if $HAS_NEXT != 0}href="{url path='/admin/categories/update' category_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next category'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
                                             {form_hidden_fields form=$form}
 
                                             {form_field form=$form field='success_url'}
-                                                <input type="hidden" name="{$name}" value="{$close_url}">
+                                                <input type="hidden" name="{$name}" value="{$close_url nofilter}">
                                             {/form_field}
 
                                             {* Display error message if exist *}

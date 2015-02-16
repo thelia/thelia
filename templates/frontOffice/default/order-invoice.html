@@ -75,10 +75,10 @@
                     <tr>
                         <td class="image">
                             {assign "cart_count" $LOOP_COUNT}
-                            <a href="{$PRODUCT_URL}">
+                            <a href="{$PRODUCT_URL nofilter}">
                             {ifloop rel='product-image'}
                                 {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
-                                    <img src="{$IMAGE_URL}" alt="Product #{$cart_count}">
+                                    <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
                                 {/loop}
                             {/ifloop}
                             {elseloop rel="product-image"}
@@ -88,7 +88,7 @@
                         </td>
                         <td class="product" >
                             <h3 class="name">
-                                <a href="{$PRODUCT_URL}">{$TITLE}</a>
+                                <a href="{$PRODUCT_URL nofilter}">{$TITLE}</a>
                             </h3>
                             <div class="product-options">
                                 <dl class="dl-horizontal">
@@ -311,7 +311,7 @@
                                     <label for="payment_{$paymentModuleId}">
                                         <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
-                                            <img src="{$IMAGE_URL}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
+                                            <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}
                                         {$TITLE}
                                     </label>
@@ -336,7 +336,7 @@
                                             {$termsAndConditionsUrl=$URL}
                                         {/loop}
                                     {/if}
-                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="$termsAndConditionsUrl"}.
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="{$termsAndConditionsUrl nofilter}"}.
                                 </label>
                                 {if $error }
                                     <span class="help-block">{$message}</span>

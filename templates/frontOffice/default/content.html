@@ -31,9 +31,9 @@
         {$breadcrumbs = []}
         {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
             {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
-                {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+                {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
             {/loop}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL}]}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
         {/loop}
     {/if}
 {/block}
@@ -64,7 +64,7 @@
                 <div class="documents">
                     <ul>
                     {loop name="blog.document"  type="document" content="{$ID}"}
-                    <li><a href="{$DOCUMENT_URL}" target="_blank">{$TITLE}</a></li>
+                    <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>
                 </div>    

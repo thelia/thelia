@@ -117,7 +117,7 @@
                                                                 <option value="">{intl l="No logo image"}</option>
 
                                                                 {loop name="brand-images" type="image" brand=$ID width="90" height="90" resize_mode="crop"}
-                                                                    <option value="{$ID}" data-img-src="{$IMAGE_URL}" {if $LOGO_IMAGE_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
+                                                                    <option value="{$ID}" data-img-src="{$IMAGE_URL nofilter}" {if $LOGO_IMAGE_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
                                                         {/custom_render_form_field}

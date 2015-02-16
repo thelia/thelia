@@ -33,7 +33,7 @@
                 {else}
                 {$next_url=$smarty.get.next|default:{url path="/account"}}
                 {/if}
-                <input type="hidden" name="{$name}" value="{$next_url}" />
+                <input type="hidden" name="{$name}" value="{$next_url nofilter}" />
             {/form_field}
 
             {form_field form=$form field='error_message'}

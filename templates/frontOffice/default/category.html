@@ -65,7 +65,7 @@
                 {loop name="category.description" type="category" id={$category_id} limit="1" }
                     <h1 id="main-label" class="page-header">{category attr="title"}</h1>
                     {loop name="category.image" type="image" source="category" source_id={$ID} width=218 height=146 resize_mode="borders"}
-                    <p><img itemprop="image" src="{$IMAGE_URL}" alt="{$TITLE}"></p>
+                    <p><img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$TITLE}"></p>
                     {/loop}
                     {if $DESCRIPTION}
                     <div class="description">

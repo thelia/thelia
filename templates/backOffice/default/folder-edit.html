@@ -29,7 +29,7 @@
 
                     <div class="col-md-5 actions">
                         <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/folders/update/$PREVIOUS"}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous folder'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
-                        <a  href="{$URL}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+                        <a  href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                         <a {if $HAS_NEXT != 0}href="{url path="/admin/folders/update/$NEXT"}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next folder'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                     </div>
                 </div>
