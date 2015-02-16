@@ -45,6 +45,10 @@ class Configuration extends BaseForm {
                 "label" => Translator::getInstance()->trans("Instagram username")
             ),
             array(
+                "id" => "pinterest",
+                "label" => Translator::getInstance()->trans("Pinterest username")
+            ),
+            array(
                 "id" => "youtube",
                 "label" => Translator::getInstance()->trans("Youtube URL")
             ),

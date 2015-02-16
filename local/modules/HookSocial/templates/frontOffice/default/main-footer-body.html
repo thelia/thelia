@@ -23,6 +23,18 @@
         </a>
     </li>
     {/if}
+    {if {config key="hooksocial_pinterest"} }
+    <li>
+        <a href="https://www.pinterest.com/{config key="hooksocial_pinterest"}" class="pinterest" rel="nofollow" data-toggle="tooltip" data-placement="top" title="{intl l="Pinterest" d="hooksocial.fo.default"}"
+        target="_blank">
+            <span class="icon-stack">
+                <span class="icon-circle icon-stack-base"></span>
+                <span class="icon-pinterest icon-light"></span>
+            </span>
+            <span class="visible-print">{intl l="Pinterest" d="hooksocial.fo.default"}</span>
+        </a>
+    </li>
+    {/if}
     {if {config key="hooksocial_instagram"} }
     <li>
         <a href="http://instagram.com/{config key="hooksocial_instagram"}" rel="nofollow" class="instagram" data-toggle="tooltip" data-placement="top"
