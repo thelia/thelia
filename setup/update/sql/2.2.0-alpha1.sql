@@ -50,5 +50,4 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL)
 ;
 
-
 SET FOREIGN_KEY_CHECKS = 1;

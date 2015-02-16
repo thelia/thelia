@@ -27,7 +27,9 @@ use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Base\IgnoredModuleHookQuery;
 use Thelia\Model\HookQuery;
+use Thelia\Model\IgnoredModuleHook;
 use Thelia\Model\ModuleHook as ModuleHookModel;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Model\ModuleQuery;
@@ -118,6 +120,12 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
             ->setPosition($this->getLastPositionInHook($event->getHookId()))
             ->save();
 
+        // Be sure to delete this module hook from the ignored module hook table
+        IgnoredModuleHookQuery::create()
+            ->filterByHookId($event->getHookId())
+            ->filterByModuleId($event->getModuleId())
+            ->delete();
+
         $event->setModuleHook($moduleHook);
     }
 
@@ -145,6 +153,18 @@ class ModuleHook extends BaseAction implements EventSubscriberInterface
         if (null !== $moduleHook = ModuleHookQuery::create()->findPk($event->getModuleHookId())) {
             $moduleHook->delete();
             $event->setModuleHook($moduleHook);
+
+            // Prevent hook recreation by RegisterListenersPass::registerHook()
+            // We store the method here to be able to retreive it when
+            // we need to get all hook declared by a module
+            $imh = new IgnoredModuleHook();
+            $imh
+                ->setModuleId($moduleHook->getModuleId())
+                ->setHookId($moduleHook->getHookId())
+                ->setMethod($moduleHook->getMethod())
+                ->setClassname($moduleHook->getClassname())
+                ->save();
+
             $this->cacheClear($event->getDispatcher());
         }
     }

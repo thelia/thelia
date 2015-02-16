@@ -52,6 +52,10 @@ use Thelia\Model\Map\HookTableMap;
  * @method     ChildHookQuery rightJoinModuleHook($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleHook relation
  * @method     ChildHookQuery innerJoinModuleHook($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleHook relation
  *
+ * @method     ChildHookQuery leftJoinIgnoredModuleHook($relationAlias = null) Adds a LEFT JOIN clause to the query using the IgnoredModuleHook relation
+ * @method     ChildHookQuery rightJoinIgnoredModuleHook($relationAlias = null) Adds a RIGHT JOIN clause to the query using the IgnoredModuleHook relation
+ * @method     ChildHookQuery innerJoinIgnoredModuleHook($relationAlias = null) Adds a INNER JOIN clause to the query using the IgnoredModuleHook relation
+ *
  * @method     ChildHookQuery leftJoinHookI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the HookI18n relation
  * @method     ChildHookQuery rightJoinHookI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the HookI18n relation
  * @method     ChildHookQuery innerJoinHookI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the HookI18n relation
@@ -677,6 +681,79 @@ abstract class HookQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\IgnoredModuleHook object
+     *
+     * @param \Thelia\Model\IgnoredModuleHook|ObjectCollection $ignoredModuleHook  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildHookQuery The current query, for fluid interface
+     */
+    public function filterByIgnoredModuleHook($ignoredModuleHook, $comparison = null)
+    {
+        if ($ignoredModuleHook instanceof \Thelia\Model\IgnoredModuleHook) {
+            return $this
+                ->addUsingAlias(HookTableMap::ID, $ignoredModuleHook->getHookId(), $comparison);
+        } elseif ($ignoredModuleHook instanceof ObjectCollection) {
+            return $this
+                ->useIgnoredModuleHookQuery()
+                ->filterByPrimaryKeys($ignoredModuleHook->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByIgnoredModuleHook() only accepts arguments of type \Thelia\Model\IgnoredModuleHook or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the IgnoredModuleHook relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildHookQuery The current query, for fluid interface
+     */
+    public function joinIgnoredModuleHook($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('IgnoredModuleHook');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'IgnoredModuleHook');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the IgnoredModuleHook relation IgnoredModuleHook object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\IgnoredModuleHookQuery A secondary query class using the current class as primary query
+     */
+    public function useIgnoredModuleHookQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinIgnoredModuleHook($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'IgnoredModuleHook', '\Thelia\Model\IgnoredModuleHookQuery');
+    }
+
+    /**
      * Filter the query by a related \Thelia\Model\HookI18n object
      *
      * @param \Thelia\Model\HookI18n|ObjectCollection $hookI18n  the related object to use as filter
@@ -747,6 +824,23 @@ abstract class HookQuery extends ModelCriteria
         return $this
             ->joinHookI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'HookI18n', '\Thelia\Model\HookI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Module object
+     * using the ignored_module_hook table as cross reference
+     *
+     * @param Module $module the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildHookQuery The current query, for fluid interface
+     */
+    public function filterByModule($module, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useIgnoredModuleHookQuery()
+            ->filterByModule($module, $comparison)
+            ->endUse();
     }
 
     /**

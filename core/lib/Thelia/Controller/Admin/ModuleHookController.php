@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Core\Event\Hook\ModuleHookCreateEvent;
 use Thelia\Core\Event\Hook\ModuleHookDeleteEvent;
 use Thelia\Core\Event\Hook\ModuleHookEvent;
@@ -24,6 +25,8 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\ModuleHookCreationForm;
 use Thelia\Form\ModuleHookModificationForm;
+use Thelia\Model\IgnoredModuleHook;
+use Thelia\Model\IgnoredModuleHookQuery;
 use Thelia\Model\ModuleHook;
 use Thelia\Model\ModuleHookQuery;
 
@@ -314,4 +317,80 @@ class ModuleHookController extends AbstractCrudController
             'module_hook_id' => $module_hook_id === null ? $this->getRequest()->get('module_hook_id') : $module_hook_id
         ];
     }
+
+    public function getModuleHookClassnames($moduleId)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $result = [];
+
+        $moduleHooks = ModuleHookQuery::create()
+            ->filterByModuleId($moduleId)
+            ->groupByClassname()
+            ->find();
+
+        /** @var ModuleHook $moduleHook */
+        foreach ($moduleHooks as $moduleHook) {
+            $result[] = $moduleHook->getClassname();
+        }
+
+        $ignoredModuleHooks = IgnoredModuleHookQuery::create()
+            ->filterByModuleId($moduleId)
+            ->groupByClassname()
+            ->find();
+
+        /** @var IgnoredModuleHook $moduleHook */
+        foreach ($ignoredModuleHooks as $moduleHook) {
+            $className = $moduleHook->getClassname();
+            if (! in_array($className, $result)) {
+                $result[] = $className;
+            }
+        }
+
+        sort($result);
+
+        return new JsonResponse($result);
+    }
+
+    public function getModuleHookMethods($moduleId, $className)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE_HOOK, [], AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $result = [];
+
+        $moduleHooks = ModuleHookQuery::create()
+            ->filterByModuleId($moduleId)
+            ->filterByClassname($className)
+            ->find();
+
+        /** @var ModuleHook $moduleHook */
+        foreach ($moduleHooks as $moduleHook) {
+            $method = $moduleHook->getMethod();
+            if (! in_array($method, $result)) {
+                $result[] = $method;
+            }
+        }
+
+        $ignoredModuleHooks = IgnoredModuleHookQuery::create()
+            ->filterByModuleId($moduleId)
+            ->filterByClassname($className)
+            ->find();
+
+        /** @var IgnoredModuleHook $moduleHook */
+        foreach ($ignoredModuleHooks as $moduleHook) {
+            $method = $moduleHook->getMethod();
+            if (! in_array($method, $result)) {
+                $result[] = $method;
+            }
+        }
+
+        sort($result);
+
+        return new JsonResponse($result);
+    }
+
 }
