@@ -88,7 +88,7 @@
                                         {/loop}
                                     </dl>
                                 </div>
-                                <a href="{token_url path="/cart/delete/$ITEM_ID"}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
+                                <a href="{token_url path="/cart/delete/$ITEM_ID" success_url={url path='/cart'}}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
                                 {if $IS_PROMO == 1}
@@ -103,6 +103,7 @@
                             <td class="qty">
                                 <div class="form-group group-qty">
                                     <form action="{token_url path="/cart/update"}" class="form-inline" method="post">
+                                        <input type="hidden" name="success_url" value="{url path='/cart'}">
                                         <input type="hidden" name="cart_item" value="{$ITEM_ID}">
                                         <div class="form-group">
                                             {if $STOCK <= 500}
