@@ -126,18 +126,18 @@
 {/literal}
 <page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
     <page_header>
-        {hook name="delivery.header" order="{$order_id}"}
+        {hook name="delivery.header" order=$order_id}
     </page_header>
 
     <page_footer>
-        {hook name="delivery.footer-top" order="{$order_id}"}
+        {hook name="delivery.footer-top" order=$order_id}
         <table>
             <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
             <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
             <tbody>
             <tr>
 		    	<td>
-					{hook name="delivery.imprint" order="{$order_id}"}
+					{hook name="delivery.imprint" order=$order_id}
 					{elsehook rel="delivery.imprint"}
 		                <!-- Imprint -->
 		                {config key="store_name"}
@@ -164,7 +164,7 @@
             </tr>
             </tbody>
         </table>
-		{hook name="delivery.footer-bottom" order="{$order_id}"}
+		{hook name="delivery.footer-bottom" order=$order_id}
     </page_footer>
 
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
@@ -188,7 +188,7 @@
         <tr>
             <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
         </tr>
-        {hookblock name="delivery.information" order="{$order_id}" fields="title,value"}
+        {hookblock name="delivery.information" order=$order_id fields="title,value"}
         {forhook rel="delivery.information"}
         <tr>
             <td><h3>{$title} : <span>{$value}</span></h3></td>
@@ -197,7 +197,7 @@
         {/hookblock}
     </table>
 	
-	{hook name="delivery.after-information" order="{$order_id}"}	
+	{hook name="delivery.after-information" order=$order_id}
 
     <table class="table-address">
         <col style="width: 50%; padding: 3mm;" />
@@ -207,7 +207,7 @@
                 <h3>{intl l="Delivery address"}</h3>
 				{ifhook rel="delivery.delivery-address"}
                 {* delivery module can customize the delivery address *}
-                {hook name="delivery.delivery-address" module="{order attr="delivery_module"}" order="{$order_id}"}
+                {hook name="delivery.delivery-address" module={order attr="delivery_module"} order=$order_id}
                 {/ifhook}
                 {elsehook rel="delivery.delivery-address"}                
 				<p>
@@ -234,7 +234,7 @@
         </tr>
     </table>
 
-    {hook name="delivery.after-addresses" order="{$order_id}"}
+    {hook name="delivery.after-addresses" order=$order_id}
 
     <table style="padding-top: 5mm;">
         <col style="width: 40%; padding: 3mm;" />
@@ -280,8 +280,8 @@
             <td class="clear-none"></td>
         </tr>
     </table>
-	
-{hook name="delivery.after-summary" order="{$order_id}"}
+
+{hook name="delivery.after-summary" order=$order_id}
 
 {/loop}
 </page>

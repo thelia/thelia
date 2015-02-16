@@ -127,18 +127,18 @@
 {/literal}
 <page backtop="10mm" backleft="10mm" backright="10mm" backbottom="10mm">
     <page_header>
-		{hook name="invoice.header" order="{$order_id}"}
+		{hook name="invoice.header" order=$order_id}
     </page_header>
 
     <page_footer>
-		{hook name="invoice.footer-top" order="{$order_id}"}
+		{hook name="invoice.footer-top" order=$order_id}
         <table>
             <col style="width: 80%; padding: 1mm; border: none; text-align: left;" />
             <col style="width: 20%; padding: 1mm; border: none; text-align: right;" />
             <tbody>
             <tr>
                 <td>
-					{hook name="invoice.imprint" order="{$order_id}"}
+					{hook name="invoice.imprint" order=$order_id}
 					{elsehook rel="invoice.imprint"}
 						<!-- Imprint -->
 		                {config key="store_name"}
@@ -165,7 +165,7 @@
             </tr>
             </tbody>
         </table>
-		{hook name="invoice.footer-bottom" order="{$order_id}"}
+		{hook name="invoice.footer-bottom" order=$order_id}
     </page_footer>
 
     {$taxes = []}
@@ -190,7 +190,7 @@
         <tr>
             <td><h3>{intl l="Customer Number"} : <span>{loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}{$REF}{/loop}</span></h3></td>
         </tr>
-		{hookblock name="invoice.information" order="{$order_id}" fields="title,value"}
+		{hookblock name="invoice.information" order=$order_id fields="title,value"}
         {forhook rel="invoice.information"}
         <tr>
             <td><h3>{$title} : <span>{$value}</span></h3></td>
@@ -199,7 +199,7 @@
         {/hookblock}
     </table>
 	
-	{hook name="invoice.after-information" order="{$order_id}"}
+	{hook name="invoice.after-information" order=$order_id}
 
     <table class="table-address">
         <col style="width: 50%; padding: 3mm;" />
@@ -209,7 +209,7 @@
                 <h3>{intl l="Delivery address"}</h3>
 				{ifhook rel="invoice.delivery-address"}
                     {* delivery module can customize the delivery address *}
-                    {hook name="invoice.delivery-address" module="{order attr="delivery_module"}" order="{$order_id}"}
+                    {hook name="invoice.delivery-address" module={order attr="delivery_module"} order=$order_id}
                 {/ifhook}
                 {elsehook rel="invoice.delivery-address"}                
 				<p>
@@ -236,7 +236,7 @@
         </tr>
     </table>
 
-    {hook name="invoice.after-addresses" order="{$order_id}"}
+    {hook name="invoice.after-addresses" order=$order_id}
 
     <table cellspacing="0" cellpadding="0" style="padding-top: 5mm;">
         <col style="width: 40%; padding: 1mm;" />
@@ -285,7 +285,7 @@
         {/loop}
     </table>
 
-{hook name="invoice.after-products" order="{$order_id}"}
+{hook name="invoice.after-products" order=$order_id}
 
     {if $POSTAGE_TAX_RULE_TITLE}
         {$taxes[$POSTAGE_TAX_RULE_TITLE][] = $POSTAGE_TAX}
@@ -362,7 +362,7 @@
         </tr>
     </table>
 
-{hook name="invoice.after-summary" order="{$order_id}"}
+{hook name="invoice.after-summary" order=$order_id}
 
 {/loop}
 </page>
