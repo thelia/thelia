@@ -167,9 +167,9 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // instead of 'delete cannot delete' caused by a constraint violation.
                 // FIXME: we hav to find a way to delete modules used by order.
                 if (
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                    OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
                     ||
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
+                    OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
                 ) {
                     throw new \LogicException(
                         Translator::getInstance()->trans(
