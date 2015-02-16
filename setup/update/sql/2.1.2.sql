@@ -19,4 +19,26 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 UPDATE `config_i18n` SET `title`='Utiliser un cookie persistant pour memoriser le panier du client' WHERE `locale`='fr_FR' AND `id`=(SELECT`id` FROM `config` WHERE `name`='cart.use_persistent_cookie');
 
+-- New ignored_module_hook table
+
+CREATE TABLE IF NOT EXISTS `ignored_module_hook`
+(
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `method` VARCHAR(255),
+    `classname` VARCHAR(255),
+    INDEX `fk_deleted_module_hook_module_id_idx` (`module_id`),
+    INDEX `fk_deleted_module_hook_hook_id_idx` (`hook_id`),
+    CONSTRAINT `fk_deleted_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_deleted_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
 SET FOREIGN_KEY_CHECKS = 1;

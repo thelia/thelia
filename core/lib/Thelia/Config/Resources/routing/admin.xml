@@ -1185,6 +1185,14 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleHookController::updatePositionAction</default>
     </route>
 
+    <route id="admin.module-hook.get-module-hook-classnames" path="/admin/module-hooks/get-module-hook-classnames/{moduleId}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::getModuleHookClassnames</default>
+    </route>
+
+    <route id="admin.module-hook.get-module-hook-methods" path="/admin/module-hooks/get-module-hook-methods/{moduleId}/{className}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleHookController::getModuleHookMethods</default>
+    </route>
+
     <!-- end Hooks rule management -->
 
     <!-- tax management -->

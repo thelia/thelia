@@ -2228,6 +2228,53 @@ CREATE TABLE `module_config`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
+-- api
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `api`;
+
+CREATE TABLE `api`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `label` VARCHAR(255),
+    `api_key` VARCHAR(100),
+    `profile_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_api_profile_id` (`profile_id`),
+    CONSTRAINT `fk_api_profile_id`
+        FOREIGN KEY (`profile_id`)
+        REFERENCES `profile` (`id`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- ignored_module_hook
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ignored_module_hook`;
+
+CREATE TABLE `ignored_module_hook`
+(
+    `module_id` INTEGER NOT NULL,
+    `hook_id` INTEGER NOT NULL,
+    `method` VARCHAR(255),
+    `classname` VARCHAR(255),
+    INDEX `fk_deleted_module_hook_module_id_idx` (`module_id`),
+    INDEX `fk_deleted_module_hook_hook_id_idx` (`hook_id`),
+    CONSTRAINT `fk_deleted_module_hook_module_id`
+        FOREIGN KEY (`module_id`)
+        REFERENCES `module` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_deleted_module_hook_hook_id`
+        FOREIGN KEY (`hook_id`)
+        REFERENCES `hook` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 

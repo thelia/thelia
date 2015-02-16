@@ -1813,4 +1813,22 @@
     </behavior>
     <behavior name="timestampable" />
   </table>
+  <table isCrossRef="true" name="ignored_module_hook" namespace="Thelia\Model">
+    <column name="module_id" required="true" type="INTEGER" />
+    <column name="hook_id" required="true" type="INTEGER" />
+    <column name="method" size="255" type="VARCHAR" />
+    <column name="classname" size="255" type="VARCHAR" />
+    <foreign-key foreignTable="module" name="fk_deleted_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="module_id" />
+    </foreign-key>
+    <foreign-key foreignTable="hook" name="fk_deleted_module_hook_hook_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="hook_id" />
+    </foreign-key>
+    <index name="fk_deleted_module_hook_module_id_idx">
+      <index-column name="module_id" />
+    </index>
+    <index name="fk_deleted_module_hook_hook_id_idx">
+      <index-column name="hook_id" />
+    </index>
+  </table>
 </database>
