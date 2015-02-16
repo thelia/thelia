@@ -8,6 +8,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Brand\BrandImageModification;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\BrandImage as BaseBrandImage;
 use Thelia\Model\Breadcrumb\BrandBreadcrumbTrait;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -85,19 +86,7 @@ class BrandImage extends BaseBrandImage implements FileModelInterface, Breadcrum
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.brand.image.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new BrandImageModification($request);
+        return AdminForm::BRAND_IMAGE_MODIFICATION;
     }
 
     /**

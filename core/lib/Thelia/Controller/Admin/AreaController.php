@@ -12,7 +12,6 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
@@ -21,10 +20,8 @@ use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\Area\AreaCountryForm;
-use Thelia\Form\Area\AreaCreateForm;
-use Thelia\Form\Area\AreaModificationForm;
-use Thelia\Form\Area\AreaPostageForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AreaQuery;
 
@@ -58,7 +55,7 @@ class AreaController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new AreaCreateForm($this->getRequest());
+        return $this->createForm(AdminForm::AREA_CREATE);
     }
 
     /**
@@ -66,7 +63,7 @@ class AreaController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new AreaModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::AREA_MODIFICATION);
     }
 
     /**
@@ -80,7 +77,7 @@ class AreaController extends AbstractCrudController
             'name' => $object->getName()
         );
 
-        return new AreaModificationForm($this->getRequest(), 'form', $data);
+        return $this->createForm(AdminForm::AREA_MODIFICATION, 'form', $data);
     }
 
     /**
@@ -227,7 +224,7 @@ class AreaController extends AbstractCrudController
             return $response;
         }
 
-        $areaCountryForm = new AreaCountryForm($this->getRequest());
+        $areaCountryForm = $this->createForm(AdminForm::AREA_COUNTRY);
         $error_msg = null;
         try {
             $form = $this->validateForm($areaCountryForm);
@@ -297,7 +294,7 @@ class AreaController extends AbstractCrudController
             return $response;
         }
 
-        $areaUpdateForm = new AreaPostageForm($this->getRequest());
+        $areaUpdateForm = $this->createForm(AdminForm::AREA_POSTAGE);
         $error_msg = null;
 
         try {

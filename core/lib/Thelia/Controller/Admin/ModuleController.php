@@ -22,9 +22,9 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Exception\InvalidModuleException;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\ModuleInstallForm;
-use Thelia\Form\ModuleModificationForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ModuleQuery;
 use Thelia\Module\ModuleManagement;
@@ -60,7 +60,7 @@ class ModuleController extends AbstractCrudController
 
     protected function getUpdateForm()
     {
-        return new ModuleModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::MODULE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -114,7 +114,7 @@ class ModuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ModuleModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::MODULE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -313,16 +313,14 @@ class ModuleController extends AbstractCrudController
         $newModule        = null;
         $moduleDefinition = null;
 
-        $moduleInstall = new ModuleInstallForm($this->getRequest());
+        /** @var ModuleInstallForm $moduleInstall */
+        $moduleInstall = $this->createForm(AdminForm::MODULE_INSTALL);
 
         try {
-            $form = $this->validateForm($moduleInstall, "post");
+            $this->validateForm($moduleInstall, "post");
 
             $moduleDefinition = $moduleInstall->getModuleDefinition();
             $modulePath       = $moduleInstall->getModulePath();
-
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $file */
-            $file = $form->get("module")->getData();
 
             $moduleInstallEvent = new ModuleInstallEvent();
             $moduleInstallEvent
@@ -354,16 +352,14 @@ class ModuleController extends AbstractCrudController
             $message = $this->getTranslator()->trans("Sorry, an error occured: %s", ['%s' => $e->getMessage()]);
         }
 
-        if ($message !== false) {
-            Tlog::getInstance()->error(sprintf("Error during module installation process. Exception was %s", $message));
+        Tlog::getInstance()->error(sprintf("Error during module installation process. Exception was %s", $message));
 
-            $moduleInstall->setErrorMessage($message);
+        $moduleInstall->setErrorMessage($message);
 
-            $this->getParserContext()
-                ->addForm($moduleInstall)
-                ->setGeneralError($message);
+        $this->getParserContext()
+            ->addForm($moduleInstall)
+            ->setGeneralError($message);
 
-            return $this->render("modules");
-        }
+        return $this->render("modules");
     }
 }

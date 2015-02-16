@@ -27,8 +27,8 @@ use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Import as ImportLoop;
 use Thelia\Exception\FileNotFoundException;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\ImportForm;
 use Thelia\ImportExport\Import\ImportHandler;
 use Thelia\Model\ImportCategoryQuery;
 use Thelia\Model\ImportQuery;
@@ -76,7 +76,7 @@ class ImportController extends BaseAdminController
         /**
          * Get needed services
          */
-        $form = new ImportForm($this->getRequest());
+        $form = $this->createForm(AdminForm::IMPORT);
         $errorMessage = null;
         $successMessage = null;
 

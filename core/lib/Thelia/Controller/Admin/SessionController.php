@@ -12,14 +12,13 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
+use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Form\AdminLogin;
-use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AdminLog;
-use Thelia\Core\Security\Exception\AuthenticationException;
-
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\LangQuery;

@@ -14,7 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Security\AccessManager;
-
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\SeoForm;
 
@@ -90,7 +90,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
      */
     protected function getUpdateSeoForm()
     {
-        return new SeoForm($this->getRequest());
+        return $this->createForm(AdminForm::SEO);
     }
 
     /**
@@ -133,7 +133,7 @@ abstract class AbstractSeoCrudController extends AbstractCrudController
             'meta_keywords'     => $object->getMetaKeywords()
         );
 
-        $seoForm = new SeoForm($this->getRequest(), "form", $data);
+        $seoForm = $this->createForm(AdminForm::SEO, "form", $data);
         $this->getParserContext()->addForm($seoForm);
 
         // URL based on the language

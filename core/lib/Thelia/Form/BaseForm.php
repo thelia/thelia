@@ -95,6 +95,15 @@ abstract class BaseForm
      */
     private $type;
 
+    /**
+     * @param Request $request
+     * @param string $type
+     * @param array $data
+     * @param array $options
+     * @param ContainerInterface $container
+     * @deprecated Thelia forms should not be instantiated directly. Please use BaseController::createForm() instead
+     * @see BaseController::createForm()
+     */
     public function __construct(
         Request $request,
         $type = "form",

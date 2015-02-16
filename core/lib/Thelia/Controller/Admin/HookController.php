@@ -26,8 +26,7 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Core\Translation\Translator;
-use Thelia\Form\HookCreationForm;
-use Thelia\Form\HookModificationForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\Hook;
 use Thelia\Model\HookQuery;
@@ -227,7 +226,7 @@ class HookController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new HookCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::HOOK_CREATION);
     }
 
     /**
@@ -235,7 +234,7 @@ class HookController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new HookModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::HOOK_MODIFICATION);
     }
 
     /**
@@ -261,7 +260,7 @@ class HookController extends AbstractCrudController
             'description' => $object->getDescription(),
         ];
 
-        return new HookModificationForm($this->getRequest(), 'form', $data);
+        return $this->createForm(AdminForm::HOOK_MODIFICATION, 'form', $data);
     }
 
     /**

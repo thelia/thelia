@@ -12,15 +12,15 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
-use Thelia\Model\FeatureAvQuery;
-use Thelia\Form\FeatureAvModificationForm;
-use Thelia\Form\FeatureAvCreationForm;
+use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
+use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Form\FeatureAvModificationForm;
+use Thelia\Model\FeatureAvQuery;
 
 /**
  * Manages features-av
@@ -46,12 +46,12 @@ class FeatureAvController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new FeatureAvCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::FEATURE_AV_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new FeatureAvModificationForm($this->getRequest());
+        throw new \LogicException("Featiure Av. modification is not yet implemented");
     }
 
     protected function getCreationEvent($formData)
@@ -104,17 +104,7 @@ class FeatureAvController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum()
-        );
-
-        // Setup the object form
-        return new FeatureAvModificationForm($this->getRequest(), "form", $data);
+        throw new \LogicException("Feature Av. modification is not yet implemented");
     }
 
     protected function getObjectFromEvent($event)

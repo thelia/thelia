@@ -425,7 +425,7 @@ class FileController extends BaseAdminController
 
         $fileModelInstance = $fileManager->getModelInstance($objectType, $parentType);
 
-        $fileUpdateForm = $fileModelInstance->getUpdateFormInstance($this->getRequest());
+        $fileUpdateForm = $this->createForm($fileModelInstance->getUpdateFormId());
 
         /** @var FileModelInterface $file */
         $file = $fileModelInstance->getQueryInstance()->findPk($fileId);

@@ -83,6 +83,7 @@
         <form name="thelia.admin.feature.modification" class="Thelia\Form\FeatureModificationForm"/>
 
         <form name="thelia.admin.attributeav.creation" class="Thelia\Form\AttributeAvCreationForm"/>
+        <form name="thelia.admin.attributeav.modification" class="Thelia\Form\AttributeAvCreationForm"/>
 
         <form name="thelia.admin.featureav.creation" class="Thelia\Form\FeatureAvCreationForm"/>
 

@@ -9,6 +9,7 @@ use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CategoryDocumentModification;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\CategoryDocument as BaseCategoryDocument;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
@@ -95,19 +96,7 @@ class CategoryDocument extends BaseCategoryDocument implements BreadcrumbInterfa
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.category.document.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new CategoryDocumentModification($request);
+        return AdminForm::CATEGORY_DOCUMENT_MODIFICATION;
     }
 
     /**

@@ -57,14 +57,6 @@ interface FileModelInterface
     public function getUpdateFormId();
 
     /**
-     * Get the form instance used to change this object information
-     *
-     * @param Request $request the current request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request);
-    /**
      * @return string the path to the upload directory where files are stored, without final slash
      */
     public function getUploadDir();
@@ -150,4 +142,12 @@ interface FileModelInterface
      * @return FileModelInterface
      */
     public function setLocale($locale);
+
+    /**
+     * Set the current locale
+     *
+     * @param  bool            $visible true if the file is visible, false otherwise
+     * @return FileModelInterface
+     */
+    public function setVisible($visible);
 }

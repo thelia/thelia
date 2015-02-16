@@ -12,20 +12,14 @@
 
 namespace Thelia\Controller\Api;
 
-use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Thelia\Core\Event\CustomerTitle\CustomerTitleEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Title;
 use Thelia\Model\CustomerTitleI18nQuery;
 use Thelia\Model\CustomerTitleQuery;
-use Thelia\Model\Map\CustomerTitleTableMap;
 
 /**
  * Class TitleController

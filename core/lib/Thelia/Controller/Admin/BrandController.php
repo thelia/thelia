@@ -21,8 +21,8 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Brand\BrandCreationForm;
 use Thelia\Form\Brand\BrandModificationForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Brand;
 use Thelia\Model\BrandQuery;
 
@@ -54,7 +54,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function getCreationForm()
     {
-        return new BrandCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::BRAND_CREATION);
     }
 
     /**
@@ -62,7 +62,7 @@ class BrandController extends AbstractSeoCrudController
      */
     protected function getUpdateForm()
     {
-        return new BrandModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::BRAND_MODIFICATION);
     }
 
     /**
@@ -89,7 +89,7 @@ class BrandController extends AbstractSeoCrudController
         ];
 
         // Setup the object form
-        return new BrandModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::BRAND_MODIFICATION, "form", $data);
     }
 
     /**

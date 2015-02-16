@@ -12,9 +12,9 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\UpdatePositionEvent;
 
 /**
  * An abstract CRUD controller for Thelia ADMIN, to manage basic CRUD operations on a givent object.

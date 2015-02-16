@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ProductImageModification;
 use Thelia\Model\Base\ProductImage as BaseProductImage;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -94,19 +95,7 @@ class ProductImage extends BaseProductImage implements BreadcrumbInterface, File
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.product.image.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new ProductImageModification($request);
+        return AdminForm::PRODUCT_IMAGE_MODIFICATION;
     }
 
     /**

@@ -12,9 +12,9 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\ConfigStoreForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -36,7 +36,7 @@ class ConfigStoreController extends BaseAdminController
         }
 
         // The form is self-hydrated
-        $configStoreForm = new ConfigStoreForm($this->getRequest(), 'form');
+        $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
         $this->getParserContext()->addForm($configStoreForm);
 
@@ -51,7 +51,7 @@ class ConfigStoreController extends BaseAdminController
 
         $error_msg = false;
         $response = null;
-        $configStoreForm = new ConfigStoreForm($this->getRequest());
+        $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
         try {
             $form = $this->validateForm($configStoreForm);

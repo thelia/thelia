@@ -21,6 +21,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Category;
 use Thelia\Model\CategoryQuery;
+use Thelia\Form\Definition\ApiForm;
 
 /**
  * Class CategoryController
@@ -56,7 +57,7 @@ class CategoryController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-        return $this->createForm("thelia.api.category.create", "form", $data);
+        return $this->createForm(ApiForm::CATEGORY_CREATION, "form", $data);
     }
 
     /**
@@ -65,7 +66,7 @@ class CategoryController extends AbstractCrudApiController
      */
     protected function getUpdateForm(array $data = array())
     {
-        return $this->createForm("thelia.api.category.update", "form", $data, [
+        return $this->createForm(ApiForm::CATEGORY_MODIFICATION, "form", $data, [
             'method' => 'PUT',
         ]);
     }

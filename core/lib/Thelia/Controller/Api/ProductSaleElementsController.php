@@ -23,6 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Country;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Product;
@@ -33,6 +34,7 @@ use Thelia\Core\Template\Loop\ProductSaleElements as ProductSaleElementsLoop;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
+use Thelia\Form\Definition\ApiForm;
 
 /**
  * Class ProductSaleElementsController
@@ -130,7 +132,7 @@ class ProductSaleElementsController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::CREATE);
 
-        $baseForm = $this->createForm("thelia.api.product_sale_elements", "form", [], [
+        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, "form", [], [
             "validation_groups" => ["create", "Default"],
             'csrf_protection' => false,
             "cascade_validation" => true,
@@ -193,7 +195,7 @@ class ProductSaleElementsController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::UPDATE);
 
-        $baseForm = $this->createForm("thelia.api.product_sale_elements", "form", [], [
+        $baseForm = $this->createForm(ApiForm::PRODUCT_SALE_ELEMENTS, "form", [], [
             "validation_groups" => ["update", "Default"],
             'csrf_protection' => false,
             "cascade_validation" => true,

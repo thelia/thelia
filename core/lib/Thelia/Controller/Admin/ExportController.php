@@ -12,20 +12,20 @@
 
 namespace Thelia\Controller\Admin;
 
+use Thelia\Core\Event\ImportExport as ImportExportEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
+use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Export as ExportLoop;
-use Thelia\Core\Event\ImportExport as ImportExportEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
-use Thelia\Core\HttpFoundation\Response;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\ExportForm;
 use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Export\ImagesExportInterface;
@@ -77,7 +77,7 @@ class ExportController extends BaseAdminController
         /**
          * Define and validate the form
          */
-        $form = new ExportForm($this->getRequest());
+        $form = $this->createForm(AdminForm::EXPORT);
         $errorMessage = null;
 
         try {

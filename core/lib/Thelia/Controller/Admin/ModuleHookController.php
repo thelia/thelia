@@ -23,7 +23,7 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\ModuleHookCreationForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\ModuleHookModificationForm;
 use Thelia\Model\IgnoredModuleHook;
 use Thelia\Model\IgnoredModuleHookQuery;
@@ -104,7 +104,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new ModuleHookCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::MODULE_HOOK_CREATION);
     }
 
     /**
@@ -112,7 +112,7 @@ class ModuleHookController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new ModuleHookModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION);
     }
 
     /**
@@ -132,7 +132,7 @@ class ModuleHookController extends AbstractCrudController
             'active'    => $object->getActive(),
         ];
 
-        return new ModuleHookModificationForm($this->getRequest(), 'form', $data);
+        return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION, 'form', $data);
     }
 
     /**

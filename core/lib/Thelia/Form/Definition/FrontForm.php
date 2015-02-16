@@ -10,23 +10,23 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
+namespace Thelia\Form\Definition;
 
 /**
- * Class LanguageController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * Class FrontForm
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ * @package Thelia\Form\Definition
  */
-class LanguageController extends BaseAdminController
+final class FrontForm
 {
-    public function defaultAction()
-    {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) {
-            return $response;
-        }
-        return $this->render("languages");
-    }
+    const CUSTOMER_LOGIN = 'thelia.front.customer.login';
+    const CUSTOMER_LOST_PASSWORD = 'thelia.front.customer.lostpassword';
+    const CUSTOMER_CREATE = 'thelia.front.customer.create';
+    const CUSTOMER_PROFILE_UPDATE = 'thelia.front.customer.profile.update';
+    const CUSTOMER_PASSWORD_UPDATE = 'thelia.front.customer.password.update';
+    const ADDRESS_CREATE = 'thelia.front.address.create';
+    const ADDRESS_UPDATE = 'thelia.front.address.update';
+    const CONTACT = 'thelia.front.contact';
+    const NEWSLETTER = 'thelia.front.newsletter';
 }

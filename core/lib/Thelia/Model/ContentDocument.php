@@ -11,6 +11,7 @@ use Thelia\Files\FileModelInterface;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Form\ContentDocumentModification;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Base\ContentDocument as BaseContentDocument;
 use Thelia\Model\Breadcrumb\BreadcrumbInterface;
 use Thelia\Model\Breadcrumb\FolderBreadcrumbTrait;
@@ -95,19 +96,7 @@ class ContentDocument extends BaseContentDocument implements BreadcrumbInterface
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.content.document.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new ContentDocumentModification($request);
+        return AdminForm::CONTENT_DOCUMENT_MODIFICATION;
     }
 
     /**
