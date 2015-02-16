@@ -56,6 +56,13 @@
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
                     </div>
                     {/form_field}
+                    
+                    {form_field form=$form field='pinterest'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}">
+                    </div>
+                    {/form_field}
 
                     {form_field form=$form field='youtube'}
                     <div class="form-group {if $error}has-error{/if}">
