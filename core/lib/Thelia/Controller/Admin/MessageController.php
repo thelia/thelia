@@ -241,9 +241,9 @@ class MessageController extends AbstractCrudController
         }
 
         if ($html) {
-            $content = $message->getHtmlMessageBody($parser);
+            $content = $message->setLocale($this->getCurrentEditionLocale())->getHtmlMessageBody($parser);
         } else {
-            $content = $message->getTextMessageBody($parser);
+            $content = $message->setLocale($this->getCurrentEditionLocale())->getTextMessageBody($parser);
         }
 
         return new Response($content);
