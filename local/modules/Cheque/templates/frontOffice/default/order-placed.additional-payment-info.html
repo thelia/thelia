@@ -16,6 +16,6 @@
 </blockquote>
 <p><span class="glyphicon glyphicon-warning-sign"></span> {intl d='cheque.fo.default' l="Be sure to sign your cheque !"}</p>
 
-{loop type="module-config" name="cheque-instructions" module="cheque" variable="instructions"}
+{loop type="module-config" name="cheque-instructions" module="cheque" variable="instructions" locale={lang attr='locale'}}
 <p>{$VALUE nofilter}</p>
 {/loop}
