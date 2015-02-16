@@ -61,7 +61,7 @@
                                                     {elseif $export_order == "id_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=id{if $export_order == "id"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=id{if $export_order == "id"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="ID"}
                                                     </a>
                                                 </th>
@@ -71,7 +71,7 @@
                                                     {elseif $export_order == "alpha_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=alpha{if $export_order == "alpha"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="Name"}
                                                     </a>
                                                 </th>
@@ -84,7 +84,7 @@
                                                     {elseif $export_order == "manual_reverse"}
                                                         <i class="glyphicon glyphicon-chevron-down"></i>
                                                     {/if}
-                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category}&{/if}export_order=manual{if $export_order == "manual"}_reverse{/if}#category_{$category_title}">
+                                                    <a href="{url path="/admin/export"}?{if $url_category}{$url_category nofilter}&{/if}export_order=manual{if $export_order == "manual"}_reverse{/if}#category_{$category_title}">
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>
@@ -100,7 +100,7 @@
                                                         {$ID}
                                                     </td>
                                                     <td>
-                                                        <a href="#category_{$category_title}" class="btn-show-export-modal" data-id="{$ID}" data-url="{$URL}">{$TITLE}</a>
+                                                        <a href="#category_{$category_title}" class="btn-show-export-modal" data-id="{$ID}" data-url="{$URL nofilter}">{$TITLE}</a>
                                                     </td>
                                                     <td>
                                                         {$DESCRIPTION nofilter}
@@ -118,7 +118,7 @@
                                                     </td>
                                                     <td>
                                                         <div class="btn-group">
-                                                            <a class="btn btn-default btn-xs btn-show-export-modal" data-id="{$ID}" data-url="{$URL}" title="{intl l="Do this export"}">
+                                                            <a class="btn btn-default btn-xs btn-show-export-modal" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this export"}">
                                                                 <span class="glyphicon glyphicon-open"></span>
                                                             </a>
                                                         </div>

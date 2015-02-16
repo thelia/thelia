@@ -13,7 +13,7 @@
         <tr>
             <td class="col-md-4">
                 {loop name="product_thumbnail" type="image" product=$ID width="218" height="146" resize_mode="borders" limit="1"}
-                    <img itemprop="image" src="{$IMAGE_URL}" alt="Product #{$LOOP_COUNT}">
+                    <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="Product #{$LOOP_COUNT}">
                 {/loop}
             </td>
             <td class="col-md-4">

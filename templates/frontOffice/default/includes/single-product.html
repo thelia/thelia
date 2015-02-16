@@ -12,9 +12,9 @@
 		
 		{hook name="singleproduct.top" product="{$product_id}"}
 
-        <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
+        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
-                <img itemprop="image" src="{$IMAGE_URL}" alt="{$productTitle}">
+                <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$productTitle}">
             {/loop}
             {elseloop rel="product_thumbnail"}
                 {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
@@ -23,7 +23,7 @@
         </a>
 
         <div class="product-info">
-            <h2 class="name"><a href="{$URL}"><span itemprop="name">{$productTitle}</span></a></h2>
+            <h2 class="name"><a href="{$URL nofilter}"><span itemprop="name">{$productTitle}</span></a></h2>
             {if $hasDescription}
             <div class="description" itemprop="description">
                 <p>{$DESCRIPTION nofilter}</p>
@@ -110,7 +110,7 @@
                 {else}
                     <div>
                         <div class="product-btn">
-                            <a href="{$URL}" class="btn btn-cart">{intl l="View product"}</a>
+                            <a href="{$URL nofilter}" class="btn btn-cart">{intl l="View product"}</a>
                         </div>
                     </div>
                 {/if}

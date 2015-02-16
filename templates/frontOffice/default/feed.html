@@ -17,7 +17,7 @@
         {else}
             {loop type="category" name="category" id=$_id_ lang=$_lang_ }
                 <title>{intl l="All products in"} {$TITLE} - {$store_name}</title>
-                <link>{$URL}</link>
+                <link>{$URL nofilter}</link>
                 <description>{$CHAPO}</description>
                 <language>{$LOCALE|replace:'_':'-'|lower}</language>
                 <pubDate>{format_date date=$UPDATE_DATE format="r"}</pubDate>
@@ -28,10 +28,10 @@
         {loop type="product" name="product" category_default=$_id_ lang=$_lang_ order="id_reverse" }
             <item>
                 <title>{$TITLE}</title>
-                <link>{$URL}</link>
+                <link>{$URL nofilter}</link>
                 <description>{$CHAPO}</description>
                 <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
-                <guid>{$URL}</guid>
+                <guid>{$URL nofilter}</guid>
             </item>
         {/loop}
     </channel>
@@ -47,16 +47,16 @@
             {loop type="brand" name="brand-list" lang=$_lang_ order="id-reverse" }
                 <item>
                     <title>{$TITLE}</title>
-                    <link>{$URL}</link>
+                    <link>{$URL nofilter}</link>
                     <description>{$CHAPO}</description>
                     <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
-                    <guid>{$URL}</guid>
+                    <guid>{$URL nofilter}</guid>
                 </item>
             {/loop}
         {else}
             {loop type="brand" name="brand-desc" lang=$_lang_ id=$_id_}
             <title>{intl l="All products for brand %title in %store" title="$TITLE" store="$store_name"}</title>
-            <link>{$URL}</link>
+            <link>{$URL nofilter}</link>
             <description>{$CHAPO}</description>
             <language>{$locale|replace:'_':'-'|lower}</language>
             <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
@@ -67,10 +67,10 @@
         {loop type="product" name="products-in-brand" brand=$_id_ lang=$_lang_ order="id_reverse" }
             <item>
                 <title>{$TITLE}</title>
-                <link>{$URL}</link>
+                <link>{$URL nofilter}</link>
                 <description>{$CHAPO}</description>
                 <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
-                <guid>{$URL}</guid>
+                <guid>{$URL nofilter}</guid>
             </item>
         {/loop}
     </channel>
@@ -86,7 +86,7 @@
     {else}
         {loop type="folder" name="folder" id=$_id_ lang=$_lang_ }
         <title>{intl l="All contents in"} {$TITLE} - {$store_name}</title>
-        <link>{$URL}</link>
+        <link>{$URL nofilter}</link>
         <description>{$CHAPO}</description>
         <language>{$LOCALE|replace:'_':'-'|lower}</language>
         <pubDate>{format_date date=$UPDATE_DATE format="r"}</pubDate>
@@ -97,10 +97,10 @@
     {loop type="content" name="content" folder_default=$_id_ lang=$_lang_ }
         <item>
             <title>{$TITLE}</title>
-            <link>{$URL}</link>
+            <link>{$URL nofilter}</link>
             <description>{$CHAPO}</description>
             <pubDate>{format_date date=$CREATE_DATE format="r"}</pubDate>
-            <guid>{$URL}</guid>
+            <guid>{$URL nofilter}</guid>
         </item>
     {/loop}
     </channel>

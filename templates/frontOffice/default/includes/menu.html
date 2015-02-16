@@ -26,11 +26,11 @@
                     {loop name="cat-parent-$level" type="category" parent=$parent need_count_child=1 not_empty="1"}
 
                             {if $CHILD_COUNT> 0}
-                                <li><a href="{$URL}#collapse{$ID}" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}">{$TITLE}</a>
+                                <li><a href="{$URL nofilter}#collapse{$ID}" class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#collapse{$ID}">{$TITLE}</a>
                                 {menu parent=$ID level=$level+1}
                                 </li>
                             {else}
-                                <li><a href="{$URL}">{$TITLE} ({count type="product" category="{$ID}"})</a></li>
+                                <li><a href="{$URL nofilter}">{$TITLE} ({count type="product" category="{$ID}"})</a></li>
                             {/if}
                     {/loop}
 
