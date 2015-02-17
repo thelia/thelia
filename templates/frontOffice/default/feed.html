@@ -55,7 +55,7 @@
             {/loop}
         {else}
             {loop type="brand" name="brand-desc" lang=$_lang_ id=$_id_}
-            <title>{intl l="All products for brand %title in %store" title="$TITLE" store="$store_name"}</title>
+            <title>{intl l="All products for brand %title in %store" title="{$TITLE}" store="{$store_name}"}</title>
             <link>{$URL nofilter}</link>
             <description>{$CHAPO}</description>
             <language>{$locale|replace:'_':'-'|lower}</language>

@@ -131,7 +131,7 @@
                                     {$zones="`$zones`, `$NAME`"}
                                     {$zone_count=$LOOP_TOTAL}
                                 {/loop}
-                                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count=$zone_count  zones={$zones|ltrim:', '}}}
+                                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count={$zone_count}  zones={$zones|ltrim:', '}}}
                                 {$btnstyle="btn-info"}
                                 {$icon=''}
                             {/ifloop}

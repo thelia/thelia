@@ -13,7 +13,7 @@
 
     {if $exception_message}
         <p>
-            {intl l='The following error message has been found: %msg' msg=$exception_message}
+            {intl l='The following error message has been found: %msg' msg={$exception_message}}
         </p>
     {/if}
 {/block}
