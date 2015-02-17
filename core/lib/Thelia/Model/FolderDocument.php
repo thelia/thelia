@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\FolderDocumentModification;
 use Thelia\Model\Base\FolderDocument as BaseFolderDocument;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -93,19 +94,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.folder.document.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new FolderDocumentModification($request);
+        return AdminForm::FOLDER_DOCUMENT_MODIFICATION;
     }
 
     /**

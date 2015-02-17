@@ -23,7 +23,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Sale\SaleCreationForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Sale\SaleModificationForm;
 use Thelia\Model\Sale;
 use Thelia\Model\SaleProduct;
@@ -54,7 +54,7 @@ class SaleController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new SaleCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::SALE_CREATION);
     }
 
     /**
@@ -62,7 +62,7 @@ class SaleController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new SaleModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::SALE_MODIFICATION);
     }
 
     /**
@@ -117,7 +117,7 @@ class SaleController extends AbstractCrudController
         ];
 
         // Setup the object form
-        return new SaleModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::SALE_MODIFICATION, "form", $data);
     }
 
     /**

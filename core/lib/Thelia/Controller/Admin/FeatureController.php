@@ -12,19 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Feature\FeatureDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Feature\FeatureUpdateEvent;
-use Thelia\Core\Event\Feature\FeatureCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\FeatureQuery;
-use Thelia\Form\FeatureModificationForm;
-use Thelia\Form\FeatureCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-
 use Thelia\Core\Event\Feature\FeatureAvUpdateEvent;
+use Thelia\Core\Event\Feature\FeatureCreateEvent;
+use Thelia\Core\Event\Feature\FeatureDeleteEvent;
 use Thelia\Core\Event\Feature\FeatureEvent;
+use Thelia\Core\Event\Feature\FeatureUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\FeatureQuery;
 
 /**
  * Manages features
@@ -50,12 +48,12 @@ class FeatureController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new FeatureCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::FEATURE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new FeatureModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::FEATURE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -141,7 +139,7 @@ class FeatureController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new FeatureModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::FEATURE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

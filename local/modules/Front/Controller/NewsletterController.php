@@ -27,8 +27,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\NewsletterForm;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Log\Tlog;
+use Thelia\Model\Customer;
 
 /**
  * Class NewsletterController
@@ -41,10 +42,9 @@ class NewsletterController extends BaseFrontController
     public function subscribeAction()
     {
         $errorMessage = false;
-        $newsletterForm = new NewsletterForm($this->getRequest());
+        $newsletterForm = $this->createForm(FrontForm::NEWSLETTER);
 
         try {
-
             $form = $this->validateForm($newsletterForm);
 
             $event = new NewsletterEvent(
@@ -52,6 +52,7 @@ class NewsletterController extends BaseFrontController
                 $this->getRequest()->getSession()->getLang()->getLocale()
             );
 
+            /** @var Customer $customer */
             if (null !== $customer = $this->getSecurityContext()->getCustomerUser()) {
                 $event->setFirstname($customer->getFirstname());
                 $event->setLastname($customer->getLastname());
@@ -97,6 +98,5 @@ class NewsletterController extends BaseFrontController
                 ->setGeneralError($errorMessage)
             ;
         }
-
     }
 }

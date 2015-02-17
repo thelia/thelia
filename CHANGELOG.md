@@ -34,6 +34,7 @@
 - Fix deploy image directory destination
 - Fix redirect response if a AuthenticationException is catched
 - The PaymentModule log default level is now INFO instead of ERROR
+- Direct instantiations of Thelia forms is deprecated. BaseController::createForm() should be used instead.
 
 # 2.1.1
 

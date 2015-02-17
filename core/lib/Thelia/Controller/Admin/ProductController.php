@@ -15,73 +15,66 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
-use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Core\Event\Product\ProductCreateEvent;
-use Thelia\Core\Event\Product\ProductAddCategoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteEvent;
-use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
-use Thelia\Core\Event\Product\ProductDeleteContentEvent;
-use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
-use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductAddCategoryEvent;
+use Thelia\Core\Event\Product\ProductAddContentEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
+use Thelia\Core\Event\Product\ProductCreateEvent;
+use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
+use Thelia\Core\Event\Product\ProductDeleteContentEvent;
+use Thelia\Core\Event\Product\ProductDeleteEvent;
+use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
-use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
+use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
-
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Response;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
-
+use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Form\ProductModificationForm;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
+use Thelia\Model\ContentQuery;
+use Thelia\Model\Country;
+use Thelia\Model\Currency;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
-use Thelia\Model\ContentQuery;
-use Thelia\Model\AttributeQuery;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\MetaDataQuery;
 use Thelia\Model\MetaData;
+use Thelia\Model\MetaDataQuery;
+use Thelia\Model\Product;
+use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
+use Thelia\Model\ProductPrice;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
-use Thelia\Model\ProductAssociatedContentQuery;
-use Thelia\Model\ProductSaleElements as ProductSaleElementsModel;
 use Thelia\Model\ProductSaleElements;
-use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElements as ProductSaleElementsModel;
 use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
-use Thelia\Model\ProductPriceQuery;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\Currency;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Model\Country;
-use Thelia\Model\Product;
-
-use Thelia\Form\ProductCreationForm;
-use Thelia\Form\ProductModificationForm;
-use Thelia\Form\ProductSaleElementUpdateForm;
-use Thelia\Form\ProductDefaultSaleElementUpdateForm;
-use Thelia\Form\ProductCombinationGenerationForm;
-
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;
@@ -140,12 +133,12 @@ class ProductController extends AbstractSeoCrudController
 
     protected function getCreationForm()
     {
-        return new ProductCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::PRODUCT_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new ProductModificationForm($this->getRequest(), "form", [], [], $this->container);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", [], [], $this->container);
     }
 
     protected function getCreationEvent($formData)
@@ -332,10 +325,10 @@ class ProductController extends AbstractSeoCrudController
                 $this->appendValue($combinationPseData, "ean_code", $saleElement->getEanCode());
             }
 
-            $defaultPseForm = new ProductDefaultSaleElementUpdateForm($this->getRequest(), "form", $defaultPseData);
+            $defaultPseForm = $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE, "form", $defaultPseData);
             $this->getParserContext()->addForm($defaultPseForm);
 
-            $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
+            $combinationPseForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE, "form", $combinationPseData);
             $this->getParserContext()->addForm($combinationPseForm);
         }
 
@@ -366,7 +359,7 @@ class ProductController extends AbstractSeoCrudController
         }
 
         // Setup the object form
-        return new ProductModificationForm($this->getRequest(), "form", $data, [], $this->container);
+        return $this->createForm(AdminForm::PRODUCT_MODIFICATION, "form", $data, [], $this->container);
     }
 
     /**
@@ -1152,7 +1145,7 @@ class ProductController extends AbstractSeoCrudController
     public function updateProductSaleElementsAction()
     {
         return $this->processProductSaleElementUpdate(
-            new ProductSaleElementUpdateForm($this->getRequest())
+            $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_UPDATE)
         );
     }
 
@@ -1162,7 +1155,7 @@ class ProductController extends AbstractSeoCrudController
     public function updateProductDefaultSaleElementAction()
     {
         return $this->processProductSaleElementUpdate(
-            new ProductDefaultSaleElementUpdateForm($this->getRequest())
+            $this->createForm(AdminForm::PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE)
         );
     }
 
@@ -1196,7 +1189,7 @@ class ProductController extends AbstractSeoCrudController
             return $response;
         }
 
-        $changeForm = new ProductCombinationGenerationForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::PRODUCT_COMBINATION_GENERATION);
 
         try {
             // Check the form against constraints violations

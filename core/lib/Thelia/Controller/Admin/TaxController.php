@@ -12,13 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Tax\TaxEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\TaxCreationForm;
-use Thelia\Form\TaxModificationForm;
-use Thelia\Model\TaxQuery;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\Tax;
+use Thelia\Model\TaxQuery;
 
 class TaxController extends AbstractCrudController
 {
@@ -37,14 +36,14 @@ class TaxController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        $form = new TaxCreationForm($this->getRequest(), 'form', [], ["tax_engine" => $this->container->get('thelia.taxEngine')]);
+        $form = $this->createForm(AdminForm::TAX_CREATION, 'form', [], ["tax_engine" => $this->container->get('thelia.taxEngine')]);
 
         return $form;
     }
 
     protected function getUpdateForm()
     {
-        return new TaxModificationForm($this->getRequest(), 'form', [], ["tax_engine" => $this->container->get('thelia.taxEngine')]);
+        return $this->createForm(AdminForm::TAX_MODIFICATION, 'form', [], ["tax_engine" => $this->container->get('thelia.taxEngine')]);
     }
 
     protected function getCreationEvent($formData)
@@ -101,7 +100,12 @@ class TaxController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TaxModificationForm($this->getRequest(), "form", $data, ["tax_engine" => $this->container->get('thelia.taxEngine')]);
+        return $this->createForm(
+            AdminForm::TAX_MODIFICATION,
+            "form",
+            $data,
+            ["tax_engine" => $this->container->get('thelia.taxEngine')]
+        );
     }
 
     protected function getObjectFromEvent($event)

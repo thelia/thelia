@@ -12,16 +12,15 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Folder\FolderCreateEvent;
 use Thelia\Core\Event\Folder\FolderDeleteEvent;
 use Thelia\Core\Event\Folder\FolderToggleVisibilityEvent;
 use Thelia\Core\Event\Folder\FolderUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Form\FolderCreationForm;
-use Thelia\Form\FolderModificationForm;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\FolderQuery;
 
 /**
@@ -52,7 +51,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getCreationForm()
     {
-        return new FolderCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::FOLDER_CREATION);
     }
 
     /**
@@ -60,7 +59,7 @@ class FolderController extends AbstractSeoCrudController
      */
     protected function getUpdateForm()
     {
-        return new FolderModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::FOLDER_MODIFICATION);
     }
 
     /**
@@ -86,7 +85,7 @@ class FolderController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return new FolderModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::FOLDER_MODIFICATION, "form", $data);
     }
 
     /**

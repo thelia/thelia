@@ -21,10 +21,8 @@ use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\Lang\LangCreateForm;
-use Thelia\Form\Lang\LangDefaultBehaviorForm;
-use Thelia\Form\Lang\LangUpdateForm;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Form\Lang\LangUrlForm;
 use Thelia\Log\Tlog;
@@ -52,7 +50,7 @@ class LangController extends BaseAdminController
         foreach (LangQuery::create()->find() as $lang) {
             $data[LangUrlForm::LANG_PREFIX.$lang->getId()] = $lang->getUrl();
         }
-        $langUrlForm = new LangUrlForm($this->getRequest(), 'form', $data);
+        $langUrlForm = $this->createForm(AdminForm::LANG_URL, 'form', $data);
         $this->getParserContext()->addForm($langUrlForm);
 
         return $this->render('languages', array_merge($param, array(
@@ -71,7 +69,7 @@ class LangController extends BaseAdminController
 
         $lang = LangQuery::create()->findPk($lang_id);
 
-        $langForm = new LangUpdateForm($this->getRequest(), 'form', array(
+        $langForm = $this->createForm(AdminForm::LANG_UPDATE, 'form', array(
             'id' => $lang->getId(),
             'title' => $lang->getTitle(),
             'code' => $lang->getCode(),
@@ -98,7 +96,7 @@ class LangController extends BaseAdminController
 
         $error_msg = false;
 
-        $langForm = new LangUpdateForm($this->getRequest());
+        $langForm = $this->createForm(AdminForm::LANG_UPDATE);
 
         try {
             $form = $this->validateForm($langForm);
@@ -203,7 +201,7 @@ class LangController extends BaseAdminController
             return $response;
         }
 
-        $createForm = new LangCreateForm($this->getRequest());
+        $createForm = $this->createForm(AdminForm::LANG_CREATE);
 
         $error_msg = false;
 
@@ -298,7 +296,7 @@ class LangController extends BaseAdminController
 
         $error_msg = false;
 
-        $behaviorForm = new LangDefaultBehaviorForm($this->getRequest());
+        $behaviorForm = $this->createForm(AdminForm::LANG_DEFAULT_BEHAVIOR);
 
         try {
             $form = $this->validateForm($behaviorForm);
@@ -338,7 +336,7 @@ class LangController extends BaseAdminController
         }
 
         $error_msg = false;
-        $langUrlForm = new LangUrlForm($this->getRequest());
+        $langUrlForm = $this->createForm(AdminForm::LANG_URL);
 
         try {
             $form = $this->validateForm($langUrlForm);

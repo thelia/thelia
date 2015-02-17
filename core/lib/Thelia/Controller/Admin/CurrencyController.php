@@ -12,16 +12,15 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
-use Thelia\Model\CurrencyQuery;
-use Thelia\Form\CurrencyModificationForm;
-use Thelia\Form\CurrencyCreationForm;
+use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\CurrencyQuery;
 
 /**
  * Manages currencies
@@ -47,12 +46,12 @@ class CurrencyController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new CurrencyCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::CURRENCY_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new CurrencyModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::CURRENCY_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -118,7 +117,7 @@ class CurrencyController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new CurrencyModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::CURRENCY_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

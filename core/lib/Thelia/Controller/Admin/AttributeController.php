@@ -12,19 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
-use Thelia\Core\Event\Attribute\AttributeCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\AttributeQuery;
-use Thelia\Form\AttributeModificationForm;
-use Thelia\Form\AttributeCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
+use Thelia\Core\Event\Attribute\AttributeCreateEvent;
+use Thelia\Core\Event\Attribute\AttributeDeleteEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
+use Thelia\Core\Event\Attribute\AttributeUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\AttributeQuery;
 
 /**
  * Manages attributes
@@ -50,12 +48,12 @@ class AttributeController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new AttributeCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::ATTRIBUTE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new AttributeModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -141,7 +139,7 @@ class AttributeController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new AttributeModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::ATTRIBUTE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

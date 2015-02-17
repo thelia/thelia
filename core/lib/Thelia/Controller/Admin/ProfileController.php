@@ -12,13 +12,12 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Profile\ProfileEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\ProfileCreationForm;
-use Thelia\Form\ProfileModificationForm;
 use Thelia\Form\ProfileUpdateModuleAccessForm;
 use Thelia\Form\ProfileUpdateResourceAccessForm;
 use Thelia\Model\ProfileQuery;
@@ -40,12 +39,12 @@ class ProfileController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new ProfileCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::PROFILE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new ProfileModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::PROFILE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -103,7 +102,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_MODIFICATION, "form", $data);
     }
 
     protected function hydrateResourceUpdateForm($object)
@@ -113,7 +112,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileUpdateResourceAccessForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS, "form", $data);
     }
 
     protected function hydrateModuleUpdateForm($object)
@@ -123,7 +122,7 @@ class ProfileController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ProfileUpdateModuleAccessForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -305,7 +304,7 @@ class ProfileController extends AbstractCrudController
         $error_msg = false;
 
         // Create the form from the request
-        $changeForm = new ProfileUpdateResourceAccessForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_RESOURCE_ACCESS);
 
         try {
             // Check the form against constraints violations
@@ -368,7 +367,7 @@ class ProfileController extends AbstractCrudController
         $error_msg = false;
 
         // Create the form from the request
-        $changeForm = new ProfileUpdateModuleAccessForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::PROFILE_UPDATE_MODULE_ACCESS);
 
         try {
             // Check the form against constraints violations

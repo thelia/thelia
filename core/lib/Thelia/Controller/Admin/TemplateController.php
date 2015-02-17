@@ -12,21 +12,20 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Template\TemplateDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Template\TemplateUpdateEvent;
-use Thelia\Core\Event\Template\TemplateCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\TemplateQuery;
-use Thelia\Form\TemplateModificationForm;
-use Thelia\Form\TemplateCreationForm;
-use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
 use Thelia\Core\Event\Template\TemplateAddAttributeEvent;
 use Thelia\Core\Event\Template\TemplateAddFeatureEvent;
+use Thelia\Core\Event\Template\TemplateCreateEvent;
+use Thelia\Core\Event\Template\TemplateDeleteAttributeEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Core\Event\Template\TemplateDeleteFeatureEvent;
-use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Core\Event\Template\TemplateUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AttributeTemplateQuery;
+use Thelia\Model\FeatureTemplateQuery;
+use Thelia\Model\TemplateQuery;
 
 /**
  * Manages product templates
@@ -52,12 +51,12 @@ class TemplateController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new TemplateCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::TEMPLATE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new TemplateModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::TEMPLATE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -105,7 +104,7 @@ class TemplateController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TemplateModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::TEMPLATE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

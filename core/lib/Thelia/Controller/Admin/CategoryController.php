@@ -12,23 +12,22 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Category\CategoryDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Category\CategoryUpdateEvent;
-use Thelia\Core\Event\Category\CategoryCreateEvent;
-use Thelia\Core\Security\AccessManager;
-use Thelia\Model\CategoryQuery;
-use Thelia\Form\CategoryModificationForm;
-use Thelia\Form\CategoryCreationForm;
-use Thelia\Core\Event\UpdatePositionEvent;
-use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
-use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
-use Thelia\Core\Event\Category\CategoryAddContentEvent;
-use Thelia\Model\FolderQuery;
-use Thelia\Model\ContentQuery;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Event\Category\CategoryAddContentEvent;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
+use Thelia\Core\Event\Category\CategoryDeleteContentEvent;
+use Thelia\Core\Event\Category\CategoryDeleteEvent;
+use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
+use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\CategoryAssociatedContentQuery;
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ContentQuery;
+use Thelia\Model\FolderQuery;
 
 /**
  * Manages categories
@@ -55,12 +54,12 @@ class CategoryController extends AbstractSeoCrudController
 
     protected function getCreationForm()
     {
-        return new CategoryCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::CATEGORY_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new CategoryModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::CATEGORY_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -132,7 +131,7 @@ class CategoryController extends AbstractSeoCrudController
         );
 
         // Setup the object form
-        return new CategoryModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::CATEGORY_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

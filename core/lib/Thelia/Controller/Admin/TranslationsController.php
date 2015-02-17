@@ -13,13 +13,13 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Finder\Finder;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
-use Thelia\Core\Template\TemplateHelper;
-use Thelia\Core\Template\TemplateDefinition;
 use Thelia\Tools\URL;
 
 /**

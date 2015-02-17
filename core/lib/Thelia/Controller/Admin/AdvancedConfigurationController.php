@@ -16,9 +16,7 @@ use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Form\Cache\AssetsFlushForm;
-use Thelia\Form\Cache\CacheFlushForm;
-use Thelia\Form\Cache\ImagesAndDocumentsCacheFlushForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
@@ -44,7 +42,7 @@ class AdvancedConfigurationController extends BaseAdminController
             return $result;
         }
 
-        $form = new CacheFlushForm($this->getRequest());
+        $form = $this->createForm(AdminForm::CACHE_FLUSH);
         try {
             $this->validateForm($form);
 
@@ -63,7 +61,7 @@ class AdvancedConfigurationController extends BaseAdminController
             return $result;
         }
 
-        $form = new AssetsFlushForm($this->getRequest());
+        $form = $this->createForm(AdminForm::ASSETS_FLUSH);
         try {
             $this->validateForm($form);
 
@@ -82,7 +80,7 @@ class AdvancedConfigurationController extends BaseAdminController
             return $result;
         }
 
-        $form = new ImagesAndDocumentsCacheFlushForm($this->getRequest());
+        $form = $this->createForm(AdminForm::IMAGES_AND_DOCUMENTS_CACHE_FLUSH);
         try {
             $this->validateForm($form);
 

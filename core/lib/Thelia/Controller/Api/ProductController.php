@@ -26,6 +26,7 @@ use Thelia\Core\Template\Loop\Product;
 use Thelia\Form\Api\Product\ProductCreationForm;
 use Thelia\Form\Api\Product\ProductModificationForm;
 use Thelia\Model\ProductQuery;
+use Thelia\Form\Definition\ApiForm;
 
 /**
  * Class ProductController
@@ -90,8 +91,7 @@ class ProductController extends BaseApiController
     {
         $this->checkAuth(AdminResources::PRODUCT, [], AccessManager::CREATE);
 
-        $request = $this->getRequest();
-        $form = new ProductCreationForm($request, 'form', [], ['csrf_protection' => false]);
+        $form = $this->createForm(ApiForm::PRODUCT_CREATION, 'form', [], ['csrf_protection' => false]);
 
         try {
             $creationForm = $this->validateForm($form);
@@ -109,7 +109,7 @@ class ProductController extends BaseApiController
 
             $this->dispatch(TheliaEvents::PRODUCT_UPDATE, $updateEvent);
 
-            $request->query->set('lang', $creationForm->get('locale')->getData());
+            $this->getRequest()->query->set('lang', $creationForm->get('locale')->getData());
             $response = $this->getProductAction($product->getId());
             $response->setStatusCode(201);
 
@@ -125,10 +125,8 @@ class ProductController extends BaseApiController
 
         $this->checkProductExists($productId);
 
-        $request = $this->getRequest();
-
-        $form = new ProductModificationForm(
-            $request,
+        $form = $this->createForm(
+            ApiForm::PRODUCT_MODIFICATION,
             'form',
             ['id' => $productId],
             [
@@ -136,6 +134,8 @@ class ProductController extends BaseApiController
                 'method' => 'PUT'
             ]
         );
+
+        $request = $this->getRequest();
 
         $data = $request->request->all();
         $data['id'] = $productId;

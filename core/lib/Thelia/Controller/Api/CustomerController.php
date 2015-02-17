@@ -27,6 +27,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Template\Loop\Customer;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\CustomerQuery;
+use Thelia\Form\Definition\ApiForm;
 
 /**
  * Class CustomerController
@@ -70,7 +71,7 @@ class CustomerController extends AbstractCrudApiController
      */
     protected function getCreationForm(array $data = array())
     {
-        return $this->createForm("thelia.api.customer.create");
+        return $this->createForm(ApiForm::CUSTOMER_CREATE);
     }
 
     /**
@@ -80,7 +81,7 @@ class CustomerController extends AbstractCrudApiController
     protected function getUpdateForm(array $data = array())
     {
         return $this->createForm(
-            "thelia.api.customer.update",
+            ApiForm::CUSTOMER_UPDATE,
             "form",
             [],
             ['method' => 'PUT']
@@ -192,7 +193,7 @@ class CustomerController extends AbstractCrudApiController
         $this->checkAuth($this->resources, $this->modules, AccessManager::VIEW);
 
         $request = $this->getRequest();
-        $customerLoginForm = $this->createForm("thelia.api.customer.login");
+        $customerLoginForm = $this->createForm(ApiForm::CUSTOMER_LOGIN);
 
         try {
             $this->validateForm($customerLoginForm, "post");

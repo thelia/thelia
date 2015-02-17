@@ -21,8 +21,7 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
-use Thelia\Form\Api\ApiCreateForm;
-use Thelia\Form\Api\ApiUpdateForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Api;
 use Thelia\Model\ApiQuery;
@@ -96,7 +95,7 @@ class ApiController extends BaseAdminController
             return $response;
         }
 
-        $form = new ApiCreateForm($this->getRequest());
+        $form = $this->createForm(AdminForm::API_CREATE);
         $error_msg = null;
         try {
             $createForm = $this->validateForm($form);
@@ -131,7 +130,7 @@ class ApiController extends BaseAdminController
     public function updateAction($api_id)
     {
         if (null === $response = $this->checkApiAccess($api_id, AccessManager::UPDATE)) {
-            $form = new ApiUpdateForm($this->getRequest(), 'form', ['profile' => $this->api->getProfileId()]);
+            $form = $this->createForm(AdminForm::API_UPDATE, 'form', ['profile' => $this->api->getProfileId()]);
 
             $this->getParserContext()->addForm($form);
 
@@ -153,7 +152,7 @@ class ApiController extends BaseAdminController
     private function doUpdate(Api $api)
     {
         $error_msg = null;
-        $form = new ApiUpdateForm($this->getRequest());
+        $form = $this->createForm(AdminForm::API_UPDATE);
         try {
             $updateForm = $this->validateForm($form);
 

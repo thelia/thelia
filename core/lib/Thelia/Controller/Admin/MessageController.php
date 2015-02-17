@@ -12,19 +12,18 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\Finder\Finder;
+use Thelia\Core\Event\Message\MessageCreateEvent;
+use Thelia\Core\Event\Message\MessageDeleteEvent;
+use Thelia\Core\Event\Message\MessageUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Message\MessageDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Message\MessageUpdateEvent;
-use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Model\MessageQuery;
-use Thelia\Form\MessageModificationForm;
-use Thelia\Form\MessageCreationForm;
-use Symfony\Component\Finder\Finder;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
 
@@ -52,12 +51,12 @@ class MessageController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new MessageCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::MESSAGE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new MessageModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::MESSAGE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -126,7 +125,7 @@ class MessageController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new MessageModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::MESSAGE_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

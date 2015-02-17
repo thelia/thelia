@@ -12,17 +12,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\Tax\TaxRuleEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\TaxRuleCreationForm;
-use Thelia\Form\TaxRuleModificationForm;
-use Thelia\Form\TaxRuleTaxListUpdateForm;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRuleQuery;
-use Thelia\Form\TaxCreationForm;
 
 class TaxRuleController extends AbstractCrudController
 {
@@ -48,7 +45,12 @@ class TaxRuleController extends AbstractCrudController
         //
         // So we create an instance of TaxCreationForm here (we have the container), and put it in the ParserContext.
         // This way, the Form plugin will use this instance, instead on creating it.
-        $taxCreationForm = new TaxCreationForm($this->getRequest(), 'form', array(), array("tax_engine" => $this->container->get('thelia.taxEngine')));
+        $taxCreationForm = $this->createForm(
+            AdminForm::TAX_CREATION,
+            'form',
+            array(),
+            array("tax_engine" => $this->container->get('thelia.taxEngine'))
+        );
 
         $this->getParserContext()->addForm($taxCreationForm);
 
@@ -57,12 +59,12 @@ class TaxRuleController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new TaxRuleCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::TAX_RULE_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new TaxRuleModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::TAX_RULE_MODIFICATION);
     }
 
     protected function getCreationEvent($formData)
@@ -125,7 +127,7 @@ class TaxRuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TaxRuleModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::TAX_RULE_MODIFICATION, "form", $data);
     }
 
     protected function hydrateTaxUpdateForm($object)
@@ -135,7 +137,7 @@ class TaxRuleController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new TaxRuleTaxListUpdateForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE, "form", $data);
     }
 
     protected function getObjectFromEvent($event)
@@ -272,7 +274,7 @@ class TaxRuleController extends AbstractCrudController
         $error_msg = false;
 
         // Create the form from the request
-        $changeForm = new TaxRuleTaxListUpdateForm($this->getRequest());
+        $changeForm = $this->createForm(AdminForm::TAX_RULE_TAX_LIST_UPDATE);
 
         try {
             // Check the form against constraints violations

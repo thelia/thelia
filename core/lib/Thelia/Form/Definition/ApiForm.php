@@ -10,23 +10,27 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Controller\Admin;
-
-use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Security\Resource\AdminResources;
+namespace Thelia\Form\Definition;
 
 /**
- * Class LanguageController
- * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * Class ApiForm
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ * @package TheliaFormDefinition
  */
-class LanguageController extends BaseAdminController
+final class ApiForm
 {
-    public function defaultAction()
-    {
-        if (null !== $response = $this->checkAuth(AdminResources::LANGUAGE, array(), AccessManager::VIEW)) {
-            return $response;
-        }
-        return $this->render("languages");
-    }
+    const EMPTY_FORM = 'thelia.api.empty';
+
+    const CUSTOMER_CREATE = 'thelia.api.customer.create';
+    const CUSTOMER_UPDATE = 'thelia.api.customer.update';
+    const CUSTOMER_LOGIN = 'thelia.api.customer.login';
+
+    const CATEGORY_CREATION = 'thelia.api.category.create';
+    const CATEGORY_MODIFICATION = 'thelia.api.category.update';
+
+    const PRODUCT_SALE_ELEMENTS = 'thelia.api.product_sale_elements';
+
+    const PRODUCT_CREATION = 'thelia.api.product.creation';
+    const PRODUCT_MODIFICATION = 'thelia.api.product.modification';
 }

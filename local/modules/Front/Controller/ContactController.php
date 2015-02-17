@@ -25,6 +25,7 @@ namespace Front\Controller;
 
 use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Form\ContactForm;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\ConfigQuery;
 
@@ -41,7 +42,7 @@ class ContactController extends BaseFrontController
     public function sendAction()
     {
         $error_message = false;
-        $contactForm = new ContactForm($this->getRequest());
+        $contactForm = $this->createForm(FrontForm::CONTACT);
 
         try {
             $form = $this->validateForm($contactForm);

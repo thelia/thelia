@@ -16,8 +16,8 @@ use Thelia\Core\Event\MailingSystem\MailingSystemEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\MailingSystemModificationForm;
 use Thelia\Model\ConfigQuery;
 
 class MailingSystemController extends BaseAdminController
@@ -44,7 +44,7 @@ class MailingSystemController extends BaseAdminController
         );
 
         // Setup the object form
-        $form = new MailingSystemModificationForm($this->getRequest(), "form", $data);
+        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION, "form", $data);
 
         // Pass it to the parser
         $this->getParserContext()->addForm($form);
@@ -63,7 +63,7 @@ class MailingSystemController extends BaseAdminController
         $error_msg = false;
 
         // Create the form from the request
-        $form = new MailingSystemModificationForm($this->getRequest());
+        $form = $this->createForm(AdminForm::MAILING_SYSTEM_MODIFICATION);
 
         try {
             // Check the form against constraints violations

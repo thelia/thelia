@@ -12,15 +12,15 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Form\AttributeAvModificationForm;
-use Thelia\Form\AttributeAvCreationForm;
+use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;
+use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\AttributeAvModificationForm;
+use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\AttributeAvQuery;
 
 /**
  * Manages attributes-av
@@ -46,12 +46,12 @@ class AttributeAvController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new AttributeAvCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::ATTRIBUTE_AV_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new AttributeAvModificationForm($this->getRequest());
+        throw new \LogicException("Attribute Av. modification is not yet implemented");
     }
 
     protected function getCreationEvent($formData)
@@ -104,17 +104,7 @@ class AttributeAvController extends AbstractCrudController
 
     protected function hydrateObjectForm($object)
     {
-        $data = array(
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum()
-        );
-
-        // Setup the object form
-        return new AttributeAvModificationForm($this->getRequest(), "form", $data);
+        throw new \LogicException("Attribute Av. modification is not yet implemented");
     }
 
     protected function getObjectFromEvent($event)

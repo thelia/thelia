@@ -49,7 +49,7 @@ class ConfigureController extends BaseAdminController
         $ex = null;
 
         // Create the Form from the request
-        $configurationForm = new ConfigurationForm($this->getRequest());
+        $configurationForm = $this->createForm('cheque.instructions.configure');
 
         try {
             // Check the form against constraints violations

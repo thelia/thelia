@@ -12,9 +12,9 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\SystemLogConfigurationForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
@@ -82,7 +82,7 @@ class SystemLogController extends BaseAdminController
         }
 
         // Hydrate the general configuration form
-        $systemLogForm = new SystemLogConfigurationForm($this->getRequest(), 'form', array(
+        $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION, 'form', array(
             'level'             => ConfigQuery::read(Tlog::VAR_LEVEL, Tlog::DEFAULT_LEVEL),
             'format'            => ConfigQuery::read(Tlog::VAR_PREFIXE, Tlog::DEFAUT_PREFIXE),
             'show_redirections' => ConfigQuery::read(Tlog::VAR_SHOW_REDIRECT, Tlog::DEFAUT_SHOW_REDIRECT),
@@ -103,7 +103,7 @@ class SystemLogController extends BaseAdminController
 
         $error_msg = false;
 
-        $systemLogForm = new SystemLogConfigurationForm($this->getRequest());
+        $systemLogForm = $this->createForm(AdminForm::SYSTEM_LOG_CONFIGURATION);
 
         try {
             $form = $this->validateForm($systemLogForm);

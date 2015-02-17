@@ -12,15 +12,14 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\Security\Resource\AdminResources;
-use Thelia\Core\Event\Config\ConfigDeleteEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Event\Config\ConfigUpdateEvent;
 use Thelia\Core\Event\Config\ConfigCreateEvent;
+use Thelia\Core\Event\Config\ConfigDeleteEvent;
+use Thelia\Core\Event\Config\ConfigUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\ConfigQuery;
-use Thelia\Form\ConfigModificationForm;
-use Thelia\Form\ConfigCreationForm;
 
 /**
  * Manages variables
@@ -46,12 +45,12 @@ class ConfigController extends AbstractCrudController
 
     protected function getCreationForm()
     {
-        return new ConfigCreationForm($this->getRequest());
+        return $this->createForm(AdminForm::CONFIG_CREATION);
     }
 
     protected function getUpdateForm()
     {
-        return new ConfigModificationForm($this->getRequest());
+        return $this->createForm(AdminForm::CONFIG_MODIFICATION);
     }
 
     protected function getCreationEvent($data)
@@ -117,7 +116,7 @@ class ConfigController extends AbstractCrudController
         );
 
         // Setup the object form
-        return new ConfigModificationForm($this->getRequest(), "form", $data);
+        return $this->createForm(AdminForm::CONFIG_MODIFICATION, "form", $data);
     }
 
     protected function getObjectFromEvent($event)

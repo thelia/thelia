@@ -43,7 +43,7 @@ class ConfigurationController extends BaseAdminController
         }
 
         $request = $this->getRequest();
-        $form = new CarouselImageForm($request);
+        $form = $this->createForm('carousel.image');
         $error_message = null;
         try {
             $this->validateForm($form);
@@ -115,7 +115,8 @@ class ConfigurationController extends BaseAdminController
 
         $request = $this->getRequest();
 
-        $form = new CarouselUpdateForm($request);
+        $form = $this->createForm('carousel.update');
+
         $error_message = null;
 
         try {

@@ -30,6 +30,7 @@ use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\AddressCreateForm;
 use Thelia\Form\AddressUpdateForm;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AddressQuery;
 
@@ -65,7 +66,7 @@ class AddressController extends BaseFrontController
 
         $this->checkAuth();
 
-        $addressCreate = new AddressCreateForm($this->getRequest());
+        $addressCreate = $this->createForm(FrontForm::ADDRESS_CREATE);
         $message = false;
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();
@@ -134,7 +135,7 @@ class AddressController extends BaseFrontController
         $this->checkAuth();
         $request = $this->getRequest();
 
-        $addressUpdate = new AddressUpdateForm($request);
+        $addressUpdate = $this->createForm(FrontForm::ADDRESS_UPDATE);
         $message = false;
         try {
             $customer = $this->getSecurityContext()->getCustomerUser();

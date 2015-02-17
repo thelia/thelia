@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Form\BaseForm;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\FolderImageModification;
 use Thelia\Model\Base\FolderImage as BaseFolderImage;
 use Propel\Runtime\Connection\ConnectionInterface;
@@ -93,19 +94,7 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
      */
     public function getUpdateFormId()
     {
-        return 'thelia.admin.folder.image.modification';
-    }
-
-    /**
-     * Get the form instance used to change this object information
-     *
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     *
-     * @return BaseForm the form
-     */
-    public function getUpdateFormInstance(Request $request)
-    {
-        return new FolderImageModification($request);
+        return AdminForm::FOLDER_IMAGE_MODIFICATION;
     }
 
     /**

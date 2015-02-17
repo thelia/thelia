@@ -14,11 +14,10 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\Address\AddressCreateOrUpdateEvent;
 use Thelia\Core\Event\Address\AddressEvent;
-use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Form\AddressCreateForm;
-use Thelia\Form\AddressUpdateForm;
+use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
 
@@ -83,7 +82,7 @@ class AddressController extends AbstractCrudController
      */
     protected function getCreationForm()
     {
-        return new AddressCreateForm($this->getRequest());
+        return $this->createForm(AdminForm::ADDRESS_CREATE);
     }
 
     /**
@@ -91,14 +90,14 @@ class AddressController extends AbstractCrudController
      */
     protected function getUpdateForm()
     {
-        return new AddressUpdateForm($this->getRequest());
+        return $this->createForm(AdminForm::ADDRESS_UPDATE);
     }
 
     /**
      * Fills in the form data array
      *
      * @param  unknown        $object
-     * @return multitype:NULL
+     * @return array
      */
     protected function createFormDataArray($object)
     {
@@ -126,7 +125,7 @@ class AddressController extends AbstractCrudController
      */
     protected function hydrateObjectForm($object)
     {
-        return new AddressUpdateForm($this->getRequest(), "form", $this->createFormDataArray($object));
+        return $this->createForm(AdminForm::ADDRESS_UPDATE, "form", $this->createFormDataArray($object));
     }
 
     /**
