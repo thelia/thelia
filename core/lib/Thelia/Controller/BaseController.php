@@ -63,8 +63,6 @@ abstract class BaseController extends ContainerAware
 
     protected $translator;
 
-    protected static $formDefinition;
-
     /** @var bool Fallback on default template when setting the templateDefinition */
     protected $useFallbackTemplate = false;
 
@@ -204,22 +202,7 @@ abstract class BaseController extends ContainerAware
      */
     protected function getErrorMessages(Form $form)
     {
-        $errors = '';
-
-        foreach ($form->getErrors() as $key => $error) {
-            $errors .= $error->getMessage() . ', ';
-        }
-
-        /** @var Form $child */
-        foreach ($form->all() as $child) {
-            if (!$child->isValid()) {
-                $fieldName = $child->getConfig()->getOption('label', $child->getName());
-
-                $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
-            }
-        }
-
-        return rtrim($errors, ', ');
+        return $this->getTheliaFormValidator()->getErrorMessages($form);
     }
 
     /**
@@ -232,52 +215,15 @@ abstract class BaseController extends ContainerAware
      */
     protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
-        $form = $aBaseForm->getForm();
+        return $this->getTheliaFormValidator()->validateForm($aBaseForm, $expectedMethod);
+    }
 
-        if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
-            $form->handleRequest($aBaseForm->getRequest());
-
-            if ($form->isValid()) {
-                $env = $this->container->getParameter("kernel.environment");
-
-                if ($aBaseForm instanceof FirewallForm && !$aBaseForm->isFirewallOk($env)) {
-                    throw new FormValidationException(
-                        $this->getTranslator()->trans(
-                            "You've submitted this form too many times. ".
-                            "Further submissions will be ignored during %time",
-                            [
-                                "%time" => $aBaseForm->getWaitingTime(),
-                            ]
-                        )
-                    );
-                }
-
-                return $form;
-            } else {
-                $errorMessage = null;
-                if ($form->get("error_message")->getData() != null) {
-                    $errorMessage = $form->get("error_message")->getData();
-                } else {
-                    $errorMessage = sprintf(
-                        $this->getTranslator()->trans(
-                            "Missing or invalid data: %s"
-                        ),
-                        $this->getErrorMessages($form)
-                    );
-                }
-
-                throw new FormValidationException($errorMessage);
-            }
-        } else {
-            throw new FormValidationException(
-                sprintf(
-                    $this->getTranslator()->trans(
-                        "Wrong form method, %s expected."
-                    ),
-                    $expectedMethod
-                )
-            );
-        }
+    /**
+     * @return \Thelia\Core\Form\TheliaFormValidatorInterface
+     */
+    protected function getTheliaFormValidator()
+    {
+        return $this->container->get("thelia.form_validator");
     }
 
     /**
@@ -554,21 +500,19 @@ abstract class BaseController extends ContainerAware
      */
     public function createForm($name, $type = "form", array $data = array(), array $options = array())
     {
-        if (static::$formDefinition === null) {
-            static::$formDefinition = $this->container->getParameter("thelia.parser.forms");
-        }
-
         if (empty($name)) {
             $name = static::EMPTY_FORM_NAME;
         }
 
-        if (!isset(static::$formDefinition[$name])) {
-            throw new \OutOfBoundsException(
-                sprintf("The form '%s' doesn't exist", $name)
-            );
-        }
+        return $this->getTheliaFormFactory()->createForm($name, $type, $data, $options);
+    }
 
-        return new static::$formDefinition[$name]($this->getRequest(), $type, $data, $options, $this->container);
+    /**
+     * @return \Thelia\Core\Form\TheliaFormFactoryInterface
+     */
+    protected function getTheliaFormFactory()
+    {
+        return $this->container->get("thelia.form_factory");
     }
 
     /**

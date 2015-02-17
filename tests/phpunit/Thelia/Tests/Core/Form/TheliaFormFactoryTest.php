@@ -10,7 +10,7 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Controller;
+namespace Thelia\Tests\Core\Form;
 
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -18,48 +18,25 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Validator\ValidatorBuilder;
+use Thelia\Core\Form\TheliaFormFactory;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Translation\Translator;
 use Thelia\Tests\Resources\Form\Type\TestType;
 
 /**
- * Class BaseControllerTest
+ * Class TheliaFormFactoryTest
  * @package Thelia\Tests\Controller
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class BaseControllerTest extends \PHPUnit_Framework_TestCase
+class TheliaFormFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Thelia\Controller\BaseController */
-    protected $controller;
+    /** @var \Thelia\Core\Form\TheliaFormFactory */
+    protected $factory;
 
-    /** @var  \ReflectionProperty */
-    protected $definitionReflection;
-
-    protected $formDefinition;
 
     protected function setUp()
     {
-        $this->controller = $controller = $this->getMock(
-            "Thelia\\Controller\\BaseController",
-            [
-                "getParser",
-                "render",
-                "renderRaw"
-            ]
-        );
-
-        /**
-         * Reset static :: $formDefinition on controllers
-         */
-        $this->definitionReflection = $reflection = (new \ReflectionObject($this->controller))
-            ->getProperty('formDefinition')
-        ;
-        $reflection->setAccessible(true);
-        $this->formDefinition = $reflection->getValue();
-
-        $reflection->setValue(null);
-
         /**
          * Add the test type to the factory and
          * the form to the container
@@ -76,25 +53,18 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
         $container->set("thelia.translator", new Translator($container));
         $container->setParameter(
             "thelia.parser.forms",
-            array(
+            $definition = array(
                 "test_form" => "Thelia\\Tests\\Resources\\Form\\TestForm",
             )
         );
 
         $request = new Request();
         $request->setSession(new Session(new MockArraySessionStorage()));
-
         $container->set("request", $request);
         $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
-
         $container->set("event_dispatcher", new EventDispatcher());
 
-        $this->controller->setContainer($container);
-    }
-
-    protected function tearDown()
-    {
-        $this->definitionReflection->setValue($this->formDefinition);
+        $this->factory = new TheliaFormFactory($request, $container, $definition);
     }
 
     public function testCreateFormWithoutType()
@@ -103,7 +73,7 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
          * If we build the form without type, we only have
          * the defined fields
          */
-        $form = $this->controller->createForm("test_form");
+        $form = $this->factory->createForm("test_form");
 
         $this->assertTrue(
             $form->getForm()->has("test_field")
@@ -124,7 +94,7 @@ class BaseControllerTest extends \PHPUnit_Framework_TestCase
          * If we use a type, we have that type's fields.
          * -> The implementation is correct.
          */
-        $form = $this->controller->createForm("test_form", "test_type");
+        $form = $this->factory->createForm("test_form", "test_type");
 
         $this->assertTrue(
             $form->getForm()->has("test_field")
