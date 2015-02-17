@@ -61,7 +61,7 @@ class TaxCreationForm extends BaseForm
 
         $this->formBuilder
             ->add("locale", "text", array(
-                "constraints" => array(new NotBlank())
+                "constraints" => array(new NotBlank()),
             ))
             ->add("type", "choice", array(
                 "choices" => $typeList,
@@ -79,7 +79,7 @@ class TaxCreationForm extends BaseForm
                 $this->formBuilder
                     // Replace the '\' in the class name by hyphens
                     // See TaxController::getRequirements if some changes are made about this.
-                    ->add(Tax::escapeTypeName($name) . ':' . $requirement->getName(), new TheliaType(), array(
+                    ->add(Tax::escapeTypeName($name).':'.$requirement->getName(), new TheliaType(), array(
                         //"instance" => $requirement->getType(),
                         "constraints" => array(
                             new Constraints\Callback(

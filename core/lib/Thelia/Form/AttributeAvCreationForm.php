@@ -23,21 +23,21 @@ class AttributeAvCreationForm extends BaseForm
         $this->formBuilder
             ->add("title", "text", [
                 "constraints" => [
-                    new NotBlank()
+                    new NotBlank(),
                 ],
                 "label"       => Translator::getInstance()->trans("Title *"),
                 "label_attr"  => [
-                    "for" => "title"
+                    "for" => "title",
                 ]
             ])
             ->add("locale", "text", [
                 "constraints" => [
-                    new NotBlank()
+                    new NotBlank(),
                 ]
             ])
             ->add("attribute_id", "hidden", [
                 "constraints" => [
-                    new NotBlank()
+                    new NotBlank(),
                 ]
             ]);
     }

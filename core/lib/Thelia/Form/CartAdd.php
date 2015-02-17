@@ -55,38 +55,38 @@ class CartAdd extends BaseForm
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
-                            array($this, "checkProduct")
-                    )))
+                            array($this, "checkProduct"),
+                    ))),
                 ),
                 "label" => "product",
                 "label_attr" => array(
-                    "for" => "cart_product"
-                )
+                    "for" => "cart_product",
+                ),
             ))
             ->add("product_sale_elements_id", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
-                            array($this, "checkStockAvailability")
-                    )))
+                            array($this, "checkStockAvailability"),
+                    ))),
                 ),
-                "required" => true
+                "required" => true,
 
             ))
             ->add("quantity", "number", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array("methods" => array(
-                            array($this, "checkStock")
+                            array($this, "checkStock"),
                     ))),
                     new Constraints\GreaterThanOrEqual(array(
-                        "value" => 0
-                    ))
+                        "value" => 0,
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Quantity"),
                 "label_attr" => array(
-                    "for" => "quantity"
-                )
+                    "for" => "quantity",
+                ),
             ))
             ->add("append", "integer")
             ->add("newness", "integer")

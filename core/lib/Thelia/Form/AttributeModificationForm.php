@@ -26,8 +26,8 @@ class AttributeModificationForm extends AttributeCreationForm
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
-                        )
-                    )
+                        ),
+                    ),
             ))
         ;
 

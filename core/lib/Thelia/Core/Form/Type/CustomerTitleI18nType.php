@@ -31,31 +31,29 @@ class CustomerTitleI18nType extends AbstractTheliaType
         ]);
     }
 
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add("locale", "text", array(
                 "required" => true,
                 "constraints" => array(
-                    new NotBlank()
-                )
+                    new NotBlank(),
+                ),
             ))
             ->add("short", "text", array(
                 "required" => false,
                 "constraints" => array(
                     new Length(["max" => 10]),
-                )
+                ),
             ))
             ->add("long", "text", array(
                 "required" => false,
                 "constraints" => array(
                     new Length(["max" => 45]),
-                )
+                ),
             ))
         ;
     }
-
 
     /**
      * Returns the name of this type.

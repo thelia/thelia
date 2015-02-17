@@ -51,16 +51,16 @@ class AreaPostageForm extends BaseForm
             ->add('area_id', 'integer', array(
                 'constraints' => array(
                     new GreaterThan(array('value' => 0)),
-                    new NotBlank()
-                )
+                    new NotBlank(),
+                ),
             ))
             ->add('postage', 'number', array(
                 'constraints' => array(
                     new GreaterThanOrEqual(array('value' => 0)),
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label_attr' => array('for' => 'area_postage'),
-                'label' => Translator::getInstance()->trans('Postage')
+                'label' => Translator::getInstance()->trans('Postage'),
             ))
         ;
     }

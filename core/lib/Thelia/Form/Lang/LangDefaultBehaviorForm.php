@@ -52,12 +52,12 @@ class LangDefaultBehaviorForm extends BaseForm
                     1 => Translator::getInstance()->trans("Replace by the default language"),
                 ),
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans("If a translation is missing or incomplete :"),
                 'label_attr' => array(
-                    'for' => 'defaultBehavior-form'
-                )
+                    'for' => 'defaultBehavior-form',
+                ),
             ));
     }
 

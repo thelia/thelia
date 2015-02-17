@@ -31,11 +31,11 @@ class ProductModificationForm extends ProductCreationForm
             ->add("id", "integer", array(
                     "label"       => Translator::getInstance()->trans("Prodcut ID *"),
                     "label_attr"  => array("for" => "product_id_field"),
-                    "constraints" => array(new GreaterThan(array('value' => 0)))
+                    "constraints" => array(new GreaterThan(array('value' => 0))),
             ))
             ->add("template_id", "integer", array(
                     "label"       => Translator::getInstance()->trans("Product template"),
-                    "label_attr"  => array("for" => "product_template_field")
+                    "label_attr"  => array("for" => "product_template_field"),
             ))
             ->add("brand_id", "integer", [
                 'constraints' => [ new NotBlank() ],
@@ -48,7 +48,7 @@ class ProductModificationForm extends ProductCreationForm
             ])
             ->add("virtual_document_id", "integer", array(
                 "label"      => Translator::getInstance()->trans("Virtual document"),
-                "label_attr" => array("for" => "virtual_document_id_field")
+                "label_attr" => array("for" => "virtual_document_id_field"),
             ))
         ;
 

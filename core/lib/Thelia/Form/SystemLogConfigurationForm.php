@@ -36,33 +36,33 @@ class SystemLogConfigurationForm extends BaseForm
 
                 "label" => Translator::getInstance()->trans('Log level *'),
                 "label_attr" => array(
-                    "for" => "level_field"
-                )
+                    "for" => "level_field",
+                ),
             ))
             ->add("format", "text", array(
                 "label" => Translator::getInstance()->trans('Log format *'),
                 "label_attr" => array(
-                    "for" => "format_field"
-                )
+                    "for" => "format_field",
+                ),
             ))
             ->add("show_redirections", "integer", array(
                     "constraints" => array(new Constraints\NotBlank()),
                     "label" => Translator::getInstance()->trans('Show redirections *'),
                     "label_attr" => array(
-                            "for" => "show_redirections_field"
-                    )
+                            "for" => "show_redirections_field",
+                    ),
             ))
             ->add("files", "text", array(
                     "label" => Translator::getInstance()->trans('Activate logs only for these files'),
                     "label_attr" => array(
-                            "for" => "files_field"
-                    )
+                            "for" => "files_field",
+                    ),
             ))
             ->add("ip_addresses", "text", array(
                     "label" => Translator::getInstance()->trans('Activate logs only for these IP Addresses'),
                     "label_attr" => array(
-                            "for" => "files_field"
-                    )
+                            "for" => "files_field",
+                    ),
             ))
             ;
     }

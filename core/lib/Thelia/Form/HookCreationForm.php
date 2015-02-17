@@ -28,17 +28,17 @@ class HookCreationForm extends BaseForm
         $this->formBuilder
             ->add("code", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Hook code"),
                 "label_attr" => array(
-                    "for" => "code"
-                )
+                    "for" => "code",
+                ),
             ))
             ->add("locale", "hidden", array(
                 "constraints" => array(
-                    new NotBlank()
-                )
+                    new NotBlank(),
+                ),
             ))
             ->add("type", "choice", array(
                 "choices" => array(
@@ -48,35 +48,35 @@ class HookCreationForm extends BaseForm
                     TemplateDefinition::PDF => Translator::getInstance()->trans("pdf"),
                 ),
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Type"),
                 "label_attr" => array(
-                    "for" => "type"
-                )
+                    "for" => "type",
+                ),
             ))
             ->add("native", "hidden", array(
                 "label" => Translator::getInstance()->trans("Native"),
                 "label_attr" => array(
                     "for" => "native",
-                    "help" => Translator::getInstance()->trans("Core hook of Thelia.")
-                )
+                    "help" => Translator::getInstance()->trans("Core hook of Thelia."),
+                ),
             ))
             ->add("active", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
                 "label_attr" => array(
-                    "for" => "active"
-                )
+                    "for" => "active",
+                ),
             ))
             ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Hook title"),
                 "label_attr" => array(
-                    "for" => "title"
-                )
+                    "for" => "title",
+                ),
             ))
         ;
     }

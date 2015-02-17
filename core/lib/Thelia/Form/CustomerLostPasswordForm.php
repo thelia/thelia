@@ -56,14 +56,14 @@ class CustomerLostPasswordForm extends FirewallForm
                     new Callback(array(
                         "methods" => array(
                             array($this,
-                                "verifyExistingEmail")
-                        )
-                    ))
+                                "verifyExistingEmail", ),
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
                 "label_attr" => array(
-                    "for" => "forgot-email"
-                )
+                    "for" => "forgot-email",
+                ),
             ));
     }
 

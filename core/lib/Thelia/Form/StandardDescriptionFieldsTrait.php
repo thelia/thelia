@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Thelia\Core\Translation\Translator;
 
 /**
@@ -50,10 +49,10 @@ trait StandardDescriptionFieldsTrait
                     'required'    => true,
                     'label'       => Translator::getInstance()->trans('Title'),
                     'label_attr'  => [
-                        'for' => 'title_field'
+                        'for' => 'title_field',
                     ],
                     'attr' => [
-                        'placeholder' => Translator::getInstance()->trans('A descriptive title')
+                        'placeholder' => Translator::getInstance()->trans('A descriptive title'),
                     ]
                 ]
             );
@@ -69,13 +68,13 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Summary'),
                     'label_attr'  => [
                         'for'         => 'summary_field',
-                        'help'        => Translator::getInstance()->trans('A short description, used when a summary or an introduction is required')
+                        'help'        => Translator::getInstance()->trans('A short description, used when a summary or an introduction is required'),
                     ],
                     'attr' => [
                         'rows'        => 3,
-                        'placeholder' => Translator::getInstance()->trans('Short description text')
+                        'placeholder' => Translator::getInstance()->trans('Short description text'),
                     ]
-               ]
+                ]
             );
         }
 
@@ -89,10 +88,10 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Detailed description'),
                     'label_attr'  => [
                         'for'  => 'detailed_description_field',
-                        'help' => Translator::getInstance()->trans('The detailed description.')
+                        'help' => Translator::getInstance()->trans('The detailed description.'),
                     ],
                     'attr' => [
-                        'rows' => 10
+                        'rows' => 10,
                     ]
                 ]
             );
@@ -108,7 +107,7 @@ trait StandardDescriptionFieldsTrait
                     'label'       => Translator::getInstance()->trans('Conclusion'),
                     'label_attr'  => [
                         'for'         => 'conclusion_field',
-                        'help'        => Translator::getInstance()->trans('A short text, used when an additional or supplemental information is required.')
+                        'help'        => Translator::getInstance()->trans('A short text, used when an additional or supplemental information is required.'),
                     ],
                     'attr' => [
                         'placeholder' => Translator::getInstance()->trans('Short additional text'),

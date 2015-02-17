@@ -37,8 +37,8 @@ class HookModificationForm extends HookCreationForm
                     "for" => "by_module",
                     "help" => Translator::getInstance()->trans(
                         "This hook is specific to a module (delivery/payment modules)."
-                    )
-                )
+                    ),
+                ),
             ))
             ->add("block", "checkbox", array(
                 "label" => Translator::getInstance()->trans("Hook block"),
@@ -47,8 +47,8 @@ class HookModificationForm extends HookCreationForm
                     "for" => "block",
                     "help" => Translator::getInstance()->trans(
                         "If checked, this hook will be used by a hook block. If not, by hook function."
-                    )
-                )
+                    ),
+                ),
             ))
         ;
 

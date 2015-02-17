@@ -15,7 +15,6 @@ namespace Thelia\Core\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-
 /**
  * Class TheliaFormFactory
  * @package Thelia\Core\Form
@@ -40,10 +39,10 @@ class TheliaFormFactory implements TheliaFormFactoryInterface
     }
 
     /**
-     * @param string $name
-     * @param string $type
-     * @param array $data
-     * @param array $options
+     * @param  string                $name
+     * @param  string                $type
+     * @param  array                 $data
+     * @param  array                 $options
      * @return \Thelia\Form\BaseForm
      */
     public function createForm($name, $type = "form", array $data = array(), array $options = array())

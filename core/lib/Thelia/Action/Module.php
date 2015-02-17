@@ -99,9 +99,9 @@ class Module extends BaseAction implements EventSubscriberInterface
     /**
      * Check if module can be activated : supported version of Thelia, module dependencies.
      *
-     * @param \Thelia\Model\Module $module
-     * @throws Exception if activation fails.
-     * @return bool true if the module can be activated, otherwise false
+     * @param  \Thelia\Model\Module $module
+     * @throws Exception            if activation fails.
+     * @return bool                 true if the module can be activated, otherwise false
      */
     private function checkActivation($module)
     {
@@ -120,7 +120,7 @@ class Module extends BaseAction implements EventSubscriberInterface
      * could have dependencies to this module
      *
      * @param  \Thelia\Model\Module $module
-     * @return bool true if the module can be deactivated, otherwise false
+     * @return bool                 true if the module can be deactivated, otherwise false
      */
     private function checkDeactivation($module)
     {
@@ -166,8 +166,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 // If the module is referenced by an order, display a meaningful error
                 // instead of 'delete cannot delete' caused by a constraint violation.
                 // FIXME: we hav to find a way to delete modules used by order.
-                if (
-                    OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
+                if (OrderQuery::create()->filterByDeliveryModuleId($module->getId())->count() > 0
                     ||
                     OrderQuery::create()->filterByPaymentModuleId($module->getId())->count() > 0
                 ) {
@@ -390,7 +389,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         return [
             TheliaEvents::MODULE_TOGGLE_ACTIVATION => [
                 ['checkToggleActivation', 255],
-                ['toggleActivation', 128]
+                ['toggleActivation', 128],
             ],
             TheliaEvents::MODULE_UPDATE_POSITION => ['updatePosition', 128],
             TheliaEvents::MODULE_DELETE => ['delete', 128],

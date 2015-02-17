@@ -26,7 +26,7 @@ abstract class AbstractTheliaType extends AbstractType
 {
     /**
      * @param $groups
-     * @param array $constraints
+     * @param  array $constraints
      * @return array
      *
      * Replaces validation groups in constraints
@@ -46,8 +46,8 @@ abstract class AbstractTheliaType extends AbstractType
     }
 
     /**
-     * @param AbstractType $type
-     * @param string $groups
+     * @param  AbstractType $type
+     * @param  string       $groups
      * @return array
      *
      * Get an array with the type's constraints loaded with groups

@@ -71,9 +71,9 @@ class ImportForm extends BaseForm
                     new Callback([
                         "methods" => [
                             [$this, "checkLanguage"],
-                        ]
-                    ])
-                ]
+                        ],
+                    ]),
+                ],
             ))
         ;
     }

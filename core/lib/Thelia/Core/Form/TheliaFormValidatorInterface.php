@@ -10,10 +10,10 @@
 /* file that was distributed with this source code.                                  */
 /*************************************************************************************/
 namespace Thelia\Core\Form;
+
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Form\Form;
-
 
 /**
  * Class TheliaFormValidator
@@ -25,8 +25,8 @@ interface TheliaFormValidatorInterface
     /**
      * Validate a BaseForm
      *
-     * @param  BaseForm $aBaseForm the form
-     * @param  string $expectedMethod the expected method, POST or GET, or null for any of them
+     * @param  BaseForm                     $aBaseForm      the form
+     * @param  string                       $expectedMethod the expected method, POST or GET, or null for any of them
      * @throws FormValidationException      is the form contains error, or the method is not the right one
      * @return \Symfony\Component\Form\Form Form the symfony form object
      */

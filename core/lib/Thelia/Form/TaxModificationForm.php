@@ -39,7 +39,7 @@ class TaxModificationForm extends TaxCreationForm
                                 ),
                             )
                         ),
-                    )
+                    ),
             ))
         ;
     }

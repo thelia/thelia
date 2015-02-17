@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
@@ -35,50 +34,50 @@ class CustomerLogin extends BruteforceForm
                     new Constraints\Email(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyExistingEmail")
-                        )
-                    ))
+                            array($this, "verifyExistingEmail"),
+                        ),
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your email address"),
                 "label_attr" => array(
-                    "for" => "email"
-                )
+                    "for" => "email",
+                ),
             ))
             ->add("account", "choice", array(
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyAccount")
-                        )
-                    ))
+                            array($this, "verifyAccount"),
+                        ),
+                    )),
                 ),
                 "choices" => array(
                     0 => Translator::getInstance()->trans("No, I am a new customer."),
-                    1 => Translator::getInstance()->trans("Yes, I have a password :")
+                    1 => Translator::getInstance()->trans("Yes, I have a password :"),
                 ),
                 "label_attr" => array(
-                    "for" => "account"
+                    "for" => "account",
                 ),
-                "data" => 0
+                "data" => 0,
             ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(array(
                         'groups' => array('existing_customer'),
-                    ))
+                    )),
                 ),
                 "label" => Translator::getInstance()->trans("Please enter your password"),
                 "label_attr" => array(
-                    "for" => "password"
+                    "for" => "password",
                 ),
-                "required"    => false
+                "required"    => false,
             ))
             ->add("remember_me", "checkbox", array(
                 'value' => 'yes',
                 "label" => Translator::getInstance()->trans("Remember me ?"),
                 "label_attr" => array(
-                    "for" => "remember_me"
-                )
+                    "for" => "remember_me",
+                ),
             ))
         ;
     }

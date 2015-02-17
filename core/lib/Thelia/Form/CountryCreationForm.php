@@ -22,51 +22,51 @@ class CountryCreationForm extends BaseForm
         $this->formBuilder
             ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Country title *"),
                 "label_attr" => array(
-                    "for" => "title"
-                )
+                    "for" => "title",
+                ),
             ))
             ->add("locale", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
-                "label_attr" => array("for" => "locale_create")
+                "label_attr" => array("for" => "locale_create"),
             ))
             ->add("area", "text", array(
                 "label" => Translator::getInstance()->trans("Country area"),
                 "label_attr" => array(
-                    "for" => "area"
-                )
+                    "for" => "area",
+                ),
             ))
             ->add("isocode", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("ISO Code *"),
                 "label_attr" => array(
-                    "for" => "isocode"
-                )
+                    "for" => "isocode",
+                ),
             ))
             ->add("isoalpha2", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Alpha code 2 *"),
                 "label_attr" => array(
-                    "for" => "isoalpha2"
-                )
+                    "for" => "isoalpha2",
+                ),
             ))
             ->add("isoalpha3", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Alpha code 3 *"),
                 "label_attr" => array(
-                    "for" => "isoalpha3"
-                )
+                    "for" => "isoalpha3",
+                ),
             ))
         ;
     }

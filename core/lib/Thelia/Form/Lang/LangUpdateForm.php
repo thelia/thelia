@@ -30,8 +30,8 @@ class LangUpdateForm extends LangCreateForm
             ->add('id', 'hidden', array(
                 'constraints' => array(
                     new NotBlank(),
-                    new GreaterThan(array('value' => 0))
-                )
+                    new GreaterThan(array('value' => 0)),
+                ),
             ));
     }
 

@@ -35,7 +35,7 @@ class BrandCreationForm extends BaseForm
                 'label'       => Translator::getInstance()->trans('Brand name'),
                 'label_attr'  => [
                     'for'         => 'title',
-                    'help'        => $titleFieldHelpLabel
+                    'help'        => $titleFieldHelpLabel,
                 ],
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans('The brand name or title'),
@@ -58,7 +58,7 @@ class BrandCreationForm extends BaseForm
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('This brand is online'),
                 'label_attr' => [
-                    'for' => 'visible_create'
+                    'for' => 'visible_create',
                 ]
             ]
         );

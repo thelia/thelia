@@ -48,72 +48,72 @@ class LangCreateForm extends BaseForm
         $this->formBuilder
             ->add('title', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('Language name'),
                 'label_attr' => array(
-                    'for' => 'title_lang'
-                )
+                    'for' => 'title_lang',
+                ),
             ))
             ->add('code', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('ISO 639-1 Code'),
                 'label_attr' => array(
-                    'for' => 'code_lang'
-                )
+                    'for' => 'code_lang',
+                ),
             ))
             ->add('locale', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('language locale'),
                 'label_attr' => array(
-                    'for' => 'locale_lang'
-                )
+                    'for' => 'locale_lang',
+                ),
             ))
             ->add('date_format', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('date format'),
                 'label_attr' => array(
-                    'for' => 'date_lang'
-                )
+                    'for' => 'date_lang',
+                ),
             ))
             ->add('time_format', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('time format'),
                 'label_attr' => array(
-                    'for' => 'time_lang'
-                )
+                    'for' => 'time_lang',
+                ),
             ))
             ->add('decimal_separator', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('decimal separator'),
                 'label_attr' => array(
-                    'for' => 'decimal_separator'
-                )
+                    'for' => 'decimal_separator',
+                ),
             ))
             ->add('thousands_separator', 'text', array(
                 'label' => Translator::getInstance()->trans('thousands separator'),
                 'label_attr' => array(
-                    'for' => 'thousands_separator'
-                )
+                    'for' => 'thousands_separator',
+                ),
             ))
             ->add('decimals', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label' => Translator::getInstance()->trans('Decimal places'),
                 'label_attr' => array(
-                    'for' => 'decimals'
-                )
+                    'for' => 'decimals',
+                ),
             ))
         ;
     }

@@ -104,7 +104,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
         $errors = '';
 
         foreach ($form->getErrors() as $key => $error) {
-            $errors .= $error->getMessage() . ', ';
+            $errors .= $error->getMessage().', ';
         }
 
         /** @var Form $child */

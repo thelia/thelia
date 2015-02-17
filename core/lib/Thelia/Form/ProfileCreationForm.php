@@ -31,7 +31,7 @@ class ProfileCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add("locale", "text", array(
-                "constraints" => array(new NotBlank())
+                "constraints" => array(new NotBlank()),
             ))
             ->add("code", "text", array(
                 "constraints" => array(

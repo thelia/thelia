@@ -40,7 +40,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                                 ),
                             )
                         ),
-                    )
+                    ),
             ))
             ->add("tax_list", "hidden", array(
                 "required" => true,
@@ -55,7 +55,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                             ),
                         )
                     ),
-                )
+                ),
             ))
             ->add("country_list", "choice", array(
                 "choices" => $countryList,
@@ -63,7 +63,7 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                 "multiple" => true,
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                )
+                ),
             ))
         ;
     }

@@ -70,9 +70,9 @@ class ExportForm extends BaseForm
                     new Callback([
                         "methods" => [
                             [$this, "checkLanguage"],
-                        ]
-                    ])
-                ]
+                        ],
+                    ]),
+                ],
             ))
         ;
     }

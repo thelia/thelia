@@ -26,20 +26,20 @@ class TemplateCreationForm extends BaseForm
                 "text",
                 array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Template Name *"),
                 "label_attr" => array(
-                    "for" => "name"
-                ))
+                    "for" => "name",
+                ), )
             )
             ->add(
                 "locale",
                 "text",
                 array(
                 "constraints" => array(
-                    new NotBlank()
-                ))
+                    new NotBlank(),
+                ), )
             )
         ;
     }

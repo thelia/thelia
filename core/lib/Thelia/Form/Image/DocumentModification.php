@@ -47,7 +47,7 @@ abstract class DocumentModification extends BaseForm
                     'constraints' => [ ],
                     'label' => $translator->trans('Replace current document by this file'),
                     'label_attr' => [
-                        'for' => 'file'
+                        'for' => 'file',
                     ]
                 ]
             )
@@ -60,11 +60,10 @@ abstract class DocumentModification extends BaseForm
                     'required'    => false,
                     'label'       => $translator->trans('This document is online'),
                     'label_attr' => [
-                        'for' => 'visible_create'
+                        'for' => 'visible_create',
                     ]
                 ]
             );
-        ;
 
         // Add standard description fields
         $this->addStandardDescFields();
