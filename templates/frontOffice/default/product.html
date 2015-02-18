@@ -132,7 +132,7 @@
                 {loop type="sale" name="product-sale-info" product="{$ID}" active="1"}
                     <div class="product-promo">
                         <p class="sale-label">{$SALE_LABEL}</p>
-                        <p class="sale-saving"> {intl l="Save %amount%sign on this product" amount=$PRICE_OFFSET_VALUE sign=$PRICE_OFFSET_SYMBOL}</p>
+                        <p class="sale-saving"> {intl l="Save %amount%sign on this product" amount={$PRICE_OFFSET_VALUE} sign={$PRICE_OFFSET_SYMBOL}}</p>
                         {if $HAS_END_DATE}
                             <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
                         {/if}

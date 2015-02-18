@@ -2,7 +2,7 @@
 {default_translation_domain domain='bo.default'}
 
 {loop type="product" name="product-info" id=$product_id}
-    <p>{intl l="Select the attributes values of \"%title\" that should be included in this sale operation." title=$TITLE}</p>
+    <p>{intl l="Select the attributes values of \"%title\" that should be included in this sale operation." title={$TITLE}}</p>
 {/loop}
 
 <form>
@@ -12,7 +12,7 @@
     {loop name="product-attributes" type="attribute" product="{$product_id}"}
             {ifloop rel="product-attributes-av"}
             <tr>
-                <th>{intl l="Attribute %title" title=$TITLE}</th>
+                <th>{intl l="Attribute %title" title={$TITLE}}</th>
             </tr>
             <tr>
                 <td>

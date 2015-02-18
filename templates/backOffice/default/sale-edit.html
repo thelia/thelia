@@ -93,7 +93,7 @@
                                             {custom_render_form_field form=$form field='price_offset' value_key=$ID show_label=$aff}
                                                 <div class="input-group">
                                                     <input type="text" {form_field_attributes form=$form field="price_offset" value_key=$ID}>
-                                                    <span class="input-group-addon">{intl l='For prices in %currency' currency=$SYMBOL}</span>
+                                                    <span class="input-group-addon">{intl l='For prices in %currency' currency={$SYMBOL}}</span>
                                                 </div>
                                             {/custom_render_form_field}
                                         {/loop}

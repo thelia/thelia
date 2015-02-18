@@ -133,7 +133,7 @@ Use the optionnal $field_value parameter if no value is defined
                         <input type="text" data-widget="{$type}" data-rel="#{$label_attr.for}" class="form-control" />
                     {/if}
                 {else}
-                    <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type=$type}</div>
+                    <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type={$type}}</div>
                 {/if}
 
             {/if}

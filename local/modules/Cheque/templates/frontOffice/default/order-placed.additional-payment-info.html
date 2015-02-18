@@ -1,5 +1,5 @@
 {loop type="module-config" name="cheque-instructions" module="cheque" variable="payable_to"}
-    <p>{intl d='cheque.fo.default' l="Please make your cheque payable to <b>%name</b>, and send it to the following address :" name=$VALUE}</p>
+    <p>{intl d='cheque.fo.default' l="Please make your cheque payable to <b>%name</b>, and send it to the following address :" name={$VALUE}}</p>
 {/loop}
 
 <blockquote>
