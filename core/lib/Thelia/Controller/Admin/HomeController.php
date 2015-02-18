@@ -57,11 +57,10 @@ class HomeController extends BaseAdminController
         if ($cacheEnable) {
             $context = "_" . $this->getRequest()->query->get('month', date('m')) . "_" . $this->getRequest()->query->get('year', date('Y'));
 
-            $cacheDir = $this->getCacheDir();
             $cacheKey = self::STATS_CACHE_KEY . $context;
             $cacheExpire = intval(ConfigQuery::read("admin_cache_home_stats_ttl", '600'));
 
-            $cacheDriver = new FilesystemCache($cacheDir);
+            $cacheDriver = new FilesystemCache($this->getCacheDir());
 
             if (!$this->getRequest()->query->get('flush', "0")) {
                 $cacheContent = $cacheDriver->fetch($cacheKey);
@@ -143,7 +142,7 @@ class HomeController extends BaseAdminController
     {
         $cacheDir = $this->container->getParameter("kernel.cache_dir");
         $cacheDir = rtrim($cacheDir, '/');
-        $cacheDir .= '/' . self::STATS_CACHE_DIR . '/';
+        $cacheDir .= DIRECTORY_SEPARATOR . self::STATS_CACHE_DIR . DIRECTORY_SEPARATOR;
 
         return $cacheDir;
     }
