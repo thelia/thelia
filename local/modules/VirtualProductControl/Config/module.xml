@@ -6,7 +6,7 @@
         <description>Check if a virtual product delivery module is enabled if at least one product is virtual</description>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Contôle de produit virtuel</title>
+        <title>Contrôle de produit virtuel</title>
         <description>Vérifie qu'un module de livraison pour produit virtuel soit activé si des produits virtuels existent</description>
     </descriptive>
     <version>1.0</version>
