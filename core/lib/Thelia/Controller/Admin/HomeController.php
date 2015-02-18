@@ -12,14 +12,26 @@
 
 namespace Thelia\Controller\Admin;
 
+use Doctrine\Common\Cache\FilesystemCache;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Thelia;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
 
 class HomeController extends BaseAdminController
 {
+    /**
+     * Folder name for stats cache
+     */
+    const STATS_CACHE_DIR = "stats";
+
+    /**
+     * Key prefix for stats cache
+     */
+    const STATS_CACHE_KEY = "stats";
+
     const RESOURCE_CODE = "admin.home";
 
     public function defaultAction()
@@ -38,61 +50,101 @@ class HomeController extends BaseAdminController
             return $response;
         }
 
-        $data = new \stdClass();
+        $cacheEnable = intval(ConfigQuery::read("admin_cache_home_stats_enable", '1'));
 
-        $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
+        $cacheContent = false;
 
-        /* sales */
-        $saleSeries = new \stdClass();
-        $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
-        $saleSeries->data = OrderQuery::getMonthlySaleStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+        if ($cacheEnable) {
+            $context = "_" . $this->getRequest()->query->get('month', date('m')) . "_" . $this->getRequest()->query->get('year', date('Y'));
 
-        /* new customers */
-        $newCustomerSeries = new \stdClass();
-        $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
-        $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+            $cacheDir = $this->getCacheDir();
+            $cacheKey = self::STATS_CACHE_KEY . $context;
+            $cacheExpire = intval(ConfigQuery::read("admin_cache_home_stats_ttl", '600'));
 
-        /* orders */
-        $orderSeries = new \stdClass();
-        $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
-        $orderSeries->data = OrderQuery::getMonthlyOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+            $cacheDriver = new FilesystemCache($cacheDir);
 
-        /* first order */
-        $firstOrderSeries = new \stdClass();
-        $firstOrderSeries->color = $this->getRequest()->query->get('first_orders_color', '#5bc0de');
-        $firstOrderSeries->data = OrderQuery::getFirstOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y'))
-        );
+            if (!$this->getRequest()->query->get('flush', "0")) {
+                $cacheContent = $cacheDriver->fetch($cacheKey);
+            } else {
+                $cacheDriver->delete($cacheKey);
+            }
+        }
 
-        /* cancelled orders */
-        $cancelledOrderSeries = new \stdClass();
-        $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
-        $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats(
-            $this->getRequest()->query->get('month', date('m')),
-            $this->getRequest()->query->get('year', date('Y')),
-            array(5)
-        );
+        if ($cacheContent === false) {
+            $data = new \stdClass();
 
-        $data->series = array(
-            $saleSeries,
-            $newCustomerSeries,
-            $orderSeries,
-            $firstOrderSeries,
-            $cancelledOrderSeries,
-        );
+            $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
 
-        $json = json_encode($data);
+            /* sales */
+            $saleSeries = new \stdClass();
+            $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
+            $saleSeries->data = OrderQuery::getMonthlySaleStats(
+                $this->getRequest()->query->get('month', date('m')),
+                $this->getRequest()->query->get('year', date('Y'))
+            );
 
-        return $this->jsonResponse($json);
+            /* new customers */
+            $newCustomerSeries = new \stdClass();
+            $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
+            $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats(
+                $this->getRequest()->query->get('month', date('m')),
+                $this->getRequest()->query->get('year', date('Y'))
+            );
+
+            /* orders */
+            $orderSeries = new \stdClass();
+            $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
+            $orderSeries->data = OrderQuery::getMonthlyOrdersStats(
+                $this->getRequest()->query->get('month', date('m')),
+                $this->getRequest()->query->get('year', date('Y'))
+            );
+
+            /* first order */
+            $firstOrderSeries = new \stdClass();
+            $firstOrderSeries->color = $this->getRequest()->query->get('first_orders_color', '#5bc0de');
+            $firstOrderSeries->data = OrderQuery::getFirstOrdersStats(
+                $this->getRequest()->query->get('month', date('m')),
+                $this->getRequest()->query->get('year', date('Y'))
+            );
+
+            /* cancelled orders */
+            $cancelledOrderSeries = new \stdClass();
+            $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
+            $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats(
+                $this->getRequest()->query->get('month', date('m')),
+                $this->getRequest()->query->get('year', date('Y')),
+                array(5)
+            );
+
+            $data->series = array(
+                $saleSeries,
+                $newCustomerSeries,
+                $orderSeries,
+                $firstOrderSeries,
+                $cancelledOrderSeries,
+            );
+
+            $cacheContent = json_encode($data);
+
+            if ($cacheEnable) {
+                $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
+            }
+        }
+
+        return $this->jsonResponse($cacheContent);
+    }
+
+    /**
+     * get the cache directory for sitemap
+     *
+     * @return mixed|string
+     */
+    protected function getCacheDir()
+    {
+        $cacheDir = $this->container->getParameter("kernel.cache_dir");
+        $cacheDir = rtrim($cacheDir, '/');
+        $cacheDir .= '/' . self::STATS_CACHE_DIR . '/';
+
+        return $cacheDir;
     }
 }
