@@ -417,7 +417,7 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l='Enter here the category name in the default language (%title)' title="$TITLE"}</div>
+                    <div class="help-block">{intl l='Enter here the category name in the default language (%title)' title={$TITLE}}</div>
 
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
@@ -501,7 +501,7 @@
                         <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title="$TITLE"}</div>
+                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title={$TITLE}}</div>
 
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
