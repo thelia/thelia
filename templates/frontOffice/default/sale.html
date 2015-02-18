@@ -25,7 +25,7 @@
             <h1 id="main-label" class="page-header">{$SALE_LABEL}</h1>
 
             <div class="sale-discount-information">
-                <p class="sale-saving"> {intl l="Save %amount%sign on these products" amount=$PRICE_OFFSET_VALUE sign=$PRICE_OFFSET_SYMBOL}</p>
+                <p class="sale-saving"> {intl l="Save %amount%sign on these products" amount={$PRICE_OFFSET_VALUE} sign={$PRICE_OFFSET_SYMBOL}}</p>
                 {if $HAS_END_DATE}
                     <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
                 {/if}

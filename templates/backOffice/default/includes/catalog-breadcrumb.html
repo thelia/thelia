@@ -22,7 +22,7 @@
 
 	{if $editing_product == true}
         {loop name="product_path" type="product" visible="*" id=$product_id}
-            <li>{intl l="Editing %title" title="$TITLE"}</li>
+            <li>{intl l="Editing %title" title="{$TITLE}"}</li>
         {/loop}
 	{/if}
 </ul>
