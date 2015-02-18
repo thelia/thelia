@@ -22,7 +22,7 @@
 
     {if $editing_content == true}
         {loop name="content_path" type="content" visible="*" id=$content_id}
-            <li>{intl l="Editing %title" title="$TITLE"}</li>
+            <li>{intl l="Editing %title" title="{$TITLE}"}</li>
         {/loop}
     {/if}
 </ul>

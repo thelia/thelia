@@ -9,7 +9,7 @@
     {loop name="product-attributes" type="attribute" product="{$product_id}"}
             {ifloop rel="product-attributes-av"}
             <tr>
-                <th>{intl l="Attribute %title" title=$TITLE}</th>
+                <th>{intl l="Attribute %title" title={$TITLE}}</th>
             </tr>
             <tr>
                 <td>

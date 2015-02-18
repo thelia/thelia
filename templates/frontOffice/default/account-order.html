@@ -29,7 +29,7 @@
 
     <article class="col-main" role="main" aria-labelledby="main-label">
 
-        <h1 id="main-label" class="page-header">{intl l="Order details %ref" ref="$REF"}</h1>
+        <h1 id="main-label" class="page-header">{intl l="Order details %ref" ref={$REF}}</h1>
 
         {hook name="account-order.top" order="{$order_id}"}
 
@@ -117,7 +117,7 @@
                         {elsehook rel="account-order.invoice-information"}
                             <p>{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</p>
                             {if $TRANSACTION_REF}
-                            <p>{intl l="Transaction REF : %ref" ref=$TRANSACTION_REF}</p>
+                            <p>{intl l="Transaction REF : %ref" ref={$TRANSACTION_REF}}</p>
                             {/if}
                         {/elsehook}
 

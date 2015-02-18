@@ -74,7 +74,7 @@
 	                            {if $TEMPLATE}
 	                                {intl
 	                                  l="You can change template attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-	                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+	                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id={$TEMPLATE}}
 	                                }
 	                            {else}
 	                                {intl
@@ -135,7 +135,7 @@
 	                            {if $TEMPLATE}
 	                                {intl
 	                                    l="You can change templates features and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-	                                    tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+	                                    tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id={$TEMPLATE}}
 	                                }
 	                            {else}
 	                                {intl
@@ -193,7 +193,7 @@
 								                         </div>
 
 													     <span class="help-block text-right">
-													         {intl l='Use Ctrl+click to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id=$ID}
+													         {intl l='Use Ctrl+click to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id={$ID}}
 													     </span>
 							                         {/ifloop}
 
