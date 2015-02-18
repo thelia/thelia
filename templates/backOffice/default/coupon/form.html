@@ -113,7 +113,7 @@
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>
                                 {* Do not use 'date' input type, as some browsers enforce RFC339 date formats, which is not what we want *}
-                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                <input required type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $defaultDate}{$defaultDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt={$dateFormat} date={$smarty.now|date_format:$dateFormat}}">
                                 {if $error}{$message}{/if}
                             </div>
                         {/form_field}

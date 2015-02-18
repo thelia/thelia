@@ -278,8 +278,8 @@
 	                            {if $max_input_vars_warning}
 	                            <div class="alert alert-danger">
 	                               {intl l='<strong>Cannot translate all fields.</strong> According to your PHP configuration, forms cannot contains more than %current_max_input_vars input fields, but at least %required_max_input_vars are required. Please change the value of max_input_vars in your PHP configuration of change the translation file by hand.'
-	                                current_max_input_vars=$current_max_input_vars
-	                                required_max_input_vars=$required_max_input_vars
+	                                current_max_input_vars={$current_max_input_vars}
+	                                required_max_input_vars={$required_max_input_vars}
 	                                }
 	                            </div>
 	                            {/if}

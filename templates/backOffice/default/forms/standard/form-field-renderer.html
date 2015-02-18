@@ -105,7 +105,7 @@ fragment uses the following additional variables :
 
                     <input type="{$type}" {$attributes nofilter} />
                 {else}
-                    <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type=$type}</div>
+                    <div class="alert alert-danger">{intl l="Unsupported field type '%type' in form-field.html" type={$type}}</div>
                 {/if}
 
             {/if}

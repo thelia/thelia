@@ -4,6 +4,6 @@
 
 <div id="condition-add-operators-values" class="form-group">
     <label for="operator">{intl l="Validity start date"} :</label>
-    <input type="text" class="form-control" id="{$fieldName}-value" name="{$fieldName}[value]" value="{$currentValue}" placeholder="{intl l="Format: %fmt" fmt=$dateFormat}">
-    <span class="label-help-block">{intl l='Please enter the date using the %fmt format' fmt=$dateFormat}</span>
+    <input type="text" class="form-control" id="{$fieldName}-value" name="{$fieldName}[value]" value="{$currentValue}" placeholder="{intl l="Format: %fmt" fmt={$dateFormat}}">
+    <span class="label-help-block">{intl l='Please enter the date using the %fmt format' fmt={$dateFormat}}</span>
 </div>

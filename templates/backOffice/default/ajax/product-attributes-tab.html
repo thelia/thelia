@@ -74,7 +74,7 @@
 	                            {if $TEMPLATE}
 	                                {intl
 	                                  l="You can change template attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-	                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+	                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id={$TEMPLATE}}
 	                                }
 	                            {else}
 	                                {intl
@@ -135,7 +135,7 @@
 	                            {if $TEMPLATE}
 	                                {intl
 	                                    l="You can change templates features and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-	                                    tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+	                                    tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id={$TEMPLATE}}
 	                                }
 	                            {else}
 	                                {intl
