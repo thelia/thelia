@@ -155,7 +155,7 @@ class SaleModificationForm extends SaleCreationForm
                 'label'        => Translator::getInstance()->trans('Product price offset for each currency'),
                 'label_attr'   => [
                     'for' => 'price_offset'
-               ],
+                ],
              ]
         )
         ->add(

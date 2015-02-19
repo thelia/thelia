@@ -75,7 +75,7 @@ trait StandardDescriptionFieldsTrait
                         'rows'        => 3,
                         'placeholder' => Translator::getInstance()->trans('Short description text')
                     ]
-               ]
+                ]
             );
         }
 
