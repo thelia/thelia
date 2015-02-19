@@ -217,9 +217,10 @@ class AsseticAssetManager implements AssetManagerInterface
                 foreach ($this->assetFilters as $filterIdentifier => $filterInstance) {
                     if ($filterIdentifier == $filter_name) {
                         $filterManager->set($filterIdentifier, $filterInstance);
+
+                        // No, goto is not evil.
+                        goto filterFound;
                     }
-                    // No, goto is not evil.
-                    goto filterFound;
                 }
 
                 throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
