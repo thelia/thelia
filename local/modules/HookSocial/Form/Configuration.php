@@ -30,31 +30,31 @@ class Configuration extends BaseForm {
         $definitions = array(
             array(
                 "id" => "twitter",
-                "label" => Translator::getInstance()->trans("Twitter username")
+                "label" => Translator::getInstance()->trans("Twitter username", array(), 'hooksocial')
             ),
             array(
                 "id" => "facebook",
-                "label" => Translator::getInstance()->trans("Facebook username")
+                "label" => Translator::getInstance()->trans("Facebook username", array(), 'hooksocial')
             ),
             array(
                 "id" => "google",
-                "label" => Translator::getInstance()->trans("Google + username")
+                "label" => Translator::getInstance()->trans("Google + username", array(), 'hooksocial')
             ),
             array(
                 "id" => "instagram",
-                "label" => Translator::getInstance()->trans("Instagram username")
+                "label" => Translator::getInstance()->trans("Instagram username", array(), 'hooksocial')
             ),
             array(
                 "id" => "pinterest",
-                "label" => Translator::getInstance()->trans("Pinterest username")
+                "label" => Translator::getInstance()->trans("Pinterest username", array(), 'hooksocial')
             ),
             array(
                 "id" => "youtube",
-                "label" => Translator::getInstance()->trans("Youtube URL")
+                "label" => Translator::getInstance()->trans("Youtube URL", array(), 'hooksocial')
             ),
             array(
                 "id" => "rss",
-                "label" => Translator::getInstance()->trans("RSS URL")
+                "label" => Translator::getInstance()->trans("RSS URL", array(), 'hooksocial')
             )
         );
 
