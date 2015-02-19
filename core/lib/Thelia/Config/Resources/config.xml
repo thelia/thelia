@@ -79,34 +79,33 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-        <!-- The assets processors -->
-
-        <service id="less.assetic.processor" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+        <!-- The asset filters -->
+        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
             <tag name="thelia.asset.filter" key="less" />
         </service>
 
-        <service id="less_legacy.assetic.processor" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+        <service id="less_legacy.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
             <argument key="identifier">less_legacy</argument>
             <tag name="thelia.asset.filter" key="less_legacy" />
         </service>
 
-        <service id="sass.assetic.processor" class="Assetic\Filter\Sass\SassFilter">
+        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
             <tag name="thelia.asset.filter" key="sass"  />
         </service>
 
-        <service id="cssembed.assetic.processor" class="Assetic\Filter\PhpCssEmbedFilter">
+        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
             <tag name="thelia.asset.filter" key="cssembed" />
         </service>
 
-        <service id="cssrewrite.assetic.processor" class="Assetic\Filter\CssRewriteFilter">
+        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
             <tag name="thelia.asset.filter" key="cssrewrite"/>
         </service>
 
-        <service id="cssimport.assetic.processor" class="Assetic\Filter\CssImportFilter">
+        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
             <tag name="thelia.asset.filter" key="cssimport"/>
         </service>
 
-        <service id="compass.assetic.processor" class="Assetic\Filter\CompassFilter">
+        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
             <tag name="thelia.asset.filter" key="compass"/>
         </service>
 
