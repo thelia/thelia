@@ -48,8 +48,8 @@ abstract class ImageModification extends BaseForm
                     'constraints' => [
                         new Image(
                             [
-    //                            'minWidth' => 200,
-    //                            'minHeight' => 200
+                                // 'minWidth' => 200,
+                                // 'minHeight' => 200
                             ]
                         )
                     ],

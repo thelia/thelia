@@ -103,7 +103,7 @@ class MessageModificationForm extends BaseForm
                     "label" => Translator::getInstance()->trans('Name of the HTML layout file'),
                     "label_attr" => array(
                             "for" => "html_layout_file_name"
-                ),
+                    ),
                 "required" => false
             ))
 
@@ -111,7 +111,7 @@ class MessageModificationForm extends BaseForm
                     "label" => Translator::getInstance()->trans('Name of the HTML template file'),
                     "label_attr" => array(
                             "for" => "html_template_file_name"
-                ),
+                    ),
                 "required" => false
             ))
 
@@ -119,7 +119,7 @@ class MessageModificationForm extends BaseForm
                     "label" => Translator::getInstance()->trans('Name of the text layout file'),
                     "label_attr" => array(
                             "for" => "text_layout_file_name"
-                ),
+                    ),
                 "required" => false
             ))
 
@@ -127,7 +127,7 @@ class MessageModificationForm extends BaseForm
                     "label" => Translator::getInstance()->trans('Name of the text template file'),
                     "label_attr" => array(
                             "for" => "text_template_file_name"
-                ),
+                    ),
                 "required" => false
             ))
             ;

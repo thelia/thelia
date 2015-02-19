@@ -34,13 +34,13 @@ class FolderCreationForm extends BaseForm
                 "constraints" => array(
                     new NotBlank()
                 ),
-               "label_attr" => array("for" => "parent_create")
+                "label_attr" => array("for" => "parent_create")
             ))
             ->add("locale", "text", array(
                 "constraints" => array(
                     new NotBlank()
                 ),
-               "label_attr" => array("for" => "locale_create")
+                "label_attr" => array("for" => "locale_create")
             ))
             ->add("visible", "integer", array(
                 "label" => Translator::getInstance()->trans("This folder is online."),
