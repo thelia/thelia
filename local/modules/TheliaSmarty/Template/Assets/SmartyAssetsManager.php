@@ -219,6 +219,9 @@ class SmartyAssetsManager
         if ($repeat) {
             $url = '';
             try {
+                // Check if we're in failsafe mode
+                $isfailsafe = isset($params['failsafe']) ? $params['failsafe'] : false;
+
                 $url = $this->computeAssetUrl($assetType, $params, $template);
 
                 if (empty($url)) {
@@ -227,7 +230,7 @@ class SmartyAssetsManager
                     Tlog::getInstance()->addWarning($message);
 
                     // In debug mode, throw exception
-                    if ($this->assetsManager->isDebugMode()) {
+                    if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
                         throw new TheliaProcessException($message);
                     }
                 }
@@ -241,7 +244,7 @@ class SmartyAssetsManager
                 );
 
                 // If we're in development mode, just retrow the exception, so that it will be displayed
-                if ($this->assetsManager->isDebugMode()) {
+                if ($this->assetsManager->isDebugMode() && ! $isfailsafe) {
                     throw $ex;
                 }
             }

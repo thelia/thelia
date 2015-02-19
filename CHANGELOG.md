@@ -22,6 +22,7 @@
 - Add confirmation email for customers, backoffice configuration variables customer_confirm_email
 - Refactor ```Thelia\Controller\BaseController::createForm``` into a factory service ```Thelia\Core\Form\TheliaFormFactory```
 - Refactor ```Thelia\Controller\BaseController::validateForm``` and ```Thelia\Controller\BaseController::getErrorMessages``` into a service ```Thelia\Core\Form\TheliaFormValidator```
+- Add the "failsafe=[true|false]" parameter to the assets smarty functions (stylesheets, images, javascripts).
 
 # 2.1.2
 
