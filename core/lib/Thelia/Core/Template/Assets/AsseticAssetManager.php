@@ -33,6 +33,8 @@ class AsseticAssetManager implements AssetManagerInterface
 
     protected $source_file_extensions = array('less', 'js', 'coffee', 'html', 'tpl', 'htm', 'xml');
 
+    protected $assetFilters = [];
+
     public function __construct($debugMode)
     {
         $this->debugMode = $debugMode;
@@ -212,39 +214,18 @@ class AsseticAssetManager implements AssetManagerInterface
             foreach ($filter_list as $filter_name) {
                 $filter_name = trim($filter_name);
 
-                switch ($filter_name) {
-                    case 'less':
-                        $filterManager->set('less', new LessDotPhpFilter());
-                        break;
-
-                    case 'less_legacy':
-                        $filterManager->set('less_legacy', new Filter\LessphpFilter());
-                        break;
-
-                    case 'sass':
-                        $filterManager->set('sass', new Filter\Sass\SassFilter());
-                        break;
-
-                    case 'cssembed':
-                        $filterManager->set('cssembed', new Filter\PhpCssEmbedFilter());
-                        break;
-
-                    case 'cssrewrite':
-                        $filterManager->set('cssrewrite', new Filter\CssRewriteFilter());
-                        break;
-
-                    case 'cssimport':
-                        $filterManager->set('cssimport', new Filter\CssImportFilter());
-                        break;
-
-                    case 'compass':
-                        $filterManager->set('compass', new Filter\CompassFilter());
-                        break;
-
-                    default:
-                        throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
-                        break;
+                foreach ($this->assetFilters as $filterIdentifier => $filterInstance) {
+                    if ($filterIdentifier == $filter_name) {
+                        $filterManager->set($filterIdentifier, $filterInstance);
+                    }
+                    // No, goto is not evil.
+                    goto filterFound;
                 }
+
+                throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
+                break;
+
+                filterFound:
             }
         } else {
             $filter_list = array();
@@ -340,5 +321,13 @@ class AsseticAssetManager implements AssetManagerInterface
     public function isDebugMode()
     {
         return $this->debugMode;
+    }
+
+    /**
+     * Register an asset filter
+     */
+    public function registerAssetFilter($filterIdentifier, $filter)
+    {
+        $this->assetFilters[$filterIdentifier] = $filter;
     }
 }

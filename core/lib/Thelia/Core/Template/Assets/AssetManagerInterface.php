@@ -59,4 +59,9 @@ interface AssetManagerInterface
      * @return bool true if the AssetManager was started in debug mode
      */
     public function isDebugMode();
+
+    /**
+     * Register an asset filter
+     */
+    public function registerAssetFilter($filterIdentifier, $filter);
 }
