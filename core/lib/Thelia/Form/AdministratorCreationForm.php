@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\AdminQuery;
@@ -33,48 +32,48 @@ class AdministratorCreationForm extends BaseForm
                     new Constraints\Callback(array(
                         "methods" => array(
                             array($this, "verifyExistingLogin"),
-                        )
+                        ),
                     )),
                 ),
                 "label" => Translator::getInstance()->trans("Login"),
                 "label_attr" => array(
-                    "for" => "login"
+                    "for" => "login",
                 ),
             ))
             ->add("firstname", "text", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
+                    new Constraints\NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("First Name"),
                 "label_attr" => array(
-                    "for" => "firstname"
+                    "for" => "firstname",
                 ),
             ))
             ->add("lastname", "text", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
+                    new Constraints\NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Last Name"),
                 "label_attr" => array(
-                    "for" => "lastname"
-                )
+                    "for" => "lastname",
+                ),
             ))
             ->add("password", "password", array(
                 "constraints" => array(),
                 "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
-                    "for" => "password"
+                    "for" => "password",
                 ),
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
                     new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField")
-                    )))
+                        array($this, "verifyPasswordField"),
+                    ))),
                 ),
                 "label" => Translator::getInstance()->trans('Password confirmation'),
                 "label_attr" => array(
-                    "for" => "password_confirmation"
+                    "for" => "password_confirmation",
                 ),
             ))
             ->add(
@@ -87,7 +86,7 @@ class AdministratorCreationForm extends BaseForm
                     ),
                     "label" => Translator::getInstance()->trans('Profile'),
                     "label_attr" => array(
-                        "for" => "profile"
+                        "for" => "profile",
                     ),
                 )
             )
@@ -101,7 +100,7 @@ class AdministratorCreationForm extends BaseForm
                     ),
                     "label" => Translator::getInstance()->trans('Preferred locale'),
                     "label_attr" => array(
-                        "for" => "locale"
+                        "for" => "locale",
                     ),
                 )
             )

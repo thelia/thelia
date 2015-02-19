@@ -59,8 +59,6 @@ class Application extends BaseApplication
 
     protected function registerCommands()
     {
-
-
         $container = $this->kernel->getContainer();
 
         foreach ($container->getParameter("command.definition") as $command) {

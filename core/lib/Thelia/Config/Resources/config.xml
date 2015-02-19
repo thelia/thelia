@@ -237,6 +237,17 @@
             <tag name="thelia.forms.extension" />
         </service>
 
+        <service id="thelia.form_factory" class="Thelia\Core\Form\TheliaFormFactory" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="service_container" />
+            <argument>%thelia.parser.forms%</argument>
+        </service>
+
+        <service id="thelia.form_validator" class="Thelia\Core\Form\TheliaFormValidator">
+            <argument type="service" id="thelia.translator" />
+            <argument>%kernel.environment%</argument>
+        </service>
+
         <service id="currency.converter" class="Thelia\CurrencyConverter\CurrencyConverter" />
 
         <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">

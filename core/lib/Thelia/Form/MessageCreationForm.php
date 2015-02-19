@@ -26,7 +26,7 @@ class MessageCreationForm extends BaseForm
 
         if (!$change_mode) {
             $name_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateName"))
+                "methods" => array(array($this, "checkDuplicateName")),
             ));
         }
 
@@ -36,15 +36,15 @@ class MessageCreationForm extends BaseForm
                 "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
                     "for" => "name",
-                    'help' => Translator::getInstance()->trans("This is an identifier that will be used in the code to get this message")
+                    'help' => Translator::getInstance()->trans("This is an identifier that will be used in the code to get this message"),
                 ),
                 'attr' => [
-                    'placeholder' => Translator::getInstance()->trans("Mail template name")
-                ]
+                    'placeholder' => Translator::getInstance()->trans("Mail template name"),
+                ],
             ))
             ->add("title", "text", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
+                    new Constraints\NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans('Purpose'),
                 "label_attr" => array(
@@ -52,16 +52,16 @@ class MessageCreationForm extends BaseForm
                     'help' => Translator::getInstance()->trans(
                         "Enter here the mail template purpose in the default language (%title%)",
                         [ '%title%' => Lang::getDefaultLanguage()->getTitle() ]
-                    )
+                    ),
                 ),
                 'attr' => [
-                    'placeholder' => Translator::getInstance()->trans("Mail template purpose")
-                ]
+                    'placeholder' => Translator::getInstance()->trans("Mail template purpose"),
+                ],
             ))
             ->add("locale", "hidden", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
-                )
+                    new Constraints\NotBlank(),
+                ),
             ))
             ->add("secured", "hidden", array())
         ;

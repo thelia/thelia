@@ -36,7 +36,7 @@ class AreaCountryForm extends BaseForm
                 [
                     'constraints' => [
                         new GreaterThan(array('value' => 0)),
-                        new NotBlank()
+                        new NotBlank(),
                     ]
                 ]
             )
@@ -52,11 +52,11 @@ class AreaCountryForm extends BaseForm
                     'label'        => Translator::getInstance()->trans('Countries'),
                     'label_attr'   => [
                         'for'         => 'products',
-                        'help'        => Translator::getInstance()->trans('Select the countries to include in this shipping zone')
+                        'help'        => Translator::getInstance()->trans('Select the countries to include in this shipping zone'),
                     ],
                     'attr' => [
                         'size'     => 10,
-                        'multiple' => true
+                        'multiple' => true,
                     ]
                 ]
             )

@@ -35,10 +35,10 @@ class OrderPayment extends FirewallForm
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyInvoiceAddress")
-                        )
-                    ))
-                )
+                            array($this, "verifyInvoiceAddress"),
+                        ),
+                    )),
+                ),
             ))
             ->add("payment-module", "integer", array(
                 "required" => true,
@@ -46,20 +46,20 @@ class OrderPayment extends FirewallForm
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            array($this, "verifyPaymentModule")
-                        )
-                    ))
-                )
+                            array($this, "verifyPaymentModule"),
+                        ),
+                    )),
+                ),
             ))
             // Add terms & conditions
             ->add("agreed", "checkbox", array(
                 "constraints" => array(
-                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register.")))
+                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
                 ),
-                "label"=>"Agreed",
+                "label" => "Agreed",
                 "label_attr" => array(
-                    "for" => "agreed"
-                )
+                    "for" => "agreed",
+                ),
             ));
     }
 

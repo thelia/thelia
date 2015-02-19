@@ -12,12 +12,8 @@
 
 namespace Thelia\Form;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints\GreaterThan;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\Hook;
-use Thelia\Model\HookQuery;
 
 /**
  * Class HookModificationForm
@@ -36,8 +32,8 @@ class ModuleHookModificationForm extends ModuleHookCreationForm
                 "label" => Translator::getInstance()->trans("Active"),
                 "required" => false,
                 "label_attr" => array(
-                    "for" => "active"
-                )
+                    "for" => "active",
+                ),
             ))
         ;
     }

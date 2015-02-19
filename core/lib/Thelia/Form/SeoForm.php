@@ -33,14 +33,14 @@ class SeoForm extends BaseForm
             ->add("id", "hidden", array(
                 'required' => true,
                 "constraints" => array(
-                    new GreaterThan(array('value' => 0))
-                )
+                    new GreaterThan(array('value' => 0)),
+                ),
             ))
             ->add("locale", "hidden", array(
                 'required' => true,
                 "constraints" => array(
-                    new NotBlank()
-                )
+                    new NotBlank(),
+                ),
             ))
         ;
 

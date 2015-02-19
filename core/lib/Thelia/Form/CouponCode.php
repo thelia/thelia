@@ -42,9 +42,9 @@ class CouponCode extends BaseForm
                         new Constraints\NotBlank(),
                         new Constraints\Callback([
                             "methods" => [
-                                [$this, "verifyExistingCode"]
-                            ]
-                        ])
+                                [$this, "verifyExistingCode"],
+                            ],
+                        ]),
                     ]
                 ]
             )

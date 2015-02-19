@@ -27,27 +27,27 @@ class ConfigModificationForm extends BaseForm
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
-                        )
-                    )
+                        ),
+                    ),
             ))
             ->add("name", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans('Name'),
                 "label_attr" => array(
-                    "for" => "name"
-                )
+                    "for" => "name",
+                ),
             ))
             ->add("value", "text", array(
                 "label" => Translator::getInstance()->trans('Value'),
                 "label_attr" => array(
-                    "for" => "value"
-                )
+                    "for" => "value",
+                ),
             ))
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array(
-                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin')
+                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ))
          ;
 

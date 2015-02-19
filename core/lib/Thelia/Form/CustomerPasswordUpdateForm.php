@@ -34,36 +34,36 @@ class CustomerPasswordUpdateForm extends BaseForm
                     "constraints" => array(
                         new Constraints\NotBlank(),
                         new Constraints\Callback(array("methods" => array(
-                            array($this, "verifyCurrentPasswordField")
-                        )))
+                            array($this, "verifyCurrentPasswordField"),
+                        ))),
                     ),
                     "label" => Translator::getInstance()->trans("Current Password"),
                     "label_attr" => array(
-                        "for" => "password_old"
-                    )
+                        "for" => "password_old",
+                    ),
                 ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                 ),
                 "label" => Translator::getInstance()->trans("New Password"),
                 "label_attr" => array(
-                    "for" => "password"
-                )
+                    "for" => "password",
+                ),
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                     new Constraints\Callback(array("methods" => array(
-                        array($this, "verifyPasswordField")
-                    )))
+                        array($this, "verifyPasswordField"),
+                    ))),
                 ),
                 "label" => Translator::getInstance()->trans('Password confirmation'),
                 "label_attr" => array(
-                    "for" => "password_confirmation"
-                )
+                    "for" => "password_confirmation",
+                ),
             ));
     }
 

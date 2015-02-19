@@ -49,7 +49,7 @@ class ApiCreateForm extends BaseForm
         $this->formBuilder
             ->add('label', 'text', [
                 'constraints' => [
-                    new NotBlank()
+                    new NotBlank(),
                 ],
                 'label' => Translator::getInstance()->trans('label'),
                 'label_attr' => ['for' => 'api_label']
@@ -64,7 +64,7 @@ class ApiCreateForm extends BaseForm
                     ),
                     "label" => Translator::getInstance()->trans('Profile'),
                     "label_attr" => array(
-                        "for" => "profile"
+                        "for" => "profile",
                     ),
                 )
             )

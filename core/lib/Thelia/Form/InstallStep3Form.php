@@ -41,8 +41,8 @@ class InstallStep3Form extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
-                    )
+                        new NotBlank(),
+                    ),
                 )
             )
             ->add(
@@ -50,8 +50,8 @@ class InstallStep3Form extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
-                    )
+                        new NotBlank(),
+                    ),
                 )
             )
             ->add(
@@ -59,8 +59,8 @@ class InstallStep3Form extends BaseForm
                 'text',
                 array(
                     'constraints' => array(
-                        new NotBlank()
-                    )
+                        new NotBlank(),
+                    ),
                 )
             )
             ->add(
@@ -71,10 +71,10 @@ class InstallStep3Form extends BaseForm
                         new NotBlank(),
                         new GreaterThan(
                             array(
-                                'value' => 0
+                                'value' => 0,
                             )
-                        )
-                    )
+                        ),
+                    ),
                 )
             )
             ->add(
@@ -82,8 +82,8 @@ class InstallStep3Form extends BaseForm
                 'hidden',
                 array(
                     'constraints' => array(
-                        new NotBlank()
-                    )
+                        new NotBlank(),
+                    ),
                 )
             );
     }

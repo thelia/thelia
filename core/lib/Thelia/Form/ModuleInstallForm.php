@@ -13,7 +13,6 @@
 namespace Thelia\Form;
 
 use Exception;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -46,20 +45,20 @@ class ModuleInstallForm extends BaseForm
                         new Constraints\File(
                             [
                                 'mimeTypes' => [
-                                    'application/zip'
+                                    'application/zip',
                                 ],
-                                'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file')
+                                'mimeTypesMessage' => Translator::getInstance()->trans('Please upload a valid Zip file'),
                             ]
                         ),
                         new Constraints\Callback([
                             "methods" => [
-                                [$this, "checkModuleValidity"]
-                            ]
-                        ])
+                                [$this, "checkModuleValidity"],
+                            ],
+                        ]),
                     ],
                     'label' => Translator::getInstance()->trans('The module zip file'),
                     'label_attr' => [
-                        'for' => 'module'
+                        'for' => 'module',
                     ]
                 ]
             );
@@ -68,7 +67,7 @@ class ModuleInstallForm extends BaseForm
     /**
      * Check module validity
      *
-     * @param UploadedFile $file
+     * @param UploadedFile              $file
      * @param ExecutionContextInterface $context
      */
     public function checkModuleValidity(UploadedFile $file, ExecutionContextInterface $context)
@@ -175,7 +174,7 @@ class ModuleInstallForm extends BaseForm
         ];
 
         foreach ($paths as $path) {
-            if (is_dir($dir . DS . $path)) {
+            if (is_dir($dir.DS.$path)) {
                 $out['directories'][] = $path;
             } else {
                 $out['files'][] = $path;

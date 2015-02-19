@@ -22,7 +22,7 @@ class TaxRuleCreationForm extends BaseForm
     {
         $this->formBuilder
             ->add("locale", "text", array(
-                "constraints" => array(new NotBlank())
+                "constraints" => array(new NotBlank()),
             ))
         ;
 

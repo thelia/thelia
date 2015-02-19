@@ -24,28 +24,28 @@ class AdminLogin extends BruteforceForm
             ->add("username", "text", array(
                 "constraints" => array(
                     new NotBlank(),
-                    new Length(array("min" => 3))
+                    new Length(array("min" => 3)),
                 ),
                 "label" => Translator::getInstance()->trans("Username *"),
                 "label_attr" => array(
-                    "for" => "username"
-                )
+                    "for" => "username",
+                ),
             ))
             ->add("password", "password", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Password *"),
                 "label_attr" => array(
-                    "for" => "password"
-                )
+                    "for" => "password",
+                ),
             ))
             ->add("remember_me", "checkbox", array(
                     'value' => 'yes',
                     "label" => Translator::getInstance()->trans("Remember me ?"),
                     "label_attr" => array(
-                        "for" => "remember_me"
-                    )
+                        "for" => "remember_me",
+                    ),
             ))
             ;
     }

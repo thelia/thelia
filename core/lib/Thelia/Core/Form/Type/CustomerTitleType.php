@@ -33,7 +33,6 @@ class CustomerTitleType extends AbstractTheliaType
         $this->customerTitleIdType = $customerTitleIdType;
     }
 
-
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -43,12 +42,12 @@ class CustomerTitleType extends AbstractTheliaType
                 "required" => true,
                 "cascade_validation" => true,
                 "constraints" => array(
-                    new Count(["min" => 1])
-                )
+                    new Count(["min" => 1]),
+                ),
             ))
             ->add("default", "checkbox")
             ->add("title_id", "customer_title_id", array(
-                "constraints" => $this->getConstraints($this->customerTitleIdType, "update")
+                "constraints" => $this->getConstraints($this->customerTitleIdType, "update"),
             ))
         ;
     }

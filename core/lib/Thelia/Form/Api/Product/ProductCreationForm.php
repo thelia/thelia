@@ -14,7 +14,6 @@ namespace Thelia\Form\Api\Product;
 
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\ProductCreationForm as BaseProductCreationForm;
-use Thelia\Form\ProductModificationForm;
 use Thelia\Form\StandardDescriptionFieldsTrait;
 
 /**

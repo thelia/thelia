@@ -35,7 +35,7 @@ class SaleCreationForm extends BaseForm
                 'label'       => Translator::getInstance()->trans('Sale title'),
                 'label_attr'  => [
                     'for'         => 'title',
-                    'help'        => $titleFieldHelpLabel
+                    'help'        => $titleFieldHelpLabel,
                 ],
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans('The sale name or descriptive title'),
@@ -51,7 +51,7 @@ class SaleCreationForm extends BaseForm
                 'label'       => Translator::getInstance()->trans('Sale announce label'),
                 'label_attr'  => [
                     'for'         => 'label',
-                    'help'        => Translator::getInstance()->trans('The sale announce label, such as Sales ! or Flash Sales !')
+                    'help'        => Translator::getInstance()->trans('The sale announce label, such as Sales ! or Flash Sales !'),
                 ],
                 'attr' => [
                     'placeholder' => Translator::getInstance()->trans('Sale announce label'),

@@ -251,7 +251,7 @@ class Thelia extends Kernel
                     $loader->load("config.xml", "module." . $module->getCode());
 
                     $envConfigFileName = sprintf("config_%s.xml", $this->environment);
-                    $envConfigFile = sprintf('%s%s%s',$module->getAbsoluteConfigPath(), DS, $envConfigFileName);
+                    $envConfigFile = sprintf('%s%s%s', $module->getAbsoluteConfigPath(), DS, $envConfigFileName);
 
                     if (is_file($envConfigFile) && is_readable($envConfigFile)) {
                         $loader->load($envConfigFileName, "module." . $module->getCode());

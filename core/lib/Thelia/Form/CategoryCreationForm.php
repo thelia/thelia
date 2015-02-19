@@ -22,29 +22,29 @@ class CategoryCreationForm extends BaseForm
         $this->formBuilder
             ->add("title", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Category title *"),
                 "label_attr" => array(
-                    "for" => "title"
-                )
+                    "for" => "title",
+                ),
             ))
             ->add("parent", "text", array(
                 "label" => Translator::getInstance()->trans("Parent category *"),
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
-               "label_attr" => array("for" => "parent_create")
+                "label_attr" => array("for" => "parent_create"),
             ))
             ->add("locale", "text", array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
-               "label_attr" => array("for" => "locale_create")
+                "label_attr" => array("for" => "locale_create"),
             ))
             ->add("visible", "integer", array(
                 "label" => Translator::getInstance()->trans("This category is online."),
-                "label_attr" => array("for" => "visible_create")
+                "label_attr" => array("for" => "visible_create"),
             ))
         ;
     }

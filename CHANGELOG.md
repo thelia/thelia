@@ -20,6 +20,8 @@
 - Add environment specific config file loading in modules
 - Add the possibility for customers to change their email, backoffice configuration variables customer_change_email
 - Add confirmation email for customers, backoffice configuration variables customer_confirm_email
+- Refactor ```Thelia\Controller\BaseController::createForm``` into a factory service ```Thelia\Core\Form\TheliaFormFactory```
+- Refactor ```Thelia\Controller\BaseController::validateForm``` and ```Thelia\Controller\BaseController::getErrorMessages``` into a service ```Thelia\Core\Form\TheliaFormValidator```
 
 # 2.1.2
 

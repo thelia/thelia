@@ -26,20 +26,20 @@ class FeatureCreationForm extends BaseForm
                 "text",
                 array(
                 "constraints" => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans("Title *"),
                 "label_attr" => array(
-                    "for" => "title"
-                ))
+                    "for" => "title",
+                ), )
             )
             ->add(
                 "locale",
                 "text",
                 array(
                 "constraints" => array(
-                    new NotBlank()
-                ))
+                    new NotBlank(),
+                ), )
             )
             ->add(
                 "add_to_all",
@@ -47,8 +47,8 @@ class FeatureCreationForm extends BaseForm
                 array(
                 "label" => Translator::getInstance()->trans("Add to all product templates"),
                 "label_attr" => array(
-                    "for" => "add_to_all"
-                ))
+                    "for" => "add_to_all",
+                ), )
             )
         ;
     }

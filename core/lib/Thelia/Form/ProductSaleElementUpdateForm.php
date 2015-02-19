@@ -25,12 +25,12 @@ class ProductSaleElementUpdateForm extends BaseForm
             ->add("tax_rule", "integer", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
-                    "label_attr" => array("for" => "tax_rule_field")
+                    "label_attr" => array("for" => "tax_rule_field"),
             ))
             ->add("product_id", "integer", array(
                     "label"       => Translator::getInstance()->trans("Product ID *"),
                     "label_attr"  => array("for" => "product_id_field"),
-                    "constraints" => array(new GreaterThan(array('value' => 0)))
+                    "constraints" => array(new GreaterThan(array('value' => 0))),
             ))
             ->add("default_pse", "integer", array(
                     "label"       => Translator::getInstance()->trans("Default product sale element"),
@@ -39,11 +39,11 @@ class ProductSaleElementUpdateForm extends BaseForm
             ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Price currency *"),
-                    "label_attr" => array("for" => "currency_field")
+                    "label_attr" => array("for" => "currency_field"),
             ))
             ->add("use_exchange_rate", "integer", array(
                     "label"      => Translator::getInstance()->trans("Apply exchange rates on price in %sym", array("%sym" => Currency::getDefaultCurrency()->getSymbol())),
-                    "label_attr" => array("for" => "use_exchange_rate_field")
+                    "label_attr" => array("for" => "use_exchange_rate_field"),
             ))
 
             // -- Collections
@@ -70,7 +70,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_delete' => true,
                 'options'      => array(
                     'constraints' => array(new NotBlank()),
-                )
+                ),
             ))
             ->add('price_with_tax', 'collection', array(
                 'type'         => 'number',
@@ -84,7 +84,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'label'        => Translator::getInstance()->trans('Weight'),
                 'label_attr'   => array('for' => 'weight_field'),
                 'allow_add'    => true,
-                'allow_delete' => true
+                'allow_delete' => true,
             ))
             ->add('quantity', 'collection', array(
                 'type'         => 'number',
@@ -94,7 +94,7 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_delete' => true,
                 'options'      => array(
                         'constraints' => array(new NotBlank()),
-                )
+                ),
             ))
             ->add('sale_price', 'collection', array(
                 'label'        => Translator::getInstance()->trans('Sale price excluding taxes'),

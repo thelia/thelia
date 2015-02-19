@@ -41,7 +41,7 @@ class MailingSystemModificationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Encryption"),
                 "label_attr" => array(
                     "for" => "encryption_field",
-                    "help" => Translator::getInstance()->trans("ssl, tls or empty")
+                    "help" => Translator::getInstance()->trans("ssl, tls or empty"),
                 ),
             ))
             ->add("username", "text", array(
@@ -56,7 +56,7 @@ class MailingSystemModificationForm extends BaseForm
                 "label" => Translator::getInstance()->trans("Auth mode"),
                 "label_attr" => array(
                     "for" => "authmode_field",
-                    "help" => Translator::getInstance()->trans("plain, login, cram-md5 or empty")
+                    "help" => Translator::getInstance()->trans("plain, login, cram-md5 or empty"),
                 ),
             ))
             ->add("timeout", "text", array(

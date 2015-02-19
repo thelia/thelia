@@ -23,7 +23,7 @@ use Thelia\Form\StandardDescriptionFieldsTrait;
  * Time: 3:56 PM
  *
  * Form allowing to process an image
-  *
+ *
  * @package Image
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
@@ -46,16 +46,14 @@ abstract class ImageModification extends BaseForm
                 [
                     'required' => false,
                     'constraints' => [
-                        new Image(
-                            [
-    //                            'minWidth' => 200,
-    //                            'minHeight' => 200
-                            ]
-                        )
+                        new Image([
+                            //'minWidth' => 200,
+                            //'minHeight' => 200
+                        ]),
                     ],
                     'label' => $translator->trans('Replace current image by this file'),
                     'label_attr' => [
-                        'for' => 'file'
+                        'for' => 'file',
                     ]
                 ]
             )
@@ -68,7 +66,7 @@ abstract class ImageModification extends BaseForm
                     'required'    => false,
                     'label'       => $translator->trans('This image is online'),
                     'label_attr' => [
-                        'for' => 'visible_create'
+                        'for' => 'visible_create',
                     ]
                 ]
             )

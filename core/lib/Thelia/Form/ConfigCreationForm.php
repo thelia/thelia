@@ -25,7 +25,7 @@ class ConfigCreationForm extends BaseForm
 
         if (!$change_mode) {
             $name_constraints[] = new Constraints\Callback(array(
-                "methods" => array(array($this, "checkDuplicateName"))
+                "methods" => array(array($this, "checkDuplicateName")),
             ));
         }
 
@@ -34,32 +34,32 @@ class ConfigCreationForm extends BaseForm
                 "constraints" => $name_constraints,
                 "label" => Translator::getInstance()->trans('Name *'),
                 "label_attr" => array(
-                    "for" => "name"
-                )
+                    "for" => "name",
+                ),
             ))
             ->add("title", "text", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
+                    new Constraints\NotBlank(),
                 ),
                 "label" => Translator::getInstance()->trans('Purpose *'),
                 "label_attr" => array(
-                    "for" => "purpose"
-                )
+                    "for" => "purpose",
+                ),
             ))
             ->add("locale", "hidden", array(
                 "constraints" => array(
-                    new Constraints\NotBlank()
-                )
+                    new Constraints\NotBlank(),
+                ),
             ))
             ->add("value", "text", array(
                 "label" => Translator::getInstance()->trans('Value *'),
                 "label_attr" => array(
-                    "for" => "value"
-                )
+                    "for" => "value",
+                ),
             ))
             ->add("hidden", "hidden", array())
             ->add("secured", "hidden", array(
-                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin')
+                "label" => Translator::getInstance()->trans('Prevent variable modification or deletion, except for super-admin'),
             ))
         ;
     }

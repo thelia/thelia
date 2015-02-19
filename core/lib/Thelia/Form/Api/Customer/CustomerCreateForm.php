@@ -32,7 +32,7 @@ class CustomerCreateForm extends BaseCustomerCreateForm
             ->remove('agreed')
             ->add('lang', 'integer', [
                 'constraints' => [
-                    new NotBlank()
+                    new NotBlank(),
                 ]
             ]);
     }

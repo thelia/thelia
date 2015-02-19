@@ -41,7 +41,6 @@ use Thelia\Tools\URL;
  */
 class Document extends BaseCachedFile implements EventSubscriberInterface
 {
-
     /**
      * @var string Config key for document delivery mode
      */

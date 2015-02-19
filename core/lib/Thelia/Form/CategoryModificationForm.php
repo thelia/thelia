@@ -25,8 +25,8 @@ class CategoryModificationForm extends CategoryCreationForm
         $this->formBuilder
             ->add("id", "hidden", array(
                     "constraints" => array(
-                        new GreaterThan(array('value' => 0))
-                    )
+                        new GreaterThan(array('value' => 0)),
+                    ),
                 ))
         ;
 

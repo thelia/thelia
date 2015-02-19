@@ -26,8 +26,8 @@ class FeatureModificationForm extends FeatureCreationForm
                     "constraints" => array(
                         new GreaterThan(
                             array('value' => 0)
-                        )
-                    )
+                        ),
+                    ),
             ))
         ;
 

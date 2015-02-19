@@ -96,10 +96,10 @@ abstract class BaseForm
     private $type;
 
     /**
-     * @param Request $request
-     * @param string $type
-     * @param array $data
-     * @param array $options
+     * @param Request            $request
+     * @param string             $type
+     * @param array              $data
+     * @param array              $options
      * @param ContainerInterface $container
      * @deprecated Thelia forms should not be instantiated directly. Please use BaseController::createForm() instead
      * @see BaseController::createForm()
@@ -155,7 +155,7 @@ abstract class BaseForm
              * If the form has the container, disptach the events
              */
             $this->dispatcher->dispatch(
-                TheliaEvents::FORM_BEFORE_BUILD . "." . $name,
+                TheliaEvents::FORM_BEFORE_BUILD.".".$name,
                 $event
             );
         }
@@ -167,7 +167,7 @@ abstract class BaseForm
              * If the form has the container, disptach the events
              */
             $this->dispatcher->dispatch(
-                TheliaEvents::FORM_AFTER_BUILD . "." . $name,
+                TheliaEvents::FORM_AFTER_BUILD.".".$name,
                 $event
             );
         }
@@ -298,6 +298,7 @@ abstract class BaseForm
         if ($this->view === null) {
             throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
         }
+
         return $this->view;
     }
 

@@ -86,7 +86,7 @@ class SaleModificationForm extends SaleCreationForm
                         "methods" => [
                             [ $this, "checkDate" ],
                         ],
-                    ])
+                    ]),
                 ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('Start date of sales'),
@@ -95,7 +95,7 @@ class SaleModificationForm extends SaleCreationForm
                     'help'        => Translator::getInstance()->trans('The date from which sales are active. Please use %fmt format.', [ '%fmt' => self::MOMENT_JS_DATE_FORMAT]),
                 ],
                 'attr' => [
-                    'data-date-format' => self::MOMENT_JS_DATE_FORMAT
+                    'data-date-format' => self::MOMENT_JS_DATE_FORMAT,
                 ]
             ]
         )
@@ -108,7 +108,7 @@ class SaleModificationForm extends SaleCreationForm
                         "methods" => [
                             [ $this, "checkDate" ],
                         ],
-                    ])
+                    ]),
                 ],
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('End date of sales'),
@@ -117,7 +117,7 @@ class SaleModificationForm extends SaleCreationForm
                     'help'        => Translator::getInstance()->trans('The date after which sales are de-activated. Please use %fmt format.', [ '%fmt' => self::MOMENT_JS_DATE_FORMAT]),
                 ],
                 'attr' => [
-                    'data-date-format' => self::MOMENT_JS_DATE_FORMAT
+                    'data-date-format' => self::MOMENT_JS_DATE_FORMAT,
                 ]
             ]
         )
@@ -134,7 +134,7 @@ class SaleModificationForm extends SaleCreationForm
                 'label'       => Translator::getInstance()->trans('Discount type'),
                 'label_attr'  => [
                     'for'         => 'price_offset_type',
-                    'help'        => Translator::getInstance()->trans('Select the discount type that will be applied to original product prices')
+                    'help'        => Translator::getInstance()->trans('Select the discount type that will be applied to original product prices'),
                 ],
                 'attr' => [
                 ]
@@ -154,9 +154,9 @@ class SaleModificationForm extends SaleCreationForm
 
                 'label'        => Translator::getInstance()->trans('Product price offset for each currency'),
                 'label_attr'   => [
-                    'for' => 'price_offset'
-               ],
-             ]
+                    'for' => 'price_offset',
+                ],
+            ]
         )
         ->add(
             'categories',
@@ -168,10 +168,10 @@ class SaleModificationForm extends SaleCreationForm
                 'label'       => Translator::getInstance()->trans('Product categories'),
                 'label_attr'  => [
                     'for'         => 'categories',
-                    'help'        => Translator::getInstance()->trans('Select the categories of the products covered by this operation')
+                    'help'        => Translator::getInstance()->trans('Select the categories of the products covered by this operation'),
                 ],
                 'attr' => [
-                    'size' => 10
+                    'size' => 10,
                 ]
             ]
         )
@@ -186,7 +186,7 @@ class SaleModificationForm extends SaleCreationForm
                 'label'        => Translator::getInstance()->trans('Products'),
                 'label_attr'   => [
                     'for'         => 'products',
-                    'help'        => Translator::getInstance()->trans('Select the products covered by this operation')
+                    'help'        => Translator::getInstance()->trans('Select the products covered by this operation'),
                 ],
                 'attr' => [
                 ]
@@ -203,7 +203,7 @@ class SaleModificationForm extends SaleCreationForm
                 'label'        => Translator::getInstance()->trans('Product attributes'),
                 'label_attr'   => [
                     'for'         => 'product_attributes',
-                    'help'        => Translator::getInstance()->trans('Select the product attributes included in this operation')
+                    'help'        => Translator::getInstance()->trans('Select the product attributes included in this operation'),
                 ],
                 'attr' => [
                 ]

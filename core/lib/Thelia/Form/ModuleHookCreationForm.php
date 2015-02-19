@@ -43,15 +43,15 @@ class ModuleHookCreationForm extends BaseForm
                 array(
                     "choices" => $this->getModuleChoices(),
                     "constraints" => array(
-                        new NotBlank()
+                        new NotBlank(),
                     ),
                     "label" => Translator::getInstance()->trans("Module"),
                     "label_attr" => array(
                         "for" => "module_id",
                         "help" => Translator::getInstance()->trans(
                             "Only hookable modules are displayed in this menu."
-                        )
-                    )
+                        ),
+                    ),
                 )
             )
             ->add(
@@ -60,10 +60,10 @@ class ModuleHookCreationForm extends BaseForm
                 array(
                     "choices" => $this->getHookChoices(),
                     "constraints" => array(
-                        new NotBlank()
+                        new NotBlank(),
                     ),
                     "label" => Translator::getInstance()->trans("Hook"),
-                    "label_attr" => array("for" => "hook_id")
+                    "label_attr" => array("for" => "hook_id"),
                 )
             )
             ->add(
@@ -71,15 +71,15 @@ class ModuleHookCreationForm extends BaseForm
                 "text",
                 array(
                     "constraints" => array(
-                        new NotBlank()
+                        new NotBlank(),
                     ),
                     "label" => Translator::getInstance()->trans("Service ID"),
                     "label_attr" => array(
                         "for" => "classname",
                         "help" => Translator::getInstance()->trans(
                             "The service id that will handle the hook (defined in the config.xml file of the module)."
-                        )
-                    )
+                        ),
+                    ),
                 )
             )
             ->add(
@@ -92,17 +92,17 @@ class ModuleHookCreationForm extends BaseForm
                         new Callback(
                             array(
                                 "methods" => array(
-                                    array($this, "verifyMethod")
-                                )
+                                    array($this, "verifyMethod"),
+                                ),
                             )
-                        )
+                        ),
                     ),
                     "label_attr" => array(
                         "for" => "method",
                         "help" => Translator::getInstance()->trans(
                             "The method name that will handle the hook event."
-                        )
-                    )
+                        ),
+                    ),
                 )
             );
     }
@@ -148,7 +148,7 @@ class ModuleHookCreationForm extends BaseForm
 
         /** @var Hook $hook */
         foreach ($hooks as $hook) {
-            $choices[$hook->getId()] = $hook->getTitle() . ' (code ' . $hook->getCode() . ')';
+            $choices[$hook->getId()] = $hook->getTitle().' (code '.$hook->getCode().')';
         }
 
         return $choices;

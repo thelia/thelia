@@ -45,8 +45,8 @@ abstract class AbstractIdType extends AbstractType
                 new Callback([
                     "methods" => array(
                         [$this, "checkId"],
-                    )
-                ])
+                    ),
+                ]),
             ),
             "cascade_validation" => true,
         ]);

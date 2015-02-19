@@ -36,10 +36,10 @@ trait SeoFieldsTrait
                     'required'   => false,
                     'label'      => Translator::getInstance()->trans('Rewriten URL'),
                     'label_attr' => [
-                        'for' => 'rewriten_url_field'
+                        'for' => 'rewriten_url_field',
                     ],
                     'attr' => [
-                        'placeholder' => Translator::getInstance()->trans('Use the keyword phrase in your URL.')
+                        'placeholder' => Translator::getInstance()->trans('Use the keyword phrase in your URL.'),
                     ]
                 ]
             );
@@ -54,10 +54,10 @@ trait SeoFieldsTrait
                     'label'      => Translator::getInstance()->trans('Page Title'),
                     'label_attr' => [
                         'for' => 'meta_title',
-                        'help' => Translator::getInstance()->trans('The HTML TITLE element is the most important element on your web page.')
+                        'help' => Translator::getInstance()->trans('The HTML TITLE element is the most important element on your web page.'),
                     ],
                     'attr' => [
-                        'placeholder' => Translator::getInstance()->trans('Make sure that your title is clear, and contains many of the keywords within the page itself.')
+                        'placeholder' => Translator::getInstance()->trans('Make sure that your title is clear, and contains many of the keywords within the page itself.'),
                     ]
                 ]
             );
@@ -72,11 +72,11 @@ trait SeoFieldsTrait
                     'label'      => Translator::getInstance()->trans('Meta Description'),
                     'label_attr' => [
                         'for' => 'meta_description',
-                        'help' => Translator::getInstance()->trans('Keep the most important part of your description in the first 150-160 characters.')
+                        'help' => Translator::getInstance()->trans('Keep the most important part of your description in the first 150-160 characters.'),
                     ],
                     'attr' => [
                         'rows' => 6,
-                        'placeholder' => Translator::getInstance()->trans('Make sure it uses keywords found within the page itself.')
+                        'placeholder' => Translator::getInstance()->trans('Make sure it uses keywords found within the page itself.'),
                     ]
                 ]
             );
@@ -91,11 +91,11 @@ trait SeoFieldsTrait
                     'label'      => Translator::getInstance()->trans('Meta Keywords'),
                     'label_attr' => [
                         'for' => 'meta_keywords',
-                        'help' => Translator::getInstance()->trans('You don\'t need to use commas or other punctuations.')
+                        'help' => Translator::getInstance()->trans('You don\'t need to use commas or other punctuations.'),
                     ],
                     'attr' => [
                         'rows' => 3,
-                        'placeholder' => Translator::getInstance()->trans('Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.')
+                        'placeholder' => Translator::getInstance()->trans('Don\'t repeat keywords over and over in a row. Rather, put in keyword phrases.'),
                     ]
                 ]
             );

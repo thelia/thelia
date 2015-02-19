@@ -57,7 +57,7 @@ class ApiUpdateForm extends BaseForm
                     ),
                     "label" => Translator::getInstance()->trans('Profile'),
                     "label_attr" => array(
-                        "for" => "profile"
+                        "for" => "profile",
                     ),
                 )
             );

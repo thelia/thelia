@@ -48,10 +48,10 @@ class AreaCreateForm extends BaseForm
         $this->formBuilder
             ->add('name', 'text', array(
                 'constraints' => array(
-                    new NotBlank()
+                    new NotBlank(),
                 ),
                 'label_attr' => array('for' => 'shipping_name'),
-                'label' => Translator::getInstance()->trans('Shipping zone name')
+                'label' => Translator::getInstance()->trans('Shipping zone name'),
             ))
 
         ;

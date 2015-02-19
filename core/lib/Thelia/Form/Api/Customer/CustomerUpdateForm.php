@@ -12,7 +12,6 @@
 
 namespace Thelia\Form\Api\Customer;
 
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\CustomerUpdateForm as BaseCustomerUpdateForm;
 
 /**
