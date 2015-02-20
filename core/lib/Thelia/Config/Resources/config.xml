@@ -82,6 +82,7 @@
         <!-- The asset filters -->
         <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
             <tag name="thelia.asset.filter" key="less" />
+            <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="less_legacy.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
