@@ -50,15 +50,14 @@ class HomeController extends BaseAdminController
             return $response;
         }
 
-        $cacheEnable = intval(ConfigQuery::read("admin_cache_home_stats_enable", '1'));
+        $cacheExpire = ConfigQuery::getAdminCacheHomeStatsTTL();
 
         $cacheContent = false;
 
-        if ($cacheEnable) {
+        if ($cacheExpire) {
             $context = "_" . $this->getRequest()->query->get('month', date('m')) . "_" . $this->getRequest()->query->get('year', date('Y'));
 
             $cacheKey = self::STATS_CACHE_KEY . $context;
-            $cacheExpire = intval(ConfigQuery::read("admin_cache_home_stats_ttl", '600'));
 
             $cacheDriver = new FilesystemCache($this->getCacheDir());
 
@@ -125,7 +124,7 @@ class HomeController extends BaseAdminController
 
             $cacheContent = json_encode($data);
 
-            if ($cacheEnable) {
+            if ($cacheExpire) {
                 $cacheDriver->save($cacheKey, $cacheContent, $cacheExpire);
             }
         }

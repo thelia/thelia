@@ -279,5 +279,10 @@ class ConfigQuery extends BaseConfigQuery
     {
         static::write("error_message.page_name", $v);
     }
+
+    public static function getAdminCacheHomeStatsTTL()
+    {
+        return intval(static::read("admin_cache_home_stats_ttl", 600));
+    }
 }
 // ConfigQuery
