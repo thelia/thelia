@@ -98,21 +98,13 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
         {form name="thelia.admin.area.create"}
-        {form_hidden_fields form=$form}
+            {form_hidden_fields form=$form}
 
-        {form_field form=$form field='success_url'}
-        {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            <input type="hidden" name="{$name}" value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}" />
-        {/form_field}
-        {form_field form=$form field="name"}
-        <div class="form-group">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" title="{intl l="Name"}" placeholder="{intl l='Shipping zone name'}">
-        </div>
-        {/form_field}
-       
+                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+            {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
+            {render_form_field form=$form field='name'}
 
-        {hook name="shipping-configuration.create-form" location="shipping_configuration_create_form" }
+            {hook name="shipping-configuration.create-form" location="shipping_configuration_create_form" }
         {/form}
     {/capture}
 
@@ -137,7 +129,6 @@
         <input type="hidden" name="area_id" id="shipping_configuration_delete_id" value="" />
 
         {hook name="shipping-configuration.delete-form" location="shipping_configuration_delete_form" }
-
     {/capture}
 
     {include

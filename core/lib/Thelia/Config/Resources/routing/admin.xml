@@ -830,8 +830,13 @@
         <default key="_controller">Thelia\Controller\Admin\AreaController::defaultAction</default>
     </route>
 
-    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}" methods="get">
+    <route id="admin.configuration.shipping-configuration.update.view" path="/admin/configuration/shipping_configuration/update/{area_id}">
         <default key="_controller">Thelia\Controller\Admin\AreaController::updateAction</default>
+        <requirement key="area_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.save" path="/admin/configuration/shipping_configuration/save/{area_id}">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::processUpdateAction</default>
         <requirement key="area_id">\d+</requirement>
     </route>
 
@@ -854,6 +859,10 @@
 
     <route id="admin.configuration.shipping-configuration.country.remove" path="/admin/configuration/shipping_configuration/country/remove" methods="post">
         <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountry</default>
+    </route>
+
+    <route id="admin.configuration.shipping-configuration.countries.remove" path="/admin/configuration/shipping_configuration/countries/remove" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\AreaController::removeCountries</default>
     </route>
 
     <!-- end shipping routes management -->

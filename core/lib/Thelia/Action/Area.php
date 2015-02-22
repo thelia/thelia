@@ -17,6 +17,7 @@ use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
+use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaQuery;
@@ -93,6 +94,18 @@ class Area extends BaseAction implements EventSubscriberInterface
         $event->setArea($area);
     }
 
+    public function update(AreaUpdateEvent $event)
+    {
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area
+                ->setDispatcher($event->getDispatcher())
+                ->setName($event->getAreaName())
+                ->save();
+
+            $event->setArea($area);
+        }
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -120,7 +133,8 @@ class Area extends BaseAction implements EventSubscriberInterface
             TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
             TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128),
             TheliaEvents::AREA_DELETE => array('delete', 128),
-            TheliaEvents::AREA_CREATE => array('create', 128)
+            TheliaEvents::AREA_CREATE => array('create', 128),
+            TheliaEvents::AREA_UPDATE => array('update', 128)
         );
     }
 }
