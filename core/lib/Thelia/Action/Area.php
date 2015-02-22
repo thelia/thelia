@@ -20,10 +20,10 @@ use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
 use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\AreaQuery;
-use Thelia\Model\CountryQuery;
-
 use Thelia\Model\Area as AreaModel;
+use Thelia\Model\AreaQuery;
+use Thelia\Model\CountryArea;
+use Thelia\Model\CountryAreaQuery;
 
 /**
  * Class Area
@@ -39,11 +39,13 @@ class Area extends BaseAction implements EventSubscriberInterface
         $areaId = $event->getAreaId();
 
         foreach ($countryIds as $countryId) {
-            if (null !== $country = CountryQuery::create()->findPk($countryId)) {
-                $country->setDispatcher($event->getDispatcher());
-                $country->setAreaId($areaId)
-                    ->save();
-            }
+            $countryArea = new CountryArea();
+
+            $countryArea
+                ->setAreaId($areaId)
+                ->setCountryId($countryId)
+                ->save()
+            ;
         }
 
         $event->setArea(AreaQuery::create()->findPk($areaId));
@@ -51,13 +53,10 @@ class Area extends BaseAction implements EventSubscriberInterface
 
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $event->setArea($country->getArea());
-
-            $country->setDispatcher($event->getDispatcher());
-            $country->setAreaId(null)
-                ->save();
-        }
+        CountryAreaQuery::create()
+            ->filterByCountryId($event->getCountryId())
+            ->filterByAreaId($event->getAreaId())
+            ->delete();
     }
 
     public function updatePostage(AreaUpdatePostageEvent $event)

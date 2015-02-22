@@ -19,6 +19,23 @@ class Country extends BaseCountry
     protected static $defaultCountry = null;
 
     /**
+     * This method ensure backward compatibility to Thelia 2.1, where a country belongs to one and
+     * only one shipping zone.
+     *
+     * @deprecated a country may belong to several Areas (shipping zones). Use CountryArea queries instead
+     */
+    public function getAreaId()
+    {
+        $firstAreaCountry = CountryAreaQuery::create()->findOneByCountryId($this->getId());
+
+        if (null !== $firstAreaCountry) {
+            return $firstAreaCountry->getAreaId();
+        }
+
+        return null;
+    }
+
+    /**
      *
      * Put the current country as the default one.
      *

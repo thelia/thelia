@@ -24,11 +24,15 @@ use Thelia\Model\Map\IgnoredModuleHookTableMap;
  * @method     ChildIgnoredModuleHookQuery orderByHookId($order = Criteria::ASC) Order by the hook_id column
  * @method     ChildIgnoredModuleHookQuery orderByMethod($order = Criteria::ASC) Order by the method column
  * @method     ChildIgnoredModuleHookQuery orderByClassname($order = Criteria::ASC) Order by the classname column
+ * @method     ChildIgnoredModuleHookQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildIgnoredModuleHookQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildIgnoredModuleHookQuery groupByModuleId() Group by the module_id column
  * @method     ChildIgnoredModuleHookQuery groupByHookId() Group by the hook_id column
  * @method     ChildIgnoredModuleHookQuery groupByMethod() Group by the method column
  * @method     ChildIgnoredModuleHookQuery groupByClassname() Group by the classname column
+ * @method     ChildIgnoredModuleHookQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildIgnoredModuleHookQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method     ChildIgnoredModuleHookQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildIgnoredModuleHookQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -49,11 +53,15 @@ use Thelia\Model\Map\IgnoredModuleHookTableMap;
  * @method     ChildIgnoredModuleHook findOneByHookId(int $hook_id) Return the first ChildIgnoredModuleHook filtered by the hook_id column
  * @method     ChildIgnoredModuleHook findOneByMethod(string $method) Return the first ChildIgnoredModuleHook filtered by the method column
  * @method     ChildIgnoredModuleHook findOneByClassname(string $classname) Return the first ChildIgnoredModuleHook filtered by the classname column
+ * @method     ChildIgnoredModuleHook findOneByCreatedAt(string $created_at) Return the first ChildIgnoredModuleHook filtered by the created_at column
+ * @method     ChildIgnoredModuleHook findOneByUpdatedAt(string $updated_at) Return the first ChildIgnoredModuleHook filtered by the updated_at column
  *
  * @method     array findByModuleId(int $module_id) Return ChildIgnoredModuleHook objects filtered by the module_id column
  * @method     array findByHookId(int $hook_id) Return ChildIgnoredModuleHook objects filtered by the hook_id column
  * @method     array findByMethod(string $method) Return ChildIgnoredModuleHook objects filtered by the method column
  * @method     array findByClassname(string $classname) Return ChildIgnoredModuleHook objects filtered by the classname column
+ * @method     array findByCreatedAt(string $created_at) Return ChildIgnoredModuleHook objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildIgnoredModuleHook objects filtered by the updated_at column
  *
  */
 abstract class IgnoredModuleHookQuery extends ModelCriteria
@@ -298,6 +306,92 @@ abstract class IgnoredModuleHookQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(IgnoredModuleHookTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(IgnoredModuleHookTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(IgnoredModuleHookTableMap::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(IgnoredModuleHookTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(IgnoredModuleHookTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(IgnoredModuleHookTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related \Thelia\Model\Module object
      *
      * @param \Thelia\Model\Module|ObjectCollection $module The related object(s) to use as filter
@@ -537,6 +631,72 @@ abstract class IgnoredModuleHookQuery extends ModelCriteria
             $con->rollBack();
             throw $e;
         }
+    }
+
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(IgnoredModuleHookTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(IgnoredModuleHookTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(IgnoredModuleHookTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(IgnoredModuleHookTableMap::UPDATED_AT);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(IgnoredModuleHookTableMap::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ChildIgnoredModuleHookQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(IgnoredModuleHookTableMap::CREATED_AT);
     }
 
 } // IgnoredModuleHookQuery

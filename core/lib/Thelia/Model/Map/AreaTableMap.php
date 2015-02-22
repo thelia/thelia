@@ -158,8 +158,9 @@ class AreaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'SET NULL', 'RESTRICT', 'Countries');
         $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
+        $this->addRelation('CountryArea', '\\Thelia\\Model\\CountryArea', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'CASCADE', 'RESTRICT', 'CountryAreas');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Countries');
     } // buildRelations()
 
     /**
@@ -181,8 +182,8 @@ class AreaTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                CountryTableMap::clearInstancePool();
                 AreaDeliveryModuleTableMap::clearInstancePool();
+                CountryAreaTableMap::clearInstancePool();
             }
 
     /**

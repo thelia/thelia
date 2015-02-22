@@ -16,20 +16,20 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Hook as ChildHook;
-use Thelia\Model\HookQuery as ChildHookQuery;
-use Thelia\Model\IgnoredModuleHook as ChildIgnoredModuleHook;
-use Thelia\Model\IgnoredModuleHookQuery as ChildIgnoredModuleHookQuery;
-use Thelia\Model\Module as ChildModule;
-use Thelia\Model\ModuleQuery as ChildModuleQuery;
-use Thelia\Model\Map\IgnoredModuleHookTableMap;
+use Thelia\Model\Area as ChildArea;
+use Thelia\Model\AreaQuery as ChildAreaQuery;
+use Thelia\Model\Country as ChildCountry;
+use Thelia\Model\CountryArea as ChildCountryArea;
+use Thelia\Model\CountryAreaQuery as ChildCountryAreaQuery;
+use Thelia\Model\CountryQuery as ChildCountryQuery;
+use Thelia\Model\Map\CountryAreaTableMap;
 
-abstract class IgnoredModuleHook implements ActiveRecordInterface
+abstract class CountryArea implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\IgnoredModuleHookTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CountryAreaTableMap';
 
 
     /**
@@ -59,28 +59,16 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the module_id field.
+     * The value for the country_id field.
      * @var        int
      */
-    protected $module_id;
+    protected $country_id;
 
     /**
-     * The value for the hook_id field.
+     * The value for the area_id field.
      * @var        int
      */
-    protected $hook_id;
-
-    /**
-     * The value for the method field.
-     * @var        string
-     */
-    protected $method;
-
-    /**
-     * The value for the classname field.
-     * @var        string
-     */
-    protected $classname;
+    protected $area_id;
 
     /**
      * The value for the created_at field.
@@ -95,14 +83,14 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Module
+     * @var        Area
      */
-    protected $aModule;
+    protected $aArea;
 
     /**
-     * @var        Hook
+     * @var        Country
      */
-    protected $aHook;
+    protected $aCountry;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -113,7 +101,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\IgnoredModuleHook object.
+     * Initializes internal state of Thelia\Model\Base\CountryArea object.
      */
     public function __construct()
     {
@@ -208,9 +196,9 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>IgnoredModuleHook</code> instance.  If
-     * <code>obj</code> is an instance of <code>IgnoredModuleHook</code>, delegates to
-     * <code>equals(IgnoredModuleHook)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CountryArea</code> instance.  If
+     * <code>obj</code> is an instance of <code>CountryArea</code>, delegates to
+     * <code>equals(CountryArea)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -293,7 +281,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return IgnoredModuleHook The current object, for fluid interface
+     * @return CountryArea The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -325,7 +313,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return IgnoredModuleHook The current object, for fluid interface
+     * @return CountryArea The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -371,47 +359,25 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Get the [module_id] column value.
+     * Get the [country_id] column value.
      *
      * @return   int
      */
-    public function getModuleId()
+    public function getCountryId()
     {
 
-        return $this->module_id;
+        return $this->country_id;
     }
 
     /**
-     * Get the [hook_id] column value.
+     * Get the [area_id] column value.
      *
      * @return   int
      */
-    public function getHookId()
+    public function getAreaId()
     {
 
-        return $this->hook_id;
-    }
-
-    /**
-     * Get the [method] column value.
-     *
-     * @return   string
-     */
-    public function getMethod()
-    {
-
-        return $this->method;
-    }
-
-    /**
-     * Get the [classname] column value.
-     *
-     * @return   string
-     */
-    public function getClassname()
-    {
-
-        return $this->classname;
+        return $this->area_id;
     }
 
     /**
@@ -455,103 +421,61 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [module_id] column.
+     * Set the value of [country_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
      */
-    public function setModuleId($v)
+    public function setCountryId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->module_id !== $v) {
-            $this->module_id = $v;
-            $this->modifiedColumns[IgnoredModuleHookTableMap::MODULE_ID] = true;
+        if ($this->country_id !== $v) {
+            $this->country_id = $v;
+            $this->modifiedColumns[CountryAreaTableMap::COUNTRY_ID] = true;
         }
 
-        if ($this->aModule !== null && $this->aModule->getId() !== $v) {
-            $this->aModule = null;
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
         }
 
 
         return $this;
-    } // setModuleId()
+    } // setCountryId()
 
     /**
-     * Set the value of [hook_id] column.
+     * Set the value of [area_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
      */
-    public function setHookId($v)
+    public function setAreaId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->hook_id !== $v) {
-            $this->hook_id = $v;
-            $this->modifiedColumns[IgnoredModuleHookTableMap::HOOK_ID] = true;
+        if ($this->area_id !== $v) {
+            $this->area_id = $v;
+            $this->modifiedColumns[CountryAreaTableMap::AREA_ID] = true;
         }
 
-        if ($this->aHook !== null && $this->aHook->getId() !== $v) {
-            $this->aHook = null;
-        }
-
-
-        return $this;
-    } // setHookId()
-
-    /**
-     * Set the value of [method] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
-     */
-    public function setMethod($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->method !== $v) {
-            $this->method = $v;
-            $this->modifiedColumns[IgnoredModuleHookTableMap::METHOD] = true;
+        if ($this->aArea !== null && $this->aArea->getId() !== $v) {
+            $this->aArea = null;
         }
 
 
         return $this;
-    } // setMethod()
-
-    /**
-     * Set the value of [classname] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
-     */
-    public function setClassname($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->classname !== $v) {
-            $this->classname = $v;
-            $this->modifiedColumns[IgnoredModuleHookTableMap::CLASSNAME] = true;
-        }
-
-
-        return $this;
-    } // setClassname()
+    } // setAreaId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -559,7 +483,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[IgnoredModuleHookTableMap::CREATED_AT] = true;
+                $this->modifiedColumns[CountryAreaTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -572,7 +496,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @return   \Thelia\Model\CountryArea The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -580,7 +504,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[IgnoredModuleHookTableMap::UPDATED_AT] = true;
+                $this->modifiedColumns[CountryAreaTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -625,25 +549,19 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : IgnoredModuleHookTableMap::translateFieldName('ModuleId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->module_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CountryAreaTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : IgnoredModuleHookTableMap::translateFieldName('HookId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->hook_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CountryAreaTableMap::translateFieldName('AreaId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->area_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : IgnoredModuleHookTableMap::translateFieldName('Method', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->method = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : IgnoredModuleHookTableMap::translateFieldName('Classname', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->classname = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : IgnoredModuleHookTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CountryAreaTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : IgnoredModuleHookTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CountryAreaTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -656,10 +574,10 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = IgnoredModuleHookTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = CountryAreaTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\IgnoredModuleHook object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CountryArea object", 0, $e);
         }
     }
 
@@ -678,11 +596,11 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aModule !== null && $this->module_id !== $this->aModule->getId()) {
-            $this->aModule = null;
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
         }
-        if ($this->aHook !== null && $this->hook_id !== $this->aHook->getId()) {
-            $this->aHook = null;
+        if ($this->aArea !== null && $this->area_id !== $this->aArea->getId()) {
+            $this->aArea = null;
         }
     } // ensureConsistency
 
@@ -707,13 +625,13 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CountryAreaTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildIgnoredModuleHookQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCountryAreaQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -723,8 +641,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aModule = null;
-            $this->aHook = null;
+            $this->aArea = null;
+            $this->aCountry = null;
         } // if (deep)
     }
 
@@ -734,8 +652,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see IgnoredModuleHook::setDeleted()
-     * @see IgnoredModuleHook::isDeleted()
+     * @see CountryArea::setDeleted()
+     * @see CountryArea::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -744,12 +662,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildIgnoredModuleHookQuery::create()
+            $deleteQuery = ChildCountryAreaQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -786,7 +704,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -796,16 +714,16 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(CountryAreaTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(CountryAreaTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(CountryAreaTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -817,7 +735,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                IgnoredModuleHookTableMap::addInstanceToPool($this);
+                CountryAreaTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -852,18 +770,18 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aModule !== null) {
-                if ($this->aModule->isModified() || $this->aModule->isNew()) {
-                    $affectedRows += $this->aModule->save($con);
+            if ($this->aArea !== null) {
+                if ($this->aArea->isModified() || $this->aArea->isNew()) {
+                    $affectedRows += $this->aArea->save($con);
                 }
-                $this->setModule($this->aModule);
+                $this->setArea($this->aArea);
             }
 
-            if ($this->aHook !== null) {
-                if ($this->aHook->isModified() || $this->aHook->isNew()) {
-                    $affectedRows += $this->aHook->save($con);
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
                 }
-                $this->setHook($this->aHook);
+                $this->setCountry($this->aCountry);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -899,27 +817,21 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::MODULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`MODULE_ID`';
+        if ($this->isColumnModified(CountryAreaTableMap::COUNTRY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
         }
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::HOOK_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`HOOK_ID`';
+        if ($this->isColumnModified(CountryAreaTableMap::AREA_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`AREA_ID`';
         }
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::METHOD)) {
-            $modifiedColumns[':p' . $index++]  = '`METHOD`';
-        }
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::CLASSNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`CLASSNAME`';
-        }
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(CountryAreaTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(CountryAreaTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `ignored_module_hook` (%s) VALUES (%s)',
+            'INSERT INTO `country_area` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -928,17 +840,11 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`MODULE_ID`':
-                        $stmt->bindValue($identifier, $this->module_id, PDO::PARAM_INT);
+                    case '`COUNTRY_ID`':
+                        $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`HOOK_ID`':
-                        $stmt->bindValue($identifier, $this->hook_id, PDO::PARAM_INT);
-                        break;
-                    case '`METHOD`':
-                        $stmt->bindValue($identifier, $this->method, PDO::PARAM_STR);
-                        break;
-                    case '`CLASSNAME`':
-                        $stmt->bindValue($identifier, $this->classname, PDO::PARAM_STR);
+                    case '`AREA_ID`':
+                        $stmt->bindValue($identifier, $this->area_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -985,7 +891,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = IgnoredModuleHookTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CountryAreaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1002,21 +908,15 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getModuleId();
+                return $this->getCountryId();
                 break;
             case 1:
-                return $this->getHookId();
+                return $this->getAreaId();
                 break;
             case 2:
-                return $this->getMethod();
-                break;
-            case 3:
-                return $this->getClassname();
-                break;
-            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 3:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1042,18 +942,16 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['IgnoredModuleHook'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CountryArea'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['IgnoredModuleHook'][$this->getPrimaryKey()] = true;
-        $keys = IgnoredModuleHookTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CountryArea'][$this->getPrimaryKey()] = true;
+        $keys = CountryAreaTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getModuleId(),
-            $keys[1] => $this->getHookId(),
-            $keys[2] => $this->getMethod(),
-            $keys[3] => $this->getClassname(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[0] => $this->getCountryId(),
+            $keys[1] => $this->getAreaId(),
+            $keys[2] => $this->getCreatedAt(),
+            $keys[3] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1061,11 +959,11 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aModule) {
-                $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aArea) {
+                $result['Area'] = $this->aArea->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aHook) {
-                $result['Hook'] = $this->aHook->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1085,7 +983,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = IgnoredModuleHookTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CountryAreaTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1102,21 +1000,15 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setModuleId($value);
+                $this->setCountryId($value);
                 break;
             case 1:
-                $this->setHookId($value);
+                $this->setAreaId($value);
                 break;
             case 2:
-                $this->setMethod($value);
-                break;
-            case 3:
-                $this->setClassname($value);
-                break;
-            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 3:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1141,14 +1033,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = IgnoredModuleHookTableMap::getFieldNames($keyType);
+        $keys = CountryAreaTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setModuleId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setHookId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setMethod($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setClassname($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[0], $arr)) $this->setCountryId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setAreaId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -1158,14 +1048,12 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(IgnoredModuleHookTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::MODULE_ID)) $criteria->add(IgnoredModuleHookTableMap::MODULE_ID, $this->module_id);
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::HOOK_ID)) $criteria->add(IgnoredModuleHookTableMap::HOOK_ID, $this->hook_id);
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::METHOD)) $criteria->add(IgnoredModuleHookTableMap::METHOD, $this->method);
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::CLASSNAME)) $criteria->add(IgnoredModuleHookTableMap::CLASSNAME, $this->classname);
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::CREATED_AT)) $criteria->add(IgnoredModuleHookTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(IgnoredModuleHookTableMap::UPDATED_AT)) $criteria->add(IgnoredModuleHookTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CountryAreaTableMap::COUNTRY_ID)) $criteria->add(CountryAreaTableMap::COUNTRY_ID, $this->country_id);
+        if ($this->isColumnModified(CountryAreaTableMap::AREA_ID)) $criteria->add(CountryAreaTableMap::AREA_ID, $this->area_id);
+        if ($this->isColumnModified(CountryAreaTableMap::CREATED_AT)) $criteria->add(CountryAreaTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CountryAreaTableMap::UPDATED_AT)) $criteria->add(CountryAreaTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1180,7 +1068,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(IgnoredModuleHookTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
 
         return $criteria;
     }
@@ -1225,17 +1113,15 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\IgnoredModuleHook (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CountryArea (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setModuleId($this->getModuleId());
-        $copyObj->setHookId($this->getHookId());
-        $copyObj->setMethod($this->getMethod());
-        $copyObj->setClassname($this->getClassname());
+        $copyObj->setCountryId($this->getCountryId());
+        $copyObj->setAreaId($this->getAreaId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1252,7 +1138,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\IgnoredModuleHook Clone of current object.
+     * @return                 \Thelia\Model\CountryArea Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1266,26 +1152,26 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildModule object.
+     * Declares an association between this object and a ChildArea object.
      *
-     * @param                  ChildModule $v
-     * @return                 \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @param                  ChildArea $v
+     * @return                 \Thelia\Model\CountryArea The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setModule(ChildModule $v = null)
+    public function setArea(ChildArea $v = null)
     {
         if ($v === null) {
-            $this->setModuleId(NULL);
+            $this->setAreaId(NULL);
         } else {
-            $this->setModuleId($v->getId());
+            $this->setAreaId($v->getId());
         }
 
-        $this->aModule = $v;
+        $this->aArea = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildModule object, it will not be re-added.
+        // If this object has already been added to the ChildArea object, it will not be re-added.
         if ($v !== null) {
-            $v->addIgnoredModuleHook($this);
+            $v->addCountryArea($this);
         }
 
 
@@ -1294,49 +1180,49 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildModule object
+     * Get the associated ChildArea object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildModule The associated ChildModule object.
+     * @return                 ChildArea The associated ChildArea object.
      * @throws PropelException
      */
-    public function getModule(ConnectionInterface $con = null)
+    public function getArea(ConnectionInterface $con = null)
     {
-        if ($this->aModule === null && ($this->module_id !== null)) {
-            $this->aModule = ChildModuleQuery::create()->findPk($this->module_id, $con);
+        if ($this->aArea === null && ($this->area_id !== null)) {
+            $this->aArea = ChildAreaQuery::create()->findPk($this->area_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aModule->addIgnoredModuleHooks($this);
+                $this->aArea->addCountryAreas($this);
              */
         }
 
-        return $this->aModule;
+        return $this->aArea;
     }
 
     /**
-     * Declares an association between this object and a ChildHook object.
+     * Declares an association between this object and a ChildCountry object.
      *
-     * @param                  ChildHook $v
-     * @return                 \Thelia\Model\IgnoredModuleHook The current object (for fluent API support)
+     * @param                  ChildCountry $v
+     * @return                 \Thelia\Model\CountryArea The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setHook(ChildHook $v = null)
+    public function setCountry(ChildCountry $v = null)
     {
         if ($v === null) {
-            $this->setHookId(NULL);
+            $this->setCountryId(NULL);
         } else {
-            $this->setHookId($v->getId());
+            $this->setCountryId($v->getId());
         }
 
-        $this->aHook = $v;
+        $this->aCountry = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildHook object, it will not be re-added.
+        // If this object has already been added to the ChildCountry object, it will not be re-added.
         if ($v !== null) {
-            $v->addIgnoredModuleHook($this);
+            $v->addCountryArea($this);
         }
 
 
@@ -1345,26 +1231,26 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildHook object
+     * Get the associated ChildCountry object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildHook The associated ChildHook object.
+     * @return                 ChildCountry The associated ChildCountry object.
      * @throws PropelException
      */
-    public function getHook(ConnectionInterface $con = null)
+    public function getCountry(ConnectionInterface $con = null)
     {
-        if ($this->aHook === null && ($this->hook_id !== null)) {
-            $this->aHook = ChildHookQuery::create()->findPk($this->hook_id, $con);
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = ChildCountryQuery::create()->findPk($this->country_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aHook->addIgnoredModuleHooks($this);
+                $this->aCountry->addCountryAreas($this);
              */
         }
 
-        return $this->aHook;
+        return $this->aCountry;
     }
 
     /**
@@ -1372,10 +1258,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->module_id = null;
-        $this->hook_id = null;
-        $this->method = null;
-        $this->classname = null;
+        $this->country_id = null;
+        $this->area_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1399,8 +1283,8 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aModule = null;
-        $this->aHook = null;
+        $this->aArea = null;
+        $this->aCountry = null;
     }
 
     /**
@@ -1410,7 +1294,7 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(IgnoredModuleHookTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(CountryAreaTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1418,11 +1302,11 @@ abstract class IgnoredModuleHook implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildIgnoredModuleHook The current object (for fluent API support)
+     * @return     ChildCountryArea The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[IgnoredModuleHookTableMap::UPDATED_AT] = true;
+        $this->modifiedColumns[CountryAreaTableMap::UPDATED_AT] = true;
 
         return $this;
     }
