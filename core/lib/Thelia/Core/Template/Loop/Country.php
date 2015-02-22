@@ -45,7 +45,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('area'),
             Argument::createIntListTypeArgument('exclude_area'),
-            Argument::createBooleanTypeArgument('with_area', true),
+            Argument::createBooleanTypeArgument('with_area'),
             Argument::createIntListTypeArgument('exclude')
         );
     }
