@@ -44,7 +44,8 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
+            Argument::createIntListTypeArgument('exclude_area'),
+            Argument::createBooleanTypeArgument('with_area', true),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -66,6 +67,12 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (null !== $area) {
             $search->filterByAreaId($area, Criteria::IN);
+        }
+
+        $excludeArea = $this->getExcludeArea();
+
+        if (null !== $excludeArea) {
+            $search->filterByAreaId($excludeArea, Criteria::NOT_IN);
         }
 
         $withArea = $this->getWith_area();
