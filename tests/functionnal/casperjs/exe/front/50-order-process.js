@@ -36,7 +36,9 @@ casper.test.begin('Order process', 4, function suite(test) {
         '.footer-container',
         function(){
             test.assertTitle("My order - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
+
             test.assertElementCount("table.table-cart tbody tr", 1, "cart contain 1 product");
+            this.capture(screenshot_dir + 'front/50_delivery_order.png');
         },
         function(){
             this.die("The 'title' tag didn't change");
