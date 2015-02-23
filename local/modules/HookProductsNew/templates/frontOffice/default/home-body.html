@@ -30,7 +30,7 @@
                         alt="Product #{$LOOP_COUNT}" >
                         {/ifloop}
                         {elseloop rel="image_product_new"}
-                        {images file='assets/img/280x196.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$LOOP_COUNT}">{/images}
+                        <img itemprop="image" src="{image file='assets/img/280x196.png'}" alt="Product #{$LOOP_COUNT}">
                         {/elseloop}
                         <span class="mask"></span>
                     </a>
