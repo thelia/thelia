@@ -14,6 +14,7 @@ namespace Carousel\Loop;
 
 use Carousel\Carousel;
 use Carousel\Model\CarouselQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Element\LoopResult;
