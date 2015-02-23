@@ -17,7 +17,7 @@
                 <img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$productTitle}">
             {/loop}
             {elseloop rel="product_thumbnail"}
-                {images file='assets/img/218x146.png'}<img itemprop="image" src="{$asset_url}" alt="{$productTitle}">{/images}
+                <img itemprop="image" src="{image file='assets/img/218x146.png'}" alt="{$productTitle}">
             {/elseloop}
             <span class="mask"></span>
         </a>

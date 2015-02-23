@@ -152,21 +152,11 @@
 {/block}
 
 {block name="javascript-initialization"}
-    {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
+    <script src="{javascript file='assets/js/bootstrap-switch/bootstrap-switch.js'}"></script>
+    <script src="{javascript file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}"></script>
 
-    {javascripts file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-    {stylesheets file='assets/js/jquery.ui/jquery.ui.theme.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
-    {stylesheets file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
-
+    <link rel="stylesheet" href="{stylesheet file='assets/js/jquery.ui/jquery.ui.theme.css'}">
+    <link rel="stylesheet" href="{stylesheet file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}">
 
     <script type="text/javascript">
 

@@ -9,11 +9,11 @@
         <div class="col-md-12">
             <div class="form-container">
                 {form name="carousel.image"}
-                    <form method="POST" action="{url path="/admin/module/carousel/upload"}" {form_enctype form=$form} class="clearfix">
+                    <form method="POST" action="{url path="/admin/module/carousel/upload"}" {form_enctype} class="clearfix">
 
-                        {form_hidden_fields form=$form}
+                        {form_hidden_fields}
 
-                        {form_field form=$form field='file'}
+                        {form_field field='file'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="control-label">{intl d='carousel.ai' l='Add an image to the carousel'}</label>
                                 <div class="input-group">
@@ -41,7 +41,7 @@
             <div class="form-container">
                 {ifloop rel="carousel.image"}
                     {form name="carousel.update"}
-                    <form method="post" action="{url path="/admin/module/carousel/update"}" {form_enctype form=$form} class="clearfix">
+                    <form method="post" action="{url path="/admin/module/carousel/update"}" {form_enctype} class="clearfix">
 
                         {include
                             file = "includes/inner-form-toolbar.html"
@@ -49,12 +49,12 @@
                             close_url  = "{url path='/admin/modules'}"
                         }
 
-                        {form_hidden_fields form=$form}
+                        {form_hidden_fields}
 
                         {loop name="carousel.image" type="carousel" width="550" height="200" resize_mode="borders" backend_context="1" lang="$edit_language_id"}
 
                         {* Not yet implemented *}
-                        {form_field form=$form field="position{$ID}"}
+                        {form_field field="position{$ID}"}
                             <input type="hidden" name="{$name}" value={$POSITION}>
                         {/form_field}
 
@@ -76,14 +76,14 @@
 
                                 <div class="col-md-6">
                                     {* Not yet implemented
-                                    {render_form_field form=$form field="chapo{$ID} value=$CHAPO"}
+                                    {render_form_field field="chapo{$ID} value=$CHAPO"}
                                     *}
-                                    {render_form_field form=$form field="title{$ID}" value=$TITLE}
-                                    {render_form_field form=$form field="alt{$ID}" value=$ALT}
-                                    {render_form_field form=$form field="url{$ID}" value=$URL}
-                                    {render_form_field form=$form field="description{$ID}" extra_class="wysiwyg" value=$DESCRIPTION}
+                                    {render_form_field field="title{$ID}" value=$TITLE}
+                                    {render_form_field field="alt{$ID}" value=$ALT}
+                                    {render_form_field field="url{$ID}" value=$URL}
+                                    {render_form_field field="description{$ID}" extra_class="wysiwyg" value=$DESCRIPTION}
                                     {* Not yet implemented
-                                    {render_form_field form=$form field="postscriptum{$ID}" value=$POSTSCRIPTUM}
+                                    {render_form_field field="postscriptum{$ID}" value=$POSTSCRIPTUM}
                                     *}
                                 </div>
                             </div>

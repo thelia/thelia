@@ -22,7 +22,7 @@
 
     <title>{block name="page-title"}Default Page Title{/block} - {intl l='Thelia Back Office'}</title>
 
-    {images file='assets/img/favicon.ico'}<link rel="shortcut icon" href="{$asset_url}" />{/images}
+    <link rel="shortcut icon" href="{image file='assets/img/favicon.ico'}" />
 
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -33,9 +33,7 @@
 
     {block name="before-bootstrap-css"}{/block}
 
-	{stylesheets file='assets/css/styles.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    <link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">
 
     {block name="after-bootstrap-css"}{/block}
 
