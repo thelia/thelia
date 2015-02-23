@@ -130,6 +130,9 @@ class Form extends AbstractSmartyPlugin
                 $instance = $class->newInstance($this->request, $formType, array(), array(), $this->container);
             }
 
+            // Set the current form
+            $this->parserContext->setCurrentForm($instance);
+
             $instance->createView();
 
             $template->assign("form", $instance);
@@ -330,7 +333,10 @@ class Form extends AbstractSmartyPlugin
         if (false !== $snippet_content = file_get_contents($snippet_path)) {
             $this->processFormField($params, $template);
 
-            $form              = $this->getParam($params, 'form', false);
+            if (null === $form = $this->getParam($params, 'form', false)) {
+                $form = $this->parserContext->getCurrentForm();
+            }
+
             $field_name        = $this->getParam($params, 'field', false);
             $field_extra_class = $this->getParam($params, 'extra_class', '');
             $field_value       = $this->getParam($params, 'value', '');
@@ -580,10 +586,14 @@ class Form extends AbstractSmartyPlugin
      */
     protected function getInstanceFromParams($params)
     {
-        $instance = $this->getParam($params, 'form');
+        if (null === $instance = $this->getParam($params, 'form')) {
+            $instance = $this->parserContext->getCurrentForm();
+        }
 
         if (null == $instance) {
-            throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
+            throw new \InvalidArgumentException(
+                "Missing 'form' parameter in form arguments, and no current form was found."
+            );
         }
 
         if (!$instance instanceof BaseForm) {
