@@ -38,7 +38,7 @@ class AreaCreateForm extends BaseForm
                         'for' => 'shipping_name'
                     ],
                     'attr' => [
-                        'placeholder' => Translator::getInstance()->trans("A name suche as Europe or Overseas"),
+                        'placeholder' => Translator::getInstance()->trans("A name such as Europe or Overseas"),
                     ],
                 ]
             )

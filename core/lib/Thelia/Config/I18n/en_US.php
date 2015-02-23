@@ -18,7 +18,7 @@ return array(
     'A currency with code "%name" already exists.' => 'A currency with code "%name" already exists.',
     'A descriptive title' => 'A descriptive title',
     'A message with name "%name" already exists.' => 'A message with name "%name" already exists.',
-    'A name suche as Europe or Overseas' => 'A name suche as Europe or Overseas',
+    'A name such as Europe or Overseas' => 'A name such as Europe or Overseas',
     'A product with reference %ref already exists. Please choose another reference.' => 'A product with reference %ref already exists. Please choose another reference.',
     'A short description, used when a summary or an introduction is required' => 'A short description, used when a summary or an introduction is required',
     'A short text, used when an additional or supplemental information is required.' => 'A short text, used when an additional or supplemental information is required.',
