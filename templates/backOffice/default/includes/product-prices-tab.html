@@ -15,7 +15,7 @@
 
     {if $has_at_least_one_combination == false}
 	    {form name="thelia.admin.product_default_sale_element.update"}
-	    <form method="POST" action="{url path='/admin/product/default-price/update'}" {form_enctype form=$form} class="clearfix">
+	    <form method="POST" action="{url path='/admin/product/default-price/update'}" {form_enctype} class="clearfix">
 
 		    {include
 		        file = "includes/inner-form-toolbar.html"
@@ -30,25 +30,25 @@
             <input type="hidden" name="product_id" value="{$product_id}" />
 	        <input type="hidden" name="current_tab" value="prices" />
 
-	        {form_hidden_fields form=$form}
+	        {form_hidden_fields}
 
-            {form_field form=$form field='product_id'}
+            {form_field field='product_id'}
                 <input type="hidden" name="{$name}" value="{$value}" />
             {/form_field}
 
-            {form_field form=$form field='product_sale_element_id'}
+            {form_field field='product_sale_element_id'}
                 <input type="hidden" name="{$name}" value="{$default_product_sale_element_id}" />
             {/form_field}
 
-            {form_field form=$form field='isdefault'}
+            {form_field field='isdefault'}
                 <input type="hidden" name="{$name}" value="{$value}" />
             {/form_field}
 
-            {form_field form=$form field='reference'}
+            {form_field field='reference'}
                 <input type="hidden" name="{$name}" value="{$value}" />
             {/form_field}
 
-	        {form_field form=$form field='success_url'}
+	        {form_field field='success_url'}
 	            <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
 	        {/form_field}
 
@@ -57,7 +57,7 @@
 	            {$currency_symbol = $SYMBOL}
 	            {$currency_name = $NAME}
 
-	            {form_field form=$form field='currency'}
+	            {form_field field='currency'}
 	                <input type="hidden" name="{$name}" value="{$ID}" />
 	            {/form_field}
 
@@ -75,7 +75,7 @@
 
 			<div class="row">
 			    <div class="col-md-4">
-			        {form_field form=$form field='tax_rule'}
+			        {form_field field='tax_rule'}
 			            <div class="form-group {if $error}has-error{/if}">
 			                <label for="tax_rule_field" class="control-label">{$label} : </label>
 			                <div class="form-group">
@@ -106,7 +106,7 @@
 
 			              <p></p> <!-- LAME !!! FIXME -->
 
-	                      {form_field form=$form field='use_exchange_rate'}
+	                      {form_field field='use_exchange_rate'}
 	                          {if $current_currency_is_default}
 	                             <input type="hidden" name="{$name}" value="0">
 	                             {$show_pricing_fields = true}
@@ -123,7 +123,7 @@
 			                  {/if}
 	                      {/form_field}
 
-			              {form_field form=$form field='price'}
+			              {form_field field='price'}
 			                  <div class="form-group {if $error}has-error{/if}">
 			                      <label for="price_without_tax" class="control-label">{$label} : </label>
 
@@ -134,7 +134,7 @@
 			                  </div>
 			              {/form_field}
 
-                          {form_field form=$form field='price_with_tax'}
+                          {form_field field='price_with_tax'}
 			                  <div class="form-group">
 			                      <label for="price_with_tax" class="control-label">{intl l="Product price including taxes"} : </label>
 			                      <div class="input-group">
@@ -155,7 +155,7 @@
                      <div class="well well-sm">
                         <p class="title title-without-tabs">{intl l='Stock'}</p>
 
-						{form_field form=$form field='ean_code'}
+						{form_field field='ean_code'}
 						   <div class="form-group {if $error}has-error{/if}">
 						       <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -165,7 +165,7 @@
 						   </div>
 						{/form_field}
 
-                         {form_field form=$form field='weight'}
+                         {form_field field='weight'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -176,7 +176,7 @@
                             </div>
                          {/form_field}
 
-                         {form_field form=$form field='quantity'}
+                         {form_field field='quantity'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -197,7 +197,7 @@
 	                <div class="well well-sm">
 			            <p class="title title-without-tabs">{intl l='Promotion'}</p>
 
-			            {form_field form=$form field='sale_price'}
+			            {form_field field='sale_price'}
 			                <div class="form-group {if $error}has-error{/if}">
 			                    <label for="sale_price_without_tax" class="control-label">{$label} : </label>
 
@@ -208,7 +208,7 @@
 			               </div>
 			            {/form_field}
 
-                        {form_field form=$form field='sale_price_with_tax'}
+                        {form_field field='sale_price_with_tax'}
                         <div class="form-group">
                             <label for="sale_price_with_tax" class="control-label">{$label} : </label>
                             <div class="input-group">
@@ -218,7 +218,7 @@
                         </div>
                         {/form_field}
 
-						{form_field form=$form field='onsale'}
+						{form_field field='onsale'}
 						<div class="form-group {if $error}has-error{/if}">
 						    <div class="checkbox">
 						        <label>
@@ -229,7 +229,7 @@
 						</div>
 						{/form_field}
 
-			            {form_field form=$form field='isnew'}
+			            {form_field field='isnew'}
 			            <div class="form-group {if $error}has-error{/if}">
 			                <div class="checkbox">
 			                    <label>
@@ -253,7 +253,7 @@
     {if $has_at_least_one_combination}
 
        {form name="thelia.admin.product_sale_element.update"}
-       <form method="POST" action="{url path='/admin/product/combinations/update'}" {form_enctype form=$form}>
+       <form method="POST" action="{url path='/admin/product/combinations/update'}" {form_enctype}>
             <div class="row">
                 <div class="col-md-12">
 
@@ -269,13 +269,13 @@
 					<input type="hidden" name="product_id" value="{$product_id}" />
 					<input type="hidden" name="current_tab" value="prices" />
 
-					{form_hidden_fields form=$form}
+					{form_hidden_fields}
 
-					{form_field form=$form field='product_id'}
+					{form_field field='product_id'}
 					    <input type="hidden" name="{$name}" value="{$value}" />
 					{/form_field}
 
-					{form_field form=$form field='success_url'}
+					{form_field field='success_url'}
 					    <input type="hidden" name="{$name}" value="{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}" />
 					{/form_field}
 
@@ -285,14 +285,14 @@
                         {$currency_symbol = $SYMBOL}
                         {$current_currency_is_default = $IS_DEFAULT}
 
-                        {form_field form=$form field='currency'}
+                        {form_field field='currency'}
                             <input type="hidden" name="{$name}" value="{$ID}" />
                         {/form_field}
                     {/loop}
 
 					<div class="row">
 					    <div class="col-md-4">
-					        {form_field form=$form field='tax_rule'}
+					        {form_field field='tax_rule'}
 					            <div class="form-group {if $error}has-error{/if}">
 					                <label for="tax_rule_field" class="control-label">{$label} : </label>
 					                <div class="form-group">
@@ -307,7 +307,7 @@
 					        {/form_field}
 					    </div>
 					    <div class="col-md-4">
-                          {form_field form=$form field='use_exchange_rate'}
+                          {form_field field='use_exchange_rate'}
                               {if $current_currency_is_default}
                                  <input type="hidden" name="{$name}" value="0">
                                  {$show_pricing_fields = true}
@@ -364,7 +364,7 @@
 					    <tbody>
 	                        {* Get number of PSE defined, assume the form have the same number of values for each fields *}
 
-	                        {form_field form=$form field='product_sale_element_id' value_key=0}
+	                        {form_field field='product_sale_element_id' value_key=0}
 	                           {$pse_count = $total_value_count}
 	                        {/form_field}
 
@@ -372,7 +372,7 @@
 	                        <tr>
                                 <td colspan="10">
 
-                                    {form_field form=$form field='product_sale_element_id' value_key=$idx}
+                                    {form_field field='product_sale_element_id' value_key=$idx}
                                         <input type="hidden" name="{$name}" value="{$value}" />
                                         {$current_pse_id = $value}
 
@@ -406,58 +406,58 @@
                             </tr>
 
                             <tr>
-                                {form_field form=$form field='reference' value_key=$idx}
+                                {form_field field='reference' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}><input class="form-control input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
-                                {form_field form=$form field='ean_code' value_key=$idx}
+                                {form_field field='ean_code' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}><input class="form-control input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
-                                {form_field form=$form field='quantity' value_key=$idx}
+                                {form_field field='quantity' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
                                     <input class="form-control input-sm text-right" required type="text" name="{$name}" value="{$value}" />
                                 </td>
                                 {/form_field}
 
-                                {form_field form=$form field='price' value_key=$idx}
+                                {form_field field='price' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} required data-price-type="price-without-tax" data-rel-price="price_with_tax_{$idx}" id="price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" required type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
-                                {form_field form=$form field='price_with_tax' value_key=$idx}
+                                {form_field field='price_with_tax' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}><input {if !$show_pricing_fields}readonly{/if} data-price-type="price-with-tax" data-rel-price="price_without_tax_{$idx}" id="price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
-                                {form_field form=$form field='weight' value_key=$idx}
+                                {form_field field='weight' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}><input required class="form-control text-right input-sm" type="text" name="{$name}" value="{$value}" /></td>
                                 {/form_field}
 
 
-                                {form_field form=$form field='default_pse'}
+                                {form_field field='default_pse'}
                                 <td class="{if $error}has-error {/if}text-center">
                                     <input class="input-sm" type="radio" name="{$name}" value="{$current_pse_id}" {if $value == $current_pse_id}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
-                                {form_field form=$form field='onsale' value_key=$idx}
+                                {form_field field='onsale' value_key=$idx}
                                 <td class="{if $error}has-error {/if}text-center">
                                     <input class="input-sm" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
-                                {form_field form=$form field='isnew' value_key=$idx}
+                                {form_field field='isnew' value_key=$idx}
                                 <td class="{if $error}has-error {/if}text-center">
                                      <input class="input-sm" type="checkbox" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}/>
                                 </td>
                                 {/form_field}
 
-                                {form_field form=$form field='sale_price' value_key=$idx}
+                                {form_field field='sale_price' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
                                     <input {if !$show_pricing_fields}readonly{/if} required data-price-type="sale-price-without-tax" data-rel-price="sale_price_with_tax_{$idx}" id="sale_price_without_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}"  />
                                 </td>
                                 {/form_field}
 
-                                {form_field form=$form field='sale_price_with_tax' value_key=$idx}
+                                {form_field field='sale_price_with_tax' value_key=$idx}
                                 <td {if $error}class="has-error"{/if}>
                                     <input {if !$show_pricing_fields}readonly{/if} data-price-type="sale-price-with-tax" data-rel-price="sale_price_without_tax_{$idx}" id="sale_price_with_tax_{$idx}" class="price_field automatic_price_field form-control text-right input-sm" type="text" name="{$name}" value="{$value}"  />
                                 </td>
@@ -646,9 +646,9 @@
     <input type="hidden" name="product_id" value="{$product_id}" />
     <input type="hidden" name="current_tab" value="prices" />
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
-    {form_field form=$form field='product_id'}
+    {form_field field='product_id'}
         <input type="hidden" name="{$name}" value="{$product_id}" />
     {/form_field}
 
@@ -657,12 +657,12 @@
     {loop type="currency" name="get-currency-symbol" id=$edit_currency_id backend_context="1"}
         {$currency_symbol = $SYMBOL}
 
-        {form_field form=$form field='currency'}
+        {form_field field='currency'}
             <input type="hidden" name="{$name}" value="{$ID}" />
         {/form_field}
     {/loop}
 
-    {form_field form=$form field='success_url'}
+    {form_field field='success_url'}
          <input type="hidden" name="{$name}" value="{url path='/admin/products/update' product_id=$product_id current_tab='prices'}" />
     {/form_field}
 
@@ -684,7 +684,7 @@
 		                    <li>
 			                    <div class="checkbox">
 			                        <label>
-			                            {form_field form=$form field='attribute_av' value_key=$index}
+			                            {form_field field='attribute_av' value_key=$index}
 			                            <input data-attribute-id="{$ATTRIBUTE_ID}" class="attribute_av_value" type="checkbox" name="{$name}" value="{$ATTRIBUTE_ID}:{$ID}" {if $value == "$ATTRIBUTE_ID:$ID"}checked="checked"{/if}>{$TITLE}
 			                            {/form_field}
 			                        </label>
@@ -701,7 +701,7 @@
 		</div>
 
 		<div class="col-md-6">
-         {form_field form=$form field='price'}
+         {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">
                  <label for="price_without_tax" class="control-label">{$label} : </label>
 
@@ -712,7 +712,7 @@
              </div>
          {/form_field}
 
-         {form_field form=$form field='reference'}
+         {form_field field='reference'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -722,7 +722,7 @@
             </div>
          {/form_field}
 
-         {form_field form=$form field='ean_code'}
+         {form_field field='ean_code'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -734,7 +734,7 @@
 
          <div class="row">
             <div class="col-md-6">
-	            {form_field form=$form field='weight'}
+	            {form_field field='weight'}
 	            <div class="form-group {if $error}has-error{/if}">
 	                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -747,7 +747,7 @@
 	         </div>
 
 	          <div class="col-md-6">
-	          {form_field form=$form field='quantity'}
+	          {form_field field='quantity'}
 	             <div class="form-group {if $error}has-error{/if}">
 	                 <label for="{$label_attr.for}" class="control-label">{intl l='Stock'} : </label>
 
@@ -759,7 +759,7 @@
 	          </div>
 	     </div>
 
-         {form_field form=$form field='sale_price'}
+         {form_field field='sale_price'}
              <div class="form-group {if $error}has-error{/if}">
                  <label for="sale_price_without_tax" class="control-label">{$label} : </label>
                  <div class="input-group">
@@ -769,7 +769,7 @@
             </div>
          {/form_field}
 
-		 {form_field form=$form field='onsale'}
+		 {form_field field='onsale'}
 	     <div class="form-group {if $error}has-error{/if}">
 	        <div class="checkbox">
 	            <label>
@@ -780,7 +780,7 @@
 	     </div>
 	     {/form_field}
 
-         {form_field form=$form field='isnew'}
+         {form_field field='isnew'}
          <div class="form-group {if $error}has-error{/if}">
              <div class="checkbox">
                  <label>
@@ -807,7 +807,7 @@
     dialog_ok_label     = {intl l="Create combinations"}
 
     form_action        = {url path='/admin/product/combination/build'}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = ''
 
     ok_button_id = "combination_builder_dialog_ok"

@@ -166,24 +166,24 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "module_hook_creation_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
-    {form_field form=$form field='success_url'}
+    {form_field field='success_url'}
     {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
     <input type="hidden" name="{$name}" value="{url path='/admin/module-hook/update/_ID_'}" />
     {/form_field}
 
-    {render_form_field form=$form field="module_id"}
-    {render_form_field form=$form field="hook_id"}
+    {render_form_field field="module_id"}
+    {render_form_field field="hook_id"}
 
-    {custom_render_form_field form=$form field='classname'}
-        <select {form_field_attributes form=$form field='classname'} >
+    {custom_render_form_field field='classname'}
+        <select {form_field_attributes field='classname'} >
         </select>
     {/custom_render_form_field}
 
 
-    {custom_render_form_field form=$form field='method'}
-        <select {form_field_attributes form=$form field='method'} >
+    {custom_render_form_field field='method'}
+        <select {form_field_attributes field='method'} >
         </select>
     {/custom_render_form_field}
 
@@ -202,7 +202,7 @@
     dialog_cancel_label = {intl l="Cancel"}
 
     form_action        = {url path='/admin/module-hooks/create'}
-    form_enctype       = {form_enctype form=$form}
+    form_enctype       = {form_enctype}
     form_error_message = $form_error_message
 }
 {/form}

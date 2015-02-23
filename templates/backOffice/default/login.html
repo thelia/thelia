@@ -19,20 +19,20 @@
 				   		{hook name="index.top" location="index_top" }
 				        
 						{form name="thelia.admin.login"}
-						<form action="{url path='/admin/checklogin'}" method="post" {form_enctype form=$form}>
+						<form action="{url path='/admin/checklogin'}" method="post" {form_enctype}>
 
 							{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
 			                <fieldset>
 			                	<legend>{intl l='Login'}</legend>
 			                
-				                {form_hidden_fields form=$form}
+				                {form_hidden_fields}
 
-								{form_field form=$form field='success_url'}
+								{form_field field='success_url'}
 									<input type="hidden" name="{$name}" value="{url path='/admin'}" /> {* on success, redirect to /admin *}
 								{/form_field}
 								
-								{form_field form=$form field='username'}
+								{form_field field='username'}
                                     <div class="form-group {if $error}has-error{/if}">
                                         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                                         <div class="input-group">
@@ -41,7 +41,7 @@
                                         </div>
                                     </div>
                                 {/form_field}
-								{form_field form=$form field='password'}
+								{form_field field='password'}
                                     <div class="form-group {if $error}has-error{/if}">
                                         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                                         <div class="input-group">
@@ -51,7 +51,7 @@
                                     </div>
                                 {/form_field}				                
 
-								{form_field form=$form field='remember_me'}
+								{form_field field='remember_me'}
 									<div class="checkbox">
 										<label for="{$label_attr.for}">
 											<input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}

@@ -86,7 +86,7 @@
 
                                         {form name="thelia.admin.brand.modification"}
 
-                                            <form method="POST" action="{url path="/admin/brand/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
+                                            <form method="POST" action="{url path="/admin/brand/save/{$ID}"}" {form_enctype} class="clearfix">
 
                                                 {include file="includes/inner-form-toolbar.html" close_url={url path='/admin/brand'}}
 
@@ -95,10 +95,10 @@
                                                 {* Be sure to get the currency ID, even if the form could not be validated *}
                                                 <input type="hidden" name="brand_id" value="{$ID}" />
 
-                                                {form_hidden_fields form=$form}
+                                                {form_hidden_fields}
 
-                                                {render_form_field form=$form field="success_url" value={url path="/admin/brand"}}
-                                                {render_form_field form=$form field="locale" value={$edit_language_locale}}
+                                                {render_form_field field="success_url" value={url path="/admin/brand"}}
+                                                {render_form_field field="locale" value={$edit_language_locale}}
 
                                                 {if $form_error}
                                                     <div class="alert alert-danger">{$form_error_message}</div>
@@ -110,10 +110,10 @@
                                                     </div>
 
                                                     <div class="col-md-4">
-                                                        {render_form_field form=$form field="visible"}
+                                                        {render_form_field field="visible"}
 
-                                                        {custom_render_form_field form=$form field='logo_image_id'}
-                                                            <select {form_field_attributes form=$form field='logo_image_id' extra_class='brand-image-selector'} >
+                                                        {custom_render_form_field field='logo_image_id'}
+                                                            <select {form_field_attributes field='logo_image_id' extra_class='brand-image-selector'} >
                                                                 <option value="">{intl l="No logo image"}</option>
 
                                                                 {loop name="brand-images" type="image" brand=$ID width="90" height="90" resize_mode="crop"}

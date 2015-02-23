@@ -6,7 +6,7 @@
 
 {assign var="isDeliveryMethodChecked" value="0"}
     <div class="radio">
-        {form_field form=$form field='delivery-module'}
+        {form_field field='delivery-module'}
         {if $isPost}
             {if $value == $ID}
                 {assign var="isDeliveryMethodChecked" value="1"}

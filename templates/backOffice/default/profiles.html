@@ -118,7 +118,7 @@
 {* Capture the dialog body, to pass it to the generic dialog *}
 {capture "profile_create_dialog"}
 
-    {form_hidden_fields form=$form}
+    {form_hidden_fields}
 
     {loop type="lang" name="current-edit-lang" default_only="1"}
         <div class="text-center well well-sm">
@@ -126,33 +126,33 @@
             {intl l="Enter information in the default language (%title)" title={$TITLE}}
         </div>
 
-        {form_field form=$form field='locale'}
+        {form_field field='locale'}
             <input type="hidden" name="{$name}" value="{$LOCALE}" />
         {/form_field}
     {/loop}
 
-    {form_field form=$form field='code'}
+    {form_field field='code'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Profile code'}" placeholder="{intl l='Profile code'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='title'}
+    {form_field field='title'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" required="required" title="{intl l='Title'}" placeholder="{intl l='Title'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='chapo'}
+    {form_field field='chapo'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Short description'}" placeholder="{intl l='Short description'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
 
-    {form_field form=$form field='description'}
+    {form_field field='description'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">
                 {$label} :
@@ -163,7 +163,7 @@
         </div>
     {/form_field}
 
-    {form_field form=$form field='postscriptum'}
+    {form_field field='postscriptum'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
@@ -183,7 +183,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path="/admin/configuration/profiles/add"}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 

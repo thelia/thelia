@@ -27,11 +27,11 @@
 
             {form name="thelia.front.customer.profile.update"}
             <form id="form-register" class="form-horizontal" action="{url path="/account/update"}" method="post">
-                {form_field form=$form field='success_url'}
+                {form_field field='success_url'}
                     <input type="hidden" name="{$name}" value="{url path="/account"}" />
                 {/form_field}
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -43,7 +43,7 @@
                     </div>
 
                     <div class="panel-body">
-                        {form_field form=$form field="title"}
+                        {form_field field="title"}
                             <div class="form-group group-title{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -62,7 +62,7 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="firstname"}
+                        {form_field field="firstname"}
                         <div class="form-group group-firstname {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
@@ -74,7 +74,7 @@
                             </div>
                         </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="lastname"}
+                        {form_field field="lastname"}
                             <div class="form-group group-lastname {if $error}has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -89,7 +89,7 @@
 
                         {assign var="customer_change_email" value={config key="customer_change_email"}}
 
-                        {form_field form=$form field="email"}
+                        {form_field field="email"}
                         <div class="form-group group-email {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 
@@ -107,7 +107,7 @@
                         {/form_field}
 
                         {if {config key="customer_confirm_email"} && $customer_change_email}
-                        {form_field form=$form field="email_confirm"}
+                        {form_field field="email_confirm"}
                             <div class="form-group group-email {if $error}has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
 
@@ -124,7 +124,7 @@
                     </div>
                 </fieldset>
 
-                {form_field form=$form field="newsletter"}
+                {form_field field="newsletter"}
                 <div class="form-group group-newsletter{if $error} has-error{/if}">
                     <div class="control-input">
                         <div class="checkbox">

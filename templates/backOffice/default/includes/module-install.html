@@ -7,10 +7,10 @@
 
         <div class="form-container">
             {form name="thelia.admin.module.install"}
-            <form method="POST" action="{url path='/admin/module/install'}" {form_enctype form=$form} id="module-install">
-                {form_hidden_fields form=$form}
+            <form method="POST" action="{url path='/admin/module/install'}" {form_enctype} id="module-install">
+                {form_hidden_fields}
 
-                {form_field form=$form field='success_url'}
+                {form_field field='success_url'}
                 <input type="hidden" name="{$name}" value="{url path='/admin/module'}" />
                 {/form_field}
 
@@ -20,7 +20,7 @@
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                {form_field form=$form field='module'}
+                {form_field field='module'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} :
                         <span class="label-help-block">{intl l="Your module should be packaged in a zip file."}</span>

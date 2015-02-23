@@ -23,7 +23,7 @@
         {block name="contact-form"}
             {form name="thelia.front.contact"}
             <form id="form-contact" action="{url path="/contact"}" method="post">
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {hook name="contact.form-top"}
 
@@ -33,7 +33,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                        {form_field form=$form field="name"}
+                        {form_field field="name"}
                             <div class="form-group group-name col-sm-6{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -47,7 +47,7 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="email"}
+                        {form_field field="email"}
                             <div class="form-group group-email col-sm-6{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -60,7 +60,7 @@
                             </div><!--/.form-group-->
                         {/form_field}
                         </div>
-                        {form_field form=$form field="subject"}
+                        {form_field field="subject"}
                             <div class="form-group group-firstname{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">
@@ -72,7 +72,7 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
-                        {form_field form=$form field="message"}
+                        {form_field field="message"}
                             <div class="form-group group-message{if $error} has-error{/if}">
                                 <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input">

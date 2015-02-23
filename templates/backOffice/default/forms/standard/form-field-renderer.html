@@ -39,7 +39,7 @@ Use the optionnal $field_value parameter if no value is defined
             {/if}
 
             {if $show_label}
-                {form_error form=$form field=$field_name}
+                {form_error field=$field_name}
                     <br />
                     <span class="error">{$message}</span>
                 {/form_error}
@@ -63,7 +63,7 @@ Use the optionnal $field_value parameter if no value is defined
             {/if}
 
             {if $show_label}
-                {form_error form=$form field=$field_name}
+                {form_error field=$field_name}
                     <br />
                     <span class="error">{$message}</span>
                 {/form_error}
@@ -83,7 +83,7 @@ Use the optionnal $field_value parameter if no value is defined
             <label for="{$label_attr.for}" class="control-label">
                 {$label} {if $required} <span class="required">*</span>{/if}
 
-                {form_error form=$form field=$field_name}
+                {form_error field=$field_name}
                     <br />
                     <span class="error">{$message}</span>
                 {/form_error}

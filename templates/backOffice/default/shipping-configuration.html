@@ -112,9 +112,9 @@
         {form name="thelia.admin.area.create"}
             {form_hidden_fields form=$form}
 
-                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            {render_form_field form=$form field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
-            {render_form_field form=$form field='name'}
+            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+            {render_form_field field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
+            {render_form_field field='name'}
 
             {hook name="shipping-configuration.create-form" location="shipping_configuration_create_form" }
         {/form}

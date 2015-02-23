@@ -46,7 +46,7 @@
                                     <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/`$area_id`"}">
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {form_hidden_fields form=$form exclude="area_id"}
+                                        {form_hidden_fields exclude="area_id"}
 
                                         <input type="hidden" name="area_id" value="{$area_id}">
 

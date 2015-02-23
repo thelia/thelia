@@ -34,9 +34,9 @@
                         <div class="col-md-12">
                             {form name='thelia.configuration.store'}
 	 						<form method="POST" action="{url path='/admin/configuration/store/save'}">
-                                {form_hidden_fields form=$form}
+                                {form_hidden_fields}
 
-                                {form_field form=$form field='success_url'}
+                                {form_field field='success_url'}
                                     <input type="hidden" name="{$name}" value="{url path='/admin/configuration'}">
                                 {/form_field}
                                 {include
@@ -55,14 +55,14 @@
                                         {/if}
 
                                         <fieldset>
-                                            {render_form_field form=$form field='store_name'}
-                                            {render_form_field form=$form field='store_description'}
-                                            {render_form_field form=$form field='store_business_id'}
+                                            {render_form_field field='store_name'}
+                                            {render_form_field field='store_description'}
+                                            {render_form_field field='store_business_id'}
 
                                             <p class="title title-without-tabs">{intl l='Email addresses'}</p>
 
-                                            {render_form_field form=$form field='store_email'}
-                                            {render_form_field form=$form field='store_notification_emails'}
+                                            {render_form_field field='store_email'}
+                                            {render_form_field field='store_notification_emails'}
                                         </fieldset>
                                     </div>
 
@@ -70,21 +70,21 @@
                                         <fieldset>
                                             <p class="title title-without-tabs">{intl l="Store address"}</p>
 
-                                            {render_form_field form=$form field='store_address1'}
-                                            {render_form_field form=$form field='store_address2' show_label=false}
-                                            {render_form_field form=$form field='store_address3' show_label=false}
+                                            {render_form_field field='store_address1'}
+                                            {render_form_field field='store_address2' show_label=false}
+                                            {render_form_field field='store_address3' show_label=false}
 
                                             <div class="row">
                                                 <div class="col-md-3">
-                                                    {render_form_field form=$form field='store_zipcode'}
+                                                    {render_form_field field='store_zipcode'}
                                                 </div>
                                                 <div class="col-md-9">
-                                                    {render_form_field form=$form field='store_city'}
+                                                    {render_form_field field='store_city'}
                                                 </div>
                                             </div>
 
-                                            {custom_render_form_field form=$form field='store_country'}
-                                                <select {form_field_attributes form=$form field='store_country'}>
+                                            {custom_render_form_field field='store_country'}
+                                                <select {form_field_attributes field='store_country'}>
                                                     {loop type="country" name="country1"}
                                                         <option value="{$ID}" {if {$value} == $ID || (empty($value) && $IS_DEFAULT)}selected{/if}>{$TITLE}</option>
                                                     {/loop}
@@ -95,10 +95,10 @@
 
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    {render_form_field form=$form field='store_phone'}
+                                                    {render_form_field field='store_phone'}
                                                 </div>
                                                 <div class="col-md-6">
-                                                    {render_form_field form=$form field='store_fax'}
+                                                    {render_form_field field='store_fax'}
                                                 </div>
                                             </div>
 

@@ -88,7 +88,7 @@
                                     <div class="form-container">
 
                                         {form name="thelia.admin.category.modification"}
-                                        <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype form=$form} class="clearfix">
+                                        <form method="POST" action="{url path='/admin/categories/save'}" {form_enctype} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
@@ -99,9 +99,9 @@
                                             <input type="hidden" name="category_id" value="{$ID}" />
                                             <input type="hidden" name="current_tab" value="general" />
 
-                                            {form_hidden_fields form=$form}
+                                            {form_hidden_fields}
 
-                                            {form_field form=$form field='success_url'}
+                                            {form_field field='success_url'}
                                                 <input type="hidden" name="{$name}" value="{$close_url nofilter}">
                                             {/form_field}
 
@@ -114,7 +114,7 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    {form_field form=$form field='parent'}
+                                                    {form_field field='parent'}
                                                         <div class="form-group {if $error}has-error{/if}">
 
                                                             <label for="{$label_attr.for}" class="control-label">
@@ -133,7 +133,7 @@
                                                          </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='visible'}
+                                                    {form_field field='visible'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
                                                             <div class="checkbox">
