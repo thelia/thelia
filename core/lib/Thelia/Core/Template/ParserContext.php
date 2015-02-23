@@ -32,10 +32,35 @@ class ParserContext implements \IteratorAggregate
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
     }
 
+    /**
+     * Set the current form
+     *
+     * @param BaseForm $form
+     * @return $this
+     */
+    public function setCurrentForm(BaseForm $form)
+    {
+        $this->set('thelia-current-form', $form);
+
+        return $this;
+    }
+
+    /**
+     * Set the current form.
+     *
+     * @return BaseForm|null
+     */
+    public function getCurrentForm()
+    {
+        return $this->get('thelia-current-form');
+    }
+
+
     // -- Error form -----------------------------------------------------------
 
     /**
      * @param BaseForm $form the errored form
+     * @return $this
      */
     public function addForm(BaseForm $form)
     {
