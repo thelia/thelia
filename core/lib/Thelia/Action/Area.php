@@ -53,7 +53,7 @@ class Area extends BaseAction implements EventSubscriberInterface
 
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
-            CountryAreaQuery::create()
+        CountryAreaQuery::create()
                 ->filterByCountryId($event->getCountryId())
                 ->filterByAreaId($event->getAreaId())
                 ->delete();

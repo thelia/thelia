@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Message as MessageModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Message\MessageUpdateEvent;
 use Thelia\Core\Event\Message\MessageCreateEvent;
 use Thelia\Core\Event\Message\MessageDeleteEvent;

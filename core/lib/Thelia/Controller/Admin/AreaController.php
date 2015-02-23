@@ -278,7 +278,6 @@ class AreaController extends AbstractCrudController
 
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaCountryForm);
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -319,7 +318,6 @@ class AreaController extends AbstractCrudController
             }
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaDeleteCountriesForm);
-
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);

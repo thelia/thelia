@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-
 use Thelia\Core\Event\Address\AddressEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Address as BaseAddress;

@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;

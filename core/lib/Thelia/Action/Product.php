@@ -14,7 +14,6 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
@@ -31,7 +30,6 @@ use Thelia\Model\FeatureProduct;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
@@ -48,7 +46,6 @@ use Thelia\Core\Event\Product\ProductDeleteCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
-
 use Propel\Runtime\Propel;
 
 class Product extends BaseAction implements EventSubscriberInterface

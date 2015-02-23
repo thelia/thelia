@@ -49,5 +49,4 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
 
         return $area;
     }
-
 }

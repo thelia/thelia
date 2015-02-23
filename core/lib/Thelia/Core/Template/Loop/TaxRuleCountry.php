@@ -17,11 +17,9 @@ use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
 use Thelia\Model\CountryQuery;
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Model\Map\TaxRuleCountryTableMap;

@@ -14,7 +14,6 @@ namespace Thelia\Tests\Action;
 
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Model\MetaDataQuery;
-
 use Thelia\Model\Product;
 use Thelia\Action\MetaData;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;

@@ -16,5 +16,4 @@ use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
  */
 class CountryAreaQuery extends BaseCountryAreaQuery
 {
-
 }

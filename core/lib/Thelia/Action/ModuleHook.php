@@ -23,7 +23,6 @@ use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;

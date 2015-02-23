@@ -5,7 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Product as BaseProduct;
-
 use Thelia\TaxEngine\Calculator;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Event\TheliaEvents;

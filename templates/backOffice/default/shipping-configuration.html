@@ -38,8 +38,8 @@
                             <thead>
     	                        <tr>	                           
                                    <th>{intl l="Zone name"}</th>
-                                    <th>{intl l="Included countries"}</th>
-                                    <th>{intl l="Assigned modules"}</th>
+                                   <th>{intl l="Included countries"}</th>
+                                   <th>{intl l="Assigned modules"}</th>
 
                                    {hook name="shipping-configuration.table-header" location="shipping_configuration_table_header" }
 
@@ -66,6 +66,9 @@
 
                                             <span class="badge" title="{$countries}">{intl l="%count more..." count={$ctry_count}}</span>
                                         {/ifloop}
+                                        {elseloop rel="country-area"}
+                                            <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
+                                        {/elseloop}
                                     </td>
                                     <td>
                                         {loop name="module-area" type="module" area=$ID backend_context="1"}
