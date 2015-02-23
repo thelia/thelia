@@ -38,7 +38,8 @@
                             <thead>
     	                        <tr>	                           
                                    <th>{intl l="Zone name"}</th>
-                                   <th>{intl l="Associated countries"}</th>
+                                    <th>{intl l="Included countries"}</th>
+                                    <th>{intl l="Assigned modules"}</th>
 
                                    {hook name="shipping-configuration.table-header" location="shipping_configuration_table_header" }
 
@@ -49,7 +50,7 @@
                             <tbody>
                                 {loop name="area-list" type="area" backend_context="1"}
                                 <tr>
-                                    <td><a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}">{$NAME}</a></td>
+                                    <td nowrap><a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}">{$NAME}</a></td>
                                     <td>
                                         {loop name="country-area" type="country" area=$ID backend_context="1" limit="6"}
                                             {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
@@ -66,10 +67,18 @@
                                             <span class="badge" title="{$countries}">{intl l="%count more..." count={$ctry_count}}</span>
                                         {/ifloop}
                                     </td>
+                                    <td>
+                                        {loop name="module-area" type="module" area=$ID backend_context="1"}
+                                            {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                        {/loop}
+                                        {elseloop rel="module-area"}
+                                            <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
+                                        {/elseloop}
+                                    </td>
 
                                     {hook name="shipping-configuration.table-row" location="shipping_configuration_table_row" area_id={$ID} }
 
-                                    <td class="text-center">
+                                    <td nowrap class="text-center">
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-configuration" access="UPDATE"}
                                                <a class="btn btn-default btn-xs area-configuration-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_configuration/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>

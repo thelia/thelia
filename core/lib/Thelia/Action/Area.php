@@ -53,10 +53,14 @@ class Area extends BaseAction implements EventSubscriberInterface
 
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
-        CountryAreaQuery::create()
-            ->filterByCountryId($event->getCountryId())
-            ->filterByAreaId($event->getAreaId())
-            ->delete();
+            CountryAreaQuery::create()
+                ->filterByCountryId($event->getCountryId())
+                ->filterByAreaId($event->getAreaId())
+                ->delete();
+
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $event->setArea($area);
+        }
     }
 
     public function updatePostage(AreaUpdatePostageEvent $event)

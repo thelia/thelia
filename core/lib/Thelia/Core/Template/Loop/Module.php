@@ -52,6 +52,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('profile'),
+            Argument::createIntListTypeArgument('area'),
             new Argument(
                 'code',
                 new Type\TypeCollection(
@@ -118,6 +119,16 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->leftJoinProfileModule('profile_module')
                 ->addJoinCondition('profile_module', 'profile_module.PROFILE_ID=?', $profile, null, \PDO::PARAM_INT)
                 ->withColumn('profile_module.access', 'access');
+        }
+
+
+        $area = $this->getArea();
+
+        if (null !== $area) {
+            $search
+                ->useAreaDeliveryModuleQuery()
+                ->filterByAreaId($area, Criteria::IN)
+                ->endUse();
         }
 
         $code = $this->getCode();

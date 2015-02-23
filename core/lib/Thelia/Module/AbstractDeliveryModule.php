@@ -42,13 +42,12 @@ abstract class AbstractDeliveryModule extends BaseModule implements DeliveryModu
 
         if (null !== $areaDeliveryModule = AreaDeliveryModuleQuery::create()->findByCountryAndModule(
             $country,
-            $this->getModuleId()
+            $this->getModuleModel()
         )) {
             $area = $areaDeliveryModule->getArea();
         }
 
         return $area;
     }
-
 
 }

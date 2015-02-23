@@ -62,7 +62,7 @@ class Delivery extends BaseSpecificModule
                 ->findByCountryAndModule($country, $deliveryModule);
 
             if (null === $areaDeliveryModule && false === $virtual) {
-                continue;
+               continue;
             }
 
             /** @var DeliveryModuleInterface $moduleInstance */

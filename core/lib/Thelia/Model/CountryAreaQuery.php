@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'country_area' table.
  *
@@ -18,4 +17,4 @@ use Thelia\Model\Base\CountryAreaQuery as BaseCountryAreaQuery;
 class CountryAreaQuery extends BaseCountryAreaQuery
 {
 
-} // CountryAreaQuery
+}

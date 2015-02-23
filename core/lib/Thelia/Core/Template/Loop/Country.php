@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
 
 /**
@@ -66,21 +67,31 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
         $area = $this->getArea();
 
         if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
+            $search
+                ->useCountryAreaQuery('with_area')
+                ->filterByAreaId($area, Criteria::IN)
+                ->endUse();
         }
 
         $excludeArea = $this->getExcludeArea();
 
         if (null !== $excludeArea) {
-            $search->filterByAreaId($excludeArea, Criteria::NOT_IN);
+            $search
+                ->useCountryAreaQuery('without_area')
+                ->filterByAreaId($excludeArea, Criteria::NOT_IN)
+                ->endUse();
         }
 
         $withArea = $this->getWith_area();
 
         if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
+            $search
+                ->joinCountryArea('without_area', Criteria::LEFT_JOIN)
+                ->where('`without_area`.country_id ' . Criteria::ISNOTNULL);
         } elseif (false === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
+            $search
+                ->joinCountryArea('without_area', Criteria::LEFT_JOIN)
+                ->where('`without_area`.country_id ' . Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();
@@ -96,21 +107,24 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Country $country */
         foreach ($loopResult->getResultDataCollection() as $country) {
             $loopResultRow = new LoopResultRow($country);
-            $loopResultRow->set("ID", $country->getId())
+            $loopResultRow
+                ->set("ID", $country->getId())
                 ->set("IS_TRANSLATED", $country->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)
                 ->set("TITLE", $country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("ISOCODE", $country->getIsocode())
+                ->set("ISOCODE", sprintf("%03d", $country->getIsocode()))
                 ->set("ISOALPHA2", $country->getIsoalpha2())
                 ->set("ISOALPHA3", $country->getIsoalpha3())
                 ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
                 ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
             ;
+
             $this->addOutputFields($loopResultRow, $country);
 
             $loopResult->addRow($loopResultRow);
