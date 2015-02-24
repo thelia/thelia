@@ -209,7 +209,9 @@
                 {/loop}
             {/custom_render_form_field}
 
-            {render_form_field form=$form field="visible"}
+            {custom_render_form_field form=$form field="visible"}
+                <input type="checkbox" checked {form_field_attributes form=$form field="visible"}> {$label}
+            {/custom_render_form_field}
 
             {hook name='brand.create-form' location='brand_create_form'}
 
