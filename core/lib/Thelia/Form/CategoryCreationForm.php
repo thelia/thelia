@@ -54,10 +54,7 @@ class CategoryCreationForm extends BaseForm
                 'checkbox',
                 [
                     'required' => false,
-                    'label' => $this->translator->trans('This category is online'),
-                    'attr' => [
-                        'checked' => 'checked'
-                    ]
+                    'label' => $this->translator->trans('This category is online')
                 ]
             )
         ;
