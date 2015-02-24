@@ -111,7 +111,6 @@ class Template extends BaseAction implements EventSubscriberInterface
                 }
             }
 
-
             $event->setTemplate($template);
 
             $event->setProductCount($product_count);
