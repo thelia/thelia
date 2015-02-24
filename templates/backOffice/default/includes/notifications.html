@@ -6,7 +6,7 @@
 *}
 
 {if $message}
-<div class="alert alert-{$type|default:"danger"}{if not $dismissable} alert-dismissable{/if}">
+<div class="alert alert-{$alertTtype|default:"danger"}{if not $dismissable} alert-dismissable{/if}">
     {if not $dismissable}<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>{/if}
     {$message}
 </div>

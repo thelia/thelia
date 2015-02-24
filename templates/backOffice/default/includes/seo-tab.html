@@ -19,7 +19,7 @@
         {render_form_field form=$form field="success_url" value="{$success_url nofilter}"}
 
         {* Display error message if exist *}
-        {include file='includes/notifications.html' message=$form_error_message type="danger"}
+        {include file='includes/notifications.html' message=$form_error_message alert_type="danger"}
 
         {custom_render_form_field form=$form field='url'}
             <div class="input-group">
