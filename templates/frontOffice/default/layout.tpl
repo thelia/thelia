@@ -26,17 +26,18 @@ GNU General Public License : http://www.gnu.org/licenses/
 {config_load file='variables.conf'}
 {block name="init"}{/block}
 {block name="no-return-functions"}{/block}
-{assign var="store_name" value="{config key="store_name"}"}
-{assign var="store_description" value="{config key="store_description"}"}
+{assign var="store_name" value={config key="store_name"}}
+{assign var="store_description" value={config key="store_description"}}
 {assign var="lang_code" value={lang attr="code"}}
-{if not $store_name}{assign var="store_name" value="{intl l='Thelia V2'}"}{/if}
-{if not $store_description}{assign var="store_description" value="$store_name"}{/if}
+{assign var="lang_locale" value={lang attr="locale"}}
+{if not $store_name}{assign var="store_name" value={intl l='Thelia V2'}}{/if}
+{if not $store_description}{assign var="store_description" value={$store_name}}{/if}
 
 {* paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither *}
 <!--[if lt IE 7 ]><html class="no-js oldie ie6" lang="{$lang_code}"> <![endif]-->
 <!--[if IE 7 ]><html class="no-js oldie ie7" lang="{$lang_code}"> <![endif]-->
 <!--[if IE 8 ]><html class="no-js oldie ie8" lang="{$lang_code}"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><html lang="{$v}" class="no-js"> <!--<![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="{$lang_code}" class="no-js"> <!--<![endif]-->
 <head>
     {hook name="main.head-top"}
     {* Test if javascript is enabled *}
@@ -60,6 +61,18 @@ GNU General Public License : http://www.gnu.org/licenses/
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
+    {* To use the embedded less compiler :
+       1) Comment the stylesheet function above, to prevent ce style.css to be included
+       2) Uncomment the following stylesheets function, to trigger styles.less compilation
+       3) In your back-office, set the process_assets configuration variable to 1,
+       4) Run your shop in developpement ode, usinf index_dev.php
+    *}
+    {*
+    {stylesheets file='assets/less/styles.less' filters='less'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+    *}
+
     {hook name="main.stylesheet"}
 
     {block name="stylesheet"}{/block}
@@ -69,9 +82,9 @@ GNU General Public License : http://www.gnu.org/licenses/
     {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
 
     {* Feeds *}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/{lang attr="locale"}"}" />
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/{lang attr="locale"}"}" />
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/{lang attr='locale'}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/$lang_locale"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/$lang_locale"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/$lang_locale"}" />
     {block name="feeds"}{/block}
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}

@@ -14,7 +14,9 @@ namespace Thelia\Core\Template\Assets\Filter;
 
 use Assetic\Asset\AssetInterface;
 use Assetic\Filter\LessphpFilter;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 
 /**
@@ -26,7 +28,7 @@ use Thelia\Log\Tlog;
  * @author Kris Wallsmith <kris.wallsmith@gmail.com>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class LessDotPhpFilter extends LessphpFilter
+class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 {
     /** @var string the compiler cache directory */
     private $cacheDir;
@@ -71,5 +73,19 @@ class LessDotPhpFilter extends LessphpFilter
         $asset->setContent(file_get_contents($this->cacheDir . DS . $css_file_name));
 
         Tlog::getInstance()->addDebug("CSS processing done.");
+    }
+
+    public function clearCacheDir()
+    {
+        $fs = new Filesystem();
+
+        $fs->remove($this->cacheDir);
+    }
+
+    public static function getSubscribedEvents()
+    {
+        return [
+            TheliaEvents::CACHE_CLEAR => array("clearCacheDir", 128),
+        ];
     }
 }

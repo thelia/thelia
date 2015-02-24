@@ -79,11 +79,42 @@
             <argument>%kernel.debug%</argument>
         </service>
 
-		<!--
-		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
-		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
-		We use it here to inject the service container in the admin base controller.
-		-->
+        <!-- The asset filters -->
+        <service id="less.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+            <tag name="thelia.asset.filter" key="less" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="less_legacy.assetic.filter" class="Thelia\Core\Template\Assets\Filter\LessDotPhpFilter">
+            <argument key="identifier">less_legacy</argument>
+            <tag name="thelia.asset.filter" key="less_legacy" />
+        </service>
+
+        <service id="sass.assetic.filter" class="Assetic\Filter\Sass\SassFilter">
+            <tag name="thelia.asset.filter" key="sass"  />
+        </service>
+
+        <service id="cssembed.assetic.filter" class="Assetic\Filter\PhpCssEmbedFilter">
+            <tag name="thelia.asset.filter" key="cssembed" />
+        </service>
+
+        <service id="cssrewrite.assetic.filter" class="Assetic\Filter\CssRewriteFilter">
+            <tag name="thelia.asset.filter" key="cssrewrite"/>
+        </service>
+
+        <service id="cssimport.assetic.filter" class="Assetic\Filter\CssImportFilter">
+            <tag name="thelia.asset.filter" key="cssimport"/>
+        </service>
+
+        <service id="compass.assetic.filter" class="Assetic\Filter\CompassFilter">
+            <tag name="thelia.asset.filter" key="compass"/>
+        </service>
+
+        <!--
+        A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
+        thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+        We use it here to inject the service container in the admin base controller.
+        -->
         <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
         	<argument type="service" id="service_container"/>
         </service>
