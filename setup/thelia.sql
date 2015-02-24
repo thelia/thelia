@@ -23,12 +23,7 @@ CREATE TABLE `category`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     INDEX `idx_parent` (`parent`),
-    INDEX `idx_parent_position` (`parent`, `position`),
-    INDEX `fk_category_template_default_template_id_idx` (`default_template_id`),
-    CONSTRAINT `fk_category_template_default_template_id`
-        FOREIGN KEY (`default_template_id`)
-        REFERENCES `template` (`id`)
-        ON DELETE SET NULL
+    INDEX `idx_parent_position` (`parent`, `position`)
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -111,6 +106,7 @@ DROP TABLE IF EXISTS `country`;
 CREATE TABLE `country`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `area_id` INTEGER,
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
@@ -119,7 +115,13 @@ CREATE TABLE `country`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_country_by_default` (`by_default`)
+    INDEX `idx_country_area_id` (`area_id`),
+    INDEX `idx_country_by_default` (`by_default`),
+    CONSTRAINT `fk_country_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -2226,32 +2228,6 @@ CREATE TABLE `api`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
--- country_area
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `country_area`;
-
-CREATE TABLE `country_area`
-(
-    `country_id` INTEGER NOT NULL,
-    `area_id` INTEGER NOT NULL,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    INDEX `country_area_area_id_idx` (`area_id`),
-    INDEX `fk_country_area_country_id_idx` (`country_id`),
-    CONSTRAINT `fk_country_area_area_id`
-        FOREIGN KEY (`area_id`)
-        REFERENCES `area` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_country_area_country_id`
-        FOREIGN KEY (`country_id`)
-        REFERENCES `country` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB CHARACTER SET='utf8';
-
--- ---------------------------------------------------------------------
 -- ignored_module_hook
 -- ---------------------------------------------------------------------
 
@@ -2263,8 +2239,6 @@ CREATE TABLE `ignored_module_hook`
     `hook_id` INTEGER NOT NULL,
     `method` VARCHAR(255),
     `classname` VARCHAR(255),
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
     INDEX `fk_deleted_module_hook_module_id_idx` (`module_id`),
     INDEX `fk_deleted_module_hook_hook_id_idx` (`hook_id`),
     CONSTRAINT `fk_deleted_module_hook_module_id`
