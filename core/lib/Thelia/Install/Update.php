@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Install;
+
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Propel;
 use Thelia\Core\Thelia;
@@ -40,6 +41,7 @@ class Update
         '10' => '2.0.3',
         '11' => '2.0.4',
         '12' => '2.0.5',
+        '13' => '2.0.6',
     );
 
     protected function isLatestVersion($version)
@@ -57,7 +59,7 @@ class Update
 
         $updatedVersions = array();
 
-        $currentVersion = Thelia::THELIA_VERSION;
+        $currentVersion = ConfigQuery::read('thelia_version');
         $logger->debug("start update process");
         if (true === $this->isLatestVersion($currentVersion)) {
             $logger->debug("You already have the latest version. No update available");
