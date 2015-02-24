@@ -73,7 +73,7 @@ create table `country_area`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- Initialize the table with existing data
-INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) select `id`, `area_id`, NOW(), NOW() FROM `country` WHERE area_id <> NULL
+INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) select `id`, `area_id`, NOW(), NOW() FROM `country` WHERE `area_id` IS NOT NULL;
 
 -- Remove area_id column from country table
 ALTER TABLE `country` DROP `area_id`;
