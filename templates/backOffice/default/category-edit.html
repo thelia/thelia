@@ -124,7 +124,11 @@
 
                                                     {render_form_field form=$form field="default_template_id"}
 
-                                                    {render_form_field form=$form field='visible'}
+                                                    {form_field form=$form field="visible"}
+                                                    <label class="checkbox">
+                                                        <input type="checkbox" {if $value != 0}checked{/if} name="{$name}" value="1"> {$label}
+                                                    </label>
+                                                    {/form_field}
                                                 </div>
                                             </div>
 

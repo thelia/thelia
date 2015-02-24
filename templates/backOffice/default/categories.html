@@ -422,9 +422,11 @@
             {/loop}
         {/custom_render_form_field}
         
-        {custom_render_form_field form=$form field="visible"}
-            <input type="checkbox" checked {form_field_attributes form=$form field="visible"}> {$label}
-        {/custom_render_form_field}
+        {form_field form=$form field="visible"}
+        <label class="checkbox">
+            <input type="checkbox" checked name="{$name}" value="1"> {$label}
+        </label>
+        {/form_field}
 
         {hook name="category.create-form" location="category_create_form" }
 
