@@ -58,7 +58,10 @@ class BrandCreationForm extends BaseForm
                 'required'    => false,
                 'label'       => Translator::getInstance()->trans('This brand is online'),
                 'label_attr' => [
-                    'for' => 'visible_create'
+                    'for' => 'visible_create',
+                ],
+                'attr' => [
+                    'checked' => 'checked'
                 ]
             ]
         );
