@@ -10,6 +10,12 @@
 - Do not register previous url on XmlHttpRequest
 - Fix deploy image directory destination
 - Fix redirect response if a AuthenticationException is catched
+- Prevent XSS injection in error.html template
+- The hook method is now stored in the ignored_module_hook table
+- Allow to hardlink TinyMCE rather than symlink
+- Add bootstrap paths for thelia-project
+- Enlarge order dropdown menu to prevent wrapping in some languages
+- Fixed langugage when previewing e-mails
 
 # 2.1.1
 
