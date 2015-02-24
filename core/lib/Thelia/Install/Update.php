@@ -47,12 +47,14 @@ class Update
         '10' => '2.0.3',
         '11' => '2.0.4',
         '12' => '2.0.5',
-        '13' => '2.1.0-alpha1',
-        '14' => '2.1.0-alpha2',
-        '15' => '2.1.0-beta1',
-        '16' => '2.1.0-beta2',
-        '17' => '2.1.0',
-        '18' => '2.1.1',
+        '13' => '2.0.6',
+        '14' => '2.1.0-alpha1',
+        '15' => '2.1.0-alpha2',
+        '16' => '2.1.0-beta1',
+        '17' => '2.1.0-beta2',
+        '18' => '2.1.0',
+        '19' => '2.1.1',
+        '20' => '2.1.2',
     );
 
     /** @var bool */
@@ -309,7 +311,20 @@ class Update
 
     public function getCurrentVersion()
     {
-        return Thelia::THELIA_VERSION;
+        $currentVersion = null;
+        if (null !== $this->connection) {
+            try {
+                $stmt = $this->connection->prepare('SELECT value from config where name = ? LIMIT 1');
+                $stmt->execute(['thelia_version']);
+                if (false !== $row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $currentVersion = $row['value'];
+                }
+            } catch (PDOException $e) {
+                $this->log('error', sprintf('Error retrieving current version : %s', $e->getMessage()));
+                throw $e;
+            }
+        }
+        return $currentVersion;
     }
 
     public function setCurrentVersion($version)
