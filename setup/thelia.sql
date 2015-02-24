@@ -15,6 +15,7 @@ CREATE TABLE `category`
     `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
+    `default_template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -22,7 +23,12 @@ CREATE TABLE `category`
     `version_created_by` VARCHAR(100),
     PRIMARY KEY (`id`),
     INDEX `idx_parent` (`parent`),
-    INDEX `idx_parent_position` (`parent`, `position`)
+    INDEX `idx_parent_position` (`parent`, `position`),
+    INDEX `fk_category_template_default_template_id_idx` (`default_template_id`),
+    CONSTRAINT `fk_category_template_default_template_id`
+        FOREIGN KEY (`default_template_id`)
+        REFERENCES `template` (`id`)
+        ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -3114,6 +3120,7 @@ CREATE TABLE `category_version`
     `parent` INTEGER DEFAULT 0 NOT NULL,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
+    `default_template_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

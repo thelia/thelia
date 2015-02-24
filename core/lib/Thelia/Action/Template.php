@@ -14,12 +14,9 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-<<<<<<< HEAD
-=======
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\TemplateTableMap;
->>>>>>> A default product template ID could be assigned to categories
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\Template as TemplateModel;
 use Thelia\Core\Event\TheliaEvents;
