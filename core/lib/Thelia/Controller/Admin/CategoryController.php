@@ -132,7 +132,7 @@ class CategoryController extends AbstractSeoCrudController
             'chapo'                 => $object->getChapo(),
             'description'           => $object->getDescription(),
             'postscriptum'          => $object->getPostscriptum(),
-            'visible'               => $object->getVisible() ? true : false,
+            'visible'               => $object->getVisible(),
             'parent'                => $object->getParent(),
             'default_template_id'   => $object->getDefaultTemplateId()
         );

@@ -51,7 +51,7 @@ class CategoryCreationForm extends BaseForm
             )
             ->add(
                 'visible',
-                'checkbox',
+                'integer', // Should be checkbox, but this is not API compatible, see #1199
                 [
                     'required' => false,
                     'label' => $this->translator->trans('This category is online')
