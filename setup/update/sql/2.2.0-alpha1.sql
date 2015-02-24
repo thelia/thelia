@@ -1,76 +1,76 @@
-set foreign_key_checks = 0;
+SET FOREIGN_KEY_CHECKS = 0;
 
-update `config` set `value`='2.2.0-alpha1' where `name`='thelia_version';
-update `config` set `value`='2' where `name`='thelia_major_version';
-update `config` set `value`='2' where `name`='thelia_minus_version';
-update `config` set `value`='0' where `name`='thelia_release_version';
-update `config` set `value`='alpha1' where `name`='thelia_extra_version';
+UPDATE `config` SET `value`='2.2.0-alpha1' WHERE `name`='thelia_version';
+UPDATE `config` SET `value`='2' WHERE `name`='thelia_major_version';
+UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
+UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
+UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
 -- admin hooks
 
-select @max_id := ifnull(max(`id`),0) from `hook`;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
-insert into `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) values
-  (@max_id + 1, 'order.tab', 2, 0, 1, 1, 1, 1, now(), now())
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+  (@max_id + 1, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
 ;
 
-insert into  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) values
-  (@max_id + 1, 'fr_fr', 'commande - onglet', '', ''),
-  (@max_id + 1, 'en_us', 'order - tab', '', '')
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+  (@max_id + 1, 'fr_FR', 'Commande - Onglet', '', ''),
+  (@max_id + 1, 'en_US', 'Order - Tab', '', '')
 ;
 
-select @max_id := max(`id`) from `order_status`;
+SELECT @max_id := MAX(`id`) FROM `order_status`;
 
-insert into `order_status` values
-  (@max_id + 1, "refunded", now(), now())
+INSERT INTO `order_status` VALUES
+  (@max_id + 1, "refunded", NOW(), NOW())
 ;
 
-insert into  `order_status_i18n` values
-  (@max_id + 1, "en_us", "refunded", "", "", ""),
-  (@max_id + 1, "fr_fr", "remboursée", "", "", "")
+INSERT INTO  `order_status_i18n` VALUES
+  (@max_id + 1, "en_US", "Refunded", "", "", ""),
+  (@max_id + 1, "fr_FR", "Remboursée", "", "", "")
 ;
 
 -- new column in admin_log
 
-alter table `admin_log` add `resource_id` integer after `resource` ;
+ALTER TABLE `admin_log` ADD `resource_id` INTEGER AFTER `resource` ;
 
 -- new config
 
-select @max_id := ifnull(max(`id`),0) from `config`;
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
-insert into `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) values
-(@max_id + 1, 'customer_change_email', '0', 0, 0, now(), now()),
-(@max_id + 2, 'customer_confirm_email', '0', 0, 0, now(), now())
+INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
+(@max_id + 2, 'customer_confirm_email', '0', 0, 0, NOW(), NOW())
 ;
 
-insert into `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) values
-(@max_id + 1, 'en_us', 'allow customers to change their email. 1 for yes, 0 for no', null, null, null),
-(@max_id + 1, 'fr_fr', 'permettre aux clients de changer leur email. 1 pour oui, 0 pour non', null, null, null),
-(@max_id + 2, 'en_us', 'ask the customers to confirm their email, 1 for yes, 0 for no', null, null, null),
-(@max_id + 2, 'fr_fr', 'demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', null, null, null)
+INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 1, 'fr_FR', 'Permettre aux clients de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+(@max_id + 2, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL)
 ;
 
 -- country area table
 
 create table `country_area`
 (
-    `country_id` integer not null,
-    `area_id` integer not null,
-    `created_at` datetime,
-    `updated_at` datetime,
-    index `country_area_area_id_idx` (`area_id`),
-    index `fk_country_area_country_id_idx` (`country_id`),
-    constraint `fk_country_area_area_id`
-        foreign key (`area_id`)
-        references `area` (`id`)
-        on update restrict
-        on delete cascade,
-    constraint `fk_country_area_country_id`
-        foreign key (`country_id`)
-        references `country` (`id`)
-        on update restrict
-        on delete cascade
-) engine=innodb character set='utf8';
+    `country_id` INTEGER NOT NULL,
+    `area_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    INDEX `country_area_area_id_idx` (`area_id`),
+    INDEX `fk_country_area_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_country_area_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_country_area_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- Initialize the table with existing data
 INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) select `id`, `area_id`, NOW(), NOW() FROM `country` WHERE area_id <> NULL
@@ -78,4 +78,4 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 -- Remove area_id column from country table
 ALTER TABLE `country` DROP `area_id`;
 
-set foreign_key_checks = 1;
+SET FOREIGN_KEY_CHECKS = 1;
