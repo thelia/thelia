@@ -62,7 +62,7 @@ class Category extends BaseAction implements EventSubscriberInterface
         if (null !== $category = CategoryQuery::create()->findPk($event->getCategoryId())) {
             $category
                 ->setDispatcher($event->getDispatcher())
-
+                ->setDefaultTemplateId($event->getDefaultTemplateId() == 0 ? null : $event->getDefaultTemplateId())
                 ->setLocale($event->getLocale())
                 ->setTitle($event->getTitle())
                 ->setDescription($event->getDescription())

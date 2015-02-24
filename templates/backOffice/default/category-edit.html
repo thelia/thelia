@@ -99,11 +99,9 @@
                                             <input type="hidden" name="category_id" value="{$ID}" />
                                             <input type="hidden" name="current_tab" value="general" />
 
-                                            {form_hidden_fields}
+                                            {form_hidden_fields form=$form exclude="parent"}
 
-                                            {form_field field='success_url'}
-                                                <input type="hidden" name="{$name}" value="{$close_url nofilter}">
-                                            {/form_field}
+                                            {render_form_field form=$form field='success_url' value={$close_url}}
 
                                             {* Display error message if exist *}
                                             {include file='includes/notifications.html' message=$form_error_message}
@@ -114,36 +112,19 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    {form_field field='parent'}
-                                                        <div class="form-group {if $error}has-error{/if}">
+                                                    {custom_render_form_field form=$form field='parent'}
+                                                         <select {form_field_attributes form=$form field='parent' extra_class="form_control"}>
+                                                              <option value="0">{intl l="Top level"}</option>
+                                                              {$myparent=$PARENT}
+                                                              {loop name="cat-parent" type="category-tree" visible="*" category="0"}
+                                                                   <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
+                                                              {/loop}
+                                                        </select>
+                                                    {/custom_render_form_field}
 
-                                                            <label for="{$label_attr.for}" class="control-label">
-                                                                {$label} :
-                                                            </label>
+                                                    {render_form_field form=$form field="default_template_id"}
 
-                                                            <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                                                                  <option value="0">{intl l="Top level"}</option>
-
-                                                                  {$myparent=$PARENT}
-                                                                  {loop name="cat-parent" type="category-tree" visible="*" category="0"}
-                                                                       <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $myparent == $ID}selected="selected"{/if} {if $category_id == $ID}disabled="disabled"{/if}>{$TITLE}</option>
-                                                                  {/loop}
-
-                                                            </select>
-                                                         </div>
-                                                    {/form_field}
-
-                                                    {form_field field='visible'}
-                                                        <div class="form-group {if $error}has-error{/if}">
-                                                            <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
-                                                            <div class="checkbox">
-                                                                <label>
-                                                                    <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $value != 0}checked="checked"{/if}>
-                                                                    {$label}
-                                                                </label>
-                                                            </div>
-                                                        </div>
-                                                    {/form_field}
+                                                    {render_form_field form=$form field='visible'}
                                                 </div>
                                             </div>
 

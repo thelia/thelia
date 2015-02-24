@@ -12,7 +12,14 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+<<<<<<< HEAD
+=======
+
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\TemplateTableMap;
+>>>>>>> A default product template ID could be assigned to categories
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\Template as TemplateModel;
 use Thelia\Core\Event\TheliaEvents;
@@ -84,11 +91,29 @@ class Template extends BaseAction implements EventSubscriberInterface
             $product_count = ProductQuery::create()->findByTemplateId($template->getId())->count();
 
             if ($product_count <= 0) {
-                $template
-                    ->setDispatcher($event->getDispatcher())
-                    ->delete()
-                ;
+                $con = Propel::getWriteConnection(TemplateTableMap::DATABASE_NAME);
+                $con->beginTransaction();
+
+                try {
+                    $template
+                        ->setDispatcher($event->getDispatcher())
+                        ->delete($con);
+
+                    // We have to also delete any reference of this template in category tables
+                    // We can't use a FK here, as the DefaultTemplateId column may be NULL
+                    // so let's take care of this.
+                    CategoryQuery::create()
+                        ->filterByDefaultTemplateId($event->getTemplateId())
+                        ->update([ 'DefaultTemplateId' => null], $con);
+
+                    $con->commit();
+                } catch (\Exception $ex) {
+                    $con->rollback();
+
+                    throw $ex;
+                }
             }
+
 
             $event->setTemplate($template);
 

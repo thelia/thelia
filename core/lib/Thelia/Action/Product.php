@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductImage;
@@ -77,8 +78,24 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $event->getCurrencyId(),
                 $event->getTaxRuleId(),
                 $event->getBaseWeight()
-            );
+            )
         ;
+
+        // Set the product template, if one is defined in the category tree
+        $parentCatId = $event->getDefaultCategory();
+
+        while ($parentCatId > 0) {
+            if (null === $cat = CategoryQuery::create()->findPk($parentCatId)) {
+                break;
+            }
+
+            if ($cat->getDefaultTemplateId()) {
+                $product->setTemplateId($cat->getDefaultTemplateId())->save();
+                break;
+            }
+
+            $parentCatId = $cat->getParent();
+        }
 
         $event->setProduct($product);
     }
