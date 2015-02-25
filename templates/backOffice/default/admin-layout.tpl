@@ -56,7 +56,7 @@
     <![endif]-->
 </head>
 
-<body class="push-to-right">
+<body>
 	{* display top bar only if admin is connected *}
 
 	{loop name="top-bar-auth" type="auth" role="ADMIN"}
@@ -72,7 +72,7 @@
 		            <div class="col-md-12 clearfix">
 		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
 
-                        <div class="clearfix pull-right hidden-xs">
+                        <div class="clearfix pull-right hidden-xs hidden-sm">
                             <div class="button-toolbar pull-right" role="toolbar">
 
                                 {hook name="main.topbar-top" }
@@ -134,6 +134,62 @@
 
 	    {* -- Top menu section -------------------------------------------------- *}
 		{include file="includes/main-menu.html"}
+
+        <div class="visible-sm visible-xs">
+            <div class="container">
+
+                <div class="button-toolbar" id="btn-toolbar-mobile" role="toolbar">
+
+                    {hook name="main.topbar-top" }
+
+                    <div class="clearfix">
+                        <div class="btn-group pull-left">
+                            <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                            <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> <span class="hidden-xs">{admin attr="firstname"} {admin attr="lastname"}</span></button>
+                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
+                                <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="btn-group pull-right">
+                            {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
+                                <button class="btn btn-default">
+                                    <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
+                                </button>
+                            {/loop}
+
+                            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {loop type="lang" name="ui-lang"}
+                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
+                                {/loop}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {hook name="main.topbar-bottom" }
+
+                </div>
+
+                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
+                    <form id="mobile-search-engine" action="{url path='/admin/search'}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
+                            </span>
+                        </div>
+                    </form>
+                {/loop}
+
+            </div>
+        </div>
 
 	{/loop}
 
@@ -252,6 +308,7 @@
                 var $showTop = $('#main-navbar-collapse-mobile');
                 $showTop.on('click', function() {
                     $showTop.toggleClass('active');
+                    $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
                 });
             });
