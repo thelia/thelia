@@ -13,15 +13,14 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Category;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Model\Category as CategoryModel;
-use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Template;
-use Thelia\Model\TemplateQuery;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
