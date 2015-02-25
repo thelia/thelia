@@ -17,4 +17,8 @@
         </hook>
     </hooks>
 
+    <forms>
+        <form name="tinymce.configure" class="Tinymce\Form\ConfigurationForm" />
+    </forms>
+
 </config>

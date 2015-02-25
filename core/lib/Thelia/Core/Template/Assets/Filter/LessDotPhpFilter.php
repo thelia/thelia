@@ -70,7 +70,15 @@ class LessDotPhpFilter extends LessphpFilter implements EventSubscriberInterface
 
         $css_file_name = \Less_Cache::Get([$filePath => ''], $options);
 
-        $asset->setContent(file_get_contents($this->cacheDir . DS . $css_file_name));
+        $content = @file_get_contents($this->cacheDir . DS . $css_file_name);
+
+        if ($content === false) {
+            $content = '';
+
+            Tlog::getInstance()->warning("Compilation of $filePath did not generate an output file.");
+        }
+
+        $asset->setContent($content);
 
         Tlog::getInstance()->addDebug("CSS processing done.");
     }
