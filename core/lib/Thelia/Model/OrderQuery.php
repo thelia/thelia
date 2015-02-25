@@ -97,15 +97,35 @@ class OrderQuery extends BaseOrderQuery
     {
         $orderTaxJoin = new Join();
         $orderTaxJoin->addExplicitCondition(OrderProductTableMap::TABLE_NAME, 'ID', null, OrderProductTaxTableMap::TABLE_NAME, 'ORDER_PRODUCT_ID', null);
-        $orderTaxJoin->setJoinType(Criteria::INNER_JOIN);
+        $orderTaxJoin->setJoinType(Criteria::LEFT_JOIN);
 
         $query = self::baseSaleStats($startDate, $endDate, 'o')
             ->innerJoinOrderProduct()
             ->addJoinObject($orderTaxJoin)
-            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE+`order_product_tax`.PROMO_AMOUNT,`order_product`.PRICE+`order_product_tax`.AMOUNT)))", 'TOTAL')
-            ->select('TOTAL')
+            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product`.PROMO_PRICE,`order_product`.PRICE)))", 'TOTAL')
+            ->withColumn("SUM((`order_product`.QUANTITY * IF(`order_product`.WAS_IN_PROMO,`order_product_tax`.PROMO_AMOUNT,`order_product_tax`.AMOUNT)))", 'TAX')
+            ->select(['TOTAL', 'TAX'])
         ;
-        $amount = $query->findOne();
+        $arrayAmount = $query->findOne();
+
+        $amount = $arrayAmount['TOTAL'] + $arrayAmount['TAX'];
+
+        if (null === $amount) {
+            $amount = 0;
+        }
+
+        $discountQuery = self::baseSaleStats($startDate, $endDate)
+            ->withColumn("SUM(`order`.discount)", 'DISCOUNT')
+            ->select('DISCOUNT')
+        ;
+
+        $discount = $discountQuery->findOne();
+
+        if (null === $discount) {
+            $discount = 0;
+        }
+
+        $amount = $amount - $discount;
 
         if ($includeShipping) {
             $query = self::baseSaleStats($startDate, $endDate)
