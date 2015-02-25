@@ -18,10 +18,13 @@
 				<div class="title title-without-tabs clearfix">
 					{intl l='Dashboard'}
                     <div class="btn-group pull-right">
-						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
-						<button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
-						<button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
-					</div>
+                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                        <button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
+                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                    </div>
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="0"><span class="glyphicon glyphicon-refresh"></span></button>
+                    </div>
 				</div>
 
 				<div class="text-center clearfix">
@@ -378,14 +381,30 @@ jQuery(function($){
 
     $('.js-stats-change-month').click(function(e){
         $('.js-stats-change-month').attr('disabled', true);
-        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + parseInt($(this).data('month-offset')));
-        retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear(), function(){$('.js-stats-change-month').attr('disabled', false);});
 
+        var flush = 0, move = parseInt($(this).data('month-offset'));
+
+        if (move !== 0) {
+            jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + move);
+        } else {
+            flush = 1;
+        }
+
+        retrieveJQPlotJson(
+            jQplotDate.getMonth()+1,
+            jQplotDate.getFullYear(),
+            function(){$('.js-stats-change-month').attr('disabled', false);},
+            flush
+        );
     });
 
-    function retrieveJQPlotJson(month, year, callback) {
+    function retrieveJQPlotJson(month, year, callback, flush) {
 
-        $.getJSON(url, {month: month, year: year})
+        if (typeof flush === "undefined") {
+            flush = 0;
+        }
+
+        $.getJSON(url, {month: month, year: year, flush: flush})
             .done(function(data) {
                 jQplotData = data;
                 jsonSuccessLoad();

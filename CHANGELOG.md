@@ -30,7 +30,7 @@
 - Add the `country` and `order` parameters to Area loop
 - Add the `area` parameter to Module loop
 - Improved Shipping zones management
-
+- Add cache on the graph of the home page, possibility to disable cache or change ttl cache, with the configuration variable admin_cache_home_stats_ttl
 
 # 2.1.2
 
