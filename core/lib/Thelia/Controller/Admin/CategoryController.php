@@ -24,7 +24,6 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
-use Thelia\Model\Category;
 use Thelia\Model\CategoryAssociatedContentQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentQuery;
@@ -116,7 +115,7 @@ class CategoryController extends AbstractSeoCrudController
     }
 
     /**
-     * @param Category $object
+     * @param \Thelia\Model\Category $object
      * @return \Thelia\Form\BaseForm
      */
     protected function hydrateObjectForm($object)
