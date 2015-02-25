@@ -1,0 +1,50 @@
+<div class="row">
+    <div class="col-md-12 general-block-decorator">
+
+        <div class="row">
+            <div class="col-md-12 title title-without-tabs">
+                {intl d='tinymce.ai' l="TinyMCE configuration"}
+            </div>
+        </div>
+
+        <div class="form-container">
+            <div class="row">
+                <div class="col-md-12">
+
+                    {form name="tinymce.configure"}
+
+                        <form action="{url path="/admin/tinymce/configure"}" method="post">
+
+                            {include
+                            file = "includes/inner-form-toolbar.html"
+                            hide_submit_buttons = false
+
+                            page_url  = {url path="/admin/module/Tinymce"}
+                            close_url = {url path="/admin/modules"}
+                            }
+
+                            {form_hidden_fields form=$form}
+
+                            {if $form_error}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-danger">{$form_error_message}</div>
+                                    </div>
+                                </div>
+                            {/if}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {render_form_field form=$form field="editor_height"}
+
+                                    {render_form_field form=$form field="force_pasting_as_text"}
+                                    {render_form_field form=$form field="show_menu_bar"}
+                                    {render_form_field form=$form field="custom_css" extra_class=""}
+                                </div>
+                            </div>
+                        </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
