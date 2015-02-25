@@ -45,7 +45,7 @@ class ConfigurationForm extends BaseForm
                 'integer',
                 [
                     'data'  => Tinymce::getConfigValue('editor_height', 0),
-                    'label' => $this->translator->trans('Hauteur de la zone d\'édition (en pixels, 0 pour la valeur par défaut) ', [], Tinymce::MODULE_DOMAIN),
+                    'label' => $this->translator->trans('Height of the editor area, in pixels. Enter 0 for default ', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
             ->add(
