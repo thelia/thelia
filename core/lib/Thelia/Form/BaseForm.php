@@ -96,6 +96,11 @@ abstract class BaseForm
     private $type;
 
     /**
+     * @var string The form name
+     */
+    private $formUniqueIdentifier;
+
+    /**
      * @param Request            $request
      * @param string             $type
      * @param array              $data
@@ -111,6 +116,9 @@ abstract class BaseForm
         $options = array(),
         ContainerInterface $container = null
     ) {
+        // Generate the form name from the complete class name
+        $this->formUniqueIdentifier = strtolower(str_replace('\\', '_', get_class($this)));
+
         $this->request = $request;
         $this->type = $type;
 
@@ -147,8 +155,12 @@ abstract class BaseForm
          */
         $name = $this->getName();
 
+        $event = null;
+
+        $dispatchEvents = $this->hasContainer() && $name !== null && $name !== '';
+
         // We need to wrap the dispatch with a condition for backward compatibility
-        if ($this->hasContainer() && $name !== null && $name !== '') {
+        if ($dispatchEvents) {
             $event = new TheliaFormEvent($this);
 
             /**
@@ -162,7 +174,7 @@ abstract class BaseForm
 
         $this->buildForm();
 
-        if ($this->hasContainer()  && $name !== null && $name !== '') {
+        if ($dispatchEvents) {
             /**
              * If the form has the container, disptach the events
              */
@@ -200,6 +212,7 @@ abstract class BaseForm
 
         $this->validatorBuilder = $this->container->get("thelia.forms.validator_builder");
     }
+
 
     protected function initFormWithRequest($type, $data, $options)
     {
@@ -248,6 +261,9 @@ abstract class BaseForm
         return $name == 'success_url' || $name == 'error_message';
     }
 
+    /**
+     * @return \Thelia\Core\HttpFoundation\Request
+     */
     public function getRequest()
     {
         return $this->request;
@@ -308,6 +324,7 @@ abstract class BaseForm
      * Set the error status of the form.
      *
      * @param boolean $has_error
+     * @return $this
      */
     public function setError($has_error = true)
     {
@@ -330,6 +347,7 @@ abstract class BaseForm
      * Set the error message related to global form error
      *
      * @param string $message
+     * @return $this
      */
     public function setErrorMessage($message)
     {
@@ -366,6 +384,16 @@ abstract class BaseForm
     }
 
     /**
+     * Override this method if you don't want to use the standard name, which is created from the full class name.
+     *
+     * @return string the name of you form. This name must be unique
+     */
+    public function getName()
+    {
+        return $this->formUniqueIdentifier;
+    }
+
+    /**
      *
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
@@ -386,9 +414,4 @@ abstract class BaseForm
      * @return null
      */
     abstract protected function buildForm();
-
-    /**
-     * @return string the name of you form. This name must be unique
-     */
-    abstract public function getName();
 }
