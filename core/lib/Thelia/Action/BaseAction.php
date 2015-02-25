@@ -12,11 +12,9 @@
 namespace Thelia\Action;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-
 use Thelia\Core\Event\ToggleVisibilityEvent;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
-
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Form\Exception\FormValidationException;
 

@@ -13,33 +13,47 @@
 namespace Thelia\Form\Area;
 
 use Thelia\Core\Translation\Translator;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Thelia\Form\BaseForm;
 
 /**
- * Class AreaCreateForm
- * @package Thelia\Form\Shipping
- * @author Manuel Raynaud <manu@thelia.net>
+ * Class AreaDeleteCountryForm
+ * @package Thelia\Form\Area
+ * @author  Franck Allimant <franck@cqfdev.fr>
  */
-class AreaCreateForm extends BaseForm
+class AreaDeleteCountryForm extends BaseForm
 {
+    /**
+     * @inheritdoc
+     */
     protected function buildForm()
     {
         $this->formBuilder
             ->add(
-                'name',
-                'text',
+                'area_id',
+                'hidden',
                 [
+                    'required' => true,
+
                     'constraints' => [
+                        new GreaterThan(array('value' => 0)),
                         new NotBlank(),
-                    ],
-                    'label' => Translator::getInstance()->trans('Shipping zone name'),
-                    'label_attr' => [
-                        'for' => 'shipping_name'
-                    ],
-                    'attr' => [
-                        'placeholder' => Translator::getInstance()->trans("A name such as Europe or Overseas"),
-                    ],
+                    ]
+                ]
+            )
+            ->add(
+                'country_id',
+                'collection',
+                [
+                    'type'         => 'integer',
+                    'allow_add'    => true,
+                    'allow_delete' => true,
+                    'label'        => Translator::getInstance()->trans('Countries'),
+                    'label_attr'   => [
+                        'for'         => 'products',
+                        'help'        => Translator::getInstance()->trans('Select the countries to delete from this shipping zone'),
+                    ]
                 ]
             )
         ;
@@ -50,6 +64,6 @@ class AreaCreateForm extends BaseForm
      */
     public function getName()
     {
-        return 'thelia_area_creation';
+        return 'thelia_area_delete_country';
     }
 }

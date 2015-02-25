@@ -17,12 +17,13 @@ use Thelia\Core\Event\Area\AreaAddCountryEvent;
 use Thelia\Core\Event\Area\AreaCreateEvent;
 use Thelia\Core\Event\Area\AreaDeleteEvent;
 use Thelia\Core\Event\Area\AreaRemoveCountryEvent;
+use Thelia\Core\Event\Area\AreaUpdateEvent;
 use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Model\AreaQuery;
-use Thelia\Model\CountryQuery;
-
 use Thelia\Model\Area as AreaModel;
+use Thelia\Model\AreaQuery;
+use Thelia\Model\CountryArea;
+use Thelia\Model\CountryAreaQuery;
 
 /**
  * Class Area
@@ -38,11 +39,13 @@ class Area extends BaseAction implements EventSubscriberInterface
         $areaId = $event->getAreaId();
 
         foreach ($countryIds as $countryId) {
-            if (null !== $country = CountryQuery::create()->findPk($countryId)) {
-                $country->setDispatcher($event->getDispatcher());
-                $country->setAreaId($areaId)
-                    ->save();
-            }
+            $countryArea = new CountryArea();
+
+            $countryArea
+                ->setAreaId($areaId)
+                ->setCountryId($countryId)
+                ->save()
+            ;
         }
 
         $event->setArea(AreaQuery::create()->findPk($areaId));
@@ -50,12 +53,13 @@ class Area extends BaseAction implements EventSubscriberInterface
 
     public function removeCountry(AreaRemoveCountryEvent $event)
     {
-        if (null !== $country = CountryQuery::create()->findPk($event->getCountryId())) {
-            $event->setArea($country->getArea());
+        CountryAreaQuery::create()
+                ->filterByCountryId($event->getCountryId())
+                ->filterByAreaId($event->getAreaId())
+                ->delete();
 
-            $country->setDispatcher($event->getDispatcher());
-            $country->setAreaId(null)
-                ->save();
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $event->setArea($area);
         }
     }
 
@@ -93,6 +97,18 @@ class Area extends BaseAction implements EventSubscriberInterface
         $event->setArea($area);
     }
 
+    public function update(AreaUpdateEvent $event)
+    {
+        if (null !== $area = AreaQuery::create()->findPk($event->getAreaId())) {
+            $area
+                ->setDispatcher($event->getDispatcher())
+                ->setName($event->getAreaName())
+                ->save();
+
+            $event->setArea($area);
+        }
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -120,7 +136,8 @@ class Area extends BaseAction implements EventSubscriberInterface
             TheliaEvents::AREA_REMOVE_COUNTRY => array('removeCountry', 128),
             TheliaEvents::AREA_POSTAGE_UPDATE => array('updatePostage', 128),
             TheliaEvents::AREA_DELETE => array('delete', 128),
-            TheliaEvents::AREA_CREATE => array('create', 128)
+            TheliaEvents::AREA_CREATE => array('create', 128),
+            TheliaEvents::AREA_UPDATE => array('update', 128)
         );
     }
 }

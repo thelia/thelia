@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\IgnoredModuleHook;
-use Thelia\Model\IgnoredModuleHookQuery;
+use Thelia\Model\CountryArea;
+use Thelia\Model\CountryAreaQuery;
 
 
 /**
- * This class defines the structure of the 'ignored_module_hook' table.
+ * This class defines the structure of the 'country_area' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\IgnoredModuleHookQuery;
  * (i.e. if it's a text column type).
  *
  */
-class IgnoredModuleHookTableMap extends TableMap
+class CountryAreaTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.IgnoredModuleHookTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CountryAreaTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class IgnoredModuleHookTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'ignored_module_hook';
+    const TABLE_NAME = 'country_area';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\IgnoredModuleHook';
+    const OM_CLASS = '\\Thelia\\Model\\CountryArea';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.IgnoredModuleHook';
+    const CLASS_DEFAULT = 'Thelia.Model.CountryArea';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -68,37 +68,27 @@ class IgnoredModuleHookTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
-     * the column name for the MODULE_ID field
+     * the column name for the COUNTRY_ID field
      */
-    const MODULE_ID = 'ignored_module_hook.MODULE_ID';
+    const COUNTRY_ID = 'country_area.COUNTRY_ID';
 
     /**
-     * the column name for the HOOK_ID field
+     * the column name for the AREA_ID field
      */
-    const HOOK_ID = 'ignored_module_hook.HOOK_ID';
-
-    /**
-     * the column name for the METHOD field
-     */
-    const METHOD = 'ignored_module_hook.METHOD';
-
-    /**
-     * the column name for the CLASSNAME field
-     */
-    const CLASSNAME = 'ignored_module_hook.CLASSNAME';
+    const AREA_ID = 'country_area.AREA_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'ignored_module_hook.CREATED_AT';
+    const CREATED_AT = 'country_area.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'ignored_module_hook.UPDATED_AT';
+    const UPDATED_AT = 'country_area.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -112,12 +102,12 @@ class IgnoredModuleHookTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ModuleId', 'HookId', 'Method', 'Classname', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('moduleId', 'hookId', 'method', 'classname', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID, IgnoredModuleHookTableMap::HOOK_ID, IgnoredModuleHookTableMap::METHOD, IgnoredModuleHookTableMap::CLASSNAME, IgnoredModuleHookTableMap::CREATED_AT, IgnoredModuleHookTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('MODULE_ID', 'HOOK_ID', 'METHOD', 'CLASSNAME', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('module_id', 'hook_id', 'method', 'classname', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('CountryId', 'AreaId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('countryId', 'areaId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CountryAreaTableMap::COUNTRY_ID, CountryAreaTableMap::AREA_ID, CountryAreaTableMap::CREATED_AT, CountryAreaTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('COUNTRY_ID', 'AREA_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('country_id', 'area_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -127,12 +117,12 @@ class IgnoredModuleHookTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ModuleId' => 0, 'HookId' => 1, 'Method' => 2, 'Classname' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('moduleId' => 0, 'hookId' => 1, 'method' => 2, 'classname' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(IgnoredModuleHookTableMap::MODULE_ID => 0, IgnoredModuleHookTableMap::HOOK_ID => 1, IgnoredModuleHookTableMap::METHOD => 2, IgnoredModuleHookTableMap::CLASSNAME => 3, IgnoredModuleHookTableMap::CREATED_AT => 4, IgnoredModuleHookTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('MODULE_ID' => 0, 'HOOK_ID' => 1, 'METHOD' => 2, 'CLASSNAME' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('module_id' => 0, 'hook_id' => 1, 'method' => 2, 'classname' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('CountryId' => 0, 'AreaId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('countryId' => 0, 'areaId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(CountryAreaTableMap::COUNTRY_ID => 0, CountryAreaTableMap::AREA_ID => 1, CountryAreaTableMap::CREATED_AT => 2, CountryAreaTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('COUNTRY_ID' => 0, 'AREA_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('country_id' => 0, 'area_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -145,17 +135,15 @@ class IgnoredModuleHookTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('ignored_module_hook');
-        $this->setPhpName('IgnoredModuleHook');
-        $this->setClassName('\\Thelia\\Model\\IgnoredModuleHook');
+        $this->setName('country_area');
+        $this->setPhpName('CountryArea');
+        $this->setClassName('\\Thelia\\Model\\CountryArea');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         $this->setIsCrossRef(true);
         // columns
-        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', true, null, null);
-        $this->addForeignKey('HOOK_ID', 'HookId', 'INTEGER', 'hook', 'ID', true, null, null);
-        $this->addColumn('METHOD', 'Method', 'VARCHAR', false, 255, null);
-        $this->addColumn('CLASSNAME', 'Classname', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
+        $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -165,8 +153,8 @@ class IgnoredModuleHookTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Module', '\\Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('module_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Hook', '\\Thelia\\Model\\Hook', RelationMap::MANY_TO_ONE, array('hook_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -229,7 +217,7 @@ class IgnoredModuleHookTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? IgnoredModuleHookTableMap::CLASS_DEFAULT : IgnoredModuleHookTableMap::OM_CLASS;
+        return $withPrefix ? CountryAreaTableMap::CLASS_DEFAULT : CountryAreaTableMap::OM_CLASS;
     }
 
     /**
@@ -243,21 +231,21 @@ class IgnoredModuleHookTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (IgnoredModuleHook object, last column rank)
+     * @return array (CountryArea object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = IgnoredModuleHookTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = IgnoredModuleHookTableMap::getInstanceFromPool($key))) {
+        $key = CountryAreaTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CountryAreaTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + IgnoredModuleHookTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CountryAreaTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = IgnoredModuleHookTableMap::OM_CLASS;
+            $cls = CountryAreaTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            IgnoredModuleHookTableMap::addInstanceToPool($obj, $key);
+            CountryAreaTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -280,8 +268,8 @@ class IgnoredModuleHookTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = IgnoredModuleHookTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = IgnoredModuleHookTableMap::getInstanceFromPool($key))) {
+            $key = CountryAreaTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CountryAreaTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -290,7 +278,7 @@ class IgnoredModuleHookTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                IgnoredModuleHookTableMap::addInstanceToPool($obj, $key);
+                CountryAreaTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -311,17 +299,13 @@ class IgnoredModuleHookTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::MODULE_ID);
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::HOOK_ID);
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::METHOD);
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::CLASSNAME);
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::CREATED_AT);
-            $criteria->addSelectColumn(IgnoredModuleHookTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CountryAreaTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(CountryAreaTableMap::AREA_ID);
+            $criteria->addSelectColumn(CountryAreaTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CountryAreaTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.MODULE_ID');
-            $criteria->addSelectColumn($alias . '.HOOK_ID');
-            $criteria->addSelectColumn($alias . '.METHOD');
-            $criteria->addSelectColumn($alias . '.CLASSNAME');
+            $criteria->addSelectColumn($alias . '.COUNTRY_ID');
+            $criteria->addSelectColumn($alias . '.AREA_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -336,7 +320,7 @@ class IgnoredModuleHookTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(IgnoredModuleHookTableMap::DATABASE_NAME)->getTable(IgnoredModuleHookTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CountryAreaTableMap::DATABASE_NAME)->getTable(CountryAreaTableMap::TABLE_NAME);
     }
 
     /**
@@ -344,16 +328,16 @@ class IgnoredModuleHookTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(IgnoredModuleHookTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(IgnoredModuleHookTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new IgnoredModuleHookTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CountryAreaTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CountryAreaTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CountryAreaTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a IgnoredModuleHook or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CountryArea or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or IgnoredModuleHook object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CountryArea object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -364,17 +348,17 @@ class IgnoredModuleHookTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\IgnoredModuleHook) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CountryArea) { // it's a model object
             // create criteria based on pk value
             $criteria = $values->buildCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $criteria = new Criteria(CountryAreaTableMap::DATABASE_NAME);
             // primary key is composite; we therefore, expect
             // the primary key passed to be an array of pkey values
             if (count($values) == count($values, COUNT_RECURSIVE)) {
@@ -386,11 +370,11 @@ class IgnoredModuleHookTableMap extends TableMap
             }
         }
 
-        $query = IgnoredModuleHookQuery::create()->mergeWith($criteria);
+        $query = CountryAreaQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { IgnoredModuleHookTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CountryAreaTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { IgnoredModuleHookTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CountryAreaTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -398,20 +382,20 @@ class IgnoredModuleHookTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the ignored_module_hook table.
+     * Deletes all rows from the country_area table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return IgnoredModuleHookQuery::create()->doDeleteAll($con);
+        return CountryAreaQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a IgnoredModuleHook or Criteria object.
+     * Performs an INSERT on the database, given a CountryArea or Criteria object.
      *
-     * @param mixed               $criteria Criteria or IgnoredModuleHook object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CountryArea object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -420,18 +404,18 @@ class IgnoredModuleHookTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(IgnoredModuleHookTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CountryAreaTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from IgnoredModuleHook object
+            $criteria = $criteria->buildCriteria(); // build Criteria from CountryArea object
         }
 
 
         // Set the correct dbName
-        $query = IgnoredModuleHookQuery::create()->mergeWith($criteria);
+        $query = CountryAreaQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -447,7 +431,7 @@ class IgnoredModuleHookTableMap extends TableMap
         return $pk;
     }
 
-} // IgnoredModuleHookTableMap
+} // CountryAreaTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-IgnoredModuleHookTableMap::buildTableMap();
+CountryAreaTableMap::buildTableMap();

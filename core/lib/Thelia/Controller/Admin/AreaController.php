@@ -21,14 +21,17 @@ use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Form\BaseForm;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
 
 /**
  * Class AreaController
  * @package Thelia\Controller\Admin
  * @author Manuel Raynaud <manu@thelia.net>
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
 class AreaController extends AbstractCrudController
 {
@@ -69,11 +72,13 @@ class AreaController extends AbstractCrudController
     /**
      * Hydrate the update form for this object, before passing it to the update template
      *
-     * @param unknown $object
+     * @param  Area $object
+     * @return BaseForm
      */
     protected function hydrateObjectForm($object)
     {
         $data = array(
+            'area_id' => $object->getId(),
             'name' => $object->getName()
         );
 
@@ -83,7 +88,7 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the creation event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
      *
      * @return \Thelia\Core\Event\Area\AreaCreateEvent
      */
@@ -97,15 +102,25 @@ class AreaController extends AbstractCrudController
     /**
      * Creates the update event with the provided form data
      *
-     * @param unknown $formData
+     * @param array $formData
+     * @return \Thelia\Core\Event\Area\AreaUpdateEvent
      */
     protected function getUpdateEvent($formData)
     {
         $event = new AreaUpdateEvent();
 
-        return $this->hydrateEvent($event, $formData);
+        $this->hydrateEvent($event, $formData);
+
+        $event->setAreaId($formData['area_id']);
+
+        return $event;
     }
 
+    /**
+     * @param \Thelia\Core\Event\Area\AreaCreateEvent $event
+     * @param array $formData
+     * @return \Thelia\Core\Event\Area\AreaCreateEvent
+     */
     private function hydrateEvent($event, $formData)
     {
         $event->setAreaName($formData['name']);
@@ -115,6 +130,8 @@ class AreaController extends AbstractCrudController
 
     /**
      * Creates the delete event with the provided form data
+     *
+     * @return AreaDeleteEvent
      */
     protected function getDeleteEvent()
     {
@@ -125,6 +142,7 @@ class AreaController extends AbstractCrudController
      * Return true if the event contains the object, e.g. the action has updated the object in the event.
      *
      * @param \Thelia\Core\Event\Area\AreaEvent $event
+     * @return bool
      */
     protected function eventContainsObject($event)
     {
@@ -135,6 +153,7 @@ class AreaController extends AbstractCrudController
      * Get the created object from an event.
      *
      * @param \Thelia\Core\Event\Area\AreaEvent $event
+     * @return Area
      */
     protected function getObjectFromEvent($event)
     {
@@ -153,6 +172,7 @@ class AreaController extends AbstractCrudController
      * Returns the object label form the object event (name, title, etc.)
      *
      * @param \Thelia\Model\Area $object
+     * @return string
      */
     protected function getObjectLabel($object)
     {
@@ -163,6 +183,7 @@ class AreaController extends AbstractCrudController
      * Returns the object ID from the object
      *
      * @param \Thelia\Model\Area $object
+     * @return int
      */
     protected function getObjectId($object)
     {
@@ -172,7 +193,8 @@ class AreaController extends AbstractCrudController
     /**
      * Render the main list template
      *
-     * @param unknown $currentOrder, if any, null otherwise.
+     * @param string|null $currentOrder, if any, null otherwise.
+     * @return \Thelia\Core\HttpFoundation\Response
      */
     protected function renderListTemplate($currentOrder)
     {
@@ -255,7 +277,7 @@ class AreaController extends AbstractCrudController
             }
 
             // Redirect to the success URL
-            $this->generateSuccessRedirect($areaCountryForm);
+            return $this->generateSuccessRedirect($areaCountryForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated
             $error_msg = $this->createStandardFormValidationErrorMessage($ex);
@@ -274,16 +296,80 @@ class AreaController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
+    /**
+     * delete several countries from a shipping zone
+     */
+    public function removeCountries()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $areaDeleteCountriesForm = $this->createForm(AdminForm::AREA_DELETE_COUNTRY);
+
+        try {
+            $form = $this->validateForm($areaDeleteCountriesForm);
+
+            $data = $form->getData();
+
+            foreach ($data['country_id'] as $countryId) {
+                $this->removeOneCountryFromArea($data['area_id'], $countryId);
+            }
+            // Redirect to the success URL
+            return $this->generateSuccessRedirect($areaDeleteCountriesForm);
+        } catch (FormValidationException $ex) {
+            // Form cannot be validated
+            $error_msg = $this->createStandardFormValidationErrorMessage($ex);
+        } catch (\Exception $ex) {
+            // Any other error
+            $error_msg = $ex->getMessage();
+        }
+
+        $this->setupFormErrorContext(
+            $this->getTranslator()->trans("Failed to delete selected countries"),
+            $error_msg,
+            $areaDeleteCountriesForm
+        );
+
+        // At this point, the form has errors, and should be redisplayed.
+        return $this->renderEditionTemplate();
+    }
+
+    protected function removeOneCountryFromArea($areaId, $countryId)
+    {
+        $removeCountryEvent = new AreaRemoveCountryEvent($areaId, $countryId);
+
+        $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
+
+        if (null !== $changedObject = $this->getObjectFromEvent($removeCountryEvent)) {
+            $this->adminLogAppend(
+                $this->resourceCode,
+                AccessManager::UPDATE,
+                sprintf(
+                    "%s %s (ID %s) removed country ID %s from shipping zone ID %s",
+                    ucfirst($this->objectName),
+                    $this->getObjectLabel($changedObject),
+                    $this->getObjectId($changedObject),
+                    $countryId,
+                    $areaId
+                ),
+                $this->getObjectId($changedObject)
+            );
+        }
+    }
+
     public function removeCountry()
     {
         // Check current user authorization
         if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
             return $response;
         }
-        $request = $this->getRequest();
-        $removeCountryEvent = new AreaRemoveCountryEvent($request->request->get('area_id', 0), $request->request->get('country_id', 0));
 
-        $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
+        $this->removeOneCountryFromArea(
+            $this->getRequest()->get('area_id', 0),
+            $this->getRequest()->get('country_id', 0)
+        );
 
         return $this->redirectToEditionTemplate();
     }

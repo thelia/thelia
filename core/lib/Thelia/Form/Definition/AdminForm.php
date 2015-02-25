@@ -117,6 +117,7 @@ final class AdminForm
     const AREA_CREATE = 'thelia.admin.area.create';
     const AREA_MODIFICATION = 'thelia.admin.area.modification';
     const AREA_COUNTRY = 'thelia.admin.area.country';
+    const AREA_DELETE_COUNTRY = 'thelia.admin.area.delete.country';
     const AREA_POSTAGE = 'thelia.admin.area.postage';
 
     const SHIPPING_ZONE_ADD_AREA = 'thelia.shopping_zone_area';

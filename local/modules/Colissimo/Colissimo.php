@@ -18,6 +18,7 @@ use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\OrderException;
 use Thelia\Install\Database;
+use Thelia\Model\AreaDeliveryModuleQuery;
 use Thelia\Model\Country;
 use Thelia\Module\AbstractDeliveryModule;
 use Thelia\Module\Exception\DeliveryException;
@@ -42,26 +43,29 @@ class Colissimo extends AbstractDeliveryModule
         return self::$prices;
     }
 
-    public function isValidDelivery(Country $country) {
+    public function isValidDelivery(Country $country)
+    {
+        if (null !== $area = $this->getAreaForCountry($country)) {
+            $areaId = $area->getId();
 
-        $areaId = $country->getAreaId();
+            $prices = self::getPrices();
 
-        $prices = self::getPrices();
+            /* Check if Colissimo delivers the area */
+            if (isset($prices[$areaId]) && isset($prices[$areaId]["slices"])) {
+                // Yes ! Check if the cart weight is below slice limit
+                $areaPrices = $prices[$areaId]["slices"];
+                ksort($areaPrices);
 
-        /* Check if Colissimo delivers the area */
-        if (isset($prices[$areaId]) && isset($prices[$areaId]["slices"])) {
+                /* Check cart weight is below the maximum weight */
+                end($areaPrices);
+                $maxWeight = key($areaPrices);
 
-            // Yes ! Check if the cart weight is below slice limit
-            $areaPrices = $prices[$areaId]["slices"];
-            ksort($areaPrices);
+                $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
-            /* Check cart weight is below the maximum weight */
-            end($areaPrices);
-            $maxWeight = key($areaPrices);
-
-            $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
-
-            if ($cartWeight <= $maxWeight) return true;
+                if ($cartWeight <= $maxWeight) {
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -84,7 +88,11 @@ class Colissimo extends AbstractDeliveryModule
             /* check if Colissimo delivers the asked area */
             if (!isset($prices[$areaId]) || !isset($prices[$areaId]["slices"])) {
                 throw new DeliveryException(
-                    Translator::getInstance()->trans("Colissimo delivery unavailable for the delivery country", [], self::MESSAGE_DOMAIN)
+                    Translator::getInstance()->trans(
+                        "Colissimo delivery unavailable for the delivery country",
+                        [],
+                        self::MESSAGE_DOMAIN
+                    )
                 );
             }
 
@@ -138,7 +146,7 @@ class Colissimo extends AbstractDeliveryModule
         $cartWeight = $this->getRequest()->getSession()->getSessionCart($this->getDispatcher())->getWeight();
 
         $postage = self::getPostageAmount(
-            $country->getAreaId(),
+            $this->getAreaForCountry($country)->getId(),
             $cartWeight
         );
 

@@ -8,9 +8,7 @@ use Thelia\Core\Event\Content\ContentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Content as BaseContent;
-
 use Thelia\Model\Map\ContentTableMap;
-
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;

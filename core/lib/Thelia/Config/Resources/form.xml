@@ -114,9 +114,12 @@
         <form name="thelia.admin.area.create" class="Thelia\Form\Area\AreaCreateForm"/>
         <form name="thelia.admin.area.modification" class="Thelia\Form\Area\AreaModificationForm"/>
         <form name="thelia.admin.area.country" class="Thelia\Form\Area\AreaCountryForm"/>
+        <form name="thelia.admin.area.delete.country" class="Thelia\Form\Area\AreaDeleteCountryForm"/>
         <form name="thelia.admin.area.postage" class="Thelia\Form\Area\AreaPostageForm"/>
 
+        <!-- thelia.shopping_zone_area is a typo, and will be removed in a future version -->
         <form name="thelia.shopping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
+        <form name="thelia.shipping_zone_area" class="Thelia\Form\ShippingZone\ShippingZoneAddArea"/>
         <form name="thelia.shopping_zone_remove_area" class="Thelia\Form\ShippingZone\ShippingZoneRemoveArea"/>
 
         <form name="thelia.lang.update" class="Thelia\Form\Lang\LangUpdateForm"/>

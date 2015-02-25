@@ -22,7 +22,15 @@
 - Add confirmation email for customers, backoffice configuration variables customer_confirm_email
 - Refactor ```Thelia\Controller\BaseController::createForm``` into a factory service ```Thelia\Core\Form\TheliaFormFactory```
 - Refactor ```Thelia\Controller\BaseController::validateForm``` and ```Thelia\Controller\BaseController::getErrorMessages``` into a service ```Thelia\Core\Form\TheliaFormValidator```
-- Add the "failsafe=[true|false]" parameter to the assets smarty functions (stylesheets, images, javascripts).
+- Add the `failsafe=[true|false]` parameter to the assets Smarty functions (stylesheets, images, javascripts).
+- A country could belong to more than one shipping zone.
+- Add the `exclude_area` parameter to the Country loop.
+- The Country loop now returns a proper country ISO code, left-padded with zeros, e.g. '004' instead of '4'
+- The Country::getAreaId() method is deprecated.
+- Add the `country` and `order` parameters to Area loop
+- Add the `area` parameter to Module loop
+- Improved Shipping zones management
+
 
 # 2.1.2
 

@@ -20,6 +20,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AreaQuery;
+use Thelia\Type\EnumListType;
+use Thelia\Type\TypeCollection;
 
 /**
  * Class Area
@@ -66,10 +68,21 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('country'),
             Argument::createIntTypeArgument('with_zone'),
             Argument::createIntTypeArgument('without_zone'),
             Argument::createBooleanOrBothTypeArgument('unassigned'),
-            Argument::createIntListTypeArgument('module_id')
+            Argument::createIntListTypeArgument('module_id'),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new EnumListType([
+                        'id', 'id_reverse',
+                        'alpha', 'name_reverse'
+                    ])
+                ),
+                'alpha'
+            )
         );
     }
 
@@ -115,6 +128,33 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
                 ->endUse();
         }
 
+        $countries = $this->getCountry();
+
+        if ($countries) {
+            $search
+                ->useCountryAreaQuery()
+                ->filterByCountryId($countries, Criteria::IN)
+                ->endUse();
+        }
+
+        $orders  = $this->getOrder();
+
+        foreach ($orders as $order) {
+            switch ($order) {
+                case 'id':
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case 'id-reverse':
+                    $search->orderById(Criteria::DESC);
+                    break;
+                case "alpha":
+                    $search->orderByName(Criteria::ASC);
+                    break;
+                case "alpha-reverse":
+                    $search->orderByName(Criteria::DESC);
+                    break;
+            }
+        }
         return $search;
     }
 

@@ -28,6 +28,20 @@
                     <form action="" method="post">
 
                         <div class="general-block-decorator">
+
+                            {ifloop rel="country-not-in-any-zone"}
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-warning">
+                                            {intl l='<strong>Warning</strong>, some of your countries are not included in any shipping zone:'}
+                                            {loop name="country-not-in-any-zone" type="country" with_area=false}
+                                                {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{else}.{/if}
+                                            {/loop}
+                                        </div>
+                                    </div>
+                                </div>
+                            {/ifloop}
+
                             <div class="table-responsive">
                                 <table class="table table-striped table-condensed">
                                    <caption class="clearfix">
@@ -43,9 +57,9 @@
                                             <th>{intl  l="ID"}</th>
                                             <th>{intl l="Name"}</th>
                                             <th>{intl l="Default"}</th>
-                                            <th>{intl l="Shop"}</th>
                                             <th>{intl l="N° ISO"}</th>
                                             <th>{intl l="ISO Code"}</th>
+                                            <th>{intl l="Shipping zone"}</th>
 
                                             {hook name="countries.table-header" location="countries_table_header" }
 
@@ -63,13 +77,24 @@
                                                         <input class="change-default-toggle" type="radio" name="by_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
                                                     </div>
                                                 </td>
-{*                                                <td>
+                                                {*
+                                                <td>
                                                     <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                         <input class="change-default" type="radio" name="" value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}/>
                                                     </div>                                                
-                                                </td> *}
+                                                </td>
+                                                *}
                                                 <td>{$ISOCODE}</td>
                                                 <td>{$ISOALPHA3}</td>
+
+                                                <td>
+                                                    {loop type="area" name="country-area" country={$ID}}
+                                                        <a href="{url path="/admin/configuration/shipping_configuration/update/{$ID}"}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                                    {/loop}
+                                                    {elseloop rel="country-area"}
+                                                        <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
+                                                    {/elseloop}
+                                                </td>
 
                                                 {hook name="countries.table-row" location="countries_table_row" country_id={$ID} }
 

@@ -50,4 +50,32 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL)
 ;
 
+-- country area table
+
+create table `country_area`
+(
+    `country_id` INTEGER NOT NULL,
+    `area_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    INDEX `country_area_area_id_idx` (`area_id`),
+    INDEX `fk_country_area_country_id_idx` (`country_id`),
+    CONSTRAINT `fk_country_area_area_id`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `area` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_country_area_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- Initialize the table with existing data
+INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) select `id`, `area_id`, NOW(), NOW() FROM `country` WHERE `area_id` IS NOT NULL;
+
+-- Remove area_id column from country table
+ALTER TABLE `country` DROP `area_id`;
+
 SET FOREIGN_KEY_CHECKS = 1;

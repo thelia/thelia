@@ -8,7 +8,6 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Country\CountryEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Country as BaseCountry;
-
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Core\Translation\Translator;
 
@@ -17,6 +16,23 @@ class Country extends BaseCountry
     use \Thelia\Model\Tools\ModelEventDispatcherTrait;
 
     protected static $defaultCountry = null;
+
+    /**
+     * This method ensure backward compatibility to Thelia 2.1, where a country belongs to one and
+     * only one shipping zone.
+     *
+     * @deprecated a country may belong to several Areas (shipping zones). Use CountryArea queries instead
+     */
+    public function getAreaId()
+    {
+        $firstAreaCountry = CountryAreaQuery::create()->findOneByCountryId($this->getId());
+
+        if (null !== $firstAreaCountry) {
+            return $firstAreaCountry->getAreaId();
+        }
+
+        return null;
+    }
 
     /**
      *

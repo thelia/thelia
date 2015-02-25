@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\TemplateQuery;
 use Thelia\Model\Template as TemplateModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Template\TemplateUpdateEvent;
 use Thelia\Core\Event\Template\TemplateCreateEvent;
 use Thelia\Core\Event\Template\TemplateDeleteEvent;
