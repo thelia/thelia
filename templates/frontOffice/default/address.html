@@ -27,7 +27,7 @@
 
         {form name="thelia.front.address.create"}
         <form id="form-address" class="form-horizontal" action="{url path="/address/create"}" method="post">
-            {form_field form=$form field='success_url'}
+            {form_field field='success_url'}
                 {if $value}
                 {$next_url=$value}
                 {else}
@@ -36,10 +36,10 @@
                 <input type="hidden" name="{$name}" value="{$next_url nofilter}" />
             {/form_field}
 
-            {form_field form=$form field='error_message'}
+            {form_field field='error_message'}
                 <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}" />
             {/form_field}
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
             {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
             {hook name="address-create.form-top"}
@@ -50,7 +50,7 @@
                 </div>
 
                 <div class="panel-body">
-                    {form_field form=$form field="label"}
+                    {form_field field="label"}
                     <div class="form-group group-label{if $error} has-error{/if}">
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -67,7 +67,7 @@
                     <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="title"}
+                    {form_field field="title"}
                         <div class="form-group group-title{if $error} has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
@@ -85,7 +85,7 @@
                         </div><!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="firstname"}
+                    {form_field field="firstname"}
                         <div class="form-group group-firstname {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -101,7 +101,7 @@
                     {/form_field}
                     <!--/.form-group-->
 
-                    {form_field form=$form field="lastname"}
+                    {form_field field="lastname"}
                         <div class="form-group group-lastname {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -116,7 +116,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="company"}
+                    {form_field field="company"}
                       <div class="form-group group-company{if $error} has-error{/if}">
                         <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                           <div class="control-input">
@@ -129,7 +129,7 @@
                       </div><!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="address1"}
+                    {form_field field="address1"}
                         <div class="form-group group-address1 {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -144,7 +144,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="address2"}
+                    {form_field field="address2"}
                         <div class="form-group group-address2 {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if} </label>
 
@@ -159,7 +159,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="zipcode"}
+                    {form_field field="zipcode"}
                         <div class="form-group group-zipcode {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -174,7 +174,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="city"}
+                    {form_field field="city"}
                         <div class="form-group group-city {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -189,7 +189,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="country"}
+                    {form_field field="country"}
                         <div class="form-group group-country {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input">
@@ -207,7 +207,7 @@
                         </div><!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="phone"}
+                    {form_field field="phone"}
                         <div class="form-group group-phone {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -222,7 +222,7 @@
                         <!--/.form-group-->
                     {/form_field}
 
-                    {form_field form=$form field="cellphone"}
+                    {form_field field="cellphone"}
                         <div class="form-group group-cellphone {if $error}has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
 
@@ -239,7 +239,7 @@
                 </div>
             </fieldset>
 
-            {form_field form=$form field="is_default"}
+            {form_field field="is_default"}
             <div class="form-group group-primary">
                 <div class="control-input">
                     <div class="checkbox">

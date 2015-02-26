@@ -33,7 +33,7 @@
                                 <div class="col-md-12">
 
         						    {form name="thelia.admin.customer.update"}
-        						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path='/admin/customer/save'}" {form_enctype} class="clearfix">
 
                                             {include
                                                 file="includes/inner-form-toolbar.html"
@@ -41,12 +41,12 @@
                                                 close_url  = {url path='/admin/customers'}
                                             }
 
-         						        	{form_hidden_fields form=$form}
+         						        	{form_hidden_fields}
 
                                             <input type="hidden" name="page" value="{$page}" />
                                             <input type="hidden" name="customer_id" value="{$customer_id}" />
 
-        						        	{form_field form=$form field='success_url'}
+        						        	{form_field field='success_url'}
         						        		<input type="hidden" name="{$name}" value="{url path='/admin/customers' page=$page}" />
         						        	{/form_field}
 
@@ -55,7 +55,7 @@
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
 
-                                                {form_field form=$form field='title'}
+                                                {form_field field='title'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
 
@@ -67,35 +67,35 @@
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='firstname'}
+                                                {form_field field='firstname'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='lastname'}
+                                                {form_field field='lastname'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='email'}
+                                                {form_field field='email'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='discount'}
+                                                {form_field field='discount'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='permanent discount'}">
                                                     </div>
                                                 {/form_field}
 
-                                                {form_field form=$form field='reseller'}
+                                                {form_field field='reseller'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                             <div class="checkbox">
                                                                 <label>
@@ -106,7 +106,7 @@
                                                     </div>
                                                 {/form_field}
                                                 
-                                                {form_field form=$form field='password'}
+                                                {form_field field='password'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label} (leave blank to keep current customer password) {if $required} <span class="required">*</span>{/if} : </label>
                                                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Password'}">
@@ -117,47 +117,47 @@
 
                                                     <p class="title title-without-tabs">{intl l="Default address"}</p>
 
-                                                    {form_field form=$form field='company'}
+                                                    {form_field field='company'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address1'}
+                                                    {form_field field='address1'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address2'}
+                                                    {form_field field='address2'}
                                                         <div class="form-group">
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='address3'}
+                                                    {form_field field='address3'}
                                                         <div class="form-group">
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='zipcode'}
+                                                    {form_field field='zipcode'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='city'}
+                                                    {form_field field='city'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='country'}
+                                                    {form_field field='country'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <select name="{$name}" id="{$label_attr.for}" class="form-control">
@@ -168,14 +168,14 @@
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='phone'}
+                                                    {form_field field='phone'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
                                                         </div>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='cellphone'}
+                                                    {form_field field='cellphone'}
                                                         <div class="form-group {if $error}has-error{/if}">
                                                             <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
                                                             <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Cellphone'}">
@@ -375,7 +375,7 @@
         dialog_cancel_label = {intl l="Cancel"}
 
         form_action        = {url path='/admin/address/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 
@@ -406,7 +406,7 @@
 	        dialog_cancel_label = {intl l="Cancel"}
 
 	        form_action        = {url path="/admin/address/save"}
-	        form_enctype       = {form_enctype form=$form}
+	        form_enctype       = {form_enctype}
 	        form_error_message = $form_error_message
 	    }
 

@@ -173,21 +173,21 @@
 
                 {form name="thelia.cart.add" }
                 <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
-                    {form_hidden_fields form=$form}
+                    {form_hidden_fields}
                     <input type="hidden" name="view" value="product">
                     <input type="hidden" name="product_id" value="{$ID}">
-                    {form_field form=$form field="append"}
+                    {form_field field="append"}
                         <input type="hidden" name="{$name}" value="1">
                     {/form_field}
 
                     {if $form_error}<div class="alert alert-error">{$form_error_message}</div>{/if}
 
-                    {form_field form=$form field="product"}
+                    {form_field field="product"}
                         <input id="{$label_attr.for}" type="hidden" name="{$name}" value="{$ID}" {$attr} >
                     {/form_field}
 
                     {* pse *}
-                    {form_field form=$form field='product_sale_elements_id'}
+                    {form_field field='product_sale_elements_id'}
                     <input id="pse-id" class="pse-id" type="hidden" name="{$name}" value="{$PRODUCT_SALE_ELEMENT}" {$attr} >
                     {/form_field}
 
@@ -214,7 +214,7 @@
                     {/if}
 
                     <fieldset class="product-cart form-inline">
-                        {form_field form=$form field='quantity'}
+                        {form_field field='quantity'}
                         <div class="form-group group-qty {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="1" required>

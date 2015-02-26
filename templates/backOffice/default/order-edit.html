@@ -486,20 +486,20 @@
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "edit_order_address_dialog"}
             
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
                     
-            {form_field form=$form field='id'}
+            {form_field field='id'}
                 <input type="hidden" id="{$label_attr.for}" name="{$name}" class="js-order-address-id" value="{$value}">
             {/form_field}
 
-            {form_field form=$form field='company'}
+            {form_field field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-company" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='title'}                
+            {form_field field='title'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     
@@ -511,54 +511,54 @@
                 </div>
             {/form_field}
 
-            {form_field form=$form field='firstname'}
+            {form_field field='firstname'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-firstname" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='lastname'}
+            {form_field field='lastname'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-lastname" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='address1'}
+            {form_field field='address1'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address1" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
                 </div>
 
                 <div class="form-group">
-                    {form_field form=$form field='address2'}
+                    {form_field field='address2'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address2" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}                    
                 </div>
 
                 <div class="form-group">
-                    {form_field form=$form field='address3'}
+                    {form_field field='address3'}
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-address3" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
                     {/form_field}
                 </div>
             {/form_field}
 
-            {form_field form=$form field='zipcode'}
+            {form_field field='zipcode'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-zipcode" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='city'}
+            {form_field field='city'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-city" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
                 </div>
             {/form_field}
 
-            {form_field form=$form field='country'}
+            {form_field field='country'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <select name="{$name}" id="{$label_attr.for}" class="form-control js-country">
@@ -569,7 +569,7 @@
                 </div>
             {/form_field}
 
-            {form_field form=$form field='phone'}
+            {form_field field='phone'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-phone" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
@@ -589,7 +589,7 @@
             dialog_cancel_label = {intl l="Cancel"}
 
             form_action        = {url path="/admin/order/update/$order_id/address"}
-            form_enctype       = {form_enctype form=$form}
+            form_enctype       = {form_enctype}
             form_error_message = $form_error_message
             form_id = 'updateOrderAddressForm'
         }

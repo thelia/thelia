@@ -31,9 +31,9 @@
 
             {form name="thelia.order.coupon"}
 
-            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype form=$form}>
+            <form id="form-coupon" action="{url path="/order/coupon"}" method="post" {form_enctype}>
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -82,7 +82,7 @@
                                 {/loop}
                             {/ifloop}
                             {elseloop rel="product-image"}
-                                {images file='assets/img/product/1/118x85.png'}<img itemprop="image" src="{$asset_url}" alt="Product #{$cart_count}">{/images}
+                                <img itemprop="image" src="{image file='assets/img/product/1/118x85.png'}" alt="Product #{$cart_count}">
                             {/elseloop}
                             </a>
                         </td>
@@ -157,10 +157,10 @@
                             <tr>
                                 <th class="coupon"><label for="coupon">{intl l="You may have a coupon ?"}</label></th>
                                 <td class="coupon">
-                                    {form_field form=$form field='success_url'}
+                                    {form_field field='success_url'}
                                     <input type="hidden" name="{$name}" value="{url path="/order/invoice"}" />
                                     {/form_field}
-                                    {form_field form=$form field='coupon-code'}
+                                    {form_field field='coupon-code'}
                                     <div class="{if $error}has-error{/if}">
                                         <div class="input-group">
                                             <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
@@ -210,9 +210,9 @@
             
             {form name="thelia.order.payment"}
             {assign var="isPost" value=$smarty.post|count}
-            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype form=$form}>
+            <form id="form-cart-payment" action="{url path="/order/invoice"}" method="post" {form_enctype}>
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -244,7 +244,7 @@
                     </div>
                     {/elsehook}
 
-                    {form_field form=$form field='invoice-address'}
+                    {form_field field='invoice-address'}
                     <div class="panel">
                         <div class="panel-heading">{intl l="Billing address"}</div>
 
@@ -294,7 +294,7 @@
 
                 {/form_field}
 
-                {form_field form=$form field='payment-module'}
+                {form_field field='payment-module'}
 
                 <div id="payment-method" class="panel">
                     <div class="panel-heading">{intl l="Choose your payment method"}</div>
@@ -323,7 +323,7 @@
                 </div>
                 {/form_field}
 
-                {form_field form=$form field="agreed"}
+                {form_field field="agreed"}
                 <div class="well">
                     <div class="form-group group-agreed{if $error} has-error{/if}">
                         <div class="control-input">

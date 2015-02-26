@@ -6,11 +6,9 @@ casper.test.begin('Order process', 4, function suite(test) {
 
         // Wait for delivery methods ajax loading
         casper.waitForResource(function testResource(resource) {
-            if(resource.url.indexOf("deliveryModuleList") > 0) {
-                console.log("Delivery methods successfully loaded");
-                return true;
-            }
-            return false;
+            return resource.url.indexOf("deliveryModuleList") > 0;
+        }, function(){
+            test.info("Delivery methods successfully loaded");
         });
 
         casper.waitForSelector(

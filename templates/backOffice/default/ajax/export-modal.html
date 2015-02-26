@@ -2,8 +2,8 @@
 {default_translation_domain domain='bo.default'}
 
 {form name="thelia.export"}
-<form action="{$URL nofilter}" method="post" {form_enctype form=$form}>
-    {form_hidden_fields form=$form}
+<form action="{$URL nofilter}" method="post" {form_enctype}>
+    {form_hidden_fields}
     <div class="modal fade" id="real-export-modal" tabindex="-1" role="dialog" aria-labelledby="export-modal-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -26,7 +26,7 @@
                         {ifloop rel="export-formatters"}
                             <div class="row">
                                 <div class="col-md-4">
-                                    {form_field form=$form field="formatter"}
+                                    {form_field field="formatter"}
                                     <div class="row">
                                         <div class="col-md-12">
                                             <label for="{$label_attr.for}">
@@ -47,7 +47,7 @@
                                     {/form_field}
                                 </div>
                                 <div class="col-md-3">
-                                    {form_field form=$form field="language"}
+                                    {form_field field="language"}
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <label for="{$label_attr.for}">
@@ -68,7 +68,7 @@
                                 {ifloop rel="export-archive-builder"}
                                     <div class="col-md-1"></div>
                                     <div class="col-md-4">
-                                        {form_field form=$form field="do_compress"}
+                                        {form_field field="do_compress"}
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <label for="{$label_attr.for}">
@@ -86,7 +86,7 @@
                                 </div>
                                 <div class="row export-compression-selection-row">
                                     <div class="col-md-4">
-                                        {form_field form=$form field="archive_builder"}
+                                        {form_field field="archive_builder"}
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <label for="{$label_attr.for}">
@@ -107,7 +107,7 @@
                                     </div>
                                     {if $HAS_IMAGES}
                                     <div class="col-md-4">
-                                        {form_field form=$form field="images"}
+                                        {form_field field="images"}
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <label for="{$label_attr.for}">
@@ -125,7 +125,7 @@
                                     {/if}
                                     {if $HAS_DOCUMENTS}
                                     <div class="col-md-4">
-                                        {form_field form=$form field="documents"}
+                                        {form_field field="documents"}
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <label for="{$label_attr.for}">

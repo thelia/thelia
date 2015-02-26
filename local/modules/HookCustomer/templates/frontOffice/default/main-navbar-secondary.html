@@ -9,24 +9,24 @@
         <a href="{url path="/login"}" class="login dropdown-toggle">{intl l="Log In!" d="hookcustomer.fo.default"}</a>
         <div class="dropdown-menu">
             {form name="thelia.front.customer.login"}
-            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype form=$form}>
-            {form_hidden_fields form=$form}
-            {form_field form=$form field="success_url"}
+            <form id="form-login-mini" action="{url path="/login"}" method="post" {form_enctype}>
+            {form_hidden_fields}
+            {form_field field="success_url"}
             <input type="hidden" name="{$name}" value="{navigate to="current"}">
             {/form_field}
-            {form_field form=$form field="email"}
+            {form_field field="email"}
             <div class="form-group group-email">
                 <label for="{$label_attr.for}-mini">{intl l="Email address" d="hookcustomer.fo.default"}</label>
                 <input type="email" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
             </div>
             {/form_field}
-            {form_field form=$form field="password"}
+            {form_field field="password"}
             <div class="form-group group-password">
                 <label for="{$label_attr.for}-mini">{intl l="Password" d="hookcustomer.fo.default"}</label>
                 <input type="password" name="{$name}" id="{$label_attr.for}-mini" class="form-control" maxlength="255" aria-required="true" required>
             </div>
             {/form_field}
-            {form_field form=$form field="account"}
+            {form_field field="account"}
             <input type="hidden" name="{$name}" value="1">
             {/form_field}
             <div class="form-group group-btn">

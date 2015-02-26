@@ -29,7 +29,7 @@
                                 close_url = {url path="/admin/modules"}
                             }
 
-                            {form_hidden_fields form=$form}
+                            {form_hidden_fields}
 
                             {if $form_error}
                                 <div class="row">
@@ -40,11 +40,11 @@
                             {/if}
 
                             {loop type="module-config" name="get-payable-to" module="Cheque" variable="payable_to"}
-                                {render_form_field form=$form field="payable_to" value=$VALUE}
+                                {render_form_field field="payable_to" value=$VALUE}
                             {/loop}
 
                             {loop type="module-config" name="get-instruction" module="Cheque" variable="instructions" locale=$edit_language_locale}
-                                {render_form_field form=$form field="instructions" extra_class="wysiwyg" value=$VALUE}
+                                {render_form_field field="instructions" extra_class="wysiwyg" value=$VALUE}
                             {/loop}
                          </form>
                     {/form}

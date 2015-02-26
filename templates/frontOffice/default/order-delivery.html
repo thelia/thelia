@@ -31,15 +31,15 @@
 
             {form name="thelia.order.delivery"}
             {assign var="isPost" value="{$smarty.post|count}"}
-            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype form=$form}>
+            <form id="form-cart-delivery" action="{url path="/order/delivery"}" method="post" {form_enctype}>
 
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                 {hook name="order-delivery.form-top"}
 
-                {form_field form=$form field='delivery-address'}
+                {form_field field='delivery-address'}
 
                 <div id="delivery-address" class="panel">
                     <div class="panel-heading clearfix">
@@ -120,7 +120,7 @@
 
                 {/form_field}
 
-                {form_field form=$form field='delivery-module'}
+                {form_field field='delivery-module'}
 
                 <div id="delivery-method" class="panel">
                     <div class="panel-heading">

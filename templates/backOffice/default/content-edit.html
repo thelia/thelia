@@ -90,7 +90,7 @@
                                         <div class="form-container">
 
                                             {form name="thelia.admin.content.modification"}
-                                                <form method="POST" action="{url path='/admin/content/save'}" {form_enctype form=$form} class="clearfix">
+                                                <form method="POST" action="{url path='/admin/content/save'}" {form_enctype} class="clearfix">
 
                                                     {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"}
 
@@ -99,13 +99,13 @@
 
                                                     <input type="hidden" name="current_tab" value="general"/>
 
-                                                    {form_hidden_fields form=$form}
+                                                    {form_hidden_fields}
 
-                                                    {form_field form=$form field='success_url'}
+                                                    {form_field field='success_url'}
                                                         <input type="hidden" name="{$name}" value="{url path="/admin/content/update/{$ID}"}"/>
                                                     {/form_field}
 
-                                                    {form_field form=$form field='locale'}
+                                                    {form_field field='locale'}
                                                         <input type="hidden" name="{$name}" value="{$edit_language_locale}"/>
                                                     {/form_field}
 
@@ -119,7 +119,7 @@
 
                                                         <div class="col-md-4">
 
-                                                            {form_field form=$form field='default_folder'}
+                                                            {form_field field='default_folder'}
                                                                 <div class="form-group {if $error}has-error{/if}">
 
                                                                     <label for="{$label_attr.for}" class="control-label">
@@ -138,7 +138,7 @@
                                                                 </div>
                                                             {/form_field}
 
-                                                            {form_field form=$form field='visible'}
+                                                            {form_field field='visible'}
                                                                 <div class="form-group {if $error}has-error{/if}">
                                                                     <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
 

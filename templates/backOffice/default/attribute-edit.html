@@ -34,7 +34,7 @@
                         <div class="col-md-12">
 	                        <div class="form-container">
 	                            {form name="thelia.admin.attribute.modification"}
-		                        <form method="POST" action="{url path='/admin/configuration/attributes/save'}" {form_enctype form=$form} class="clearfix">
+		                        <form method="POST" action="{url path='/admin/configuration/attributes/save'}" {form_enctype} class="clearfix">
 
 		                             {include file="includes/inner-form-toolbar.html" close_url="{url path='/admin/configuration/attributes'}"}
 
@@ -42,26 +42,26 @@
 
 		                                <p class="title title-without-tabs">{intl l='Attribute information'}</p>
 
-                                        {form_field form=$form field='id'}
+                                        {form_field field='id'}
                                             <input type="hidden" name="{$name}" value="{$attribute_id}" />
                                         {/form_field}
 
      	                                {* Be sure to get the attribute ID, even if the form could not be validated *}
      	                                <input type="hidden" name="attribute_id" value="{$attribute_id}" />
 
-     						        	{form_hidden_fields form=$form}
+     						        	{form_hidden_fields}
 
-     						        	{form_field form=$form field='success_url'}
+     						        	{form_field field='success_url'}
      						        		<input type="hidden" name="{$name}" value="{url path='/admin/configuration/attributes'}" />
      						        	{/form_field}
 
-     			                        {form_field form=$form field='locale'}
+     			                        {form_field field='locale'}
      			                        	<input type="hidden" name="{$name}" value="{$edit_language_locale}" />
      			                        {/form_field}
 
      					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {include file="includes/standard-description-form-fields.html" form=$form}
+                                        {include file="includes/standard-description-form-fields.html"}
 		    						</div>
 
 		     						<div class="col-md-6">
@@ -206,21 +206,21 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
 
     {capture "creation_dialog"}
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
         {* Be sure to get the attribute ID, even if the form could not be validated *}
         <input type="hidden" name="attribute_id" value="{$attribute_id}" />
 
-        {form_field form=$form field='success_url'}
+        {form_field field='success_url'}
             {* on success, redirect to this page  *}
             <input type="hidden" name="{$name}" value="{url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}" />
         {/form_field}
 
-        {form_field form=$form field='attribute_id'}
+        {form_field field='attribute_id'}
         <input type="hidden" name="{$name}" value="{$attribute_id}" />
         {/form_field}
 
-        {form_field form=$form field='title'}
+        {form_field field='title'}
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
@@ -232,7 +232,7 @@
 
                     <div class="help-block">{intl l="Enter here the value in the current edit language (%title)" title={$TITLE}}</div>
 
-                    {form_field form=$form field='locale'}
+                    {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
                     {/form_field}
                 {/loop}
@@ -253,7 +253,7 @@
         dialog_ok_label     = {intl l="Create this value"}
 
         form_action        = {url path='/admin/configuration/attributes-av/create'}
-        form_enctype       = {form_enctype form=$form}
+        form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
 {/form}

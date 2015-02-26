@@ -29,7 +29,7 @@
                     <div class="form-container">
                         <div class="col-md-12">
                             {form name="thelia.admin.module-hook.modification"}
-                            <form method="POST" action="{url path="/admin/module-hook/save/{$ID}"}" {form_enctype form=$form} class="clearfix">
+                            <form method="POST" action="{url path="/admin/module-hook/save/{$ID}"}" {form_enctype} class="clearfix">
                                 {include
                                 file = "includes/inner-form-toolbar.html"
                                 hide_submit_buttons = false
@@ -43,26 +43,26 @@
                                         {* Be sure to get the hook ID, even if the form could not be validated *}
                                         <input type="hidden" name="module_hook_id" value="{$module_hook_id}" />
 
-                                        {form_hidden_fields form=$form}
+                                        {form_hidden_fields}
 
-                                        {render_form_field form=$form field="success_url" value={url path="/admin/module-hooks"}}
+                                        {render_form_field field="success_url" value={url path="/admin/module-hooks"}}
 
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {render_form_field form=$form field="module_id"}
-                                        {render_form_field form=$form field="hook_id"}
-                                        {render_form_field form=$form field="active"}
+                                        {render_form_field field="module_id"}
+                                        {render_form_field field="hook_id"}
+                                        {render_form_field field="active"}
                                     </div>
                                     <div class="col-md-6">
 
-                                        {custom_render_form_field form=$form field='classname'}
-                                            <select {form_field_attributes form=$form field='classname'} >
+                                        {custom_render_form_field field='classname'}
+                                            <select {form_field_attributes field='classname'} >
                                             </select>
                                         {/custom_render_form_field}
 
 
-                                        {custom_render_form_field form=$form field='method'}
-                                            <select {form_field_attributes form=$form field='method'} >
+                                        {custom_render_form_field field='method'}
+                                            <select {form_field_attributes field='method'} >
                                             </select>
                                         {/custom_render_form_field}
                                     </div>

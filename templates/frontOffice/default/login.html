@@ -22,19 +22,19 @@
         <article class="col-main" role="main" aria-labelledby="main-label">
             <h1 id="main-label" class="page-header">{intl l="Login"}</h1>
             {form name="thelia.front.customer.login"}
-            <form id="form-login" action="{url path="/login"}" method="post" {form_enctype form=$form} novalidate>
+            <form id="form-login" action="{url path="/login"}" method="post" {form_enctype} novalidate>
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-                {form_field form=$form field='success_url'}
+                {form_field field='success_url'}
                     <input type="hidden" name="{$name}" value="{navigate to="previous"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
 
-                {form_field form=$form field='error_message'}
+                {form_field field='error_message'}
                     <input type="hidden" name="{$name}" value="{intl l="missing or invalid data"}"> {* the url the user is redirected to on login success *}
                 {/form_field}
-                {form_hidden_fields form=$form}
+                {form_hidden_fields}
                 {hook name="login.form-top"}
                 <fieldset>
-                    {form_field form=$form field="email"}
+                    {form_field field="email"}
                         <div class="form-group group-email{if $error} has-error{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <div class="control-input">
@@ -50,7 +50,7 @@
                     {/form_field}
 
                     <fieldset>
-                        {form_field form=$form field="account"}
+                        {form_field field="account"}
                         <legend>{intl l="Do you have an account?"}</legend>
                             {foreach $choices as $choice}
                             <div class="radio radio-account{$choice->value}">
@@ -61,7 +61,7 @@
                             {/foreach}
                         {/form_field}
                         <div class="group-password">
-                            {form_field form=$form field="password"}
+                            {form_field field="password"}
                             <div class="form-group {if $error} has-error{/if}">
                                 <label for="{$label_attr.for}" class="sr-only">{$label}</label>
                                 <div class="control-input">
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                             {/form_field}
-                            {form_field form=$form field='remember_me'}
+                            {form_field field='remember_me'}
                             <div class="checkbox pull-right">
                                 <label for="{$label_attr.for}">
                                     <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {$label}

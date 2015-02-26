@@ -44,17 +44,17 @@
                             {ifloop rel="area.module.not_associated"}
                             {form name="thelia.shipping_zone_area"}
                             <form method="POST" action="{url path="/admin/configuration/shipping_zones/area/add"}">
-                                {form_hidden_fields form=$form}
+                                {form_hidden_fields}
 
-                                {form_field form=$form field='success_url'}
+                                {form_field field='success_url'}
                                     <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
                                 {/form_field}
 
-                                {form_field form=$form field='shipping_zone_id'}
+                                {form_field field='shipping_zone_id'}
                                 <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
                                 {/form_field}
 
-                                {form_field form=$form field='area_id'}
+                                {form_field field='area_id'}
                                 <label class="control-label" for="{$label_attr.for}">{$label}</label>
                                 <div class="input-group">                                    
                                     <select name="{$name}" id="{$label_attr.for}" data-toggle="selectpicker">
@@ -124,17 +124,17 @@
 
     {capture "delete_zone_dialog"}
         {form name="thelia.shopping_zone_remove_area"}
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
 
-            {form_field form=$form field='success_url'}
+            {form_field field='success_url'}
                 <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
             {/form_field}
 
-            {form_field form=$form field='shipping_zone_id'}
+            {form_field field='shipping_zone_id'}
                 <input type="hidden" name="{$name}" value="{$delivery_module_id}" />
             {/form_field}
 
-            {form_field form=$form field='area_id'}
+            {form_field field='area_id'}
                 <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
             {/form_field}
             {hook name="zone.delete-form" location="zone_delete_form" module_id={$delivery_module_id} }

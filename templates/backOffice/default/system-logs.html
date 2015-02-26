@@ -35,7 +35,7 @@
                             {form name='thelia.system-logs.configuration'}
 	 						<form method="POST" action="{url path='/admin/configuration/system-logs/save'}">
 
-                                {form_hidden_fields form=$form}
+                                {form_hidden_fields}
 
 		                        {include
 		                            file = "includes/inner-form-toolbar.html"
@@ -55,7 +55,7 @@
 
                                         <fieldset>
 
-                                            {form_field form=$form field="level"}
+                                            {form_field field="level"}
 					                        <div class="form-group {if $error}has-error{/if}">
 
 					                            <label for="{$label_attr.for}" class="control-label">{$label}: </label>
@@ -72,7 +72,7 @@
                                             </div>
                                             {/form_field}
 
-					                        {form_field form=$form field='format'}
+					                        {form_field field='format'}
 					                           <div class="form-group {if $error}has-error{/if}">
 					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
@@ -95,7 +95,7 @@
 					                           </div>
 					                        {/form_field}
 
-					                        {form_field form=$form field='show_redirections'}
+					                        {form_field field='show_redirections'}
 					                           <div class="form-group {if $error}has-error{/if}">
 					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
@@ -112,7 +112,7 @@
 					                           </div>
 					                        {/form_field}
 
-					                        {form_field form=$form field='files'}
+					                        {form_field field='files'}
 					                           <div class="form-group {if $error}has-error{/if}">
 					                               <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
@@ -124,7 +124,7 @@
 					                           </div>
 					                        {/form_field}
 
-                                            {form_field form=$form field='ip_addresses'}
+                                            {form_field field='ip_addresses'}
                                                <div class="form-group {if $error}has-error{/if}">
                                                    <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 

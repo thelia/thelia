@@ -57,9 +57,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {/block}
 
     {* Stylesheets *}
-    {stylesheets file='assets/css/styles.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    <link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">
 
     {* To use the embedded less compiler :
        1) Comment the stylesheet function above, to prevent ce style.css to be included
@@ -78,8 +76,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
-    {images file='assets/img/favicon.ico'}<link rel="shortcut icon" type="image/x-icon" href="{$asset_url}">{/images}
-    {images file='assets/img/favicon.png'}<link rel="icon" type="image/png" href="{$asset_url}" />{/images}
+    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/img/favicon.ico'}">
+    <link rel="icon" type="image/png" href="{image file='assets/img/favicon.png'}" />
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/$lang_locale"}" />
@@ -131,7 +129,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         <div class="header">
             <h1 class="logo">
                 <a href="{navigate to="index"}" title="{$store_name}">
-                    {images file='assets/img/logo.gif'}<img src="{$asset_url}" alt="{$store_name}">{/images}
+                    <img src="{image file='assets/img/logo.gif'}" alt="{$store_name}">
                 </a>
             </h1>
             {hook name="main.navbar-primary"}
@@ -244,9 +242,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 <!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> <!--<![endif]-->
 <script>
     if (typeof jQuery == 'undefined') {
-        {javascripts file='assets/js/libs/jquery.js'}
-            document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
-        {/javascripts}
+        document.write(unescape("%3Cscript src='{javascript file='assets/js/libs/jquery.js'}' %3E%3C/script%3E"));
     }
 </script>
 
@@ -256,14 +252,9 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{$lang_code}.js"></script>
 {/if}
 
+<script src="{javascript file='assets/js/bootstrap/bootstrap.js'}"></script>
 
-{javascripts file='assets/js/bootstrap/bootstrap.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
-
-{javascripts file='assets/js/plugins/bootbox/bootbox.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+<script src="{javascript file='assets/js/plugins/bootbox/bootbox.js'}"></script>
 
 {hook name="main.after-javascript-include"}
 
@@ -274,9 +265,8 @@ GNU General Public License : http://www.gnu.org/licenses/
 {block name="javascript-initialization"}{/block}
 
 <!-- Custom scripts -->
-{javascripts file='assets/js/script.js'}
-    <script src="{$asset_url}"></script>
-{/javascripts}
+<script src="{javascript file='assets/js/script.js'}"></script>
+
 {hook name="main.body-bottom"}
 </body>
 </html>

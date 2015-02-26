@@ -30,7 +30,7 @@
 
                 {form name="thelia.admin.module.modification"}
 
-                <form method="POST" action="{url path="/admin/module/save"}" {form_enctype form=$form} >
+                <form method="POST" action="{url path="/admin/module/save"}" {form_enctype} >
 
                     {include
                         file = "includes/inner-form-toolbar.html"
@@ -43,13 +43,13 @@
                     {* Be sure to get the product ID, even if the form could not be validated *}
                     <input type="hidden" name="module_id" value="{$ID}" />
 
-                    {form_hidden_fields form=$form}
+                    {form_hidden_fields}
 
-                    {render_form_field form=$form field="success_url" value={url path="/admin/modules"}}
+                    {render_form_field field="success_url" value={url path="/admin/modules"}}
 
                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                    {include file="includes/standard-description-form-fields.html" form=$form}
+                    {include file="includes/standard-description-form-fields.html"}
 
                     <div class="row">
                         <div class="col-md-12">

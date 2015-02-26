@@ -2,8 +2,8 @@
 {default_translation_domain domain='bo.default'}
 
 {form name="thelia.import"}
-<form action="{$URL nofilter}" method="post" {form_enctype form=$form}>
-    {form_hidden_fields form=$form}
+<form action="{$URL nofilter}" method="post" {form_enctype}>
+    {form_hidden_fields}
     <div class="modal fade" id="real-import-modal" tabindex="-1" role="dialog" aria-labelledby="import-modal-label" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -23,7 +23,7 @@
                     {/if}
                     <div class="row">
                         <div class="col-md-12">
-                            {form_field form=$form field="language"}
+                            {form_field field="language"}
                                 <label for="{$label_attr.for}">
                                     {$label}
                                 </label>
@@ -37,7 +37,7 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            {form_field form=$form field="file_upload"}
+                            {form_field field="file_upload"}
                                 <label form="{$label_attr.for}">
                                     {$label}
                                 </label>

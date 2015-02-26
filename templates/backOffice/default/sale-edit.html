@@ -1,9 +1,7 @@
 {extends file="admin-layout.tpl"}
 
 {block name="after-bootstrap-css"}
-    {stylesheets file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}
-        <link rel="stylesheet" href="{$asset_url}">
-    {/stylesheets}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
 {/block}
 
 {block name="no-return-functions"}
@@ -36,7 +34,7 @@
 
                 {form name="thelia.admin.sale.modification"}
 
-                <form method="POST" id="sale-update-form" action="{url path="/admin/sale/save/{$ID}"}" {form_enctype form=$form} >
+                <form method="POST" id="sale-update-form" action="{url path="/admin/sale/save/{$ID}"}" {form_enctype} >
 
                     {include
                         file = "includes/inner-form-toolbar.html"
@@ -49,10 +47,10 @@
                     {* Be sure to get the sale ID, even if the form could not be validated *}
                     <input type="hidden" name="sale_id" value="{$ID}" />
 
-                    {form_hidden_fields form=$form}
+                    {form_hidden_fields}
 
-                    {render_form_field form=$form field="success_url" value={url path="/admin/sales"}}
-                    {render_form_field form=$form field="locale" value={$edit_language_locale}}
+                    {render_form_field field="success_url" value={url path="/admin/sales"}}
+                    {render_form_field field="locale" value={$edit_language_locale}}
 
                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -60,39 +58,39 @@
                         <div class="col-md-7">
                             <p class="title title-without-tabs">{intl l='Sale operation features'}</p>
 
-                            {render_form_field form=$form field='label'}
+                            {render_form_field field='label'}
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    {render_form_field form=$form field='active'}
-                                    {render_form_field form=$form field='display_initial_price'}
+                                    {render_form_field field='active'}
+                                    {render_form_field field='display_initial_price'}
 
-                                    {custom_render_form_field form=$form field='start_date'}
+                                    {custom_render_form_field field='start_date'}
                                         {* data-date-format is a moment.js date format *}
                                         <div class="input-group">
-                                            <input type="text" {form_field_attributes form=$form field="start_date" extra_class="datetime-picker"}>
+                                            <input type="text" {form_field_attributes field="start_date" extra_class="datetime-picker"}>
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
                                         </div>
                                     {/custom_render_form_field}
 
-                                    {custom_render_form_field form=$form field='end_date'}
+                                    {custom_render_form_field field='end_date'}
 
                                         <div class="input-group">
-                                            <input type="text" {form_field_attributes form=$form field="end_date" extra_class="datetime-picker"}>
+                                            <input type="text" {form_field_attributes field="end_date" extra_class="datetime-picker"}>
                                             <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
                                         </div>
                                     {/custom_render_form_field}
                                 </div>
 
                                 <div class="col-md-6">
-                                    {render_form_field form=$form field='price_offset_type'}
+                                    {render_form_field field='price_offset_type'}
 
                                     <div class="well well-sm">
                                         {loop type="currency" name="sale.currencies" backend_context="1" lang=$edit_language_id}
                                             {$aff=($LOOP_COUNT == 1)}
-                                            {custom_render_form_field form=$form field='price_offset' value_key=$ID show_label=$aff}
+                                            {custom_render_form_field field='price_offset' value_key=$ID show_label=$aff}
                                                 <div class="input-group">
-                                                    <input type="text" {form_field_attributes form=$form field="price_offset" value_key=$ID}>
+                                                    <input type="text" {form_field_attributes field="price_offset" value_key=$ID}>
                                                     <span class="input-group-addon">{intl l='For prices in %currency' currency={$SYMBOL}}</span>
                                                 </div>
                                             {/custom_render_form_field}
@@ -106,7 +104,7 @@
                         <div class="col-md-5">
                             <p class="title title-without-tabs">{intl l='Sale operation description'}</p>
 
-                            {include file="includes/standard-description-form-fields.html" form=$form}
+                            {include file="includes/standard-description-form-fields.html"}
                         </div>
                     </div>
 
@@ -117,7 +115,7 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    {form_field field="categories" form=$form}
+                                    {form_field field="categories"}
                                     <div class="form-group ">
                                         <label for="cat_source" class="control-label">{intl l='Available product categories'}</label>
 
@@ -139,10 +137,10 @@
                                 </div>
 
                                 <div class="col-md-6">
-                                    {form_field field="categories" form=$form}
+                                    {form_field field="categories"}
                                     <div class="form-group ">
                                         <label for="cat_source" class="control-label">{intl l='Selected categories'}</label>
-                                        <select {form_field_attributes form=$form field='categories'}'>
+                                        <select {form_field_attributes field='categories'}'>
                                         {* protect ourselves against empty $value, which causes all categories to be displayed *}
                                         {if empty($value)}{$value = [ 0 ]}{/if}
                                         {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1}
@@ -373,12 +371,12 @@
 
         {form name="thelia.admin.sale.modification"}
 
-            {form_field form=$form field="products"}
+            {form_field field="products"}
                 // This is the products IDs as hydrated in the controller.
                 var selected_product_ids_at_page_load = [ {$value|implode:','} ];
             {/form_field}
 
-            {form_field form=$form field="product_attributes"}
+            {form_field field="product_attributes"}
                 // This is the products IDs as hydrated in the controller.
                 var selected_attributes_avs_ids_at_page_load = {$value|@json_encode nofilter};
             {/form_field}

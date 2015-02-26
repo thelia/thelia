@@ -29,7 +29,7 @@
                                 <div class="col-md-12">
 
         						    {form name="$formId"}
-        						    	<form method="POST" action="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" {form_enctype form=$form} class="clearfix">
+        						    	<form method="POST" action="{url path="/admin/image/type/{$imageType}/{$ID}/update"}" {form_enctype} class="clearfix">
                                             {include
                                                 file = "includes/inner-form-toolbar.html"
                                                 hide_submit_buttons = false
@@ -38,10 +38,10 @@
                                                 close_url = "{url path="{$redirectUrl}" current_tab="images" noamp=1}"
                                             }
 
-        						        	{form_hidden_fields form=$form}
+        						        	{form_hidden_fields}
 
-                                            {render_form_field form=$form field="success_url" value="{url path="/admin/image/type/{$imageType}/{$ID}/update"}"}
-                                            {render_form_field form=$form field="locale" value="$edit_language_locale"}
+                                            {render_form_field field="success_url" value="{url path="/admin/image/type/{$imageType}/{$ID}/update"}"}
+                                            {render_form_field field="locale" value="$edit_language_locale"}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -64,9 +64,9 @@
                                                 </div>
 
                                                 <div class="col-md-6">
-                                                    {render_form_field form=$form field="file"}
+                                                    {render_form_field field="file"}
 
-                                                    {form_field form=$form field='visible'}
+                                                    {form_field field='visible'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{intl l='Visibility'}</label>
 
@@ -79,14 +79,14 @@
                                                     </div>
                                                     {/form_field}
 
-                                                    {render_form_field form=$form field="title" value=$TITLE}
-                                                    {render_form_field form=$form field="chapo" value=$CHAPO}
-                                                    {render_form_field form=$form field="postscriptum" value=$POSTSCRIPTUM}
+                                                    {render_form_field field="title" value=$TITLE}
+                                                    {render_form_field field="chapo" value=$CHAPO}
+                                                    {render_form_field field="postscriptum" value=$POSTSCRIPTUM}
                                                 </div>
                                             </div>
                                             <div class="row">
                                                 <div class="col-md-12">
-                                                    {render_form_field form=$form field="description" value=$DESCRIPTION extra_class="wysiwyg"}
+                                                    {render_form_field field="description" value=$DESCRIPTION extra_class="wysiwyg"}
                                                 </div>
                                             </div>
 

@@ -1,6 +1,6 @@
 <div class="form-container">
 
-    <form method="POST" action="{$formAction}" {form_enctype form=$form} class="clearfix">
+    <form method="POST" action="{$formAction}" {form_enctype} class="clearfix">
 
         {include
             file = "includes/inner-form-toolbar.html"
@@ -14,23 +14,23 @@
         <input type="hidden" name="current_id" value="{$current_id}">
         <input type="hidden" name="current_tab" value="seo">
 
-        {form_hidden_fields form=$form}
+        {form_hidden_fields}
 
-        {render_form_field form=$form field="success_url" value="{$success_url nofilter}"}
+        {render_form_field field="success_url" value="{$success_url nofilter}"}
 
         {* Display error message if exist *}
         {include file='includes/notifications.html' message=$form_error_message type="danger"}
 
-        {custom_render_form_field form=$form field='url'}
+        {custom_render_form_field field='url'}
             <div class="input-group">
                 <span class="input-group-addon">{$url_language|default:{config key="url_site"} nofilter}/</span>
-                <input type="text" {form_field_attributes form=$form field='url'}>
+                <input type="text" {form_field_attributes field='url'}>
             </div>
         {/custom_render_form_field}
 
-        {render_form_field form=$form field="meta_title"}
-        {render_form_field form=$form field="meta_description"}
-        {render_form_field form=$form field="meta_keywords"}
+        {render_form_field field="meta_title"}
+        {render_form_field field="meta_description"}
+        {render_form_field field="meta_keywords"}
 
         {include
             file = "includes/inner-form-toolbar.html"
