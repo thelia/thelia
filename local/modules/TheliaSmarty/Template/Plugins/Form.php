@@ -333,7 +333,7 @@ class Form extends AbstractSmartyPlugin
         if (false !== $snippet_content = file_get_contents($snippet_path)) {
             $this->processFormField($params, $template);
 
-            if (null === $form = $this->getParam($params, 'form', false)) {
+            if (null === $form = $this->getParam($params, 'form', null)) {
                 $form = $this->parserContext->getCurrentForm();
             }
 
