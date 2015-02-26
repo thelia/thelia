@@ -271,12 +271,14 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
             $width_orig = $image->getSize()->getWidth();
             $height_orig = $image->getSize()->getHeight();
 
+            $ratio = $width_orig / $height_orig;
+
             if (is_null($dest_width)) {
-                $dest_width = $width_orig;
+                $dest_width = $dest_height * $ratio;
             }
 
             if (is_null($dest_height)) {
-                $dest_height = $height_orig;
+                $dest_height = $dest_width / $ratio;
             }
 
             if (is_null($resize_mode)) {
