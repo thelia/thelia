@@ -80,6 +80,7 @@ class Template extends BaseAction implements EventSubscriberInterface
      * Delete a product template entry
      *
      * @param \Thelia\Core\Event\Template\TemplateDeleteEvent $event
+     * @throws \Exception
      */
     public function delete(TemplateDeleteEvent $event)
     {
@@ -119,7 +120,10 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     public function addAttribute(TemplateAddAttributeEvent $event)
     {
-        if (null === AttributeTemplateQuery::create()->filterByAttributeId($event->getAttributeId())->filterByTemplate($event->getTemplate())->findOne()) {
+        if (null === AttributeTemplateQuery::create()
+                ->filterByAttributeId($event->getAttributeId())
+                ->filterByTemplate($event->getTemplate())
+                ->findOne()) {
             $attribute_template = new AttributeTemplate();
 
             $attribute_template
@@ -133,21 +137,21 @@ class Template extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updateAttributePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
+        $this->genericUpdatePosition(AttributeTemplateQuery::create(), $event);
     }
 
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updateFeaturePosition(UpdatePositionEvent $event)
     {
-        return $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
+        $this->genericUpdatePosition(FeatureTemplateQuery::create(), $event);
     }
 
     public function deleteAttribute(TemplateDeleteAttributeEvent $event)
@@ -164,7 +168,11 @@ class Template extends BaseAction implements EventSubscriberInterface
 
     public function addFeature(TemplateAddFeatureEvent $event)
     {
-        if (null === FeatureTemplateQuery::create()->filterByFeatureId($event->getFeatureId())->filterByTemplate($event->getTemplate())->findOne()) {
+        if (null === FeatureTemplateQuery::create()
+                ->filterByFeatureId($event->getFeatureId())
+                ->filterByTemplate($event->getTemplate())
+                ->findOne()
+        ) {
             $feature_template = new FeatureTemplate();
 
             $feature_template
