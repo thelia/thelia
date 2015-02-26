@@ -99,9 +99,9 @@
                                             <input type="hidden" name="category_id" value="{$ID}" />
                                             <input type="hidden" name="current_tab" value="general" />
 
-                                            {form_hidden_fields form=$form exclude="parent"}
+                                            {form_hidden_fields exclude="parent"}
 
-                                            {render_form_field form=$form field='success_url' value={$close_url}}
+                                            {render_form_field field='success_url' value={$close_url}}
 
                                             {* Display error message if exist *}
                                             {include file='includes/notifications.html' message=$form_error_message}
@@ -112,8 +112,8 @@
                                                 </div>
 
                                                 <div class="col-md-4">
-                                                    {custom_render_form_field form=$form field='parent'}
-                                                         <select {form_field_attributes form=$form field='parent' extra_class="form_control"}>
+                                                    {custom_render_form_field field='parent'}
+                                                         <select {form_field_attributes field='parent' extra_class="form_control"}>
                                                               <option value="0">{intl l="Top level"}</option>
                                                               {$myparent=$PARENT}
                                                               {loop name="cat-parent" type="category-tree" visible="*" category="0"}
@@ -122,9 +122,9 @@
                                                         </select>
                                                     {/custom_render_form_field}
 
-                                                    {render_form_field form=$form field="default_template_id"}
+                                                    {render_form_field field="default_template_id"}
 
-                                                    {form_field form=$form field="visible"}
+                                                    {form_field field="visible"}
                                                     <label class="checkbox">
                                                         <input type="checkbox" {if $value != 0}checked{/if} name="{$name}" value="1"> {$label}
                                                     </label>

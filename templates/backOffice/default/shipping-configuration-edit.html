@@ -50,12 +50,12 @@
 
                                         <input type="hidden" name="area_id" value="{$area_id}">
 
-                                        {render_form_field form=$form field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
-                                        {render_form_field form=$form field="area_id" value=$area_id}
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                        {render_form_field field="area_id" value=$area_id}
 
-                                        {custom_render_form_field form=$form field='name'}
+                                        {custom_render_form_field field='name'}
                                             <div class="input-group">
-                                                <input type="text" {form_field_attributes form=$form field="name" value={$NAME}}>
+                                                <input type="text" {form_field_attributes field="name" value={$NAME}}>
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
                                                 </span>
@@ -68,15 +68,15 @@
                                     <form method="POST" action="{url path="/admin/configuration/shipping_configuration/country/add"}">
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                        {form_hidden_fields form=$form exclude="area_id"}
+                                        {form_hidden_fields exclude="area_id"}
 
                                         <input type="hidden" name="area_id" value="{$area_id}">
 
-                                        {render_form_field form=$form field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
-                                        {render_form_field form=$form field="area_id" value=$area_id}
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                        {render_form_field field="area_id" value=$area_id}
 
-                                        {custom_render_form_field form=$form field='country_id'}
-                                            <select multiple {form_field_attributes form=$form field="country_id"}>
+                                        {custom_render_form_field field='country_id'}
+                                            <select multiple {form_field_attributes field="country_id"}>
                                                 {loop name="country-without-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id}
                                                     <option value="{$ID}">{$TITLE}</option>
                                                 {/loop}
@@ -93,10 +93,10 @@
                                 <form method="POST" action="{url path="/admin/configuration/shipping_configuration/countries/remove"}">
                                     {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                                    {form_hidden_fields form=$form exclude="area_id"}
+                                    {form_hidden_fields exclude="area_id"}
 
-                                    {render_form_field form=$form field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
-                                    {render_form_field form=$form field="area_id" value=$area_id}
+                                    {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                    {render_form_field field="area_id" value=$area_id}
 
                                     <div class="table-responsive">
                                         <table class="table table-striped table-condensed">
@@ -115,7 +115,7 @@
                                                     <tr>
                                                         <td>{$TITLE}</td>
                                                         <td class="text-center">
-                                                            {form_field form=$form field="country_id"}
+                                                            {form_field field="country_id"}
                                                                 <input class="country-selection" type="checkbox" name="{$name}[]" value="{$ID}">
                                                             {/form_field}
                                                         </td>
