@@ -4,6 +4,15 @@ casper.test.begin('Order process', 4, function suite(test) {
 
     casper.start(thelia2_base_url + "order/delivery", function goToDelivery() {
 
+        // Wait for delivery methods ajax loading
+        casper.waitForResource(function testResource(resource) {
+            if(resource.url.indexOf("deliveryModuleList") > 0) {
+                console.log("Delivery methods successfully loaded");
+                return true;
+            }
+            return false;
+        });
+
         casper.waitForSelector(
             '#delivery-module-list-block .radio',
             function() {
