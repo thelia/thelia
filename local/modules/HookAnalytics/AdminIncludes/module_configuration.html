@@ -27,9 +27,9 @@
             {form name="hookanalytics.configuration.form"}
                 <form method="POST" id="hookanalytics-form" action="{url path="/admin/module/hookanalytics/save"}" {form_enctype} class="clearfix">
 
-                    {form_hidden_fieldsNOW()}
+                    {form_hidden_fields}
 
-                    {form_fieldNOW() field='trackingcode'}
+                    {form_field field='trackingcode'}
                     <div class="form-group {if $error}has-error{/if}">
                         <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                         <textarea id="{$label_attr.for}" name="{$name}" class="form-control" style="height: 200px;" title="{$label}">{$value}</textarea>
