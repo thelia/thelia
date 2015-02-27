@@ -6,47 +6,257 @@
 // COMMON STYLES
 // -------------
 
-// Base class and wrapper
-.navbar {
-    margin-bottom: 0;
-    .dropdown-menu {
-      > li {
-        > a > .label {
-          font-size: 15px;
+#main-navbar {
+    background: #26272B;
+    position: fixed;
+    width: 240px;
+    height: 100%;
+    left: -157px;
+    top: 0;
+    z-index: 1000;
+    .transition(all 0.3s ease);
+    padding-top: 50px;
+
+    > ul > li {
+        position: relative;
+
+        > a {
+            text-align: right;
+
+            .item-text {
+                display: none;
+            }
         }
-      }
 
+        &.active {
+            > a {
+                color: #fff;
+                background: @brand-primary;
+            }
+        }
     }
-  .navbar-nav > li:hover{
-    background-color: @active-menu;
-  }
-}
 
-// Inner for background effects
-// Gradient is applied to its own element because overflow visible is not honored by IE when filter is present
-.navbar-inner {
-    border-top: none;
-    border-radius: 0;
+    &.open {
+        left: 0;
 
-    .container{
-        width: 1170px;
+        ul > li {
+            > a {
+                text-align: left;
+            }
+        }
+
+        .item-text {
+            display: inline;
+        }
+    }
+
+    &.closed {
+        .collapse {
+            position: absolute;
+            top: 0;
+            right: 100px;
+            width: 240px;
+            .opacity(0);
+            .transition(all 0.3s ease);
+            display: block;
+        }
+
+        ul > li {
+            &:hover {
+                .collapse {
+                    height: auto !important;
+                    right: -240px;
+                    .opacity(1);
+                    visibility: visible;
+                }
+            }
+        }
+    }
+
+    ul {
+        a {
+            display: block;
+            padding: 17px;
+            color: #fff;
+            font-size: @font-size-base;
+            .transition(all 0.3s);
+            border-bottom: 1px solid @gray;
+            font-weight: normal;
+
+            &:hover,
+            &:focus {
+                text-decoration: none;
+                background: @gray;
+            }
+
+            [class^="icon-"], [class*=" icon-"] {
+                margin-right: 10px;
+            }
+
+            &.collapsed {
+                .caret {
+                    .rotate(0deg);
+                }
+            }
+
+            .caret {
+                .rotate(-180deg);
+                .transition(all 0.3s ease-in);
+            }
+        }
+
+        li:first-child {
+            a {
+                border-top: 1px solid @gray;
+            }
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            background: #000;
+
+            a {
+                font-size: @font-size-base - 1;
+
+                &:hover,
+                &:focus {
+                    background: #333;
+                }
+            }
+
+            li {
+                display: inline;
+                width: 100%;
+
+                &:first-child {
+                    a {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+    }
+
+    @media (max-width: 1460px) {
+
+        & {
+            left: -167px;
+        }
+
+        ul {
+            a {
+                font-size: 13px;
+            }
+            [class^="icon-"], [class*=" icon-"] {
+                font-size: 25px;
+            }
+        }
+    }
+
+    @media (max-width: 1325px) {
+        & {
+            left: 0;
+            position: static;
+            width: 100%;
+            height: auto;
+            padding: 0;
+
+            > ul > li {
+                > a {
+                    text-align: left;
+
+                    .item-text {
+                        display: inline-block;
+                    }
+                }
+            }
+
+            &.closed {
+                display: none;
+            }
+
+            &.open {
+                .collapse {
+                    position: static;
+                    width: 100%;
+                    display: none;
+
+                    &.in {
+                        display: block;
+                        .opacity(1);
+                    }
+                }
+            }
+        }
     }
 }
 
-// Navbar button for toggling navbar items in responsive layouts
-// These definitions need to come after '.navbar .btn'
-.navbar .btn {
-	.button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
+#main-navbar-collapse {
+    position: absolute;
+    left: 239px;
+    top: 65px;
+    cursor: pointer;
+    padding: 14px 30px 19px 8px;
+    background: #26272B;
+    border: 1px solid @gray;
+    border-radius: 0 5px 5px 0;
+    border-left-color: @gray-dark;
+
+    span {
+        &,
+        &:before,
+        &:after {
+            cursor: pointer;
+            border-radius: 1px;
+            height: 3px;
+            width: 20px;
+            background: white;
+            position: absolute;
+            display: block;
+            content: '';
+            .transition(all 0.3s ease-in-out);
+        }
+
+        &:before {
+            top: -6px;
+        }
+
+        &:after {
+            bottom: -6px;
+        }
+    }
+
+    &.active {
+        span {
+            background: none;
+
+            &:before,
+            &:after {
+                top: 0;
+            }
+
+            &:before {
+                transform: rotate(45deg);
+            }
+
+            &:after {
+                transform: rotate(-45deg);
+            }
+        }
+    }
 }
 
-.navbar-default .navbar-toggle .icon-bar{
-	background-color: @btn-primary-color;
-}
+#main-navbar-collapse-mobile {
+    &:extend(#main-navbar-collapse all);
 
-.navbar-form{
-	padding: 0;
-}
+    top: 8px;
+    right: 10px;
+    left: auto;
+    border-left: 1px solid @gray;
+    border-radius: 5px;
 
-.navbar-form-xs {
-    margin: 8px 0;
+    @media (max-width: 1325px) {
+        .show;
+    }
 }

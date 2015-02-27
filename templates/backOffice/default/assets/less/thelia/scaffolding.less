@@ -7,9 +7,28 @@
 // -------------------------
 
 body {
-  // background: #FFF url("@{imgDir}/bg.jpg") top left no-repeat;
-  // background-size: cover;
-  background-color: #eee;
+    background-color: #eee;
+    overflow-x: hidden;
+    position: relative;
+    left: 0;
+    .transition(all 0.3s ease);
+
+    &.push-to-right {
+        left: 240px;
+
+        @media (max-width: 1325px) {
+            left: 0;
+        }
+
+    }
+}
+
+#mobile-search-engine {
+    margin: 20px 0;
+}
+
+#btn-toolbar-mobile {
+    margin-top: 20px;
 }
 
 
@@ -17,5 +36,5 @@ body {
 // -------------------------
 
 a {
-  font-weight: bold;
+    font-weight: bold;
 }
