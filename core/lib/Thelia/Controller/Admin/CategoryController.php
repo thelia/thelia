@@ -89,6 +89,7 @@ class CategoryController extends AbstractSeoCrudController
             ->setPostscriptum($formData['postscriptum'])
             ->setVisible($formData['visible'])
             ->setParent($formData['parent'])
+            ->setDefaultTemplateId($formData['default_template_id'])
         ;
 
         return $changeEvent;
@@ -113,6 +114,10 @@ class CategoryController extends AbstractSeoCrudController
         return $event->hasCategory();
     }
 
+    /**
+     * @param \Thelia\Model\Category $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateObjectForm($object)
     {
         // Hydrate the "SEO" tab form
@@ -120,14 +125,15 @@ class CategoryController extends AbstractSeoCrudController
 
         // The "General" tab form
         $data = array(
-            'id'           => $object->getId(),
-            'locale'       => $object->getLocale(),
-            'title'        => $object->getTitle(),
-            'chapo'        => $object->getChapo(),
-            'description'  => $object->getDescription(),
-            'postscriptum' => $object->getPostscriptum(),
-            'visible'      => $object->getVisible(),
-            'parent'       => $object->getParent()
+            'id'                    => $object->getId(),
+            'locale'                => $object->getLocale(),
+            'title'                 => $object->getTitle(),
+            'chapo'                 => $object->getChapo(),
+            'description'           => $object->getDescription(),
+            'postscriptum'          => $object->getPostscriptum(),
+            'visible'               => $object->getVisible(),
+            'parent'                => $object->getParent(),
+            'default_template_id'   => $object->getDefaultTemplateId()
         );
 
         // Setup the object form
@@ -249,6 +255,10 @@ class CategoryController extends AbstractSeoCrudController
         return $this->nullResponse();
     }
 
+    /**
+     * @param CategoryDeleteEvent $deleteEvent
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
     protected function performAdditionalDeleteAction($deleteEvent)
     {
         // Redirect to parent category list
@@ -257,6 +267,10 @@ class CategoryController extends AbstractSeoCrudController
         return $this->redirectToListTemplateWithId($category_id);
     }
 
+    /**
+     * @param CategoryUpdateEvent $updateEvent
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
     protected function performAdditionalUpdateAction($updateEvent)
     {
         $response = null;
@@ -269,6 +283,10 @@ class CategoryController extends AbstractSeoCrudController
         return $response;
     }
 
+    /**
+     * @param UpdatePositionEvent $event
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
     protected function performAdditionalUpdatePositionAction($event)
     {
         $category = CategoryQuery::create()->findPk($event->getObjectId());
@@ -292,7 +310,10 @@ class CategoryController extends AbstractSeoCrudController
             $list = ContentQuery::create()
                 ->joinWithI18n($this->getCurrentEditionLocale())
                 ->filterByFolder($folders, Criteria::IN)
-                ->filterById(CategoryAssociatedContentQuery::create()->select('content_id')->findByCategoryId($categoryId), Criteria::NOT_IN)
+                ->filterById(
+                    CategoryAssociatedContentQuery::create()->select('content_id')->findByCategoryId($categoryId),
+                    Criteria::NOT_IN
+                )
                 ->find();
             ;
 

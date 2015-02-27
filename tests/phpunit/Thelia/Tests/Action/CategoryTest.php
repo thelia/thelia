@@ -13,12 +13,14 @@
 namespace Thelia\Tests\Action;
 
 use Thelia\Action\Category;
+use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;
 use Thelia\Core\Event\Category\CategoryToggleVisibilityEvent;
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
+use Thelia\Core\Event\Template\TemplateDeleteEvent;
 use Thelia\Model\Category as CategoryModel;
-use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Template;
 use Thelia\Tests\TestCaseWithURLToolSetup;
 
 /**
@@ -81,6 +83,9 @@ class CategoryTest extends TestCaseWithURLToolSetup
      */
     public function testUpdate(CategoryModel $category)
     {
+        $template = new Template();
+        $template->setName('A sample template')->save();
+
         $event = new CategoryUpdateEvent($category->getId());
 
         $event
@@ -91,6 +96,7 @@ class CategoryTest extends TestCaseWithURLToolSetup
             ->setPostscriptum('bar postscriptum')
             ->setVisible(0)
             ->setParent(0)
+            ->setDefaultTemplateId($template->getId())
             ->setDispatcher($this->getDispatcher())
         ;
 
@@ -107,13 +113,39 @@ class CategoryTest extends TestCaseWithURLToolSetup
         $this->assertEquals('bar chapo', $updatedCategory->getChapo());
         $this->assertEquals('bar postscriptum', $updatedCategory->getPostscriptum());
         $this->assertEquals(0, $updatedCategory->getVisible());
+        $this->assertEquals($template->getId(), $updatedCategory->getDefaultTemplateId());
         $this->assertEquals(0, $updatedCategory->getParent());
 
-        return $updatedCategory;
+        return [ $updatedCategory, $template ];
     }
 
     /**
+     * @param array $argArray
      * @depends testUpdate
+     */
+    public function testRemoveTemplate($argArray)
+    {
+        $category = $argArray[0];
+        $template = $argArray[1];
+
+        $event = new TemplateDeleteEvent($template->getId());
+
+        $event->setDispatcher($this->getDispatcher());
+
+        $action = new \Thelia\Action\Template();
+        $action->delete($event);
+
+        $this->assertInstanceOf('Thelia\Model\Template', $event->getTemplate());
+
+        $theCat = CategoryQuery::create()->findPk($category->getId());
+
+        $this->assertNull($theCat->getDefaultTemplateId());
+
+        return $category;
+    }
+
+    /**
+     * @depends testRemoveTemplate
      */
     public function testDelete(CategoryModel $category)
     {

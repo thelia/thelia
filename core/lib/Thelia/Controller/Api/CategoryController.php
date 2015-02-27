@@ -120,7 +120,8 @@ class CategoryController extends AbstractCrudApiController
             ->setVisible($data['visible'])
             ->setChapo($data['chapo'])
             ->setDescription($data['description'])
-            ->setPostscriptum($data['postscriptum']);
+            ->setPostscriptum($data['postscriptum'])
+            ->setDefaultTemplateId($data['default_template_id'])
         ;
 
         $this->setLocaleIntoQuery($data["locale"]);

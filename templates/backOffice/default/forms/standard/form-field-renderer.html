@@ -25,7 +25,11 @@ Use the optionnal $field_value parameter if no value is defined
 
 {if $type == 'hidden'}
 
-    <input type="hidden" {$attributes nofilter} />
+    {if $content == ''}
+        <input type="hidden" {$attributes nofilter} />
+    {else}
+        {$content nofilter}
+    {/if}
 
 {elseif $type == 'checkbox'}
 

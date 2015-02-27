@@ -110,7 +110,7 @@
     {* Capture the dialog body, to pass it to the generic dialog *}
     {capture "creation_dialog"}
         {form name="thelia.admin.area.create"}
-            {form_hidden_fields form=$form}
+            {form_hidden_fields}
 
             {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
             {render_form_field field='success_url' value="{url path='/admin/configuration/shipping_configuration/update/_ID_'}"}
