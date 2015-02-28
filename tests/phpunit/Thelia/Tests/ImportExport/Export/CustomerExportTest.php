@@ -42,7 +42,7 @@ class CustomerExportTest extends \PHPUnit_Framework_TestCase
         $lang = Lang::getDefaultLanguage();
         $data = $handler->buildData($lang);
 
-        $keys = ["ref","title","last_name","first_name","email","label",
+        $keys = ["ref","title","last_name","first_name",'birthday',"email","label",
             "discount","is_registered_to_newsletter","sign_up_date",
             "total_orders","last_order_amount","last_order_date",
             "address_first_name","address_last_name","company","address1",
