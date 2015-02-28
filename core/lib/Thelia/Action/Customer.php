@@ -113,6 +113,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $customer->setDiscount($event->getDiscount());
         }
 
+        if ($event->getBirthday() !== null) {
+            $customer->setBirthday($event->getBirthday());
+        }
+
         $customer->save();
 
         $event->setCustomer($customer);
@@ -153,7 +157,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getDiscount(),
             $event->getCompany(),
             $event->getRef(),
-            $event->getEmailUpdateAllowed()
+            $event->getEmailUpdateAllowed(),
+            $event->getBirthday()
         );
 
         $event->setCustomer($customer);
