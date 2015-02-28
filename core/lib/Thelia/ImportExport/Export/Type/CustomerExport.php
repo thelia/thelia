@@ -110,6 +110,7 @@ class CustomerExport extends ExportHandler
                 CustomerTableMap::REF,
                 CustomerTableMap::LASTNAME,
                 CustomerTableMap::FIRSTNAME,
+                CustomerTableMap::BIRTHDAY,
                 CustomerTableMap::EMAIL,
                 CustomerTableMap::DISCOUNT,
                 CustomerTableMap::CREATED_AT,
@@ -195,6 +196,7 @@ class CustomerExport extends ExportHandler
                 $currentCustomer["title_TITLE"] = "";
                 $currentCustomer[CustomerTableMap::LASTNAME] = "";
                 $currentCustomer[CustomerTableMap::FIRSTNAME] = "";
+                $currentCustomer[CustomerTableMap::BIRTHDAY] = "";
                 $currentCustomer[CustomerTableMap::EMAIL] = "";
                 $currentCustomer["address_COMPANY"] = "";
                 $currentCustomer["newsletter_IS_REGISTRED"] = "";
@@ -298,6 +300,7 @@ class CustomerExport extends ExportHandler
             CustomerTableMap::REF => "ref",
             CustomerTableMap::LASTNAME => "last_name",
             CustomerTableMap::FIRSTNAME => "first_name",
+            CustomerTableMap::BIRTHDAY => "birthday",
             CustomerTableMap::EMAIL => "email",
             CustomerTableMap::DISCOUNT => "discount",
             CustomerTableMap::CREATED_AT => "sign_up_date",
@@ -330,6 +333,7 @@ class CustomerExport extends ExportHandler
             "title",
             "last_name",
             "first_name",
+            'birthday',
             "email",
             "discount",
             "is_registered_to_newsletter",

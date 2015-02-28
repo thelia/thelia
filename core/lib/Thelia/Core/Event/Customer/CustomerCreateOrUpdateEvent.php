@@ -23,6 +23,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     protected $title;
     protected $firstname;
     protected $lastname;
+    protected $birthday;
     protected $address1;
     protected $address2;
     protected $address3;
@@ -62,8 +63,9 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param float  $discount
      * @param string $company
      * @param string $ref
+     * @param \DateTime|null $birthday
      */
-    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company, $ref)
+    public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company, $ref, \DateTime $birthday = null)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -84,6 +86,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
         $this->discount = $discount;
         $this->company = $company;
         $this->ref = $ref;
+        $this->birthday = $birthday;
     }
     /**
      * @return mixed
@@ -155,6 +158,14 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     public function getLastname()
     {
         return $this->lastname;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getBirthday()
+    {
+        return $this->birthday;
     }
 
     /**
