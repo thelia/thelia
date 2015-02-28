@@ -92,6 +92,16 @@
 
                                 {/loop}
 
+                                {elseloop rel="profiles"}
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class="alert alert-info">
+                                                {intl l="No administration profile defined yet. Click the + button to create one."}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
+
                             </tbody>                            
                         </table>
                     </div>
