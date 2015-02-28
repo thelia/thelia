@@ -110,7 +110,6 @@ class CountryController extends AbstractCrudController
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
-            ->setArea($formData['area'])
         ;
 
         return $event;

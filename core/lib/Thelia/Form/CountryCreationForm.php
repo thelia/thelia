@@ -20,52 +20,42 @@ class CountryCreationForm extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("title", "text", array(
-                "constraints" => array(
+            ->add('title', 'text', array(
+                'constraints' => array(
                     new NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("Country title *"),
-                "label_attr" => array(
-                    "for" => "title",
-                ),
+                'label' => $this->translator->trans('Country title')
             ))
-            ->add("locale", "text", array(
-                "constraints" => array(
+            ->add('locale', 'hidden', array(
+                'constraints' => array(
                     new NotBlank(),
                 ),
-                "label_attr" => array("for" => "locale_create"),
             ))
-            ->add("area", "text", array(
-                "label" => Translator::getInstance()->trans("Country area"),
-                "label_attr" => array(
-                    "for" => "area",
-                ),
-            ))
-            ->add("isocode", "text", array(
-                "constraints" => array(
+            ->add('isocode', 'text', array(
+                'constraints' => array(
                     new NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("ISO Code *"),
-                "label_attr" => array(
-                    "for" => "isocode",
+                'label' => $this->translator->trans('Numerical ISO Code'),
+                'label_attr' => array(
+                    'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
                 ),
             ))
-            ->add("isoalpha2", "text", array(
-                "constraints" => array(
+            ->add('isoalpha2', 'text', array(
+                'constraints' => array(
                     new NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("Alpha code 2 *"),
-                "label_attr" => array(
-                    "for" => "isoalpha2",
+                'label' => $this->translator->trans('ISO Alpha-2 code'),
+                'label_attr' => array(
+                    'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
                 ),
             ))
-            ->add("isoalpha3", "text", array(
-                "constraints" => array(
+            ->add('isoalpha3', 'text', array(
+                'constraints' => array(
                     new NotBlank(),
                 ),
-                "label" => Translator::getInstance()->trans("Alpha code 3 *"),
-                "label_attr" => array(
-                    "for" => "isoalpha3",
+                'label' => $this->translator->trans('ISO Alpha-3 code'),
+                'label_attr' => array(
+                    'help' => $this->translator->trans('Check country iso codes <a href="http://en.wikipedia.org/wiki/ISO_3166-1#Current_codes" target="_blank">here</a>.')
                 ),
             ))
         ;

@@ -147,61 +147,28 @@
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "country_creation_dialog"}
 
-            {form_hidden_fields}
+            {form_hidden_fields exclude="locale"}
 
-            {form_field field='success_url'}
-               {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-               <input type="hidden" name="{$name}" value="{url path='/admin/configuration/country/update/_ID_'}" />
-            {/form_field}
+            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+            {render_form_field field='success_url' value="{url path='/admin/configuration/country/update/_ID_'}"}
 
-            {loop type="lang" name="current-edit-lang" default_only="1"}
+            {custom_render_form_field field="title"}
+            {loop type="lang" name="default-lang" default_only="1"}
+                {* Switch edition to the current locale *}
+                <input type="hidden" name="edit_language_id" value="{$ID}" />
 
-                {form_field field='title'}
-                    <div class="form-group {if $error}has-error{/if}">
-                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                        <div class="input-group">
-                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Country title'}">
-                            <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
-                        </div>
-                        <div class="help-block">{intl l="Enter here the value in the default language (%title)" title={$TITLE}}</div>
-                    </div>
-                {/form_field}
+                {render_form_field field="locale" value=$LOCALE}
 
-                {form_field field='locale'}
-                    <input type="hidden" name="{$name}" value="{$LOCALE}" />
-                {/form_field}
-
+                <div class="input-group">
+                    <input type="text" {form_field_attributes field="title"}>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                </div>
             {/loop}
+            {/custom_render_form_field}
 
-            {form_field field='area'}
-                <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                    <select name="{$name}" id="{$label_attr.for}" class="form-control">                        
-                        <option value="{$ID}">{$TITLE}</option>                        
-                    </select>
-                </div>
-            {/form_field}
-
-            {form_field field='isocode'}
-                <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='ISO Code'}">
-                </div>
-            {/form_field}
-
-            {form_field field='isoalpha2'}
-                <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Alpha code 2'}">
-                </div>
-            {/form_field}
-
-            {form_field field='isoalpha3'}
-                <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Alpha code 3'}">
-                </div>
-            {/form_field}
+            {render_form_field field="isocode"}
+            {render_form_field field="isoalpha2"}
+            {render_form_field field="isoalpha3"}
 
             {hook name="country.create-form" location="country_create_form" }
 
