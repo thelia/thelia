@@ -317,7 +317,7 @@ class CustomerController extends BaseFrontController
                 $customerChangeEvent->setCustomer($customer);
 
                 $customerChangeEvent->setEmailUpdateAllowed(
-                    (intval(ConfigQuery::read('customer_change_email', 0))) ? true : false
+                    ConfigQuery::getCustomerChangeEmail()
                 );
 
                 $this->dispatch(TheliaEvents::CUSTOMER_UPDATEPROFILE, $customerChangeEvent);
