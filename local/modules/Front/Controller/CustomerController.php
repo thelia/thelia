@@ -242,6 +242,7 @@ class CustomerController extends BaseFrontController
             'lastname'     => $customer->getLastName(),
             'email'        => $customer->getEmail(),
             'email_confirm'        => $customer->getEmail(),
+            'birthday'     => $customer->getBirthday(),
             'newsletter'   => null !== NewsletterQuery::create()->findOneByEmail($customer->getEmail()),
         );
 
@@ -526,7 +527,8 @@ class CustomerController extends BaseFrontController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            isset($data["birthday"])?$data["birthday"]:null
         );
 
         return $customerCreateEvent;
