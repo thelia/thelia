@@ -1,3 +1,12 @@
+# 2.1.3
+
+- Add ```\Thelia\Model\OrderProduct::setCartItemId``` and ```\Thelia\Model\OrderProduct::getCartItemId``` to remove the typo with ```cartIemId```
+
+## DEPRECATED
+
+- ```\Thelia\Model\OrderProduct::setCartIemId``` Because of a typo
+- ```\Thelia\Model\OrderProduct::getCartIemId``` Because of a typo too
+
 # 2.1.2
 
 - Add the possibility to delete a coupon from the backoffice.

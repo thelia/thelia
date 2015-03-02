@@ -315,7 +315,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->setTaxRuleTitle($taxRuleI18n->getTitle())
                 ->setTaxRuleDescription($taxRuleI18n->getDescription())
                 ->setEanCode($pse->getEanCode())
-                ->setCartIemId($cartItem->getId())
+                ->setCartItemId($cartItem->getId())
                 ->setDispatcher($dispatcher)
                 ->save($con)
             ;
