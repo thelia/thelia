@@ -44,22 +44,25 @@ class ConfigurationForm extends BaseForm
                 'editor_height',
                 'integer',
                 [
-                    'data'  => Tinymce::getConfigValue('editor_height', 0),
-                    'label' => $this->translator->trans('Height of the editor area, in pixels. Enter 0 for default ', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'data'     => Tinymce::getConfigValue('editor_height', 0),
+                    'label'    => $this->translator->trans('Height of the editor area, in pixels. Enter 0 for default ', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
             ->add(
                 'show_menu_bar',
                 'checkbox',
                 [
-                    'data'       =>intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
-                    'label'      => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
+                    'required' => false,
+                    'data'     =>intval(Tinymce::getConfigValue('show_menu_bar', 0)) != 0,
+                    'label'    => $this->translator->trans('Show the TinyMCE menu bar', [], Tinymce::MODULE_DOMAIN),
                 ]
             )
             ->add(
                 'force_pasting_as_text',
                 'checkbox',
                 [
+                    'required'   => false,
                     'data'       => intval(Tinymce::getConfigValue('force_pasting_as_text', 0)) != 0,
                     'label'      => $this->translator->trans('Force pasting as text', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
@@ -71,6 +74,7 @@ class ConfigurationForm extends BaseForm
                 'set_images_as_responsive',
                 'checkbox',
                 [
+                    'required'   => false,
                     'data'       => intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
                     'label'      => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
                     'label_attr' => [
@@ -91,6 +95,17 @@ class ConfigurationForm extends BaseForm
                     'attr' => [
                         'rows' => 10,
                         'style' => 'font-family: \'Courier New\', Courier, monospace;'
+                    ]
+                ]
+            )
+            ->add(
+                'test_zone',
+                'textarea',
+                [
+                    'required'   => false,
+                    'label'      => $this->translator->trans('Sample editor', [], Tinymce::MODULE_DOMAIN),
+                    'label_attr' => [
+                        'help' => $this->translator->trans('This is a sample text editor, to view actual configuration.', [], Tinymce::MODULE_DOMAIN)
                     ]
                 ]
             )
