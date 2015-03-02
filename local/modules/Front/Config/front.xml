@@ -222,7 +222,7 @@
     <!-- end contact management -->
 
     <!-- newsletter management -->
-    <route id="newsletter.process" path="/newsletter">
+    <route id="newsletter.process" path="/newsletter" methods="post">
         <default key="_controller">Front\Controller\NewsletterController::subscribeAction</default>
         <default key="_view">newsletter</default>
     </route>
