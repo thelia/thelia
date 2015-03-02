@@ -184,14 +184,7 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
         {capture "creation_dialog"}
-			{form_hidden_fields}
-
-            {loop type="lang" name="default-lang" default_only="1"}
-                {* Switch edition to the current locale *}
-                <input type="hidden" name="edit_language_id" value="{$ID}" />
-
-                {render_form_field field="locale" value=$LOCALE}
-            {/loop}
+			{form_hidden_fields exclude="locale"}
 
             {render_form_field field="success_url" value={url path='/admin/brand/update/_ID_'}}
 
