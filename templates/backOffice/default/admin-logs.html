@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="after-bootstrap-css"}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
+{/block}
+
 {block name="no-return-functions"}
     {$admin_current_location = 'configuration'}
 {/block}
@@ -42,24 +46,20 @@
 
 	                            <div class="row">
 	                                <div class="col-lg-3 clearfix">
-	                                    <div class="input-group">
+	                                    <div class="input-group date">
 	                                        <span class="input-group-addon">{intl l='From'}</span>
-	                                        <input class="form-control" type="text" id="from_date" readonly="readonly">
-	                                        <span class="input-group-btn">
-	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#from_date" type="button">
-	                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                            </button>
+	                                        <input class="form-control datetime-picker from-datetime-picker" type="text" id="from_date" readonly="readonly">
+	                                        <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
 	                                        </span>
 	                                    </div>
 	                                </div>
 	                                <div class="col-lg-3 clearfix input-group">
-	                                    <div class="input-group">
+	                                    <div class="input-group date">
 	                                        <span class="input-group-addon">{intl l='To'}</span>
-	                                        <input class="form-control" type="text" id="to_date" readonly="readonly">
-	                                        <span class="input-group-btn">
-	                                            <button class="btn btn-default js-show-datepicker" data-datepicker-selector="#to_date" type="button">
-	                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                            </button>
+	                                        <input class="form-control datetime-picker to-datetime-picker" type="text" id="to_date" readonly="readonly">
+	                                        <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
 	                                        </span>
 	                                    </div>
 	                                </div>
@@ -153,29 +153,33 @@
 
 {block name="javascript-initialization"}
     <script src="{javascript file='assets/js/bootstrap-switch/bootstrap-switch.js'}"></script>
-    <script src="{javascript file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.js'}"></script>
 
-    <link rel="stylesheet" href="{stylesheet file='assets/js/jquery.ui/jquery.ui.theme.css'}">
-    <link rel="stylesheet" href="{stylesheet file='assets/js/jquery.ui/jquery.ui.datepicker/jquery.ui.datepicker.css'}">
+    {javascripts file='assets/js/moment-with-locales.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
     <script type="text/javascript">
 
+        {$langcode = {lang attr="code"}|substr:0:2}
+
         jQuery(function($) {
 
-            $('#from_date').datepicker({
-                maxDate: "-1d",
-                showOn: 'manual'
+            $('.from-datetime-picker').datetimepicker({
+                language: "{$langcode}",
+                useSeconds: false,
+                format: 'YYYY-MM-DD',
+                defaultDate: moment().subtract(7, 'days')
             });
-            $('#from_date').datepicker( "setDate", "-7d" );
 
-            $('#to_date').datepicker({
-                maxDate: "0",
-                showOn: 'manual'
-            });
-            $('#to_date').datepicker( "setDate", "0" );
-
-            $('.js-show-datepicker').click(function(e){
-                $($(this).data('datepicker-selector')).datepicker('show');
+            $('.to-datetime-picker').datetimepicker({
+                language: "{$langcode}",
+                useSeconds: false,
+                format: 'YYYY-MM-DD',
+                defaultDate: moment()
             });
 
             $('.js-show-logs').click(function(e) {
@@ -198,14 +202,14 @@
                     modules.push($(v).data('id'));
                 });
 
-                var fromDate = new Date( $('#from_date').datepicker( "getDate" ) );
-                var toDate = new Date( $('#to_date').datepicker( "getDate" ) );
+                var fromDate = $('.from-datetime-picker').data('DateTimePicker').getDate().format('YYYY-MM-DD');
+                var toDate = $('.to-datetime-picker').data('DateTimePicker').getDate().format('YYYY-MM-DD');
 
                 $.post(
                     "{url path='/admin/configuration/adminLogs/logger'}",
                     {
-                        fromDate:       $.datepicker.formatDate("yy-mm-dd", fromDate),
-                        toDate:         $.datepicker.formatDate("yy-mm-dd", toDate),
+                        fromDate:       fromDate,
+                        toDate:         toDate,
                         admins:         admins,
                         resources:      resources,
                         modules:        modules
@@ -214,8 +218,12 @@
                         $('#loading-block').hide();
                         $('#logger-display').html(html);
                         $('.js-show-logs').attr('disabled', false);
+
+                        $('html, body').scrollTop($("#logger-display").offset().top);
                     }
                 );
+
+                e.preventDefault();
             });
         });
 

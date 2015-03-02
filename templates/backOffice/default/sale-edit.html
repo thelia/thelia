@@ -249,8 +249,10 @@
 
         {* data-date-format is a moment.js date format *}
 
+        {$langcode = {lang attr="code"}|substr:0:2}
+
         $('.datetime-picker').datetimepicker({
-            lang: "{lang attr="code"}",
+            language: "{$langcode}",
             useSeconds: false
         });
 

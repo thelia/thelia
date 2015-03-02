@@ -33,6 +33,7 @@
 - Add cache on the graph of the home page, possibility to disable cache or change ttl cache, with the configuration variable admin_cache_home_stats_ttl
 - New feature: a default product template could be defined in categories. Products created in this category will get this default product template. If no default product template is defined in a given category, it will be searched in parent categories.
 - New main navigation style and position
+- jquery.ui.datepicker is no longer used in the default back-office template (bootstrap-datetimepicker is used instead).
 
 # 2.1.3
 
