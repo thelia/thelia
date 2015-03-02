@@ -68,6 +68,17 @@ class ConfigurationForm extends BaseForm
                 ]
             )
             ->add(
+                'set_images_as_responsive',
+                'checkbox',
+                [
+                    'data'       => intval(Tinymce::getConfigValue('set_images_as_responsive', 1)) != 0,
+                    'label'      => $this->translator->trans('Add responsive class to images', [], Tinymce::MODULE_DOMAIN),
+                    'label_attr' => [
+                        'help' => $this->translator->trans('If checked, the "img-responsive" class is added by default to inserted images', [], Tinymce::MODULE_DOMAIN)
+                    ]
+                ]
+            )
+            ->add(
                 'custom_css',
                 'textarea',
                 [
