@@ -34,6 +34,15 @@
 - New feature: a default product template could be defined in categories. Products created in this category will get this default product template. If no default product template is defined in a given category, it will be searched in parent categories.
 - New main navigation style and position
 
+# 2.1.3
+
+- Add ```\Thelia\Model\OrderProduct::setCartItemId``` and ```\Thelia\Model\OrderProduct::getCartItemId``` to remove the typo with ```cartIemId```
+
+## DEPRECATED
+
+- ```\Thelia\Model\OrderProduct::setCartIemId``` Because of a typo
+- ```\Thelia\Model\OrderProduct::getCartIemId``` Because of a typo too
+
 # 2.1.2
 
 - Add the possibility to delete a coupon from the backoffice.
@@ -48,6 +57,12 @@
 - Fix redirect response if a AuthenticationException is catched
 - The PaymentModule log default level is now INFO instead of ERROR
 - Direct instantiations of Thelia forms is deprecated. BaseController::createForm() should be used instead.
+- Prevent XSS injection in error.html template
+- The hook method is now stored in the ignored_module_hook table
+- Allow to hardlink TinyMCE rather than symlink
+- Add bootstrap paths for thelia-project
+- Enlarge order dropdown menu to prevent wrapping in some languages
+- Fixed langugage when previewing e-mails
 
 # 2.1.1
 
