@@ -276,7 +276,7 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
                     $configContent = @file_get_contents($module->getAbsoluteConfigPath() . DS . "config.xml");
 
                     $hasConfigurationInterface = $configContent &&
-                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) !== false
+                        preg_match('/event\s*=\s*[\'"]module.configuration[\'"]/', $configContent) === 1
                     ;
 
                     if (false === $hasConfigurationInterface) {
