@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Exception\TheliaProcessException;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Tools\URL;
 use Tinymce\Form\ConfigurationForm;
@@ -66,7 +67,14 @@ class ConfigureController extends BaseAdminController
             // Save Custom CSS in default assets
             $customCss = __DIR__ .DS.'..'.DS.'templates'.DS.'backOffice'.DS.'default'.DS.'assets'.DS.'css'.DS.'custom-css.less';
 
-            @file_put_contents($customCss, $data['custom_css']);
+            if (1 || false === file_put_contents($customCss, $data['custom_css'])) {
+                throw new TheliaProcessException(
+                    $this->getTranslator()->trans(
+                        "Failed to update custom CSS file \"%file\". Please check this file or parent folder write permissions.",
+                        [ '%file' => $customCss ]
+                    )
+                );
+            }
 
             // Log configuration modification
             $this->adminLogAppend(
