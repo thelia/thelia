@@ -38,72 +38,67 @@
                             </div>
                         </div>
 
-                        <div class="row">
-	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Period'} :</strong>
-	                            </div>
 
-	                            <div class="row">
-	                                <div class="col-lg-3 clearfix">
-	                                    <div class="input-group date">
-	                                        <span class="input-group-addon">{intl l='From'}</span>
-	                                        <input class="form-control datetime-picker from-datetime-picker" type="text" id="from_date" readonly="readonly">
-	                                        <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                        </span>
-	                                    </div>
-	                                </div>
-	                                <div class="col-lg-3 clearfix input-group">
-	                                    <div class="input-group date">
-	                                        <span class="input-group-addon">{intl l='To'}</span>
-	                                        <input class="form-control datetime-picker to-datetime-picker" type="text" id="to_date" readonly="readonly">
-	                                        <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-	                                        </span>
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+                        <div class="row">
+                            <div class="col-md-1 text-right">
+                                <p class="form-control-static"><strong>{intl l='Period'} :</strong></p>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon">{intl l='From'}</span>
+                                        <input class="form-control datetime-picker from-datetime-picker" type="text" id="from_date" readonly="readonly">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon">{intl l='To'}</span>
+                                        <input class="form-control datetime-picker to-datetime-picker" type="text" id="to_date" readonly="readonly">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Administrators'} :</strong>
-	                            </div>
+
+                                <p class="form-control-static"><strong>{intl l='Administrators'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="admin" name="admin-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="admin_{$ID}" data-id="{$LOGIN}" class="js-admin" type="checkbox" checked>
-	                                    <label for="admin_{$ID}" style="font-weight: normal;">{$LOGIN} ({$FIRSTNAME|upper} {$LASTNAME|ucwords})</label>
+                                        <label class="checkbox-inline">
+                                            <input id="admin_{$ID}" data-id="{$LOGIN}" class="js-admin" type="checkbox" checked>{$LOGIN} ({$FIRSTNAME} {$LASTNAME})
+                                        </label>
 	                                </div>
-	                            {/loop}
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
+                                {/loop}
 	                            </div>
 	                        </div>
 	                    </div>
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Resources'} :</strong>
-	                            </div>
+                                <p class="form-control-static"><strong>{intl l='Resources'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="resource" name="resources-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="resource_{$ID}" data-id="{$CODE}" class="js-resource" type="checkbox" checked>
-	                                    <label for="resource_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+                                        <label class="checkbox-inline">
+	                                        <input id="resource_{$ID}" data-id="{$CODE}" class="js-resource" type="checkbox" checked> {$TITLE}
+                                        </label>
 	                                </div>
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
 	                            {/loop}
 	                            </div>
 
@@ -112,20 +107,17 @@
 
                         <div class="row">
 	                        <div class="col-md-12">
-	                            <div>
-	                                <strong>{intl l='Modules'} :</strong>
-	                            </div>
+                                <p class="form-control-static"><strong>{intl l='Modules'} :</strong></p>
 
 	                            <div class="row">
 	                            {loop type="module" name="modules-list" backend_context="1"}
-	                                {if ($LOOP_COUNT-1)%4 == 0 AND $LOOP_COUNT != 0 AND $LOOP_COUNT != $LOOP_TOTAL}
-	                                    </div>
-	                                    <div class="row">
-	                                {/if}
 	                                <div class="col-md-3">
-	                                    <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked>
-	                                    <label for="module_{$ID}" style="font-weight: normal;">{$TITLE}</label>
+                                        <label class="checkbox-inline">
+	                                        <input id="module_{$ID}" data-id="{$CODE}" class="js-module" type="checkbox" checked> {$TITLE}
+                                        </label>
 	                                </div>
+
+                                    {if ($LOOP_COUNT)%4 == 0}<div class="clearfix"></div>{/if}
 	                            {/loop}
 	                            </div>
 
@@ -138,9 +130,11 @@
                             </div>
                         </div>
 
-                        <div id="loading-block" class="col-md-12 loading-block"></div>
+                        <div class="row">
+                            <div id="loading-block" class="col-md-12 loading-block"></div>
 
-                        <div class="col-md-12 clearfix" id="logger-display"></div>
+                            <div class="col-md-12 clearfix" id="logger-display"></div>
+                        </div>
                     </div>
                 </div>
             </div>
