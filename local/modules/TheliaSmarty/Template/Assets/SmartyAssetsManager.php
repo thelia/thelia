@@ -157,6 +157,7 @@ class SmartyAssetsManager
         $filters      = isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $templateName = isset($params['template']) ? $params['template'] : false;
+        $failsafe     = isset($params['failsafe']) ? $params['failsafe'] : false;
 
         Tlog::getInstance()->debug("Searching asset $file in source $assetOrigin, with template $templateName");
 
@@ -202,7 +203,12 @@ class SmartyAssetsManager
             );
         } else {
             // Log the problem
-            throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
+            if ($failsafe) {
+                // The asset URL will be ''
+                Tlog::getInstance()->addWarning("Failed to find asset source file " . $params['file']);
+            } else {
+                throw new TheliaProcessException("Failed to find asset source file " . $params['file']);
+            }
         }
 
         return $assetUrl;
