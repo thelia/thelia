@@ -89,7 +89,7 @@
                         <ul>
                             {loop name="subcategories" type="category" parent=$category_id}
                                 <li>
-                                    <a href="{url path={navigate to="current"} category_id=$ID }">{$TITLE}</a>
+                                    <a href="{$URL}">{$TITLE}</a>
                                 </li>
                             {/loop}
                         </ul>
