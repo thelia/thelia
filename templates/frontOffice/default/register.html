@@ -80,6 +80,20 @@
                                 </div>
                             </div><!--/.form-group-->
                         {/form_field}
+                        {if {config key="customer_birthday_enable"}}
+                            {form_field field="birthday"}
+                                <div class="form-group group-birthday{if $error} has-error{/if}">
+                                    <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
+                                    <div class="control-input">
+                                        <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" placeholder="{$label_attr.placeholder}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
+                                        {if $error }
+                                            <span class="help-block">{$message}</span>
+                                            {assign var="error_focus" value="true"}
+                                        {/if}
+                                    </div>
+                                </div><!--/.form-group-->
+                            {/form_field}
+                        {/if}
                         {form_field field="email"}
                         <div class="form-group group-email{if $error} has-error{/if}">
                             <label class="control-label" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>

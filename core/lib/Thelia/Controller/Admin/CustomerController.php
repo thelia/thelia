@@ -18,6 +18,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Exception\CustomerException;
 use Thelia\Form\Definition\AdminForm;
+use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Tools\Password;
 
@@ -86,6 +87,10 @@ class CustomerController extends AbstractCrudController
         return $event->hasCustomer();
     }
 
+    /**
+     * @param Customer $object
+     * @return \Thelia\Form\BaseForm
+     */
     protected function hydrateObjectForm($object)
     {
         // Get default adress of the customer
@@ -100,6 +105,7 @@ class CustomerController extends AbstractCrudController
                 'title'     => $object->getTitleId(),
                 'discount'  => $object->getDiscount(),
                 'reseller'  => $object->getReseller(),
+                'birthday'  => $object->getBirthday()
         );
 
         if ($address !== null) {
@@ -148,7 +154,8 @@ class CustomerController extends AbstractCrudController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            isset($data["birthday"])?$data["birthday"]:null
         );
 
         return $customerCreateEvent;

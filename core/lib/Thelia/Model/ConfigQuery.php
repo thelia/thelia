@@ -284,5 +284,25 @@ class ConfigQuery extends BaseConfigQuery
     {
         return intval(static::read("admin_cache_home_stats_ttl", 600));
     }
+
+    public static function getCustomerConfirmEmail()
+    {
+        return boolval(static::read("customer_confirm_email", false));
+    }
+
+    public static function getCustomerChangeEmail()
+    {
+        return boolval(static::read("customer_change_email", false));
+    }
+
+    public static function getCustomerBirthdayEnable()
+    {
+        return boolval(static::read("customer_birthday_enable", false));
+    }
+
+    public static function getCustomerBirthdayRequired()
+    {
+        return boolval(static::read("customer_birthday_required", false));
+    }
 }
 // ConfigQuery

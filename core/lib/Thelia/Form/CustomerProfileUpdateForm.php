@@ -14,6 +14,7 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
 /**
@@ -28,6 +29,7 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
         parent::buildForm();
 
         $this->formBuilder
+
             ->remove("auto_login")
             // Remove From Personal Informations
             ->remove("phone")
@@ -43,6 +45,18 @@ class CustomerProfileUpdateForm extends CustomerCreateForm
             // Remove Login Information
             ->remove("password")
             ->remove("password_confirm");
+
+        if (!ConfigQuery::getCustomerChangeEmail()) {
+            $this->formBuilder
+                ->remove('email')
+                ->add("email", "email", array(
+                    "required" => false,
+                    "label" => Translator::getInstance()->trans("Email Address"),
+                    "label_attr" => array(
+                        "for" => "email",
+                    )
+                ));
+        }
     }
 
     /**

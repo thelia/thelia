@@ -17,6 +17,7 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\Lang;
 
 /**
  * Class CustomerCreateForm
@@ -51,7 +52,7 @@ class CustomerCreateForm extends AddressCreateForm
                 "label" => Translator::getInstance()->trans("Email Address"),
                 "label_attr" => array(
                     "for" => "email",
-                ),
+                )
             ))
             // Add Login Information
             ->add("password", "password", array(
@@ -87,7 +88,7 @@ class CustomerCreateForm extends AddressCreateForm
             ));
 
         //confirm email
-        if (intval(ConfigQuery::read("customer_confirm_email", 0))) {
+        if (ConfigQuery::getCustomerConfirmEmail()) {
             $this->formBuilder->add("email_confirm", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
@@ -100,6 +101,22 @@ class CustomerCreateForm extends AddressCreateForm
                 "label_attr" => array(
                     "for" => "email_confirm",
                 ),
+            ));
+        }
+
+        //birthday
+        if (ConfigQuery::getCustomerBirthdayEnable()) {
+            $format = self::getFormatBirthday();
+
+            $this->formBuilder->add("birthday", "date", array(
+                "widget" => "single_text",
+                "format" => $format,
+                "required" => ConfigQuery::getCustomerBirthdayRequired(),
+                "label" => Translator::getInstance()->trans("Birthday"),
+                "label_attr" => array(
+                    "for" => "birthday",
+                    "placeholder" => strtoupper($format)
+                )
             ));
         }
     }
@@ -133,5 +150,25 @@ class CustomerCreateForm extends AddressCreateForm
     public function getName()
     {
         return "thelia_customer_create";
+    }
+
+    /**
+     * @return string
+     */
+    private function getFormatBirthday()
+    {
+        if ($this->getRequest()->getSession() != null) {
+            $format = $this->getRequest()->getSession()->getLang()->getDateFormat();
+        } else {
+            $format = Lang::getDefaultLanguage()->getDateFormat();
+        }
+
+        $format = str_replace(
+            array('y', 'd', 'm', 'Y', 'j', 'n'),
+            array('yy', 'dd', 'MM', 'yyyy', 'dd', 'MM'),
+            $format
+        );
+
+        return $format;
     }
 }

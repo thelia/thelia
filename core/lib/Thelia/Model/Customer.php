@@ -51,6 +51,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param  null                                      $company
      * @param  null                                      $ref
      * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
+     * @param  \DateTime                                 $birthday
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -74,7 +75,8 @@ class Customer extends BaseCustomer implements UserInterface
         $discount = 0,
         $company = null,
         $ref = null,
-        $forceEmailUpdate = false
+        $forceEmailUpdate = false,
+        \DateTime $birthday = null
     ) {
         $this
             ->setTitleId($titleId)
@@ -86,6 +88,7 @@ class Customer extends BaseCustomer implements UserInterface
             ->setSponsor($sponsor)
             ->setDiscount($discount)
             ->setRef($ref)
+            ->setBirthday($birthday)
         ;
 
         if (!is_null($lang)) {

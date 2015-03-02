@@ -40,14 +40,20 @@ SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (@max_id + 1, 'customer_change_email', '0', 0, 0, NOW(), NOW()),
-(@max_id + 2, 'customer_confirm_email', '0', 0, 0, NOW(), NOW())
+(@max_id + 2, 'customer_confirm_email', '0', 0, 0, NOW(), NOW()),
+(@max_id + 3, 'customer_birthday_enable', '0', 0, 0, NOW(), NOW()),
+(@max_id + 4, 'customer_birthday_required', '1', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id + 1, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
 (@max_id + 1, 'fr_FR', 'Permettre aux clients de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
 (@max_id + 2, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
-(@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL)
+(@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+(@max_id + 3, 'en_US', 'Ask customers their birthday, 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 3, 'fr_FR', 'Demander aux clients leur date de naissance. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+(@max_id + 4, 'en_US', 'Force the customer to enter a birthday, 1 for yes, 0 for no', NULL, NULL, NULL),
+(@max_id + 4, 'fr_FR', 'Forcer le client à entrer une de naissance. 1 pour oui, 0 pour non', NULL, NULL, NULL)
 ;
 
 -- country area table
@@ -77,5 +83,8 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 
 -- Remove area_id column from country table
 ALTER TABLE `country` DROP `area_id`;
+
+ALTER TABLE  `customer` ADD  `birthday` DATE NULL AFTER  `algo` ;
+ALTER TABLE  `customer_version` ADD  `birthday` DATE NULL AFTER  `algo` ;
 
 SET FOREIGN_KEY_CHECKS = 1;

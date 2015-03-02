@@ -88,6 +88,15 @@
                                                     </div>
                                                 {/form_field}
 
+                                                {if {config key="customer_birthday_enable"}}
+                                                    {form_field field="birthday"}
+                                                        <div class="form-group {if $error}has-error{/if}">
+                                                            <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>
+                                                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{$label_attr.placeholder}">
+                                                        </div>
+                                                    {/form_field}
+                                                {/if}
+
                                                 {form_field field='discount'}
                                                     <div class="form-group {if $error}has-error{/if}">
                                                         <label for="{$label_attr.for}" class="control-label">{$label}{if $required} <span class="required">*</span>{/if} : </label>

@@ -29,6 +29,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
+ * @method     ChildCustomerQuery orderByBirthday($order = Criteria::ASC) Order by the birthday column
  * @method     ChildCustomerQuery orderByReseller($order = Criteria::ASC) Order by the reseller column
  * @method     ChildCustomerQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
@@ -49,6 +50,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery groupByEmail() Group by the email column
  * @method     ChildCustomerQuery groupByPassword() Group by the password column
  * @method     ChildCustomerQuery groupByAlgo() Group by the algo column
+ * @method     ChildCustomerQuery groupByBirthday() Group by the birthday column
  * @method     ChildCustomerQuery groupByReseller() Group by the reseller column
  * @method     ChildCustomerQuery groupByLang() Group by the lang column
  * @method     ChildCustomerQuery groupBySponsor() Group by the sponsor column
@@ -100,6 +102,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneByEmail(string $email) Return the first ChildCustomer filtered by the email column
  * @method     ChildCustomer findOneByPassword(string $password) Return the first ChildCustomer filtered by the password column
  * @method     ChildCustomer findOneByAlgo(string $algo) Return the first ChildCustomer filtered by the algo column
+ * @method     ChildCustomer findOneByBirthday(string $birthday) Return the first ChildCustomer filtered by the birthday column
  * @method     ChildCustomer findOneByReseller(int $reseller) Return the first ChildCustomer filtered by the reseller column
  * @method     ChildCustomer findOneByLang(string $lang) Return the first ChildCustomer filtered by the lang column
  * @method     ChildCustomer findOneBySponsor(string $sponsor) Return the first ChildCustomer filtered by the sponsor column
@@ -120,6 +123,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     array findByEmail(string $email) Return ChildCustomer objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomer objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomer objects filtered by the algo column
+ * @method     array findByBirthday(string $birthday) Return ChildCustomer objects filtered by the birthday column
  * @method     array findByReseller(int $reseller) Return ChildCustomer objects filtered by the reseller column
  * @method     array findByLang(string $lang) Return ChildCustomer objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomer objects filtered by the sponsor column
@@ -226,7 +230,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `BIRTHDAY`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `customer` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -571,6 +575,49 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::ALGO, $algo, $comparison);
+    }
+
+    /**
+     * Filter the query on the birthday column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBirthday('2011-03-14'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday('now'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday(array('max' => 'yesterday')); // WHERE birthday > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $birthday The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByBirthday($birthday = null, $comparison = null)
+    {
+        if (is_array($birthday)) {
+            $useMinMax = false;
+            if (isset($birthday['min'])) {
+                $this->addUsingAlias(CustomerTableMap::BIRTHDAY, $birthday['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($birthday['max'])) {
+                $this->addUsingAlias(CustomerTableMap::BIRTHDAY, $birthday['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::BIRTHDAY, $birthday, $comparison);
     }
 
     /**

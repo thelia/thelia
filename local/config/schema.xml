@@ -385,6 +385,7 @@
     <column name="email" size="255" type="VARCHAR" />
     <column name="password" size="255" type="VARCHAR" />
     <column name="algo" size="128" type="VARCHAR" />
+    <column name="birthday" type="DATE" />
     <column name="reseller" type="TINYINT" />
     <column name="lang" size="10" type="VARCHAR" />
     <column name="sponsor" size="50" type="VARCHAR" />

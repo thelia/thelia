@@ -15,6 +15,8 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Lang;
 
 /**
  * Class CustomerUpdateForm
@@ -184,6 +186,22 @@ class CustomerUpdateForm extends BaseForm
                 ),
             ))
         ;
+
+        //birthday
+        if (intval(ConfigQuery::getCustomerBirthdayEnable())) {
+            $format = self::getFormatBirthday();
+
+            $this->formBuilder->add("birthday", "date", array(
+                "widget" => "single_text",
+                "format" => $format,
+                "required" => ConfigQuery::getCustomerBirthdayRequired(),
+                "label" => Translator::getInstance()->trans("Birthday"),
+                "label_attr" => array(
+                    "for" => "birthday",
+                    "placeholder" => strtoupper($format)
+                )
+            ));
+        }
     }
 
     /**
@@ -201,5 +219,25 @@ class CustomerUpdateForm extends BaseForm
         if (isset($data["email_confirm"]) && $data["email"] != $data["email_confirm"]) {
             $context->addViolation(Translator::getInstance()->trans("email confirmation is not the same as email field"));
         }
+    }
+
+    /**
+     * @return string
+     */
+    private function getFormatBirthday()
+    {
+        if ($this->getRequest()->getSession() != null) {
+            $format = $this->getRequest()->getSession()->getLang()->getDateFormat();
+        } else {
+            $format = Lang::getDefaultLanguage()->getDateFormat();
+        }
+
+        $format = str_replace(
+            array('y', 'd', 'm', 'Y', 'j', 'n'),
+            array('yy', 'dd', 'MM', 'yyyy', 'dd', 'MM'),
+            $format
+        );
+
+        return $format;
     }
 }

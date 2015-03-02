@@ -65,6 +65,8 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                         'firstname_reverse',
                         'lastname',
                         'lastname_reverse',
+                        'birthday',
+                        'birthday_reverse',
                         'last_order',
                         'last_order_reverse',
                         'order_amount',
@@ -191,6 +193,13 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                     $search->orderByFirstname(Criteria::DESC);
                     break;
 
+                case 'birthday':
+                    $search->orderByBirthday(Criteria::ASC);
+                    break;
+                case 'birthday_reverse':
+                    $search->orderByBirthday(Criteria::DESC);
+                    break;
+
                 case 'registration_date':
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
@@ -206,6 +215,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Customer $customer */
         foreach ($loopResult->getResultDataCollection() as $customer) {
             $loopResultRow = new LoopResultRow($customer);
 
@@ -216,6 +226,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set("FIRSTNAME", $customer->getFirstname())
                 ->set("LASTNAME", $customer->getLastname())
                 ->set("EMAIL", $customer->getEmail())
+                ->set('BIRTHDAY', $customer->getBirthday())
                 ->set("RESELLER", $customer->getReseller())
                 ->set("SPONSOR", $customer->getSponsor())
                 ->set("DISCOUNT", $customer->getDiscount())

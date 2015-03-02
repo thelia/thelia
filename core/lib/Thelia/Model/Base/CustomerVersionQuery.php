@@ -29,6 +29,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersionQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerVersionQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerVersionQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
+ * @method     ChildCustomerVersionQuery orderByBirthday($order = Criteria::ASC) Order by the birthday column
  * @method     ChildCustomerVersionQuery orderByReseller($order = Criteria::ASC) Order by the reseller column
  * @method     ChildCustomerVersionQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerVersionQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
@@ -51,6 +52,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersionQuery groupByEmail() Group by the email column
  * @method     ChildCustomerVersionQuery groupByPassword() Group by the password column
  * @method     ChildCustomerVersionQuery groupByAlgo() Group by the algo column
+ * @method     ChildCustomerVersionQuery groupByBirthday() Group by the birthday column
  * @method     ChildCustomerVersionQuery groupByReseller() Group by the reseller column
  * @method     ChildCustomerVersionQuery groupByLang() Group by the lang column
  * @method     ChildCustomerVersionQuery groupBySponsor() Group by the sponsor column
@@ -84,6 +86,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersion findOneByEmail(string $email) Return the first ChildCustomerVersion filtered by the email column
  * @method     ChildCustomerVersion findOneByPassword(string $password) Return the first ChildCustomerVersion filtered by the password column
  * @method     ChildCustomerVersion findOneByAlgo(string $algo) Return the first ChildCustomerVersion filtered by the algo column
+ * @method     ChildCustomerVersion findOneByBirthday(string $birthday) Return the first ChildCustomerVersion filtered by the birthday column
  * @method     ChildCustomerVersion findOneByReseller(int $reseller) Return the first ChildCustomerVersion filtered by the reseller column
  * @method     ChildCustomerVersion findOneByLang(string $lang) Return the first ChildCustomerVersion filtered by the lang column
  * @method     ChildCustomerVersion findOneBySponsor(string $sponsor) Return the first ChildCustomerVersion filtered by the sponsor column
@@ -106,6 +109,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     array findByEmail(string $email) Return ChildCustomerVersion objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomerVersion objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomerVersion objects filtered by the algo column
+ * @method     array findByBirthday(string $birthday) Return ChildCustomerVersion objects filtered by the birthday column
  * @method     array findByReseller(int $reseller) Return ChildCustomerVersion objects filtered by the reseller column
  * @method     array findByLang(string $lang) Return ChildCustomerVersion objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomerVersion objects filtered by the sponsor column
@@ -207,7 +211,7 @@ abstract class CustomerVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `ID`, `REF`, `TITLE_ID`, `FIRSTNAME`, `LASTNAME`, `EMAIL`, `PASSWORD`, `ALGO`, `BIRTHDAY`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY`, `ORDER_IDS`, `ORDER_VERSIONS` FROM `customer_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -564,6 +568,49 @@ abstract class CustomerVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerVersionTableMap::ALGO, $algo, $comparison);
+    }
+
+    /**
+     * Filter the query on the birthday column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByBirthday('2011-03-14'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday('now'); // WHERE birthday = '2011-03-14'
+     * $query->filterByBirthday(array('max' => 'yesterday')); // WHERE birthday > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $birthday The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerVersionQuery The current query, for fluid interface
+     */
+    public function filterByBirthday($birthday = null, $comparison = null)
+    {
+        if (is_array($birthday)) {
+            $useMinMax = false;
+            if (isset($birthday['min'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::BIRTHDAY, $birthday['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($birthday['max'])) {
+                $this->addUsingAlias(CustomerVersionTableMap::BIRTHDAY, $birthday['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerVersionTableMap::BIRTHDAY, $birthday, $comparison);
     }
 
     /**
