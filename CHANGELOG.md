@@ -26,14 +26,14 @@
 - A country could belong to more than one shipping zone.
 - Add the `exclude_area` parameter to the Country loop.
 - The Country loop now returns a proper country ISO code, left-padded with zeros, e.g. '004' instead of '4'
-- The Country::getAreaId() method is deprecated.
+- The Country::getAreaId() method is DEPRECATED.
 - Add the `country` and `order` parameters to Area loop
 - Add the `area` parameter to Module loop
 - Improved Shipping zones management
 - Add cache on the graph of the home page, possibility to disable cache or change ttl cache, with the configuration variable admin_cache_home_stats_ttl
 - New feature: a default product template could be defined in categories. Products created in this category will get this default product template. If no default product template is defined in a given category, it will be searched in parent categories.
 - New main navigation style and position
-- jquery.ui.datepicker is no longer used in the default back-office template (bootstrap-datetimepicker is used instead).
+- jquery.ui.datepicker is now DEPRECATED and will be REMOVED in 2.3. Please use boostrap-datepicker
 
 # 2.1.3
 
