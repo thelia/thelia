@@ -70,6 +70,7 @@
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>
+                                                {hook name="import.table-header" location="import_table_header"}
                                                 <th class="col-md-1">
                                                     {intl l="Actions"}
                                                 </th>
@@ -95,6 +96,7 @@
                                                         id=$ID
                                                     }
                                                 </td>
+                                                {hook name="import.table-row" location="import_table_row" import_id=$ID}
                                                 <td>
                                                     <div class="btn-group">
                                                         <a class="btn btn-default btn-xs btn-show-import-modal" href="#category_{$category_title}" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this import"}">

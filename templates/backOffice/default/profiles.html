@@ -43,6 +43,7 @@
                                     <th class="col-md-1">{intl l="Code"}</th>
                                     <th class="col-md-3">{intl l="Name"}</th>
                                     <th class="col-md-4">{intl l="Description"}</th>
+                                    {hook name="profile.table-header" location="profile_table_header"}
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
@@ -75,6 +76,7 @@
                                         {/if}
                                     </td>
                                     <td>{$DESCRIPTION}</td>
+                                    {hook name="profile.table-row" location="profile_table_row" sale_id=$ID}
                                     <td>
                                         <div class="btn-group">
                                             {if $can_change}
