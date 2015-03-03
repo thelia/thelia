@@ -115,7 +115,8 @@ class Update
      *
      * @return array containing the database
      */
-    protected function getDatabaseConfig() {
+    protected function getDatabaseConfig()
+    {
         $configPath = THELIA_CONF_DIR . "/database.yml";
 
         if (!file_exists($configPath)) {
