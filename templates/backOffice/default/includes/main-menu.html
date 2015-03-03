@@ -11,7 +11,7 @@
 
     <ul class="list-unstyled">
         <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
-            <a href="{url path='/admin/home'}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
+            <a href="{url path='/admin/home'}" title="{intl l="Home"}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
         </li>
 
         {loop name="menu-auth-customer" type="auth" role="ADMIN" resource="admin.customer" access="VIEW"}
@@ -19,7 +19,7 @@
                 {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
                     <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
-                        <a data-toggle="collapse" href="#collapse-customer" {if $admin_current_location != 'customer'}class="collapsed"{/if}>
+                        <a title="{intl l="Customers"}" data-toggle="collapse" href="#collapse-customer" {if $admin_current_location != 'customer'}class="collapsed"{/if}>
                             <span class="icon-customers"></span>
                             <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
                         </a>
@@ -38,7 +38,7 @@
             {/ifhook}
             {elsehook rel="main.top-menu-customer"}
                 <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
-                    <a href="{url path='/admin/customers'}">
+                    <a href="{url path='/admin/customers'}" title="{intl l="Customers"}">
                         <span class="icon-customers"></span>
                         <span class="item-text">{intl l="Customers"}</span>
                     </a>
@@ -49,7 +49,7 @@
         {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
         <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-            <a data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
+            <a title="{intl l="Orders"}" data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
                 <span class="icon-orders"></span>
                 <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
             </a>
@@ -90,7 +90,7 @@
                 {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
-                    <a data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
+                    <a title="{intl l="Catalog"}" data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
                         <span class="icon-catalog"></span>
                         <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
                     </a>
@@ -109,7 +109,7 @@
             {/ifhook}
             {elsehook rel="main.top-menu-catalog"}
                 <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
-                    <a href="{url path='/admin/catalog'}">
+                    <a title="{intl l="Catalog"}" href="{url path='/admin/catalog'}">
                         <span class="icon-catalog"></span>
                         <span class="item-text">{intl l="Catalog"}</span>
                     </a>
@@ -122,7 +122,7 @@
                 {hookblock name="main.top-menu-content" fields="id,class,url,title"}
                     <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
-                        <a data-toggle="collapse" href="#collapse-content" {if $admin_current_location != 'content'}class="collapsed"{/if}>
+                        <a title="{intl l="Folders"}" data-toggle="collapse" href="#collapse-content" {if $admin_current_location != 'content'}class="collapsed"{/if}>
                             <span class="icon-records"></span>
                             <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
                         </a>
@@ -141,7 +141,7 @@
             {/ifhook}
             {elsehook rel="main.top-menu-content"}
                 <li class="{if $admin_current_location == 'folder'}active{/if}" id="contents_menu">
-                    <a href="{url path='/admin/folders'}">
+                    <a title="{intl l="Folders"}" href="{url path='/admin/folders'}">
                         <span class="icon-records"></span>
                         <span class="item-text">{intl l="Folders"}</span>
                     </a>
@@ -151,7 +151,7 @@
 
         {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
             <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                <a data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
+                <a {intl l="Tools"} data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
                     <span class="icon-tools"></span>
                     <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
                 </a>
@@ -194,7 +194,7 @@
             {ifhook rel="main.top-menu-modules"}
                 {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                    <a data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
+                    <a title="{intl l="Modules"}" data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
                         <span class="icon-modules"></span>
                         <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
                     </a>
@@ -213,7 +213,7 @@
             {/ifhook}
             {elsehook rel="main.top-menu-modules"}
                 <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                    <a href="{url path='/admin/modules'}">
+                    <a title="{intl l="Modules"}" href="{url path='/admin/modules'}">
                         <span class="icon-modules"></span>
                         <span class="item-text">{intl l="Modules"}</span>
                     </a>
@@ -225,7 +225,7 @@
             {ifhook rel="main.top-menu-configuration"}
                 {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
                     <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                        <a data-toggle="collapse" href="#collapse-configuration" {if $admin_current_location != 'configuration'}class="collapsed"{/if}>
+                        <a title="{intl l="Configuration"}" data-toggle="collapse" href="#collapse-configuration" {if $admin_current_location != 'configuration'}class="collapsed"{/if}>
                             <span class="icon-configuration"></span>
                             <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
                         </a>
@@ -244,7 +244,7 @@
             {/ifhook}
             {elsehook rel="main.top-menu-configuration"}
                 <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                    <a href="{url path='/admin/configuration'}">
+                    <a title="{intl l="Configuration"}" href="{url path='/admin/configuration'}">
                         <span class="icon-configuration"></span>
                         <span class="item-text">{intl l="Configuration"}</span>
                     </a>
