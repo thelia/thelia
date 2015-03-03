@@ -33,12 +33,16 @@
                                 </div>
                             {/if}
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-5">
                                     {render_form_field form=$form field="editor_height"}
 
                                     {render_form_field form=$form field="force_pasting_as_text"}
+                                    {render_form_field form=$form field="set_images_as_responsive"}
                                     {render_form_field form=$form field="show_menu_bar"}
-                                    {render_form_field form=$form field="custom_css" extra_class=""}
+                                    {render_form_field form=$form field="custom_css"}
+                                </div>
+                                <div class="col-md-7">
+                                    {render_form_field form=$form field="test_zone" extra_class="wysiwyg"}
                                 </div>
                             </div>
                         </form>

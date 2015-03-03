@@ -26,7 +26,8 @@
                 paste_remove_styles: true,
                 paste_remove_styles_if_webkit: true,
                 paste_strip_class_attributes: true,
-            {/if}
+                paste_as_text: true,
+        {/if}
         {/loop}
 
         // Use our smarty plugin to guess the best available language
@@ -46,19 +47,25 @@
 
         image_advtab: true,
 
+        {loop type="module-config" name="dummy" module="tinymce" variable="set_images_as_responsive" default_value="1"}
+            {if $VALUE != 0}
+            // Set image as responsive
+            image_dimensions: false,
+            image_class_list: [
+                {
+                    title: '{intl l='Responsive'}', value: 'img-responsive'
+                },
+                {
+                    title: '{intl l='None'}', value: ''
+                }
+            ],
+            {/if}
+        {/loop}
+
         // File manager configuration
         external_filemanager_path: "{url file='/tinymce/filemanager/'}",
         filemanager_title: "{intl l='File manager' d='tinymce.bo.default'}" ,
         external_plugins: { "filemanager" : "{url file='/tinymce/filemanager/plugin.min.js'}"},
-
-        // Always paste as text, removing external formatting when pasting text
-        //paste_as_text: true,
-
-        // All newlines are <p>, Shift+enter inserts <br />
-        //force_p_newlines : true,
-
-        relative_urls : false,
-        document_base_url : "{url path="/"}",
 
         // Styles (CSS or LESS) available in the editor could be defined in assets/css/editor.less file.
         {$css = ''}
@@ -74,7 +81,11 @@
 
         {if $css != ''}
             content_css: "{$css}",
-            importcss_append: true
+            importcss_append: true,
         {/if}
+
+        convert_urls: false,
+        relative_urls : false,
+        document_base_url : "{url path="/"}"
     });
 </script>
