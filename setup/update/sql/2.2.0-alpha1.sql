@@ -78,4 +78,31 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 -- Remove area_id column from country table
 ALTER TABLE `country` DROP `area_id`;
 
+-- new hook --
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'profile.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 2, 'profile.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 3, 'import.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 4, 'import.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 5, 'export.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 6, 'export.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'fr_FR', 'Profil - colonne tableau', '', ''),
+(@max_id + 1, 'en_US', 'Profile - table header', '', ''),
+(@max_id + 2, 'fr_FR', 'Profil - ligne du tableau', '', ''),
+(@max_id + 2, 'en_US', 'Profile - table row', '', ''),
+(@max_id + 3, 'fr_FR', 'Import - colonne tableau', '', ''),
+(@max_id + 3, 'en_US', 'Import - table header', '', ''),
+(@max_id + 4, 'fr_FR', 'Import - ligne du tableau', '', ''),
+(@max_id + 4, 'en_US', 'Import - table row', '', ''),
+(@max_id + 5, 'fr_FR', 'Export - colonne tableau', '', ''),
+(@max_id + 5, 'en_US', 'Export - table header', '', ''),
+(@max_id + 6, 'fr_FR', 'Export - ligne du tableau', '', ''),
+(@max_id + 6, 'en_US', 'Export - table row', '', '')
+;
+
 SET FOREIGN_KEY_CHECKS = 1;
