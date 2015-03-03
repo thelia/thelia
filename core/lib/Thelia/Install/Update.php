@@ -17,6 +17,8 @@ use PDOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Config\DefinePropel;
 use Thelia\Core\Thelia;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
@@ -89,15 +91,8 @@ class Update
 
         $dbConfig = null;
 
-        $configPath = THELIA_ROOT . "/local/config/database.yml";
-
-        if (!file_exists($configPath)) {
-            throw new UpdateException("Thelia is not installed yet");
-        }
-
         try {
-            $dbConfig = Yaml::parse($configPath);
-            $dbConfig = $dbConfig['database']['connection'];
+            $dbConfig = $this->getDatabaseConfig();
         } catch (ParseException $ex) {
             throw new UpdateException("database.yml is not a valid file : " . $ex->getMessage());
         }
@@ -111,6 +106,46 @@ class Update
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
+    }
+
+    /**
+     * retrieve the database configuration
+     *
+     * @return array containing the database
+     */
+    protected function getDatabaseConfig() {
+        $configPath = THELIA_CONF_DIR . "/database.yml";
+
+        if (!file_exists($configPath)) {
+            throw new UpdateException("Thelia is not installed yet");
+        }
+
+        $definePropel = new DefinePropel(
+            new DatabaseConfiguration(),
+            Yaml::parse($configPath),
+            $this->getEnvParameters()
+        );
+
+        return $definePropel->getConfig();
+    }
+
+    /**
+     * Gets the environment parameters.
+     *
+     * Only the parameters starting with "SYMFONY__" are considered.
+     *
+     * @return array An array of parameters
+     */
+    protected function getEnvParameters()
+    {
+        $parameters = array();
+        foreach ($_SERVER as $key => $value) {
+            if (0 === strpos($key, 'SYMFONY__')) {
+                $parameters[strtolower(str_replace('__', '.', substr($key, 9)))] = $value;
+            }
+        }
+
+        return $parameters;
     }
 
     public function isLatestVersion($version = null)
@@ -170,8 +205,8 @@ class Update
 
     /**
      * Backup current DB to file local/backup/update.sql
-     *
      * @return bool if it succeeds, false otherwise
+     * @throws \Exception
      */
     public function backupDb()
     {
