@@ -34,6 +34,7 @@
 - New feature: a default product template could be defined in categories. Products created in this category will get this default product template. If no default product template is defined in a given category, it will be searched in parent categories.
 - New main navigation style and position
 - jquery.ui.datepicker is now DEPRECATED and will be REMOVED in 2.3. Please use boostrap-datepicker
+- Add new hook `profile.table-row`, `profile.table-header`, `import.table-row`, `import.table-header`, `export.table-row`, `export.table-header`
 
 # 2.1.3
 
