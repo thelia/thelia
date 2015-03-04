@@ -1,6 +1,7 @@
 # 2.1.3
 
 - Add ```\Thelia\Model\OrderProduct::setCartItemId``` and ```\Thelia\Model\OrderProduct::getCartItemId``` to remove the typo with ```cartIemId```
+- A notice is displayed when the product's template is changed
 
 ## DEPRECATED
 
