@@ -61,7 +61,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
 
         $this->createDirectories();
         $this->createFiles();
-        if (method_exists($this, "renderBlock")) {
+        if (method_exists($output, "renderBlock")) {
             // impossible to change output class in CommandTester...
             $output->renderBlock(array(
                 '',
