@@ -23,6 +23,8 @@
                     <li>{intl l='Editing country "%name"' name="{$TITLE}"}</li>
                 </ul>
 
+            {hook name="country-edit.top" country_id=$country_id}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -93,6 +95,8 @@
         			</div>
 
         		</div>
+
+            {hook name="country-edit.bottom" country_id=$country_id}
 
     		{/loop}
 

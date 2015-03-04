@@ -23,6 +23,8 @@
                 <li>{intl l='Editing feature "%name"' name={$TITLE}}</li>
             </ul>
 
+		{hook name="feature-edit.top" feature_id=$feature_id}
+
     		<div class="row">
     			<div class="col-md-12 general-block-decorator">
     				<div class="row">
@@ -183,6 +185,8 @@
     			</div>
 
     		</div>
+
+		{hook name="feature-edit.bottom" feature_id=$feature_id}
 
 		{/loop}
 

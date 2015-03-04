@@ -15,6 +15,8 @@
 
         {include file="includes/folder-breadcrumb.html" }
 
+        {hook name="folder-edit.top" folder_id=$folder_id}
+
         <div class="row">
             {loop name="folder_edit" type="folder" visible="*" id="{$folder_id}" backend_context="1" lang="$edit_language_id"}
 
@@ -196,6 +198,9 @@
 		    </div>
             {/loop}
  		</div>
+
+        {hook name="folder-edit.bottom" folder_id=$folder_id}
+
 	</div>
 </div>
 {/block}

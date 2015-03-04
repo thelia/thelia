@@ -23,6 +23,8 @@
             <li>{intl l='Editing mailing template "%name"' name={$NAME}}</li>
         </ul>
 
+        {hook name="message-edit.top" message_id=$message_id}
+
 		<div class="row">
 			<div class="col-md-12 general-block-decorator">
 				<div class="row">
@@ -232,6 +234,9 @@
 			</div>
 
 		</div>
+
+        {hook name="message-edit.bottom" message_id=$message_id}
+
 		{/loop}
 
         {elseloop rel="message_edit"}

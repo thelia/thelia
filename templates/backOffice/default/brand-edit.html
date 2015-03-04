@@ -27,6 +27,8 @@
                 </ul>
             </nav>
 
+            {hook name="brand-edit.top" brand_id=$brand_id}
+
             <div class="row">
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
@@ -178,6 +180,9 @@
                     </div>
                 </div>
             </div>
+
+            {hook name="brand-edit.bottom" brand_id=$brand_id}
+
             {/loop}
         </div>
     </div>

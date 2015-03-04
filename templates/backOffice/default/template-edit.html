@@ -23,6 +23,8 @@
                     <li>{intl l='Editing template "%name"' name={$NAME}}</li>
                 </ul>
 
+                {hook name="template-edit.top" template_id=$template_id}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -99,6 +101,7 @@
 
         		</div>
 
+                {hook name="template-edit.bottom" template_id=$template_id}
     		{/loop}
 
             {elseloop rel="template_edit"}

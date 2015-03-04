@@ -27,6 +27,8 @@
 
         {loop type="sale" name="sale" active='*' id=$sale_id backend_context="1" lang=$edit_language_id}
 
+        {hook name="sale-edit.top" sale_id=$sale_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
@@ -203,6 +205,9 @@
                 </div>
             </div>
         </div>
+
+        {hook name="sale-edit.bottom" sale_id=$sale_id}
+
         {/loop}
     </div>
 </div>

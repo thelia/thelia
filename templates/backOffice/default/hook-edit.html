@@ -19,6 +19,8 @@
             <li>{intl l='Editing hook "%name"' name="{$TITLE}"}</li>
         </ul>
 
+        {hook name="hook-edit.top" hook_id=$hook_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
@@ -71,6 +73,8 @@
                 </div>
             </div>
         </div>
+
+        {hook name="hook-edit.bottom" hook_id=$hook_id}
 
         {/loop}
 

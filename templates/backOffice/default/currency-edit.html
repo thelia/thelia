@@ -23,6 +23,8 @@
                     <li>{intl l='Editing currency "%name"' name="{$NAME}"}</li>
                 </ul>
 
+			{hook name="currency-edit.top" currency_id=$currency_id}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -112,6 +114,8 @@
         			</div>
 
         		</div>
+
+			{hook name="currency-edit.bottom" currency_id=$currency_id}
 
     		{/loop}
 

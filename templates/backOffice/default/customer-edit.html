@@ -21,6 +21,8 @@
                     <li>{intl l="Edit customer %firstname %lastname" firstname={$FIRSTNAME} lastname={$LASTNAME}}</li>
                 </ul>
 
+            {hook name="customer-edit.top" customer_id=$customer_id}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -335,6 +337,8 @@
                 </div>
 
             {hook name="customer.edit" location="customer-edit" customer_id=$customer_id}
+
+            {hook name="customer-edit.bottom" customer_id=$customer_id}
 
     		{/loop}
 

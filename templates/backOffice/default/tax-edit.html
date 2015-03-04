@@ -24,6 +24,8 @@
 
         {loop type="tax" name="tax" id=$tax_id backend_context="1" lang=$edit_language_id}
 
+        {hook name="tax-edit.top" tax_id=$tax_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
@@ -127,6 +129,8 @@
 
             </div>
         </div>
+
+        {hook name="tax-edit.bottom" tax_id=$tax_id}
 
         {/loop}
 

@@ -17,6 +17,8 @@
                     <li>{intl l='Editing document "%name"' name="{$TITLE}"}</li>
                 </ul>
 
+            {hook name="document-edit.top" document_id=$documentId}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -101,6 +103,8 @@
         			</div>
 
         		</div>
+
+            {hook name="document-edit.bottom" document_id=$documentId}
 
     		{/loop}
 
