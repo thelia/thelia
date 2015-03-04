@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tools;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -27,11 +28,6 @@ class TokenProvider
      * @var string The stored token for this page
      */
     protected $token;
-
-    /**
-     * @var string The token of the previous page
-     */
-    protected $previousToken;
 
     /**
      * @var SessionInterface The session where the token is stored
@@ -67,18 +63,8 @@ class TokenProvider
         $this->session = $request->getSession();
         $this->translator = $translator;
         $this->tokenName = $tokenName;
-    }
 
-    protected function saveToken()
-    {
-        if (null !== $sessionToken = $this->session->get($this->tokenName)) {
-            $this->previousToken = $sessionToken;
-            $this->session->set($this->tokenName, null);
-
-            return true;
-        }
-
-        return false;
+        $this->token = $this->session->get($this->tokenName);
     }
 
     /**
@@ -88,7 +74,6 @@ class TokenProvider
     {
         if (null === $this->token) {
             $this->token = $this->getToken();
-            $this->saveToken();
 
             $this->session->set($this->tokenName, $this->token);
         }
@@ -103,25 +88,27 @@ class TokenProvider
      */
     public function checkToken($entryValue)
     {
-        $isValid = false;
-
-        if (!$this->saveToken()) {
+        if (null === $this->token) {
             throw new TokenAuthenticationException(
                 "Tried to check a token without assigning it before"
             );
         } else {
-            if ($this->previousToken !== $entryValue) {
+            if ($this->token !== $entryValue) {
                 throw new TokenAuthenticationException(
                     "Tried to validate an invalid token"
                 );
             } else {
-                $isValid = true;
+                $this->refreshToken();
             }
-
-            $this->session->set($this->tokenName, null);
         }
 
-        return $isValid;
+        return true;
+    }
+
+    protected function refreshToken()
+    {
+        $this->token = null;
+        $this->assignToken();
     }
 
     /**
