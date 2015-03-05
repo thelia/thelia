@@ -23,6 +23,8 @@
 
         {loop type="module" name="module" id=$module_id backend_context="1" lang=$edit_language_id}
 
+        {hook name="module-edit.top" module_id=$module_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
@@ -68,6 +70,8 @@
 
             </div>
         </div>
+
+        {hook name="module-edit.bottom" module_id=$module_id}
 
         {/loop}
 

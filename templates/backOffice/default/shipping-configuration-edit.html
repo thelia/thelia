@@ -20,6 +20,9 @@
             <li><a href="{url path='/admin/configuration/shipping_configuration'}">{intl l="Shipping configuration"}</a></li>
             <li>{intl l='Editing shipping zone "%name"' name="{$NAME}"}</li>
         </ul>
+
+        {hook name="shipping-configuration-edit.top" area_id=$area_id}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
@@ -142,6 +145,9 @@
                 </div>
             </div>
         </div>
+
+        {hook name="shipping-configuration-edit.bottom" area_id=$area_id}
+
         {/loop}
 
         {elseloop rel="area-edit"}

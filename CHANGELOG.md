@@ -35,6 +35,7 @@
 - New main navigation style and position
 - jquery.ui.datepicker is now DEPRECATED and will be REMOVED in 2.3. Please use boostrap-datepicker
 - Add ```thelia.logger``` service to prepare the transition with another logger.
+- Add 56 new admin hook
 
 # 2.1.3
 

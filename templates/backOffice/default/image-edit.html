@@ -17,6 +17,8 @@
                     <li>{intl l='Editing image "%name"' name={$TITLE}}</li>
                 </ul>
 
+            {hook name="image-edit.top" image_id=$imageId}
+
         		<div class="row">
         			<div class="col-md-12 general-block-decorator">
         				<div class="row">
@@ -108,6 +110,8 @@
         			</div>
 
         		</div>
+
+            {hook name="image-edit.bottom" image_id=$imageId}
 
     		{/loop}
 

@@ -23,6 +23,8 @@
                 <li>{intl l="Order details"}</a></li>
 	        </ul>
 
+            {hook name="order-edit.top" order_id=$order_id}
+
 	        <div class="row">
             	<div class="col-md-12">
 
@@ -475,6 +477,8 @@
 
             	</div>
             </div>
+
+            {hook name="order-edit.bottom" order_id=$order_id}
 
         </div>
     </div>

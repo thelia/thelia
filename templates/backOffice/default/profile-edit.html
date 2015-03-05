@@ -26,6 +26,8 @@
 
         {loop type="profile" name="profile" id=$profile_id backend_context="1" lang=$edit_language_id}
 
+        {hook name="profile-edit.top" profile_id=$profile_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
@@ -288,6 +290,9 @@
             </div>
 
         </div>
+
+        {hook name="profile-edit.bottom" profile_id=$profile_id}
+
         {/loop}
 
     </div>

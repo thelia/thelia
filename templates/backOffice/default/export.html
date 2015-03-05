@@ -88,6 +88,7 @@
                                                         {intl l="Position"}
                                                     </a>
                                                 </th>
+                                                {hook name="export.table-header"}
                                                 <th class="col-md-1">
                                                     {intl l="Actions"}
                                                 </th>
@@ -116,6 +117,7 @@
                                                             id=$ID
                                                         }
                                                     </td>
+                                                    {hook name="export.table-row" export_id=$ID}
                                                     <td>
                                                         <div class="btn-group">
                                                             <a class="btn btn-default btn-xs btn-show-export-modal" data-id="{$ID}" data-url="{$URL nofilter}" title="{intl l="Do this export"}">

@@ -23,6 +23,8 @@
                 <li>{intl l='Editing attribute "%name"' name={$TITLE}}</li>
             </ul>
 
+		{hook name="attribute-edit.top" attribute_id=$attribute_id}
+
     		<div class="row">
     			<div class="col-md-12 general-block-decorator">
     				<div class="row">
@@ -183,6 +185,8 @@
     			</div>
 
     		</div>
+
+		{hook name="attribute-edit.bottom" attribute_id=$attribute_id}
 
 		{/loop}
 

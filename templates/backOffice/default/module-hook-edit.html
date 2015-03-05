@@ -19,6 +19,8 @@
             <li>{intl l='Editing hook for module "%name"' name="{$MODULE_TITLE}"}</li>
         </ul>
 
+        {hook name="module-hook-edit.top" module_hook_id=$module_hook_id}
+
         <div class="row">
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
@@ -73,10 +75,13 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            {/loop}
+        {hook name="module-hook-edit.bottom" module_hook_id=$module_hook_id}
 
-            {elseloop rel="module_hook_edit"}
+        {/loop}
+
+        {elseloop rel="module_hook_edit"}
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-error">
@@ -84,9 +89,7 @@
                     </div>
                 </div>
             </div>
-            {/elseloop}
-
-        </div>
+        {/elseloop}
     </div>
 </div>
 {/block}

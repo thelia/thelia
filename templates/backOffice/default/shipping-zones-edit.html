@@ -23,6 +23,8 @@
             <li>{intl l='Editing shipping configuration for module "%name"' name="{$TITLE}"}</li>
         </ul>
 
+        {hook name="shipping-zones-edit.top" delivery_module_id=$delivery_module_id}
+
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
@@ -115,6 +117,8 @@
                 </div>
             </div>
         </div>
+
+        {hook name="shipping-zones-edit.bottom" delivery_module_id=$delivery_module_id}
 
         {/loop}
     </div>

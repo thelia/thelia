@@ -16,6 +16,8 @@
 
             {include file="includes/catalog-breadcrumb.html" editing_category="true"}
 
+            {hook name="category-edit.top" category_id=$category_id}
+
             <div class="row">
                 {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" lang="$edit_language_id"}
 
@@ -301,6 +303,9 @@
                 </div>
                 {/loop}
             </div>
+
+            {hook name="category-edit.bottom" category_id=$category_id}
+
         </div>
     </div>
 

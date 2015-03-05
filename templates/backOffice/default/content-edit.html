@@ -15,6 +15,8 @@
 
             {include file="includes/folder-breadcrumb.html" editing_content="true"}
 
+            {hook name="content-edit.top" content_id=$content_id}
+
             <div class="row">
                 {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
                     <div class="col-md-12 general-block-decorator">
@@ -213,6 +215,9 @@
                     </div>
                 {/loop}
             </div>
+
+            {hook name="content-edit.bottom" content_id=$content_id}
+
         </div>
     </div>
     {* Delete category confirmation dialog *}
