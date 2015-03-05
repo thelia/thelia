@@ -39,6 +39,9 @@
 
         <parameter key="thelia.token_id">thelia.token_provider</parameter>
         <parameter key="thelia.validator.translation_domain">validators</parameter>
+
+        <!-- Thelia logger class -->
+        <parameter key="thelia.logger.class">Thelia\Log\Tlog</parameter>
     </parameters>
 
 
@@ -284,5 +287,8 @@
         <service id="currency.converter.ecbProvider" class="Thelia\CurrencyConverter\Provider\ECBProvider">
             <tag name="currency.converter.provider" priority="0" />
         </service>
+
+        <!-- Thelia logger -->
+        <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
     </services>
 </config>
