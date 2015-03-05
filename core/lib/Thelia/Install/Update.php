@@ -42,6 +42,7 @@ class Update
         '11' => '2.0.4',
         '12' => '2.0.5',
         '13' => '2.0.6',
+        '14' => '2.0.7',
     );
 
     protected function isLatestVersion($version)
@@ -93,9 +94,15 @@ class Update
     protected function updateToVersion($version, Database $database, Tlog $logger)
     {
         if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.sql')) {
-            $logger->debug(sprintf('inserting file %s', $version.'$sql'));
+            $logger->debug(sprintf('inserting file %s', $version.'.sql'));
             $database->insertSql(null, array(THELIA_ROOT . '/setup/update/'.$version.'.sql'));
-            $logger->debug(sprintf('end inserting file %s', $version.'$sql'));
+            $logger->debug(sprintf('end inserting file %s', $version.'.sql'));
+        }
+
+        if (file_exists(THELIA_ROOT . '/setup/update/'.$version.'.php')) {
+            $logger->debug(sprintf('including file %s', $version.'.php'));
+            include_once(THELIA_ROOT . '/setup/update/'.$version.'.php');
+            $logger->debug(sprintf('end inserting file %s', $version.'.sql'));
         }
 
         ConfigQuery::write('thelia_version', $version);
