@@ -11,6 +11,7 @@
 
 {block name="main-content"}
     {assign order_page {$smarty.get.page|default:1}}
+    {assign view_status {$smarty.get.status}}
     {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
 <div class="orders">
 
@@ -191,6 +192,8 @@
 
 {capture "cancel_order_dialog"}
     <input type="hidden" name="order_page" value="{$order_page}">
+    <input type="hidden" name="status" value="{$view_status}">
+
     <input type="hidden" name="order_id" id="cancel_order_id" />
     <input type="hidden" name="status_id" value="5" />
 {/capture}
