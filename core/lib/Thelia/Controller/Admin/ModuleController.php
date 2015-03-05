@@ -13,12 +13,14 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Thelia\Action\Module;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Exception\InvalidModuleException;
@@ -361,5 +363,41 @@ class ModuleController extends AbstractCrudController
             ->setGeneralError($message);
 
         return $this->render("modules");
+    }
+
+    public function informationAction($module_id)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
+        if (null !== $module = ModuleQuery::create()->findPk($module_id)) {
+            $title = $module->setLocale($this->getSession()->getLang()->getLocale())->getTitle();
+
+            // Get the module descriptor
+            $moduleDescriptor = $module->getAbsoluteConfigPath() . DS . 'module.xml';
+
+            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+                // Transform the pseudo-array into a real array
+                $arrayData = json_decode(json_encode((array)$xmlData), 1);
+
+                $content = $this->renderRaw("ajax/module-information", [
+                    'moduleId' => $module_id,
+                    'moduleData' => $arrayData
+                ]);
+
+            } else {
+                $content = $this->getTranslator()->trans(
+                    'Failed to load descriptor (module.xml) for module ID "%id".',
+                    [ '%id' => $module_id]
+                );
+            }
+
+        } else {
+            $title = $this->getTranslator()->trans('Error occured.');
+            $content = $this->getTranslator()->trans('Module ID "%id" was not found.', [ '%id' => $module_id]);
+        }
+
+        return new JsonResponse([ 'title' => $title, 'body' => $content]);
     }
 }

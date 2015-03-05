@@ -1,6 +1,6 @@
 {extends file="admin-layout.tpl"}
 
-{block name="page-title"}{intl l='Hooks position'}{/block}
+{block name="page-title"}{intl l='Modules attachments'}{/block}
 
 {block name="check-resource"}admin.module-hook{/block}
 {block name="check-access"}view{/block}
@@ -14,7 +14,7 @@
             <ul class="breadcrumb pull-left">
                 <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-                <li>{intl l="Hooks position"}</li>
+                <li>{intl l="Modules attachments"}</li>
             </ul>
         </div>
 
@@ -27,7 +27,7 @@
                     </a>
                 </div>
                 {/loop}
-                <p class="title title-without-tabs">{intl l="Hooks position"}</p>
+                <p class="title title-without-tabs">{intl l="Modules attachments"}</p>
             </div>
             <div class="hooks-filter">
                 <form class="form-horizontal" role="form" action="#" id="hook-filter-form">
@@ -145,11 +145,9 @@
             </div>
 
             <div class="col-md-12">
-                <div class="alert alert-info">
-                    <ul>
-                        <li><a href="{url path='/admin/modules'}" class="text-info">{intl l="Manage modules"}</a></li>
-                        <li><a href="{url path='/admin/hooks'}" class="text-info">{intl l="Manage hooks"}</a></li>
-                    </ul>
+                <div class="text-right">
+                    <a href="{url path='/admin/modules'}" class="btn btn-primary">{intl l="Manage modules"} <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a href="{url path='/admin/hooks'}" class="btn btn-primary">{intl l="Manage hooks"}  <span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
         </div>

@@ -46,12 +46,11 @@
 
             </div>
 
+
             <div class="col-md-12">
-                <div class="alert alert-info">
-                    <ul>
-                        <li><a href="{url path='/admin/hooks'}" class="text-info">{intl l="Manage hooks"}</a></li>
-                        <li><a href="{url path='/admin/module-hooks'}" class="text-info">{intl l="Manage hooks positions"}</a></li>
-                    </ul>
+                <div class="text-right">
+                    <a href="{url path='/admin/hooks'}" class="btn btn-primary">{intl l="Manage hooks"} <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a href="{url path='/admin/module-hooks'}" class="btn btn-primary">{intl l="Manage modules attachements"}  <span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
         </div>
@@ -107,6 +106,26 @@
     </div>
 </div>
 
+{* Module information dialog *}
+<div class="modal fade" id="module-information" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 id="module-information-title"></h3>
+            </div>
+
+            <div class="modal-body" id="module-information-body">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{intl l='Close'}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {/block}
 
 {block name="javascript-initialization"}
@@ -138,19 +157,16 @@
                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
                $.ajax({
                     url: url_management+$(this).data('id')
-               }).done(function(){
+               }).always(function(){
                    $("#loading-event").remove();
-               })
-               .success(function() {
+               }).done(function() {
             	   if (is_checked)
             		   $('.config-btn-' + module_id).removeClass('disabled');
             	   else
                        $('.config-btn-' + module_id).addClass('disabled');
 
-               })
-               .fail(function(jqXHR, textStatus, errorThrown){
+               }).fail(function(jqXHR, textStatus, errorThrown){
                     checkbox.bootstrapSwitch('toggleState', true);
-                    $("#loading-event").remove();
                     $('#module-failed-body').html(jqXHR.responseJSON.error);
                     $("#module-failed").modal("show");
                });
@@ -190,6 +206,21 @@
                 $(event.currentTarget).next('.more').toggleClass('hidden');
             });
 
+            $('.module-information').click(function(event) {
+                $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
+
+                $.ajax({
+                    url: '{url path='/admin/module/information/__ID__'}'.replace('__ID__', $(this).data('id'))
+                }).always(function(){
+                    $("#loading-event").remove();
+                }).success(function(data) {
+                    $('#module-information-title').html(data.title);
+                    $('#module-information-body').html(data.body);
+                    $("#module-information").modal("show");
+                });
+
+                event.preventDefault();
+            });
         });
     </script>
 
