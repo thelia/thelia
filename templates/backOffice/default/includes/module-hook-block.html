@@ -3,14 +3,15 @@
         <thead>
             <tr>
                 <th>{intl l='ID'}</th>
-                <th> {intl l='Module'}</th>
+                <th> {intl l='Module name'}</th>
+                <th> {intl l='Module code'}</th>
                 <th class="text-center">{intl l='Enable/Disable'}</th>
                 <th class="text-center">{intl l='Position'}</th>
                 <th class="text-center">{intl l='Action'}</th>
             </tr>
         </thead>
         <tbody>
-            {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1}
+            {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1 lang=$lang_id}
             {assign var="visible" value="{if $MODULE_ACTIVE && $HOOK_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}" }
             <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
                 data-visible="{$visible}"
@@ -21,6 +22,7 @@
                 >
                 <td>{$ID}</td>
                 <td>{$MODULE_TITLE}</td>
+                <td>{$MODULE_CODE}</td>
                 <td class="text-center">
                     {if ! $by_module }
                         {if $MODULE_ACTIVE && $HOOK_ACTIVE && !$by_module}
