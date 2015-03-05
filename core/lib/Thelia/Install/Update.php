@@ -57,6 +57,7 @@ class Update
         '18' => '2.1.0',
         '19' => '2.1.1',
         '20' => '2.1.2',
+        '21' => '2.1.3',
     );
 
     /** @var bool */
@@ -105,6 +106,7 @@ class Update
                 $dbConfig['user'],
                 $dbConfig['password']
             );
+
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
@@ -204,7 +206,6 @@ class Update
 
         return $this->updatedVersions;
     }
-
 
     /**
      * Backup current DB to file local/backup/update.sql
@@ -338,7 +339,7 @@ class Update
 
         if (file_exists($filename)) {
             $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once $filename;
+            include_once($filename);
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
