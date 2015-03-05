@@ -168,6 +168,25 @@
         </div>
     </div>
 
+    <div class="modal fade" id="template_notice" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>{intl l="warning"}</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {intl l="If you change the template, all the prices will be reset and you have to configure them again."}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="ok"}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {/block}
 
 {block name="javascript-initialization"}
@@ -218,6 +237,10 @@ $(function() {
         if (triggers.length == 2) {
             $(triggers[0]).trigger(triggers[1]);
         }
+    });
+
+    $("body").on("change", "#template_id", function(){
+        $("#template_notice").modal('show');
     });
 
 

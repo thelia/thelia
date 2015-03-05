@@ -626,6 +626,7 @@ return array(
     'ISO Code' => 'Code ISO',
     'If a translation is missing or incomplete :' => 'Si une traduction est manquante ou incomplète :',
     'If yes, redirections through Redirect::exec() will be displayed as links' => 'Si oui, les redirections générés pas Redirect::exec seront affichés par des liens',
+    'If you change the template, all the prices will be reset and you have to configure them again.' => 'En changeant de template, les prix vont être réinitialiser et vous devrez les reconfigurer',
     'Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.' => 'La chaîne semble contient une variable smarty (&#36;). Si c\'est le cas elle ne peut pas être traduite correctement',
     'Image information' => 'Information de l\'image',
     'Image+file+not+found' => 'Fichier+image+absent',
@@ -1184,6 +1185,7 @@ return array(
     'last order' => 'Dernière commande',
     'long description' => 'description longue',
     'none' => 'aucun',
+    'ok' => 'ok',
     'order amount' => 'Montant de la commande',
     'orders for this customer' => 'commandes pour ce client',
     'pdf' => 'pdf',
@@ -1199,5 +1201,6 @@ return array(
     'tracking reference' => 'Numéro du colis',
     'uncheck all' => 'tout décocher',
     'version' => 'version',
+    'warning' => 'Attention',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l\'une après l\'autre ou en même temps: cela permet d\'appliquer des taxes sur un produit déjà taxé ou non.',
 );
