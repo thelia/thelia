@@ -70,9 +70,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('allow_slash_ended_uri', '1', 0, 0, NOW(), NOW()),
 ('error_message.show', '1', 0, 0, NOW(), NOW()),
 ('error_message.page_name', 'error.html', 0, 0, NOW(), NOW()),
-
 ('customer_change_email', '0', 0, 0, NOW(), NOW()),
-('customer_confirm_email', '1', 0, 0, NOW(), NOW())
+('customer_confirm_email', '1', 0, 0, NOW(), NOW()),
+('form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW())
 ;
 
 

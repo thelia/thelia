@@ -116,19 +116,27 @@ class TokenProvider
      */
     public function getToken()
     {
-        $raw = $this->getOpenSSLRandom();
-
+        return self::generateToken();
+    }
+    /**
+     * Same method as getToken but can be called statically
+     *
+     * @alias getToken
+     * @return string
+     */
+    public static function generateToken()
+    {
+        $raw = self::getOpenSSLRandom();
         if (false === $raw) {
-            $raw = $this->getComplexRandom();
+            $raw = self::getComplexRandom();
         }
-
         return md5($raw);
     }
 
     /**
      * @return string
      */
-    protected function getOpenSSLRandom($length = 40)
+    protected static function getOpenSSLRandom($length = 40)
     {
         if (!function_exists("openssl_random_pseudo_bytes")) {
             return false;
@@ -140,7 +148,7 @@ class TokenProvider
     /**
      * @return string
      */
-    protected function getComplexRandom()
+    protected static function getComplexRandom()
     {
         $firstValue = (float) (mt_rand(1, 0xFFFF) * rand(1, 0x10001));
         $secondValues = (float) (rand(1, 0xFFFF) * mt_rand(1, 0x10001));
