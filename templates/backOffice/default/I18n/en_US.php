@@ -682,7 +682,7 @@ return array(
     'Manage attributes included in this product template' => 'Manage attributes included in this product template',
     'Manage features included in this product template' => 'Manage features included in this product template',
     'Manage hooks' => 'Manage hooks',
-    'Manage its hooks' => 'Manage its hooks',
+    'Manage its hooks' => 'Manage module attachments',
     'Manage module rights' => 'Manage module rights',
     'Manage modules' => 'Manage modules',
     'Manage modules attachements' => 'Manage modules attachements',
