@@ -371,6 +371,8 @@ class ModuleController extends AbstractCrudController
             return $response;
         }
 
+        $status = 200;
+
         if (null !== $module = ModuleQuery::create()->findPk($module_id)) {
             $title = $module->setLocale($this->getSession()->getLang()->getLocale())->getTitle();
 
@@ -387,6 +389,8 @@ class ModuleController extends AbstractCrudController
                 ]);
 
             } else {
+                $status = 404;
+
                 $content = $this->getTranslator()->trans(
                     'Failed to load descriptor (module.xml) for module ID "%id".',
                     [ '%id' => $module_id]
@@ -398,6 +402,6 @@ class ModuleController extends AbstractCrudController
             $content = $this->getTranslator()->trans('Module ID "%id" was not found.', [ '%id' => $module_id]);
         }
 
-        return new JsonResponse([ 'title' => $title, 'body' => $content]);
+        return new JsonResponse([ 'title' => $title, 'body' => $content], $status);
     }
 }
