@@ -389,7 +389,7 @@ class ModuleController extends AbstractCrudController
                 ]);
 
             } else {
-                $status = 404;
+                $status = 500;
 
                 $content = $this->getTranslator()->trans(
                     'Failed to load descriptor (module.xml) for module ID "%id".',
@@ -398,6 +398,8 @@ class ModuleController extends AbstractCrudController
             }
 
         } else {
+            $status = 404;
+
             $title = $this->getTranslator()->trans('Error occured.');
             $content = $this->getTranslator()->trans('Module ID "%id" was not found.', [ '%id' => $module_id]);
         }
