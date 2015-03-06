@@ -66,6 +66,9 @@ try {
         if (null !== $lang) {
             $lang->toggleDefault();
         }
+        $secret = \Thelia\Tools\TokenProvider::generateToken();
+
+        \Thelia\Model\ConfigQuery::write('form.secret', $secret, 0, 0);
     }
 
     //clean up cache directories

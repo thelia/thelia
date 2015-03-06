@@ -49,12 +49,14 @@ class Update
         '10' => '2.0.3',
         '11' => '2.0.4',
         '12' => '2.0.5',
-        '13' => '2.1.0-alpha1',
-        '14' => '2.1.0-alpha2',
-        '15' => '2.1.0-beta1',
-        '16' => '2.1.0-beta2',
-        '17' => '2.1.0',
-        '18' => '2.1.1',
+        '13' => '2.0.6',
+        '14' => '2.1.0-alpha1',
+        '15' => '2.1.0-alpha2',
+        '16' => '2.1.0-beta1',
+        '17' => '2.1.0-beta2',
+        '18' => '2.1.0',
+        '19' => '2.1.1',
+        '20' => '2.1.2',
     );
 
     /** @var bool */
@@ -103,6 +105,7 @@ class Update
                 $dbConfig['user'],
                 $dbConfig['password']
             );
+
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }
@@ -202,7 +205,6 @@ class Update
 
         return $this->updatedVersions;
     }
-
 
     /**
      * Backup current DB to file local/backup/update.sql
@@ -336,7 +338,7 @@ class Update
 
         if (file_exists($filename)) {
             $this->log('debug', sprintf('executing file %s', $version . '.php'));
-            include_once $filename;
+            include_once($filename);
             $this->log('debug', sprintf('end executing file %s', $version . '.php'));
         }
 
