@@ -19,6 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
+use Thelia\Tools\TokenProvider;
 
 /**
  * try to install a new instance of Thelia
@@ -100,6 +101,7 @@ class Install extends ContainerAwareCommand
             ""
         ));
         $database->insertSql($connectionInfo["dbName"]);
+        $this->manageSecret($database);
 
         $output->writeln(array(
             "",
@@ -115,6 +117,13 @@ class Install extends ContainerAwareCommand
             "<info>Config file created with success. Your thelia is installed</info>",
             ""
         ));
+    }
+
+    protected function manageSecret(Database $database)
+    {
+        $secret = TokenProvider::generateToken();
+        $sql = "UPDATE `config` SET `value`=? WHERE `name`='form.secret'";
+        $database->execute($sql, [$secret]);
     }
 
     /**
