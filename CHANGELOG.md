@@ -1,5 +1,6 @@
 # 2.0.7
 - Change TokenProvider behavior to be more flexible
+- More secure csrf token
 
 # 2.0.6
 - Do not register previous url on XmlHttpRequest

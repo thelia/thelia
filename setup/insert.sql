@@ -60,7 +60,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('form_firewall_time_to_wait', '60', 0, 0, NOW(), NOW()),
 ('form_firewall_bruteforce_attempts', '10', 0, 0, NOW(), NOW()),
 ('form_firewall_attempts', '6', 0, 0, NOW(), NOW()),
-('form_firewall_active', '1', 0, 0, NOW(), NOW());
+('form_firewall_active', '1', 0, 0, NOW(), NOW()),
+('form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (1, 'en_US', 'Class name of the session handler', NULL, NULL, NULL),

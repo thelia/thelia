@@ -48,6 +48,10 @@ if($_SESSION['install']['step'] == 5) {
     \Thelia\Model\ConfigQuery::create()
         ->filterByName('url_site')
         ->update(array('Value' => $_POST['url_site']));
+
+    $secret = \Thelia\Tools\TokenProvider::generateToken();
+
+    \Thelia\Model\ConfigQuery::write('form.secret', $secret, 0, 0);
 }
 
 //clean up cache directories

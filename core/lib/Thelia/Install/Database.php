@@ -110,7 +110,7 @@ class Database
         $success = $stmt->execute($args);
 
         if ($success === false || $stmt->errorCode() != 0) {
-            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args,1).", error:".print_r($stmt->errorInfo(), 1));
+            throw new \RuntimeException("Failed to execute SQL '$sql', arguments:" . print_r($args, 1).", error:".print_r($stmt->errorInfo(), 1));
         }
     }
 
