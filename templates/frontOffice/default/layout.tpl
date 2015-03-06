@@ -57,7 +57,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {/block}
 
     {* Stylesheets *}
-    <link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">
+    {*<link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">*}
 
     {* To use the embedded less compiler :
        1) Comment the stylesheet function above, to prevent ce style.css to be included
@@ -65,11 +65,11 @@ GNU General Public License : http://www.gnu.org/licenses/
        3) In your back-office, set the process_assets configuration variable to 1,
        4) Run your shop in developpement ode, usinf index_dev.php
     *}
-    {*
+
     {stylesheets file='assets/less/styles.less' filters='less'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
-    *}
+
 
     {hook name="main.stylesheet"}
 
