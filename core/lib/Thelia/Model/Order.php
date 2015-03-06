@@ -149,7 +149,7 @@ class Order extends BaseOrder
                 ->findOne();
             $price = ($orderProduct->getWasInPromo() == 1 ? $orderProduct->getPromoPrice() : $orderProduct->getPrice());
             $amount += $price * $orderProduct->getQuantity();
-            $tax += round($taxAmount->getVirtualColumn('total_tax'), 2) * $orderProduct->getQuantity();
+            $tax += $taxAmount->getVirtualColumn('total_tax') * $orderProduct->getQuantity();
         }
 
         $total = $amount + $tax;
