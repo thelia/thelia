@@ -8,7 +8,7 @@
         <subtitle>This is a pseudo-payment module for free orders.</subtitle>
     </descriptive>
     <descriptive locale="fr_FR">
-        <title>Vous n'avez rien ào payer pour cette commande</title>
+        <title>Vous n'avez rien à payer pour cette commande</title>
         <subtitle>Un pseudo-module de paiement pour les commandes de montant nul</subtitle>
     </descriptive>
     <languages>
