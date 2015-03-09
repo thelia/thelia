@@ -113,13 +113,16 @@ CREATE TABLE `coupon_customer_count`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
+SELECT @max := MAX(`id`) FROM `country`;
+SET @max := @max+1;
+
 INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `by_default`, `shop_country`, `created_at`, `updated_at`) VALUES
-(269, 5, '344', 'HK', 'HKG', 0, 0, NOW(), NOW());
+(@max, 5, '344', 'HK', 'HKG', 0, 0, NOW(), NOW());
  
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(269, 'en_US', 'Hong Kong', '', '', ''),
-(269, 'es_ES', 'Hong Kong', '', '', ''),
-(269, 'fr_FR', 'Hong Kong', '', '', '');
-
+(@max, 'fr_FR', 'Hong Kong', '', '', ''),
+(@max, 'es_ES', 'Hong Kong', '', '', ''),
+(@max, 'en_US', 'Hong Kong', '', '', '')
+;
 
 SET FOREIGN_KEY_CHECKS = 1;

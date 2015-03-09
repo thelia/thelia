@@ -18,14 +18,18 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
-(@max_id + 1, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
-(@max_id + 2, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
-(@max_id + 2, 'fr_FR', 'Nom du cookie de stockage du panier', NULL, NULL, NULL),
-(@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
+(@max_id + 1, 'fr_FR', 'Utiliser un cookie persistant pour memoriser le panier du client', NULL, NULL, NULL),
+(@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
 (@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
-(@max_id + 4, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL),
-(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL)
+(@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
+(@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 4, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
+(@max_id + 2, 'en_US', NULL, NULL, NULL, NULL),
+(@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
+(@max_id + 4, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL)
 ;
 
 DELETE FROM `config` WHERE `name`='currency_rate_update_url';
@@ -54,42 +58,60 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-  (@max_id+1, 'en_US', 'Order - cart top', '', ''),
   (@max_id+1, 'fr_FR', 'Commande - panier haut', '', ''),
-  (@max_id+2, 'en_US', 'Order - cart bottom', '', ''),
   (@max_id+2, 'fr_FR', 'Commande - panier bas', '', ''),
-  (@max_id+3, 'en_US', 'Order - bill top', '', ''),
   (@max_id+3, 'fr_FR', 'Commande - facture haut', '', ''),
-  (@max_id+4, 'en_US', 'Order - bill bottom', '', ''),
   (@max_id+4, 'fr_FR', 'Commande - facture bas', '', ''),
-  (@max_id+5, 'en_US', 'Order - Before product list', '', ''),
   (@max_id+5, 'fr_FR', 'Commande - Avant la liste des produits', '', ''),
-  (@max_id+6, 'en_US', 'Order - Before starting product row', '', ''),
-  (@max_id+6, 'fr_FR', 'Commande - Avant d''ouvrir la ligne produit', '', ''),
-  (@max_id+7, 'en_US', 'Order - After closing product row', '', ''),
+  (@max_id+6, 'fr_FR', 'Commande - Avant d\'ouvrir la ligne produit', '', ''),
   (@max_id+7, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
-  (@max_id+8, 'en_US', 'Order - After product list', '', ''),
   (@max_id+8, 'fr_FR', 'Commande - Après la liste des produits', '', ''),
-  (@max_id+9, 'en_US', 'Sales - at the top', '', ''),
   (@max_id+9, 'fr_FR', 'Promotions - en haut', '', ''),
-  (@max_id+10, 'en_US', 'Sales - table header', '', ''),
   (@max_id+10, 'fr_FR', 'Promotions - colonne tableau', '', ''),
-  (@max_id+11, 'en_US', 'Sales - table row', '', ''),
   (@max_id+11, 'fr_FR', 'Promotions - ligne du tableau', '', ''),
-  (@max_id+12, 'en_US', 'Sales - at the bottom', '', ''),
   (@max_id+12, 'fr_FR', 'Promotions - en bas', '', ''),
-  (@max_id+13, 'en_US', 'Sale - create form', '', ''),
   (@max_id+13, 'fr_FR', 'Promotion - formulaire de création', '', ''),
-  (@max_id+14, 'en_US', 'Sale - delete form', '', ''),
   (@max_id+14, 'fr_FR', 'Promotion - formulaire de suppression', '', ''),
-  (@max_id+15, 'en_US', 'Sales - JavaScript', '', ''),
   (@max_id+15, 'fr_FR', 'Promotions - JavaScript', '', ''),
-  (@max_id+16, 'en_US', 'Product - at the bottom of a product combination', '', ''),
-  (@max_id+16, 'fr_FR', 'Produit - en bas d''une combinaison de déclinaisons', '', ''),
-  (@max_id+17, 'en_US', 'Layout - Before the main content', '', ''),
+  (@max_id+16, 'fr_FR', 'Produit - en bas d\'une combinaison de déclinaisons', '', ''),
   (@max_id+17, 'fr_FR', 'Layout - Avant le contenu principal', '', ''),
-  (@max_id+18, 'en_US', 'Admin layout - After the main content', '', ''),
-  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', '')
+  (@max_id+18, 'fr_FR', 'Admin layout - Après le contenu principal', '', ''),
+  (@max_id+1, 'es_ES', NULL, '', ''),
+  (@max_id+2, 'es_ES', NULL, '', ''),
+  (@max_id+3, 'es_ES', NULL, '', ''),
+  (@max_id+4, 'es_ES', NULL, '', ''),
+  (@max_id+5, 'es_ES', NULL, '', ''),
+  (@max_id+6, 'es_ES', NULL, '', ''),
+  (@max_id+7, 'es_ES', NULL, '', ''),
+  (@max_id+8, 'es_ES', NULL, '', ''),
+  (@max_id+9, 'es_ES', NULL, '', ''),
+  (@max_id+10, 'es_ES', NULL, '', ''),
+  (@max_id+11, 'es_ES', NULL, '', ''),
+  (@max_id+12, 'es_ES', NULL, '', ''),
+  (@max_id+13, 'es_ES', NULL, '', ''),
+  (@max_id+14, 'es_ES', NULL, '', ''),
+  (@max_id+15, 'es_ES', NULL, '', ''),
+  (@max_id+16, 'es_ES', NULL, '', ''),
+  (@max_id+17, 'es_ES', NULL, '', ''),
+  (@max_id+18, 'es_ES', NULL, '', ''),
+  (@max_id+1, 'en_US', 'Order - cart top', '', ''),
+  (@max_id+2, 'en_US', 'Order - cart bottom', '', ''),
+  (@max_id+3, 'en_US', 'Order - bill top', '', ''),
+  (@max_id+4, 'en_US', 'Order - bill bottom', '', ''),
+  (@max_id+5, 'en_US', 'Order - Before product list', '', ''),
+  (@max_id+6, 'en_US', 'Order - Before starting product row', '', ''),
+  (@max_id+7, 'en_US', 'Order - After closing product row', '', ''),
+  (@max_id+8, 'en_US', 'Order - After product list', '', ''),
+  (@max_id+9, 'en_US', 'Sales - at the top', '', ''),
+  (@max_id+10, 'en_US', 'Sales - table header', '', ''),
+  (@max_id+11, 'en_US', 'Sales - table row', '', ''),
+  (@max_id+12, 'en_US', 'Sales - at the bottom', '', ''),
+  (@max_id+13, 'en_US', 'Sale - create form', '', ''),
+  (@max_id+14, 'en_US', 'Sale - delete form', '', ''),
+  (@max_id+15, 'en_US', 'Sales - JavaScript', '', ''),
+  (@max_id+16, 'en_US', 'Product - at the bottom of a product combination', '', ''),
+  (@max_id+17, 'en_US', 'Layout - Before the main content', '', ''),
+  (@max_id+18, 'en_US', 'Admin layout - After the main content', '', '')
 ;
 
 # ======================================================================================================================
@@ -124,10 +146,12 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id+1, 'en_US',  'Smarty template engine integration', NULL,  NULL,  NULL),
-(@max_id+1, 'fr_FR',  'intégration du moteur de template Smarty', NULL,  NULL,  NULL),
-(@max_id+2, 'en_US',  'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL),
-(@max_id+2, 'fr_FR',  'Contôle de produit virtuel', 'Vérifie qu''un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL)
+(@max_id+1, 'fr_FR', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', NULL,  NULL,  NULL),
+(@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'es_ES', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'en_US', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'en_US', 'Virtual Product Controller', NULL,  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

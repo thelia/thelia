@@ -20,86 +20,47 @@ ALTER TABLE `module` ADD INDEX `idx_module_activate` (`activate`);
 SELECT @max := MAX(`id`) FROM `resource`;
 SET @max := @max+1;
 
-
 INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.configuration.store', NOW(), NOW());
+(@max, 'admin.configuration.store', NOW(), NOW()),
+(@max+1, 'admin.configuration.variable', NOW(), NOW()),
+(@max+2, 'admin.configuration.admin-logs', NOW(), NOW()),
+(@max+3, 'admin.configuration.system-logs', NOW(), NOW()),
+(@max+4, 'admin.configuration.advanced', NOW(), NOW()),
+(@max+5, 'admin.configuration.translations', NOW(), NOW()),
+(@max+6, 'admin.tools', NOW(), NOW()),
+(@max+7, 'admin.export', NOW(), NOW()),
+(@max+8, 'admin.export.customer.newsletter', NOW(), NOW())
+;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'fr_FR', 'Informations sur la boutique'),
+(@max+1, 'fr_FR', 'Variables de configuration'),
+(@max+2, 'fr_FR', 'Consulter les logs d\'administration'),
+(@max+3, 'fr_FR', 'Configuration du système de log'),
+(@max+4, 'fr_FR', 'Configuration avancée'),
+(@max+5, 'fr_FR', 'Traductions'),
+(@max+6, 'fr_FR', 'Outils'),
+(@max+7, 'fr_FR', 'gestion des exports'),
+(@max+8, 'fr_FR', NULL),
+(@max, 'es_ES', NULL),
+(@max+1, 'es_ES', NULL),
+(@max+2, 'es_ES', NULL),
+(@max+3, 'es_ES', NULL),
+(@max+4, 'es_ES', NULL),
+(@max+5, 'es_ES', NULL),
+(@max+6, 'es_ES', NULL),
+(@max+7, 'es_ES', NULL),
+(@max+8, 'es_ES', NULL),
 (@max, 'en_US', 'Store information configuration'),
-(@max, 'fr_FR', 'Informations sur la boutique');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.configuration.variable', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'en_US', 'Configuration variables'),
-(@max, 'fr_FR', 'Variables de configuration');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-  (@max, 'admin.configuration.admin-logs', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max, 'en_US', 'View administration logs'),
-  (@max, 'fr_FR', 'Consulter les logs d\'administration');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-  (@max, 'admin.configuration.system-logs', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max, 'en_US', 'Logging system configuration'),
-  (@max, 'fr_FR', 'Configuration du système de log');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-  (@max, 'admin.configuration.advanced', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max, 'en_US', 'Advanced configuration'),
-  (@max, 'fr_FR', 'Configuration avancée');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-  (@max, 'admin.configuration.translations', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max, 'en_US', 'Translations'),
-  (@max, 'fr_FR', 'Traductions');
-
-SET @max := @max+1;
-
-INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.tools', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'en_US', 'Tools panel'),
-(@max, 'fr_FR', 'Outils');
-
-SET @max := @max+1;
-
-INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.export', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'en_US', 'Back-office export management'),
-(@max, 'fr_FR', 'gestion des exports');
-
-
-SET @max := @max+1;
-
-INSERT INTO `resource` (`id`, `code`, `created_at`, `updated_at`) VALUES
-(@max, 'admin.export.customer.newsletter', NOW(), NOW());
-
-INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'en_US', 'export of newsletter subscribers'),
-(@max, 'fr_FR', 'export des inscrits à la newsletter');
+(@max+1, 'en_US', 'Configuration variables'),
+(@max+2, 'en_US', 'View administration logs'),
+(@max+3, 'en_US', 'Logging system configuration'),
+(@max+4, 'en_US', 'Advanced configuration'),
+(@max+5, 'en_US', 'Translations'),
+(@max+6, 'en_US', 'Tools panel'),
+(@max+7, 'en_US', 'Back-office export management'),
+(@max+8, 'en_US', NULL)
+;
 
 SELECT @max := MAX(`id`) FROM `lang`;
 SET @max := @max+1;
