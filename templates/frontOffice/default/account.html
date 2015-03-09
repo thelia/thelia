@@ -90,8 +90,12 @@
                                     <th>{if $DEFAULT === 1}
                                             {intl l="Main Address"}
                                         {else}
+<<<<<<< HEAD
                                             {$default={intl l='Address %nb' nb={$LOOP_COUNT}}}
                                             {$LABEL|default:$default}
+=======
+                                            {$LABEL|default:{intl l='Address %nb' nb=$LOOP_COUNT}}
+>>>>>>> Various template fixes
                                         {/if}
                                     </th>
                                     <td>
@@ -127,9 +131,15 @@
                                     </td>
                                     <td>
                                         <div class="group-btn">
+<<<<<<< HEAD
                                             <a href="{url path="/address/update/%id" id=$ID}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
                                                 <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+=======
+                                            <a href="{url path="/address/update/`$ID`"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                            {if $DEFAULT != 1}
+                                                <a href="{url path="/address/delete/`$ID`"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+>>>>>>> Various template fixes
                                             {/if}
                                         </div>
                                     </td>
