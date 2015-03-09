@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_1.xsd">
+    <fullnamespace>FreeOrder\FreeOrder</fullnamespace>
+    <descriptive locale="en_US">
+        <title>There's nothing to pay for this order</title>
+        <subtitle>This is a pseudo-payment module for free orders.</subtitle>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Vous n'avez rien ào payer pour cette commande</title>
+        <subtitle>Un pseudo-module de paiement pour les commandes de montant nul</subtitle>
+    </descriptive>
+    <languages>
+        <language>en_US</language>
+        <language>fr_FR</language>
+    </languages>
+    <version>1.0.0</version>
+    <author>
+        <name>Franck Allimant</name>
+        <company>CQFDev</company>
+        <email>franck@cqfdev.fr</email>
+    </author>
+    <type>payment</type>
+    <thelia>2.1.0</thelia>
+    <stability>prod</stability>
+</module>
