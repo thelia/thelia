@@ -91,7 +91,7 @@ class TranslationsController extends BaseAdminController
 
         // Find the i18n directory, and the directory to examine.
 
-        if (! empty($item_name) || $item_to_translate == 'co') {
+        if (! empty($item_name) || $item_to_translate == 'co' || $item_to_translate == 'in') {
             switch ($item_to_translate) {
 
                 // Module core
@@ -163,10 +163,10 @@ class TranslationsController extends BaseAdminController
                     // Check if we have admin-include files
                     try {
                         $finder = Finder::create()
-                                    ->files()
-                                    ->depth(0)
-                                    ->in($module->getAbsoluteAdminIncludesPath())
-                                    ->name('/\.html$/i')
+                            ->files()
+                            ->depth(0)
+                            ->in($module->getAbsoluteAdminIncludesPath())
+                            ->name('/\.html$/i')
                         ;
 
                         $hasAdminIncludes = $finder->count() > 0;
@@ -184,6 +184,16 @@ class TranslationsController extends BaseAdminController
                     $domain = 'core';
                     $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
                     $walkMode = TemplateHelper::WALK_MODE_PHP;
+                    break;
+
+                // Thelia Install
+                case 'in':
+                    $directory = THELIA_SETUP_DIRECTORY;
+                    $domain = 'install';
+                    $i18n_directory = THELIA_SETUP_DIRECTORY . '/I18n';
+                    $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+                    // resources not loaded by default
+                    $this->loadTranslation($i18n_directory, $domain);
                     break;
 
                 // Front-office template
