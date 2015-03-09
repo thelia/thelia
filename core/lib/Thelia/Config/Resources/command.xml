@@ -21,6 +21,7 @@
         <command class="Thelia\Command\AdminUpdatePasswordCommand"/>
         <command class="Thelia\Command\ConfigCommand"/>
         <command class="Thelia\Command\SaleCheckActivationCommand"/>
+        <command class="Thelia\Command\GenerateSQLCommand"/>
     </commands>
 
 </config>
