@@ -44,7 +44,7 @@ class Cheque extends BaseModule implements PaymentModuleInterface
      */
     public function isValidPayment()
     {
-        return true;
+        return $this->getCurrentOrderTotalAmount() > 0;
     }
 
     public function postActivation(ConnectionInterface $con = null)
