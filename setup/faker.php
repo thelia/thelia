@@ -60,7 +60,7 @@ $localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
 
 $localizedFaker = [];
 
-foreach($localeList as $locale) {
+foreach ($localeList as $locale) {
     $localizedFaker[$locale] = Faker\Factory::create($locale);
 }
 
@@ -77,7 +77,6 @@ $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne(
 //\Thelia\Log\Tlog::getInstance()->setLevel(\Thelia\Log\Tlog::ERROR);
 
 try {
-
     $stmt = $con->prepare("SET foreign_key_checks = 0");
     $stmt->execute();
 
@@ -247,7 +246,7 @@ try {
     for ($j = 0; $j <= 3; $j++) {
         $address = new Thelia\Model\Address();
         $address->setLabel(getRealText(20))
-            ->setTitleId(rand(1,3))
+            ->setTitleId(rand(1, 3))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
             ->setAddress1($faker->streetAddress)
@@ -277,7 +276,7 @@ try {
     for ($i = 0; $i < 50; $i++) {
         $customer = new Thelia\Model\Customer();
         $customer->createOrUpdate(
-            rand(1,3),
+            rand(1, 3),
             $faker->firstname,
             $faker->lastname,
             $faker->streetAddress,
@@ -295,7 +294,7 @@ try {
         for ($j = 0; $j <= 3; $j++) {
             $address = new Thelia\Model\Address();
             $address->setLabel(getRealText(20))
-                ->setTitleId(rand(1,3))
+                ->setTitleId(rand(1, 3))
                 ->setFirstname($faker->firstname)
                 ->setLastname($faker->lastname)
                 ->setAddress1($faker->streetAddress)
@@ -533,21 +532,21 @@ try {
         }
 
         //associate PSE and stocks to products
-        $pse_count = rand(1,7);
+        $pse_count = rand(1, 7);
         for ($pse_idx=0; $pse_idx<$pse_count; $pse_idx++) {
             $stock = new \Thelia\Model\ProductSaleElements();
             $stock->setProductId($productId);
             $stock->setRef($productId . '_' . $pse_idx . '_' . $faker->randomNumber(8));
-            $stock->setQuantity($faker->numberBetween(1,50));
-            $stock->setPromo($faker->numberBetween(0,1));
-            $stock->setNewness($faker->numberBetween(0,1));
+            $stock->setQuantity($faker->numberBetween(1, 50));
+            $stock->setPromo($faker->numberBetween(0, 1));
+            $stock->setNewness($faker->numberBetween(0, 1));
             $stock->setWeight($faker->randomFloat(2, 1, 5));
             $stock->setIsDefault($pse_idx == 0 ? true : false);
             $stock->setEanCode(substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 13));
             $stock->save();
 
             // associate document to virtual product
-            if (array_key_exists($productId, $virtualProductList)){
+            if (array_key_exists($productId, $virtualProductList)) {
                 $virtualDocument = new \Thelia\Model\MetaData();
                 $virtualDocument
                     ->setMetaKey('virtual')
@@ -572,7 +571,7 @@ try {
             $alreadyPicked = array();
             $minAttrCount = $pse_count == 1 ? 0 : 1;
 
-            for ($attrIdx=0; $attrIdx<rand($minAttrCount,count($attributeList)); $attrIdx++) {
+            for ($attrIdx=0; $attrIdx<rand($minAttrCount, count($attributeList)); $attrIdx++) {
 
                 $featureProduct = new Thelia\Model\AttributeCombination();
                 do {
@@ -623,7 +622,7 @@ try {
 
         $deliveryOrderAddress = new OrderAddress();
         $deliveryOrderAddress
-            ->setCustomerTitleId(mt_rand(1,3))
+            ->setCustomerTitleId(mt_rand(1, 3))
             ->setCompany(getRealText(15))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
@@ -639,7 +638,7 @@ try {
 
         $invoiceOrderAddress = new OrderAddress();
         $invoiceOrderAddress
-            ->setCustomerTitleId(mt_rand(1,3))
+            ->setCustomerTitleId(mt_rand(1, 3))
             ->setCompany(getRealText(15))
             ->setFirstname($faker->firstname)
             ->setLastname($faker->lastname)
@@ -709,7 +708,7 @@ try {
                 ->setPrice($price=mt_rand(1, 100))
                 ->setPromoPrice(mt_rand(1, $price))
                 ->setWasNew($pse->getNewness())
-                ->setWasInPromo(rand(0,1) == 1)
+                ->setWasInPromo(rand(0, 1) == 1)
                 ->setWeight($pse->getWeight())
                 ->setTaxRuleTitle(getRealText(20))
                 ->setTaxRuleDescription(getRealText(50))
@@ -908,7 +907,7 @@ function generate_image($image, $typeobj, $id)
         ->line(new Imagine\Image\Point(0, 239), new Imagine\Image\Point(0, 0), $white)
     ;
 
-    $image_file = sprintf("%s/../local/media/images/%s/sample-image-%s.png", __DIR__, $typeobj, $id);
+    $image_file = sprintf("%s/media/images/%s/sample-image-%s.png", THELIA_LOCAL_DIR, $typeobj, $id);
 
     if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
 
@@ -928,7 +927,7 @@ function generate_document($document, $typeobj, $id)
     ->save()
     ;
 
-    $document_file = sprintf("%s/../local/media/documents/%s/sample-document-%s.txt", __DIR__, $typeobj, $id);
+    $document_file = sprintf("%s/media/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
 
     if (! is_dir(dirname($document_file))) mkdir(dirname($document_file), 0777, true);
 
