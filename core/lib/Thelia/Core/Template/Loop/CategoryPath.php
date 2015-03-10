@@ -66,7 +66,7 @@ class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
         $this->configureI18nProcessing($search, array('TITLE'));
 
         $search->filterById($id);
-        if ($visible != BooleanOrBothType::ANY) {
+        if ($visible !== BooleanOrBothType::ANY) {
             $search->filterByVisible($visible);
         }
 
