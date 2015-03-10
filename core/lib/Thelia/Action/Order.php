@@ -360,6 +360,11 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function createManual(OrderManualEvent $event)
     {
+        $paymentModule = ModuleQuery::create()->findPk($event->getOrder()->getPaymentModuleId());
+
+        /** @var \Thelia\Module\PaymentModuleInterface $paymentModuleInstance */
+        $paymentModuleInstance = $paymentModule->createInstance();
+
         $event->setPlacedOrder(
             $this->createOrder(
                 $event->getDispatcher(),
@@ -368,7 +373,7 @@ class Order extends BaseAction implements EventSubscriberInterface
                 $event->getLang(),
                 $event->getCart(),
                 $event->getCustomer(),
-                true
+                $paymentModuleInstance->manageStockOnCreation()
             )
         );
 
