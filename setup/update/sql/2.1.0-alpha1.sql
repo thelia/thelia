@@ -2462,7 +2462,7 @@ CREATE TABLE `customer_version`
 SELECT @store_email := `value` FROM `config` where name='store_email';
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('store_notification_emails',@store_email, 1, 1, NOW(), NOW());
+('store_notification_emails', IFNULL(@store_email, ''), 1, 1, NOW(), NOW());
 
 SELECT @max_id := MAX(`id`) FROM `message`;
 
@@ -2536,9 +2536,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 SELECT @max_id := MAX(`id`) FROM `config`;
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id, 'fr_FR', NULL, NULL, NULL, NULL),
+(@max_id, 'fr_FR', 'Autoriser le stock négatif (1) ou pas (0) (0 par défaut)', NULL, NULL, NULL),
 (@max_id, 'es_ES', NULL, NULL, NULL, NULL),
-(@max_id, 'en_US', NULL, NULL, NULL, NULL)
+(@max_id, 'en_US', 'Allow negative product stock (1) or not (0, default)', NULL, NULL, NULL)
 ;
 
 # ======================================================================================================================
@@ -2625,13 +2625,13 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+1, 'fr_FR', 'Hooks'),
   (@max_id+2, 'fr_FR', 'Position des hooks'),
   (@max_id+3, 'fr_FR', 'Gestion des promotions'),
-  (@max_id+4, 'fr_FR', NULL),
+  (@max_id+4, 'fr_FR', 'Liste des administrateurs'),
   (@max_id+5, 'fr_FR', 'Configuration d\'une catégorie'),
   (@max_id+6, 'fr_FR', 'Configuration des transports'),
   (@max_id+7, 'fr_FR', 'Configuration des règles de taxes'),
   (@max_id+8, 'fr_FR', 'Gestion des hooks'),
   (@max_id+9, 'fr_FR', 'Importation / exportation de données'),
-  (@max_id+10, 'fr_FR', NULL),
+  (@max_id+10, 'fr_FR', 'Gestion des modules'),
   (@max_id+11, 'fr_FR', 'Gestion des profils d\'administration'),
   (@max_id+1, 'es_ES', NULL),
   (@max_id+2, 'es_ES', NULL),
@@ -2647,13 +2647,13 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+1, 'en_US', 'Hooks'),
   (@max_id+2, 'en_US', 'Hook positions'),
   (@max_id+3, 'en_US', 'Sales management'),
-  (@max_id+4, 'en_US', NULL),
+  (@max_id+4, 'en_US', 'Administrator list'),
   (@max_id+5, 'en_US', 'Category configuration'),
   (@max_id+6, 'en_US', 'Shipping configuration'),
   (@max_id+7, 'en_US', 'Tax rules configuration'),
   (@max_id+8, 'en_US', 'Hooks management'),
   (@max_id+9, 'en_US', 'Data import / export'),
-  (@max_id+10, 'en_US', NULL),
+  (@max_id+10, 'en_US', 'Modules management'),
   (@max_id+11, 'en_US', 'Administration profiles management')
 ;
 

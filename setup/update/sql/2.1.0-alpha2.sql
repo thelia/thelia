@@ -19,7 +19,7 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id + 1, 'fr_FR', 'Utiliser un cookie persistant pour memoriser le panier du client', NULL, NULL, NULL),
-(@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'fr_FR', 'Nom du cookie pour le panier', NULL, NULL, NULL),
 (@max_id + 3, 'fr_FR', 'Durée de vie du cookie du panier dans le navigateur du client, en secondes', NULL, NULL, NULL),
 (@max_id + 4, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
 (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
@@ -27,7 +27,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
 (@max_id + 4, 'es_ES', NULL, NULL, NULL, NULL),
 (@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
-(@max_id + 2, 'en_US', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
 (@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
 (@max_id + 4, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL)
 ;
@@ -146,11 +146,11 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
-(@max_id+1, 'fr_FR', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'fr_FR', 'Integration du moteur de template Smarty', NULL,  NULL,  NULL),
 (@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL),
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+2, 'es_ES', NULL, NULL,  NULL,  NULL),
-(@max_id+1, 'en_US', NULL, NULL,  NULL,  NULL),
+(@max_id+1, 'en_US', 'Smarty template engine integration', NULL,  NULL,  NULL),
 (@max_id+2, 'en_US', 'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL)
 ;
 

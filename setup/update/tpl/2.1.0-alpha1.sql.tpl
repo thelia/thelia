@@ -1426,7 +1426,7 @@ CREATE TABLE `customer_version`
 SELECT @store_email := `value` FROM `config` where name='store_email';
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('store_notification_emails',@store_email, 1, 1, NOW(), NOW());
+('store_notification_emails', IFNULL(@store_email, ''), 1, 1, NOW(), NOW());
 
 SELECT @max_id := MAX(`id`) FROM `message`;
 

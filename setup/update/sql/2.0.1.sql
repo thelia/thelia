@@ -41,7 +41,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+5, 'fr_FR', 'Traductions'),
 (@max+6, 'fr_FR', 'Outils'),
 (@max+7, 'fr_FR', 'gestion des exports'),
-(@max+8, 'fr_FR', NULL),
+(@max+8, 'fr_FR', 'Export des inscrits à la newsletter'),
 (@max, 'es_ES', NULL),
 (@max+1, 'es_ES', NULL),
 (@max+2, 'es_ES', NULL),
@@ -59,7 +59,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+5, 'en_US', 'Translations'),
 (@max+6, 'en_US', 'Tools panel'),
 (@max+7, 'en_US', 'Back-office export management'),
-(@max+8, 'en_US', NULL)
+(@max+8, 'en_US', 'export of newsletter subscribers')
 ;
 
 SELECT @max := MAX(`id`) FROM `lang`;

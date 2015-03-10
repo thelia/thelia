@@ -91,9 +91,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 {foreach $locales as $locale}
-(@max_id + 1, '{$locale}', {intl l='Life time of the session cookie in the customer browser, in seconds' locale=$locale}, NULL, NULL, NULL),
-(@max_id + 2, '{$locale}', {intl l='Show error message instead of a white page on a server error' locale=$locale}, NULL, NULL, NULL),
-(@max_id + 3, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL)
 (@max_id + 1, '{$locale}', {intl l='Category page - before the main content area' locale=$locale}, '', ''),
 (@max_id + 2, '{$locale}', {intl l='Category page - after the main content area' locale=$locale}, '', ''),
 (@max_id + 3, '{$locale}', {intl l='Content page - before the main content area' locale=$locale}, '', ''),

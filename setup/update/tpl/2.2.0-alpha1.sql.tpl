@@ -81,6 +81,8 @@ create table `country_area`
 INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`) select `id`, `area_id`, NOW(), NOW() FROM `country` WHERE `area_id` IS NOT NULL;
 
 -- Remove area_id column from country table
-ALTER TABLE `country` DROP `area_id`;
+ALTER TABLE `country` DROP FOREIGN KEY `fk_country_area_id`;
+ALTER TABLE `country` DROP KEY `idx_country_area_id`;
+ALTER TABLE `country` DROP COLUMN `area_id`;
 
 SET FOREIGN_KEY_CHECKS = 1;

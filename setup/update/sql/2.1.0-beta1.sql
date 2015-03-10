@@ -93,9 +93,6 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id + 1, 'fr_FR', 'Durée de vie du cookie de la session dans le navigateur du client, en secondes', NULL, NULL, NULL),
-(@max_id + 2, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
-(@max_id + 3, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL)
 (@max_id + 1, 'fr_FR', 'Page catégorie - au dessus de la zone de contenu principale', '', ''),
 (@max_id + 2, 'fr_FR', 'Page catégorie - en dessous de la zone de contenu principale', '', ''),
 (@max_id + 3, 'fr_FR', 'Page de contenu - au dessus de la zone de contenu principale', '', ''),
@@ -130,9 +127,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 32, 'fr_FR', 'Détail d\'une commande - feuille de style CSS', '', ''),
 (@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion des javascript', '', ''),
 (@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du javascript', '', ''),
-(@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
-(@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
-(@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL)
 (@max_id + 1, 'es_ES', NULL, '', ''),
 (@max_id + 2, 'es_ES', NULL, '', ''),
 (@max_id + 3, 'es_ES', NULL, '', ''),
@@ -167,9 +161,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 32, 'es_ES', NULL, '', ''),
 (@max_id + 33, 'es_ES', NULL, '', ''),
 (@max_id + 34, 'es_ES', NULL, '', ''),
-(@max_id + 1, 'en_US', 'Life time of the session cookie in the customer browser, in seconds', NULL, NULL, NULL),
-(@max_id + 2, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
-(@max_id + 3, 'en_US', 'Filename of the error page', NULL, NULL, NULL)
 (@max_id + 1, 'en_US', 'Category page - before the main content area', '', ''),
 (@max_id + 2, 'en_US', 'Category page - after the main content area', '', ''),
 (@max_id + 3, 'en_US', 'Content page - before the main content area', '', ''),
