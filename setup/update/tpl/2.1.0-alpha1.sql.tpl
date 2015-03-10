@@ -1588,7 +1588,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
   (@max_id+1, '{$locale}', {intl l='Hooks' locale=$locale}),
   (@max_id+2, '{$locale}', {intl l='Hook positions' locale=$locale}),
   (@max_id+3, '{$locale}', {intl l='Sales management' locale=$locale}),
-  (@max_id+4, '{$locale}', {intl l='Administats list' locale=$locale}),
+  (@max_id+4, '{$locale}', {intl l='Administrator list' locale=$locale}),
   (@max_id+5, '{$locale}', {intl l='Category configuration' locale=$locale}),
   (@max_id+6, '{$locale}', {intl l='Shipping configuration' locale=$locale}),
   (@max_id+7, '{$locale}', {intl l='Tax rules configuration' locale=$locale}),
