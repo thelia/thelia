@@ -147,11 +147,11 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id+1, 'fr_FR', NULL, NULL,  NULL,  NULL),
-(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', NULL,  NULL,  NULL),
+(@max_id+2, 'fr_FR', 'Contôle de produit virtuel', 'Vérifie qu\'un module de livraison pour produit virtuel soit activé si des produits virtuels existent',  NULL,  NULL),
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+2, 'es_ES', NULL, NULL,  NULL,  NULL),
 (@max_id+1, 'en_US', NULL, NULL,  NULL,  NULL),
-(@max_id+2, 'en_US', 'Virtual Product Controller', NULL,  NULL,  NULL)
+(@max_id+2, 'en_US', 'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL)
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;
