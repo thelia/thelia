@@ -13,12 +13,14 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\LangQuery;
 use Thelia\Model\ModuleHookQuery;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
@@ -29,7 +31,7 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
+class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = false;
 
@@ -59,6 +61,8 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
     public function buildModelCriteria()
     {
         $search = ModuleHookQuery::create();
+
+        $this->configureI18nProcessing($search, []);
 
         $id = $this->getId();
         if (null !== $id) {
@@ -140,7 +144,8 @@ class ModuleHook extends BaseLoop implements PropelSearchLoopInterface
                     ->set("ID", $moduleHook->getId())
                     ->set("HOOK_ID", $moduleHook->getHookId())
                     ->set("MODULE_ID", $moduleHook->getModuleId())
-                    ->set("MODULE_TITLE", $moduleHook->getModule()->getTitle())
+                    ->set("MODULE_TITLE", $moduleHook->getModule()->setLocale($this->locale)->getTitle())
+                    ->set("MODULE_CODE", $moduleHook->getModule()->getCode())
                     ->set("CLASSNAME", $moduleHook->getClassname())
                     ->set("METHOD", $moduleHook->getMethod())
                     ->set("ACTIVE", $moduleHook->getActive())

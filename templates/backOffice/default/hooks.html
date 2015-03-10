@@ -73,7 +73,7 @@
                                             order='id'
                                             reverse_order='id_reverse'
                                             path='/admin/hooks'
-                                            label="{intl l='ID'}"
+                                            label={intl l='ID'}
                                             }
                                         </th>
                                         <th>
@@ -82,7 +82,7 @@
                                             order='code'
                                             reverse_order='code_reverse'
                                             path='/admin/hooks'
-                                            label="{intl l='Code'}"
+                                            label={intl l='Code'}
                                             }
                                         </th>
                                         <th>
@@ -91,7 +91,7 @@
                                             order='alpha'
                                             reverse_order='alpha_reverse'
                                             path='/admin/hooks'
-                                            label="{intl l="Title"}"
+                                            label={intl l="Title"}
                                             }
                                             </th>
                                         <th>
@@ -100,7 +100,7 @@
                                             order='native'
                                             reverse_order='native_reverse'
                                             path='/admin/hooks'
-                                            label="{intl l="Official"}"
+                                            label={intl l="Official"}
                                             }
                                         </th>
                                         <th>
@@ -109,7 +109,7 @@
                                             order='enabled'
                                             reverse_order='enabled_reverse'
                                             path='/admin/hooks'
-                                            label="{intl l="Active"}"
+                                            label={intl l="Active"}
                                             }
                                         </th>
 
@@ -123,8 +123,8 @@
                                 {loop name="hooks" type="hook" backend_context="1" hook_type=$template_type lang=$lang_id order=$order}
                                 <tr>
                                     <td>{$ID}</td>
-                                    <td><a href="{url path="/admin/hook/update/{$ID}"}">{$CODE}</a></td>
-                                    <td><a href="{url path="/admin/hook/update/{$ID}"}">{$TITLE}</a></td>
+                                    <td><a href="{url path="/admin/hook/update/`$ID`"}">{$CODE}</a></td>
+                                    <td><a href="{url path="/admin/hook/update/`$ID`"}">{$TITLE}</a></td>
                                     <td>
                                         {if $NATIVE}
                                         <span class="label label-md label-success"><i class='glyphicon glyphicon-ok-circle'></i></span>
@@ -143,7 +143,7 @@
                                     <td class="actions">
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.hook" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/hook/update/{$ID}"}">
+                                            <a class="btn btn-default btn-xs hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/hook/update/`$ID`"}">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                             </a>
                                             {/loop}
@@ -176,15 +176,11 @@
             </div>
 
             <div class="col-md-12">
-                <div class="alert alert-info">
-                    <ul>
-                        <li><a href="{url path='/admin/modules'}" class="text-info">{intl l="Manage modules"}</a></li>
-                        <li><a href="{url path='/admin/module-hooks'}" class="text-info">{intl l="Manage hooks positions"}</a></li>
-                    </ul>
+                <div class="text-right">
+                    <a href="{url path='/admin/modules'}" class="btn btn-primary">{intl l="Manage modules"} <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a href="{url path='/admin/module-hooks'}" class="btn btn-primary">{intl l="Manage modules attachements"}  <span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
-
-
         </div>
 
         {hook name="hooks.bottom" location="hooks_bottom" }

@@ -88,9 +88,15 @@ class OrderController extends BaseAdminController
         }
 
         $browsedPage = $this->getRequest()->get("order_page");
+        $currentStatus = $this->getRequest()->get("status");
 
         if ($browsedPage) {
             $params["order_page"] = $browsedPage;
+
+            if (null !== $currentStatus) {
+                $params["status"] = $currentStatus;
+            }
+
             $response = $this->generateRedirectFromRoute("admin.order.list", $params);
         } else {
             $params["tab"] = $this->getRequest()->get("tab", 'cart');

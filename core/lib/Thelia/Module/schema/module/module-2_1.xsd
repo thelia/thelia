@@ -39,7 +39,7 @@
                         <xs:documentation>The folder that contains the images to deploy.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="languages" minOccurs="1" maxOccurs="1">
+                <xs:element name="languages">
                     <xs:annotation>
                         <xs:documentation>Module languages supported : fr_FR, en_US, ...</xs:documentation>
                     </xs:annotation>
