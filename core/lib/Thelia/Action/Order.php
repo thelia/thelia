@@ -422,9 +422,9 @@ class Order extends BaseAction implements EventSubscriberInterface
      */
     public function orderBeforePayment(OrderEvent $event)
     {
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, $event);
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_CONFIRMATION_EMAIL, clone $event);
 
-        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, $event);
+        $event->getDispatcher()->dispatch(TheliaEvents::ORDER_SEND_NOTIFICATION_EMAIL, clone $event);
     }
 
     /**
