@@ -43,7 +43,7 @@
 
                 <div id="delivery-address" class="panel">
                     <div class="panel-heading clearfix">
-                        <a href="{url path="/address/create" next="{navigate to='current'}" }" class="btn btn-add-address">{intl l="Add a new address"}</a>
+                        <a href="{url path="/address/create" next={navigate to='current'} }" class="btn btn-add-address">{intl l="Add a new address"}</a>
                         {intl l="Choose your delivery address"}
                         {if $error}
                             <span class="help-block"><span class="icon-remove"></span> {$message}</span>
@@ -69,7 +69,7 @@
                                             {if $isDeliveryAddressChecked}
                                                 {intl l="Main Address"}
                                             {else}
-                                                {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
+                                                {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
                                             {/if}
                                         </label>
                                     </div>
@@ -105,7 +105,7 @@
                                 </td>
                                 <td>
                                     <div class="group-btn">
-                                        <a href="{url path="/address/update/{$ID}" next="{navigate to='current'}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                        <a href="{url path="/address/update/{$ID}" next={navigate to="current"}}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                         {if $DEFAULT != 1}
                                             <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                         {/if}

@@ -6,28 +6,26 @@ casper.test.begin('Order process', 4, function suite(test) {
 
         casper.waitForSelector(
             '#delivery-module-list-block .radio',
-            function() {
+            function then() {
                 casper.test.comment('== Page loaded : ' + this.getCurrentUrl());
+                test.assertTitle("Billing and delivery - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
+                this.capture(screenshot_dir + 'front/50_delivery_list.png');
 
+                test.assertEval(function () {
+                    return __utils__.findAll("#form-cart-delivery table.table-address tr").length >= 1;
+                }, "We expect at least one delivery address");
+
+                this.click('form#form-cart-delivery button[type="submit"]');
+            },
+            function timeout() {
+                test.assertElementCount("table.table-cart-mini tbody tr", 1, "cart contain 1 product");
                 if (this.getCurrentUrl() == thelia2_base_url + "order/invoice") {
                     test.info("with a virtual product, the delivery page is skipped");
-                    test.skip(2);
+                    test.skip(1);
                 } else {
-                    test.assertTitle("Billing and delivery - Cart - " + thelia2_store_name, "title is the one expected for url : " + this.getCurrentUrl());
-                    this.capture(screenshot_dir + 'front/50_delivery_list.png');
-
-                    test.assertEval(function () {
-                        return __utils__.findAll("#form-cart-delivery table.table-address tr").length >= 1;
-                    }, "We expect at least one delivery address");
-
-                    this.click('form#form-cart-delivery button[type="submit"]');
+                    this.die("impossible to load delivery methods");
                 }
-            },
-            function() {
-                test.assertElementCount("table.table-cart-mini tbody tr", 1, "cart contain 1 product");
-                this.die("impossible to load delivery methods");
-            },
-            thelia_default_timeout
+            }
         );
 
     });

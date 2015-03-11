@@ -41,6 +41,7 @@ casper.test.comment('Viewport size: '+ casper.options.viewportSize.width + 'x' +
 var thelia_default_timeout = 15000;
 // for the waitFor method
 casper.options.waitTimeout = thelia_default_timeout;
+casper.options.logLevel = "info";
 
 casper.test.comment('Default timeout: '+ thelia_default_timeout + ' ms');
 
