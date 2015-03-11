@@ -237,7 +237,7 @@ class TemplateHelper
 
                             $matches = array();
 
-                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)\1/ms', $content, $matches)) {
+                            if (preg_match_all('/'.$prefix.'((?<![\\\\])[\'"])((?:.(?!(?<![\\\\])\1))*.?)*?\1/ms', $content, $matches)) {
                                 Tlog::getInstance()->debug("Strings found: ", $matches[2]);
 
                                 $idx = 0;
@@ -258,6 +258,11 @@ class TemplateHelper
                                         $quote = $matches[1][$idx];
 
                                         $match = str_replace("\\$quote", $quote, $match);
+
+                                        // Ignore empty strings
+                                        if (strlen($match) == 0) {
+                                            continue;
+                                        }
 
                                         $strings[$hash] = array(
                                                 'files'   => array($short_path),
