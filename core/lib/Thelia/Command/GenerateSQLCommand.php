@@ -38,8 +38,11 @@ class GenerateSQLCommand extends ContainerAwareCommand
     /** @var SmartyParser $parser */
     protected $parser = null;
 
-    /** @var \PDO  */
+    /** @var \PDO */
     protected $con;
+
+    /** @var array */
+    protected $locales;
 
     protected function configure()
     {
@@ -47,64 +50,19 @@ class GenerateSQLCommand extends ContainerAwareCommand
             ->setName("generate:sql")
             ->setDescription("Generate SQL files (insert.sql, update*.sql)")
             ->addOption(
-                "locale",
+                "locales",
                 null,
                 InputOption::VALUE_OPTIONAL,
                 "generate only for only specific locales (separated by a ,) : fr_FR,es_ES or es_ES"
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
-
-        $container->set("request", new Request());
-        $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
-        $container->enterScope("request");
-
-        $this->translator = $container->get('thelia.translator');
-        $this->parser = $container->get('thelia.parser');
-
-        $this->con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
-
-        // load translations
-        $finder = Finder::create()
-            ->name('*.php')
-            ->depth(0)
-            ->in(THELIA_SETUP_DIRECTORY . 'I18n');
-
-        $locales = [];
-
-        // limit to only some locale(s)
-        $localesToKeep = $input->getOption("locale");
-        if (!empty($localesToKeep)) {
-            $localesToKeep = explode(',', $localesToKeep);
-        } else {
-            $localesToKeep = null;
-        }
-
-        /** @var \SplFileInfo $file */
-        foreach ($finder as $file) {
-            $locale = $file->getBasename('.php');
-            if (empty($localesToKeep) || in_array($locale, $localesToKeep)) {
-                $locales[] = $locale;
-                $this->translator->addResource(
-                    'php',
-                    $file->getRealPath(),
-                    $locale,
-                    'install'
-                );
-            }
-        }
-
-        // replace the default intl function
-        $this->parser->unregisterPlugin('function', 'intl');
-        $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);
+        $this->init($input);
 
         // Main insert.sql file
         $content = file_get_contents(THELIA_SETUP_DIRECTORY . 'insert.sql.tpl');
-        $this->parser->assign("locales", $locales);
         $content = $this->parser->renderString($content, [], false);
 
         if (false === file_put_contents(THELIA_SETUP_DIRECTORY . 'insert.sql', $content)) {
@@ -121,13 +79,12 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
-            $filename = $file->getBasename();
 
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
 
-            // Main sql file
             $destination = THELIA_SETUP_DIRECTORY . 'update' . DS . 'sql' . DS . $file->getBasename('.tpl');
+
             if (false === file_put_contents($destination, $content)) {
                 $output->writeln("Can't write file " . $destination);
             } else {
@@ -136,6 +93,99 @@ class GenerateSQLCommand extends ContainerAwareCommand
         }
     }
 
+    protected function init(InputInterface $input)
+    {
+        $container = $this->getContainer();
+
+        $container->set("request", new Request());
+        $container->get("request")->setSession(new Session(new MockArraySessionStorage()));
+        $container->enterScope("request");
+
+        $this->translator = $container->get('thelia.translator');
+        $this->parser = $container->get('thelia.parser');
+
+        $this->con = Propel::getConnection(ProductTableMap::DATABASE_NAME);
+
+        $this->initLocales($input);
+
+        $this->initParser();
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return array
+     */
+    protected function initLocales(InputInterface $input)
+    {
+        $this->locales = [];
+        $availableLocales = [];
+
+        $finder = Finder::create()
+            ->name('*.php')
+            ->depth(0)
+            ->in(THELIA_SETUP_DIRECTORY . 'I18n');
+
+        // limit to only some locale(s)
+        $localesToKeep = $input->getOption("locales");
+        if (!empty($localesToKeep)) {
+            $localesToKeep = explode(',', $localesToKeep);
+        } else {
+            $localesToKeep = null;
+        }
+
+        /** @var \SplFileInfo $file */
+        foreach ($finder as $file) {
+            $locale = $file->getBasename('.php');
+            $availableLocales[] = $locale;
+
+            if (empty($localesToKeep) || in_array($locale, $localesToKeep)) {
+                $this->locales[] = $locale;
+                $this->translator->addResource(
+                    'php',
+                    $file->getRealPath(),
+                    $locale,
+                    'install'
+                );
+            }
+        }
+
+        if (empty($this->locales)) {
+            throw new \RuntimeException(
+                sprintf(
+                    "You should at least generate sql for one locale. Available locales : %s",
+                    implode(', ', $availableLocales)
+                )
+            );
+        }
+    }
+
+    /**
+     * Initialize the smarty parser.
+     *
+     * The intl function is replaced, and locales are assigned.
+     *
+     * @throws \SmartyException
+     */
+    protected function initParser()
+    {
+        $this->parser->unregisterPlugin('function', 'intl');
+        $this->parser->registerPlugin('function', 'intl', [$this, 'translate']);
+        $this->parser->assign("locales", $this->locales);
+    }
+
+    /**
+     * Smarty function that replace the classic `intl` function.
+     *
+     * The attributes of the function are:
+     * - `l`: the key
+     * - `locale`: the locale. eg.: fr_FR
+     * - `in_string`: set to 1 not add simple quote around the string. (default = 0)
+     * - `use_default`: set to 1 to use the `l` string as a fallback. (default = 0)
+     *
+     * @param $params
+     * @param $smarty
+     * @return string
+     */
     public function translate($params, $smarty)
     {
         $translation = '';
