@@ -79,7 +79,7 @@
                 <div class="panel">
                     <div class="panel-heading">{intl l="Delivery"}</div>
                     <div class="panel-body">
-                        <h4>{intl l="Module"}</h4>
+                        <h4>{intl l="Delivery Mode"}</h4>
                         {ifhook rel="account-order.delivery-information"}
                             {hook name="account-order.delivery-information" module="{$delivery_id}" order="{$order_id}"}
                         {/ifhook}
@@ -110,7 +110,7 @@
                 <div class="panel">
                     <div class="panel-heading">{intl l="Billing"}</div>
                     <div class="panel-body">
-                        <h4>{intl l="Module"}</h4>
+                        <h4>{intl l="Billing Mode"}</h4>
                         {ifhook rel="account-order.invoice-information"}
                             {hook name="account-order.invoice-information" module="{$payment_id}" order="{$order_id}"}
                         {/ifhook}
@@ -262,10 +262,6 @@
                             {/capture}
                         {/strip}
                         {if $smarty.capture.tax ne ""}
-                            <tr>
-                                <td><p>{intl l="Tax"}</p></td>
-                                <td><P>{format_money number=$TOTAL_TAX symbol=$orderCurrency}</P></td>
-                            </tr>
                             {$smarty.capture.tax nofilter}
                         {/if}
                         <tr>
