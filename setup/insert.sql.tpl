@@ -2394,6 +2394,14 @@ INSERT INTO `tax_i18n` (`id`, `locale`, `title`, `description`) VALUES
 {/foreach}
 ;
 
+INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`) VALUES
+{foreach $locales as $locale}
+    (1, '{$locale}', {intl l='French 20% VAT' locale=$locale}),
+    (2, '{$locale}', {intl l='French 10% VAT' locale=$locale}){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
 INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {foreach $locales as $locale}
     (1, '{$locale}', {intl l='Address' locale=$locale}, NULL, NULL, NULL),
