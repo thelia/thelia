@@ -1038,4 +1038,5 @@ return array(
     'Tax rule edit - bottom' => 'Edition d\'une règle de tax - en bas',
     'Tax edit - top' => 'Edition d\'une tax - en haut',
     'Tax edit - bottom' => 'Edition d\'une tax - en bas',
+    'Order edit - displayed after product information' => 'Edition d\'une commande - sous les informations du produit',
 );

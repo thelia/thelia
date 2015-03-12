@@ -699,6 +699,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1374, 'tax-rule-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1375, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1376, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1377, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -2062,7 +2063,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1374, '{$locale}', {intl l='Tax rule edit - bottom' locale=$locale}, '', ''),
     (1375, '{$locale}', {intl l='Tax edit - top' locale=$locale}, '', ''),
     (1376, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''),
-    
+    (1377, '{$locale}', {intl l='Order edit - displayed after product information' locale=$locale}, '', ''),
+
     (2001, '{$locale}', {intl l='Invoice - CSS' locale=$locale}, NULL, NULL),
     (2002, '{$locale}', {intl l='Invoice - in the header' locale=$locale}, NULL, NULL),
     (2003, '{$locale}', {intl l='Invoice - at the top of the footer' locale=$locale}, NULL, NULL),

@@ -6,20 +6,7 @@ UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
--- admin hooks
-
-SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
-
-INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
-  (@max_id + 1, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
-;
-
-INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-{foreach $locales as $locale}
-(@max_id + 1, '{$locale}', {intl l='Order - Tab' locale=$locale}, '', ''){if ! $locale@last},{/if}
-
-{/foreach}
-;
+--- order status
 
 SELECT @max_id := MAX(`id`) FROM `order_status`;
 
@@ -145,7 +132,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 53, 'tax-rule-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 54, 'tax-rule-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 55, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 57, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -206,7 +195,9 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 53, '{$locale}', {intl l='Tax rule edit - top' locale=$locale}, '', ''),
 (@max_id + 54, '{$locale}', {intl l='Tax rule edit - bottom' locale=$locale}, '', ''),
 (@max_id + 55, '{$locale}', {intl l='Tax edit - top' locale=$locale}, '', ''),
-(@max_id + 56, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''){if ! $locale@last},{/if}
+(@max_id + 56, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''),
+(@max_id + 57, '{$locale}', {intl l='Order edit - displayed after product information' locale=$locale}, '', ''),
+(@max_id + 58, '{$locale}', {intl l='Order - Tab' locale=$locale}, '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;
