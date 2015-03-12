@@ -2404,6 +2404,18 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`) VALUES
 {/foreach}
 ;
 
+INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+{foreach $locales as $locale}
+    (1, '{$locale}', {intl l='Not paid' locale=$locale}, '', '', ''),
+    (2, '{$locale}', {intl l='Paid' locale=$locale}, '', '', ''),
+    (3, '{$locale}', {intl l='Processing' locale=$locale}, '', '', ''),
+    (4, '{$locale}', {intl l='Sent' locale=$locale}, '', '', ''),
+    (5, '{$locale}', {intl l='Canceled' locale=$locale}, '', '', ''),
+    (6, '{$locale}', {intl l='Refunded' locale=$locale}, '', '', ''){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
 INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {foreach $locales as $locale}
     (1, '{$locale}', {intl l='Address' locale=$locale}, NULL, NULL, NULL),

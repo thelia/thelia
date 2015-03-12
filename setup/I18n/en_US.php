@@ -1039,4 +1039,9 @@ return array(
     'Tax edit - top' => 'Tax edit - top',
     'Tax edit - bottom' => 'Tax edit - bottom',
     'Order edit - displayed after product information' => 'Order edit - displayed after product information',
+    'Not paid' => 'Not paid',
+    'Paid' => 'Paid',
+    'Processing' => 'Processing',
+    'Sent' => 'Sent',
+    'Canceled' => 'Canceled',
 );

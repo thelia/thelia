@@ -4322,6 +4322,27 @@ INSERT INTO `tax_rule_i18n` (`id`, `locale`, `title`) VALUES
     (2, 'en_US', 'French 10% VAT')
 ;
 
+INSERT INTO `order_status_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+    (1, 'fr_FR', 'Non payée', '', '', ''),
+    (2, 'fr_FR', 'Payée', '', '', ''),
+    (3, 'fr_FR', 'Traitement', '', '', ''),
+    (4, 'fr_FR', 'Envoyée', '', '', ''),
+    (5, 'fr_FR', 'Annulée', '', '', ''),
+    (6, 'fr_FR', 'Remboursé', '', '', ''),
+    (1, 'es_ES', NULL, '', '', ''),
+    (2, 'es_ES', NULL, '', '', ''),
+    (3, 'es_ES', NULL, '', '', ''),
+    (4, 'es_ES', NULL, '', '', ''),
+    (5, 'es_ES', NULL, '', '', ''),
+    (6, 'es_ES', NULL, '', '', ''),
+    (1, 'en_US', 'Not paid', '', '', ''),
+    (2, 'en_US', 'Paid', '', '', ''),
+    (3, 'en_US', 'Processing', '', '', ''),
+    (4, 'en_US', 'Sent', '', '', ''),
+    (5, 'en_US', 'Canceled', '', '', ''),
+    (6, 'en_US', 'Refunded', '', '', '')
+;
+
 INSERT INTO `resource_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
     (1, 'fr_FR', 'Address', NULL, NULL, NULL),
     (2, 'fr_FR', 'Configuration / Administrator', NULL, NULL, NULL),
