@@ -35,8 +35,11 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         $this->smarty = new SmartyParser(
             $container->get("request"),
             $container->get("event_dispatcher"),
-            new ParserContext($container->get("request"))
+            $parserContext = new ParserContext($container->get("request"))
         );
+
+        $container->set("thelia.parser", $this->smarty);
+        $container->set("thelia.parser.context", $parserContext);
 
         $this->smarty->addPlugins($this->getPlugin($container));
         $this->smarty->registerPlugins();
@@ -44,7 +47,7 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
 
     protected function render($template)
     {
-        return $this->smarty->fetch(__DIR__.DS."fixture".DS.$template);
+        return $this->smarty->fetch(__DIR__.DS."fixtures".DS.$template);
     }
 
     /**

@@ -131,7 +131,7 @@ class Form extends AbstractSmartyPlugin
             }
 
             // Set the current form
-            $this->parserContext->setCurrentForm($instance);
+            $this->parserContext->pushCurrentForm($instance);
 
             $instance->createView();
 
@@ -141,6 +141,7 @@ class Form extends AbstractSmartyPlugin
             $template->assign("form_error", $instance->hasError() ? true : false);
             $template->assign("form_error_message", $instance->getErrorMessage());
         } else {
+            $this->parserContext->popCurrentForm();
             return $content;
         }
     }
