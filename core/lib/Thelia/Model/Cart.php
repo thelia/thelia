@@ -185,6 +185,11 @@ class Cart extends BaseCart
     public function isVirtual()
     {
         foreach ($this->getCartItems() as $cartItem) {
+
+            if (0 < $cartItem->getProductSaleElements()->getWeight()) {
+                return false;
+            }
+
             $product = $cartItem->getProductSaleElements()->getProduct();
             if (!$product->getVirtual()) {
                 return false;
