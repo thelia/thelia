@@ -53,7 +53,17 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
+                    new Type\EnumListType([
+                        'alpha',
+                        'alpha_reverse',
+                        'manual',
+                        'manual_reverse',
+                        'random',
+                        'created',
+                        'created_reverse',
+                        'updated',
+                        'updated_reverse'
+                        ])
                 ),
                 'manual'
             ),
@@ -75,7 +85,16 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
     {
         $search->_and();
 
-        $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$searchCriteria." ?", $searchTerm, \PDO::PARAM_STR);
+        $this->addTitleSearchWhereClause($search, $searchCriteria, $searchTerm);
+    }
+
+    protected function addTitleSearchWhereClause($search, $criteria, $value)
+    {
+        $search->where(
+            "CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".$criteria." ?",
+            $value,
+            \PDO::PARAM_STR
+        );
     }
 
     public function buildModelCriteria()
@@ -83,7 +102,10 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $search = FolderQuery::create();
 
         /* manage translations */
-        $this->configureI18nProcessing($search, array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS'));
+        $this->configureI18nProcessing(
+            $search,
+            [ 'TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM', 'META_TITLE', 'META_DESCRIPTION', 'META_KEYWORDS']
+        );
 
         $id = $this->getId();
 
@@ -124,7 +146,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $title = $this->getTitle();
 
         if (!is_null($title)) {
-            $search->where("CASE WHEN NOT ISNULL(`requested_locale_i18n`.ID) THEN `requested_locale_i18n`.`TITLE` ELSE `default_locale_i18n`.`TITLE` END ".Criteria::LIKE." ?", "%".$title."%", \PDO::PARAM_STR);
+            $this->addTitleSearchWhereClause($search, Criteria::LIKE, '%'.$title.'%');
         }
 
         $visible = $this->getVisible();
@@ -154,6 +176,18 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                     $search->addAscendingOrderByColumn('RAND()');
                     break(2);
                     break;
+                case "created":
+                    $search->addAscendingOrderByColumn('created_at');
+                    break;
+                case "created_reverse":
+                    $search->addDescendingOrderByColumn('created_at');
+                    break;
+                case "updated":
+                    $search->addAscendingOrderByColumn('updated_at');
+                    break;
+                case "updated_reverse":
+                    $search->addDescendingOrderByColumn('updated_at');
+                    break;
             }
         }
 
@@ -162,6 +196,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Folder $folder */
         foreach ($loopResult->getResultDataCollection() as $folder) {
             $loopResultRow = new LoopResultRow($folder);
 
