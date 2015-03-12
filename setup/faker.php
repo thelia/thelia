@@ -658,17 +658,18 @@ try {
         $cart = new \Thelia\Model\Cart();
         $cart->save();
 
+        $currency = \Thelia\Model\CurrencyQuery::create()
+            ->addAscendingOrderByColumn('RAND()')
+            ->findOne();
+
         $placedOrder
             ->setDeliveryOrderAddressId($deliveryOrderAddress->getId())
             ->setInvoiceOrderAddressId($invoiceOrderAddress->getId())
             ->setDeliveryModuleId($colissimo_id)
             ->setPaymentModuleId($cheque_id)
             ->setStatusId(mt_rand(1, 5))
-            ->setCurrency(
-                \Thelia\Model\CurrencyQuery::create()
-                    ->addAscendingOrderByColumn('RAND()')
-                    ->findOne()
-            )
+            ->setCurrencyRate($currency->getRate())
+            ->setCurrencyId($currency->getId())
             ->setCustomer(
                 \Thelia\Model\CustomerQuery::create()
                     ->addAscendingOrderByColumn('RAND()')
@@ -1030,6 +1031,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon1->setIsCumulative(true);
     $coupon1->setIsRemovingPostage(false);
     $coupon1->setIsAvailableOnSpecialOffers(true);
+    $coupon1->setPerCustomerUsageCount(false);
     $coupon1->save();
 
     // Coupons
@@ -1075,6 +1077,7 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon2->setIsCumulative(false);
     $coupon2->setIsRemovingPostage(true);
     $coupon2->setIsAvailableOnSpecialOffers(true);
+    $coupon2->setPerCustomerUsageCount(false);
     $coupon2->save();
 
     // Coupons
@@ -1116,5 +1119,6 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon3->setIsCumulative(true);
     $coupon3->setIsRemovingPostage(false);
     $coupon3->setIsAvailableOnSpecialOffers(false);
+    $coupon3->setPerCustomerUsageCount(false);
     $coupon3->save();
 }
