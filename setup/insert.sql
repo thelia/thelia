@@ -824,6 +824,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1374, 'tax-rule-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1375, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1376, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1377, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -2061,6 +2062,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (1375, 'en_US', 'Tax edit - top', '', ''),
 (1376, 'fr_FR', 'Edition d\'une tax - en bas', '', ''),
 (1376, 'en_US', 'Tax edit - bottom', '', ''),
+(1377, 'fr_FR', 'Edition d\'une commande - sous les informations du produit', '', ''),
+(1377, 'en_US', 'Order edit - displayed after product information', '', ''),
 
 (2001, 'fr_FR', 'Facture - CSS', '', ''),
 (2001, 'en_US', 'Invoice - CSS', '', ''),

@@ -6,18 +6,7 @@ UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
--- admin hooks
-
-SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
-
-INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
-  (@max_id + 1, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
-;
-
-INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-  (@max_id + 1, 'fr_FR', 'Commande - Onglet', '', ''),
-  (@max_id + 1, 'en_US', 'Order - Tab', '', '')
-;
+-- new order status
 
 SELECT @max_id := MAX(`id`) FROM `order_status`;
 
@@ -137,7 +126,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 53, 'tax-rule-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 54, 'tax-rule-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 55, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 57, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -253,7 +244,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 55, 'fr_FR', 'Edition d\'une tax - en haut', '', ''),
 (@max_id + 55, 'en_US', 'Tax edit - top', '', ''),
 (@max_id + 56, 'fr_FR', 'Edition d\'une tax - en bas', '', ''),
-(@max_id + 56, 'en_US', 'Tax edit - bottom', '', '')
+(@max_id + 56, 'en_US', 'Tax edit - bottom', '', ''),
+(@max_id + 57, 'fr_FR', 'Edition d\'une commande - sous les informations du produit', '', ''),
+(@max_id + 57, 'en_US', 'Order edit - displayed after product information', '', ''),
+(@max_id + 58, 'fr_FR', 'Commande - Onglet', '', ''),
+(@max_id + 58, 'en_US', 'Order - Tab', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;
