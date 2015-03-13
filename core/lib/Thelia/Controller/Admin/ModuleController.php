@@ -430,7 +430,7 @@ class ModuleController extends AbstractCrudController
                 $documentationDirectory = (string) $xmlData->documentation;
 
                 if (! empty($documentationDirectory)) {
-                    $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('*.md');
+                    $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/.+\.md$/i');
                 }
             }
 
