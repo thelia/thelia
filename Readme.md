@@ -136,6 +136,8 @@ Contribute
 
 see the documentation : http://doc.thelia.net/en/documentation/contribute.html
 
+If you submit modifications that adds new data or change the structure of the database, take a look to http://doc.thelia.net/en/documentation/contribute.html#sql-scripts-modification
+
 Usage
 -----
 
@@ -150,4 +152,3 @@ $ phpunit
 ```
 
 We still have lot of work to achieve but enjoy this part.
-
