@@ -38,6 +38,7 @@
 - Add 56 new admin hook
 - Add stacked current form into parser context. It allows to have nested forms while using the new way to write forms.
 - Module information and documentation could be viewed directly from the module list
+- Add the possibility to translate text in the sql files (insert.sql, update/sql/*.sql). to generate sql files use command `php Thelia generate:sql`. Translation can be made in the back office, in the translation page.   
 
 # 2.1.3
 
