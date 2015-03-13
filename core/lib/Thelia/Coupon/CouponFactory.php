@@ -15,6 +15,7 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Exception\CouponDisabledException;
 use Thelia\Exception\CouponExpiredException;
 use Thelia\Exception\CouponNoUsageLeftException;
 use Thelia\Exception\InvalidConditionException;
@@ -61,6 +62,11 @@ class CouponFactory
         $couponModel = $this->facade->findOneCouponByCode($couponCode);
         if ($couponModel === null) {
             return false;
+        }
+
+        // check if coupon is enabled
+        if (!$couponModel->getIsEnabled()) {
+            throw new CouponDisabledException($couponCode);
         }
 
         // Check coupon expiration date
