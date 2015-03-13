@@ -15,6 +15,7 @@ namespace Thelia\Core\Template;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
+use TheliaSmarty\Template\Exception\SmartyPluginException;
 
 /**
  * The parser context is an application-wide context, which stores var-value pairs.
@@ -24,6 +25,7 @@ use Thelia\Form\BaseForm;
  */
 class ParserContext implements \IteratorAggregate
 {
+    private $formStore = array();
     private $store = array();
 
     public function __construct(Request $request)
@@ -38,9 +40,9 @@ class ParserContext implements \IteratorAggregate
      * @param BaseForm $form
      * @return $this
      */
-    public function setCurrentForm(BaseForm $form)
+    public function pushCurrentForm(BaseForm $form)
     {
-        $this->set('thelia-current-form', $form);
+        array_push($this->formStore, $form);
 
         return $this;
     }
@@ -50,11 +52,29 @@ class ParserContext implements \IteratorAggregate
      *
      * @return BaseForm|null
      */
-    public function getCurrentForm()
+    public function popCurrentForm($default = null)
     {
-        return $this->get('thelia-current-form');
+        $form = array_pop($this->formStore);
+
+        if (null === $form) {
+            return $default;
+        }
+
+        return $form;
     }
 
+    public function getCurrentForm()
+    {
+        $form = end($this->formStore);
+
+        if (false === $form) {
+            throw new SmartyPluginException(
+                "There is currently no defined form"
+            );
+        }
+
+        return $form;
+    }
 
     // -- Error form -----------------------------------------------------------
 

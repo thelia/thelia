@@ -9,7 +9,7 @@
 - Enable image zoom in image loop before cropping to guarantee that the resulting image will match the required size, even if the original image is smaller. This feature is active only if the ```allow_zoom``` parameter is true.
 - When in development mode, an exception is thrown when an error occurs when processing assets, thus helping to diagnose missing files, LESS syntax errors, and the like.
 - Change default order for cart loop
-- New module_config SMarty function: {module_config module="module-code" key="parameter-name}
+- New module_config Smarty function: {module_config module="module-code" key="parameter-name}
 - Do not register previous url on XmlHttpRequest
 - Add ACL on documents and images tabs.
 - Add confirmation modal on documents deletion
@@ -36,6 +36,7 @@
 - jquery.ui.datepicker is now DEPRECATED and will be REMOVED in 2.3. Please use boostrap-datepicker
 - Add ```thelia.logger``` service to prepare the transition with another logger.
 - Add 56 new admin hook
+- Add stacked current form into parser context. It allows to have nested forms while using the new way to write forms.
 
 # 2.1.3
 
