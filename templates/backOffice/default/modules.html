@@ -108,7 +108,7 @@
 
 {* Module information dialog *}
 <div class="modal fade" id="module-information" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
 
             <div class="modal-header">
@@ -207,10 +207,26 @@
             });
 
             $('.module-information').click(function(event) {
+                showModuleInformation(
+                        '{url path='/admin/module/information/__ID__'}'.replace('__ID__', $(this).data('id'))
+                );
+
+                event.preventDefault();
+            });
+
+            $('.module-documentation').click(function(event) {
+                showModuleInformation(
+                        '{url path='/admin/module/documentation/__ID__'}'.replace('__ID__', $(this).data('id'))
+                );
+
+                event.preventDefault();
+            });
+
+            function showModuleInformation(url) {
                 $('body').append('<div class="modal-backdrop fade in" id="loading-event"><div class="loading"></div></div>');
 
                 $.ajax({
-                    url: '{url path='/admin/module/information/__ID__'}'.replace('__ID__', $(this).data('id'))
+                    url: url
                 }).always(function(){
                     $("#loading-event").remove();
                 }).success(function(data) {
@@ -218,9 +234,7 @@
                     $('#module-information-body').html(data.body);
                     $("#module-information").modal("show");
                 });
-
-                event.preventDefault();
-            });
+            }
         });
     </script>
 

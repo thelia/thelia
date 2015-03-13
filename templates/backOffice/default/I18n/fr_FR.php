@@ -854,6 +854,7 @@ return array(
     'Quickly create combinations using the combination builder' => 'Créer rapidement une combinaison via le générateur de combinaison',
     'Rate' => 'Taux',
     'Rate from Euro' => 'Taux à partir de l\'Euro',
+    'Read module documentation' => 'Lire la documentation du module',
     'Read the documentation of this module' => 'Lire la documentation de ce module',
     'Reference' => 'Référence',
     'Registration date' => 'Date d\'enregistrement',

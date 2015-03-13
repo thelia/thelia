@@ -12,8 +12,9 @@
 
 namespace Thelia\Controller\Admin;
 
+use Michelf\Markdown;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Thelia\Action\Module;
+use Symfony\Component\Finder\Finder;
 use Thelia\Core\Event\Module\ModuleDeleteEvent;
 use Thelia\Core\Event\Module\ModuleEvent;
 use Thelia\Core\Event\Module\ModuleInstallEvent;
@@ -406,4 +407,64 @@ class ModuleController extends AbstractCrudController
 
         return new JsonResponse([ 'title' => $title, 'body' => $content], $status);
     }
+
+    public function documentationAction($module_id)
+    {
+        if (null !== $response = $this->checkAuth(AdminResources::MODULE, array(), AccessManager::VIEW)) {
+            return $response;
+        }
+
+        $status = 200;
+
+        $content = null;
+
+        if (null !== $module = ModuleQuery::create()->findPk($module_id)) {
+            $title = $module->setLocale($this->getSession()->getLang()->getLocale())->getTitle();
+
+            $finder = null;
+
+            // Check if the module has declared a documentation
+            $moduleDescriptor = $module->getAbsoluteConfigPath() . DS . 'module.xml';
+
+            if (false !== $xmlData = @simplexml_load_file($moduleDescriptor)) {
+                $documentationDirectory = (string) $xmlData->documentation;
+
+                if (! empty($documentationDirectory)) {
+                    $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/.+\.md$/i');
+                }
+            }
+
+            // Fallback to readme.md (if any)
+            if ($finder == null || $finder->count() == 0) {
+                $finder = Finder::create()->files()->in($module->getAbsoluteBaseDir())->name('/readme\.md/i');
+            }
+
+            // Merge all MD files
+            if ($finder && $finder->count() > 0) {
+                $finder->sortByName();
+
+                /** @var \DirectoryIterator $file */
+                foreach ($finder as $file) {
+                    if (false !== $mdDocumentation = @file_get_contents($file->getPathname())) {
+                        if ($content == null) {
+                            $content = '';
+                        }
+                        $content .= Markdown::defaultTransform($mdDocumentation);
+                    }
+                }
+            }
+        } else {
+            $status = 404;
+
+            $title = $this->getTranslator()->trans('Error occured.');
+            $content = $this->getTranslator()->trans('Module ID "%id" was not found.', [ '%id' => $module_id]);
+        }
+
+        if ($content === null) {
+            $content = $this->getTranslator()->trans("This module has no Markdown documentation.");
+        }
+
+        return new JsonResponse([ 'title' => $title, 'body' => $content], $status);
+    }
+
 }

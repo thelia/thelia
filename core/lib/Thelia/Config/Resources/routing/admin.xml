@@ -1107,8 +1107,13 @@
         <default key="_controller">Thelia\Controller\Admin\ModuleController::installAction</default>
     </route>
 
-    <route id="admin.module.fet-information" path="/admin/module/information/{module_id}">
+    <route id="admin.module.information" path="/admin/module/information/{module_id}">
         <default key="_controller">Thelia\Controller\Admin\ModuleController::informationAction</default>
+        <requirement key="module_id">\d+</requirement>
+    </route>
+
+    <route id="admin.module.documentation" path="/admin/module/documentation/{module_id}">
+        <default key="_controller">Thelia\Controller\Admin\ModuleController::documentationAction</default>
         <requirement key="module_id">\d+</requirement>
     </route>
 

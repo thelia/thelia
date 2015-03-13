@@ -37,6 +37,7 @@
 - Add ```thelia.logger``` service to prepare the transition with another logger.
 - Add 56 new admin hook
 - Add stacked current form into parser context. It allows to have nested forms while using the new way to write forms.
+- Module information and documentation could be viewed directly from the module list
 
 # 2.1.3
 

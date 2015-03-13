@@ -854,6 +854,7 @@ return array(
     'Quickly create combinations using the combination builder' => 'Quickly create combinations using the combination builder',
     'Rate' => 'Rate',
     'Rate from Euro' => 'Rate from Euro',
+    'Read module documentation' => 'Read module documentation',
     'Read the documentation of this module' => 'Read the documentation of this module',
     'Reference' => 'Reference',
     'Registration date' => 'Registration date',
