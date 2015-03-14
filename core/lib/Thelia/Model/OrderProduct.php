@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\Order\OrderProductEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\OrderProduct as BaseOrderProduct;
 
@@ -17,10 +17,12 @@ class OrderProduct extends BaseOrderProduct
      */
     protected $cartIemId;
 
+    /** @var int */
     protected $cartItemId;
 
     /**
      * @param mixed $cartItemId
+     * @return $this
      */
     public function setCartItemId($cartItemId)
     {
@@ -46,9 +48,11 @@ class OrderProduct extends BaseOrderProduct
     {
         return $this->cartItemId;
     }
+
     /**
      * @param mixed $cartItemId
      * @deprecated Since 2.1.3 because it is a typo, will be removed in 2.3
+     * @return $this|OrderProduct
      */
     public function setCartIemId($cartItemId)
     {
@@ -81,7 +85,11 @@ class OrderProduct extends BaseOrderProduct
      */
     public function preInsert(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE, (new OrderEvent($this->getOrder()))->setCartItemId($this->cartIemId));
+        $this->dispatchEvent(
+            TheliaEvents::ORDER_PRODUCT_BEFORE_CREATE,
+            (new OrderProductEvent($this->getOrder(), null))
+                ->setCartItemId($this->cartItemId)
+        );
 
         return true;
     }
@@ -91,6 +99,10 @@ class OrderProduct extends BaseOrderProduct
      */
     public function postInsert(ConnectionInterface $con = null)
     {
-        $this->dispatchEvent(TheliaEvents::ORDER_PRODUCT_AFTER_CREATE, (new OrderEvent($this->getOrder()))->setCartItemId($this->cartIemId));
+        $this->dispatchEvent(
+            TheliaEvents::ORDER_PRODUCT_AFTER_CREATE,
+            (new OrderProductEvent($this->getOrder(), $this->getId()))
+                ->setCartItemId($this->cartItemId)
+        );
     }
 }

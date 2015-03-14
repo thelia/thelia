@@ -16,21 +16,49 @@ use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Order;
 
+/**
+ * Class OrderEvent
+ * @package Thelia\Core\Event\Order
+ */
 class OrderEvent extends ActionEvent
 {
+    /** @var Order */
     protected $order = null;
+
+    /** @var Order */
     protected $placedOrder = null;
+
+    /** @var null|int */
     protected $invoiceAddress = null;
+
+    /** @var null|int */
     protected $deliveryAddress = null;
+
+    /** @var null|int */
     protected $deliveryModule = null;
+
+    /** @var null|int */
     protected $paymentModule = null;
+
+    /** @var null|float */
     protected $postage = null;
+
+    /** @var float */
     protected $postageTax = 0.0;
+
+    /** @var null|string */
     protected $postageTaxRuleTitle = null;
+
+    /** @var null|string */
     protected $ref = null;
+
+    /** @var null|int */
     protected $status = null;
+
+    /** @var null|string */
     protected $deliveryRef = null;
 
+    /** @var null|int */
     protected $cartItemId = null;
 
     /**
@@ -48,14 +76,18 @@ class OrderEvent extends ActionEvent
 
     /**
      * @param Order $order
+     * @return $this
      */
     public function setOrder(Order $order)
     {
         $this->order = $order;
+
+        return $this;
     }
 
     /**
      * @param int $cartItemId
+     * @return $this
      */
     public function setCartItemId($cartItemId)
     {
@@ -74,74 +106,101 @@ class OrderEvent extends ActionEvent
 
     /**
      * @param Order $order
+     * @return $this
      */
     public function setPlacedOrder(Order $order)
     {
         $this->placedOrder = $order;
+
+        return $this;
     }
 
     /**
      * @param int $address an address ID
+     * @return $this
      */
     public function setInvoiceAddress($address)
     {
         $this->invoiceAddress = $address;
+
+        return $this;
     }
 
     /**
      * @param int $address an address ID
+     * @return $this
      */
     public function setDeliveryAddress($address)
     {
         $this->deliveryAddress = $address;
+
+        return $this;
     }
 
     /**
      * @param int $module a delivery module ID
+     * @return $this
      */
     public function setDeliveryModule($module)
     {
         $this->deliveryModule = $module;
+
+        return $this;
     }
 
     /**
      * @param int $module a payment module ID
+     * @return $this
      */
     public function setPaymentModule($module)
     {
         $this->paymentModule = $module;
+
+        return $this;
     }
 
     /**
      * @param double  $postage the postage amount
+     * @return $this
      */
     public function setPostage($postage)
     {
         $this->postage = $postage;
+
+        return $this;
     }
 
     /**
      * @param string $ref the order reference
+     * @return $this
      */
     public function setRef($ref)
     {
         $this->ref = $ref;
+
+        return $this;
     }
 
     /**
      * @param int $status the order status ID
+     * @return $this
      */
     public function setStatus($status)
     {
         $this->status = $status;
+
+        return $this;
     }
 
     /**
      * @param string $deliveryRef the delivery reference
+     * @return $this
      */
     public function setDeliveryRef($deliveryRef)
     {
         $this->deliveryRef = $deliveryRef;
+
+        return $this;
     }
 
     /**
@@ -266,6 +325,7 @@ class OrderEvent extends ActionEvent
 
     /**
      * @param null $postageTax
+     * @return $this
      */
     public function setPostageTax($postageTax)
     {
@@ -284,6 +344,7 @@ class OrderEvent extends ActionEvent
 
     /**
      * @param null $postageTaxRuleTitle
+     * @return $this
      */
     public function setPostageTaxRuleTitle($postageTaxRuleTitle)
     {
