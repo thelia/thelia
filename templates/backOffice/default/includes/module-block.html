@@ -22,8 +22,8 @@
                 <th>
                 {admin_sortable_header
                    current_order=$module_order
-                   order='alpha'
-                   reverse_order='alpha_reverse'
+                   order='title'
+                   reverse_order='title_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
                    label="{intl l='Name'}"
@@ -43,16 +43,7 @@
 
                 <th>{intl l="version"}</th>
 
-                <th>
-                {admin_sortable_header
-                   current_order=$module_order
-                   order='title'
-                   reverse_order='title_reverse'
-                   path={url path='/admin/modules'}
-                   request_parameter_name='module_order'
-                   label="{intl l='Description'}"
-                }
-                </th>
+                <th>{intl l='Description'}</th>
 
                 <th class="text-center">
                 {admin_sortable_header

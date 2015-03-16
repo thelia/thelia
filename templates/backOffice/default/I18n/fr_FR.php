@@ -1218,7 +1218,7 @@ return array(
     'title' => 'titre',
     'tracking reference' => 'Numéro du colis',
     'uncheck all' => 'tout décocher',
-    'version' => 'version',
+    'version' => 'Version',
     'warning' => 'Attention',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l\'une après l\'autre ou en même temps: cela permet d\'appliquer des taxes sur un produit déjà taxé ou non.',
 );
