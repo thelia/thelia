@@ -29,21 +29,14 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@max_id + 1, 'fr_FR', 'Page brand edit - dans formulaire', '', ''),
-(@max_id + 2, 'fr_FR', 'Page sale edit - appel javascript', '', ''),
-(@max_id + 3, 'fr_FR', 'Page api - en haut', '', ''),
-(@max_id + 4, 'fr_FR', 'Page api - en bas', '', ''),
-(@max_id + 5, 'fr_FR', 'Page api - formulaire de suppression', '', ''),
-(@max_id + 1, 'es_ES', NULL, '', ''),
-(@max_id + 2, 'es_ES', NULL, '', ''),
-(@max_id + 3, 'es_ES', NULL, '', ''),
-(@max_id + 4, 'es_ES', NULL, '', ''),
-(@max_id + 5, 'es_ES', NULL, '', ''),
-(@max_id + 1, 'en_US', 'Brand edit page - in the form', '', ''),
-(@max_id + 2, 'en_US', 'Sale edit page - javascript last call block', '', ''),
-(@max_id + 3, 'en_US', 'Api page - at top', '', ''),
-(@max_id + 4, 'en_US', 'Api page - at bottom', '', ''),
-(@max_id + 5, 'en_US', 'Api page - in deletion form', '', '')
+{foreach $locales as $locale}
+(@max_id + 1, '{$locale}', {intl l='Brand edit page - in the form' locale=$locale}, '', ''),
+(@max_id + 2, '{$locale}', {intl l='Sale edit page - javascript last call block' locale=$locale}, '', ''),
+(@max_id + 3, '{$locale}', {intl l='Api page - at top' locale=$locale}, '', ''),
+(@max_id + 4, '{$locale}', {intl l='Api page - at bottom' locale=$locale}, '', ''),
+(@max_id + 5, '{$locale}', {intl l='Api page - in deletion form' locale=$locale}, '', ''){if ! $locale@last},{/if}
+
+{/foreach}
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

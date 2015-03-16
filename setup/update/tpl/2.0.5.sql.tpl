@@ -15,9 +15,10 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 (@max_id + 1, 'admin.search', NOW(), NOW());
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max_id + 1, 'fr_FR', 'Recherche'),
-(@max_id + 1, 'es_ES', NULL),
-(@max_id + 1, 'en_US', 'Search')
+{foreach $locales as $locale}
+(@max_id + 1, '{$locale}', {intl l='Search' locale=$locale}){if ! $locale@last},{/if}
+
+{/foreach}
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

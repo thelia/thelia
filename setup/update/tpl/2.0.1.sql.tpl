@@ -33,33 +33,18 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-(@max, 'fr_FR', 'Informations sur la boutique'),
-(@max+1, 'fr_FR', 'Variables de configuration'),
-(@max+2, 'fr_FR', 'Consulter les logs d\'administration'),
-(@max+3, 'fr_FR', 'Configuration du système de log'),
-(@max+4, 'fr_FR', 'Configuration avancée'),
-(@max+5, 'fr_FR', 'Traductions'),
-(@max+6, 'fr_FR', 'Outils'),
-(@max+7, 'fr_FR', 'gestion des exports'),
-(@max+8, 'fr_FR', 'Export des inscrits à la newsletter'),
-(@max, 'es_ES', NULL),
-(@max+1, 'es_ES', NULL),
-(@max+2, 'es_ES', NULL),
-(@max+3, 'es_ES', NULL),
-(@max+4, 'es_ES', NULL),
-(@max+5, 'es_ES', NULL),
-(@max+6, 'es_ES', NULL),
-(@max+7, 'es_ES', NULL),
-(@max+8, 'es_ES', NULL),
-(@max, 'en_US', 'Store information configuration'),
-(@max+1, 'en_US', 'Configuration variables'),
-(@max+2, 'en_US', 'View administration logs'),
-(@max+3, 'en_US', 'Logging system configuration'),
-(@max+4, 'en_US', 'Advanced configuration'),
-(@max+5, 'en_US', 'Translations'),
-(@max+6, 'en_US', 'Tools panel'),
-(@max+7, 'en_US', 'Back-office export management'),
-(@max+8, 'en_US', 'export of newsletter subscribers')
+{foreach $locales as $locale}
+(@max, '{$locale}', {intl l='Store information configuration' locale=$locale}),
+(@max+1, '{$locale}', {intl l='Configuration variables' locale=$locale}),
+(@max+2, '{$locale}', {intl l='View administration logs' locale=$locale}),
+(@max+3, '{$locale}', {intl l='Logging system configuration' locale=$locale}),
+(@max+4, '{$locale}', {intl l='Advanced configuration' locale=$locale}),
+(@max+5, '{$locale}', {intl l='Translations' locale=$locale}),
+(@max+6, '{$locale}', {intl l='Tools panel' locale=$locale}),
+(@max+7, '{$locale}', {intl l='Back-office export management' locale=$locale}),
+(@max+8, '{$locale}', {intl l='export of newsletter subscribers' locale=$locale}){if ! $locale@last},{/if}
+
+{/foreach}
 ;
 
 SELECT @max := MAX(`id`) FROM `lang`;

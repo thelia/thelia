@@ -13,9 +13,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-(@maxHookId + 1, 'fr_FR', 'Page coupon - formulaire de suppression', '', ''),
-(@maxHookId + 1, 'es_ES', NULL, '', ''),
-(@maxHookId + 1, 'en_US', 'Coupon page - in deletion form', '', '')
+{foreach $locales as $locale}
+(@maxHookId + 1, '{$locale}', {intl l='Coupon page - in deletion form' locale=$locale}, '', ''){if ! $locale@last},{/if}
+
+{/foreach}
 ;
 
 UPDATE `config_i18n` SET `title`='Utiliser un cookie persistant pour memoriser le panier du client' WHERE `locale`='fr_FR' AND `id`=(SELECT`id` FROM `config` WHERE `name`='cart.use_persistent_cookie');
