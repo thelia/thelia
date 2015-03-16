@@ -1134,7 +1134,6 @@ return array(
     'Variable purpose' => 'Variable purpose',
     'Variable value' => 'Variable value',
     'Variables to inject' => 'Variables to inject',
-    'Version' => 'Version',
     'Version %ver' => 'Version %ver',
     'View' => 'View',
     'View only missing translations.' => 'View only missing translations.',
@@ -1219,6 +1218,7 @@ return array(
     'title' => 'title',
     'tracking reference' => 'Tracking reference',
     'uncheck all' => 'uncheck all',
+    'version' => 'Version',
     'warning' => 'warning',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'You can build tax rules where the taxes are applied on the sole product price, and tax rules where a tax is applied on the result of a previous tax calculation.',
 );

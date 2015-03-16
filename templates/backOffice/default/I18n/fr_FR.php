@@ -1134,7 +1134,6 @@ return array(
     'Variable purpose' => 'Objet de la variable',
     'Variable value' => 'Valeur de la variable',
     'Variables to inject' => 'Variables à injecter',
-    'Version' => 'Version',
     'Version %ver' => 'Version %ver',
     'View' => 'Voir',
     'View only missing translations.' => 'Afficher uniquement les traductions manquantes',
@@ -1219,6 +1218,7 @@ return array(
     'title' => 'titre',
     'tracking reference' => 'Numéro du colis',
     'uncheck all' => 'tout décocher',
+    'version' => 'Version',
     'warning' => 'Attention',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'vous pouvez combiner des taxes en règles de taxe et choisir si elle sont appliquées l\'une après l\'autre ou en même temps: cela permet d\'appliquer des taxes sur un produit déjà taxé ou non.',
 );
