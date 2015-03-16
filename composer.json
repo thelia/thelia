@@ -25,7 +25,7 @@
         "symfony-cmf/routing": "1.0.0",
         "symfony/form": "2.2.*",
         "symfony/validator": "2.3.*",
-        "smarty/smarty": "v3.1.14",
+        "smarty/smarty": "3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",
         "leafo/lessphp": "0.4.*",
         "ptachoire/cssembed": "1.0.*",
@@ -59,28 +59,5 @@
         "branch-alias": {
             "dev-master": "2.0.0-dev"
         }
-    },
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "smarty/smarty",
-                "version": "3.1.14",
-                "dist": {
-                    "url": "http://www.smarty.net/files/Smarty-3.1.14.zip",
-                    "type": "zip"
-                },
-                "source": {
-                    "url": "http://smarty-php.googlecode.com/svn/",
-                    "type": "svn",
-                    "reference": "tags/Smarty_3_1_14/distribution/"
-                },
-                "autoload": {
-                    "classmap": [
-                        "libs/"
-                    ]
-                }
-            }
-        }
-    ]
+    }
 }
