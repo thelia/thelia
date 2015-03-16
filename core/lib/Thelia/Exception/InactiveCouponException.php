@@ -16,11 +16,11 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class CouponDisabledException
+ * Class InactiveCouponException
  * @package Thelia\Exception
  * @author Manuel Raynaud <manu@thelia.net>
  */
-class CouponDisabledException extends \RuntimeException
+class InactiveCouponException extends \RuntimeException
 {
 
     public function __construct($couponCode)
