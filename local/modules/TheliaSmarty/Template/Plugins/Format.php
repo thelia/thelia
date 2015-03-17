@@ -13,7 +13,6 @@
 namespace TheliaSmarty\Template\Plugins;
 
 use Thelia\Core\HttpFoundation\Request;
-use Thelia\Core\Template\Smarty\Plugins\an;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -28,9 +27,13 @@ use Thelia\Tools\NumberFormat;
  * Class Format
  * @package Thelia\Core\Template\Smarty\Plugins
  * @author Manuel Raynaud <manu@thelia.net>
+ * @author Benjamin Perche <benjamin@thelia.net>
  */
 class Format extends AbstractSmartyPlugin
 {
+    private static $dateKeys = ["day", "month", "year"];
+    private static $timeKeys = ["hour", "minute", "second"];
+
     protected $request;
 
     public function __construct(Request $request)
@@ -55,8 +58,8 @@ class Format extends AbstractSmartyPlugin
      *  {format_date date=$dateTimeObject output="date"} will output the date using the default date system format
      *  {format_date date=$dateTimeObject} will output with the default datetime system format
      *
-     * @param  array                                                        $params
-     * @param  null                                                         $template
+     * @param  array                                                  $params
+     * @param  null                                                   $template
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
      * @return string
      */
@@ -75,6 +78,18 @@ class Format extends AbstractSmartyPlugin
                 $date = new \DateTime();
                 $date->setTimestamp($timestamp);
             }
+        } elseif (is_array($date)) {
+            $keys = array_keys($date);
+
+            $isDate = $this->arrayContains(static::$dateKeys, $keys);
+            $isTime = $this->arrayContains(static::$timeKeys, $keys);
+
+            // If this is not a date, fallback on today
+            // If this is not a time, fallback on midnight
+            $dateFormat = $isDate ? sprintf("%d-%d-%d", $date["year"], $date["month"], $date["day"]) : (new \DateTime())->format("Y-m-d");
+            $timeFormat = $isTime ? sprintf("%d:%d:%d", $date["hour"], $date["minute"], $date["second"]) : "0:0:0";
+
+            $date = new \DateTime(sprintf("%s %s", $dateFormat, $timeFormat));
         }
 
         if (!($date instanceof \DateTime)) {
@@ -132,9 +147,9 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_number number="1246.12" decimals="1" dec_point="," thousands_sep=" "} will output "1 246,1"
      *
      * @param $params
-     * @param  null                                                         $template
+     * @param  null                                                   $template
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
-     * @return string                                                       the expected number formatted
+     * @return string                                                 the expected number formatted
      */
     public function formatNumber($params, $template = null)
     {
@@ -165,9 +180,9 @@ class Format extends AbstractSmartyPlugin
      *  ex : {format_money number="1246.12" decimals="1" dec_point="," thousands_sep=" " symbol="€"} will output "1 246,1 €"
      *
      * @param $params
-     * @param  null                                                         $template
+     * @param  null                                                   $template
      * @throws \TheliaSmarty\Template\Exception\SmartyPluginException
-     * @return string                                                       the expected number formatted
+     * @return string                                                 the expected number formatted
      */
     public function formatMoney($params, $template = null)
     {
@@ -186,15 +201,26 @@ class Format extends AbstractSmartyPlugin
         );
     }
 
+    protected function arrayContains(array $expected, array $hayStack)
+    {
+        foreach ($expected as $value) {
+            if (!in_array($value, $hayStack)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
-     * @return an array of SmartyPluginDescriptor
+     * @return SmartyPluginDescriptor[]
      */
     public function getPluginDescriptors()
     {
         return array(
             new SmartyPluginDescriptor("function", "format_date", $this, "formatDate"),
             new SmartyPluginDescriptor("function", "format_number", $this, "formatNumber"),
-            new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney")
+            new SmartyPluginDescriptor("function", "format_money", $this, "formatMoney"),
         );
     }
 }
