@@ -134,7 +134,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 55, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 57, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
+(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 59, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -197,7 +198,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 55, '{$locale}', {intl l='Tax edit - top' locale=$locale}, '', ''),
 (@max_id + 56, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''),
 (@max_id + 57, '{$locale}', {intl l='Order edit - displayed after product information' locale=$locale}, '', ''),
-(@max_id + 58, '{$locale}', {intl l='Order - Tab' locale=$locale}, '', ''){if ! $locale@last},{/if}
+(@max_id + 58, '{$locale}', {intl l='Order - Tab' locale=$locale}, '', ''),
+(@max_id + 59, '{$locale}', {intl l='Order details - after product' locale=$locale}, '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;

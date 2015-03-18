@@ -321,6 +321,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (219, 'account-order.after-javascript-include', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (220, 'account-order.javascript-initialization', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
+(222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1811,6 +1812,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (219, 'fr_FR', 'Détail d\'une commande - après l\'inclusion des javascript', NULL, NULL),
     (220, 'fr_FR', 'Détail d\'une commande - initialisation du javascript', NULL, NULL),
     (221, 'fr_FR', 'Compte client - informations additionnelles', NULL, NULL),
+    (222, 'fr_FR', 'Détail d\'une commande - Après un produit', NULL, NULL),
+
     (1000, 'fr_FR', 'Catégorie - contenu', NULL, NULL),
     (1001, 'fr_FR', 'Contenu - contenu', NULL, NULL),
     (1002, 'fr_FR', 'Dossier - contenu', NULL, NULL),
@@ -2442,6 +2445,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (219, 'es_ES', NULL, NULL, NULL),
     (220, 'es_ES', NULL, NULL, NULL),
     (221, 'es_ES', NULL, NULL, NULL),
+    (222, 'es_ES', NULL, NULL, NULL),
+
     (1000, 'es_ES', NULL, NULL, NULL),
     (1001, 'es_ES', NULL, NULL, NULL),
     (1002, 'es_ES', NULL, NULL, NULL),
@@ -3073,6 +3078,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (219, 'en_US', 'Order details - after javascript include', NULL, NULL),
     (220, 'en_US', 'Order details - javascript initialization', NULL, NULL),
     (221, 'en_US', 'Customer account - additional information', NULL, NULL),
+    (222, 'en_US', 'Order details - after product', NULL, NULL),
+
     (1000, 'en_US', 'Category - content', NULL, NULL),
     (1001, 'en_US', 'Content - content', NULL, NULL),
     (1002, 'en_US', 'Folder - content', NULL, NULL),

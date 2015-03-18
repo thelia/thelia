@@ -321,6 +321,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (219, 'account-order.after-javascript-include', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (220, 'account-order.javascript-initialization', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
+(222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -1686,6 +1687,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (219, '{$locale}', {intl l='Order details - after javascript include' locale=$locale}, NULL, NULL),
     (220, '{$locale}', {intl l='Order details - javascript initialization' locale=$locale}, NULL, NULL),
     (221, '{$locale}', {intl l='Customer account - additional information' locale=$locale}, NULL, NULL),
+    (222, '{$locale}', {intl l='Order details - after product' locale=$locale}, NULL, NULL),
+
     (1000, '{$locale}', {intl l='Category - content' locale=$locale}, NULL, NULL),
     (1001, '{$locale}', {intl l='Content - content' locale=$locale}, NULL, NULL),
     (1002, '{$locale}', {intl l='Folder - content' locale=$locale}, NULL, NULL),

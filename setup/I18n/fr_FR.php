@@ -1044,4 +1044,5 @@ return array(
     'Processing' => 'Traitement',
     'Sent' => 'Envoyée',
     'Canceled' => 'Annulée',
+    'Order details - after product' => 'Détail d\'une commande - Après un produit',
 );

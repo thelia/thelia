@@ -1044,4 +1044,5 @@ return array(
     'Processing' => 'Processing',
     'Sent' => 'Sent',
     'Canceled' => 'Canceled',
+    'Order details - after product' => 'Order details - after product',
 );

@@ -134,7 +134,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 55, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 57, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW())
+(@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
+(@max_id + 59, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -197,6 +198,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 56, 'fr_FR', 'Edition d\'une tax - en bas', '', ''),
 (@max_id + 57, 'fr_FR', 'Edition d\'une commande - sous les informations du produit', '', ''),
 (@max_id + 58, 'fr_FR', 'Commande- Onglet', '', ''),
+(@max_id + 59, 'fr_FR', 'Détail d\'une commande - Après un produit', '', ''),
 (@max_id + 1, 'es_ES', NULL, '', ''),
 (@max_id + 2, 'es_ES', NULL, '', ''),
 (@max_id + 3, 'es_ES', NULL, '', ''),
@@ -255,6 +257,7 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 56, 'es_ES', NULL, '', ''),
 (@max_id + 57, 'es_ES', NULL, '', ''),
 (@max_id + 58, 'es_ES', NULL, '', ''),
+(@max_id + 59, 'es_ES', NULL, '', ''),
 (@max_id + 1, 'en_US', 'Profile - table header', '', ''),
 (@max_id + 2, 'en_US', 'Profile - table row', '', ''),
 (@max_id + 3, 'en_US', 'Import - table header', '', ''),
@@ -312,7 +315,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 55, 'en_US', 'Tax edit - top', '', ''),
 (@max_id + 56, 'en_US', 'Tax edit - bottom', '', ''),
 (@max_id + 57, 'en_US', 'Order edit - displayed after product information', '', ''),
-(@max_id + 58, 'en_US', 'Order - Tab', '', '')
+(@max_id + 58, 'en_US', 'Order - Tab', '', ''),
+(@max_id + 59, 'en_US', 'Order details - after product', '', '')
 ;
 
 
