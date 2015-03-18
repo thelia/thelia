@@ -80,9 +80,9 @@ GNU General Public License : http://www.gnu.org/licenses/
     <link rel="icon" type="image/png" href="{image file='assets/img/favicon.png'}" />
 
     {* Feeds *}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/$lang_locale"}" />
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/$lang_locale"}" />
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/$lang_locale"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All contents'}" href="{url path="/feed/content/%lang" lang=$lang_locale}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All brands'}"   href="{url path="/feed/brand/%lang" lang=$lang_locale}" />
     {block name="feeds"}{/block}
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}

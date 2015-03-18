@@ -105,9 +105,9 @@
                                 </td>
                                 <td>
                                     <div class="group-btn">
-                                        <a href="{url path="/address/update/{$ID}" next={navigate to="current"}}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                        <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                         {if $DEFAULT != 1}
-                                            <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                            <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                         {/if}
                                     </div>
                                 </td>

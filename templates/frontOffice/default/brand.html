@@ -28,7 +28,7 @@
 {* Feeds *}
 {block name="feeds"}
 {if $brand_id}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/{lang attr='locale'}/{$brand_id}"}"/>
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All product in brand %title' title={brand attr='title'}}" href="{url path="/feed/brand/%lang/%brand_id" lang={lang attr='locale'} brand_id=$brand_id}"/>
 {/if}
 {/block}
 
