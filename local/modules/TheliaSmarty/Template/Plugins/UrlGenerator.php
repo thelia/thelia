@@ -12,6 +12,7 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use TheliaSmarty\Template\SmartyParser;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Thelia\Tools\TokenProvider;
@@ -66,11 +67,13 @@ class UrlGenerator extends AbstractSmartyPlugin
             throw new \InvalidArgumentException(Translator::getInstance()->trans("Please specify either 'path' or 'file' parameter in {url} function."));
         }
 
+        $excludeParams = $this->resolvePath($params, $path, $smarty);
+
         $target = $this->getParam($params, 'target', null);
 
         $url = URL::getInstance()->absoluteUrl(
             $path,
-            $this->getArgsFromParam($params, array('noamp', 'path', 'file', 'target')),
+            $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
             $mode
         );
 
@@ -82,6 +85,36 @@ class UrlGenerator extends AbstractSmartyPlugin
             $url .= '#'.$target;
         }
         return $url;
+    }
+
+    /**
+     *
+     * find placeholders in the path and replace them by the given value
+     *
+     * @param $params
+     * @param $path
+     * @param $smarty
+     * @return array the placeholders found
+     */
+    protected function resolvePath(&$params, &$path, $smarty)
+    {
+        $placeholder = [];
+
+        foreach ($params as $key => $value) {
+            if (false !== strpos($path, "%$key")) {
+                $placeholder["%$key"] = SmartyParser::theliaEscape($value, $smarty);
+                unset($params[$key]);
+            }
+        }
+
+        $path = strtr($path, $placeholder);
+        $keys = array_keys($placeholder);
+        array_walk($keys, function(&$item, $key) {
+            $item = str_replace('%', '', $item);
+        });
+
+        return $keys;
+
     }
 
      /**
