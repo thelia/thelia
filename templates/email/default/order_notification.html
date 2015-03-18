@@ -27,7 +27,7 @@
                 {assign var="customerRef" value=$REF}
             {/loop}
 
-            <p><a href="{url path="/admin/order/update/$ID"}">{intl l="View this order in your shop back-office."}</a></p>
+            <p><a href="{url path="/admin/order/update/%id" id=$ID}">{intl l="View this order in your shop back-office."}</a></p>
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr>
