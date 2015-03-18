@@ -242,7 +242,7 @@ class Order extends BaseOrder
         return $this->hasStatusHelper(
             $exact ?
             OrderStatus::CODE_PAID :
-            [ OrderStatus::CODE_PAID] //, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
+            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
         );
     }
 
