@@ -171,15 +171,14 @@
                                     </div>
 
                                     <div class="tab-pane fade" id="seo">
-                                        {form name="thelia.admin.seo"}
-                                            {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/content/seo/save'}"
-                                            closeUrl = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                        {include file="includes/seo-tab.html"
+                                            formAction  = "{url path='/admin/content/seo/save'}"
+                                            pageUrl     = "{url path='/admin/content/update'}/$content_id"
+                                            closeUrl    = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
                                             success_url = "{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
-                                            current_id = $content_id
-                                            }
-                                        {/form}
+                                            current_id  = $content_id
+                                            seoType     = 'content'
+                                        }
                                     </div>
 
                                     <div class="tab-pane fade" id="association">
