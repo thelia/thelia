@@ -237,13 +237,9 @@ class Order extends BaseOrder
      * if false, it will check if the order has been paid, whatever the current status is. The default is false.
      * @return bool true if this order is PAID, false otherwise.
      */
-    public function isPaid($exact = false)
+    public function isPaid()
     {
-        return $this->hasStatusHelper(
-            $exact ?
-            OrderStatus::CODE_PAID :
-            [ OrderStatus::CODE_PAID, OrderStatus::CODE_PROCESSING, OrderStatus::CODE_SENT ]
-        );
+        return $this->hasStatusHelper(OrderStatus::CODE_PAID);
     }
 
     /**
