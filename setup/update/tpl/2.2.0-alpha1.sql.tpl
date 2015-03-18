@@ -14,7 +14,7 @@ INSERT INTO `order_status` VALUES
   (@max_id + 1, "refunded", NOW(), NOW())
 ;
 
-INSERT INTO  `order_status_i18n` VALUES
+INSERT INTO `order_status_i18n` VALUES
 {foreach $locales as $locale}
 (@max_id + 1, "{$locale}", {intl l="Refunded" locale=$locale}, "", "", ""){if ! $locale@last},{/if}
 

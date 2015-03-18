@@ -14,7 +14,7 @@ INSERT INTO `order_status` VALUES
   (@max_id + 1, "refunded", NOW(), NOW())
 ;
 
-INSERT INTO  `order_status_i18n` VALUES
+INSERT INTO `order_status_i18n` VALUES
 (@max_id + 1, "fr_FR", 'Remboursé', "", "", ""),
 (@max_id + 1, "es_ES", NULL, "", "", ""),
 (@max_id + 1, "en_US", 'Refunded', "", "", "")
