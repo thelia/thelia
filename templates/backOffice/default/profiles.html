@@ -59,7 +59,7 @@
                                 <tr>
                                     <td>
                                         {if $can_change}
-                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}">
+                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">
                                                 {$CODE}
                                             </a>
                                         {else}
@@ -68,7 +68,7 @@
                                     </td>
                                     <td>
                                         {if $can_change}
-                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}">
+                                            <a title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">
                                                  {$TITLE}
                                             </a>
                                         {else}
@@ -80,7 +80,7 @@
                                     <td>
                                         <div class="btn-group">
                                             {if $can_change}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this profile'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/if}
 
                                             {assign linkedAdminCount {count name="linked-admin" type="admin" profile=$ID}}

@@ -73,7 +73,7 @@
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
                                             {loop type="profile" name="admin-profile" id={$PROFILE}}
-                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/$ID"}">{$TITLE}</a>
+                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
                                             {/loop}
                                         {else}
                                             {intl l='Superadministrator'}

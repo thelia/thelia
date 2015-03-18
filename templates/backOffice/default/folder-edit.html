@@ -30,9 +30,9 @@
 		            </div>
 
                     <div class="col-md-5 actions">
-                        <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/folders/update/$PREVIOUS"}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous folder'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                        <a {if $HAS_PREVIOUS != 0}href="{url path="/admin/folders/update/%previous" previous=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous folder'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                         <a  href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                        <a {if $HAS_NEXT != 0}href="{url path="/admin/folders/update/$NEXT"}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next folder'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                        <a {if $HAS_NEXT != 0}href="{url path="/admin/folders/update/%next" next=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next folder'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                     </div>
                 </div>
 
@@ -94,7 +94,7 @@
 			                            {form_hidden_fields}
 
 			                            {form_field field='success_url'}
-			                                <input type="hidden" name="{$name}" value="{url path="/admin/folders/update/{$ID}"}" />
+			                                <input type="hidden" name="{$name}" value="{url path="/admin/folders/update/%id" id=$ID}" />
 			                            {/form_field}
 
                                         {form_field field='locale'}

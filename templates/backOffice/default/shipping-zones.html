@@ -32,7 +32,7 @@
                             <div class="alert alert-warning">
                                 {intl l='<strong>Warning</strong>, some of your shipping zones are not attached to any delivery module:'}
                                 {loop name="area-not-attached" type="area" unassigned=true}
-                                    <a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}" title="{intl l='Edit this delivery zone'}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{else}.{/if}
+                                    <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}" title="{intl l='Edit this delivery zone'}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{else}.{/if}
                                 {/loop}
                             </div>
                         </div>
@@ -60,7 +60,7 @@
                             <tbody>
                                 {loop type="module" module_type="2" active="*" name="delivery.list" backend_context="1"}
                                 <tr>
-                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$TITLE}</a></td>
+                                   <td><a href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$TITLE}</a></td>
                                     <td>
                                         {loop name="area.module.associated" type="area" with_zone=$ID backend_context="1"}
                                             {$countries = ''}
@@ -69,7 +69,7 @@
                                             {/loop}
                                             {$countries = ltrim($countries, ', ')}
 
-                                            <a href="{url path="/admin/configuration/shipping_configuration/update/$ID"}" title="{$countries}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                            <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}" title="{$countries}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                         {/loop}
                                         {elseloop rel="area.module.associated"}
                                             {intl l="There are no shipping zones attached to this module."}
@@ -80,7 +80,7 @@
                                     <td class="text-center">
                                         <div class="btn-group">
                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-zone" access="UPDATE"}
-                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="btn btn-default btn-xs shipping-zones-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                            {/loop}
                                         </div>
                                     </td>

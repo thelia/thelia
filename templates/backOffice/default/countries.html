@@ -71,7 +71,7 @@
                                         {loop name="countries" type="country" backend_context="1" lang=$lang_id order=$order}
                                             <tr>
                                                 <td>{$ID}</td>
-                                                <td><a href="{url path="/admin/configuration/country/update/{$ID}"}">{$TITLE}</a></td>
+                                                <td><a href="{url path="/admin/configuration/country/update/%id" id=$ID}">{$TITLE}</a></td>
                                                 <td>
                                                     <div class="make-switch switch-small switch-radio change-default-toggle" data-id="{$ID}" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
                                                         <input class="change-default-toggle" type="radio" name="by_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
@@ -89,7 +89,7 @@
 
                                                 <td>
                                                     {loop type="area" name="country-area" country={$ID}}
-                                                        <a href="{url path="/admin/configuration/shipping_configuration/update/{$ID}"}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
+                                                        <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                                     {/loop}
                                                     {elseloop rel="country-area"}
                                                         <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
@@ -101,7 +101,7 @@
                                                 <td class="actions">
                                                     <div class="btn-group">
                                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.country" access="UPDATE"}
-                                                            <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/{$ID}"}">
+                                                            <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/%id" id=$ID}">
                                                                 <span class="glyphicon glyphicon-edit"></span>
                                                             </a>
                                                         {/loop}

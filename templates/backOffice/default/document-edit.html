@@ -30,19 +30,19 @@
                             <div class="form-container">
                                 <div class="col-md-12">
         						    {form name="$formId"}
-        						    	<form method="POST" action="{url path="/admin/document/type/{$documentType}/{$ID}/update"}" enctype="multipart/form-data" class="clearfix">
+        						    	<form method="POST" action="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}" enctype="multipart/form-data" class="clearfix">
 
                                             {include
                                                 file = "includes/inner-form-toolbar.html"
                                                 hide_submit_buttons = false
 
-                                                page_url  = "{url path="/admin/document/type/{$documentType}/{$ID}/update"}"
+                                                page_url  = "{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}"
                                                 close_url = "{url path="{$redirectUrl}" current_tab="documents" noamp=1}"
                                             }
 
         						        	{form_hidden_fields}
 
-                                            {render_form_field field="success_url" value="{url path="/admin/document/type/{$documentType}/{$ID}/update"}"}
+                                            {render_form_field field="success_url" value="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}"}
                                             {render_form_field field="locale" value="$edit_language_locale"}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
@@ -90,7 +90,7 @@
                                                 hide_submit_buttons = false
                                                 hide_flags = true
 
-                                                page_url  = "{url path="/admin/document/type/{$documentType}/{$ID}/update"}"
+                                                page_url  = "{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}"
                                                 close_url = "{url path="{$redirectUrl}" current_tab="documents"}"
                                             }
                                         </form>

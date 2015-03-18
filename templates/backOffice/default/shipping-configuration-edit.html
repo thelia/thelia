@@ -38,7 +38,7 @@
                             hide_submit_buttons = true
                             hide_flags = true
 
-                            page_url  = {url path="/admin/configuration/shipping_configuration/update/`$area_id`"}
+                            page_url  = {url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}
                             close_url = {url path="/admin/configuration/shipping_configuration"}
                         }
 
@@ -46,14 +46,14 @@
                             <div class="col-md-4">
 
                                 {form name="thelia.admin.area.modification"}
-                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/`$area_id`"}">
+                                    <form method="POST" action="{url path="/admin/configuration/shipping_configuration/save/%id" id=$area_id}">
                                         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
                                         {form_hidden_fields exclude="area_id"}
 
                                         <input type="hidden" name="area_id" value="{$area_id}">
 
-                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
                                         {render_form_field field="area_id" value=$area_id}
 
                                         {custom_render_form_field field='name'}
@@ -75,7 +75,7 @@
 
                                         <input type="hidden" name="area_id" value="{$area_id}">
 
-                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                        {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
                                         {render_form_field field="area_id" value=$area_id}
 
                                         {custom_render_form_field field='country_id'}
@@ -98,7 +98,7 @@
 
                                     {form_hidden_fields exclude="area_id"}
 
-                                    {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/`$area_id`"}}
+                                    {render_form_field field="success_url" value={url path="/admin/configuration/shipping_configuration/update/%id" id=$area_id}}
                                     {render_form_field field="area_id" value=$area_id}
 
                                     <div class="table-responsive">

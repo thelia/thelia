@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-12">
             <p></p> {* <---- FIXME Lame ! *}
-		    <form method="POST" class="clearfix" action="{url path="/admin/product/$ID/set-product-template"}" id="product_template_form">
+		    <form method="POST" class="clearfix" action="{url path="/admin/product/%id/set-product-template" id=$ID}" id="product_template_form">
 
                 <input type="hidden" name="product_id" value="{$product_id}" />
                 <input type="hidden" name="current_tab" value="attributes" />

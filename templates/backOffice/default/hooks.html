@@ -123,8 +123,8 @@
                                 {loop name="hooks" type="hook" backend_context="1" hook_type=$template_type lang=$lang_id order=$order}
                                 <tr>
                                     <td>{$ID}</td>
-                                    <td><a href="{url path="/admin/hook/update/`$ID`"}">{$CODE}</a></td>
-                                    <td><a href="{url path="/admin/hook/update/`$ID`"}">{$TITLE}</a></td>
+                                    <td><a href="{url path="/admin/hook/update/%id" id=$ID}">{$CODE}</a></td>
+                                    <td><a href="{url path="/admin/hook/update/%id" id=$ID}">{$TITLE}</a></td>
                                     <td>
                                         {if $NATIVE}
                                         <span class="label label-md label-success"><i class='glyphicon glyphicon-ok-circle'></i></span>

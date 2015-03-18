@@ -114,7 +114,7 @@
                                     <tr>
                                         <td>
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}">{$CODE}</a>
+                                                <a title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}">{$CODE}</a>
                                             {/loop}
                                             {elseloop rel="can_change"}
                                                 {$CODE}
@@ -155,7 +155,7 @@
 
                                         <td class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
                                                 <a title="{intl l='Delete this coupon'}" class="btn btn-default btn-xs delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">

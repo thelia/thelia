@@ -31,9 +31,9 @@
                         </div>
                         <noscript>
                             {if $ACTIVE}
-                            <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                            <a title="{intl l="Deactivate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
                             {else}
-                            <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                            <a title="{intl l="activate hook" title={$TITLE}}" href="{url path="/admin/module-hooks/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                             {/if}
                         </noscript>
                         {else}
@@ -61,7 +61,7 @@
                 <td class="actions">
                     <div class="btn-group">
                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="UPDATE"}
-                        <a class="btn btn-default btn-xs module-hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/module-hook/update/{$ID}"}">
+                        <a class="btn btn-default btn-xs module-hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/module-hook/update/%id" id=$ID}">
                             <span class="glyphicon glyphicon-edit"></span>
                         </a>
                         {/loop}

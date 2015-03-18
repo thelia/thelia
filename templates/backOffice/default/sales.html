@@ -108,7 +108,7 @@
 
                                             <td>
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
-                                                    <a title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/$ID"}">{$TITLE}</a>
+                                                    <a title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">{$TITLE}</a>
                                                 {/loop}
                                                 {elseloop rel="can_change"}
                                                     {$TITLE}
@@ -150,7 +150,7 @@
                                             <td class="actions">
                                                 <div class="btn-group">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.sales" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs sale-change" title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/$ID"}">
+                                                        <a class="btn btn-default btn-xs sale-change" title="{intl l='Change this sale'}" href="{url path="/admin/sale/update/%id" id=$ID}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}

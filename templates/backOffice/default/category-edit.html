@@ -243,7 +243,7 @@
                                                     <tr>
                                                         <td>{$CONTENT_ID}</td>
 
-                                                        <td><a href="{url path="/admin/content/update/{$CONTENT_ID}"}">{$TITLE}</a></td>
+                                                        <td><a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a></td>
 
                                                         {hook name="category.contents-table-row" location="category_contents_table_row" }
 
@@ -385,7 +385,7 @@ $(function() {
 
         if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/category/$category_id/available-related-content/"}' + val + '.xml',
+	             url      : '{url path="/admin/category/%id/available-related-content/" id=$category_id}' + val + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
