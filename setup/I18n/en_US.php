@@ -1045,4 +1045,10 @@ return array(
     'Sent' => 'Sent',
     'Canceled' => 'Canceled',
     'Order details - after product' => 'Order details - after product',
+    'Tab SEO - top' => 'Tab SEO - top',
+    'Tab SEO - bottom' => 'Tab SEO - bottom',
+    'Tab image - top' => 'Tab image - top',
+    'Tab image - bottom' => 'Tab image - bottom',
+    'Tab document - top' => 'Tab document - top',
+    'Tab document - bottom' => 'Tab document - bottom',
 );

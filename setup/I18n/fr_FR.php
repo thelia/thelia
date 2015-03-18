@@ -1045,4 +1045,10 @@ return array(
     'Sent' => 'Envoyée',
     'Canceled' => 'Annulée',
     'Order details - after product' => 'Détail d\'une commande - Après un produit',
+    'Tab SEO - top' => 'Onglet SEO - en haut',
+    'Tab SEO - bottom' => 'Onglet SEO - en bas',
+    'Tab image - top' => 'Onglet image - en haut',
+    'Tab image - bottom' => 'Onglet image - en bas',
+    'Tab document - top' => 'Onglet document - en haut',
+    'Tab document - bottom' => 'Onglet document - en bas',
 );

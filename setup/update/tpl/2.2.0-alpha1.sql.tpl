@@ -135,9 +135,14 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (@max_id + 56, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 57, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (@max_id + 58, 'order.tab', 2, 0, 1, 1, 1, 1, NOW(), NOW()),
-(@max_id + 59, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW())
+(@max_id + 59, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 60, 'tab-seo.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 61, 'tab-seo.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 62, 'tab-image.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 63, 'tab-image.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 64, 'tab-document.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 65, 'tab-document.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
-
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 {foreach $locales as $locale}
@@ -199,7 +204,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 56, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''),
 (@max_id + 57, '{$locale}', {intl l='Order edit - displayed after product information' locale=$locale}, '', ''),
 (@max_id + 58, '{$locale}', {intl l='Order - Tab' locale=$locale}, '', ''),
-(@max_id + 59, '{$locale}', {intl l='Order details - after product' locale=$locale}, '', ''){if ! $locale@last},{/if}
+(@max_id + 59, '{$locale}', {intl l='Order details - after product' locale=$locale}, '', ''),
+(@max_id + 60, '{$locale}', {intl l='Tab SEO - top' locale=$locale}, '', ''),
+(@max_id + 61, '{$locale}', {intl l='Tab SEO - bottom' locale=$locale}, '', ''),
+(@max_id + 62, '{$locale}', {intl l='Tab image - top' locale=$locale}, '', ''),
+(@max_id + 63, '{$locale}', {intl l='Tab image - bottom' locale=$locale}, '', ''),
+(@max_id + 64, '{$locale}', {intl l='Tab document - top' locale=$locale}, '', ''),
+(@max_id + 65, '{$locale}', {intl l='Tab document - bottom' locale=$locale}, '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;
