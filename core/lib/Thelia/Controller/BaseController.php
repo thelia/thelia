@@ -223,17 +223,19 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * @param $order_id
-     * @param $fileName
+     * @param int $order_id
+     * @param string $fileName
+     * @param bool $checkOrderStatus
+     * @param bool $checkAdminUser
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function generateOrderPdf($order_id, $fileName)
+    protected function generateOrderPdf($order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true)
     {
         $order = OrderQuery::create()->findPk($order_id);
 
         // check if the order has the paid status
-        if (!$this->getSecurityContext()->hasAdminUser()) {
-            if (!$order->isPaid()) {
+        if ($checkAdminUser && !$this->getSecurityContext()->hasAdminUser()) {
+            if ($checkOrderStatus && !$order->isPaid()) {
                 throw new NotFoundHttpException();
             }
         }
