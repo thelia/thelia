@@ -205,6 +205,12 @@
         <service id="thelia.action.customer_title" class="Thelia\Action\CustomerTitle">
             <tag name="kernel.event_subscriber"/>
         </service>
+
+        <service id="thelia.customer.form" class="Thelia\Core\EventListener\FormListener" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="controller_resolver" />
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 
 </config>
