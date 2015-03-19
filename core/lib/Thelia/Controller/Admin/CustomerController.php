@@ -41,6 +41,9 @@ class CustomerController extends AbstractCrudController
         );
     }
 
+    /**
+     * @return \Thelia\Form\CustomerCreateForm
+     */
     protected function getCreationForm()
     {
         return $this->createForm(AdminForm::CUSTOMER_CREATE);
