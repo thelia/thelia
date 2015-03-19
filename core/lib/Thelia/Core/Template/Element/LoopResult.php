@@ -65,12 +65,12 @@ class LoopResult implements \Iterator, \JsonSerializable
     {
         if (true === $this->versioned) {
             foreach ($this->getVersionOutputs() as $output) {
-                $row->set($output[0], $row->model->$output[1]());
+                $row->set($output[0], $row->model->{$output[1]}());
             }
         }
         if (true === $this->timestamped) {
             foreach ($this->getTimestampOutputs() as $output) {
-                $row->set($output[0], $row->model->$output[1]());
+                $row->set($output[0], $row->model->{$output[1]}());
             }
         }
         if (true === $this->countable) {

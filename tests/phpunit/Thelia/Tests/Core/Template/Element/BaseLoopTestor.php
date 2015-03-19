@@ -118,8 +118,8 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
     public function testExec()
     {
         $method = $this->getMethod('exec');
-
-        $methodReturn = $method->invokeArgs($this->instance, array(null));
+        $page = 0;
+        $methodReturn = $method->invokeArgs($this->instance, array(&$page));
 
         $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
