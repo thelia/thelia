@@ -454,7 +454,7 @@ class OrderController extends BaseFrontController
         if (null !== $orderProduct = OrderProductQuery::create()->findPk($order_product_id)) {
             $order = $orderProduct->getOrder();
 
-            if ($order->isPaid()) {
+            if ($order->isPaid(false)) {
                 // check customer
                 $this->checkOrderCustomer($order->getId());
 
