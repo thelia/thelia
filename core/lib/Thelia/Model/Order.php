@@ -233,8 +233,8 @@ class Order extends BaseOrder
     /**
      * Check if the current status of this order is PAID
      *
-     * @param bool $exact if true, the method will chek if the current status is exactly OrderStatus::CODE_PAID.
-     * if false, it will check if the order has been paid, whatever the current status is. The default is false.
+     * @param bool $exact if true, the method will check if the current status is exactly OrderStatus::CODE_PAID.
+     * if false, it will check if the order has been paid, whatever the current status is. The default is true.
      * @return bool true if this order is PAID, false otherwise.
      */
     public function isPaid($exact = true)
