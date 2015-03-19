@@ -60,7 +60,7 @@
                                     {if $CELLPHONE != ""}
                                         <span class="mobile">{$CELLPHONE}</span>
                                     {/if}
-                                    <span class="email">{mailto address="{$EMAIL}" encode="hex"}</span>
+                                    <span class="email">{mailto address=$EMAIL encode="hex"}</span>
                                 </li>
                                 <li class="group-btn">
                                     <a href="{url path="/account/update"}" class="btn btn-change-account"><i class="icon-pencil"></i> {intl l="Change my account information"}</a>
@@ -90,7 +90,8 @@
                                     <th>{if $DEFAULT === 1}
                                             {intl l="Main Address"}
                                         {else}
-                                            {$LABEL|default:"{intl l='Address %nb' nb={$LOOP_COUNT}}"}
+                                            {$default={intl l='Address %nb' nb={$LOOP_COUNT}}}
+                                            {$LABEL|default:$default}
                                         {/if}
                                     </th>
                                     <td>
@@ -126,9 +127,9 @@
                                     </td>
                                     <td>
                                         <div class="group-btn">
-                                            <a href="{url path="/address/update/{$ID}"}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
+                                            <a href="{url path="/address/update/%id" id=$ID}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
-                                                <a href="{url path="/address/delete/{$ID}"}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
+                                                <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>
                                     </td>
@@ -168,7 +169,7 @@
                                     <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
                                     <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
                                     <td>
-                                        <a href="{url path="/account/order/$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
+                                        <a href="{url path="/account/order/%id" id=$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
                                     </td>
                                 </tr>
                                 {/loop}

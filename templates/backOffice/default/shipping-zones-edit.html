@@ -49,7 +49,7 @@
                                 {form_hidden_fields}
 
                                 {form_field field='success_url'}
-                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
+                                    <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/%id" id=$delivery_module_id}" /> {* the url the user is redirected to on login success *}
                                 {/form_field}
 
                                 {form_field field='shipping_zone_id'}
@@ -131,7 +131,7 @@
             {form_hidden_fields}
 
             {form_field field='success_url'}
-                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/{$delivery_module_id}"}" /> {* the url the user is redirected to on login success *}
+                <input type="hidden" name="{$name}" value="{url path="/admin/configuration/shipping_zones/update/%id" id=$delivery_module_id}" /> {* the url the user is redirected to on login success *}
             {/form_field}
 
             {form_field field='shipping_zone_id'}

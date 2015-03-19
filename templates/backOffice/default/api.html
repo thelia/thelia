@@ -57,7 +57,7 @@
                                     <td >
                                         {if $api.ProfileId}
                                             {loop type="profile" name="admin-profile" id={$api.ProfileId}}
-                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/$ID"}">{$TITLE}</a>
+                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
                                             {/loop}
                                         {else}
                                             {intl l='Superadministrator'}
@@ -66,7 +66,7 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/{$api.Id}"}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
@@ -200,7 +200,7 @@
         dialog_ok_label     = {intl l="Save"}
         dialog_cancel_label = {intl l="Cancel"}
 
-        form_action        = {url path="/admin/configuration/api/update/{$api_id}"}
+        form_action        = {url path="/admin/configuration/api/update/%id" id={$api_id}}
         form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }

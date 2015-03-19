@@ -147,7 +147,7 @@
                                             <a class="btn btn-default btn-xs" title="{intl l='Browse this folder'}" href="{url path='admin/folders' parent=$ID}"><i class="glyphicon glyphicon-folder-open"></i></a>
 
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/{$ID}"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
@@ -265,12 +265,12 @@
 
                                     <td>
                                         {loop type="image" name="folder_image" source="content" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path="admin/content/update/$OBJECT_ID"}" title="{intl l='Edit this content'}">
+                                            <a href="{url path="admin/content/update/%id" id=$OBJECT_ID}" title="{intl l='Edit this content'}">
                                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                             </a>
                                         {/loop}
 
-                                    <td class="object-title"><a href="{url path="/admin/content/update/$ID"}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
+                                    <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}" title="{intl l='Edit this content'}">{$TITLE}</a></td>
 
                                     {hook name="contents.row" location="content_list_row" }
 
@@ -303,7 +303,7 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}

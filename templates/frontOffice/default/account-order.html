@@ -9,7 +9,7 @@
 {block name='no-return-functions' append}
 {$breadcrumbs = [
 ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/$order_id"}]
+['title' => {intl l="Order details"}, 'url'=>{url path="/account/order/%order_id" order_id=$order_id}]
 ]}
 {/block}
 
@@ -54,7 +54,7 @@
                 {/if}
 
                 <dt>{intl l="PDF invoice"}</dt>
-                <dd><a href="{url path="/account/order/pdf/invoice/$ID"}">{intl l="Download"}</a></dd>
+                <dd><a href="{url path="/account/order/pdf/invoice/%id" id=$ID}">{intl l="Download"}</a></dd>
             {/if}
             {if $DELIVERY_REF}
                 <dt>{intl l="Delivery REF"}</dt>

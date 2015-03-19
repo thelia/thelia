@@ -88,7 +88,7 @@
                                 <li>
                                     <a href="#images"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/image/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/image/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.imageUploadManager.initImageDropZone">
                                         {intl l="Images"}
                                     </a>
@@ -97,7 +97,7 @@
                                     <a href="#documents"
                                        id="tab-documents"
                                        data-toggle="tab"
-                                       data-href="{url path="/admin/document/type/product/{$ID}/form-ajax"}"
+                                       data-href="{url path="/admin/document/type/product/%id/form-ajax" id=$ID}"
                                        data-callback="$.documentUploadManager.initDocumentDropZone">
                                         {intl l="Documents"}
                                     </a>
@@ -307,7 +307,7 @@ $(function() {
 
 	    if (val != "") {
 	        $.ajax({
-	             url      : '{url path="/admin/product/$product_id/attribute-values/"}' + $(this).val() + '.xml',
+	             url      : '{url path="/admin/product/%id/attribute-values/" id=$product_id}' + $(this).val() + '.xml',
 	             type     : 'get',
 	             dataType : 'json',
 	             success  : function(json) {
@@ -349,7 +349,7 @@ $(function() {
     	$('#combination_attributes option').prop('selected', 'selected');
 
         $.ajax({
-            url      : '{url path="/admin/product/$product_id/add-attribute-value-to-combination/"}'
+            url      : '{url path="/admin/product/%id/add-attribute-value-to-combination/" id=$product_id}'
                             + $('#attribute_value_id').val()
                             + '/'
                             + $('#combination_attributes').val()

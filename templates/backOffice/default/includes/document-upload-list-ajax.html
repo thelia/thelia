@@ -23,7 +23,7 @@ Parameters:
                         <a class="document-toggle-btn btn btn-default btn-xs {if $VISIBLE}visibility-visible{/if}" href="{url path="/admin/document/type/$documentType/$ID/toggle"}" data-error-message="{intl l='Please retry'}">
                             <i class="glyphicon glyphicon-eye-open"></i><i class="glyphicon glyphicon-eye-close"></i>
                         </a>
-                        <a class="document-update-btn btn btn-default btn-xs" href="{url path="/admin/document/type/$documentType/$ID/update"}" data-error-message="{intl l='Please retry'}">
+                        <a class="document-update-btn btn btn-default btn-xs" href="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}" data-error-message="{intl l='Please retry'}">
                             <i class="glyphicon glyphicon-edit"></i>
                         </a>
                     {/loop}
@@ -34,7 +34,7 @@ Parameters:
                     {/elseloop}
 
                     {loop type="auth" name="can_delete" role="ADMIN" resource="{$resource|default:"admin.$documentType"}" access="DELETE"}
-                        <a class="document-delete-btn btn btn-default btn-xs" id="document-{$ID}" data-id="{$ID}" href="{url path="/admin/document/type/$documentType/delete/$ID"}" data-error-message="{intl l='Please retry'}">
+                        <a class="document-delete-btn btn btn-default btn-xs" id="document-{$ID}" data-id="{$ID}" href="{url path="/admin/document/type/%document/delete/%id" document=$documentType id=$ID}" data-error-message="{intl l='Please retry'}">
                             <span class="glyphicon glyphicon-trash"></span>
                         </a>
                     {/loop}

@@ -94,9 +94,9 @@
                             </div>
                             <noscript>
                                 {if $ACTIVE}
-                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="deactivation"}</a>
+                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
                                 {else}
-                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/{$ID}"}">{intl l="activation"}</a>
+                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                                 {/if}
                             </noscript>
                         </td>
@@ -139,14 +139,14 @@
                                 {$btnstyle="btn-danger"}
                             {/elseloop}
 
-                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/$ID"}">{$icon nofilter}{intl l="Shipping zones"}</a>
+                            <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
                         <div class="btn-group">
                             {if $EXISTS}
 
                                 {if $CONFIGURABLE == 1}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/$CODE"}">{intl l="Configure"}</a>
+                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}">{intl l="Configure"}</a>
                                     {/loop}
                                 {/if}
 
@@ -161,7 +161,7 @@
                                 {/loop*}
 
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                 {/loop}
                             {/if}
 

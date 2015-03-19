@@ -295,7 +295,7 @@
                                         {assign "orderStatusLabel" "order_$CODE"}
                                         {/loop}
                                             <tr>
-                                                <td><a href="{url path="/admin/order/update/$ID"}">{$REF}</a></td>
+                                                <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
                                                 <td>{format_date date=$CREATE_DATE}</td>
                                                 <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT}</td>
                                                 <td>

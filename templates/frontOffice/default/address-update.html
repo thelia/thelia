@@ -12,7 +12,7 @@
 {block name='no-return-functions' append}
     {$breadcrumbs = [
         ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/{$address_id}"}]
+        ['title' => {intl l="Address Update"}, 'url'=>{url path="/address/update/%address_id" address_id=$address_id}]
     ]}
 {/block}
 
@@ -27,7 +27,7 @@
 
     {form name="thelia.front.address.update"}
     {loop name="customer.update" type="address" customer="current" id=$address_id}
-        <form id="form-address" class="form-horizontal" action="{url path="/address/update/$address_id"}" method="post">
+        <form id="form-address" class="form-horizontal" action="{url path="/address/update/%address_id" address_id=$address_id}" method="post">
         {form_field field='success_url'}
             {if $value}
                 {$next_url=$value}

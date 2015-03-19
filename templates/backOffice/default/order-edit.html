@@ -279,7 +279,7 @@
                                         <div class="title title-without-tabs clearfix">
                                             {intl l='Delivery module'}
                                             <div class="pull-right col-md-3">
-                                                <form action="{url path="/admin/order/update/$ID/delivery-ref"}" method="post">
+                                                <form action="{url path="/admin/order/update/%id/delivery-ref" id=$ID}" method="post">
                                                     <input class="js-current-tab" type="hidden" name="tab" value="{$order_tab}">
                                                     <div class="input-group">
                                                         <input class="form-control" type="text" name="delivery_ref" value="{$DELIVERY_REF}" placeholder="{intl l="tracking reference"}"/>
@@ -311,7 +311,7 @@
                                                         <caption class="clearfix">
                                                             {intl l='Invoice informations'}
                                                             <div class="pull-right">
-                                                                <a class="btn btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/$ID"}">
+                                                                <a class="btn btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/%id" id=$ID}">
                                                                     <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Invoice'}
                                                                 </a>
                                                                 <a class="btn btn-primary js-update-order-address" data-address-id="{$INVOICE_ADDRESS}" title="{intl l='Edit invoice address'}" href="#edit_order_address_dialog" data-toggle="modal">
@@ -386,7 +386,7 @@
                                                         <caption class="clearfix">
                                                             {intl l='Delivery address'}
                                                             <div class="pull-right">
-                                                                <a class="btn btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/$ID"}">
+                                                                <a class="btn btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id" id=$ID}">
                                                                     <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Purchase order'}
                                                                 </a>
                                                                 <a class="btn btn-primary js-update-order-address" data-address-id="{$DELIVERY_ADDRESS}" title="{intl l='Edit delivery address'}" href="#edit_order_address_dialog" data-toggle="modal">
@@ -592,7 +592,7 @@
             dialog_ok_label     = {intl l="Confirm changes"}
             dialog_cancel_label = {intl l="Cancel"}
 
-            form_action        = {url path="/admin/order/update/$order_id/address"}
+            form_action        = {url path="/admin/order/update/%id/address" id=$order_id}
             form_enctype       = {form_enctype}
             form_error_message = $form_error_message
             form_id = 'updateOrderAddressForm'

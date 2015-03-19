@@ -28,7 +28,7 @@
                             <div class="col-md-5 actions">
 
                                 {if $HAS_PREVIOUS != 0}
-                                    <a href="{url path="/admin/content/update/$PREVIOUS"}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                    <a href="{url path="/admin/content/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous content'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                                 {else}
                                     <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
                                 {/if}
@@ -36,7 +36,7 @@
                                 <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview folder page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
 
                                 {if $HAS_NEXT != 0}
-                                    <a href="{url path="/admin/content/update/$NEXT"}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                    <a href="{url path="/admin/content/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next content'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                                 {else}
                                     <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
                                 {/if}
@@ -104,7 +104,7 @@
                                                     {form_hidden_fields}
 
                                                     {form_field field='success_url'}
-                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update/{$ID}"}"/>
+                                                        <input type="hidden" name="{$name}" value="{url path="/admin/content/update/%id" id=$ID}"/>
                                                     {/form_field}
 
                                                     {form_field field='locale'}
@@ -297,7 +297,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
             // Load content on folder selection
             $('#folder_id').change(function(event) {
                 $.ajax({
-                    url: '{url path="/admin/folder/$folder_id/available-related-content/"}' + $(this).val() + '.xml',
+                    url: '{url path="/admin/folder/%id/available-related-content/" id=$folder_id}' + $(this).val() + '.xml',
                     type: 'get',
                     dataType: 'json',
                     success: function(json) {

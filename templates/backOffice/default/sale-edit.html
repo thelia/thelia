@@ -36,13 +36,13 @@
 
                 {form name="thelia.admin.sale.modification"}
 
-                <form method="POST" id="sale-update-form" action="{url path="/admin/sale/save/{$ID}"}" {form_enctype} >
+                <form method="POST" id="sale-update-form" action="{url path="/admin/sale/save/%id" id=$ID}" {form_enctype} >
 
                     {include
                         file = "includes/inner-form-toolbar.html"
                         hide_submit_buttons = false
 
-                        page_url  = {url path="/admin/sale/update/$ID"}
+                        page_url  = {url path="/admin/sale/update/%id" id=$ID}
                         close_url = {url path="/admin/sales"}
                     }
 
@@ -184,7 +184,7 @@
                         hide_flags = true
                         page_bottom = true
 
-                        page_url  = {url path="/admin/sale/update/$ID"}
+                        page_url  = {url path="/admin/sale/update/%id" id=$ID}
                         close_url = {url path="/admin/sales"}
                     }
 
@@ -429,7 +429,7 @@
 
             $('#sale-products-list').empty();
 
-            $.ajax('{url path="/admin/sale/update-product-list/$sale_id"}', {
+            $.ajax('{url path="/admin/sale/update-product-list/%id" id=$sale_id}', {
                 type: 'POST',
                 data: {
                     categories: categories,
@@ -455,7 +455,7 @@
 
             $dialog.modal('show');
 
-            var url = '{url path="/admin/sale/update-product-attribute-list/$sale_id/__product_id__"}';
+            var url = '{url path="/admin/sale/update-product-attribute-list/%id/__product_id__" id=$sale_id}';
 
             url = url.replace("__product_id__", product_id);
 

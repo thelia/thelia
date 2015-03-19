@@ -29,7 +29,7 @@
 {* Feeds *}
 {block name="feeds"}
 {if $category_id}
-    <link rel="alternate" type="application/rss+xml" title="{intl l='All products in'} {category attr='title'}" href="{url path="/feed/catalog/{lang attr="locale"}/{category attr="id"}"}" />
+    <link rel="alternate" type="application/rss+xml" title="{intl l='All products in'} {category attr='title'}" href="{url path="/feed/catalog/%lang/%category_id" lang={lang attr="locale"} category_id={category attr="id"}}" />
 {/if}
 {/block}
 
@@ -99,7 +99,7 @@
             {/if}
 
             {ifloop rel="product_list"}
-                {assign var="amount" value="{count type="product" category=$category_id}"}
+                {$amount={count type="product" category=$category_id}}
                 <div class="toolbar toolbar-top" role="toolbar">
                     <div class="sorter-container">
                     <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>

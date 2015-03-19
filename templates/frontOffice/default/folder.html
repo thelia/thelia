@@ -36,7 +36,7 @@
 {/block}
 
 {block name="feeds"}
-<link rel="alternate" type="application/rss+xml" title="{intl l='All contents in'} {folder attr='title'}" href="{url path="/feed/content/{lang attr="locale"}/{folder attr="id"}"}" />
+<link rel="alternate" type="application/rss+xml" title="{intl l='All contents in'} {folder attr='title'}" href="{url path="/feed/content/%lang/%folder_id" lang={lang attr="locale"} folder_id={folder attr="id"}}" />
 {/block}
 
 {* Content *}

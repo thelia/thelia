@@ -88,7 +88,7 @@
                                         {/loop}
                                     </dl>
                                 </div>
-                                <a href="{token_url path="/cart/delete/$ITEM_ID" success_url={url path='/cart'}}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
+                                <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-remove"><i class="icon-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
                                 {if $IS_PROMO == 1}

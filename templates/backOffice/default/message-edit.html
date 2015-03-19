@@ -160,11 +160,11 @@
                                 <br/>
                                 <div class="row">
                                     <div class="col-md-12">
-                                        <button class="btn btn-default btn-primary preview-button" data-url="{url path='/admin/message/preview/'}{$ID}">
+                                        <button class="btn btn-default btn-primary preview-button" data-url="{url path='/admin/message/preview/%id' id=$ID}">
                                             {intl l="Preview HTML"}
                                         </button>
 
-                                        <button class="btn btn-default preview-button" data-url="{url path='/admin/message/preview/text/'}{$ID}">
+                                        <button class="btn btn-default preview-button" data-url="{url path='/admin/message/preview/text/%id' id=$ID}">
                                             {intl l="Preview text"}
                                         </button>
                                     </div>

@@ -50,7 +50,7 @@
                                     file = "includes/inner-form-toolbar.html"
                                     hide_submit_buttons = false
 
-                                    page_url  = {url path="/admin/configuration/taxes_rules/update/$tax_rule_id" tab=data}
+                                    page_url  = {url path="/admin/configuration/taxes_rules/update/%id" id=$tax_rule_id tab=data}
                                     close_url = {url path="/admin/configuration/taxes_rules"}
                                     }
 
@@ -112,7 +112,7 @@
 
                         <div class="form-group">
                             <label for="" class="label-control">{intl l="Choose a country"} :</label>
-                            <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/$tax_rule_id"}" method="GET">
+                            <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/%id" id=$tax_rule_id}" method="GET">
                                 <input type="hidden" name="tab" value="taxes">
                                 <select id="country-selector" name="country" data-toggle="selectpicker">
                                     {loop type="country" name="country-list"}
