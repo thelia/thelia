@@ -85,7 +85,7 @@ class Order extends BaseOrder
 
     public function preSave(ConnectionInterface $con = null)
     {
-        if ($this->isPaid() && null === $this->getInvoiceDate()) {
+        if ($this->isPaid(false) && null === $this->getInvoiceDate()) {
             $this
                 ->setInvoiceDate(time());
         }

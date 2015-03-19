@@ -235,7 +235,7 @@ abstract class BaseController extends ContainerAware
 
         // check if the order has the paid status
         if ($checkAdminUser && !$this->getSecurityContext()->hasAdminUser()) {
-            if ($checkOrderStatus && !$order->isPaid()) {
+            if ($checkOrderStatus && !$order->isPaid(false)) {
                 throw new NotFoundHttpException();
             }
         }
