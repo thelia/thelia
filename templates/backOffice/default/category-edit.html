@@ -150,15 +150,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/categories/seo/save'}"
-                                            current_id=$ID
-                                            closeUrl = $close_url
-                                            success_url = $close_url
-                                        }
-                                    {/form}
+                                    {include file="includes/seo-tab.html"
+                                        formAction  = "{url path='/admin/categories/seo/save'}"
+                                        pageUrl     = "{url path='/admin/categories/update' category_id=$ID}"
+                                        current_id  = $ID
+                                        closeUrl    = $close_url
+                                        success_url = $close_url
+                                        seoType     = 'category'
+                                    }
                                 </div>
 
                                 <div class="tab-pane fade" id="associations">

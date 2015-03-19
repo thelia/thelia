@@ -1,3 +1,6 @@
+{hook name="tab-seo.top" id=$parentId type=$seoType}
+
+{form name="thelia.admin.seo"}
 <div class="form-container">
 
     <form method="POST" action="{$formAction}" {form_enctype} class="clearfix">
@@ -42,3 +45,6 @@
 
     </form>
 </div>
+{/form}
+
+{hook name="tab-seo.bottom" id=$parentId type=$seoType}

@@ -108,7 +108,7 @@ class Hook extends AbstractSmartyPlugin
         $content = trim($event->dump());
 
         if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-            $content = sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>%s', $hookName, $content);
+            $content = self::showHook($hookName, $params) . $content;
         }
 
         $this->hookResults[$hookName] = $content;
@@ -155,6 +155,39 @@ class Hook extends AbstractSmartyPlugin
         return $this->smartyPluginModule;
     }
 
+    protected function showHook($hookName, $params)
+    {
+        $content = '<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">' . $hookName;
+
+        foreach ($params as $name => $value) {
+            if ($name !== 'location' && $name !== "name") {
+                $type = '';
+                if (is_object($value)) {
+                    $value = get_class($value);
+                    $type = 'object';
+                } elseif (is_array($value)) {
+                    $value = implode(',', $value);
+                    $type = 'array';
+                } elseif (is_int($value)) {
+                    $type = 'float';
+                } elseif (is_int($value)) {
+                    $type = 'int';
+                } elseif (is_string($value)) {
+                    $value = (strlen($value) > 30) ? substr($value, 0, 30) . '...' : $value;
+                    $type = 'string';
+                }
+
+                if ($type !== '') {
+                    $type = '<span style="background-color: #FF7D00; color: #fff">' . $type . '</span> ';
+                }
+
+                $content .= '<span style="background-color: #008000; color: #fff; margin-left: 6px;">' . $name . ' = ' . $type . $value . '</span>';
+            }
+        }
+
+        return $content . '</div>';
+    }
+
     /**
      * Process the content of the hook block.
      *
@@ -192,8 +225,7 @@ class Hook extends AbstractSmartyPlugin
 
         if (!$repeat) {
             if ($this->debug && $smarty->getRequest()->get('SHOW_HOOK')) {
-                $content = sprintf('<div style="background-color: #C82D26; color: #fff; border-color: #000000; border: solid;">%s</div>', $hookName)
-                    . $content;
+                $content = self::showHook($hookName, $params) . $content;
             }
 
             return $content;

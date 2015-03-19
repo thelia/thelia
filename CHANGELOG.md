@@ -35,12 +35,13 @@
 - New main navigation style and position
 - jquery.ui.datepicker is now DEPRECATED and will be REMOVED in 2.3. Please use boostrap-datepicker
 - Add ```thelia.logger``` service to prepare the transition with another logger.
-- Add 56 new admin hook
+- Add 62 new admin hook
 - Add stacked current form into parser context. It allows to have nested forms while using the new way to write forms.
 - Module information and documentation could be viewed directly from the module list
 - Add the possibility to translate text in the sql files (insert.sql, update/sql/\*.sql). to generate sql files use command `php Thelia generate:sql`. Translation can be made in the back office, in the translation page.   
 - format_date smarty function now handle symfony form type ```date```, ```datetime``` and ```time``` view value.
 - Allow BaseController::generateOrderPdf to generate a pdf without having the rights
+- SHOW_HOOK now displays parameters
 
 # 2.1.3
 

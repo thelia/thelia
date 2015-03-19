@@ -113,16 +113,14 @@
                                 </div>
 
                                 <div class="tab-pane fade" id="seo">
-                                    {form name="thelia.admin.seo"}
-                                        {include file="includes/seo-tab.html"
-                                            form = $form
-                                            formAction = "{url path='/admin/products/seo/save'}"
-                                            pageUrl = "{url path='/admin/products/update' product_id=$ID}"
-                                            closeUrl = $close_url
-                                            current_id = $product_id
-                                            success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
-                                        }
-                                    {/form}
+                                    {include file="includes/seo-tab.html"
+                                        formAction  = "{url path='/admin/products/seo/save'}"
+                                        pageUrl     = "{url path='/admin/products/update' product_id=$ID}"
+                                        closeUrl    = $close_url
+                                        current_id  = $product_id
+                                        success_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY  page=$page}"
+                                        seoType     = 'product'
+                                    }
                                 </div>
 
                                 <div class="tab-pane fade" id="prices">

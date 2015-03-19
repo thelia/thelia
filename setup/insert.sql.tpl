@@ -3,8 +3,8 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 (2, 'English', 'en', 'en_US', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', '.', ' ', '2', '1', NOW(), NOW()),
 (3, 'Castellano', 'es', 'es_ES', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', ',', '.', '2', '0', NOW(), NOW()),
 (4, 'Italiano', 'it', 'it_IT', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '0', NOW(), NOW()),
-(5, 'Russian', 'ru', 'ru_RU', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0,  NOW(), NOW()),
-(6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0,  NOW(), NOW());
+(5, 'Russian', 'ru', 'ru_RU', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW()),
+(6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW());
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 ('check-available-stock', '1', 0, 0, NOW(), NOW()),
@@ -304,23 +304,24 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (202, 'brand.sidebar-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (203, 'brand.sidebar-body', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (204, 'brand.sidebar-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
-(205, 'account-order.top', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(205, 'account-order.top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (206, 'account-order.information', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
-(207, 'account-order.after-information', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(207, 'account-order.after-information', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (208, 'account-order.delivery-information', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 (209, 'account-order.delivery-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 (210, 'account-order.invoice-information', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 (211, 'account-order.invoice-address', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
-(212, 'account-order.after-addresses', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(213, 'account-order.products-top', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(214, 'account-order.product-extra', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(215, 'account-order.products-bottom', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(216, 'account-order.after-products', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(217, 'account-order.bottom', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(218, 'account-order.stylesheet', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(219, 'account-order.after-javascript-include', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
-(220, 'account-order.javascript-initialization', 1,  0, 0, 1, 1, 1, NOW(), NOW()),
+(212, 'account-order.after-addresses', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(213, 'account-order.products-top', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(214, 'account-order.product-extra', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(215, 'account-order.products-bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(216, 'account-order.after-products', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(217, 'account-order.bottom', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(218, 'account-order.stylesheet', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(219, 'account-order.after-javascript-include', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
+(220, 'account-order.javascript-initialization', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 (221, 'account.additional', 1, 0, 1, 1, 1, 1, NOW(), NOW()),
+(222, 'account-order.product', 1, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (1000, 'category.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1001, 'content.tab-content', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -700,6 +701,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1375, 'tax-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1376, 'tax-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1377, 'order-edit.product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1378, 'tab-seo.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1379, 'tab-seo.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1380, 'tab-image.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1381, 'tab-image.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1382, 'tab-document.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1383, 'tab-document.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -745,7 +752,7 @@ INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `upda
 
 INSERT INTO `currency` (`id`, `code`, `symbol`, `rate`, `position`, `by_default`, `created_at`, `updated_at`)
 VALUES
-(1, 'EUR', '€', '1.00', 1, '1', NOW(),  NOW()),
+(1, 'EUR', '€', '1.00', 1, '1', NOW(), NOW()),
 (2, 'USD', '$', '1.26', 2, '0', NOW(), NOW()),
 (3, 'GBP', '£', '0.89', 3, '0', NOW(), NOW());
 
@@ -1294,18 +1301,18 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 (268, 4, NOW(), NOW()),
 (269, 5, NOW(), NOW());
 
-INSERT INTO  `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
+INSERT INTO `tax` (`id`, `type`, `serialized_requirements`, `created_at`, `updated_at`)
 VALUES
 (1, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMjAifQ==', NOW(), NOW()),
 (2, 'Thelia\\TaxEngine\\TaxType\\PricePercentTaxType', 'eyJwZXJjZW50IjoiMTAifQ==', NOW(), NOW());
 
 
-INSERT INTO  `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
+INSERT INTO `tax_rule` (`id`, `is_default`, `created_at`, `updated_at`)
 VALUES
 (1, 1, NOW(), NOW()),
 (2, 0, NOW(), NOW());
 
-INSERT INTO  `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
+INSERT INTO `tax_rule_country` (`tax_rule_id`, `country_id`, `tax_id`, `position`, `created_at`, `updated_at`)
 VALUES
 (1, 64, 1, 1, NOW(), NOW()),
 (2, 64, 2, 1, NOW(), NOW());
@@ -1686,6 +1693,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (219, '{$locale}', {intl l='Order details - after javascript include' locale=$locale}, NULL, NULL),
     (220, '{$locale}', {intl l='Order details - javascript initialization' locale=$locale}, NULL, NULL),
     (221, '{$locale}', {intl l='Customer account - additional information' locale=$locale}, NULL, NULL),
+    (222, '{$locale}', {intl l='Order details - after product' locale=$locale}, NULL, NULL),
+
     (1000, '{$locale}', {intl l='Category - content' locale=$locale}, NULL, NULL),
     (1001, '{$locale}', {intl l='Content - content' locale=$locale}, NULL, NULL),
     (1002, '{$locale}', {intl l='Folder - content' locale=$locale}, NULL, NULL),
@@ -2064,6 +2073,12 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1375, '{$locale}', {intl l='Tax edit - top' locale=$locale}, '', ''),
     (1376, '{$locale}', {intl l='Tax edit - bottom' locale=$locale}, '', ''),
     (1377, '{$locale}', {intl l='Order edit - displayed after product information' locale=$locale}, '', ''),
+    (1378, '{$locale}', {intl l='Tab SEO - top' locale=$locale}, '', ''),
+    (1379, '{$locale}', {intl l='Tab SEO - bottom' locale=$locale}, '', ''),
+    (1380, '{$locale}', {intl l='Tab image - top' locale=$locale}, '', ''),
+    (1381, '{$locale}', {intl l='Tab image - bottom' locale=$locale}, '', ''),
+    (1382, '{$locale}', {intl l='Tab document - top' locale=$locale}, '', ''),
+    (1383, '{$locale}', {intl l='Tab document - bottom' locale=$locale}, '', ''),
 
     (2001, '{$locale}', {intl l='Invoice - CSS' locale=$locale}, NULL, NULL),
     (2002, '{$locale}', {intl l='Invoice - in the header' locale=$locale}, NULL, NULL),
@@ -2368,8 +2383,8 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `po
     (251, '{$locale}', {intl l='Canada - Québec' locale=$locale}, NULL, NULL, NULL),
     (252, '{$locale}', {intl l='Canada - Nouveau-Brunswick' locale=$locale}, NULL, NULL, NULL),
     (253, '{$locale}', {intl l='Canada - Nouvelle-Écosse' locale=$locale}, NULL, NULL, NULL),
-    (254, '{$locale}', {intl l='Canada - Île-du-Prince-Édouard    ' locale=$locale}, NULL, NULL, NULL),
-    (255, '{$locale}', {intl l='Canada - Terre-Neuve-et-Labrador    ' locale=$locale}, NULL, NULL, NULL),
+    (254, '{$locale}', {intl l='Canada - Île-du-Prince-Édouard' locale=$locale}, NULL, NULL, NULL),
+    (255, '{$locale}', {intl l='Canada - Terre-Neuve-et-Labrador' locale=$locale}, NULL, NULL, NULL),
     (256, '{$locale}', {intl l='Canada - Yukon' locale=$locale}, NULL, NULL, NULL),
     (257, '{$locale}', {intl l='Canada - Territoires-du-Nord-Ouest' locale=$locale}, NULL, NULL, NULL),
     (258, '{$locale}', {intl l='Canada - Nunavut' locale=$locale}, NULL, NULL, NULL),
