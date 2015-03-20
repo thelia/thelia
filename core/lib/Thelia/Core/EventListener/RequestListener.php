@@ -225,7 +225,7 @@ class RequestListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (!$request->isXmlHttpRequest()) {
+        if (!$request->isXmlHttpRequest() && $event->getResponse()->isSuccessful()) {
             $referrer = $request->attributes->get('_previous_url', null);
 
             if (null !== $referrer) {
