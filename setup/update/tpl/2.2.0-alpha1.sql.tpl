@@ -215,5 +215,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
+-- Fix attribute_template and feature_template relations
+ALTER TABLE `attribute_template` DROP FOREIGN KEY `fk_attribute_template`; ALTER TABLE `attribute_template` ADD CONSTRAINT `fk_attribute_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `feature_template` DROP FOREIGN KEY `fk_feature_template`; ALTER TABLE `feature_template` ADD CONSTRAINT `fk_feature_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 SET FOREIGN_KEY_CHECKS = 1;
