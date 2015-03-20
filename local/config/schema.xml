@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -243,7 +242,7 @@
     <foreign-key foreignTable="feature" name="fk_feature_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="feature_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_feature_template">
+    <foreign-key foreignTable="template" name="fk_feature_template" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="template_id" />
     </foreign-key>
     <index name="idx_feature_template_id">
@@ -347,7 +346,7 @@
     <foreign-key foreignTable="attribute" name="fk_attribute_template_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
-    <foreign-key foreignTable="template" name="fk_attribute_template">
+    <foreign-key foreignTable="template" name="fk_attribute_template" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="template_id" />
     </foreign-key>
     <index name="idx_attribute_template_id">
