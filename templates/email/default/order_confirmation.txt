@@ -8,7 +8,7 @@
 {intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
 
 {intl l="Your delivery address"}
-{loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
