@@ -325,6 +325,14 @@
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email address'}">
                 </div>
             {/form_field}
+            {if {config key="customer_confirm_email"}}
+                {form_field field='email_confirm'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email confirmation address'}">
+                    </div>
+                {/form_field}
+            {/if}
 
             {hook name="customer.create-form" location="customer_create_form" }
 
