@@ -73,13 +73,19 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
-     * @param $jsonData
-     * @param int $status
-     * @return Response Return a JSON response
+     * @param string|array $jsonData since version 2.2, it is possible to pass an array
+     * @param int $status HTTP Code
+     * @param null|string $message since version 2.2
+     * @return Response
      */
-    protected function jsonResponse($jsonData, $status = 200)
+    protected function jsonResponse($jsonData, $status = 200, $message = null)
     {
-        return new Response($jsonData, $status, array('content-type' => 'application/json'));
+        if (is_array($jsonData) || is_object($jsonData)) {
+            $jsonData = json_encode($jsonData);
+        }
+
+        return (new Response($jsonData, $status, array('content-type' => 'application/json')))
+            ->setStatusCode($status, $message);
     }
 
     /**
