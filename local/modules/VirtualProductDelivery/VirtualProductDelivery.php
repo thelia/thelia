@@ -24,6 +24,7 @@ use Thelia\Module\Exception\DeliveryException;
 
 class VirtualProductDelivery extends AbstractDeliveryModule
 {
+
     /**
      * The module is valid if the cart contains only virtual products.
      *
@@ -98,4 +99,3 @@ class VirtualProductDelivery extends AbstractDeliveryModule
         $message->save();
     }
 }
-

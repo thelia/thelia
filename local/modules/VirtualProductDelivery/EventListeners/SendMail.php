@@ -22,6 +22,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
+use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
 
 /**
  * Class SendMail
@@ -51,49 +52,67 @@ class SendMail implements EventSubscriberInterface
             ->findOne();
 
         if ($order->hasVirtualProduct() && $event->getStatus() == $paidStatusId) {
-            $contact_email = ConfigQuery::read('store_email');
-
-            $customer = $order->getCustomer();
-
-            if ($contact_email) {
-                $message = MessageQuery::create()
-                    ->filterByName('mail_virtualproduct')
-                    ->findOne();
-
-                if (false === $message) {
-                    throw new \Exception("Failed to load message 'mail_virtualproduct'.");
-                }
-
-                $order = $event->getOrder();
-
-                $this->parser->assign('customer_id', $customer->getId());
-                $this->parser->assign('order_id', $order->getId());
-                $this->parser->assign('order_ref', $order->getRef());
-                $this->parser->assign('order_date', $order->getCreatedAt());
-                $this->parser->assign('update_date', $order->getUpdatedAt());
-
-                $message
-                    ->setLocale($order->getLang()->getLocale());
-
-                $instance = \Swift_Message::newInstance()
-                    ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                    ->addFrom($contact_email, ConfigQuery::read('store_name'))
-                ;
-
-                // Build subject and body
-                $message->buildMessage($this->parser, $instance);
-
-                $this->mailer->send($instance);
-
-                Tlog::getInstance()->debug("Virtual product download message sent to customer ".$customer->getEmail());
-            } else {
-                Tlog::getInstance()->addDebug(
-                    "Virtual product download: store contact email is not defined. Customer ID:",
-                    $customer->getId()
+            $event
+                ->getDispatcher()
+                ->dispatch(
+                    VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE,
+                    $event
                 );
-            }
         }
     }
+
+    /**
+     * Send email to notify customer that files for virtual products are available
+     *
+     * @param OrderEvent $event
+     * @throws \Exception
+     */
+    public function sendEmail(OrderEvent $event)
+    {
+        $order = $event->getOrder();
+
+        $contact_email = ConfigQuery::read('store_email');
+
+        $customer = $order->getCustomer();
+
+        if ($contact_email) {
+            $message = MessageQuery::create()
+                ->filterByName('mail_virtualproduct')
+                ->findOne();
+
+            if (null === $message) {
+                throw new \Exception("Failed to load message 'mail_virtualproduct'.");
+            }
+
+            $order = $event->getOrder();
+
+            $this->parser->assign('customer_id', $customer->getId());
+            $this->parser->assign('order_id', $order->getId());
+            $this->parser->assign('order_ref', $order->getRef());
+            $this->parser->assign('order_date', $order->getCreatedAt());
+            $this->parser->assign('update_date', $order->getUpdatedAt());
+
+            $message
+                ->setLocale($order->getLang()->getLocale());
+
+            $instance = \Swift_Message::newInstance()
+                ->addTo($customer->getEmail(), $customer->getFirstname() . " " . $customer->getLastname())
+                ->addFrom($contact_email, ConfigQuery::read('store_name'));
+
+            // Build subject and body
+            $message->buildMessage($this->parser, $instance);
+
+            $this->mailer->send($instance);
+
+            Tlog::getInstance()->debug("Virtual product download message sent to customer " . $customer->getEmail());
+        } else {
+            Tlog::getInstance()->addDebug(
+                "Virtual product download: store contact email is not defined. Customer ID:",
+                $customer->getId()
+            );
+        }
+    }
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -118,7 +137,8 @@ class SendMail implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128)
+            TheliaEvents::ORDER_UPDATE_STATUS => array("updateStatus", 128),
+            VirtualProductDeliveryEvents::ORDER_VIRTUAL_FILES_AVAILABLE => array("sendEmail", 128)
         );
     }
 }
