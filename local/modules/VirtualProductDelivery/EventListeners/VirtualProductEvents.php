@@ -26,6 +26,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\MetaData as MetaDataModel;
 use Thelia\Model\ProductDocumentQuery;
+use VirtualProductDelivery\VirtualProductDelivery;
 
 /**
  * Class VirtualProductEvents
@@ -69,7 +70,8 @@ class VirtualProductEvents implements EventSubscriberInterface
                         "The file [%file] does not exist",
                         [
                             "%file" => $orderProduct->getId()
-                        ]
+                        ],
+                        VirtualProductDelivery::MESSAGE_DOMAIN
                     )
                 );
             }
