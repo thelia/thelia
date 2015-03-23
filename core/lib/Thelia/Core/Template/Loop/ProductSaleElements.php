@@ -111,7 +111,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
         $new = $this->getNew();
 
         if (null !== $new) {
-            $search->filterByPromo($new);
+            $search->filterByNewness($new);
         }
 
         $default = $this->getDefault();
