@@ -42,6 +42,7 @@
 - format_date smarty function now handle symfony form type ```date```, ```datetime``` and ```time``` view value.
 - Allow BaseController::generateOrderPdf to generate a pdf without having the rights
 - SHOW_HOOK now displays parameters
+- Add fallback for email template for mails sent from a module. If the template file does not exist in the current email template, it will use the one that comes with the module.     
 
 # 2.1.3
 
