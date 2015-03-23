@@ -13,7 +13,6 @@
 namespace VirtualProductDelivery;
 
 use Propel\Runtime\Connection\ConnectionInterface;
-use SimpleXMLElement;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Country;
 use Thelia\Model\LangQuery;
@@ -24,6 +23,10 @@ use Thelia\Module\Exception\DeliveryException;
 
 class VirtualProductDelivery extends AbstractDeliveryModule
 {
+    const MESSAGE_DOMAIN = 'virtualproductdelivery';
+
+    /** @var Translator */
+    protected $translator;
 
     /**
      * The module is valid if the cart contains only virtual products.
@@ -41,7 +44,7 @@ class VirtualProductDelivery extends AbstractDeliveryModule
     {
         if (!$this->isValidDelivery($country)) {
             throw new DeliveryException(
-                Translator::getInstance()->trans("This module cannot be used on the current cart.")
+                $this->trans("This module cannot be used on the current cart.")
             );
         }
 
@@ -61,41 +64,42 @@ class VirtualProductDelivery extends AbstractDeliveryModule
 
     public function postActivation(ConnectionInterface $con = null)
     {
-        // delete existing message
-        $message = MessageQuery::create()
-            ->filterByName('mail_virtualproduct')
-            ->findOne($con);
-
-        if (null !== $message) {
-            $message->delete($con);
-        }
-
         // create new message
-        $message = new Message();
-        $message
-            ->setName('mail_virtualproduct')
-            ->setSecured(0);
+        if (null === MessageQuery::create()->findOneByName('mail_virtualproduct')) {
+            $message = new Message();
+            $message
+                ->setName('mail_virtualproduct')
+                ->setHtmlTemplateFileName('virtual-product-download.html')
+                ->setHtmlLayoutFileName('')
+                ->setTextTemplateFileName('virtual-product-download.txt')
+                ->setTextLayoutFileName('')
+                ->setSecured(0);
 
-        $basePath = __DIR__ . '/Config/message/%s.xml';
-        $languages = LangQuery::create()->find();
+            $languages = LangQuery::create()->find();
 
-        foreach ($languages as $language) {
-            $locale = $language->getLocale();
+            foreach ($languages as $language) {
+                $locale = $language->getLocale();
 
-            $message->setLocale($locale);
+                $message->setLocale($locale);
 
-            $path = sprintf($basePath, $language->getLocale());
-            if (file_exists($path) && is_readable($path)) {
-                $dom = new SimpleXMLElement(file_get_contents($path));
-                if ($dom) {
-                    $message->setTitle((string) $dom->title);
-                    $message->setSubject((string) $dom->subject);
-                    $message->setTextMessage((string) $dom->text);
-                    $message->setHtmlMessage((string) $dom->html);
-                }
+                $message->setSubject(
+                    $this->trans('Order {$order_ref} validated. Download your files.', [], $locale)
+                );
+                $message->setTitle(
+                    $this->trans('Virtual product download message', [], $locale)
+                );
             }
+
+            $message->save();
+        }
+    }
+
+    protected function trans($id, $parameters = [], $locale = null)
+    {
+        if (null === $this->translator) {
+            $this->translator = Translator::getInstance();
         }
 
-        $message->save();
+        return $this->translator->trans($id, $parameters, self::MESSAGE_DOMAIN, $locale);
     }
 }
