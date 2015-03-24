@@ -3,7 +3,7 @@
     {loop name="current-sales" type="sale" limit="2"}
         <section id="product-sale-{$ID}">
             <div class="products-heading">
-                <h2>{$SALE_LABEL} <a href="{url path="/sale" sale=$ID}" class="btn-all">{intl l="+ View All"}</a></h2>
+                <h2>{$SALE_LABEL} <a href="{url path="/sale" sale=$ID}" class="btn-all">{intl l="+ View All" d="hookproductsoffer.fo.default"}</a></h2>
                 <div class="short-description" itemprop="description">{$CHAPO}</div>
             </div>
 
@@ -24,7 +24,7 @@
 {ifloop rel="product_promo"}
     <section id="products-offer">
         <div class="products-heading">
-            <h2>{intl l="Offers"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All"}</a></h2>
+            <h2>{intl l="Offers"} <a href="{url path="/view_all" type="offers"}" class="btn-all">{intl l="+ View All" d="hookproductsoffer.fo.default"}</a></h2>
         </div>
 
         <div class="products-content">
