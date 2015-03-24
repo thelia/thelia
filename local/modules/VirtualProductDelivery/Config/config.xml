@@ -9,7 +9,6 @@
             <tag name="kernel.event_subscriber"/>
         </service>
         <service id="virtualproductdelivery.mail" class="VirtualProductDelivery\EventListeners\SendMail" scope="request">
-            <argument type="service" id="thelia.parser" />
             <argument type="service" id="mailer"/>
             <tag name="kernel.event_subscriber"/>
         </service>

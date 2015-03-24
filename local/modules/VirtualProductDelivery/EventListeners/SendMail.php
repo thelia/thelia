@@ -12,16 +12,13 @@
 
 namespace VirtualProductDelivery\EventListeners;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\ConfigQuery;
-use Thelia\Model\MessageQuery;
-use Thelia\Model\OrderStatus;
-use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\OrderProductQuery;
 use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
 
 /**
@@ -32,13 +29,10 @@ use VirtualProductDelivery\Events\VirtualProductDeliveryEvents;
 class SendMail implements EventSubscriberInterface
 {
 
-    protected $parser;
-
     protected $mailer;
 
-    public function __construct(ParserInterface $parser, MailerFactory $mailer)
+    public function __construct(MailerFactory $mailer)
     {
-        $this->parser = $parser;
         $this->mailer = $mailer;
     }
 
@@ -46,12 +40,7 @@ class SendMail implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $paidStatusId = OrderStatusQuery::create()
-            ->filterByCode(OrderStatus::CODE_PAID)
-            ->select('Id')
-            ->findOne();
-
-        if ($order->hasVirtualProduct() && $event->getStatus() == $paidStatusId) {
+        if ($order->hasVirtualProduct() && $order->isPaid(true)) {
             $event
                 ->getDispatcher()
                 ->dispatch(
@@ -71,44 +60,31 @@ class SendMail implements EventSubscriberInterface
     {
         $order = $event->getOrder();
 
-        $contact_email = ConfigQuery::read('store_email');
+        // Be sure that we have a document to download
+        $virtualProductCount = OrderProductQuery::create()
+            ->filterByOrderId($order->getId())
+            ->filterByVirtual(true)
+            ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
+            ->count();
 
-        $customer = $order->getCustomer();
+        if ($virtualProductCount > 0) {
 
-        if ($contact_email) {
-            $message = MessageQuery::create()
-                ->filterByName('mail_virtualproduct')
-                ->findOne();
+            $customer = $order->getCustomer();
 
-            if (null === $message) {
-                throw new \Exception("Failed to load message 'mail_virtualproduct'.");
-            }
-
-            $order = $event->getOrder();
-
-            $this->parser->assign('customer_id', $customer->getId());
-            $this->parser->assign('order_id', $order->getId());
-            $this->parser->assign('order_ref', $order->getRef());
-            $this->parser->assign('order_date', $order->getCreatedAt());
-            $this->parser->assign('update_date', $order->getUpdatedAt());
-
-            $message
-                ->setLocale($order->getLang()->getLocale());
-
-            $instance = \Swift_Message::newInstance()
-                ->addTo($customer->getEmail(), $customer->getFirstname() . " " . $customer->getLastname())
-                ->addFrom($contact_email, ConfigQuery::read('store_name'));
-
-            // Build subject and body
-            $message->buildMessage($this->parser, $instance);
-
-            $this->mailer->send($instance);
-
-            Tlog::getInstance()->debug("Virtual product download message sent to customer " . $customer->getEmail());
+            $this->mailer->sendEmailToCustomer(
+                'mail_virtualproduct',
+                $customer,
+                [
+                    'customer_id' => $customer->getId(),
+                    'order_id' => $order->getId(),
+                    'order_ref' => $order->getRef(),
+                    'order_date' => $order->getCreatedAt(),
+                    'update_date' => $order->getUpdatedAt()
+                ]
+            );
         } else {
-            Tlog::getInstance()->addDebug(
-                "Virtual product download: store contact email is not defined. Customer ID:",
-                $customer->getId()
+            Tlog::getInstance()->warning(
+                "Virtual product download message not sent to customer: there's nothing to downnload"
             );
         }
     }
