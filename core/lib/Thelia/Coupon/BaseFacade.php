@@ -20,6 +20,7 @@ use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateHelper;
+use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Coupon;
@@ -187,11 +188,23 @@ class BaseFacade implements FacadeInterface
         if (null === $couponCodes) {
             return array();
         }
+        /** @var CouponFactory $couponFactory */
         $couponFactory = $this->container->get('thelia.coupon.factory');
 
-        $coupons = array();
+        $coupons = [];
+
         foreach ($couponCodes as $couponCode) {
-            $coupons[] = $couponFactory->buildCouponFromCode($couponCode);
+            // Only valid coupons are returned
+            try {
+                if (false !== $couponInterface = $couponFactory->buildCouponFromCode($couponCode)) {
+                    $coupons[] = $couponInterface;
+                }
+            } catch (\Exception $ex) {
+                // Just ignore the coupon and log the problem, just in case someone realize it.
+                Tlog::getInstance()->warning(
+                    sprintf("Coupon %s ignored, exception occurred: %s", $couponCode, $ex->getMessage())
+                );
+            }
         }
 
         return $coupons;
