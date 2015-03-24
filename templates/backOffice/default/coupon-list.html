@@ -106,7 +106,7 @@
 
                                     {hook name="coupon.table-header" location="coupon_table_header" }
 
-                                    <th>&nbsp;</th>
+                                    <th>{intl l="Actions"}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -153,18 +153,29 @@
 
                                         {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
 
-                                        <td class="btn-group">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
-                                            {/loop}
-                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
-                                                <a title="{intl l='Delete this coupon'}" class="btn btn-default btn-xs delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
-                                                    <i class="glyphicon glyphicon-trash"></i>
-                                                </a>
-                                            {/loop}
+                                        <td>
+                                            <div class="btn-group">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.coupon" access="UPDATE"}
+                                                    <a class="btn btn-default btn-xs" title="{intl l='Change this coupon'}" href="{url path="/admin/coupon/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                {/loop}
+                                                {loop type="auth" name="can_delete" role="ADMIN" resource="admin.coupon" access="DELETE"}
+                                                    <a title="{intl l='Delete this coupon'}" class="btn btn-default btn-xs delete_coupon_btn" href="#delete_coupon" data-target="#delete_coupon" data-id="{$ID}" data-toggle="modal">
+                                                        <i class="glyphicon glyphicon-trash"></i>
+                                                    </a>
+                                                {/loop}
+                                            </div>
                                         </td>
                                     </tr>
                                 {/loop}
+                                {elseloop rel="list_coupon"}
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="alert alert-info text-center">
+                                                <p>{intl l="No coupon is currently defined. Please use the (+) button above to create your first coupon."}</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
                             </tbody>
                         </table>
                     </div>
