@@ -269,7 +269,7 @@ class ModuleValidator
                         "The module %name requires Thelia %version or newer",
                         [
                             '%name' => $this->moduleDirName,
-                            '%version' => $this->moduleDefinition->getVersion()
+                            '%version' => $this->moduleDefinition->getTheliaVersion()
                         ]
                     )
                 );
