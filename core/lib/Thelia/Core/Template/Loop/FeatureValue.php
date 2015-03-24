@@ -72,6 +72,11 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             true
         );
 
+        $search
+            ->useFeatureAvQuery('feature_av')
+                ->withColumn(FeatureAvTableMap::POSITION, 'feature_av_position')
+            ->endUse();
+
         $feature = $this->getFeature();
 
         $search->filterByFeatureId($feature, Criteria::EQUAL);
@@ -103,10 +108,10 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case "manual":
-                    $search->orderByPosition(Criteria::ASC);
+                    $search->orderBy('feature_av_position', Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    $search->orderBy('feature_av_position', Criteria::DESC);
                     break;
             }
         }
@@ -116,6 +121,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\FeatureProduct $featureValue */
         foreach ($loopResult->getResultDataCollection() as $featureValue) {
             $loopResultRow = new LoopResultRow($featureValue);
 
