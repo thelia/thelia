@@ -119,6 +119,9 @@ class Cart extends BaseCart
 
         if ($discount) {
             $total -= $this->getDiscount();
+            if($total < 0) {
+                $total = 0;
+            }
         }
 
         return $total;
