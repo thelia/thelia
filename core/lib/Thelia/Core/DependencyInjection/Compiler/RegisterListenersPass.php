@@ -203,6 +203,13 @@ class RegisterListenersPass implements CompilerPassInterface
                     ->setPosition(ModuleHook::MAX_POSITION)
                     ->save();
             }
+        } else {
+            // Update hook if id was changed in the definition
+            if ($moduleHook->getClassname() != $id) {
+                $moduleHook
+                    ->setClassname($id)
+                    ->save();
+            }
         }
     }
 
