@@ -16,8 +16,7 @@ $(function($){
 
         var documentDropzone = new Dropzone("#documents-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
-            uploadMultiple: false,
-            maxFilesize: 8
+            uploadMultiple: false
         });
 
         var totalFiles      = 0,
