@@ -156,8 +156,8 @@ class TemplateTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'template_id', ), 'SET NULL', null, 'Products');
-        $this->addRelation('FeatureTemplate', '\\Thelia\\Model\\FeatureTemplate', RelationMap::ONE_TO_MANY, array('id' => 'template_id', ), null, null, 'FeatureTemplates');
-        $this->addRelation('AttributeTemplate', '\\Thelia\\Model\\AttributeTemplate', RelationMap::ONE_TO_MANY, array('id' => 'template_id', ), null, null, 'AttributeTemplates');
+        $this->addRelation('FeatureTemplate', '\\Thelia\\Model\\FeatureTemplate', RelationMap::ONE_TO_MANY, array('id' => 'template_id', ), 'CASCADE', 'RESTRICT', 'FeatureTemplates');
+        $this->addRelation('AttributeTemplate', '\\Thelia\\Model\\AttributeTemplate', RelationMap::ONE_TO_MANY, array('id' => 'template_id', ), 'CASCADE', 'RESTRICT', 'AttributeTemplates');
         $this->addRelation('TemplateI18n', '\\Thelia\\Model\\TemplateI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TemplateI18ns');
         $this->addRelation('Feature', '\\Thelia\\Model\\Feature', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Features');
         $this->addRelation('Attribute', '\\Thelia\\Model\\Attribute', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Attributes');
@@ -184,6 +184,8 @@ class TemplateTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 ProductTableMap::clearInstancePool();
+                FeatureTemplateTableMap::clearInstancePool();
+                AttributeTemplateTableMap::clearInstancePool();
                 TemplateI18nTableMap::clearInstancePool();
             }
 

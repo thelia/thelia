@@ -166,7 +166,7 @@ class FeatureTemplateTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Feature', '\\Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_ONE, array('template_id' => 'id', ), null, null);
+        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_ONE, array('template_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**

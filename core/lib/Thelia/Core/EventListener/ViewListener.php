@@ -12,19 +12,17 @@
 
 namespace Thelia\Core\EventListener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
-use Thelia\Core\Security\Exception\AuthenticationException;
 
 /**
  *
@@ -63,7 +61,8 @@ class ViewListener implements EventSubscriberInterface
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $parser = $this->container->get('thelia.parser');
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $templateHelper = $this->container->get('thelia.template_helper');
+        $parser->setTemplateDefinition($templateHelper->getActiveFrontTemplate());
         $request = $this->container->get('request');
         $response = null;
         try {

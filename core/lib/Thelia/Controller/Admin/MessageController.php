@@ -21,7 +21,6 @@ use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\Module;
@@ -164,7 +163,7 @@ class MessageController extends AbstractCrudController
     {
         $list = array();
 
-        $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $dir = $this->getTemplateHelper()->getActiveMailTemplate()->getAbsolutePath();
 
         $finder = Finder::create()->files()->in($dir)->ignoreDotFiles(true)->sortByName()->name("*.$requiredExtension");
 
@@ -233,7 +232,7 @@ class MessageController extends AbstractCrudController
             $this->pageNotFound();
         }
 
-        $parser = $this->getParser(TemplateHelper::getInstance()->getActiveMailTemplate());
+        $parser = $this->getParser($this->getTemplateHelper()->getActiveMailTemplate());
 
         foreach ($this->getRequest()->query->all() as $key => $value) {
             $parser->assign($key, $value);

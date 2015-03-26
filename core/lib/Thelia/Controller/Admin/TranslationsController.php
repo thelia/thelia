@@ -13,10 +13,11 @@
 namespace Thelia\Controller\Admin;
 
 use Symfony\Component\Finder\Finder;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Translation\TranslationEvent;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleQuery;
@@ -48,7 +49,7 @@ class TranslationsController extends BaseAdminController
     protected function getModuleTemplateNames(Module $module, $template_type)
     {
         $templates =
-            TemplateHelper::getInstance()->getList(
+            $this->getTemplateHelper()->getList(
                 $template_type,
                 $module->getAbsoluteTemplateBasePath()
             );
@@ -79,7 +80,7 @@ class TranslationsController extends BaseAdminController
 
         $template = $directory = $i18n_directory = false;
 
-        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+        $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
 
         $templateArguments = array(
                 'item_to_translate'             => $item_to_translate,
@@ -102,12 +103,12 @@ class TranslationsController extends BaseAdminController
                         $directory = $module->getAbsoluteBaseDir();
                         $domain = $module->getTranslationDomain();
                         $i18n_directory = $module->getAbsoluteI18nPath();
-                        $walkMode = TemplateHelper::WALK_MODE_PHP;
+                        $walkMode = TranslationEvent::WALK_MODE_PHP;
                     } elseif ($module_part == 'admin-includes') {
                         $directory = $module->getAbsoluteAdminIncludesPath();
                         $domain = $module->getAdminIncludesTranslationDomain();
                         $i18n_directory = $module->getAbsoluteAdminIncludesI18nPath();
-                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+                        $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     } elseif (! empty($module_part)) {
                         // Front, back, pdf or email office template,
                         // form of $module_part is [bo|fo|pdf|email].subdir-name
@@ -138,7 +139,7 @@ class TranslationsController extends BaseAdminController
                                 throw new \InvalidArgumentException("Undefined module template type: '$type'.");
                         }
 
-                        $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+                        $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     }
 
                     // Modules translations files are in the cache, and are not always
@@ -182,8 +183,13 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
+<<<<<<< HEAD
                     $i18n_directory = THELIA_LIB . 'Config' . DS . 'I18n';
                     $walkMode = TemplateHelper::WALK_MODE_PHP;
+=======
+                    $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
+                    $walkMode = TranslationEvent::WALK_MODE_PHP;
+>>>>>>> TemplateHelper is now replaced with a service
                     break;
 
                 // Thelia Install
@@ -191,7 +197,7 @@ class TranslationsController extends BaseAdminController
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
                     $i18n_directory = THELIA_SETUP_DIRECTORY . '/I18n';
-                    $walkMode = TemplateHelper::WALK_MODE_TEMPLATE;
+                    $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     // resources not loaded by default
                     $this->loadTranslation($i18n_directory, $domain);
                     break;
@@ -226,7 +232,7 @@ class TranslationsController extends BaseAdminController
 
                 // Load translations files is this template is not the current template
                 // as it is not loaded in Thelia.php
-                if (! TemplateHelper::getInstance()->isActive($template)) {
+                if (! $this->getTemplateHelper()->isActive($template)) {
                     $this->loadTranslation($i18n_directory, $domain);
                 }
             }
@@ -241,11 +247,14 @@ class TranslationsController extends BaseAdminController
                         $texts = $this->getRequest()->get('text', array());
 
                         if (! empty($texts)) {
-                            $file = sprintf("%s".DS."%s.php", $i18n_directory, $this->getCurrentEditionLocale());
+                            $event = TranslationEvent::createWriteFileEvent(
+                                sprintf("%s".DS."%s.php", $i18n_directory, $this->getCurrentEditionLocale()),
+                                $texts,
+                                $this->getRequest()->get('translation', []),
+                                true
+                            );
 
-                            $translations = $this->getRequest()->get('translation', array());
-
-                            TemplateHelper::getInstance()->writeTranslation($file, $texts, $translations, true);
+                            $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_WRITE_FILE, $event);
 
                             if ($save_mode == 'stay') {
                                 return $this->generateRedirectFromRoute("admin.configuration.translations", $templateArguments);
@@ -257,24 +266,24 @@ class TranslationsController extends BaseAdminController
                 }
 
                 // Load strings
-                $stringsCount = TemplateHelper::getInstance()->walkDir(
+                $event = TranslationEvent::createGetStringsEvent(
                     $directory,
                     $walkMode,
-                    $this->getTranslator(),
                     $this->getCurrentEditionLocale(),
-                    $domain,
-                    $all_strings
+                    $domain
                 );
 
+                $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
+
                 // Estimate number of fields, and compare to php ini max_input_vars
-                $stringsCount = $stringsCount * 2 + 6;
+                $stringsCount = $event->getTranslatableStringCount() * 2 + 6;
 
                 if ($stringsCount > ini_get('max_input_vars')) {
                     $templateArguments['max_input_vars_warning']  = true;
                     $templateArguments['required_max_input_vars'] = $stringsCount;
                     $templateArguments['current_max_input_vars']  = ini_get('max_input_vars');
                 } else {
-                    $templateArguments['all_strings'] = $all_strings;
+                    $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }
             }
         }

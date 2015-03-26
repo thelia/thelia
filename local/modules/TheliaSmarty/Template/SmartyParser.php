@@ -21,6 +21,7 @@ use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TemplateHelperInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use Thelia\Core\Template\TemplateDefinition;
@@ -41,6 +42,7 @@ class SmartyParser extends Smarty implements ParserInterface
     protected $request;
     protected $dispatcher;
     protected $parserContext;
+    protected $templateHelper;
 
     protected $backOfficeTemplateDirectories = array();
     protected $frontOfficeTemplateDirectories = array();
@@ -60,6 +62,7 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param Request                  $request
      * @param EventDispatcherInterface $dispatcher
      * @param ParserContext            $parserContext
+     * @param TemplateHelperInterface  $templateHelper
      * @param string                   $env
      * @param bool                     $debug
      */
@@ -67,6 +70,7 @@ class SmartyParser extends Smarty implements ParserInterface
         Request $request,
         EventDispatcherInterface $dispatcher,
         ParserContext $parserContext,
+        TemplateHelperInterface $templateHelper,
         $env = "prod",
         $debug = false
     ) {
@@ -75,6 +79,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->request = $request;
         $this->dispatcher = $dispatcher;
         $this->parserContext = $parserContext;
+        $this->templateHelper = $templateHelper;
 
         // Configure basic Smarty parameters
 
@@ -467,5 +472,13 @@ class SmartyParser extends Smarty implements ParserInterface
                 );
             }
         }
+    }
+
+    /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     */
+    public function getTemplateHelper()
+    {
+        return $this->templateHelper;
     }
 }

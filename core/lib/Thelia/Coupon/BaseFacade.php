@@ -19,7 +19,6 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Thelia\Condition\ConditionEvaluator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
@@ -74,7 +73,9 @@ class BaseFacade implements FacadeInterface
     public function getDeliveryAddress()
     {
         try {
-            return AddressQuery::create()->findPk($this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress());
+            return AddressQuery::create()->findPk(
+                $this->getRequest()->getSession()->getOrder()->getChoosenDeliveryAddress()
+            );
         } catch (\Exception $ex) {
             throw new \LogicException("Failed to get delivery address (" . $ex->getMessage() . ")");
         }
@@ -255,7 +256,9 @@ class BaseFacade implements FacadeInterface
             $this->parser = $this->container->get('thelia.parser');
 
             // Define the current back-office template that should be used
-            $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+            $this->parser->setTemplateDefinition(
+                $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+            );
         }
 
         return $this->parser;

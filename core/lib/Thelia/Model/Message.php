@@ -2,13 +2,12 @@
 
 namespace Thelia\Model;
 
-use Thelia\Core\Template\Exception\ResourceNotFoundException;
-use Thelia\Model\Base\Message as BaseMessage;
 use Propel\Runtime\Connection\ConnectionInterface;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Message\MessageEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Model\Base\Message as BaseMessage;
 
 class Message extends BaseMessage
 {
@@ -148,7 +147,11 @@ class Message extends BaseMessage
      */
     public function buildMessage(ParserInterface $parser, \Swift_Message $messageInstance, $useFallbackTemplate = true)
     {
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveMailTemplate(), $useFallbackTemplate);
+        $parser->setTemplateDefinition(
+            $parser->getTemplateHelper()->getActiveMailTemplate(),
+            $useFallbackTemplate
+        );
+
         $subject     = $parser->fetch(sprintf("string:%s", $this->getSubject()));
         $htmlMessage = $this->getHtmlMessageBody($parser);
         $textMessage = $this->getTextMessageBody($parser);

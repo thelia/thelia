@@ -13,12 +13,15 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\Lang\LangCreateEvent;
 use Thelia\Core\Event\Lang\LangDefaultBehaviorEvent;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
+use Thelia\Core\Event\Lang\LangEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
 use Thelia\Model\ConfigQuery;
@@ -32,6 +35,14 @@ use Thelia\Model\Lang as LangModel;
  */
 class Lang extends BaseAction implements EventSubscriberInterface
 {
+    /** @var TemplateHelperInterface  */
+    protected $templateHelper;
+
+    public function __construct(TemplateHelperInterface $templateHelper)
+    {
+        $this->templateHelper = $templateHelper;
+    }
+
     public function update(LangUpdateEvent $event)
     {
         if (null !== $lang = LangQuery::create()->findPk($event->getId())) {
@@ -113,6 +124,34 @@ class Lang extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function fixMissingFlag(LangEvent $event)
+    {
+        // Be sure that a lang have a flag, otherwise copy the
+        // "unknown" flag
+        $adminTemplate = $this->templateHelper->getActiveAdminTemplate();
+        $unknownFlag = ConfigQuery::getUnknownFlagPath();
+
+        $unknownFlagPath = $adminTemplate->getAbsolutePath().DS.$unknownFlag;
+
+        if (! file_exists($unknownFlagPath)) {
+            throw new \RuntimeException(
+                Translator::getInstance()->trans(
+                    "The image which replaces an undefined country flag (%file) was not found. Please check unknown-flag-path configuration variable, and check that the image exists.",
+                    array("%file" => $unknownFlag)
+                )
+            );
+        }
+
+        // Check if the country flag exists
+        $countryFlag = rtrim(dirname($unknownFlagPath), DS).DS.$event->getLang()->getCode().'.png';
+
+        if (! file_exists($countryFlag)) {
+            $fs = new Filesystem();
+
+            $fs->copy($unknownFlagPath, $countryFlag);
+        }
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -141,7 +180,8 @@ class Lang extends BaseAction implements EventSubscriberInterface
             TheliaEvents::LANG_CREATE => array('create', 128),
             TheliaEvents::LANG_DELETE => array('delete', 128),
             TheliaEvents::LANG_DEFAULTBEHAVIOR => array('defaultBehavior', 128),
-            TheliaEvents::LANG_URL => array('langUrl', 128)
+            TheliaEvents::LANG_URL => array('langUrl', 128),
+            TheliaEvents::LANG_FIX_MISSING_FLAG => array('fixMissingFlag', 128)
         );
     }
 }

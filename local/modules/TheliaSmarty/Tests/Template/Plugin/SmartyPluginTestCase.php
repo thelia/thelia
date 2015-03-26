@@ -14,6 +14,7 @@ namespace TheliaSmarty\Tests\Template\Plugin;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Tests\ContainerAwareTestCase;
 use TheliaSmarty\Template\SmartyParser;
 
@@ -35,7 +36,8 @@ abstract class SmartyPluginTestCase extends ContainerAwareTestCase
         $this->smarty = new SmartyParser(
             $container->get("request"),
             $container->get("event_dispatcher"),
-            $parserContext = new ParserContext($container->get("request"))
+            $parserContext = new ParserContext($container->get("request")),
+            $templateHelper = new TheliaTemplateHelper()
         );
 
         $container->set("thelia.parser", $this->smarty);

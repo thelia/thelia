@@ -122,6 +122,7 @@ return array(
     'Country title' => 'Country title',
     'Coupon' => 'Coupon',
     'Coupon %code is expired.' => 'Coupon %code is expired.',
+    'Coupon code %code is disabled.' => 'Coupon code %code is disabled.',
     'Critical' => 'Critical',
     'Curency selection page' => 'Curency selection page',
     'Currencies' => 'Currencies',
