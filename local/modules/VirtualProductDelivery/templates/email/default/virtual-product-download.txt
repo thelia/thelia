@@ -1,0 +1,26 @@
+{default_translation_domain domain="virtualproductdelivery.email.default"}
+{default_locale locale={$locale}}
+
+{loop name="order.invoice" type="order" id=$order_id customer="*" limit="1" backend_context="1"}
+
+{intl l="Your order %ref has been validated. You can download your files." ref={$REF}}
+
+----------------------------------------------------------------------
+{intl l="Products:"}
+----------------------------------------------------------------------
+{loop type="order_product" name="order-products" order=$ID virtual="1" backend_context="1"}
+{$TITLE} : {url path="/account/download/$ID"}
+{ifloop rel="combinations"}
+{loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+{$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+{/loop}
+{/ifloop}
+----------------------------------------------------------------------
+{/loop}
+{/loop}
+
+{intl l="You have to be logged in to your account to download this files."}
+
+{intl l="Feel free to contact us for any further information."}
+
+{intl l="Best Regards."}

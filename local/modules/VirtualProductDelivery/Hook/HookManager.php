@@ -14,7 +14,6 @@ namespace VirtualProductDelivery\Hook;
 
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Core\Translation\Translator;
 
 /**
  * Class HookManager
