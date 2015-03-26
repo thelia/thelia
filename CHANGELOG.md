@@ -44,6 +44,7 @@
 - SHOW_HOOK now displays parameters
 - Add fallback for email template for mails sent from a module. If the template file does not exist in the current email template, it will use the one that comes with the module.
 - Add dispatch of console events
+- Refactor VirtualProductDelivery module. The email sending is now triggered from a new event to gain more flexibility. Now, email messages use smarty file templates located in `templates/email/default`.     
 
 # 2.1.3
 
