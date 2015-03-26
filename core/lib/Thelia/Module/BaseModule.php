@@ -22,12 +22,14 @@ use Thelia\Core\Event\Hook\HookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\ModuleException;
 use Thelia\Log\Tlog;
 use Thelia\Model\Cart;
 use Thelia\Model\Country;
 use Thelia\Model\HookQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\LangQuery;
 use Thelia\Model\Map\ModuleImageTableMap;
 use Thelia\Model\Map\ModuleTableMap;
 use Thelia\Model\Module;
@@ -69,6 +71,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
             $con = Propel::getWriteConnection(ModuleTableMap::DATABASE_NAME);
             $con->beginTransaction();
             try {
+                $this->initializeCoreI18n();
                 if ($this->preActivation($con)) {
                     $moduleModel->setActivate(self::IS_ACTIVATED);
                     $moduleModel->save($con);
@@ -837,5 +840,31 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
         }
 
         return $value;
+    }
+
+    /**
+     * Add core translations of the module to use in `preActivation` and `postActivation`
+     * when the module is not yest activated and translations are not available
+     */
+    private function initializeCoreI18n()
+    {
+        if ($this->hasContainer()) {
+            /** @var Translator $translator */
+            $translator = $this->container->get('thelia.translator');
+
+            if (null !== $translator) {
+                $i18nPath = sprintf('%s%s/I18n/', THELIA_MODULE_DIR, $this->getCode());
+                $languages = LangQuery::create()->find();
+
+                foreach ($languages as $language) {
+                    $locale = $language->getLocale();
+                    $i18nFile = sprintf('%s%s.php', $i18nPath, $locale);
+
+                    if (is_file($i18nFile) && is_readable($i18nFile)) {
+                        $translator->addResource('php', $i18nFile, $locale, strtolower(self::getModuleCode()));
+                    }
+                }
+            }
+        }
     }
 }
