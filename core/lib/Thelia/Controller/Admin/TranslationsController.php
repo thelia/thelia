@@ -76,8 +76,6 @@ class TranslationsController extends BaseAdminController
             $module_part = false;
         }
 
-        $all_strings = array();
-
         $template = $directory = $i18n_directory = false;
 
         $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
@@ -183,13 +181,8 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
-<<<<<<< HEAD
                     $i18n_directory = THELIA_LIB . 'Config' . DS . 'I18n';
-                    $walkMode = TemplateHelper::WALK_MODE_PHP;
-=======
-                    $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
->>>>>>> TemplateHelper is now replaced with a service
                     break;
 
                 // Thelia Install
@@ -257,7 +250,10 @@ class TranslationsController extends BaseAdminController
                             $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_WRITE_FILE, $event);
 
                             if ($save_mode == 'stay') {
-                                return $this->generateRedirectFromRoute("admin.configuration.translations", $templateArguments);
+                                return $this->generateRedirectFromRoute(
+                                    "admin.configuration.translations",
+                                    $templateArguments
+                                );
                             } else {
                                 return $this->generateRedirect(URL::getInstance()->adminViewUrl('configuration'));
                             }
