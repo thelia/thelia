@@ -225,6 +225,7 @@ return array(
     'Update Profile' => 'Mettre à jour votre profil',
     'Update Quantity' => 'Mettre à jour la quantité',
     'Upsell Products' => 'Produits liés',
+    'Useful links' => 'Liens utiles',
     'View' => 'Voir',
     'View Cart' => 'Voir le panier',
     'View all' => ' Voir tout',
