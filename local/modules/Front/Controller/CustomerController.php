@@ -507,7 +507,7 @@ class CustomerController extends BaseFrontController
      */
     private function createEventInstance($data)
     {
-        $other = clone $data;
+        $other = $data;
         unset($other['title']);
         unset($other['firstname']);
         unset($other['lastname']);

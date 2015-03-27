@@ -63,7 +63,7 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
      * @param float  $discount
      * @param string $company
      * @param string $ref
-     * @param array $other
+     * @param array $other Additional fields
      */
     public function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount, $company, $ref, array $other = array())
     {
@@ -292,7 +292,8 @@ class CustomerCreateOrUpdateEvent extends CustomerEvent
     /**
      * @return array
      */
-    public function getOther() {
+    public function getOther()
+    {
         return $this->other;
     }
 }
