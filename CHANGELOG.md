@@ -46,6 +46,7 @@
 - Add dispatch of console events
 - Refactor VirtualProductDelivery module. The email sending is now triggered from a new event to gain more flexibility. Now, email messages use smarty file templates located in `templates/email/default`.     
 - Added capability to use translator in module functions `preActivation` and `postActivation`
+- Add environment aware database connection
 
 # 2.1.3
 
