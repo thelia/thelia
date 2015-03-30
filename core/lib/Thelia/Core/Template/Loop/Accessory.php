@@ -40,7 +40,7 @@ class Accessory extends Product
         $argumentCollection = parent::getArgDefinitions();
 
         $argumentCollection->addArgument(
-            Argument::createIntTypeArgument('product', null, true)
+            Argument::createIntListTypeArgument('product', null, true)
         );
 
         $argumentCollection->get('order')->default = "accessory";
