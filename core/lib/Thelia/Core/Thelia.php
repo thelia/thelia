@@ -282,7 +282,7 @@ class Thelia extends Kernel
             }
 
             // Load core translation
-            $translationDirs['core'] = realpath(__DIR__ . DS . ".." . DS ."Config".DS.'I18n');
+            $translationDirs['core'] = THELIA_LIB . 'Config' . DS . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
             $th = TemplateHelper::getInstance();
