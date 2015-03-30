@@ -13,9 +13,9 @@
 namespace Thelia\Action;
 
 use Imagine\Image\Box;
-use Imagine\Image\Color;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Imagine\Image\Palette\RGB;
 use Imagine\Image\Point;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Image\ImageEvent;
@@ -138,10 +138,13 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
 
                     $background_color = $event->getBackgroundColor();
 
+                    $palette = new RGB();
+
                     if ($background_color != null) {
-                        $bg_color = new Color($background_color);
+                        $bg_color = $palette->color($background_color);
                     } else {
-                        $bg_color = null;
+                        // Define a fully transparent white background color
+                        $bg_color = $palette->color('fff', 0);
                     }
 
                     // Apply resize
@@ -202,7 +205,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                             case 'colorize':
                                 // Syntax: colorize:couleur. Exemple: colorize:#ff00cc
                                 if (isset($params[1])) {
-                                    $the_color = new Color($params[1]);
+                                    $the_color = $palette->color($params[1]);
 
                                     $image->effects()->colorize($the_color);
                                 }
