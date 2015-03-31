@@ -111,7 +111,11 @@ class Thelia extends Kernel
         $cache = new ConfigCache($cachePath, $this->debug);
 
         if (!$cache->isFresh()) {
-            $file = THELIA_CONF_DIR . 'database.yml';
+            if (file_exists(THELIA_CONF_DIR."database_".$this->environment.".yml")) {
+                $file = THELIA_CONF_DIR."database_".$this->environment.".yml";
+            } else {
+                $file = THELIA_CONF_DIR . 'database.yml';
+            }
 
             $definePropel = new DefinePropel(
                 new DatabaseConfiguration(),
