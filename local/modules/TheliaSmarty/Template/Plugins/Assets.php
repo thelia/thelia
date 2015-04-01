@@ -53,7 +53,9 @@ class Assets extends AbstractSmartyPlugin
 
     public function blockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->assetManager->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
+        return $this
+            ->assetManager
+            ->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
     }
 
     public function blockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
@@ -64,6 +66,11 @@ class Assets extends AbstractSmartyPlugin
     public function functionImage($params, \Smarty_Internal_Template $template)
     {
         return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
+    }
+
+    public function functionAsset($params, \Smarty_Internal_Template $template)
+    {
+        return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template, false);
     }
 
     public function functionJavascript($params, \Smarty_Internal_Template $template)
@@ -79,7 +86,7 @@ class Assets extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins hendled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
@@ -88,6 +95,7 @@ class Assets extends AbstractSmartyPlugin
             new SmartyPluginDescriptor('block', 'javascripts', $this, 'blockJavascripts'),
             new SmartyPluginDescriptor('block', 'images', $this, 'blockImages'),
 
+            new SmartyPluginDescriptor('function', 'asset', $this, 'functionAsset'),
             new SmartyPluginDescriptor('function', 'image', $this, 'functionImage'),
             new SmartyPluginDescriptor('function', 'javascript', $this, 'functionJavascript'),
             new SmartyPluginDescriptor('function', 'stylesheet', $this, 'functionStylesheet'),

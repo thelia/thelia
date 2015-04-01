@@ -128,19 +128,19 @@ class SmartyAssetsManager
     /**
      * Retrieve asset URL
      *
-     * @param string                    $assetType js|css|image
-     * @param array                     $params    Parameters
+     * @param string $assetType js|css|image
+     * @param array $params Parameters
      *                                             - file File path in the default template
      *                                             - source module asset
      *                                             - filters filter to apply
      *                                             - debug
      *                                             - template if you want to load asset from another template
-     * @param \Smarty_Internal_Template $template  Smarty Template
+     * @param \Smarty_Internal_Template $template Smarty Template
      *
+     * @param bool $allowFilters if false, the 'filters' parameter is ignored
      * @return string
-     * @throws \Exception
      */
-    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
+    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template, $allowFilters = true)
     {
         $assetUrl = "";
 
@@ -154,7 +154,7 @@ class SmartyAssetsManager
         }
 
         $assetOrigin  = isset($params['source']) ? $params['source'] : SmartyParser::TEMPLATE_ASSETS_KEY;
-        $filters      = isset($params['filters']) ? $params['filters'] : '';
+        $filters      = $allowFilters && isset($params['filters']) ? $params['filters'] : '';
         $debug        = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
         $templateName = isset($params['template']) ? $params['template'] : false;
         $failsafe     = isset($params['failsafe']) ? $params['failsafe'] : false;
@@ -223,10 +223,14 @@ class SmartyAssetsManager
     ) {
         // Opening tag (first call only)
         if ($repeat) {
+            $isfailsafe = false;
+
             $url = '';
             try {
                 // Check if we're in failsafe mode
-                $isfailsafe = isset($params['failsafe']) ? $params['failsafe'] : false;
+                if (isset($params['failsafe'])) {
+                    $isfailsafe = $params['failsafe'];
+                }
 
                 $url = $this->computeAssetUrl($assetType, $params, $template);
 
