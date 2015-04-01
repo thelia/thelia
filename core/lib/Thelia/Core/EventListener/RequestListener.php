@@ -64,10 +64,10 @@ class RequestListener implements EventSubscriberInterface
         /** @var \Thelia\Core\HttpFoundation\Request $request */
         $request = $event->getRequest();
         $lang = $request->getSession()->getLang();
-        $vendorDir = THELIA_ROOT.'core'.DS.'vendor';
-        $vendorFormDir = $vendorDir.DS.'symfony'.DS.'form'.DS.'Symfony'.DS.'Component'.DS.'Form';
+
+        $vendorFormDir = THELIA_VENDOR . 'symfony' . DS . 'form' . DS . 'Symfony' . DS . 'Component' . DS . 'Form';
         $vendorValidatorDir =
-            $vendorDir.DS.'symfony'.DS.'validator'.DS.'Symfony'.DS.'Component'.DS.'Validator';
+            THELIA_VENDOR . 'symfony' . DS . 'validator' . DS . 'Symfony' . DS . 'Component' . DS . 'Validator';
 
         $this->translator->addResource(
             'xlf',
