@@ -8,6 +8,8 @@
     bootstrap="tests/phpunit/Thelia/Tests/bootstrap.php"
     verbose="true"
     backupGlobals="false"
+    printerFile="thelia/core/vendor/whatthejeff/nyancat-phpunit-resultprinter/src/NyanCat/PHPUnit/ResultPrinter.php"
+    printerClass="NyanCat\PHPUnit\ResultPrinter"
 >
     <testsuites>
 	    <testsuite name="Thelia">
