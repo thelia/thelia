@@ -22,6 +22,14 @@ if (!defined('THELIA_ROOT')) {
     define('THELIA_ROOT', rtrim(realpath(dirname(__DIR__)), DS) . DS);
 }
 
+if (!defined('THELIA_LIB')) {
+    define('THELIA_LIB', THELIA_ROOT . 'core' . DS . 'lib' . DS . 'Thelia' . DS);
+}
+
+if (!defined('THELIA_VENDOR')) {
+    define('THELIA_VENDOR', THELIA_ROOT . 'core' . DS . 'vendor' . DS);
+}
+
 if (!defined('THELIA_LOCAL_DIR')) {
     define('THELIA_LOCAL_DIR', THELIA_ROOT . 'local' . DS);
 }

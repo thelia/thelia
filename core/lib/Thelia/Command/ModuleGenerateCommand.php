@@ -137,6 +137,14 @@ class ModuleGenerateCommand extends BaseModuleGenerate
                 $schemaContent = file_get_contents($skeletonDir . "schema.xml");
 
                 $schemaContent = str_replace("%%NAMESPACE%%", $this->module, $schemaContent);
+                $schemaContent = str_replace(
+                    '%%XSD_LOCATION%%',
+                    $fs->makePathRelative(
+                        THELIA_VENDOR . 'propel/propel/resources/xsd/',
+                        $this->moduleDirectory
+                    ) . 'database.xsd',
+                    $schemaContent
+                );
 
                 file_put_contents($filename, $schemaContent);
             }

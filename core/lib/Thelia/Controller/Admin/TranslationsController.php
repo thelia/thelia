@@ -180,9 +180,9 @@ class TranslationsController extends BaseAdminController
 
                 // Thelia Core
                 case 'co':
-                    $directory = THELIA_ROOT . 'core/lib/Thelia';
+                    $directory = THELIA_LIB;
                     $domain = 'core';
-                    $i18n_directory = THELIA_ROOT . 'core/lib/Thelia/Config/I18n';
+                    $i18n_directory = THELIA_LIB . 'Config' . DS . 'I18n';
                     $walkMode = TemplateHelper::WALK_MODE_PHP;
                     break;
 
