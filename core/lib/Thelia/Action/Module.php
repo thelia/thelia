@@ -217,22 +217,6 @@ class Module extends BaseAction implements EventSubscriberInterface
                     );
                 }
 
-                // If the module is referenced by an order, display a meaningful error
-                // instead of 'delete cannot delete' caused by a constraint violation.
-                // FIXME: we hav to find a way to delete modules used by order.
-                if (
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
-                    ||
-                    null !== OrderQuery::create()->findByDeliveryModuleId($module->getId())
-                ) {
-                    throw new \LogicException(
-                        Translator::getInstance()->trans(
-                            'The module "%name%" is currently in use by at least one order, and can\'t be deleted.',
-                            ['%name%' => $module->getCode()]
-                        )
-                    );
-                }
-
                 $module->delete($con);
 
                 $con->commit();
