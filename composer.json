@@ -55,7 +55,8 @@
         "phpunit/phpunit": "4.5.*",
         "fzaninotto/faker": "1.5.x-dev",
         "thelia/hooktest-module": "~1.0",
-        "thelia/hooktest-template": "~1.0"
+        "thelia/hooktest-template": "~1.0",
+        "whatthejeff/nyancat-phpunit-resultprinter": "~1.2"
     },
     "minimum-stability": "stable",
     "config": {
