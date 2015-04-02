@@ -21,9 +21,7 @@ namespace Thelia\Core\Template;
  */
 class TemplateHelper implements TemplateHelperInterface
 {
-    /**
-     * This is a singleton
-     */
+    /** This is a singleton */
     private static $instance = null;
 
     /** @var TemplateHelperInterface  */
@@ -32,6 +30,8 @@ class TemplateHelper implements TemplateHelperInterface
     private function __construct(TemplateHelperInterface $templateHelper)
     {
         $this->templateHelper = $templateHelper;
+
+        self::$instance = $this;
     }
 
     /**
