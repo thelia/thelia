@@ -47,7 +47,9 @@
 - Refactor VirtualProductDelivery module. The email sending is now triggered from a new event to gain more flexibility. Now, email messages use smarty file templates located in `templates/email/default`.     
 - Added capability to use translator in module functions `preActivation` and `postActivation`
 - Add environment aware database connection
-- new 'asset' Smarty function, to get the URL of an arbitrary file from template assets, such as a video or a font. 
+- new 'asset' Smarty function, to get the URL of an arbitrary file from template assets, such as a video or a font.
+- Imagine package is updated to 0.6.2, which provides a better support for transparency.
+- Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 
 # 2.1.3
 

@@ -880,11 +880,13 @@ function generate_image($image, $typeobj, $id)
         ->save()
     ;
 
+    $palette = new \Imagine\Image\Palette\RGB();
+
     // Generate images
     $imagine = new Imagine\Gd\Imagine();
-    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Imagine\Image\Color('#E9730F'));
+    $image   = $imagine->create(new Imagine\Image\Box(320, 240), $palette->color('#E9730F'));
 
-    $white = new Imagine\Image\Color('#FFF');
+    $white = $palette->color('#FFF');
 
     $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 14, $white);
 
