@@ -26,6 +26,9 @@ class TemplateHelper implements TemplateHelperInterface
      */
     private static $instance = null;
 
+    /** @var TemplateHelperInterface  */
+    private $templateHelper;
+
     private function __construct(TemplateHelperInterface $templateHelper)
     {
         $this->templateHelper = $templateHelper;

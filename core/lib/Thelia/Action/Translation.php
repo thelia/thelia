@@ -20,9 +20,9 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class Area
+ * Class Translation
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author  Franck Allimant <franck@cqfdev.fr>
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {
@@ -60,16 +60,16 @@ class Translation extends BaseAction implements EventSubscriberInterface
      */
     protected function walkDir($directory, $walkMode, $currentLocale, $domain, &$strings)
     {
-        $num_texts = 0;
+        $numTexts = 0;
 
         if ($walkMode == TranslationEvent::WALK_MODE_PHP) {
             $prefix = '\-\>[\s]*trans[\s]*\([\s]*';
 
-            $allowed_exts = array('php');
+            $allowedExts = array('php');
         } elseif ($walkMode == TranslationEvent::WALK_MODE_TEMPLATE) {
             $prefix = '\{intl(?:.*?)l=[\s]*';
 
-            $allowed_exts = array('html', 'tpl', 'xml', 'txt');
+            $allowedExts = array('html', 'tpl', 'xml', 'txt');
         } else {
             throw new \InvalidArgumentException(
                 Translator::getInstance()->trans(
@@ -89,7 +89,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 }
 
                 if ($fileInfo->isDir()) {
-                    $num_texts += $this->walkDir(
+                    $numTexts += $this->walkDir(
                         $fileInfo->getPathName(),
                         $walkMode,
                         $currentLocale,
@@ -101,7 +101,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 if ($fileInfo->isFile()) {
                     $ext = $fileInfo->getExtension();
 
-                    if (in_array($ext, $allowed_exts)) {
+                    if (in_array($ext, $allowedExts)) {
                         if ($content = file_get_contents($fileInfo->getPathName())) {
                             $short_path = $this->normalizePath($fileInfo->getPathName());
 
@@ -126,7 +126,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                             $strings[$hash]['files'][] = $short_path;
                                         }
                                     } else {
-                                        $num_texts++;
+                                        $numTexts++;
 
                                         // remove \' (or \"), that will prevent the translator to work properly, as
                                         // "abc \def\" ghi" will be passed as abc "def" ghi to the translator.
@@ -162,10 +162,10 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 }
             }
         } catch (\UnexpectedValueException $ex) {
-            // Directory does not exists => ignore/
+            // Directory does not exists => ignore it.
         }
 
-        return $num_texts;
+        return $numTexts;
     }
 
     public function writeTranslationFile(TranslationEvent $event)
