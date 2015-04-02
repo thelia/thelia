@@ -1,6 +1,7 @@
 # 2.0.7
 - Change TokenProvider behavior to be more flexible
 - More secure csrf token
+- Fix ```templates/backOffice/default/includes/inner-form-toolbar.html``` change currency destination
 
 # 2.0.6
 - Do not register previous url on XmlHttpRequest
