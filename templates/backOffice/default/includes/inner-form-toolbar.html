@@ -38,7 +38,7 @@ Parameters:
             <div class="col-md-12">
                 <div class="button-group">
                     {loop name="currency_list" type="currency"}
-                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path='/admin/products/update' edit_currency_id=$ID product_id=$product_id current_tab='prices'}" title="{intl l='Edit prices in %curr' curr={$NAME}}">
+                        <a class="btn btn-sm {if $ID == $edit_currency_id}btn-primary{else}btn-default{/if}" href="{url noamp=1 path={$page_url|default:$current_url nofilter} edit_currency_id=$ID product_id=$product_id current_tab='prices'}" title="{intl l='Edit prices in %curr' curr={$NAME}}">
                             {$SYMBOL}
                         </a>
                     {/loop}
