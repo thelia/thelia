@@ -12,15 +12,14 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Type;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use Thelia\Type;
 
 /**
  *
@@ -66,7 +65,7 @@ class Template extends BaseLoop implements ArraySearchLoopInterface
             $templateType = TemplateDefinition::EMAIL;
         }
 
-        return TemplateHelper::getInstance()->getList($templateType);
+        return $this->container->get('thelia.template_helper')->getList($templateType);
     }
 
     public function parseResults(LoopResult $loopResult)

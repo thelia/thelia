@@ -16,6 +16,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
+            <argument type="service" id="thelia.template_helper"/>
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>
@@ -117,6 +118,7 @@
         <service id="smarty.plugin.adminUtilities" class="TheliaSmarty\Template\Plugins\AdminUtilities" scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="thelia.securityContext" />
+            <argument type="service" id="thelia.template_helper" />
         </service>
 
         <service id="smarty.plugin.flashMessage" class="TheliaSmarty\Template\Plugins\FlashMessage" scope="request">

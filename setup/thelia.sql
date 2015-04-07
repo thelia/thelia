@@ -286,6 +286,8 @@ CREATE TABLE `feature_template`
     CONSTRAINT `fk_feature_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -414,6 +416,8 @@ CREATE TABLE `attribute_template`
     CONSTRAINT `fk_attribute_template`
         FOREIGN KEY (`template_id`)
         REFERENCES `template` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

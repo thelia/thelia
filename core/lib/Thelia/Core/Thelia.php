@@ -42,7 +42,6 @@ use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Module;
@@ -271,10 +270,13 @@ class Thelia extends Kernel
             /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
+            /** @var \Thelia\Core\Template\TemplateHelperInterface $templateHelper */
+            $templateHelper = $container->get('thelia.template_helper');
+
             /** @var Module $module */
             foreach ($modules as $module) {
                 try {
-                    $this->loadModuleTranslationDirectories($module, $translationDirs);
+                    $this->loadModuleTranslationDirectories($module, $translationDirs, $templateHelper);
 
                     $this->addStandardModuleTemplatesToParserEnvironment($parser, $module);
                 } catch (\Exception $e) {
@@ -289,10 +291,9 @@ class Thelia extends Kernel
             $translationDirs['core'] = THELIA_LIB . 'Config' . DS . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
-            $th = TemplateHelper::getInstance();
 
             /** @var TemplateDefinition $templateDefinition */
-            foreach ($th->getStandardTemplateDefinitions() as $templateDefinition) {
+            foreach ($templateHelper->getStandardTemplateDefinitions() as $templateDefinition) {
                 if (is_dir($dir = $templateDefinition->getAbsoluteI18nPath())) {
                     $translationDirs[$templateDefinition->getTranslationDomain()] = $dir;
                 }
@@ -304,7 +305,7 @@ class Thelia extends Kernel
         }
     }
 
-    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs)
+    private function loadModuleTranslationDirectories(Module $module, array &$translationDirs, $templateHelper)
     {
         // Core module translation
         if (is_dir($dir = $module->getAbsoluteI18nPath())) {
@@ -318,7 +319,7 @@ class Thelia extends Kernel
 
         // Module back-office template, if any
         $templates =
-            TemplateHelper::getInstance()->getList(
+            $templateHelper->getList(
                 TemplateDefinition::BACK_OFFICE,
                 $module->getAbsoluteTemplateBasePath()
             );
@@ -330,7 +331,7 @@ class Thelia extends Kernel
 
         // Module front-office template, if any
         $templates =
-            TemplateHelper::getInstance()->getList(
+            $templateHelper->getList(
                 TemplateDefinition::FRONT_OFFICE,
                 $module->getAbsoluteTemplateBasePath()
             );
@@ -342,7 +343,7 @@ class Thelia extends Kernel
 
         // Module pdf template, if any
         $templates =
-            TemplateHelper::getInstance()->getList(
+            $templateHelper->getList(
                 TemplateDefinition::PDF,
                 $module->getAbsoluteTemplateBasePath()
             );
@@ -354,7 +355,7 @@ class Thelia extends Kernel
 
         // Module email template, if any
         $templates =
-            TemplateHelper::getInstance()->getList(
+            $templateHelper->getList(
                 TemplateDefinition::EMAIL,
                 $module->getAbsoluteTemplateBasePath()
             );

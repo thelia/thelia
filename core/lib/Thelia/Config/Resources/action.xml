@@ -177,6 +177,7 @@
         </service>
 
         <service id="thelia.action.lang" class="Thelia\Action\Lang">
+            <argument type="service" id="thelia.template_helper" />
             <tag name="kernel.event_subscriber"/>
         </service>
 
@@ -203,6 +204,10 @@
         </service>
 
         <service id="thelia.action.customer_title" class="Thelia\Action\CustomerTitle">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.translation" class="Thelia\Action\Translation">
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

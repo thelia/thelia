@@ -20,7 +20,6 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Thelia\Core\Template\TemplateHelper;
 use Thelia\Form\BaseForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -202,7 +201,7 @@ class BaseAdminController extends BaseController
 
         // Define the template that should be used
         $parser->setTemplateDefinition(
-            $template ?: TemplateHelper::getInstance()->getActiveAdminTemplate(),
+            $template ?: $this->getTemplateHelper()->getActiveAdminTemplate(),
             $this->useFallbackTemplate
         );
 

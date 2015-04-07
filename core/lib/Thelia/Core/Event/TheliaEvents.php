@@ -789,6 +789,8 @@ final class TheliaEvents
     const LANG_DEFAULTBEHAVIOR                  = 'action.lang.defaultBehavior';
     const LANG_URL                              = 'action.lang.url';
 
+    const LANG_FIX_MISSING_FLAG                 = 'action.lang.fix_missing_flag';
+
     const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
 
     const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
@@ -879,4 +881,9 @@ final class TheliaEvents
     const CUSTOMER_TITLE_AFTER_UPDATE = "action.title.after_update";
 
     const CUSTOMER_TITLE_DELETE = "action.title.delete";
+
+    // -- Translation -------------------------------------------
+
+    const TRANSLATION_GET_STRINGS = 'action.translation.get_strings';
+    const TRANSLATION_WRITE_FILE = 'action.translation.write_file';
 }

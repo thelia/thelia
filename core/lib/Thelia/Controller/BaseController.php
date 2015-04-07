@@ -12,31 +12,29 @@
 
 namespace Thelia\Controller;
 
+use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Core\Event\PdfEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Router;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\DefaultActionEvent;
+use Thelia\Core\Event\PdfEvent;
+use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
-use Thelia\Form\FirewallForm;
+use Thelia\Form\BaseForm;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\OrderQuery;
 use Thelia\Tools\Redirect;
-use Thelia\Core\Template\ParserContext;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
-use Thelia\Form\Exception\FormValidationException;
-use Thelia\Core\Event\DefaultActionEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Thelia\Tools\URL;
 
 /**
@@ -58,6 +56,8 @@ abstract class BaseController extends ContainerAware
     protected $currentRouter;
 
     protected $translator;
+
+    protected $templateHelper;
 
     /** @var bool Fallback on default template when setting the templateDefinition */
     protected $useFallbackTemplate = false;
@@ -191,6 +191,18 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface
+     */
+    protected function getTemplateHelper()
+    {
+        if (null === $this->templateHelper) {
+            $this->templateHelper = $this->container->get("thelia.template_helper");
+        }
+
+        return $this->templateHelper;
+    }
+
+    /**
      * Get all errors that occurred in a form
      *
      * @param  \Symfony\Component\Form\Form $form
@@ -245,7 +257,7 @@ abstract class BaseController extends ContainerAware
             array(
                 'order_id' => $order_id
             ),
-            TemplateHelper::getInstance()->getActivePdfTemplate()
+            $this->getTemplateHelper()->getActivePdfTemplate()
         );
 
         try {

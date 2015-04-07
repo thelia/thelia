@@ -122,6 +122,7 @@ return array(
     'Country title' => 'Nom de ce pays',
     'Coupon' => 'Code promo',
     'Coupon %code is expired.' => 'La date limite d\'utilisation du coupon %code est dépassée.',
+    'Coupon code %code is disabled.' => 'Le code promo %code est désactivé.',
     'Critical' => 'Critique',
     'Curency selection page' => 'Page du choix de la device',
     'Currencies' => 'Devises',

@@ -15,7 +15,7 @@ namespace Thelia\Module;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Model\Order;
 use Thelia\Tools\URL;
 
@@ -33,9 +33,11 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
     public function generateGatewayFormResponse($order, $gateway_url, $form_data)
     {
         /** @var ParserInterface $parser */
-        $parser = $this->container->get("thelia.parser");
+        $parser = $this->getContainer()->get("thelia.parser");
 
-        $parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $parser->setTemplateDefinition(
+            $$parser->getTemplateHelper()->getActiveFrontTemplate()
+        );
 
         $renderedTemplate = $parser->render(
             "order-payment-gateway.html",

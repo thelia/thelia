@@ -12,11 +12,11 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
-use TheliaSmarty\Template\SmartyPluginDescriptor;
-use TheliaSmarty\Template\AbstractSmartyPlugin;
-use Thelia\Tools\URL;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\TemplateHelper;
+use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Tools\URL;
+use TheliaSmarty\Template\AbstractSmartyPlugin;
+use TheliaSmarty\Template\SmartyPluginDescriptor;
 
 /**
  * This class implements variour admin template utilities
@@ -26,10 +26,12 @@ use Thelia\Core\Template\TemplateHelper;
 class AdminUtilities extends AbstractSmartyPlugin
 {
     private $securityContext;
+    private $templateHelper;
 
-    public function __construct(SecurityContext $securityContext)
+    public function __construct(SecurityContext $securityContext, TemplateHelperInterface $templateHelper)
     {
         $this->securityContext = $securityContext;
+        $this->templateHelper = $templateHelper;
     }
 
     protected function fetchSnippet($smarty, $templateName, $variablesArray)
@@ -39,7 +41,7 @@ class AdminUtilities extends AbstractSmartyPlugin
         $snippet_path = sprintf(
             '%s/%s/%s.html',
             THELIA_TEMPLATE_DIR,
-            TemplateHelper::getInstance()->getActiveAdminTemplate()->getPath(),
+            $this->templateHelper->getActiveAdminTemplate()->getPath(),
             $templateName
         );
 

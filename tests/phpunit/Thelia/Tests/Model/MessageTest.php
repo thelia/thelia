@@ -12,16 +12,16 @@
 
 namespace Thelia\Tests\Model;
 
-use Thelia\Model\ConfigQuery;
-use Symfony\Component\Filesystem\Filesystem;
-use Thelia\Model\Message as ModelMessage;
-use TheliaSmarty\Template\SmartyParser;
-use Thelia\Core\Template\ParserContext;
-use Thelia\Core\Template\TemplateHelper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TheliaTemplateHelper;
+use Thelia\Model\ConfigQuery;
+use Thelia\Model\Message as ModelMessage;
+use TheliaSmarty\Template\SmartyParser;
 
 /**
  * Class CustomerTest
@@ -35,6 +35,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
      */
     protected $container;
     protected $parser;
+    protected $templateHelper;
 
     private $backup_mail_template = 'undefined';
 
@@ -44,7 +45,9 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         ConfigQuery::write('active-mail-template', 'test');
 
-        @mkdir(TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath(), 0777, true);
+        $this->templateHelper = new TheliaTemplateHelper();
+
+        @mkdir($this->templateHelper->getActiveMailTemplate()->getAbsolutePath(), 0777, true);
 
         $container = new ContainerBuilder();
 
@@ -63,8 +66,8 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $container->set("event_dispatcher", $dispatcher);
         $container->set('request', $request);
 
-        $this->parser = new SmartyParser($request, $dispatcher, new ParserContext($request), 'dev', true);
-        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveMailTemplate());
+        $this->parser = new SmartyParser($request, $dispatcher, new ParserContext($request), $this->templateHelper, 'dev', true);
+        $this->parser->setTemplateDefinition($this->templateHelper->getActiveMailTemplate());
 
         $container->set('thelia.parser', $this->parser);
 
@@ -131,7 +134,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $message->setHtmlLayoutFileName('layout.html.tpl');
         $message->setTextLayoutFileName('layout.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         file_put_contents($path.DS.'layout.html.tpl', 'HTML Layout: {$message_body nofilter}');
         file_put_contents($path.DS.'layout.text.tpl', 'TEXT Layout: {$message_body nofilter}');
@@ -160,7 +163,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $message->setTextLayoutFileName('layout3.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         file_put_contents($path.DS.'layout3.text.tpl', 'TEXT Layout 3: {$message_body nofilter} :-) <>');
 
@@ -189,7 +192,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $message->setTextLayoutFileName('layout3.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         file_put_contents($path.DS.'layout3.text.tpl', 'TEXT Layout 3: {$message_body nofilter} :-) <>');
 
@@ -222,7 +225,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $message->setHtmlLayoutFileName('layout4.html.tpl');
         $message->setTextLayoutFileName('layout4.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         $this->parser->assign('myvar', 'my-value');
 
@@ -261,7 +264,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         //$message->setHtmlLayoutFileName('layout5.html.tpl');
         //$message->setTextLayoutFileName('layout5.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         $this->parser->assign('myvar', 'my-value');
 
@@ -297,7 +300,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $message->setHtmlLayoutFileName('layout6.html.tpl');
         $message->setTextLayoutFileName('layout6.text.tpl');
 
-        $path = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $path = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         $this->parser->assign('myvar', 'my-value');
 
@@ -315,7 +318,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        $dir = TemplateHelper::getInstance()->getActiveMailTemplate()->getAbsolutePath();
+        $dir = $this->templateHelper->getActiveMailTemplate()->getAbsolutePath();
 
         ConfigQuery::write('active-mail-template', $this->backup_mail_template);
 

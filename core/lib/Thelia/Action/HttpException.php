@@ -13,15 +13,15 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Exception\AdminAccessDenied;
 use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\TemplateHelper;
-use Symfony\Component\HttpKernel\Exception\HttpException as BaseHttpException;
 
 /**
  *
@@ -61,7 +61,9 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     protected function displayAdminGeneralError(GetResponseForExceptionEvent $event)
     {
         // Define the template thant shoud be used
-        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveAdminTemplate());
+        $this->parser->setTemplateDefinition(
+            $this->parser->getTemplateHelper()->getActiveAdminTemplate()
+        );
 
         $message = $event->getException()->getMessage();
 
@@ -81,7 +83,9 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     protected function display404(GetResponseForExceptionEvent $event)
     {
         // Define the template thant shoud be used
-        $this->parser->setTemplateDefinition(TemplateHelper::getInstance()->getActiveFrontTemplate());
+        $this->parser->setTemplateDefinition(
+            $this->parser->getTemplateHelper()->getActiveFrontTemplate()
+        );
 
         $response = new Response($this->parser->render(ConfigQuery::getPageNotFoundView()), 404);
 
@@ -92,7 +96,13 @@ class HttpException extends BaseAction implements EventSubscriberInterface
     {
         /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
         $exception = $event->getException();
-        $event->setResponse(new Response($exception->getMessage(), $exception->getStatusCode(), $exception->getHeaders()));
+        $event->setResponse(
+            new Response(
+                $exception->getMessage(),
+                $exception->getStatusCode(),
+                $exception->getHeaders()
+            )
+        );
     }
 
     /**

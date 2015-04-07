@@ -165,7 +165,7 @@ class AttributeTableMap extends TableMap
         $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
         $this->addRelation('AttributeTemplate', '\\Thelia\\Model\\AttributeTemplate', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeTemplates');
         $this->addRelation('AttributeI18n', '\\Thelia\\Model\\AttributeI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'AttributeI18ns');
-        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_MANY, array(), null, null, 'Templates');
+        $this->addRelation('Template', '\\Thelia\\Model\\Template', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Templates');
     } // buildRelations()
 
     /**

@@ -17,6 +17,7 @@ use Thelia\Action\Lang;
 use Thelia\Core\Event\Lang\LangDeleteEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
+use Thelia\Core\Template\TheliaTemplateHelper;
 use Thelia\Model\LangQuery;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Core\Event\Lang\LangCreateEvent;
@@ -64,7 +65,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper());
         $action->create($event);
 
         $createdLang = $event->getLang();
@@ -106,7 +107,7 @@ class LangTest extends ContainerAwareTestCase
             ->setDispatcher($this->dispatcher)
         ;
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper());
         $action->update($event);
 
         $updatedLang = $event->getLang();
@@ -135,7 +136,7 @@ class LangTest extends ContainerAwareTestCase
         $event = new LangToggleDefaultEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper());
         $action->toggleDefault($event);
 
         $updatedLang = $event->getLang();
@@ -161,7 +162,7 @@ class LangTest extends ContainerAwareTestCase
         $event = new LangDeleteEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper());
         $action->delete($event);
 
         $deletedLang = $event->getLang();
@@ -183,7 +184,7 @@ class LangTest extends ContainerAwareTestCase
         $event = new LangDeleteEvent($lang->getId());
         $event->setDispatcher($this->dispatcher);
 
-        $action = new Lang();
+        $action = new Lang(new TheliaTemplateHelper());
         $action->delete($event);
     }
 

@@ -47,6 +47,9 @@
 
     <services>
 
+        <!-- Thelia template helper -->
+        <service id="thelia.template_helper" class="Thelia\Core\Template\TheliaTemplateHelper" />
+
         <!--  URL maganement -->
         <service id="thelia.url.manager" class="Thelia\Tools\URL">
             <argument type="service" id="service_container" />

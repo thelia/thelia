@@ -77,4 +77,9 @@ interface ParserInterface
      * @param mixed  $value    the value of the variable
      */
     public function assign($variable, $value);
+
+    /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     */
+    public function getTemplateHelper();
 }
