@@ -169,7 +169,7 @@
                                     <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
                                     <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
                                     <td>
-                                        <a href="{url path="/account/order/%id" id=$ID"}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
+                                        <a href="{url path="/account/order/%id" id=$ID}" class="btn btn-order-details" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
                                     </td>
                                 </tr>
                                 {/loop}
