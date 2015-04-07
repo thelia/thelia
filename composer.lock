@@ -1404,21 +1404,24 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.3.21",
+            "version": "v2.3.27",
             "target-dir": "Symfony/Component/HttpFoundation",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation.git",
-                "reference": "30c90f08f948dd43e7310beae7a85c02ad2b655d"
+                "reference": "98a2199db323438a2d5e4b2d6bb031cf6f4bfaca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/30c90f08f948dd43e7310beae7a85c02ad2b655d",
-                "reference": "30c90f08f948dd43e7310beae7a85c02ad2b655d",
+                "url": "https://api.github.com/repos/symfony/HttpFoundation/zipball/98a2199db323438a2d5e4b2d6bb031cf6f4bfaca",
+                "reference": "98a2199db323438a2d5e4b2d6bb031cf6f4bfaca",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "~2.7"
             },
             "type": "library",
             "extra": {
@@ -1450,21 +1453,21 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "http://symfony.com",
-            "time": "2014-10-23 13:11:04"
+            "time": "2015-04-01 14:16:10"
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v2.3.21",
+            "version": "v2.3.23",
             "target-dir": "Symfony/Component/HttpKernel",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpKernel.git",
-                "reference": "0154ff659004d4148e8da0f2bdb672efe55e6ee5"
+                "reference": "495206899d7bf2767ee6ef3133ff5e63b880fde2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/0154ff659004d4148e8da0f2bdb672efe55e6ee5",
-                "reference": "0154ff659004d4148e8da0f2bdb672efe55e6ee5",
+                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/495206899d7bf2767ee6ef3133ff5e63b880fde2",
+                "reference": "495206899d7bf2767ee6ef3133ff5e63b880fde2",
                 "shasum": ""
             },
             "require": {
@@ -1521,7 +1524,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "http://symfony.com",
-            "time": "2014-10-24 05:54:08"
+            "time": "2014-12-03 12:04:45"
         },
         {
             "name": "symfony/icu",
