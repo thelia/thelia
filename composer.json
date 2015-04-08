@@ -45,11 +45,11 @@
         "symfony/form": "2.3.*",
         "stack/builder": "1.0.*",
         "thelia/currency-converter": "~1.0",
-        "smarty/smarty": "3.1.19",
         "symfony/class-loader": "2.3.*",
         "maximebf/debugbar": "dev-master",
         "oyejorge/less.php": "~1.7",
-        "michelf/php-markdown": "1.5.0"
+        "michelf/php-markdown": "1.5.0",
+        "smarty/smarty": "3.1.19"
     },
     "require-dev": {
         "phpunit/phpunit": "4.5.*",
