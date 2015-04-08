@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 
 /**
  * clear the cache
@@ -44,7 +45,13 @@ class CacheClear extends ContainerAwareCommand
                 'with-images',
                 null,
                 InputOption::VALUE_NONE,
-                'clear images generated in web/cache directory'
+                'clear images generated in `image_cache_dir_from_web_root` or web/cache/images directory'
+            )
+            ->addOption(
+                'with-documents',
+                null,
+                InputOption::VALUE_NONE,
+                'clear documents generated in `document_cache_dir_from_web_root` or web/cache/documents directory'
             )
         ;
     }
@@ -55,12 +62,28 @@ class CacheClear extends ContainerAwareCommand
 
         $this->clearCache($cacheDir, $output);
 
-        if (!$input->getOption("without-assets")) {
-            $this->clearCache(THELIA_WEB_DIR . "assets", $output);
+        if (!$input->getOption('without-assets')) {
+            $this->clearCache(THELIA_WEB_DIR . ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
         }
 
         if ($input->getOption('with-images')) {
-            $this->clearCache(THELIA_CACHE_DIR, $output);
+            $this->clearCache(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'image_cache_dir_from_web_root',
+                    'cache' . DS . 'images'
+                ),
+                $output
+            );
+        }
+
+        if ($input->getOption('with-documents')) {
+            $this->clearCache(
+                THELIA_WEB_DIR . ConfigQuery::read(
+                    'document_cache_dir_from_web_root',
+                    'cache' . DS . 'documents'
+                ),
+                $output
+            );
         }
     }
 
