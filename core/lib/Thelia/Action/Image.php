@@ -70,7 +70,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
      */
     protected function getCacheDirFromWebRoot()
     {
-        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
+        return ConfigQuery::read('image_cache_dir_from_web_root', 'cache' . DS . 'images');
     }
 
     /**
