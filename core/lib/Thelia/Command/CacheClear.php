@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Model\ConfigQuery;
 
 /**
  * clear the cache
@@ -55,8 +56,8 @@ class CacheClear extends ContainerAwareCommand
 
         $this->clearCache($cacheDir, $output);
 
-        if (!$input->getOption("without-assets")) {
-            $this->clearCache(THELIA_WEB_DIR . "assets", $output);
+        if (!$input->getOption('without-assets')) {
+            $this->clearCache(THELIA_WEB_DIR . ConfigQuery::read('asset_dir_from_web_root', 'assets'), $output);
         }
 
         if ($input->getOption('with-images')) {
