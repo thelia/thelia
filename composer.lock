@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c8a6f1e5fa0d644a67e4e6abb98090dc",
+    "hash": "8f802f35fadb3b09343c43848fbb1941",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -646,24 +646,58 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "3.1.19",
+            "version": "v3.1.19",
             "source": {
-                "type": "svn",
-                "url": "http://smarty-php.googlecode.com/svn/",
-                "reference": "tags/Smarty_3_1_19/distribution/"
+                "type": "git",
+                "url": "https://github.com/smarty-php/smarty.git",
+                "reference": "be0fd3186ceec57e4da9a44031f517c06ae2418a"
             },
             "dist": {
                 "type": "zip",
-                "url": "http://www.smarty.net/files/Smarty-3.1.19.zip",
-                "reference": null,
-                "shasum": null
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/be0fd3186ceec57e4da9a44031f517c06ae2418a",
+                "reference": "be0fd3186ceec57e4da9a44031f517c06ae2418a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1.x-dev"
+                }
+            },
             "autoload": {
                 "classmap": [
-                    "libs/"
+                    "libs/Smarty.class.php",
+                    "libs/SmartyBC.class.php",
+                    "libs/sysplugins/smarty_security.php"
                 ]
-            }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Monte Ohrt",
+                    "email": "monte@ohrt.com"
+                },
+                {
+                    "name": "Uwe Tews",
+                    "email": "uwe.tews@googlemail.com"
+                },
+                {
+                    "name": "Rodney Rehm",
+                    "email": "rodney.rehm@medialize.de"
+                }
+            ],
+            "description": "Smarty - the compiling PHP template engine",
+            "homepage": "http://www.smarty.net",
+            "keywords": [
+                "templating"
+            ],
+            "time": "2014-10-31 01:29:14"
         },
         {
             "name": "stack/builder",
