@@ -20,6 +20,8 @@
 
 
 {block name="main-content"}
+    {$currencySymbol = {currency attr="symbol"}}
+
     <div class="main">
         <article class="col-main" role="main" aria-labelledby="main-label">
 
@@ -110,27 +112,27 @@
                         <td class="unitprice">
                             <div class="secondary-price">
                             {if $IS_PROMO == 1}
-                                <small><span class="price">{format_money number=$PROMO_PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PROMO_PRICE symbol=$currencySymbol}</span></small>
                             {else}
-                                <small><span class="price">{format_money number=$PRICE symbol={currency attr="symbol"}}</span></small>
+                                <small><span class="price">{format_money number=$PRICE symbol=$currencySymbol}</span></small>
                             {/if}
                             </div>
                         </td>
                         <td class="unitprice">
                             {if $IS_PROMO == 1}
                                 {assign "real_price" $PROMO_TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
-                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
+                                <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol=$currencySymbol}</span></div>
+                                <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol=$currencySymbol}</span></small>
                             {else}
                                 {assign "real_price" $TAXED_PRICE}
-                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
+                                <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol=$currencySymbol}</span></div>
                             {/if}
                         </td>
                         <td class="qty">
                             <span class="price">{$QUANTITY}</span>
                         </td>
                         <td class="subprice">
-                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                            <span class="price">{format_money number={$real_price * $QUANTITY} symbol=$currencySymbol}</span>
                         </td>
                     </tr>
 
@@ -149,7 +151,7 @@
                                 <th class="discount">{intl l="Discount"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number=$discount symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number=$discount symbol=$currencySymbol}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -177,10 +179,10 @@
                             </tr>
                             {if {cart attr="is_virtual"} != 1}
                             <tr>
-                                <th class="shipping">{intl l="Shipping Tax"}</th>
+                                <th class="shipping">{intl l="Shipping"}</th>
                                 <td class="shipping">
                                     <div class="shipping-price">
-                                        <span class="price">{format_money number={order attr="postage"} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={order attr="postage"} symbol=$currencySymbol}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -189,7 +191,10 @@
                                 <th>{intl l="Total excl. taxes"}</th>
                                 <td>
                                     <div>
-                                        <span class="price">{format_money number={{cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}} symbol={currency attr="symbol"}}</span>
+                                        {$totalExclTax = {cart attr="total_price"} + {order attr="postage"} - {order attr="postage_tax"}}
+                                        {if $totalExclTax < 0}{$totalExclTax = 0}{/if}
+
+                                        <span class="price">{format_money number=$totalExclTax symbol=$currencySymbol}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -197,7 +202,7 @@
                                 <th class="total">{intl l="Total incl. taxes"}</th>
                                 <td class="total">
                                     <div class="total-price">
-                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}} symbol={currency attr="symbol"}}</span>
+                                        <span class="price">{format_money number={{cart attr="total_taxed_price"} + {order attr="postage"}} symbol=$currencySymbol}</span>
                                     </div>
                                 </td>
                             </tr>
@@ -219,7 +224,7 @@
                 <div id="cart-address">
                     {ifhook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
+                        {hook name="order-invoice.delivery-address" module={order attr="delivery_module"}}
                     {/ifhook}
                     {elsehook rel="order-invoice.delivery-address"}
                     <div class="panel">
@@ -309,13 +314,13 @@
                                 {assign "paymentModuleId" $ID}
                                 <li class="list-group-item text-left">
                                     <label for="payment_{$paymentModuleId}">
-                                        <input type="radio" name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
+                                        <input type="radio" {if $LOOP_COUNT == 1}checked{/if} name="{$name}" id="payment_{$paymentModuleId}" value="{$paymentModuleId}" {if $LOOP_TOTAL ==1 && $LOOP_COUNT == 1}checked{/if}>
                                         {loop type="image" name="paymentspicture" source="module" source_id=$ID force_return="true" width="100" height="72"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{intl l="Pay with %module_title" module_title={$TITLE}}">
                                         {/loop}
                                         {$TITLE}
                                     </label>
-                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
+                                    {hook name="order-invoice.payment-extra" module={$paymentModuleId}}
                                 </li>
                             {/loop}
                         </ul>
@@ -336,7 +341,7 @@
                                             {$termsAndConditionsUrl=$URL}
                                         {/loop}
                                     {/if}
-                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="{$termsAndConditionsUrl nofilter}"}.
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link={$termsAndConditionsUrl nofilter}}.
                                 </label>
                                 {if $error }
                                     <span class="help-block">{$message}</span>

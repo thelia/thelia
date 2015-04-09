@@ -60,7 +60,7 @@
                                     {if $CELLPHONE != ""}
                                         <span class="mobile">{$CELLPHONE}</span>
                                     {/if}
-                                    <span class="email">{mailto address=$EMAIL encode="hex"}</span>
+                                    <span class="email">{mailto address={$EMAIL} encode="hex"}</span>
                                 </li>
                                 <li class="group-btn">
                                     <a href="{url path="/account/update"}" class="btn btn-change-account"><i class="icon-pencil"></i> {intl l="Change my account information"}</a>
@@ -90,8 +90,7 @@
                                     <th>{if $DEFAULT === 1}
                                             {intl l="Main Address"}
                                         {else}
-                                            {$default={intl l='Address %nb' nb={$LOOP_COUNT}}}
-                                            {$LABEL|default:$default}
+                                            {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
                                         {/if}
                                     </th>
                                     <td>
