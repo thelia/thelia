@@ -600,7 +600,7 @@ $(function() {
 
                 $.ajax(
                     "{url path='/admin/product_sale_elements'}/"+pse_id+"/"+type+"/"+type_id
-                ).done(function() {
+                ).done(function(data) {
                     /**
                      * If the modal is for images, add some graphics
                      */
@@ -621,6 +621,11 @@ $(function() {
                             });
                         }
                     }
+
+                    if (data['is-associated'])
+                        $this.removeClass('btn-default').addClass('btn-primary');
+                    else
+                        $this.removeClass('btn-primary').addClass('btn-default');
 
                 }).fail(function(data) {
                     var $body = $(".modal-body", $modal_container);

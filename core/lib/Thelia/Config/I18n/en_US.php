@@ -406,6 +406,7 @@ return array(
     'Product price offset for each currency' => 'Product price offset for each currency',
     'Product reference (must be unique)' => 'Product reference (must be unique)',
     'Product reference *' => 'Product reference *',
+    'Product sale element ID' => 'Product sale element ID',
     'Product sale element ID *' => 'Product sale element ID *',
     'Product template' => 'Product template',
     'Product title' => 'Product title',

@@ -346,7 +346,10 @@ ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
     .inner-toolbar-bottom {
         border-top: 1px dotted #A5CED8;
         margin-top: 1em;
-        padding-top: 0.5em;
+        padding-top: 0.2em;
+
+        border-bottom: none;
+        padding-bottom: 0;
     }
 }
 
@@ -584,10 +587,9 @@ ul.document-list {
   color: @associated-color;
 }
 
-
 // help block
 .alert-help {
-  .alert-variant(@gray-lighter; darken(@gray-lighter, 20%); @gray);
+    .alert-variant(@gray-lighter; darken(@gray-lighter, 20%); @gray);
 }
 
 .page-header {
@@ -596,6 +598,40 @@ ul.document-list {
     margin-top: 25px;
 }
 
+.pse-definitions {
+    margin-top:10px;
+
+    .pse-panel {
+        .pse-definition {
+            margin-bottom: 0;
+        }
+
+        .pse-options {
+            .is-associated {
+                .btn-primary;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+
+            label {
+                margin-bottom: 3px;
+                font-size: 90%;
+            }
+
+            .input-sm {
+                height: 22px;
+                padding: 3px 5px;
+            }
+
+            .input-group-addon {
+                padding: 2px 8px;
+                font-size: 90%;
+            }
+        }
+    }
+}
 .install-module-col {
     .general-block-decorator {
         min-height: 150px;

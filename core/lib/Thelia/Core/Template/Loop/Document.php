@@ -24,6 +24,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\MetaData;
+use Thelia\Model\MetaDataQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
@@ -67,7 +69,8 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         'folder',
         'content',
         'brand',
-        'pse'
+        'pse',
+        'virtual_product'
     ];
 
     /**
@@ -110,7 +113,16 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
      */
     protected function createSearchQuery($source, $object_id)
     {
-        if ($source == 'pse' || $source == 'product_sale_element') {
+        if ($source == 'virtual_product') {
+            // Get the product document attached to the PSE
+            $documentId = MetaDataQuery::getVal(
+                'virtual',
+                MetaData::PSE_KEY,
+                $object_id
+            );
+
+            $search = ProductDocumentQuery::create()->filterById($documentId);
+        } elseif ($source == 'pse' || $source == 'product_sale_element') {
             // Get the product image attached to the PSE
             $pseDocumentSearch = ProductSaleElementsProductDocumentQuery::create();
 
@@ -269,8 +281,10 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             // Create document processing event
             $event = new DocumentEvent();
 
-            // PSE images are stored in the product directory
-            $documentDirectory = $this->objectType == 'pse' ? 'product' : $this->objectType;
+            // PSE documents and Virtual documents are stored in the product directory
+            $documentDirectory =
+                $this->objectType == 'pse' || $this->objectType == 'virtual_product' ?
+                'product' : $this->objectType;
 
             // Put source document file path
 

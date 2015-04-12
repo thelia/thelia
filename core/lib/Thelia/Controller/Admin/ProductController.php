@@ -263,6 +263,8 @@ class ProductController extends AbstractSeoCrudController
             "tax_rule"    => $object->getTaxRuleId()
         );
 
+        $numberFormatter = NumberFormat::getInstance($this->getRequest());
+
         /** @var ProductSaleElements $saleElement */
         foreach ($saleElements as $saleElement) {
             // Get the product price for the current currency
@@ -296,14 +298,14 @@ class ProductController extends AbstractSeoCrudController
                 $defaultPseData = array(
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
-                    "price"                   => $this->formatPrice($productPrice->getPrice()),
-                    "price_with_tax"          => $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)),
+                    "price"                   => $numberFormatter->formatStandardNumber($productPrice->getPrice()),
+                    "price_with_tax"          => $numberFormatter->formatStandardNumber($this->computePrice($productPrice->getPrice(), 'without_tax', $object)),
                     "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
                     "currency"                => $productPrice->getCurrencyId(),
                     "weight"                  => $saleElement->getWeight(),
                     "quantity"                => $saleElement->getQuantity(),
-                    "sale_price"              => $this->formatPrice($productPrice->getPromoPrice()),
-                    "sale_price_with_tax"     => $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)),
+                    "sale_price"              => $numberFormatter->formatStandardNumber($productPrice->getPromoPrice()),
+                    "sale_price_with_tax"     => $numberFormatter->formatStandardNumber($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)),
                     "onsale"                  => $saleElement->getPromo() > 0 ? 1 : 0,
                     "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
@@ -318,12 +320,12 @@ class ProductController extends AbstractSeoCrudController
 
                 $this->appendValue($combinationPseData, "product_sale_element_id", $saleElement->getId());
                 $this->appendValue($combinationPseData, "reference", $saleElement->getRef());
-                $this->appendValue($combinationPseData, "price", $this->formatPrice($productPrice->getPrice()));
-                $this->appendValue($combinationPseData, "price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)));
+                $this->appendValue($combinationPseData, "price", $numberFormatter->formatStandardNumber($productPrice->getPrice()));
+                $this->appendValue($combinationPseData, "price_with_tax", $numberFormatter->formatStandardNumber($this->computePrice($productPrice->getPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "weight", $saleElement->getWeight());
                 $this->appendValue($combinationPseData, "quantity", $saleElement->getQuantity());
-                $this->appendValue($combinationPseData, "sale_price", $this->formatPrice($productPrice->getPromoPrice()));
-                $this->appendValue($combinationPseData, "sale_price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)));
+                $this->appendValue($combinationPseData, "sale_price", $numberFormatter->formatStandardNumber($productPrice->getPromoPrice()));
+                $this->appendValue($combinationPseData, "sale_price_with_tax", $numberFormatter->formatStandardNumber($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "onsale", $saleElement->getPromo() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isnew", $saleElement->getNewness() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isdefault", $saleElement->getIsDefault() > 0 ? 1 : 0);
