@@ -75,7 +75,13 @@ class ImageTest extends BaseLoopTestor
         $image = ProductSaleElementsProductImageQuery::create()->findOne();
 
         if ($image) {
-            $this->baseTestSearchById($image->getId(), array('source' => 'pse'));
+            $this->baseTestSearchById(
+                $image->getId(),
+                array(
+                    'source' => 'pse',
+                    'source_id' => $image->getProductSaleElementsId()
+                )
+            );
         }
     }
 }
