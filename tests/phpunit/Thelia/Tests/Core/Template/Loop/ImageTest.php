@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Model\ProductImageQuery;
@@ -67,5 +68,14 @@ class ImageTest extends BaseLoopTestor
         $image = CategoryImageQuery::create()->findOne();
 
         $this->baseTestSearchById($image->getId(), array('source' => 'category'));
+    }
+
+    public function testSearchByPseId()
+    {
+        $image = ProductSaleElementsProductImageQuery::create()->findOne();
+
+        if ($image) {
+            $this->baseTestSearchById($image->getId(), array('source' => 'pse'));
+        }
     }
 }

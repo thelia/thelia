@@ -12,24 +12,26 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageQuery;
+use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Type\EnumType;
-use Thelia\Log\Tlog;
+use Thelia\Type\TypeCollection;
 
 /**
  * The image loop
@@ -68,7 +70,15 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible standard image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
+    protected $possible_sources = [
+        'category',
+        'product',
+        'folder',
+        'content',
+        'module',
+        'brand',
+        'pse'
+    ];
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -99,10 +109,6 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 'none'
             ),
             Argument::createAnyTypeArgument('effects'),
-            Argument::createIntTypeArgument('category'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('folder'),
-            Argument::createIntTypeArgument('content'),
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
@@ -128,49 +134,66 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      */
     protected function createSearchQuery($source, $object_id)
     {
-        $object = ucfirst($source);
+        if ($source == 'pse' || $source == 'product_sale_element') {
+            // Get the product image attached to the PSE
+            $pseImageSearch = ProductSaleElementsProductImageQuery::create();
 
-        $ns = $this->getQueryNamespace();
+            if (! is_null($object_id)) {
+                $pseImageSearch->findOneByProductSaleElementsId($object_id);
+            }
 
-        if ('\\' !== $ns[0]) {
-            $ns = '\\'.$ns;
-        }
+            if (null !== $pseImage = $pseImageSearch->findOne()) {
+                $imageId = $pseImage->getId();
+            } else {
+                $imageId = null;
+            }
 
-        $queryClass   = sprintf("%s\\%sImageQuery", $ns, $object);
-        $filterMethod = sprintf("filterBy%sId", $object);
+            $search = ProductImageQuery::create()->filterByProductId($imageId);
+        } else {
+            $object = ucfirst($source);
 
-        // xxxImageQuery::create()
-        $method = new \ReflectionMethod($queryClass, 'create');
-        $search = $method->invoke(null); // Static !
+            $ns = $this->getQueryNamespace();
 
-        // $query->filterByXXX(id)
-        if (! is_null($object_id)) {
-            $method = new \ReflectionMethod($queryClass, $filterMethod);
-            $method->invoke($search, $object_id);
-        }
+            if ('\\' !== $ns[0]) {
+                $ns = '\\' . $ns;
+            }
 
-        $orders  = $this->getOrder();
+            $queryClass = sprintf("%s\\%sImageQuery", $ns, $object);
+            $filterMethod = sprintf("filterBy%sId", $object);
 
-        // Results ordering
-        foreach ($orders as $order) {
-            switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn('i18n_TITLE');
-                    break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn('i18n_TITLE');
-                    break;
-                case "manual-reverse":
-                    $search->orderByPosition(Criteria::DESC);
-                    break;
-                case "manual":
-                    $search->orderByPosition(Criteria::ASC);
-                    break;
-                case "random":
-                    $search->clearOrderByColumns();
-                    $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
-                    break;
+            // xxxImageQuery::create()
+            $method = new \ReflectionMethod($queryClass, 'create');
+            $search = $method->invoke(null); // Static !
+
+            // $query->filterByXXX(id)
+            if (!is_null($object_id)) {
+                $method = new \ReflectionMethod($queryClass, $filterMethod);
+                $method->invoke($search, $object_id);
+            }
+
+            $orders = $this->getOrder();
+
+            // Results ordering
+            foreach ($orders as $order) {
+                switch ($order) {
+                    case "alpha":
+                        $search->addAscendingOrderByColumn('i18n_TITLE');
+                        break;
+                    case "alpha-reverse":
+                        $search->addDescendingOrderByColumn('i18n_TITLE');
+                        break;
+                    case "manual-reverse":
+                        $search->orderByPosition(Criteria::DESC);
+                        break;
+                    case "manual":
+                        $search->orderByPosition(Criteria::ASC);
+                        break;
+                    case "random":
+                        $search->clearOrderByColumns();
+                        $search->addAscendingOrderByColumn('RAND()');
+                        break(2);
+                        break;
+                }
             }
         }
 
@@ -326,6 +349,9 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 $event->setEffects($effects);
             }
 
+            // PSE images are stored in the product directory
+            $imageDirectory = $this->objectType == 'pse' ? 'product' : $this->objectType;
+
             // Put source image file path
             $sourceFilePath = sprintf(
                 '%s/%s/%s',
@@ -336,6 +362,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
             $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
+
 
             $loopResultRow = new LoopResultRow($result);
 

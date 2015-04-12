@@ -12,6 +12,7 @@
 
 namespace Thelia\Tests\Core\Template\Loop;
 
+use Thelia\Model\Base\ProductSaleElementsProductDocumentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Model\ProductDocumentQuery;
@@ -67,5 +68,20 @@ class DocumentTest extends BaseLoopTestor
         $document = CategoryDocumentQuery::create()->findOne();
 
         $this->baseTestSearchById($document->getId(), array('source' => 'category'));
+    }
+
+    public function testSearchByPseId()
+    {
+        $document = ProductSaleElementsProductDocumentQuery::create()->findOne();
+
+        if ($document) {
+            $this->baseTestSearchById(
+                $document->getId(),
+                array(
+                    'source' => 'pse',
+                    'source_id' => $document->getProductSaleElementsId()
+                )
+            );
+        }
     }
 }

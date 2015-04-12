@@ -12,23 +12,24 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Thelia\Core\Template\Element\BaseI18nLoop;
-use Thelia\Core\Template\Element\PropelSearchLoopInterface;
-use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Element\BaseI18nLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Type\BooleanOrBothType;
-use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Log\Tlog;
+use Thelia\Type\TypeCollection;
 
 /**
  * The document loop
@@ -60,7 +61,14 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible standard document sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'brand');
+    protected $possible_sources = [
+        'category',
+        'product',
+        'folder',
+        'content',
+        'brand',
+        'pse'
+    ];
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -79,10 +87,6 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
                 'manual'
             ),
             Argument::createIntTypeArgument('lang'),
-            Argument::createIntTypeArgument('category'),
-            Argument::createIntTypeArgument('product'),
-            Argument::createIntTypeArgument('folder'),
-            Argument::createIntTypeArgument('content'),
             Argument::createAnyTypeArgument('source'),
             Argument::createIntTypeArgument('source_id'),
             Argument::createBooleanTypeArgument('force_return', true),
@@ -106,49 +110,66 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
      */
     protected function createSearchQuery($source, $object_id)
     {
-        $object = ucfirst($source);
+        if ($source == 'pse' || $source == 'product_sale_element') {
+            // Get the product image attached to the PSE
+            $pseDocumentSearch = ProductSaleElementsProductDocumentQuery::create();
 
-        $ns = $this->getQueryNamespace();
+            if (! is_null($object_id)) {
+                $pseDocumentSearch->findOneByProductSaleElementsId($object_id);
+            }
 
-        if ('\\' !== $ns[0]) {
-            $ns = '\\'.$ns;
-        }
+            if (null !== $pseDocument = $pseDocumentSearch->findOne()) {
+                $documentId = $pseDocument->getId();
+            } else {
+                $documentId = null;
+            }
 
-        $queryClass   = sprintf("%s\\%sDocumentQuery", $ns, $object);
-        $filterMethod = sprintf("filterBy%sId", $object);
+            $search = ProductDocumentQuery::create()->filterByProductId($documentId);
+        } else {
+            $object = ucfirst($source);
 
-        // xxxDocumentQuery::create()
-        $method = new \ReflectionMethod($queryClass, 'create');
-        $search = $method->invoke(null); // Static !
+            $ns = $this->getQueryNamespace();
 
-        // $query->filterByXXX(id)
-        if (! is_null($object_id)) {
-            $method = new \ReflectionMethod($queryClass, $filterMethod);
-            $method->invoke($search, $object_id);
-        }
+            if ('\\' !== $ns[0]) {
+                $ns = '\\' . $ns;
+            }
 
-        $orders  = $this->getOrder();
+            $queryClass = sprintf("%s\\%sDocumentQuery", $ns, $object);
+            $filterMethod = sprintf("filterBy%sId", $object);
 
-        // Results ordering
-        foreach ($orders as $order) {
-            switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn('i18n_TITLE');
-                    break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn('i18n_TITLE');
-                    break;
-                case "manual-reverse":
-                    $search->orderByPosition(Criteria::DESC);
-                    break;
-                case "manual":
-                    $search->orderByPosition(Criteria::ASC);
-                    break;
-                case "random":
-                    $search->clearOrderByColumns();
-                    $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
-                    break;
+            // xxxDocumentQuery::create()
+            $method = new \ReflectionMethod($queryClass, 'create');
+            $search = $method->invoke(null); // Static !
+
+            // $query->filterByXXX(id)
+            if (!is_null($object_id)) {
+                $method = new \ReflectionMethod($queryClass, $filterMethod);
+                $method->invoke($search, $object_id);
+            }
+
+            $orders = $this->getOrder();
+
+            // Results ordering
+            foreach ($orders as $order) {
+                switch ($order) {
+                    case "alpha":
+                        $search->addAscendingOrderByColumn('i18n_TITLE');
+                        break;
+                    case "alpha-reverse":
+                        $search->addDescendingOrderByColumn('i18n_TITLE');
+                        break;
+                    case "manual-reverse":
+                        $search->orderByPosition(Criteria::DESC);
+                        break;
+                    case "manual":
+                        $search->orderByPosition(Criteria::ASC);
+                        break;
+                    case "random":
+                        $search->clearOrderByColumns();
+                        $search->addAscendingOrderByColumn('RAND()');
+                        break(2);
+                        break;
+                }
             }
         }
 
@@ -248,7 +269,11 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             // Create document processing event
             $event = new DocumentEvent();
 
+            // PSE images are stored in the product directory
+            $documentDirectory = $this->objectType == 'pse' ? 'product' : $this->objectType;
+
             // Put source document file path
+
             $sourceFilePath = sprintf(
                 '%s/%s/%s',
                 $baseSourceFilePath,
