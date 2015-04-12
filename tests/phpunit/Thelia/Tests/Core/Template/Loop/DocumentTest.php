@@ -76,7 +76,7 @@ class DocumentTest extends BaseLoopTestor
 
         if ($document) {
             $this->baseTestSearchById(
-                $document->getId(),
+                $document->getProductDocument()->getId(),
                 array(
                     'source' => 'pse',
                     'source_id' => $document->getProductSaleElementsId()

@@ -76,7 +76,7 @@ class ImageTest extends BaseLoopTestor
 
         if ($image) {
             $this->baseTestSearchById(
-                $image->getId(),
+                $image->getProductImage()->getId(),
                 array(
                     'source' => 'pse',
                     'source_id' => $image->getProductSaleElementsId()
