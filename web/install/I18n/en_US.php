@@ -1,7 +1,6 @@
 <?php
 
 return array(
-
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>',
     'Administrator login :' => 'Administrator login :',
     'Administrator password :' => 'Administrator password :',

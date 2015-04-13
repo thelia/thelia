@@ -13,7 +13,8 @@
 ini_set('display_errors', '1');
 
 set_time_limit(0);
-
+ob_start();
+ 
 session_start();
 
 include 'bootstrap.php';

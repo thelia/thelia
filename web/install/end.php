@@ -25,7 +25,31 @@ include "header.php";
 
 try {
     if ($_SESSION['install']['step'] != $step && (empty($_POST['admin_login']) || empty($_POST['admin_password']) || ($_POST['admin_password'] != $_POST['admin_password_verif']) || strlen($_POST['admin_login']) < 3)) {
-        header('location: config.php?err=1');
+        $query = $_POST;
+        $query["err"] = 0;
+
+        if (empty($_POST['admin_login'])) {
+            $query["err"] |= 1;
+        }
+
+        if (empty($_POST['admin_password'])) {
+            $query["err"] |= 2;
+        }
+
+        if ($_POST['admin_password'] != $_POST['admin_password_verif']) {
+            $query["err"] |= 4;
+        }
+
+        if (isset($query["admin_password"])) {
+            unset($query["admin_password"]);
+        }
+
+        if (isset($query["admin_password_verif"])) {
+            unset($query["admin_password_verif"]);
+        }
+
+        header(sprintf('location: config.php?%s', http_build_query($query)));
+        exit; // Don't forget to exit, otherwise, the script will continue to run.
     }
 
     if($_SESSION['install']['step'] == 5) {
