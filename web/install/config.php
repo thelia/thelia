@@ -14,6 +14,7 @@ $step = 5;
 include("header.php");
 global $thelia;
 $err = isset($_GET['err']) && $_GET['err'];
+$errCode = isset($_GET['err']) ? $_GET['err'] : 0;
 
 if (!$err && $_SESSION['install']['step'] != $step) {
     $checkConnection = new \Thelia\Install\CheckDatabaseConnection($_SESSION['install']['host'], $_SESSION['install']['username'], $_SESSION['install']['password'], $_SESSION['install']['port']);
@@ -67,11 +68,24 @@ $url = $_SERVER['PHP_SELF'];
 $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
 
 ?>
+<?php if ($errCode & 1) { ?>
+<div class="alert alert-danger">
+    <?php echo $trans->trans('Missing or invalid login'); ?>
+</div>
+<?php } if ($errCode & 2) { ?>
+<div class="alert alert-danger">
+    <?php echo $trans->trans('Missing password'); ?>
+</div>
+<?php } if ($errCode & 4) { ?>
+<div class="alert alert-danger">
+    <?php echo $trans->trans("The given passwords do not match"); ?>
+</div>
+<?php } ?>
 <form action="end.php" method="POST" >
     <div class="well">
         <div class="form-group">
             <label for="admin_login"><?php echo $trans->trans('Administrator login :'); ?></label>
-            <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="" required>
+            <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="<?php if(isset($_GET["admin_login"])) { echo $_GET["admin_login"]; } ?>" required>
         </div>
         <div class="form-group">
             <label for="admin_password"><?php echo $trans->trans('Administrator password :'); ?></label>
@@ -84,21 +98,21 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
         <div class="form-group">
             <label for="admin_locale"><?php echo $trans->trans('Administrator preferred locale :'); ?></label>
             <select id="admin_locale" name="admin_locale" class="form-control" required>
-                <option value="en_US">English</option>
-                <option value="fr_FR">Français</option>
+                <option value="en_US"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "en_US") { echo " selected=\"\""; } ?>>English</option>
+                <option value="fr_FR"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "fr_FR") { echo " selected=\"\""; } ?>>Français</option>
             </select>
         </div>
         <div class="form-group">
             <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
-            <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="" required>
+            <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="<?php if(isset($_GET["store_email"])) { echo $_GET["store_email"]; } ?>" required>
         </div>
         <div class="form-group">
             <label for="site_name"><?php echo $trans->trans('Company name :'); ?></label>
-            <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="" required>
+            <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="<?php if(isset($_GET["store_name"])) { echo $_GET["store_name"]; } ?>" required>
         </div>
         <div class="form-group">
             <label for="site_name"><?php echo $trans->trans('website url :'); ?></label>
-            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="http://<?php echo $_SERVER['SERVER_NAME'].$website_url; ?>" required>
+            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="<?php if(isset($_GET["url_site"])) { echo $_GET["url_site"]; } else { echo "http://".$_SERVER['SERVER_NAME'].$website_url; } ?>" required>
         </div>
         <div class="clearfix">
             <div class="control-btn">
