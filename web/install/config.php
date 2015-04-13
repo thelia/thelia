@@ -85,7 +85,7 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
     <div class="well">
         <div class="form-group">
             <label for="admin_login"><?php echo $trans->trans('Administrator login :'); ?></label>
-            <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="<?php if(isset($_GET["admin_login"])) { echo $_GET["admin_login"]; } ?>" required>
+            <input id="admin_login" class="form-control" type="text" name="admin_login" placeholder="admin" value="<?php if(isset($_GET["admin_login"])) { echo htmlspecialchars(addslashes($_GET["admin_login"])); } ?>" required>
         </div>
         <div class="form-group">
             <label for="admin_password"><?php echo $trans->trans('Administrator password :'); ?></label>
@@ -104,15 +104,15 @@ $website_url = preg_replace("#/install/[a-z](.*)#" ,'', $url);
         </div>
         <div class="form-group">
             <label for="email_contact"><?php echo $trans->trans('Contact email :'); ?></label>
-            <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="<?php if(isset($_GET["store_email"])) { echo $_GET["store_email"]; } ?>" required>
+            <input id="email_contact" class="form-control" type="text" name="store_email" placeholder="foo@bar.com" value="<?php if(isset($_GET["store_email"])) { echo htmlspecialchars(addslashes($_GET["store_email"])); } ?>" required>
         </div>
         <div class="form-group">
             <label for="site_name"><?php echo $trans->trans('Company name :'); ?></label>
-            <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="<?php if(isset($_GET["store_name"])) { echo $_GET["store_name"]; } ?>" required>
+            <input id="site_name" class="form-control" type="text" name="store_name" placeholder="" value="<?php if(isset($_GET["store_name"])) { echo htmlspecialchars(addslashes($_GET["store_name"])); } ?>" required>
         </div>
         <div class="form-group">
             <label for="site_name"><?php echo $trans->trans('website url :'); ?></label>
-            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="<?php if(isset($_GET["url_site"])) { echo $_GET["url_site"]; } else { echo "http://".$_SERVER['SERVER_NAME'].$website_url; } ?>" required>
+            <input id="site_name" class="form-control" type="text" name="url_site" placeholder="" value="<?php if(isset($_GET["url_site"])) { echo htmlspecialchars(addslashes($_GET["url_site"])); } else { echo "http://".$_SERVER['SERVER_NAME'].$website_url; } ?>" required>
         </div>
         <div class="clearfix">
             <div class="control-btn">
