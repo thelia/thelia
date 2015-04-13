@@ -30,3 +30,4 @@
 <?php if (isset($scriptHook)) { echo $scriptHook; } ?>
 </body>
 </html>
+<?php echo ob_end_flush(); ?>
