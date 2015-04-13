@@ -26,7 +26,7 @@ use Thelia\Model\ModuleQuery;
  * Set modules position
  *
  * @package Thelia\Command
- * @author  Jérôme Billiras <jerome.billiras+github@openstudio.fr>
+ * @author  Jérôme Billiras <jerome.billiras+github@gmail.com>
  */
 class ModulePositionCommand extends ContainerAwareCommand
 {
