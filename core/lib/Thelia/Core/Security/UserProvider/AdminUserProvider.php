@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\AdminQuery;
 
 class AdminUserProvider implements UserProviderInterface
@@ -19,7 +20,7 @@ class AdminUserProvider implements UserProviderInterface
     public function getUser($key)
     {
         $admin = AdminQuery::create()
-            ->filterByLogin($key)
+            ->filterByLogin($key, Criteria::EQUAL)
             ->findOne();
 
         return $admin;

@@ -21,12 +21,16 @@ class TokenProvider
         // Always set a new token in the user environment
         $user->setToken(uniqid());
 
-        return base64_encode(serialize(array($user->getUsername(), $user->getToken(), $user->getSerial())));
+        return base64_encode(sprintf("%s\0%s\0%s", $user->getUsername(), $user->getToken(), $user->getSerial()));
     }
 
     public function decodeKey($key)
     {
-        $data = unserialize(base64_decode($key));
+        $data = explode("\0", base64_decode($key), 3);
+
+        if (count($data) !== 3) {
+            $data = ["", "", ""];
+        }
 
         return array(
             'username' => $data[0],

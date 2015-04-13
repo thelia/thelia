@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\AdminQuery;
 
 class AdminTokenUserProvider extends TokenUserProvider
@@ -19,9 +20,9 @@ class AdminTokenUserProvider extends TokenUserProvider
     public function getUser($dataArray)
     {
         return AdminQuery::create()
-            ->filterByLogin($dataArray['username'])
-            ->filterByRememberMeSerial($dataArray['serial'])
-            ->filterByRememberMeToken($dataArray['token'])
+            ->filterByLogin($dataArray['username'], Criteria::EQUAL)
+            ->filterByRememberMeSerial($dataArray['serial'], Criteria::EQUAL)
+            ->filterByRememberMeToken($dataArray['token'], Criteria::EQUAL)
             ->findOne();
     }
 }

@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\CustomerQuery;
 
 class CustomerUserProvider implements UserProviderInterface
@@ -19,7 +20,7 @@ class CustomerUserProvider implements UserProviderInterface
     public function getUser($key)
     {
         $customer = CustomerQuery::create()
-            ->filterByEmail($key)
+            ->filterByEmail($key, Criteria::EQUAL)
             ->findOne();
 
         return $customer;
