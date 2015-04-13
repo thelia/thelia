@@ -1066,25 +1066,31 @@
         },
         {
             "name": "symfony/debug",
-            "version": "v2.5.6",
+            "version": "v2.6.6",
             "target-dir": "Symfony/Component/Debug",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Debug.git",
-                "reference": "2538d5099b9728b6ca09b261566a766f4f847459"
+                "reference": "d49a46a20a8f0544aedac54466750ad787d3d3e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Debug/zipball/2538d5099b9728b6ca09b261566a766f4f847459",
-                "reference": "2538d5099b9728b6ca09b261566a766f4f847459",
+                "url": "https://api.github.com/repos/symfony/Debug/zipball/d49a46a20a8f0544aedac54466750ad787d3d3e3",
+                "reference": "d49a46a20a8f0544aedac54466750ad787d3d3e3",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.3",
+                "psr/log": "~1.0"
+            },
+            "conflict": {
+                "symfony/http-kernel": ">=2.3,<2.3.24|~2.4.0|>=2.5,<2.5.9|>=2.6,<2.6.2"
             },
             "require-dev": {
+                "symfony/class-loader": "~2.2",
                 "symfony/http-foundation": "~2.1",
-                "symfony/http-kernel": "~2.1"
+                "symfony/http-kernel": "~2.3.24|~2.5.9|~2.6,>=2.6.2",
+                "symfony/phpunit-bridge": "~2.7"
             },
             "suggest": {
                 "symfony/http-foundation": "",
@@ -1093,7 +1099,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.5-dev"
+                    "dev-master": "2.6-dev"
                 }
             },
             "autoload": {
@@ -1117,7 +1123,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "http://symfony.com",
-            "time": "2014-10-24 05:49:22"
+            "time": "2015-03-22 16:55:57"
         },
         {
             "name": "symfony/dependency-injection",
@@ -1491,36 +1497,39 @@
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v2.3.23",
+            "version": "v2.3.27",
             "target-dir": "Symfony/Component/HttpKernel",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpKernel.git",
-                "reference": "495206899d7bf2767ee6ef3133ff5e63b880fde2"
+                "reference": "d33f5c343c2a73b5cf17e14630c97f4a47ce2d66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/495206899d7bf2767ee6ef3133ff5e63b880fde2",
-                "reference": "495206899d7bf2767ee6ef3133ff5e63b880fde2",
+                "url": "https://api.github.com/repos/symfony/HttpKernel/zipball/d33f5c343c2a73b5cf17e14630c97f4a47ce2d66",
+                "reference": "d33f5c343c2a73b5cf17e14630c97f4a47ce2d66",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
                 "psr/log": "~1.0",
-                "symfony/debug": "~2.3",
+                "symfony/debug": "~2.3.24|~2.5.9|~2.6,>=2.6.2",
                 "symfony/event-dispatcher": "~2.1",
-                "symfony/http-foundation": "~2.2"
+                "symfony/http-foundation": "~2.3,>=2.3.4"
             },
             "require-dev": {
-                "symfony/browser-kit": "~2.2",
+                "symfony/browser-kit": "~2.3",
                 "symfony/class-loader": "~2.1",
-                "symfony/config": "~2.0",
+                "symfony/config": "~2.0,>=2.0.5",
                 "symfony/console": "~2.2",
-                "symfony/dependency-injection": "~2.0",
-                "symfony/finder": "~2.0",
-                "symfony/process": "~2.0",
+                "symfony/css-selector": "~2.0,>=2.0.5",
+                "symfony/dependency-injection": "~2.2",
+                "symfony/dom-crawler": "~2.0,>=2.0.5",
+                "symfony/finder": "~2.0,>=2.0.5",
+                "symfony/phpunit-bridge": "~2.7",
+                "symfony/process": "~2.0,>=2.0.5",
                 "symfony/routing": "~2.2",
-                "symfony/stopwatch": "~2.2",
+                "symfony/stopwatch": "~2.3",
                 "symfony/templating": "~2.2"
             },
             "suggest": {
@@ -1558,7 +1567,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "http://symfony.com",
-            "time": "2014-12-03 12:04:45"
+            "time": "2015-04-01 14:28:26"
         },
         {
             "name": "symfony/icu",
