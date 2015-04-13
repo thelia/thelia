@@ -6,7 +6,7 @@ UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
---- order status
+-- order status
 
 SELECT @max_id := MAX(`id`) FROM `order_status`;
 
@@ -71,6 +71,7 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 ALTER TABLE `country` DROP FOREIGN KEY `fk_country_area_id`;
 ALTER TABLE `country` DROP KEY `idx_country_area_id`;
 ALTER TABLE `country` DROP COLUMN `area_id`;
+ALTER TABLE `category` ADD COLUMN `default_template_id` INTEGER AFTER  `position`;
 
 
 -- new hook --

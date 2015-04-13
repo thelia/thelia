@@ -71,7 +71,7 @@ INSERT INTO `country_area` (`country_id`, `area_id`, `created_at`, `updated_at`)
 ALTER TABLE `country` DROP FOREIGN KEY `fk_country_area_id`;
 ALTER TABLE `country` DROP KEY `idx_country_area_id`;
 ALTER TABLE `country` DROP COLUMN `area_id`;
-
+ALTER TABLE `category` ADD COLUMN `default_template_id` INTEGER AFTER  `position`;
 
 -- new hook --
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
