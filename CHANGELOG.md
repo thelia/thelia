@@ -2,6 +2,8 @@
 
 - Add ```\Thelia\Model\OrderProduct::setCartItemId``` and ```\Thelia\Model\OrderProduct::getCartItemId``` to remove the typo with ```cartIemId```
 - A notice is displayed when the product's template is changed
+- Security fix on authentication
+- Rename cookie related config variables. They were prefixed with "thelia_" on insert, but not in the code
 
 ## DEPRECATED
 
