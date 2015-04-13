@@ -23,6 +23,7 @@ use Thelia\Core\Thelia;
 use Thelia\Install\Exception\UpdateException;
 use Thelia\Install\Exception\UpToDateException;
 use Thelia\Log\Tlog;
+use Thelia\Model\ConfigQuery;
 
 /**
  * Class Update
@@ -50,13 +51,16 @@ class Update
         '11' => '2.0.4',
         '12' => '2.0.5',
         '13' => '2.0.6',
-        '14' => '2.1.0-alpha1',
-        '15' => '2.1.0-alpha2',
-        '16' => '2.1.0-beta1',
-        '17' => '2.1.0-beta2',
-        '18' => '2.1.0',
-        '19' => '2.1.1',
-        '20' => '2.1.2',
+        '14' => '2.0.7',
+        '15' => '2.1.0-alpha1',
+        '16' => '2.1.0-alpha2',
+        '17' => '2.1.0-beta1',
+        '18' => '2.1.0-beta2',
+        '19' => '2.1.0',
+        '20' => '2.1.1',
+        '21' => '2.1.2',
+        '22' => '2.1.3',
+        '23' => '2.2.0-alpha1',
     );
 
     /** @var bool */
@@ -347,7 +351,9 @@ class Update
 
     public function getCurrentVersion()
     {
-        return Thelia::THELIA_VERSION;
+        $stmt = $this->connection->query("SELECT `value` FROM `config` WHERE name='thelia_version'");
+
+        return $stmt->fetchColumn();
     }
 
     public function setCurrentVersion($version)
