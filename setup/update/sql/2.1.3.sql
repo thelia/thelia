@@ -12,5 +12,9 @@ SELECT @max_id := IFNULL(MAX(`id`),0) FROM `config`;
 INSERT IGNORE INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (@max_id + 1, 'form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW());
 
+UPDATE `config` SET `name` = "admin_remember_me_cookie_name" WHERE `name` = "thelia_admin_remember_me_cookie_name";
+UPDATE `config` SET `name` = "admin_remember_me_cookie_expiration" WHERE `name` = "thelia_admin_remember_me_cookie_expiration";
+UPDATE `config` SET `name` = "customer_remember_me_cookie_name" WHERE `name` = "thelia_customer_remember_me_cookie_name";
+UPDATE `config` SET `name` = "customer_remember_me_cookie_expiration" WHERE `name` = "thelia_customer_remember_me_cookie_expiration";
 
 SET FOREIGN_KEY_CHECKS = 1;
