@@ -10,13 +10,12 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace ConsoleModulePosition\Command;
+namespace Thelia\Command;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Thelia\Command\ContainerAwareCommand;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Model\ModuleQuery;
