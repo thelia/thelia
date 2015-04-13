@@ -51,7 +51,7 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('store_email','', 0, 1, NOW(), NOW()),
 ('store_notification_emails','', 0, 1, NOW(), NOW()),
 ('one_domain_foreach_lang','0', 1, 1, NOW(), NOW()),
-('thelia_version','2.1.2', 1, 1, NOW(), NOW()),
+('thelia_version','2.1.3', 1, 1, NOW(), NOW()),
 ('thelia_major_version','2', 1, 1, NOW(), NOW()),
 ('thelia_minus_version','1', 1, 1, NOW(), NOW()),
 ('thelia_release_version','2', 1, 1, NOW(), NOW()),
