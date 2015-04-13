@@ -30,28 +30,33 @@ class ProductCreationForm extends BaseForm
                         "methods" => array(array($this, "checkDuplicateRef")),
                     )),
                 ),
-                "label"       => Translator::getInstance()->trans('Product reference *'),
+                "label"       => $this->translator->trans('Product reference'),
                 "label_attr"  => array("for" => "ref"),
             ))
             ->add("title", "text", array(
                 "constraints" => array(new NotBlank()),
-                "label" => Translator::getInstance()->trans('Product title'),
+                "label" => $this->translator->trans('Product title'),
                 "label_attr" => array("for" => "title"),
             ))
             ->add("default_category", "integer", array(
                 "constraints" => array(new NotBlank()),
-                "label"       => Translator::getInstance()->trans("Default product category *"),
-                "label_attr"  => array("for" => "default_category_field"),
+                "label"       => $this->translator->trans("Default product category"),
+                "label_attr"  => array(
+                    "for" => "default_category_field",
+                    "help" => $this->translator->trans(
+                        'You can attach this product to more categories in the "Associations" tab.'
+                    )
+                ),
             ))
             ->add("locale", "text", array(
                 "constraints" => array(new NotBlank()),
             ))
-            ->add("visible", "integer", array(
-                "label"      => Translator::getInstance()->trans("This product is online"),
+            ->add("visible", "checkbox", array(
+                "label"      => $this->translator->trans("This product is online"),
                 "label_attr" => array("for" => "visible_field"),
             ))
-            ->add("virtual", "integer", array(
-                "label"      => Translator::getInstance()->trans("This product does not have a physical presence"),
+            ->add("virtual", "checkbox", array(
+                "label"      => $this->translator->trans("This product does not have a physical presence"),
                 "label_attr" => array("for" => "virtual_field"),
             ))
         ;
@@ -60,25 +65,25 @@ class ProductCreationForm extends BaseForm
             $this->formBuilder
                 ->add("price", "number", array(
                     "constraints" => array(new NotBlank()),
-                    "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
+                    "label"      => $this->translator->trans("Product base price excluding taxes"),
                     "label_attr" => array("for" => "price_without_tax"),
                 ))
-                ->add("tax_price", "number", array(
-                    "label"      => Translator::getInstance()->trans("Product base price with taxes"),
-                    "label_attr" => array("for" => "price_with_tax"),
+               ->add("tax_price", "number", array(
+                       "label"      => $this->translator->trans("Product base price with taxes"),
+                       "label_attr" => array("for" => "price_with_tax"),
                 ))
                 ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
-                    "label"      => Translator::getInstance()->trans("Price currency *"),
+                    "label"      => $this->translator->trans("Price currency"),
                     "label_attr" => array("for" => "currency_field"),
                 ))
                 ->add("tax_rule", "integer", array(
                     "constraints" => array(new NotBlank()),
-                    "label"      => Translator::getInstance()->trans("Tax rule for this product *"),
+                    "label"      => $this->translator->trans("Tax rule for this product"),
                     "label_attr" => array("for" => "tax_rule_field"),
                 ))
                 ->add("weight", "number", array(
-                    "label"      => Translator::getInstance()->trans("Weight"),
+                    "label"      => $this->translator->trans("Weight"),
                     "label_attr" => array("for" => "weight_field"),
                 ))
                 ->add("quantity", "number", array(
@@ -101,7 +106,7 @@ class ProductCreationForm extends BaseForm
 
         if ($count > 0) {
             $context->addViolation(
-                Translator::getInstance()->trans(
+                $this->translator->trans(
                     "A product with reference %ref already exists. Please choose another reference.",
                     array('%ref' => $value)
                 )

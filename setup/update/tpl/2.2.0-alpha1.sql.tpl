@@ -216,7 +216,25 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 ;
 
 -- Fix attribute_template and feature_template relations
-ALTER TABLE `attribute_template` DROP FOREIGN KEY `fk_attribute_template`; ALTER TABLE `attribute_template` ADD CONSTRAINT `fk_attribute_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-ALTER TABLE `feature_template` DROP FOREIGN KEY `fk_feature_template`; ALTER TABLE `feature_template` ADD CONSTRAINT `fk_feature_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `attribute_template` DROP FOREIGN KEY `fk_attribute_template`;
+ALTER TABLE `attribute_template` ADD CONSTRAINT `fk_attribute_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `feature_template` DROP FOREIGN KEY `fk_feature_template`;
+ALTER TABLE `feature_template` ADD CONSTRAINT `fk_feature_template` FOREIGN KEY (`template_id`) REFERENCES `template`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+-- Fix PSE product_sale_elements_product_document and product_sale_elements_product_image relations
+
+ALTER TABLE `product_sale_elements_product_document` DROP FOREIGN KEY `fk_pse_product_document_product_sale_elements_id`;
+ALTER TABLE `product_sale_elements_product_document` ADD CONSTRAINT `fk_pse_product_document_product_sale_elements_id` FOREIGN KEY (`product_sale_elements_id`) REFERENCES `c1_t2_mi`.`product_sale_elements`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `product_sale_elements_product_document` DROP FOREIGN KEY `fk_pse_product_document_product_document_id`;
+ALTER TABLE `product_sale_elements_product_document` ADD CONSTRAINT `fk_pse_product_document_product_document_id` FOREIGN KEY (`product_document_id`) REFERENCES `c1_t2_mi`.`product_document`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `product_sale_elements_product_image` DROP FOREIGN KEY `fk_pse_product_image_product_sale_elements_id`;
+ALTER TABLE `product_sale_elements_product_image` ADD CONSTRAINT `fk_pse_product_image_product_sale_elements_id` FOREIGN KEY (`product_sale_elements_id`) REFERENCES `c1_t2_mi`.`product_sale_elements`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `product_sale_elements_product_image` DROP FOREIGN KEY `fk_pse_product_image_product_image_id`;
+ALTER TABLE `product_sale_elements_product_image` ADD CONSTRAINT `fk_pse_product_image_product_image_id` FOREIGN KEY (`product_image_id`) REFERENCES `c1_t2_mi`.`product_image`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 SET FOREIGN_KEY_CHECKS = 1;

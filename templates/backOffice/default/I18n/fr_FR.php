@@ -727,6 +727,7 @@ return [
     'Manage modules' => 'Gestion des modules',
     'Manage modules attachements' => 'Gérer les points d\'accroche des modules',
     'Manage resource rights' => 'Gestion de droits pour les ressources',
+    'Manage tax rules and taxes in <a href="%tax_url">Thelia configuration</a>.' => 'Gérez les taxes et règles de taxes dans <a href="%tax_url">la configuration de Thelia</a>. ',
     'Manage taxes' => 'Gérer les taxes',
     'Manage the tax rule taxes appliance order' => 'Gérer les règles de taxe et leur ordre d\'application',
     'Maximum usage count :' => 'Nombre maximum d\'utilisations',
@@ -753,13 +754,10 @@ return [
     'More pages before' => 'Pages précédentes',
     'Name' => 'Nom',
     'Namespace of main class' => 'Espace de noms de la classe principale',
-<<<<<<< HEAD
     'New' => 'Nouveau',
     'New Configuration' => 'Nouvelle Configuration',
-=======
     'New customers' => 'Nouveaux clients',
     'News' => 'Actualités',
->>>>>>> Improved PSE management UI
     'No' => 'Non',
     'No Folders found' => 'Aucun dossier trouvé',
     'No administration profile defined yet. Click the + button to create one.' => 'Aucun profil d\'administration n\'a encore été créé. Cliquer le bouton + pour en ajouter un.',
@@ -805,11 +803,8 @@ return [
     'N° ISO' => 'N° ISO',
     'OK' => 'OK',
     'Official' => 'Officiel',
-<<<<<<< HEAD
-=======
     'Offline products' => 'Produits hors ligne',
     'On sale' => 'En promotion',
->>>>>>> Improved PSE management UI
     'Online' => 'En ligne',
     'Oops! An Error Occurred' => 'Oops ! Une erreur est survenue',
     'Or' => 'Ou',
@@ -875,11 +870,9 @@ return [
     'Preview text' => 'Prévisualisation du texte',
     'Price' => 'Prix',
     'Price excl. taxes' => 'Prix taxes exclues',
-    'Price incl. taxes' => 'Prix TTC',
     'Pricing' => 'Définition des prix',
     'Product' => 'Produit',
     'Product Attributes' => 'Déclinaisons du produit',
-    'Product EAN Code' => 'Code EAN du produit',
     'Product Features' => 'Caractéristiques du produit',
     'Product accessories' => 'Accessoires',
     'Product attribute selection' => 'Sélection des déclinaisons',
@@ -948,6 +941,8 @@ return [
     'Sale operation description' => 'Description de la promotion',
     'Sale operation features' => 'Caractéristiques de la promotion',
     'Sale price incl. taxes' => 'Prix promo TTC',
+    'Sales' => 'Ventes',
+    'Sales excluding shipping' => 'Ventes hors frais de port',
     'Sales management' => 'Gestion des promotions',
     'Save' => ' Enregistrer',
     'Save and close' => 'Enregistrer et fermer',
@@ -1235,7 +1230,6 @@ return [
     'Yes' => 'Oui',
     'You can attach here some content to this category' => 'Vous pouvez lier ici des contenus à cette rubrique',
     'You can attach here some content to this product' => 'Vous pouvez associer des contenus avec ce produit',
-    'You can attach this product to more categories in the details tab.' => 'Vous pouvez lier ce produit à plusieurs rubriques dans l\'onglet détail.',
     'You can change attributes and their positions in <a href="%tpl_mgmt_url" target="tpl_window">the attributes configuration page</a>.' => 'Vous pouvez modifier les déclinaisons et leur position dans <a href="%tpl_mgmt_url" target="tpl_window">la gestion des déclinaisons</a>.',
     'You can change feature and their positions in <a href="%tpl_mgmt_url" target="tpl_window">the features configuration page</a>.' => 'Vous pouvez modifier les caractéristiques et leur position dans <a href="%tpl_mgmt_url" target="tpl_window">la gestion des caractéristiques</a>.',
     'You can change template attributes and their positions in <a href="%tpl_mgmt_url" target="tpl_window">the template configuration page</a>.' => 'Vous pouvez modifier les déclinaisons du gabarit et leur position dans <a href="%tpl_mgmt_url" target="tpl_window">la configuration des gabarits de produit</a>. ',

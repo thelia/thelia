@@ -194,6 +194,7 @@ class Product extends BaseProduct implements FileModelParentInterface
      * Create a basic product sale element attached to this product.
      *
      * @param ConnectionInterface $con
+
      * @param float $weight
      * @param float $basePrice
      * @param float $salePrice

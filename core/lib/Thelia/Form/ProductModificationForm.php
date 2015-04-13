@@ -29,25 +29,25 @@ class ProductModificationForm extends ProductCreationForm
 
         $this->formBuilder
             ->add("id", "integer", array(
-                    "label"       => Translator::getInstance()->trans("Prodcut ID *"),
+                    "label"       => $this->translator->trans("Product ID"),
                     "label_attr"  => array("for" => "product_id_field"),
                     "constraints" => array(new GreaterThan(array('value' => 0))),
             ))
             ->add("template_id", "integer", array(
-                    "label"       => Translator::getInstance()->trans("Product template"),
+                    "label"       => $this->translator->trans("Product template"),
                     "label_attr"  => array("for" => "product_template_field"),
             ))
             ->add("brand_id", "integer", [
                 'constraints' => [ new NotBlank() ],
                 'required'    => true,
-                'label'       => Translator::getInstance()->trans('Brand / Supplier'),
+                'label'       => $this->translator->trans('Brand / Supplier'),
                 'label_attr'  => [
                     'for' => 'mode',
-                    'help' => Translator::getInstance()->trans("Select the product brand, or supplier."),
+                    'help' => $this->translator->trans("Select the product brand, or supplier."),
                 ],
             ])
             ->add("virtual_document_id", "integer", array(
-                "label"      => Translator::getInstance()->trans("Virtual document"),
+                "label"      => $this->translator->trans("Virtual document"),
                 "label_attr" => array("for" => "virtual_document_id_field"),
             ))
         ;
@@ -66,7 +66,7 @@ class ProductModificationForm extends ProductCreationForm
 
         if ($count > 0) {
             $context->addViolation(
-                Translator::getInstance()->trans(
+                $this->translator->trans(
                     "A product with reference %ref already exists. Please choose another reference.",
                     array('%ref' => $value)
                 )

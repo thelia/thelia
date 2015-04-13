@@ -471,6 +471,10 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::deleteProductSaleElementAction</default>
     </route>
 
+    <route id="admin.product.combination.delete-all" path="/admin/product/combination/delete-all">
+        <default key="_controller">Thelia\Controller\Admin\ProductController::deleteAllProductSaleElementsAction</default>
+    </route>
+
     <route id="admin.product.combination.update" path="/admin/product/combinations/update">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updateProductSaleElementsAction</default>
     </route>

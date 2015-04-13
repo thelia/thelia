@@ -280,6 +280,12 @@ $(function() {
         }
     });
 
+    $('.switch-to-tab').click(function(ev) {
+        $('.nav-tabs a[href='+$(this).data('tab-anchor')+']').trigger("click");
+
+        ev.preventDefault();
+    });
+
     $("body").on("change", "#template_id", function(){
         $("#template_notice").modal('show');
     });

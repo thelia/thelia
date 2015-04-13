@@ -278,9 +278,10 @@ final class TheliaEvents
     const PRODUCT_REMOVE_CONTENT          = "action.productRemoveContent";
     const PRODUCT_UPDATE_CONTENT_POSITION = "action.updateProductContentPosition";
 
-    const PRODUCT_ADD_PRODUCT_SALE_ELEMENT    = "action.addProductSaleElement";
-    const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT = "action.deleteProductSaleElement";
-    const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT = "action.updateProductSaleElement";
+    const PRODUCT_ADD_PRODUCT_SALE_ELEMENT         = "action.addProductSaleElement";
+    const PRODUCT_DELETE_PRODUCT_SALE_ELEMENT      = "action.deleteProductSaleElement";
+    const PRODUCT_DELETE_ALL_PRODUCT_SALE_ELEMENTS = "action.deleteAllProductSaleElements";
+    const PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT      = "action.updateProductSaleElement";
 
     const PRODUCT_COMBINATION_GENERATION = "action.productCombinationGeneration";
 

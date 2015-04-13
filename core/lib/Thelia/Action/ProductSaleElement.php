@@ -12,34 +12,36 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Product\ProductCloneEvent;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteAllEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\ProductSaleElementsDocument;
 use Thelia\Core\Template\Loop\ProductSaleElementsImage;
+use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
+use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
-use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductPrice;
-use Thelia\Model\AttributeCombination;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElements;
 use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
-use Thelia\Model\ProductPriceQuery;
-use Propel\Runtime\Propel;
-use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\Map\AttributeCombinationTableMap;
-use Propel\Runtime\ActiveQuery\Criteria;
-use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
-use Propel\Runtime\Connection\ConnectionInterface;
 
 class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 {
@@ -242,6 +244,38 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
                 throw $ex;
             }
+        }
+    }
+
+
+    /**
+     * Delete all product sale elements
+     *
+     * @param  ProductSaleElementDeleteAllEvent $event
+     * @throws \Exception
+     */
+    public function deleteAll(ProductSaleElementDeleteAllEvent $event)
+    {
+        $con = Propel::getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
+
+        $con->beginTransaction();
+
+        try {
+            ProductSaleElementsQuery::create()
+                ->filterByProductId($event->getProductId())
+                ->delete($con);
+
+            if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
+                // Create a new default PSE
+                $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+            }
+
+            $con->commit();
+
+        } catch (\Exception $ex) {
+            $con->rollback();
+
+            throw $ex;
         }
     }
 
@@ -474,10 +508,11 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT    => array("create", 128),
-            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT => array("update", 128),
-            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT => array("delete", 128),
-            TheliaEvents::PRODUCT_COMBINATION_GENERATION      => array("generateCombinations", 128),
+            TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT         => array("create", 128),
+            TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT      => array("update", 128),
+            TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT      => array("delete", 128),
+            TheliaEvents::PRODUCT_DELETE_ALL_PRODUCT_SALE_ELEMENTS => array("deleteAll", 128),
+            TheliaEvents::PRODUCT_COMBINATION_GENERATION           => array("generateCombinations", 128),
             TheliaEvents::PSE_CLONE                           => array("clonePSE", 128)
         );
     }

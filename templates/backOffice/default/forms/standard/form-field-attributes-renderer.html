@@ -53,8 +53,8 @@ Use the optionnal $field_value parameter if no value is defined
 {if $max_length}
     {$sMaxLength = "maxlength=\"{$max_length}\""}
 {/if}
-
-{if $required}
+{* Radio and checkbox should not have the "required" attribute *}
+{if $required && $type != 'checkbox' && $type != 'radio'}
     {$sRequired='aria-required="true" required'}
 {/if}
 

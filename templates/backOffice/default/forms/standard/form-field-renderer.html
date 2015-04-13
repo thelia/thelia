@@ -38,7 +38,7 @@ Use the optionnal $field_value parameter if no value is defined
         <label>
             {if $content == ''}
                 <input type="checkbox" {$attributes nofilter}>
-                {$label} {if $required} <span class="required">*</span>{/if}
+                {$label}
             {else}
                 {$content nofilter}
             {/if}
@@ -62,7 +62,7 @@ Use the optionnal $field_value parameter if no value is defined
         <label>
             {if $content == ''}
                 <input type="radio" {$attributes nofilter}>
-                {$label} {if $required} <span class="required">*</span>{/if}
+                {$label}
             {else}
                 {$content nofilter}
             {/if}

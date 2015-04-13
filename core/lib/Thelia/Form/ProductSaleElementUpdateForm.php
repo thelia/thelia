@@ -24,11 +24,11 @@ class ProductSaleElementUpdateForm extends BaseForm
         $this->formBuilder
             ->add("tax_rule", "integer", array(
                     "constraints" => array(new NotBlank()),
-                    "label"      => $this->translator->trans("Tax rule for this product *"),
+                    "label"      => $this->translator->trans("Tax rule for this product"),
                     "label_attr" => array("for" => "tax_rule_field"),
             ))
             ->add("product_id", "integer", array(
-                    "label"       => $this->translator->trans("Product ID *"),
+                    "label"       => $this->translator->trans("Product ID"),
                     "label_attr"  => array("for" => "product_id_field"),
                     "constraints" => array(new GreaterThan(array('value' => 0))),
             ))
@@ -38,7 +38,7 @@ class ProductSaleElementUpdateForm extends BaseForm
             ))
             ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
-                    "label"      => $this->translator->trans("Price currency *"),
+                    "label"      => $this->translator->trans("Price currency"),
                     "label_attr" => array("for" => "currency_field"),
             ))
             ->add("use_exchange_rate", "integer", array(
@@ -65,6 +65,7 @@ class ProductSaleElementUpdateForm extends BaseForm
             ->add('price', 'collection', array(
                 'type'         => 'number',
                 'label'        => $this->translator->trans('Product price excluding taxes'),
+                'attr'         => array('placeholder' => $this->translator->trans('Price excl. taxes')),
                 'label_attr'   => array('for' => 'price_field'),
                 'allow_add'    => true,
                 'allow_delete' => true,
@@ -75,6 +76,7 @@ class ProductSaleElementUpdateForm extends BaseForm
             ->add('price_with_tax', 'collection', array(
                 'type'         => 'number',
                 'label'        => $this->translator->trans('Product price including taxes'),
+                'attr'         => array('placeholder' => $this->translator->trans('Price excl. taxes')),
                 'label_attr'   => array('for' => 'price_with_tax_field'),
                 'allow_add'    => true,
                 'allow_delete' => true,
@@ -132,9 +134,10 @@ class ProductSaleElementUpdateForm extends BaseForm
                 'allow_delete' => true,
             ))
             ->add('ean_code', 'collection', array(
-                'type'        => 'text',
-                'required'    => false,
+                'type'         => 'text',
+                'required'     => false,
                 'label'        => $this->translator->trans('EAN Code'),
+                'attr'         => array('placeholder' => 'Product EAN code'),
                 'label_attr'   => array('for' => 'ean_code_field'),
                 'allow_add'    => true,
                 'allow_delete' => true,
