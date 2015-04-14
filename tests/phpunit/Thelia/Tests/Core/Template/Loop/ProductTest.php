@@ -44,6 +44,12 @@ class ProductTest extends BaseLoopTestor
     {
         $product = ProductQuery::create()->orderById(Criteria::ASC)->findOne();
 
+        // ensure translation
+        $product->getTranslation()
+            ->setTitle("foo")
+            ->save()
+        ;
+
         if (null === $product) {
             $product = new \Thelia\Model\Product();
             $product->setDefaultCategory(0);
