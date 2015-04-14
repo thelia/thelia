@@ -68,8 +68,8 @@ class ProductPricesExportTest extends \PHPUnit_Framework_TestCase
 
             $price = $pse->getPricesByCurrency($currency);
             // The substr is a patch for php 5.4 float round
-            $this->assertEquals(substr($price->getPrice(), 0, strlen($row["price"])), $row["price"]);
-            $this->assertEquals(substr($price->getPromoPrice(), 0, strlen($row["promo_price"])), $row["promo_price"]);
+            $this->assertEquals(round($price->getPrice(), 3), round($row["price"], 3));
+            $this->assertEquals(round($price->getPromoPrice(), 3), round($row["promo_price"], 3));
             $this->assertEquals($pse->getProduct()->getTitle(), $row["title"]);
 
             $attributeCombinations = $pse->getAttributeCombinations();
