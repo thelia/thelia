@@ -15,6 +15,7 @@
         <command class="Thelia\Command\ModuleActivateCommand"/>
         <command class="Thelia\Command\ModuleDeactivateCommand"/>
         <command class="Thelia\Command\ModuleListCommand"/>
+        <command class="Thelia\Command\ModulePositionCommand"/>
         <command class="Thelia\Command\CreateAdminUser"/>
         <command class="Thelia\Command\ReloadDatabaseCommand"/>
         <command class="Thelia\Command\GenerateResources"/>
