@@ -179,6 +179,9 @@
                                                     <input class="submit-on-change" type="checkbox" name="view_missing_traductions_only" value="1" {if $view_missing_traductions_only}checked="checked"{/if}> {intl l='View only missing translations.'}
                                                 </label>
                                             </div>
+                                            <div class="form-group">
+                                                <a class="btn btn-sm btn-default copy-all" href="#">{intl l='Copy all translation.'}</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -255,9 +258,17 @@
 		                                    </td>
 
 	                                        <td class="col-md-6" >
-	                                            <div class="input-group {if $not_translated}has-error{/if}">
+	                                            <div class="input-group input-group-default {if $not_translated}has-error{/if}">
 												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
-												    <input type="text" id="translation_{$idx}" class="translation_field form-control" name="translation[]" value="{$info.translation}" />
+												    <input type="text" id="translation_{$idx}" class="translation_field translation_field_default form-control" name="translation[]" value="{$info.translation}" />
+												</div>
+												<div class="input-group input-group-custom">
+												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation-custom" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
+												    <input type="text" id="translation_custom_{$idx}" class="translation_field translation_field_custom form-control" name="translation_custom[]" value="{$info.custom_fallback}" />
+												</div>
+												<div class="input-group input-group-global">
+												    <span class="input-group-addon"><a href="#" data-text-num="{$idx}" class="copy-translation-global" title="{intl l='Copy source text in input field'}"><span class="glyphicon glyphicon-chevron-right"></span></a></span>
+												    <input type="text" id="translation_global_{$idx}" class="translation_field translation_field_global form-control" name="translation_global[]" value="{$info.global_fallback}" />
 												</div>
 	                                        </td>
 	                                    </tr>
@@ -333,14 +344,48 @@
 
         $('input.translation_field').change(function() { translation_changed = true; });
 
-        $('.copy-translation').click(function(ev) {
-        	var num = $(this).data('text-num');
+        var copyTranslation = function copyTranslation($field) {
+            var num = $field.data('text-num');
+            var $dest = null;
+            var text = '';
 
-        	$('#translation_' + num).val($('#text_' + num).val());
+            if ($field.hasClass('copy-translation-custom')) {
+                $dest = $('#translation_custom_' + num);
 
-        	translation_changed = true;
+            } else if ($field.hasClass('copy-translation-global')) {
+                $dest = $('#translation_global_' + num);
+            } else {
+                $dest = $('#translation_' + num);
+            }
 
+            if ($dest.val() == "") {
+                if (!$field.hasClass('copy-translation')) {
+                    text = $('#translation_' + num).val();
+                }
+                if (text == '') {
+                    text = $('#text_' + num).val();
+                }
+
+                $dest.val(text);
+            }
+
+            translation_changed = true;
+        };
+
+        $('.copy-translation, .copy-translation-custom, .copy-translation-global').click(function(ev) {
+            copyTranslation($(this));
         	ev.preventDefault();
+        });
+
+        $('.copy-all').click(function(ev) {
+
+            $('.copy-translation').each(
+                function(){
+                    copyTranslation($(this));
+                }
+            );
+
+            ev.preventDefault();
         });
 
         $('#translation_form').submit(function(ev) {

@@ -181,7 +181,7 @@ class TranslationsController extends BaseAdminController
                 case 'co':
                     $directory = THELIA_LIB;
                     $domain = 'core';
-                    $i18n_directory = THELIA_LIB . 'Config' . DS . 'I18n';
+                    $i18nDirectory = THELIA_LIB . 'Config' . DS . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_PHP;
                     break;
 
@@ -247,6 +247,12 @@ class TranslationsController extends BaseAdminController
                                 true
                             );
 
+                            $event
+                                ->setDomain($domain)
+                                ->setLocale($this->getCurrentEditionLocale())
+                                ->setCustomFallbackStrings($this->getRequest()->get('translation_custom', []))
+                                ->setGlobalFallbackStrings($this->getRequest()->get('translation_global', []));
+
                             $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_WRITE_FILE, $event);
 
                             if ($save_mode == 'stay') {
@@ -272,7 +278,7 @@ class TranslationsController extends BaseAdminController
                 $this->getDispatcher()->dispatch(TheliaEvents::TRANSLATION_GET_STRINGS, $event);
 
                 // Estimate number of fields, and compare to php ini max_input_vars
-                $stringsCount = $event->getTranslatableStringCount() * 2 + 6;
+                $stringsCount = $event->getTranslatableStringCount() * 4 + 6;
 
                 if ($stringsCount > ini_get('max_input_vars')) {
                     $templateArguments['max_input_vars_warning']  = true;
