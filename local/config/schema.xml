@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <database defaultIdMethod="native" name="thelia">
   <vendor type="mysql">
     <parameter name="Engine" value="InnoDB"/>
@@ -603,9 +604,6 @@
     </foreign-key>
     <foreign-key foreignTable="lang" name="fk_order_lang_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="lang_id" />
-    </foreign-key>
-    <foreign-key foreignTable="cart" name="fk_order_cart_id">
-      <reference foreign="id" local="cart_id" />
     </foreign-key>
     <index name="idx_order_currency_id">
       <index-column name="currency_id" />
