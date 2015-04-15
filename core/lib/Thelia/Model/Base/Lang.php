@@ -2191,31 +2191,6 @@ abstract class Lang implements ActiveRecordInterface
         return $this->getOrders($query, $con);
     }
 
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Lang is new, it will return
-     * an empty collection; or if this Lang has previously
-     * been saved, it will retrieve related Orders from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Lang.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildOrder[] List of ChildOrder objects
-     */
-    public function getOrdersJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildOrderQuery::create(null, $criteria);
-        $query->joinWith('Cart', $joinBehavior);
-
-        return $this->getOrders($query, $con);
-    }
-
     /**
      * Clears the current object and sets all attributes to their default values
      */
