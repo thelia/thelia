@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template;
 
+use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
@@ -28,10 +29,36 @@ class ParserContext implements \IteratorAggregate
     private $formStore = array();
     private $store = array();
 
+    /** @var Session */
+    protected $session;
+
     public function __construct(Request $request)
     {
         // Setup basic variables
         $this->set('THELIA_VERSION', Thelia::THELIA_VERSION);
+
+        $this->session = $request->getSession();
+    }
+
+    /**
+     * Store the current template info
+     *
+     * @param TemplateContext $context the template context
+     * @return $this
+     */
+    public function setCurrentTemplateContext(TemplateContext $context)
+    {
+        $this->session->set('thelia.template-context', $context);
+
+        return $this;
+    }
+
+    /**
+     * @return TemplateContext|null the current template context.
+     */
+    public function getCurrentTemplateContext()
+    {
+        return $this->session->get('thelia.template-context');
     }
 
     /**

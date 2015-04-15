@@ -21,6 +21,7 @@ use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\TemplateContext;
 use Thelia\Core\Template\TemplateHelperInterface;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
@@ -390,6 +391,13 @@ class SmartyParser extends Smarty implements ParserInterface
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
             throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
         }
+
+        $this->parserContext->setCurrentTemplateContext(
+            new TemplateContext(
+                $realTemplateName,
+                $parameters
+            )
+        );
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }
