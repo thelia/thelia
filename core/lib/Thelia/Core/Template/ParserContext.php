@@ -48,8 +48,6 @@ class ParserContext implements \IteratorAggregate
      */
     public function setCurrentTemplateContext(TemplateContext $context)
     {
-        $templateInfo = $this->session->get('thelia.template-information', []);
-
         $this->session->set('thelia.template-context', $context);
 
         return $this;
