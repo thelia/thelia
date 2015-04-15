@@ -17,8 +17,6 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Cart as ChildCart;
-use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Customer as ChildCustomer;
@@ -268,11 +266,6 @@ abstract class Order implements ActiveRecordInterface
      * @var        Lang
      */
     protected $aLang;
-
-    /**
-     * @var        Cart
-     */
-    protected $aCart;
 
     /**
      * @var        ObjectCollection|ChildOrderProduct[] Collection to store aggregation of ChildOrderProduct objects.
@@ -1357,10 +1350,6 @@ abstract class Order implements ActiveRecordInterface
             $this->modifiedColumns[OrderTableMap::CART_ID] = true;
         }
 
-        if ($this->aCart !== null && $this->aCart->getId() !== $v) {
-            $this->aCart = null;
-        }
-
 
         return $this;
     } // setCartId()
@@ -1655,9 +1644,6 @@ abstract class Order implements ActiveRecordInterface
         if ($this->aLang !== null && $this->lang_id !== $this->aLang->getId()) {
             $this->aLang = null;
         }
-        if ($this->aCart !== null && $this->cart_id !== $this->aCart->getId()) {
-            $this->aCart = null;
-        }
     } // ensureConsistency
 
     /**
@@ -1705,7 +1691,6 @@ abstract class Order implements ActiveRecordInterface
             $this->aModuleRelatedByPaymentModuleId = null;
             $this->aModuleRelatedByDeliveryModuleId = null;
             $this->aLang = null;
-            $this->aCart = null;
             $this->collOrderProducts = null;
 
             $this->collOrderCoupons = null;
@@ -1905,13 +1890,6 @@ abstract class Order implements ActiveRecordInterface
                     $affectedRows += $this->aLang->save($con);
                 }
                 $this->setLang($this->aLang);
-            }
-
-            if ($this->aCart !== null) {
-                if ($this->aCart->isModified() || $this->aCart->isNew()) {
-                    $affectedRows += $this->aCart->save($con);
-                }
-                $this->setCart($this->aCart);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -2384,9 +2362,6 @@ abstract class Order implements ActiveRecordInterface
             }
             if (null !== $this->aLang) {
                 $result['Lang'] = $this->aLang->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aCart) {
-                $result['Cart'] = $this->aCart->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collOrderProducts) {
                 $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -3138,57 +3113,6 @@ abstract class Order implements ActiveRecordInterface
         }
 
         return $this->aLang;
-    }
-
-    /**
-     * Declares an association between this object and a ChildCart object.
-     *
-     * @param                  ChildCart $v
-     * @return                 \Thelia\Model\Order The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCart(ChildCart $v = null)
-    {
-        if ($v === null) {
-            $this->setCartId(NULL);
-        } else {
-            $this->setCartId($v->getId());
-        }
-
-        $this->aCart = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCart object, it will not be re-added.
-        if ($v !== null) {
-            $v->addOrder($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildCart object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCart The associated ChildCart object.
-     * @throws PropelException
-     */
-    public function getCart(ConnectionInterface $con = null)
-    {
-        if ($this->aCart === null && ($this->cart_id !== null)) {
-            $this->aCart = ChildCartQuery::create()->findPk($this->cart_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCart->addOrders($this);
-             */
-        }
-
-        return $this->aCart;
     }
 
 
@@ -3948,7 +3872,6 @@ abstract class Order implements ActiveRecordInterface
         $this->aModuleRelatedByPaymentModuleId = null;
         $this->aModuleRelatedByDeliveryModuleId = null;
         $this->aLang = null;
-        $this->aCart = null;
     }
 
     /**
