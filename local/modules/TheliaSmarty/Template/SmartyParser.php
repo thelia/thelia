@@ -12,17 +12,17 @@
 
 namespace TheliaSmarty\Template;
 
-use \Smarty;
-use \Symfony\Component\HttpFoundation\Request;
-use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Imagine\Exception\InvalidArgumentException;
+use Smarty;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Thelia\Core\HttpFoundation\Session\Session;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
-use Thelia\Core\Template\TemplateHelperInterface;
+use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
-use Imagine\Exception\InvalidArgumentException;
+use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
@@ -164,7 +164,12 @@ class SmartyParser extends Smarty implements ParserInterface
                 '/(^[\n]*|[\n]+)[\s\t]*[\n]+/' => "\n"
             );
         } elseif ($compressionMode >= 2) {
-            if (preg_match_all('#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            if (preg_match_all(
+                '#<!--\[[^\]]+\]>.*?<!\[[^\]]+\]-->#is',
+                $source,
+                $matches,
+                PREG_OFFSET_CAPTURE | PREG_SET_ORDER
+            )) {
                 foreach ($matches as $match) {
                     $store[] = $match[0][0];
                     $_length = strlen($match[0][0]);
@@ -182,7 +187,8 @@ class SmartyParser extends Smarty implements ParserInterface
 
             $expressions = array(
                 // replace multiple spaces between tags by a single space
-                // can't remove them entirely, becaue that might break poorly implemented CSS display:inline-block elements
+                // can't remove them entirely, becaue that might break
+                // poorly implemented CSS display:inline-block elements
                 '#(:SMARTY@!@|>)\s+(?=@!@SMARTY:|<)#s' => '\1 \2',
                 // remove spaces between attributes (but not in attribute values!)
                 '#(([a-z0-9]\s*=\s*(["\'])[^\3]*?\3)|<[a-z0-9_]+)\s+([a-z/>])#is' => '\1 \4',
@@ -198,7 +204,12 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // capture html elements not to be messed with
         $_offset = 0;
-        if (preg_match_all('#<(script|pre|textarea)[^>]*>.*?</\\1>#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+        if (preg_match_all(
+            '#<(script|pre|textarea)[^>]*>.*?</\\1>#is',
+            $source,
+            $matches,
+            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
+        )) {
             foreach ($matches as $match) {
                 $store[] = $match[0][0];
                 $_length = strlen($match[0][0]);
@@ -214,7 +225,12 @@ class SmartyParser extends Smarty implements ParserInterface
 
         // capture html elements not to be messed with
         $_offset = 0;
-        if (preg_match_all('#@!@SMARTY:([0-9]+):SMARTY@!@#is', $source, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+        if (preg_match_all(
+            '#@!@SMARTY:([0-9]+):SMARTY@!@#is',
+            $source,
+            $matches,
+            PREG_OFFSET_CAPTURE | PREG_SET_ORDER
+        )) {
             foreach ($matches as $match) {
                 $store[] = $match[0][0];
                 $_length = strlen($match[0][0]);
@@ -238,9 +254,16 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param string  $key               ???
      * @param boolean $addAtBeginning    if true, the template definition should be added at the beginning of the template directory list
      */
-    public function addTemplateDirectory($templateType, $templateName, $templateDirectory, $key, $addAtBeginning = false)
-    {
-        Tlog::getInstance()->addDebug("Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key");
+    public function addTemplateDirectory(
+        $templateType,
+        $templateName,
+        $templateDirectory,
+        $key,
+        $addAtBeginning = false
+    ) {
+        Tlog::getInstance()->addDebug(
+            "Adding template directory $templateDirectory, type:$templateType name:$templateName, key: $key"
+        );
 
         if (true === $addAtBeginning && isset($this->templateDirectories[$templateType][$templateName])) {
             // When using array_merge, the key was set to 0. Use + instead.
@@ -390,16 +413,21 @@ class SmartyParser extends Smarty implements ParserInterface
     /**
      * Return a rendered template file
      *
-     * @param  string                    $realTemplateName the template name (from the template directory)
-     * @param  array                     $parameters       an associative array of names / value pairs
-     * @return string                    the rendered template text
-     * @param  bool                      $compressOutput   if true, te output is compressed using trimWhitespaces. If false, no compression occurs
+     * @param  string $realTemplateName the template name (from the template directory)
+     * @param  array $parameters an associative array of names / value pairs
+     * @return string the rendered template text
+     * @param  bool $compressOutput if true, te output is compressed using trimWhitespaces. If false, no compression occurs
      * @throws ResourceNotFoundException if the template cannot be found
      */
     public function render($realTemplateName, array $parameters = array(), $compressOutput = true)
     {
         if (false === $this->templateExists($realTemplateName) || false === $this->checkTemplate($realTemplateName)) {
-            throw new ResourceNotFoundException(Translator::getInstance()->trans("Template file %file cannot be found.", array('%file' => $realTemplateName)));
+            throw new ResourceNotFoundException(
+                Translator::getInstance()->trans(
+                    "Template file %file cannot be found.",
+                    [ '%file' => $realTemplateName ]
+                )
+            );
         }
 
         // Prepare common template variables
@@ -420,6 +448,8 @@ class SmartyParser extends Smarty implements ParserInterface
                 'debug' => $this->debug
             ]
         ]);
+
+        $this->parserContext->setCurrentTemplateInfo($realTemplateName, $parameters);
 
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }

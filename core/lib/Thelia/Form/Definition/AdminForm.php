@@ -47,6 +47,8 @@ final class AdminForm
     const PRODUCT_SALE_ELEMENT_UPDATE = 'thelia.admin.product_sale_element.update';
     const PRODUCT_DEFAULT_SALE_ELEMENT_UPDATE = 'thelia.admin.product_default_sale_element.update';
     const PRODUCT_COMBINATION_GENERATION = 'thelia.admin.product_combination.build';
+    const PRODUCT_SALE_ELEMENT_DELETE = 'thelia.admin.product_sale_element.delete';
+    const PRODUCT_SALE_ELEMENT_DELETE_ALL = 'thelia.admin.product_sale_element.delete-all';
 
     const PRODUCT_DELETE = 'thelia.admin.product.deletion';
 

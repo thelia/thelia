@@ -60,7 +60,7 @@ class ParserContext implements \IteratorAggregate
     }
 
     /**
-     * Set the current form
+     * Push the current form in stack
      *
      * @param BaseForm $form
      * @return $this
@@ -73,7 +73,9 @@ class ParserContext implements \IteratorAggregate
     }
 
     /**
-     * Set the current form.
+     * Pop the top form from stack
+     *
+     * @param BaseForm|null $default the default value to return if no form is found on stack
      *
      * @param null|BaseForm $default
      * @return BaseForm|null

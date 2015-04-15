@@ -1042,19 +1042,23 @@ class ProductController extends AbstractSeoCrudController
             return $response;
         }
 
-        $event = new ProductSaleElementDeleteEvent(
-            intval($this->getRequest()->get('product_sale_element_id', 0)),
-            $this->getCurrentEditionCurrency()->getId()
-        );
+        $deleteForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_DELETE);
 
         try {
+            $form = $this->validateForm($deleteForm, "POST");
+
+            $event = new ProductSaleElementDeleteEvent(
+                $form->get('product_sale_element_id')->getData(),
+                $this->getCurrentEditionCurrency()->getId()
+            );
+
             $this->dispatch(TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT, $event);
+
+            return $this->generateSuccessRedirect($deleteForm);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
-
-        return $this->redirectToEditionTemplate();
     }
 
 
@@ -1068,19 +1072,24 @@ class ProductController extends AbstractSeoCrudController
             return $response;
         }
 
-        $event = new ProductSaleElementDeleteAllEvent(
-            intval($this->getRequest()->get('product_id', 0)),
-            $this->getCurrentEditionCurrency()->getId()
-        );
+        $deleteAllForm = $this->createForm(AdminForm::PRODUCT_SALE_ELEMENT_DELETE_ALL);
 
         try {
+            $form = $this->validateForm($deleteAllForm, "POST");
+
+            $event = new ProductSaleElementDeleteAllEvent(
+                $form->get('product_id')->getData(),
+                $this->getCurrentEditionCurrency()->getId()
+            );
+
             $this->dispatch(TheliaEvents::PRODUCT_DELETE_ALL_PRODUCT_SALE_ELEMENTS, $event);
+
+            return $this->generateSuccessRedirect($deleteAllForm);
+
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);
         }
-
-        return $this->redirectToEditionTemplate();
     }
 
     /**
@@ -1182,7 +1191,7 @@ class ProductController extends AbstractSeoCrudController
                 return $this->redirectToEditionTemplate();
             }
 
-           // Redirect to the success URL
+            // Redirect to the success URL
             return $this->generateSuccessRedirect($changeForm);
         } catch (FormValidationException $ex) {
             // Form cannot be validated

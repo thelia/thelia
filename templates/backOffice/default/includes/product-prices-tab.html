@@ -613,8 +613,17 @@
 
 {capture "combination_delete_all_dialog"}
 
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="current_tab" value="prices" />
+    {form name="thelia.admin.product_sale_element.delete-all"}
+        {form_hidden_fields}
+
+        {form_field field='product_id'}
+            <input type="hidden" name="{$name}" value="{$product_id}" />
+        {/form_field}
+
+        {form_field field='success_url'}
+            <input type="hidden" name="{$name}" value="{url path='/admin/products/update' product_id=$product_id current_tab='prices'}" />
+        {/form_field}
+    {/form}
 
     {hook name="product.combination-delete-all-form" location="product_combination_delete_all_form" }
 {/capture}
@@ -634,10 +643,21 @@ form_content    = {$smarty.capture.combination_delete_all_dialog nofilter}
 
 {capture "combination_delete_dialog"}
 
-    <input type="hidden" name="product_id" value="{$product_id}" />
-    <input type="hidden" name="current_tab" value="prices" />
+    {form name="thelia.admin.product_sale_element.delete"}
+        {form_hidden_fields}
 
-    <input type="hidden" name="product_sale_element_id" id="combination_delete_id" value="" />
+        {form_field field='product_id'}
+            <input type="hidden" name="{$name}" value="{$product_id}" />
+        {/form_field}
+
+        {form_field field='product_sale_element_id'}
+            <input type="hidden" name="{$name}"  id="combination_delete_id" value="" />
+        {/form_field}
+
+        {form_field field='success_url'}
+            <input type="hidden" name="{$name}" value="{url path='/admin/products/update' product_id=$product_id current_tab='prices'}" />
+        {/form_field}
+    {/form}
 
     {hook name="product.combination-delete-form" location="product_combination_delete_form" }
 
