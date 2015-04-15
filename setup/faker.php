@@ -681,7 +681,7 @@ try {
                     ->findOne()
             )
             ->setPostage(mt_rand(1, 50))
-            ->setCart($cart)
+            ->setCartId($cart->getId())
         ;
 
         $placedOrder->save($con);
