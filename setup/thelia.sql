@@ -762,10 +762,7 @@ CREATE TABLE `order`
         FOREIGN KEY (`lang_id`)
         REFERENCES `lang` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE RESTRICT,
-    CONSTRAINT `fk_order_cart_id`
-        FOREIGN KEY (`cart_id`)
-        REFERENCES `cart` (`id`)
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

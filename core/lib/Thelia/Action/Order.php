@@ -226,7 +226,7 @@ class Order extends BaseAction implements EventSubscriberInterface
             OrderStatusQuery::getNotPaidStatus()->getId()
         );
 
-        $placedOrder->setCart($cart);
+        $placedOrder->setCartId($cart->getId());
 
         /* memorize discount */
         $placedOrder->setDiscount(
