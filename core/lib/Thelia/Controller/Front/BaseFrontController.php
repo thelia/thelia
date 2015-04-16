@@ -127,8 +127,10 @@ class BaseFrontController extends BaseController
             ));
 
         // Render the template.
-
         $data = $this->getParser($templateDir)->render($templateName, $args);
+
+        // Save the rendered template information
+        $this->getSession()->saveCurrentTemplate($templateName, $args);
 
         return $data;
     }

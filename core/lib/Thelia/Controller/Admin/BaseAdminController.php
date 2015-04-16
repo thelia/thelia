@@ -378,6 +378,9 @@ class BaseAdminController extends BaseController
         // Render the template.
         try {
             $content = $this->getParser($templateDir)->render($templateName, $args);
+
+            // Save the rendered template information
+            $this->getSession()->saveCurrentTemplate($templateName, $args);
         } catch (AuthenticationException $ex) {
             // User is not authenticated, and templates requires authentication -> redirect to login page
             // We user login_tpl as a path, not a template.

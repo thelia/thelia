@@ -332,4 +332,39 @@ class Session extends BaseSession
     {
         return $this->get('thelia.consumed_coupons', array());
     }
+
+    /**
+     *
+     * @param $templateName
+     * @param $templateParameters
+     */
+    public function saveCurrentTemplate($templateName, $templateParameters)
+    {
+        // Remove the final .html extension, so that the saved template name
+        // could be used as-is in controller's render() method.
+        $this->set('thelia.saved-template-name', preg_replace('/\.html$/', '', $templateName));
+        $this->set('thelia.saved-template-parameters', $templateParameters);
+    }
+
+    public function getSavedTemplateName()
+    {
+        $value = $this->get('thelia.saved-template-name');
+
+        if (null === $value) {
+            throw new \LogicException("There's no saved template name");
+        }
+
+        return $value;
+    }
+
+    public function getSavedTemplateParameters()
+    {
+        $value = $this->get('thelia.saved-template-parameters', null);
+
+        if (null === $value) {
+            throw new \LogicException("There's no saved template parameters");
+        }
+
+        return $value;
+    }
 }
