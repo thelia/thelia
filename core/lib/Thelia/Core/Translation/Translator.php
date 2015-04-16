@@ -19,7 +19,7 @@ class Translator extends BaseTranslator
 {
     const GLOBAL_FALLBACK_DOMAIN = 'global';
 
-    const GLOBAL_FALLBACK_KEY = '[%s] %s';
+    const GLOBAL_FALLBACK_KEY = '%s.%s';
 
     /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface

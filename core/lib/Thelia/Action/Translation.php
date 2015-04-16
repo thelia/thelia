@@ -14,8 +14,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\Loader\PhpFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Translation\TranslationEvent;
 use Thelia\Core\Translation\Translator;
@@ -262,7 +260,12 @@ class Translation extends BaseAction implements EventSubscriberInterface
                 );
             }
         } else {
+            /*$loader = new PhpFileLoader();
+            $catalogue = $loader->load($file);
+            $translations = $catalogue->all();
+            */
             $translations = require $file;
+
             if (! is_array($translations)) {
                 $translations = [];
             }
@@ -274,13 +277,13 @@ class Translation extends BaseAction implements EventSubscriberInterface
             $customs = $event->getCustomFallbackStrings();
             $globals = $event->getGlobalFallbackStrings();
 
+            // just reset current translations for this domain to remove strings that do not exist anymore
+            $translations[$event->getDomain()] = [];
+
             foreach ($texts as $key => $text) {
-                $customKey = sprintf(Translator::GLOBAL_FALLBACK_KEY, $event->getDomain(), $text);
 
                 if (!empty($customs[$key])) {
-                    $translations[$customKey] = $customs[$key];
-                } else {
-                    unset($translations[$customKey]);
+                    $translations[$event->getDomain()][$text] = $customs[$key];
                 }
 
                 if (!empty($globals[$key])) {
@@ -291,7 +294,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             }
 
             fwrite($fp, '<' . "?php\n\n");
-            fwrite($fp, "return array(\n");
+            fwrite($fp, "return [\n");
 
             // Sort keys alphabetically while keeping index
             ksort($translations);
@@ -299,13 +302,25 @@ class Translation extends BaseAction implements EventSubscriberInterface
             foreach ($translations as $key => $text) {
                 // Write only defined (not empty) translations
                 if (!empty($translations[$key])) {
-                    $key = str_replace("'", "\'", $key);
-                    $translation = str_replace("'", "\'", $text);
-                    fwrite($fp, sprintf("    '%s' => '%s',\n", $key, $translation));
+                    if (is_array($translations[$key])) {
+                        $key = str_replace("'", "\'", $key);
+                        fwrite($fp, sprintf("    '%s' => [\n", $key));
+                        ksort($translations[$key]);
+                        foreach ($translations[$key] as $subKey => $subText) {
+                            $subKey = str_replace("'", "\'", $subKey);
+                            $translation = str_replace("'", "\'", $subText);
+                            fwrite($fp, sprintf("        '%s' => '%s',\n", $subKey, $translation));
+                        }
+                        fwrite($fp, "    ],\n");
+                    } else {
+                        $key = str_replace("'", "\'", $key);
+                        $translation = str_replace("'", "\'", $text);
+                        fwrite($fp, sprintf("    '%s' => '%s',\n", $key, $translation));
+                    }
                 }
             }
 
-            fwrite($fp, ");\n");
+            fwrite($fp, "];\n");
 
             @fclose($fp);
         }
