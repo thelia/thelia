@@ -232,4 +232,31 @@ class AddressController extends BaseFrontController
             return $this->generateRedirectFromRoute('default', array('view'=>'account'));
         }
     }
+
+    public function makeAddressDefaultAction($addressId)
+    {
+        $this->checkAuth();
+
+        $address = AddressQuery::create()
+            ->filterByCustomer($this->getSecurityContext()->getCustomerUser())
+            ->findPk($addressId)
+        ;
+
+        if (null === $address) {
+            $this->pageNotFound();
+        }
+
+        try {
+            $event = new AddressEvent($address);
+            $this->dispatch(TheliaEvents::ADDRESS_DEFAULT, $event);
+        } catch (\Exception $e) {
+            $this->getParserContext()
+                ->setGeneralError($e->getMessage())
+            ;
+
+            return $this->render("account");
+        }
+
+        return $this->generateRedirectFromRoute('default', array('view'=>'account'));
+    }
 }

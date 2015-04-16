@@ -21,6 +21,8 @@
 
             <h1 id="main-label" class="page-header">{intl l="My Account"}</h1>
 
+            {if $general_error}<div class="alert alert-danger">{$general_error}</div>{/if}
+
             {hook name="account.top"}
             <div id="account" class="panel-group">
                 <div class="panel account-info">
@@ -129,6 +131,7 @@
                                         <div class="group-btn">
                                             <a href="{url path="/address/update/%id" id=$ID}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="icon-pencil"></i> <span>{intl l="Edit"}</span></a>
                                             {if $DEFAULT != 1}
+                                                <a href="{url path="/address/default/%id" id=$ID}" class="btn btn-address-default" data-confirm="{intl l="Do you really want to make this address your default ?"}" title="{intl l="Make this address my default"}" data-toggle="tooltip"><i class="icon-home"></i>  <span>{intl l="Cancel"}</span></a>
                                                 <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="icon-remove"></i> <span>{intl l="Cancel"}</span></a>
                                             {/if}
                                         </div>

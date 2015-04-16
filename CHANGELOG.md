@@ -1,3 +1,7 @@
+# 2.2.0-alpha2
+
+- Add a front office way to make an address the default one
+
 # 2.2.0-alpha1
 
 - Add module code ($CODE variable) into payment loop outputs
