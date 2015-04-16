@@ -287,10 +287,29 @@ class TranslationsController extends BaseAdminController
                 } else {
                     $templateArguments['all_strings'] = $event->getTranslatableStrings();
                 }
+
+                $templateArguments['is_writable'] = $this->checkWritableI18nDirectory(THELIA_LOCAL_DIR . 'I18n');
             }
         }
 
         return $this->render('translations', $templateArguments);
+    }
+
+    /**
+     * Check if a directory is writable or if the parent directory is writable
+     *
+     * @param string $dir   the directory to test
+     * @return boolean      return true if the directory is writable otr if the parent dir is writable.
+     */
+    public function checkWritableI18nDirectory($dir)
+    {
+        if (file_exists($dir)) {
+            return is_writable($dir);
+        }
+
+        $parentDir = dirname($dir);
+
+        return file_exists($parentDir) && is_writable($parentDir);
     }
 
     public function defaultAction()
