@@ -1017,6 +1017,7 @@ return array(
     'The default pricing is used when no combination is defined.' => 'Le prix par défaut est utilisé lorsqu\'aucune combinaison n\'est utilisée',
     'The destinations processes logs to display, store or send them. You can select and configure zero, one or more destinations below.' => 'Les destinations permettent d\'afficher, stocker ou bien envoyer les logs. Vous pouvez en sélectionner zéro, un ou plusieurs dans la liste ci-dessous',
     'The detailed description.' => 'La description détaillée.',
+    'The directory local/I18n does not exist or is not writable. Please fix this issue before.' => 'Le dossier local/I18n n\'existe pas ou n\'est pas accessible en écriture. Veuillez corriger le problème.',
     'The following error message has been found: %msg' => 'Le message d\'erreur suivant a été trouvé : %msg',
     'The hooks have been updated successfuly !' => 'Les points d\'accroche ont été mise à jour !',
     'The page you\'ve requested has a problem. Please contact the module developer if you were using one, or feel free to give the Thelia team a feedback on github: %url.' => 'La pge demandé a rencontré un problème. Merci de contacter le développeur du module que vous êtes en train d\'utiliser ou bien d\'ouvrir une issue à l\'équipe de développement de Thelia sur github : %url',

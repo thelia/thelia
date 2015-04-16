@@ -172,7 +172,7 @@
                                         {/if}
 	                                </div>
 
-                                    {if ! $is_writable}
+                                    {if $is_writable === false}
                                         <div class="alert alert-danger">
                                             {intl l='The directory local/I18n does not exist or is not writable. Please fix this issue before.' }
                                         </div>
