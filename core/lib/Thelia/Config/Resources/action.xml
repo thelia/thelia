@@ -208,6 +208,7 @@
         </service>
 
         <service id="thelia.action.translation" class="Thelia\Action\Translation">
+            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
     </services>

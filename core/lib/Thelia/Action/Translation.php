@@ -12,8 +12,11 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Translation\TranslationEvent;
 use Thelia\Core\Translation\Translator;
@@ -26,6 +29,16 @@ use Thelia\Log\Tlog;
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function getTranslatableStrings(TranslationEvent $event)
     {
         $stringCount = $this->walkDir(
@@ -200,6 +213,8 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             if (! $fs->exists($file)) {
                 $fs->mkdir($dir);
+
+                $this->cacheClear($event->getDispatcher());
             }
         }
 
@@ -247,10 +262,9 @@ class Translation extends BaseAction implements EventSubscriberInterface
         if (! $fs->exists($file)) {
             if (true === $event->isCreateFileIfNotExists()) {
                 $dir = dirname($file);
+                $fs->mkdir($dir);
 
-                if (!$fs->exists($file)) {
-                    $fs->mkdir($dir);
-                }
+                $this->cacheClear($event->getDispatcher());
             } else {
                 throw new \RuntimeException(
                     Translator::getInstance()->trans(
@@ -261,7 +275,7 @@ class Translation extends BaseAction implements EventSubscriberInterface
             }
         } else {
             /*$loader = new PhpFileLoader();
-            $catalogue = $loader->load($file);
+            $catalogue = $loade     r->load($file);
             $translations = $catalogue->all();
             */
             $translations = require $file;
@@ -336,6 +350,15 @@ class Translation extends BaseAction implements EventSubscriberInterface
         );
 
         return ltrim($path, '/');
+    }
+
+    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    {
+        $cacheEvent = new CacheEvent(
+            $this->container->getParameter('kernel.cache_dir')
+        );
+
+        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
     }
 
     public static function getSubscribedEvents()
