@@ -66,7 +66,12 @@ class ViewListener implements EventSubscriberInterface
         $request = $this->container->get('request');
         $response = null;
         try {
-            $content = $parser->render($request->attributes->get('_view').".html");
+            $view = $request->attributes->get('_view').".html";
+
+            $content = $parser->render($view);
+
+            // Save the current template information
+            $request->getSession()->saveCurrentTemplate($view, []);
 
             if ($content instanceof Response) {
                 $response = $content;
