@@ -6,7 +6,7 @@ UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
---- order status
+-- order status
 
 SELECT @max_id := MAX(`id`) FROM `order_status`;
 
@@ -44,7 +44,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 
 -- country area table
 
-create table `country_area`
+create table IF NOT EXISTS `country_area`
 (
     `country_id` INTEGER NOT NULL,
     `area_id` INTEGER NOT NULL,
