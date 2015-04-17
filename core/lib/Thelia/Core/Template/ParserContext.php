@@ -102,9 +102,10 @@ class ParserContext implements \IteratorAggregate
         $this->request->getSession()->addSerializedFormData(
             get_class($form),
             [
-                'data' => $form->getForm()->getData(),
-                'hasError' => $form->hasError(),
-                'errorMessage' => $form->getErrorMessage()
+                'data'         => $form->getForm()->getData(),
+                'hasError'     => $form->hasError(),
+                'errorMessage' => $form->getErrorMessage(),
+                'method'       => $form->getRequest()->getMethod()
             ]
         );
 
@@ -121,7 +122,7 @@ class ParserContext implements \IteratorAggregate
 
                 // Perform validation to restore error context
                 try {
-                    $this->formValidator->validateForm($form);
+                    $this->formValidator->validateForm($form, $formInfo['method']);
                 } catch (\Exception $ex) {
                     // Ignore the exception.
                 }

@@ -334,10 +334,10 @@ class Session extends BaseSession
     }
 
     /**
-     * Sauvegarder les paramètres d'une form.
+     * Save for information for future use.
      *
-     * @param string $formName the form name
-     * @param array $formData the form data
+     * @param string $formName identifier of the form (probably the class name)
+     * @param array $formData the form data to save
      * @return $this
      */
     public function addSerializedFormData($formName, $formData)
@@ -352,8 +352,8 @@ class Session extends BaseSession
     }
 
     /**
-     * Lecture des paramètre d'une form. La lecture est destructrice. Une fois
-     * les informations recupérées, elles sont retirées de la sauvegarde.
+     * Get form data from the saved information. Reading data destroys it: once read, the data are removed
+     * from the saved data set, to prevent obsolete data to be persisted.
      *
      * @param string $formName the form name, as passed to addSerializedFormData()
      * @return array|null
