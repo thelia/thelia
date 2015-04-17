@@ -39,6 +39,8 @@
                         {intl l='Export'}: {$TITLE}
                     </div>
 
+                    {hook name="export.top" type="page" id=$ID}
+
                     {if $DESCRIPTION}
                         <div class="row">
                             <div class="col-md-12">
@@ -185,6 +187,8 @@
                                 {/elseloop}
                             </div>
                         </div>
+
+                        {hook name="export.bottom" type="page" id=$ID}
 
                         <button type="submit" class="btn btn-primary">{intl l="Export"}</button>
                     </form>
