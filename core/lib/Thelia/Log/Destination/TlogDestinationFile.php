@@ -28,16 +28,22 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected $path_defaut = false;
     protected $fh = false;
+    protected $filePath;
 
     public function __construct()
     {
-        $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = "log" . DS . self::TLOG_DEFAULT_NAME;
         parent::__construct();
     }
 
     protected function getFilePath()
     {
-        return $this->getConfig(self::VAR_PATH_FILE);
+        if (null === $this->filePath) {
+            $this->filePath = $this->getConfig(self::VAR_PATH_FILE);
+        }
+
+        return $this->filePath;
+
     }
 
     protected function getOpenMode()
@@ -47,24 +53,45 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     public function configure()
     {
-        $file_path = $this->getFilePath();
+        $filePath = $this->getFilePath();
         $mode = $this->getOpenMode();
 
-        if (! empty($file_path)) {
-            if (! is_file($file_path)) {
-                $dir = dirname($file_path);
+        if (!empty($filePath)) {
+            if (!$this->findRelativePath($filePath, $mode)) {
+                $this->findAbsolutePath($filePath, $mode);
+            }
+        }
+
+    }
+
+    protected function findRelativePath($filePath, $mode)
+    {
+        $absolutePath = realpath(THELIA_ROOT . $filePath);
+
+        return $this->findAbsolutePath($absolutePath, $mode);
+    }
+
+    protected function findAbsolutePath($filePath, $mode)
+    {
+        if (! empty($filePath)) {
+            if (! is_file($filePath)) {
+                $dir = dirname($filePath);
                 if (! is_dir($dir)) {
                     mkdir($dir, 0777, true);
                 }
 
-                touch($file_path);
-                chmod($file_path, 0666);
+                touch($filePath);
+                chmod($filePath, 0666);
             }
 
             if ($this->fh) @fclose($this->fh);
 
-            $this->fh = fopen($file_path, $mode);
+            $this->fh = fopen($filePath, $mode);
+            $this->filePath = $filePath;
+            return true;
         }
+
+        return false;
     }
 
     public function getTitle()

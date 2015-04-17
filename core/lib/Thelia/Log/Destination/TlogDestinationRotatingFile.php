@@ -25,7 +25,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
-        $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = "log" . DS . self::TLOG_DEFAULT_NAME;
 
         $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
 
@@ -36,29 +36,35 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     {
         parent::configure();
 
-        $file_path = $this->getFilePath();
+        $filePath = $this->getFilePath();
         $mode = $this->getOpenMode();
 
         if ($this->fh) @fclose($this->fh);
 
-        if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
+        if (filesize($filePath) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
+            $backupFile = $filePath . '.' . strftime('%Y-%m-%d_%H-%M-%S');
+
+            @rename($filePath, $backupFile);
+
+            @touch($filePath);
+            @chmod($filePath, 0666);
 
             $idx = 1;
 
             do {
-                $file_path_bk = "$file_path.$idx";
+                $filePathBk = "$filePath.$idx";
 
                 $idx++;
 
-            } while (file_exists($file_path_bk));
+            } while (file_exists($filePathBk));
 
-            @rename($file_path, $file_path_bk);
+            @rename($filePath, $filePathBk);
 
-            @touch($file_path);
-            @chmod($file_path, 0666);
+            @touch($filePath);
+            @chmod($filePath, 0666);
         }
 
-        $this->fh = fopen($file_path, $mode);
+        $this->fh = fopen($filePath, $mode);
     }
 
     public function getTitle()

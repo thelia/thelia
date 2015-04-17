@@ -1,3 +1,6 @@
+# 2.0.8
+- Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
+
 # 2.0.7
 - Change TokenProvider behavior to be more flexible
 - More secure csrf token
