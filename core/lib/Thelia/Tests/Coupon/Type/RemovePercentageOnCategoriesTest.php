@@ -18,6 +18,7 @@ use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\Category;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Product;
 
@@ -51,6 +52,10 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $defaultCountry = CountryQuery::create()
+            ->filterByByDefault(1)
+            ->findOne();
+
         $currencies = CurrencyQuery::create();
         $currencies = $currencies->find();
         $stubFacade->expects($this->any())
@@ -60,6 +65,10 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
         $stubFacade->expects($this->any())
             ->method('getCartTotalPrice')
             ->will($this->returnValue($cartTotalPrice));
+
+        $stubFacade->expects($this->any())
+            ->method('getDeliveryCountry')
+            ->will($this->returnValue($defaultCountry));
 
         $stubFacade->expects($this->any())
             ->method('getCheckoutCurrency')
@@ -116,7 +125,7 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
         ;
         $cartItem1Stub
             ->expects($this->any())
-            ->method('getPrice')
+            ->method('getRealTaxedPrice')
             ->will($this->returnValue(100))
         ;
 
@@ -136,7 +145,7 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
         ;
         $cartItem2Stub
             ->expects($this->any())
-            ->method('getPrice')
+            ->method('getRealTaxedPrice')
             ->will($this->returnValue(200))
         ;
 
@@ -176,7 +185,7 @@ class RemovePercentageOnCategoriesTest extends \PHPUnit_Framework_TestCase
 
         $cartItem2Stub
             ->expects($this->any())
-            ->method('getPrice')
+            ->method('getRealTaxedPrice')
             ->will($this->returnValue(200000))
         ;
 
