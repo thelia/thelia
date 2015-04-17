@@ -42,7 +42,7 @@ class Session extends BaseSession
 {
     // Lifetime, in seconds, of form error data
     const FORM_ERROR_LIFETIME_SECONDS = 60;
-
+/*
     public function __construct(
         SessionStorageInterface $storage = null,
         AttributeBagInterface $attributes = null,
@@ -53,7 +53,7 @@ class Session extends BaseSession
         // Check for obsolete from error data
         $this->cleanOutdatedFormErrorInformation();
     }
-
+*/
     /**
      * @param bool $forceDefault
      *
