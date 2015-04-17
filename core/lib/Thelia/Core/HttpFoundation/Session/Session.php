@@ -40,20 +40,6 @@ use Thelia\Tools\URL;
  */
 class Session extends BaseSession
 {
-    // Lifetime, in seconds, of form error data
-    const FORM_ERROR_LIFETIME_SECONDS = 60;
-/*
-    public function __construct(
-        SessionStorageInterface $storage = null,
-        AttributeBagInterface $attributes = null,
-        FlashBagInterface $flashes = null
-    ) {
-        parent::__construct($storage, $attributes, $flashes);
-
-        // Check for obsolete from error data
-        $this->cleanOutdatedFormErrorInformation();
-    }
-*/
     /**
      * @param bool $forceDefault
      *
@@ -351,61 +337,25 @@ class Session extends BaseSession
     }
 
     /**
-     * Save form error information, to allow error processing even after a redirection.
-     * The data is stored during a limited time (60 seconds), to prevent retaining outdated information.
+     * Get saved errored forms information
      *
-     * @param string $formName identifier of the form (probably the class name)
-     * @param array $formData the form data to save
-     * @return $this
+     * @return array
      */
-    public function addFormErrorInformation($formName, $formData)
+    public function getFormErrorInformation()
     {
-        $formErrorInformation = $this->get('thelia.form-errors', []);
+        return $this->get('thelia.form-errors', []);
+    }
 
-        // Add new error information
-        $formErrorInformation[$formName] = [
-            'timestamp' => time(),
-            'data'      => $formData
-        ];
-
-        $this->set('thelia.form-errors', $formErrorInformation);
+    /**
+     * Save errored forms information
+     *
+     * @param array $formInformation
+     * @return mixed
+     */
+    public function setFormErrorInformation($formInformation)
+    {
+        $this->set('thelia.form-errors', $formInformation);
 
         return $this;
-    }
-
-    /**
-     * Get form error data from the saved information.
-     *
-     * @param string $formName the form name, as passed to addSerializedFormData()
-     * @return array|null
-     */
-    public function getFormErrorInformation($formName)
-    {
-        $formErrorInformation = $this->get('thelia.form-errors', []);
-
-        if (isset($formErrorInformation[$formName])) {
-            return $formErrorInformation[$formName]['data'];
-        }
-
-        return null;
-    }
-
-    /**
-     * Remove from thelia.form-errors array the obsxolete form error information.
-     */
-    protected function cleanOutdatedFormErrorInformation()
-    {
-        $formErrorInformation = $this->get('thelia.form-errors', []);
-
-        $now = time();
-
-        // Cleanup obsolete form information, and try to find the form data
-        foreach ($formErrorInformation as $name => $formData) {
-            if ($now - $formData['timestamp'] > self::FORM_ERROR_LIFETIME_SECONDS) {
-                unset($formErrorInformation[$name]);
-            }
-        }
-
-        $this->set('thelia.form-errors', $formErrorInformation);
     }
 }

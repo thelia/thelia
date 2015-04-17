@@ -27,6 +27,9 @@ use TheliaSmarty\Template\Exception\SmartyPluginException;
  */
 class ParserContext implements \IteratorAggregate
 {
+    // Lifetime, in seconds, of form error data
+    const FORM_ERROR_LIFETIME_SECONDS = 60;
+
     private $formStore = array();
     private $store = array();
 
@@ -47,6 +50,9 @@ class ParserContext implements \IteratorAggregate
         $this->request = $request;
         $this->formFactory = $formFactory;
         $this->formValidator = $formValidator;
+
+        // Purge outdated error form contexts
+        $this->cleanOutdatedFormErrorInformation();
     }
 
     /**
@@ -94,34 +100,50 @@ class ParserContext implements \IteratorAggregate
     // -- Error form -----------------------------------------------------------
 
     /**
+     * Add a new form to the error form context
+     *
      * @param BaseForm $form the errored form
      * @return $this
      */
     public function addForm(BaseForm $form)
     {
-        $this->request->getSession()->addFormErrorInformation(
-            get_class($form),
-            [
-                'data' => $form->getForm()->getData(),
-                'hasError' => $form->hasError(),
-                'errorMessage' => $form->getErrorMessage()
-            ]
-        );
+        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+
+        // Set form error information
+        $formErrorInformation[get_class($form)] = [
+            'data'         => $form->getForm()->getData(),
+            'hasError'     => $form->hasError(),
+            'errorMessage' => $form->getErrorMessage(),
+            'method'       => $this->request->getMethod(),
+            'timestamp'    => time()
+        ];
+
+        $this->request->getSession()->setFormErrorInformation($formErrorInformation);
 
         return $this;
     }
 
+    /**
+     * Check if the specified form has errors, and return an instance of this form if it's the case.
+     *
+     * @param string $formId the form ID, as defined in the container
+     * @param string $formClass the form full qualified class name
+     * @param string $formType the form type, something like 'form'
+     * @return null|BaseForm null if no error information is available
+     */
     public function getForm($formId, $formClass, $formType)
     {
-        $formInfo = $this->request->getSession()->getFormErrorInformation($formClass);
+        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
 
-        if ($formInfo !== null) {
+        if (isset($formErrorInformation[$formClass])) {
+            $formInfo = $formErrorInformation[$formClass];
+
             if (is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm($formId, $formType, $formInfo['data']);
 
-                // Perform validation to restore error context
                 try {
-                    $this->formValidator->validateForm($form);
+                    // Perform validation to restore form internal error context
+                    $this->formValidator->validateForm($form, $formInfo['method']);
                 } catch (\Exception $ex) {
                     // Ignore the exception.
                 }
@@ -134,6 +156,49 @@ class ParserContext implements \IteratorAggregate
         }
 
         return null;
+    }
+
+    /**
+     * Remove form from the saved form error information.
+     *
+     * @param BaseForm $form
+     * @return $this
+     */
+    public function clearForm(BaseForm $form)
+    {
+        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+
+        $formClass = get_class($form);
+
+        if (isset($formErrorInformation[$formClass])) {
+            unset($formErrorInformation[$formClass]);
+            $this->request->getSession()->setFormErrorInformation($formErrorInformation);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove obsolete form error information.
+     */
+    protected function cleanOutdatedFormErrorInformation()
+    {
+        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+
+        if (! empty($formErrorInformation)) {
+            $now = time();
+
+            // Cleanup obsolete form information, and try to find the form data
+            foreach ($formErrorInformation as $name => $formData) {
+                if ($now - $formData['timestamp'] > self::FORM_ERROR_LIFETIME_SECONDS) {
+                    unset($formErrorInformation[$name]);
+                }
+            }
+
+            $this->request->getSession()->setFormErrorInformation($formErrorInformation);
+        }
+
+        return $this;
     }
 
     public function setGeneralError($error)

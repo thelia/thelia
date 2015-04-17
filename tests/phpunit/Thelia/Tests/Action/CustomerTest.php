@@ -18,7 +18,6 @@ use Thelia\Core\Event\Customer\CustomerCreateOrUpdateEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\CustomerQuery;
 
