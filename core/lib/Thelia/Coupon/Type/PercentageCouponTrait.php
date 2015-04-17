@@ -47,7 +47,7 @@ trait PercentageCouponTrait
      */
     public function getCartItemDiscount(CartItem $cartItem)
     {
-        return $cartItem->getQuantity() * $cartItem->getPrice() * ($this->percentage / 100);
+        return $cartItem->getQuantity() * $cartItem->getRealTaxedPrice($this->facade->getDeliveryCountry()) * ($this->percentage / 100);
     }
 
     /**
