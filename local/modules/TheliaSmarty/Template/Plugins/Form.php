@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\Type\TheliaType;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
@@ -60,9 +61,6 @@ class Form extends AbstractSmartyPlugin
     private static $taggedFieldsStack = null;
     private static $taggedFieldsStackPosition = null;
 
-    /** @var  Request $request */
-    protected $request;
-
     /** @var  ContainerInterface */
     protected $container;
 
@@ -74,16 +72,18 @@ class Form extends AbstractSmartyPlugin
 
     protected $formDefinition = array();
 
+    /** @var array|TheliaFormFactoryInterface */
+    protected $formFactory = array();
+
     /** @var array The form collection stack */
     protected $formCollectionStack = array();
 
     /** @var array Counts collection loop in page */
     protected $formCollectionCount = array();
 
-    public function __construct(ContainerInterface $container, ParserContext $parserContext, ParserInterface $parser)
+    public function __construct(TheliaFormFactoryInterface $formFactory, ParserContext $parserContext, ParserInterface $parser)
     {
-        $this->container = $container;
-        $this->request = $container->get("request");
+        $this->formFactory = $formFactory;
         $this->parserContext = $parserContext;
         $this->parser = $parser;
     }
@@ -118,16 +118,14 @@ class Form extends AbstractSmartyPlugin
             $formClass = $this->formDefinition[$name];
 
             // Check if parser context contains our form
-            $form = $this->parserContext->getForm($formClass, $formType);
+            $form = $this->parserContext->getForm($name, $formClass, $formType);
 
             if (null != $form) {
                 // Re-use the form
                 $instance = $form;
             } else {
                 // Create a new one
-                $class = new \ReflectionClass($formClass);
-
-                $instance = $class->newInstance($this->request, $formType, array(), array(), $this->container);
+                $instance = $this->formFactory->createForm($name);
             }
 
             // Set the current form

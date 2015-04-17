@@ -332,4 +332,49 @@ class Session extends BaseSession
     {
         return $this->get('thelia.consumed_coupons', array());
     }
+
+    /**
+     * Sauvegarder les paramètres d'une form.
+     *
+     * @param string $formName the form name
+     * @param array $formData the form data
+     * @return $this
+     */
+    public function addSerializedFormData($formName, $formData)
+    {
+        $serializedFormData = $this->get('thelia.serialized-form-data', []);
+
+        $serializedFormData[$formName] = @serialize($formData);
+
+        $this->set('thelia.serialized-form-data', $serializedFormData);
+
+        return $this;
+    }
+
+    /**
+     * Lecture des paramètre d'une form. La lecture est destructrice. Une fois
+     * les informations recupérées, elles sont retirées de la sauvegarde.
+     *
+     * @param string $formName the form name, as passed to addSerializedFormData()
+     * @return array|null
+     */
+    public function getSerializedFormData($formName)
+    {
+        $serializedFormData = $this->get('thelia.serialized-form-data', []);
+
+        if (isset($serializedFormData[$formName])) {
+            $formData = @unserialize($serializedFormData[$formName]);
+
+            // Clear the form data
+            unset($serializedFormData[$formName]);
+
+            $this->set('thelia.serialized-form-data', $serializedFormData);
+
+            if ($formData !== false) {
+                return $formData;
+            }
+        }
+
+        return null;
+    }
 }

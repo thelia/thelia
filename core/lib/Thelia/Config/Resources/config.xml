@@ -146,6 +146,8 @@
 
         <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
             <argument type="service" id="request" />
+            <argument type="service" id="thelia.form_factory" />
+            <argument type="service" id="thelia.form_validator" />
         </service>
 
 
