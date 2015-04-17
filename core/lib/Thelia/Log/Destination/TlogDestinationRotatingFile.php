@@ -29,7 +29,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
 
     public function __construct($maxFileSize = self::MAX_FILE_SIZE_KB_DEFAULT)
     {
-        $this->path_defaut = THELIA_ROOT . "log" . DS . self::TLOG_DEFAULT_NAME;
+        $this->path_defaut = "log" . DS . self::TLOG_DEFAULT_NAME;
 
         $this->setConfig(self::VAR_MAX_FILE_SIZE_KB, $maxFileSize, false);
 
@@ -40,20 +40,20 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
     {
         parent::configure();
 
-        $file_path = $this->getFilePath();
+        $filePath = $this->getFilePath();
         $mode = $this->getOpenMode();
 
         if ($this->fh) {
             @fclose($this->fh);
         }
 
-        if (filesize($file_path) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
-            $backupFile = $file_path . '.' . strftime('%Y-%m-%d_%H-%M-%S');
+        if (filesize($filePath) > 1024 * $this->getConfig(self::VAR_MAX_FILE_SIZE_KB, self::MAX_FILE_SIZE_KB_DEFAULT)) {
+            $backupFile = $filePath . '.' . strftime('%Y-%m-%d_%H-%M-%S');
 
-            @rename($file_path, $backupFile);
+            @rename($filePath, $backupFile);
 
-            @touch($file_path);
-            @chmod($file_path, 0666);
+            @touch($filePath);
+            @chmod($filePath, 0666);
 
             // Keep the number of files below VAR_MAX_FILE_COUNT
             $maxCount = $this->getConfig(self::VAR_MAX_FILE_COUNT, self::MAX_FILE_COUNT_DEFAULT);
@@ -61,9 +61,9 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             $finder = new Finder();
 
             $files = $finder
-                ->in(dirname($file_path))
+                ->in(dirname($filePath))
                 ->files()
-                ->name(basename($file_path).'.*')
+                ->name(basename($filePath).'.*')
                 ->sortByModifiedTime();
 
             $deleteCount = 1 + $files->count() - $maxCount;
@@ -79,7 +79,7 @@ class TlogDestinationRotatingFile extends TlogDestinationFile
             }
         }
 
-        $this->fh = fopen($file_path, $mode);
+        $this->fh = fopen($filePath, $mode);
     }
 
     public function getTitle()
