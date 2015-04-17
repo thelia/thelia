@@ -99,7 +99,7 @@ class ParserContext implements \IteratorAggregate
      */
     public function addForm(BaseForm $form)
     {
-        $this->request->getSession()->addSerializedFormData(
+        $this->request->getSession()->addFormErrorInformation(
             get_class($form),
             [
                 'data' => $form->getForm()->getData(),
@@ -113,7 +113,7 @@ class ParserContext implements \IteratorAggregate
 
     public function getForm($formId, $formClass, $formType)
     {
-        $formInfo = $this->request->getSession()->getSerializedFormData($formClass);
+        $formInfo = $this->request->getSession()->getFormErrorInformation($formClass);
 
         if ($formInfo !== null) {
             if (is_array($formInfo['data'])) {

@@ -13,7 +13,10 @@
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -37,6 +40,20 @@ use Thelia\Tools\URL;
  */
 class Session extends BaseSession
 {
+    // Lifetime, in seconds, of form error data
+    const FORM_ERROR_LIFETIME_SECONDS = 60;
+
+    public function __construct(
+        SessionStorageInterface $storage = null,
+        AttributeBagInterface $attributes = null,
+        FlashBagInterface $flashes = null
+    ) {
+        parent::__construct($storage, $attributes, $flashes);
+
+        // Check for-errors for obsolete data
+        $this->cleanOutdatedFormErrorInformation();
+    }
+
     /**
      * @param bool $forceDefault
      *
@@ -334,47 +351,61 @@ class Session extends BaseSession
     }
 
     /**
-     * Sauvegarder les paramètres d'une form.
+     * Save form error information, to allow error processing even after a redirection.
+     * The data is stored during a limited time (60 seconds), to prevent retaining outdated information.
      *
-     * @param string $formName the form name
-     * @param array $formData the form data
+     * @param string $formName identifier of the form (probably the class name)
+     * @param array $formData the form data to save
      * @return $this
      */
-    public function addSerializedFormData($formName, $formData)
+    public function addFormErrorInformation($formName, $formData)
     {
-        $serializedFormData = $this->get('thelia.serialized-form-data', []);
+        $formErrorInformation = $this->get('thelia.form-errors', []);
 
-        $serializedFormData[$formName] = @serialize($formData);
+        // Add new error information
+        $formErrorInformation[$formName] = [
+            'timestamp' => time(),
+            'data'      => $formData
+        ];
 
-        $this->set('thelia.serialized-form-data', $serializedFormData);
+        $this->set('thelia.form-errors', $formErrorInformation);
 
         return $this;
     }
 
     /**
-     * Lecture des paramètre d'une form. La lecture est destructrice. Une fois
-     * les informations recupérées, elles sont retirées de la sauvegarde.
+     * Get form error data from the saved information.
      *
      * @param string $formName the form name, as passed to addSerializedFormData()
      * @return array|null
      */
-    public function getSerializedFormData($formName)
+    public function getFormErrorInformation($formName)
     {
-        $serializedFormData = $this->get('thelia.serialized-form-data', []);
+        $formErrorInformation = $this->get('thelia.form-errors', []);
 
-        if (isset($serializedFormData[$formName])) {
-            $formData = @unserialize($serializedFormData[$formName]);
-
-            // Clear the form data
-            unset($serializedFormData[$formName]);
-
-            $this->set('thelia.serialized-form-data', $serializedFormData);
-
-            if ($formData !== false) {
-                return $formData;
-            }
+        if (isset($formErrorInformation[$formName])) {
+            return $formErrorInformation[$formName]['data'];
         }
 
         return null;
+    }
+
+    /**
+     * Remove from thelia.form-errors array the obsxolete form error information.
+     */
+    protected function cleanOutdatedFormErrorInformation()
+    {
+        $formErrorInformation = $this->get('thelia.form-errors', []);
+
+        $now = time();
+
+        // Cleanup obsolete form information, and try to find the form data
+        foreach ($formErrorInformation as $name => $formData) {
+            if ($now - $formData['timestamp'] > self::FORM_ERROR_LIFETIME_SECONDS) {
+                unset($formErrorInformation[$name]);
+            }
+        }
+
+        $this->set('thelia.form-errors', $formErrorInformation);
     }
 }
