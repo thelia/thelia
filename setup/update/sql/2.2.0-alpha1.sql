@@ -6,7 +6,7 @@ UPDATE `config` SET `value`='2' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
--- order status
+--- order status
 
 SELECT @max_id := MAX(`id`) FROM `order_status`;
 
@@ -16,8 +16,8 @@ INSERT INTO `order_status` VALUES
 
 INSERT INTO `order_status_i18n` VALUES
 (@max_id + 1, "en_US", 'Refunded', "", "", ""),
-(@max_id + 1, "es_ES", NULL, "", "", ""),
-(@max_id + 1, "fr_FR", 'Remboursé', "", "", "")
+(@max_id + 1, "fr_FR", 'Remboursé', "", "", ""),
+(@max_id + 1, "es_ES", NULL, "", "", "")
 ;
 
 -- new column in admin_log
@@ -36,10 +36,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
 (@max_id + 1, 'en_US', 'Allow customers to change their email. 1 for yes, 0 for no', NULL, NULL, NULL),
 (@max_id + 2, 'en_US', 'Ask the customers to confirm their email, 1 for yes, 0 for no', NULL, NULL, NULL),
-(@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
-(@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
 (@max_id + 1, 'fr_FR', 'Permettre aux utilisateurs de changer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
-(@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL)
+(@max_id + 2, 'fr_FR', 'Demander aux clients de confirmer leur email. 1 pour oui, 0 pour non', NULL, NULL, NULL),
+(@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+(@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL)
 ;
 
 -- country area table
@@ -72,7 +72,6 @@ ALTER TABLE `country` DROP FOREIGN KEY `fk_country_area_id`;
 ALTER TABLE `country` DROP KEY `idx_country_area_id`;
 ALTER TABLE `country` DROP COLUMN `area_id`;
 ALTER TABLE `category` ADD COLUMN `default_template_id` INTEGER AFTER  `position`;
-
 
 -- new hook --
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
@@ -211,71 +210,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 63, 'en_US', 'Tab image - bottom', '', ''),
 (@max_id + 64, 'en_US', 'Tab document - top', '', ''),
 (@max_id + 65, 'en_US', 'Tab document - bottom', '', ''),
-(@max_id + 1, 'es_ES', NULL, '', ''),
-(@max_id + 2, 'es_ES', NULL, '', ''),
-(@max_id + 3, 'es_ES', NULL, '', ''),
-(@max_id + 4, 'es_ES', NULL, '', ''),
-(@max_id + 5, 'es_ES', NULL, '', ''),
-(@max_id + 6, 'es_ES', NULL, '', ''),
-(@max_id + 7, 'es_ES', NULL, '', ''),
-(@max_id + 8, 'es_ES', NULL, '', ''),
-(@max_id + 9, 'es_ES', NULL, '', ''),
-(@max_id + 10, 'es_ES', NULL, '', ''),
-(@max_id + 11, 'es_ES', NULL, '', ''),
-(@max_id + 12, 'es_ES', NULL, '', ''),
-(@max_id + 13, 'es_ES', NULL, '', ''),
-(@max_id + 14, 'es_ES', NULL, '', ''),
-(@max_id + 15, 'es_ES', NULL, '', ''),
-(@max_id + 16, 'es_ES', NULL, '', ''),
-(@max_id + 17, 'es_ES', NULL, '', ''),
-(@max_id + 18, 'es_ES', NULL, '', ''),
-(@max_id + 19, 'es_ES', NULL, '', ''),
-(@max_id + 20, 'es_ES', NULL, '', ''),
-(@max_id + 21, 'es_ES', NULL, '', ''),
-(@max_id + 22, 'es_ES', NULL, '', ''),
-(@max_id + 23, 'es_ES', NULL, '', ''),
-(@max_id + 24, 'es_ES', NULL, '', ''),
-(@max_id + 25, 'es_ES', NULL, '', ''),
-(@max_id + 26, 'es_ES', NULL, '', ''),
-(@max_id + 27, 'es_ES', NULL, '', ''),
-(@max_id + 28, 'es_ES', NULL, '', ''),
-(@max_id + 29, 'es_ES', NULL, '', ''),
-(@max_id + 30, 'es_ES', NULL, '', ''),
-(@max_id + 31, 'es_ES', NULL, '', ''),
-(@max_id + 32, 'es_ES', NULL, '', ''),
-(@max_id + 33, 'es_ES', NULL, '', ''),
-(@max_id + 34, 'es_ES', NULL, '', ''),
-(@max_id + 35, 'es_ES', NULL, '', ''),
-(@max_id + 36, 'es_ES', NULL, '', ''),
-(@max_id + 37, 'es_ES', NULL, '', ''),
-(@max_id + 38, 'es_ES', NULL, '', ''),
-(@max_id + 39, 'es_ES', NULL, '', ''),
-(@max_id + 40, 'es_ES', NULL, '', ''),
-(@max_id + 41, 'es_ES', NULL, '', ''),
-(@max_id + 42, 'es_ES', NULL, '', ''),
-(@max_id + 43, 'es_ES', NULL, '', ''),
-(@max_id + 44, 'es_ES', NULL, '', ''),
-(@max_id + 45, 'es_ES', NULL, '', ''),
-(@max_id + 46, 'es_ES', NULL, '', ''),
-(@max_id + 47, 'es_ES', NULL, '', ''),
-(@max_id + 48, 'es_ES', NULL, '', ''),
-(@max_id + 49, 'es_ES', NULL, '', ''),
-(@max_id + 50, 'es_ES', NULL, '', ''),
-(@max_id + 51, 'es_ES', NULL, '', ''),
-(@max_id + 52, 'es_ES', NULL, '', ''),
-(@max_id + 53, 'es_ES', NULL, '', ''),
-(@max_id + 54, 'es_ES', NULL, '', ''),
-(@max_id + 55, 'es_ES', NULL, '', ''),
-(@max_id + 56, 'es_ES', NULL, '', ''),
-(@max_id + 57, 'es_ES', NULL, '', ''),
-(@max_id + 58, 'es_ES', NULL, '', ''),
-(@max_id + 59, 'es_ES', NULL, '', ''),
-(@max_id + 60, 'es_ES', NULL, '', ''),
-(@max_id + 61, 'es_ES', NULL, '', ''),
-(@max_id + 62, 'es_ES', NULL, '', ''),
-(@max_id + 63, 'es_ES', NULL, '', ''),
-(@max_id + 64, 'es_ES', NULL, '', ''),
-(@max_id + 65, 'es_ES', NULL, '', ''),
 (@max_id + 1, 'fr_FR', 'Profil - colonne tableau', '', ''),
 (@max_id + 2, 'fr_FR', 'Profil - ligne du tableau', '', ''),
 (@max_id + 3, 'fr_FR', 'Import - colonne tableau', '', ''),
@@ -340,7 +274,72 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 62, 'fr_FR', 'Onglet image - en haut', '', ''),
 (@max_id + 63, 'fr_FR', 'Onglet image - en bas', '', ''),
 (@max_id + 64, 'fr_FR', 'Onglet document - en haut', '', ''),
-(@max_id + 65, 'fr_FR', 'Onglet document - en bas', '', '')
+(@max_id + 65, 'fr_FR', 'Onglet document - en bas', '', ''),
+(@max_id + 1, 'es_ES', NULL, '', ''),
+(@max_id + 2, 'es_ES', NULL, '', ''),
+(@max_id + 3, 'es_ES', NULL, '', ''),
+(@max_id + 4, 'es_ES', NULL, '', ''),
+(@max_id + 5, 'es_ES', NULL, '', ''),
+(@max_id + 6, 'es_ES', NULL, '', ''),
+(@max_id + 7, 'es_ES', NULL, '', ''),
+(@max_id + 8, 'es_ES', NULL, '', ''),
+(@max_id + 9, 'es_ES', NULL, '', ''),
+(@max_id + 10, 'es_ES', NULL, '', ''),
+(@max_id + 11, 'es_ES', NULL, '', ''),
+(@max_id + 12, 'es_ES', NULL, '', ''),
+(@max_id + 13, 'es_ES', NULL, '', ''),
+(@max_id + 14, 'es_ES', NULL, '', ''),
+(@max_id + 15, 'es_ES', NULL, '', ''),
+(@max_id + 16, 'es_ES', NULL, '', ''),
+(@max_id + 17, 'es_ES', NULL, '', ''),
+(@max_id + 18, 'es_ES', NULL, '', ''),
+(@max_id + 19, 'es_ES', NULL, '', ''),
+(@max_id + 20, 'es_ES', NULL, '', ''),
+(@max_id + 21, 'es_ES', NULL, '', ''),
+(@max_id + 22, 'es_ES', NULL, '', ''),
+(@max_id + 23, 'es_ES', NULL, '', ''),
+(@max_id + 24, 'es_ES', NULL, '', ''),
+(@max_id + 25, 'es_ES', NULL, '', ''),
+(@max_id + 26, 'es_ES', NULL, '', ''),
+(@max_id + 27, 'es_ES', NULL, '', ''),
+(@max_id + 28, 'es_ES', NULL, '', ''),
+(@max_id + 29, 'es_ES', NULL, '', ''),
+(@max_id + 30, 'es_ES', NULL, '', ''),
+(@max_id + 31, 'es_ES', NULL, '', ''),
+(@max_id + 32, 'es_ES', NULL, '', ''),
+(@max_id + 33, 'es_ES', NULL, '', ''),
+(@max_id + 34, 'es_ES', NULL, '', ''),
+(@max_id + 35, 'es_ES', NULL, '', ''),
+(@max_id + 36, 'es_ES', NULL, '', ''),
+(@max_id + 37, 'es_ES', NULL, '', ''),
+(@max_id + 38, 'es_ES', NULL, '', ''),
+(@max_id + 39, 'es_ES', NULL, '', ''),
+(@max_id + 40, 'es_ES', NULL, '', ''),
+(@max_id + 41, 'es_ES', NULL, '', ''),
+(@max_id + 42, 'es_ES', NULL, '', ''),
+(@max_id + 43, 'es_ES', NULL, '', ''),
+(@max_id + 44, 'es_ES', NULL, '', ''),
+(@max_id + 45, 'es_ES', NULL, '', ''),
+(@max_id + 46, 'es_ES', NULL, '', ''),
+(@max_id + 47, 'es_ES', NULL, '', ''),
+(@max_id + 48, 'es_ES', NULL, '', ''),
+(@max_id + 49, 'es_ES', NULL, '', ''),
+(@max_id + 50, 'es_ES', NULL, '', ''),
+(@max_id + 51, 'es_ES', NULL, '', ''),
+(@max_id + 52, 'es_ES', NULL, '', ''),
+(@max_id + 53, 'es_ES', NULL, '', ''),
+(@max_id + 54, 'es_ES', NULL, '', ''),
+(@max_id + 55, 'es_ES', NULL, '', ''),
+(@max_id + 56, 'es_ES', NULL, '', ''),
+(@max_id + 57, 'es_ES', NULL, '', ''),
+(@max_id + 58, 'es_ES', NULL, '', ''),
+(@max_id + 59, 'es_ES', NULL, '', ''),
+(@max_id + 60, 'es_ES', NULL, '', ''),
+(@max_id + 61, 'es_ES', NULL, '', ''),
+(@max_id + 62, 'es_ES', NULL, '', ''),
+(@max_id + 63, 'es_ES', NULL, '', ''),
+(@max_id + 64, 'es_ES', NULL, '', ''),
+(@max_id + 65, 'es_ES', NULL, '', '')
 ;
 
 -- Fix attribute_template and feature_template relations

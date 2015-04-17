@@ -707,6 +707,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1381, 'tab-image.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1382, 'tab-document.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1383, 'tab-document.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1384, 'export.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1385, 'export.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -2079,6 +2081,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1381, '{$locale}', {intl l='Tab image - bottom' locale=$locale}, '', ''),
     (1382, '{$locale}', {intl l='Tab document - top' locale=$locale}, '', ''),
     (1383, '{$locale}', {intl l='Tab document - bottom' locale=$locale}, '', ''),
+    (1384, '{$locale}', {intl l='Export modal or page - top' locale=$locale}, '', ''),
+    (1385, '{$locale}', {intl l='Export modal or page - bottom' locale=$locale}, '', ''),
 
     (2001, '{$locale}', {intl l='Invoice - CSS' locale=$locale}, NULL, NULL),
     (2002, '{$locale}', {intl l='Invoice - in the header' locale=$locale}, NULL, NULL),

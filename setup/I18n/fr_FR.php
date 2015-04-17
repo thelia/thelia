@@ -345,6 +345,8 @@ return array(
     'Ethiopia' => 'Éthiopie',
     'Euro' => 'Euro',
     'Export - JavaScript' => 'Export - JavaScript',
+    'Export modal or page - top' => 'Modal ou page d\'export - en haut',
+    'Export modal or page - bottom' => 'Modal ou page d\'export - en bas',
     'Exports - JavaScript' => 'Exports - JavaScript',
     'Exports - at the bottom of a category' => 'Exports - en bas d\'une catégorie',
     'Exports - at the bottom of column 1' => 'Exports - en bas de la colonne 1',

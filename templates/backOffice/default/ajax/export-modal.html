@@ -12,6 +12,9 @@
                     <h4 class="modal-title" id="export-modal-label">Export: {$TITLE}</h4>
                 </div>
                 <div class="modal-body">
+
+                    {hook name="export.top" type="modal" id=$ID}
+
                     {if $DESCRIPTION}
                         <div class="row">
                             <div class="col-md-12">
@@ -155,6 +158,9 @@
                         {/elseloop}
                         </div>
                     </div>
+
+                    {hook name="export.bottom" type="modal" id=$ID}
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="Close"}</button>

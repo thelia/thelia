@@ -57,6 +57,9 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+# 2.1.4
+
+- Add ```export.top``` and ```export.bottom``` hooks
 
 # 2.1.3
 
