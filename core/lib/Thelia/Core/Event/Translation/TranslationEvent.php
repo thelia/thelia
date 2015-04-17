@@ -39,6 +39,12 @@ class TranslationEvent extends ActionEvent
     /** @var  array */
     protected $translatableStrings;
 
+    /** @var  array */
+    protected $customFallbackStrings;
+
+    /** @var  array */
+    protected $globalFallbackStrings;
+
     /** @var  int */
     protected $translatableStringCount;
 
@@ -242,4 +248,37 @@ class TranslationEvent extends ActionEvent
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getCustomFallbackStrings()
+    {
+        return $this->customFallbackStrings;
+    }
+
+    /**
+     * @param array $customFallbackStrings
+     */
+    public function setCustomFallbackStrings($customFallbackStrings)
+    {
+        $this->customFallbackStrings = $customFallbackStrings;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGlobalFallbackStrings()
+    {
+        return $this->globalFallbackStrings;
+    }
+
+    /**
+     * @param array $globalFallbackStrings
+     */
+    public function setGlobalFallbackStrings($globalFallbackStrings)
+    {
+        $this->globalFallbackStrings = $globalFallbackStrings;
+        return $this;
+    }
 }

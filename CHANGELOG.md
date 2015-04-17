@@ -1,6 +1,7 @@
 # 2.2.0-alpha2
 
 - Add a front office way to make an address the default one
+- New translation domain that allows to redefine translation strings globally or specifically to a domain. By the way, we can safely update Thelia, modules, templates without overwriting specific translations.       
 
 # 2.2.0-alpha1
 

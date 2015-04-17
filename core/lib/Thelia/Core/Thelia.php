@@ -42,6 +42,7 @@ use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\TemplateDefinition;
+use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Module;
@@ -289,6 +290,9 @@ class Thelia extends Kernel
 
             // Load core translation
             $translationDirs['core'] = THELIA_LIB . 'Config' . DS . 'I18n';
+
+            // Load core translation
+            $translationDirs[Translator::GLOBAL_FALLBACK_DOMAIN] = THELIA_LOCAL_DIR . 'I18n';
 
             // Standard templates (front, back, pdf, mail)
 

@@ -12,8 +12,11 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\Translation\TranslationEvent;
 use Thelia\Core\Translation\Translator;
@@ -26,6 +29,16 @@ use Thelia\Log\Tlog;
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     public function getTranslatableStrings(TranslationEvent $event)
     {
         $stringCount = $this->walkDir(
@@ -148,6 +161,27 @@ class Translation extends BaseAction implements EventSubscriberInterface
                                                 [],
                                                 $domain,
                                                 $currentLocale,
+                                                false,
+                                                false
+                                            ),
+                                            'custom_fallback' => Translator::getInstance()->trans(
+                                                sprintf(
+                                                    Translator::GLOBAL_FALLBACK_KEY,
+                                                    $domain,
+                                                    $match
+                                                ),
+                                                [],
+                                                Translator::GLOBAL_FALLBACK_DOMAIN,
+                                                $currentLocale,
+                                                false,
+                                                false
+                                            ),
+                                            'global_fallback' => Translator::getInstance()->trans(
+                                                $match,
+                                                [],
+                                                Translator::GLOBAL_FALLBACK_DOMAIN,
+                                                $currentLocale,
+                                                false,
                                                 false
                                             ),
                                             'dollar'  => strstr($match, '$') !== false
@@ -179,6 +213,8 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             if (! $fs->exists($file)) {
                 $fs->mkdir($dir);
+
+                $this->cacheClear($event->getDispatcher());
             }
         }
 
@@ -216,6 +252,95 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    public function writeFallbackFile(TranslationEvent $event)
+    {
+        $file = THELIA_LOCAL_DIR . 'I18n' . DS . $event->getLocale() . '.php';
+
+        $fs = new Filesystem();
+        $translations = [];
+
+        if (! $fs->exists($file)) {
+            if (true === $event->isCreateFileIfNotExists()) {
+                $dir = dirname($file);
+                $fs->mkdir($dir);
+
+                $this->cacheClear($event->getDispatcher());
+            } else {
+                throw new \RuntimeException(
+                    Translator::getInstance()->trans(
+                        'Failed to open translation file %file. Please be sure that this file is writable by your Web server',
+                        array('%file' => $file)
+                    )
+                );
+            }
+        } else {
+            /*$loader = new PhpFileLoader();
+            $catalogue = $loade     r->load($file);
+            $translations = $catalogue->all();
+            */
+            $translations = require $file;
+
+            if (! is_array($translations)) {
+                $translations = [];
+            }
+        }
+
+        if ($fp = @fopen($file, 'w')) {
+
+            $texts = $event->getTranslatableStrings();
+            $customs = $event->getCustomFallbackStrings();
+            $globals = $event->getGlobalFallbackStrings();
+
+            // just reset current translations for this domain to remove strings that do not exist anymore
+            $translations[$event->getDomain()] = [];
+
+            foreach ($texts as $key => $text) {
+
+                if (!empty($customs[$key])) {
+                    $translations[$event->getDomain()][$text] = $customs[$key];
+                }
+
+                if (!empty($globals[$key])) {
+                    $translations[$text] = $globals[$key];
+                } else {
+                    unset($translations[$text]);
+                }
+            }
+
+            fwrite($fp, '<' . "?php\n\n");
+            fwrite($fp, "return [\n");
+
+            // Sort keys alphabetically while keeping index
+            ksort($translations);
+
+            foreach ($translations as $key => $text) {
+                // Write only defined (not empty) translations
+                if (!empty($translations[$key])) {
+                    if (is_array($translations[$key])) {
+                        $key = str_replace("'", "\'", $key);
+                        fwrite($fp, sprintf("    '%s' => [\n", $key));
+                        ksort($translations[$key]);
+                        foreach ($translations[$key] as $subKey => $subText) {
+                            $subKey = str_replace("'", "\'", $subKey);
+                            $translation = str_replace("'", "\'", $subText);
+                            fwrite($fp, sprintf("        '%s' => '%s',\n", $subKey, $translation));
+                        }
+                        fwrite($fp, "    ],\n");
+                    } else {
+                        $key = str_replace("'", "\'", $key);
+                        $translation = str_replace("'", "\'", $text);
+                        fwrite($fp, sprintf("    '%s' => '%s',\n", $key, $translation));
+                    }
+                }
+            }
+
+            fwrite($fp, "];\n");
+
+            @fclose($fp);
+        }
+
+    }
+
     protected function normalizePath($path)
     {
         $path = str_replace(
@@ -227,11 +352,23 @@ class Translation extends BaseAction implements EventSubscriberInterface
         return ltrim($path, '/');
     }
 
+    protected function cacheClear(EventDispatcherInterface $dispatcher)
+    {
+        $cacheEvent = new CacheEvent(
+            $this->container->getParameter('kernel.cache_dir')
+        );
+
+        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+    }
+
     public static function getSubscribedEvents()
     {
         return array(
             TheliaEvents::TRANSLATION_GET_STRINGS => array('getTranslatableStrings', 128),
-            TheliaEvents::TRANSLATION_WRITE_FILE => array('writeTranslationFile', 128)
+            TheliaEvents::TRANSLATION_WRITE_FILE => [
+                ['writeTranslationFile', 128],
+                ['writeFallbackFile', 128]
+            ]
         );
     }
 }

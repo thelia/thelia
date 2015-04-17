@@ -12,21 +12,27 @@
 
 namespace TheliaSmarty\Template\Plugins;
 
+use Thelia\Core\Translation\Translator;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class Translation extends AbstractSmartyPlugin
 {
+    /** @var Translator */
     protected $translator;
+
     protected $defaultTranslationDomain = '';
     protected $defaultLocale = null;
+
 
     protected $protectedParams = [
         'l',
         'd',
         'js',
-        'locale'
+        'locale',
+        'default',
+        'fallback'
     ];
 
     public function __construct(TranslatorInterface $translator)
@@ -81,7 +87,9 @@ class Translation extends AbstractSmartyPlugin
             $this->getParam($params, 'l'),
             $vars,
             $this->getParam($params, 'd', $this->defaultTranslationDomain),
-            $this->getParam($params, 'locale', $this->defaultLocale)
+            $this->getParam($params, 'locale', $this->defaultLocale),
+            $this->getBoolean($this->getParam($params, 'default', true), true),
+            $this->getBoolean($this->getParam($params, 'fallback', true), true)
         );
 
         if ($this->getParam($params, 'js', 0)) {
@@ -89,6 +97,16 @@ class Translation extends AbstractSmartyPlugin
         }
 
         return $str;
+    }
+
+    protected function getBoolean($value, $default = false)
+    {
+        $val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if (null === $val) {
+            $val = $default;
+        }
+
+        return $val;
     }
 
     /**
