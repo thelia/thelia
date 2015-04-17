@@ -50,7 +50,7 @@ class Session extends BaseSession
     ) {
         parent::__construct($storage, $attributes, $flashes);
 
-        // Check for-errors for obsolete data
+        // Check for obsolete from error data
         $this->cleanOutdatedFormErrorInformation();
     }
 
