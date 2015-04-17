@@ -118,13 +118,10 @@ class Form extends AbstractSmartyPlugin
             $formClass = $this->formDefinition[$name];
 
             // Check if parser context contains our form
-            $form = $this->parserContext->getForm($name, $formClass, $formType);
+            $instance = $this->parserContext->getForm($name, $formClass, $formType);
 
-            if (null != $form) {
-                // Re-use the form
-                $instance = $form;
-            } else {
-                // Create a new one
+            if (null === $instance) {
+                // Id not, create a new instance
                 $instance = $this->formFactory->createForm($name);
             }
 
