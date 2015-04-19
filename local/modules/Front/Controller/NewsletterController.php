@@ -91,12 +91,12 @@ class NewsletterController extends BaseFrontController
             return $response;
 
         } else {
-            $newsletterForm->setErrorMessage($errorMessage);
+            if ($errorMessage) {
+                $newsletterForm->setErrorMessage($errorMessage);
+                $this->getParserContext()->setGeneralError($errorMessage);
+            }
 
-            $this->getParserContext()
-                ->addForm($newsletterForm)
-                ->setGeneralError($errorMessage)
-            ;
+            $this->getParserContext()->addForm($newsletterForm);
         }
     }
 }

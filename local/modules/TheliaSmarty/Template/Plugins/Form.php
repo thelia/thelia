@@ -121,7 +121,7 @@ class Form extends AbstractSmartyPlugin
             $instance = $this->parserContext->getForm($name, $formClass, $formType);
 
             if (null === $instance) {
-                // Id not, create a new instance
+                // If not, create a new instance
                 $instance = $this->formFactory->createForm($name);
             }
 

@@ -141,15 +141,24 @@ class ParserContext implements \IteratorAggregate
             if (is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm($formId, $formType, $formInfo['data']);
 
-                try {
-                    // Perform validation to restore form internal error context
-                    $this->formValidator->validateForm($form, $formInfo['method']);
-                } catch (\Exception $ex) {
-                    // Ignore the exception.
+                // If the form has errors, perform a validation, to restore the internal error context
+                // A controller (as the NewsletterController) may use the parserContext to redisplay a
+                // validated (not errored) form. In such cases, another validation may cause unexpected
+                // results.
+                if (true === $formInfo['hasError']) {
+                    try {
+                        $this->formValidator->validateForm($form, $formInfo['method']);
+                    } catch (\Exception $ex) {
+                        // Ignore the exception.
+                    }
                 }
 
                 $form->setError($formInfo['hasError']);
-                $form->setErrorMessage($formInfo['errorMessage']);
+
+                // Check if error message is empty, as BaseForm::setErrorMessage() always set form error flag to true.
+                if (! empty($formInfo['errorMessage'])) {
+                    $form->setErrorMessage($formInfo['errorMessage']);
+                }
 
                 return $form;
             }
