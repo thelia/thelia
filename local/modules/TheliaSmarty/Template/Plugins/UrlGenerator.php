@@ -36,7 +36,7 @@ class UrlGenerator extends AbstractSmartyPlugin
      * Process url generator function
      *
      * @param  array   $params
-     * @param  unknown $smarty
+     * @param  \Smarty $smarty
      * @return string  no text is returned.
      */
     public function generateUrlFunction($params, &$smarty)
@@ -114,14 +114,13 @@ class UrlGenerator extends AbstractSmartyPlugin
         });
 
         return $keys;
-
     }
 
      /**
       * Process view url generator function
       *
       * @param  array $params
-      * @param  unknown $smarty
+      * @param  \Smarty $smarty
       * @return string no text is returned.
       */
     public function generateFrontViewUrlFunction($params, &$smarty)
@@ -133,13 +132,14 @@ class UrlGenerator extends AbstractSmartyPlugin
       * Process administration view url generator function
       *
       * @param  array $params
-      * @param  unknown $smarty
+      * @param  \Smarty $smarty
       * @return string no text is returned.
       */
     public function generateAdminViewUrlFunction($params, &$smarty)
     {
         return $this->generateViewUrlFunction($params, true);
     }
+
 
     public function navigateToUrlFunction($params, &$smarty)
     {
@@ -153,17 +153,23 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function generateViewUrlFunction($params, $forAdmin)
     {
         // the view name (without .html)
-         $view = $this->getParam($params, 'view');
+        $view   = $this->getParam($params, 'view');
+        $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+        $target = $this->getParam($params, 'target', null);
 
-          // the related action (optionale)
-         $action = $this->getParam($params, 'action');
+        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target'));
 
-        $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
+        $url = $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
 
-        if (! empty($action)) {
-            $args['action'] = $action;
+        if ($noamp == null) {
+            $url = str_replace('&', '&amp;', $url);
         }
-        return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
+
+        if ($target != null) {
+            $url .= '#'.$target;
+        }
+
+        return $url;
     }
 
      /**
@@ -232,7 +238,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
@@ -267,7 +273,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         $navigateToValues = $this->getNavigateToValues();
 
         if (!array_key_exists($to, $navigateToValues)) {
-            throw new \InvalidArgumentException(sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to));
+            throw new \InvalidArgumentException(
+                sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to)
+            );
         }
 
         return $navigateToValues[$to];
