@@ -844,7 +844,6 @@ return array(
     'Thailand' => 'Thailand',
     'The ID of the \'Terms & Conditions\' content.' => 'The ID of the \'Terms & Conditions\' content.',
     'The ID of the folder containing your information pages : terms, imprint, ...' => 'The ID of the folder containing your information pages : terms, imprint, ...',
-    'The URL to update exchange rates' => 'The URL to update exchange rates',
     'The Vatican' => 'The Vatican',
     'The default quality (in %) of the generated images' => 'The default quality (in %) of the generated images',
     'The path (relative to the default back-office template) to the image used when no flag image can be found for a country' => 'The path (relative to the default back-office template) to the image used when no flag image can be found for a country',
