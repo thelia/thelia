@@ -844,7 +844,6 @@ return array(
     'Thailand' => 'Thaïlande',
     'The ID of the \'Terms & Conditions\' content.' => 'L\'ID du contenu de vos \'CGV\'.',
     'The ID of the folder containing your information pages : terms, imprint, ...' => 'L\'ID du dossier contenant vos pages d\'informations : CGV, mentions légales, ...',
-    'The URL to update exchange rates' => 'L\'URL pour mettre à jour les taux de change',
     'The Vatican' => 'Vatican',
     'The default quality (in %) of the generated images' => 'La qualité par défaut (en %) dans les images générées',
     'The path (relative to the default back-office template) to the image used when no flag image can be found for a country' => 'Le chemin (par rapport au modèle de back-office par défaut) vers l\'image utilisée lorsque aucune image de drapeau ne peut être trouvée pour un pays',
