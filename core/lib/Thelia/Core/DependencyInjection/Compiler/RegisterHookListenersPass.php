@@ -32,10 +32,9 @@ use Thelia\Model\ModuleQuery;
  * Class RegisterListenersPass
  * @package Thelia\Core\DependencyInjection\Compiler
  *
- * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
  * @author Manuel Raynaud <manu@thelia.net>
  */
-class RegisterListenersPass implements CompilerPassInterface
+class RegisterHookListenersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
@@ -44,42 +43,6 @@ class RegisterListenersPass implements CompilerPassInterface
         }
 
         $definition = $container->getDefinition('event_dispatcher');
-
-        foreach ($container->findTaggedServiceIds('kernel.event_listener') as $id => $events) {
-            foreach ($events as $event) {
-                $priority = isset($event['priority']) ? $event['priority'] : 0;
-
-                if (!isset($event['event'])) {
-                    throw new \InvalidArgumentException(sprintf('Service "%s" must define the "event" attribute on "kernel.event_listener" tags.', $id));
-                }
-
-                if (!isset($event['method'])) {
-                    $callback = function ($matches) {
-                        return strtoupper($matches[0]);
-                    };
-                    $event['method'] = 'on'.preg_replace_callback(array(
-                            '/(?<=\b)[a-z]/i',
-                            '/[^a-z0-9]/i',
-                        ), $callback, $event['event']);
-                    $event['method'] = preg_replace('/[^a-z0-9]/i', '', $event['method']);
-                }
-
-                $definition->addMethodCall('addListenerService', array($event['event'], array($id, $event['method']), $priority));
-            }
-        }
-
-        foreach ($container->findTaggedServiceIds('kernel.event_subscriber') as $id => $attributes) {
-            // We must assume that the class value has been correctly filled, even if the service is created by a factory
-            $class = $container->getDefinition($id)->getClass();
-
-            $refClass = new \ReflectionClass($class);
-            $interface = 'Symfony\Component\EventDispatcher\EventSubscriberInterface';
-            if (!$refClass->implementsInterface($interface)) {
-                throw new \InvalidArgumentException(sprintf('Service "%s" must implement interface "%s".', $id, $interface));
-            }
-
-            $definition->addMethodCall('addSubscriberService', array($id, $class));
-        }
 
         // We have to check if Propel is initialized before registering hooks
         $managers = Propel::getServiceContainer()->getConnectionManagers();
