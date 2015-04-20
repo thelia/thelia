@@ -18,7 +18,6 @@ use Symfony\Component\Form\FormFactoryBuilder;
 use Symfony\Component\Validator\ValidatorBuilder;
 use TheliaSmarty\Template\Plugins\Form;
 
-
 /**
  * Class FormTest
  * @package TheliaSmarty\Tests\Template\Plugin
@@ -36,16 +35,12 @@ class FormTest extends SmartyPluginTestCase
      */
     protected function getPlugin(ContainerBuilder $container)
     {
-        $container->set("thelia.parser.forms", [
-            "thelia.empty" => "Thelia\\Form\\EmptyForm",
-            "thelia.empty.2" => "Thelia\\Form\\EmptyForm",
-            "thelia.api.empty" => "Thelia\\Form\\Api\\ApiEmptyForm",
-        ]);
+        $this->plugin = new Form(
+            $container->get("thelia.form_factory"),
+            $container->get("thelia.parser.context"),
+            $container->get("thelia.parser")
+        );
 
-        $container->set("thelia.form_factory_builder", (new FormFactoryBuilder())->addExtension(new CoreExtension()));
-        $container->set("thelia.forms.validator_builder", new ValidatorBuilder());
-
-        $this->plugin = new Form($container, $container->get("thelia.parser.context"), $container->get("thelia.parser"));
         $this->plugin->setFormDefinition($container->get("thelia.parser.forms"));
 
         return $this->plugin;

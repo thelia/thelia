@@ -223,7 +223,13 @@ abstract class BaseController extends ContainerAware
      */
     protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
-        return $this->getTheliaFormValidator()->validateForm($aBaseForm, $expectedMethod);
+        $form = $this->getTheliaFormValidator()->validateForm($aBaseForm, $expectedMethod);
+
+        // At this point, the form is valid (no exception was thrown). Remove it from the error context.
+        $this->getParserContext()->clearForm($aBaseForm);
+
+        return $form;
+
     }
 
     /**

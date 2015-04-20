@@ -13,7 +13,10 @@
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -331,5 +334,28 @@ class Session extends BaseSession
     public function getConsumedCoupons()
     {
         return $this->get('thelia.consumed_coupons', array());
+    }
+
+    /**
+     * Get saved errored forms information
+     *
+     * @return array
+     */
+    public function getFormErrorInformation()
+    {
+        return $this->get('thelia.form-errors', []);
+    }
+
+    /**
+     * Save errored forms information
+     *
+     * @param array $formInformation
+     * @return mixed
+     */
+    public function setFormErrorInformation($formInformation)
+    {
+        $this->set('thelia.form-errors', $formInformation);
+
+        return $this;
     }
 }

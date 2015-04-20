@@ -15,10 +15,13 @@ namespace Thelia\Tests\Model;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Form\TheliaFormFactory;
+use Thelia\Core\Form\TheliaFormValidator;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Template\TheliaTemplateHelper;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Message as ModelMessage;
 use TheliaSmarty\Template\SmartyParser;
@@ -57,6 +60,12 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $request->setSession($session);
 
+        $parserContext = new ParserContext(
+            $request,
+            new TheliaFormFactory($request, $container, []),
+            new TheliaFormValidator(new Translator($container), 'dev')
+        );
+
         /*
          *  public function __construct(
             Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
@@ -66,7 +75,7 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $container->set("event_dispatcher", $dispatcher);
         $container->set('request', $request);
 
-        $this->parser = new SmartyParser($request, $dispatcher, new ParserContext($request), $this->templateHelper, 'dev', true);
+        $this->parser = new SmartyParser($request, $dispatcher, $parserContext, $this->templateHelper, 'dev', true);
         $this->parser->setTemplateDefinition($this->templateHelper->getActiveMailTemplate());
 
         $container->set('thelia.parser', $this->parser);
