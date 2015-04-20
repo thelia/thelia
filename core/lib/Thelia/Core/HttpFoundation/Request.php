@@ -24,6 +24,8 @@ use Thelia\Model\ConfigQuery;
  */
 class Request extends BaseRequest
 {
+    private $resolvedPathInfo;
+
     /**
      * Filter PathInfo to allow slash ending uri
      *
@@ -36,10 +38,19 @@ class Request extends BaseRequest
         $pathLength = strlen($pathInfo);
 
         if ($pathInfo !== "/" && $pathInfo[$pathLength - 1] === "/" && (bool) ConfigQuery::read("allow_slash_ended_uri", false)) {
-            $this->pathInfo = $pathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
+            if (null === $this->resolvedPathInfo) {
+                $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
+            }
+
+            $pathInfo = $this->resolvedPathInfo;
         }
 
         return $pathInfo;
+    }
+
+    public function getRealPathInfo()
+    {
+        return parent::getPathInfo();
     }
 
     public function getProductId()

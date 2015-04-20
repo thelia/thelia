@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
@@ -54,7 +55,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function setContext(RequestContext $context)
     {
-        // TODO: Implement setContext() method.
         $this->context = $context;
     }
 
@@ -67,7 +67,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
      */
     public function getContext()
     {
-        // TODO: Implement getContext() method.
         return $this->context;
     }
 
@@ -155,8 +154,12 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     public function matchRequest(Request $request)
     {
         if (ConfigQuery::isRewritingEnable()) {
+            $urlTool = URL::getInstance();
+
+            $pathInfo = $request instanceof TheliaRequest ? $request->getRealPathInfo() : $request->getPathInfo();
+
             try {
-                $rewrittenUrlData = URL::getInstance()->resolve($request->getPathInfo());
+                $rewrittenUrlData = $urlTool->resolve($pathInfo);
             } catch (UrlRewritingException $e) {
                 switch ($e->getCode()) {
                     case UrlRewritingException::URL_NOT_FOUND:
@@ -170,7 +173,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             /* is the URL redirected ? */
 
             if (null !== $rewrittenUrlData->redirectedToUrl) {
-                $this->redirect($rewrittenUrlData->redirectedToUrl, 301);
+                $this->redirect($urlTool->absoluteUrl($rewrittenUrlData->redirectedToUrl), 301);
             }
 
             /* define GET arguments in request */
