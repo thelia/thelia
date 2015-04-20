@@ -1,6 +1,8 @@
 # 2.1.4
 
 - Add ```export.top``` and ```export.bottom``` hooks
+- Fix slash ended rewritten url redirection
+- Remove ```currency_rate_update_url``` in ```setup/insert.sql```
 
 # 2.1.3
 
