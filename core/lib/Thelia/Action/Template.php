@@ -14,7 +14,6 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Propel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\TemplateTableMap;
 use Thelia\Model\TemplateQuery;

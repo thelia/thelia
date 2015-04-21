@@ -36,7 +36,7 @@ class UrlGenerator extends AbstractSmartyPlugin
      * Process url generator function
      *
      * @param  array   $params
-     * @param  unknown $smarty
+     * @param  \Smarty $smarty
      * @return string  no text is returned.
      */
     public function generateUrlFunction($params, &$smarty)
@@ -45,7 +45,6 @@ class UrlGenerator extends AbstractSmartyPlugin
         $current = $this->getParam($params, 'current', false);
         $path  = $this->getParam($params, 'path', null);
         $file  = $this->getParam($params, 'file', null); // Do not invoke index.php in URL (get a static file in web space
-        $noamp = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
 
         if ($current) {
             $path = $this->request->getPathInfo();
@@ -69,21 +68,14 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $excludeParams = $this->resolvePath($params, $path, $smarty);
 
-        $target = $this->getParam($params, 'target', null);
-
         $url = URL::getInstance()->absoluteUrl(
             $path,
             $this->getArgsFromParam($params, array_merge(['noamp', 'path', 'file', 'target'], $excludeParams)),
             $mode
         );
 
-        if ($noamp == null) {
-            $url = str_replace('&', '&amp;', $url);
-        }
+        $this->applyNoAmpAndTarget($params, $url);
 
-        if ($target != null) {
-            $url .= '#'.$target;
-        }
         return $url;
     }
 
@@ -114,14 +106,13 @@ class UrlGenerator extends AbstractSmartyPlugin
         });
 
         return $keys;
-
     }
 
      /**
       * Process view url generator function
       *
       * @param  array $params
-      * @param  unknown $smarty
+      * @param  \Smarty $smarty
       * @return string no text is returned.
       */
     public function generateFrontViewUrlFunction($params, &$smarty)
@@ -133,13 +124,14 @@ class UrlGenerator extends AbstractSmartyPlugin
       * Process administration view url generator function
       *
       * @param  array $params
-      * @param  unknown $smarty
+      * @param  \Smarty $smarty
       * @return string no text is returned.
       */
     public function generateAdminViewUrlFunction($params, &$smarty)
     {
         return $this->generateViewUrlFunction($params, true);
     }
+
 
     public function navigateToUrlFunction($params, &$smarty)
     {
@@ -153,17 +145,13 @@ class UrlGenerator extends AbstractSmartyPlugin
     protected function generateViewUrlFunction($params, $forAdmin)
     {
         // the view name (without .html)
-         $view = $this->getParam($params, 'view');
+        $view   = $this->getParam($params, 'view');
 
-          // the related action (optionale)
-         $action = $this->getParam($params, 'action');
+        $args = $this->getArgsFromParam($params, array('view', 'noamp', 'target'));
 
-        $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
+        $url = $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
 
-        if (! empty($action)) {
-            $args['action'] = $action;
-        }
-        return $forAdmin ? URL::getInstance()->adminViewUrl($view, $args) : URL::getInstance()->viewUrl($view, $args);
+        return $this->applyNoAmpAndTarget($params, $url);
     }
 
      /**
@@ -208,7 +196,23 @@ class UrlGenerator extends AbstractSmartyPlugin
             ]
         );
 
-        return $newUrl;
+        return $this->applyNoAmpAndTarget($params, $newUrl);
+    }
+
+    protected function applyNoAmpAndTarget($params, $url)
+    {
+        $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+        $target = $this->getParam($params, 'target', null);
+
+        if ($noamp == null) {
+            $url = str_replace('&', '&amp;', $url);
+        }
+
+        if ($target != null) {
+            $url .= '#'.$target;
+        }
+
+        return $url;
     }
 
     /**
@@ -232,7 +236,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     /**
      * Define the various smarty plugins handled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return array an array of smarty plugin descriptors
      */
     public function getPluginDescriptors()
     {
@@ -267,7 +271,9 @@ class UrlGenerator extends AbstractSmartyPlugin
         $navigateToValues = $this->getNavigateToValues();
 
         if (!array_key_exists($to, $navigateToValues)) {
-            throw new \InvalidArgumentException(sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to));
+            throw new \InvalidArgumentException(
+                sprintf("Incorrect value `%s` for parameter `to` in `navigate` substitution.", $to)
+            );
         }
 
         return $navigateToValues[$to];

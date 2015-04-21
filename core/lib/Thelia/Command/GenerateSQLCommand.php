@@ -79,7 +79,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
 
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
-
             $content = file_get_contents($file->getRealPath());
             $content = $this->parser->renderString($content, [], false);
 
@@ -195,7 +194,6 @@ class GenerateSQLCommand extends ContainerAwareCommand
         } elseif (empty($params["locale"])) {
             throw new RuntimeException('Translation Error. Locale is empty.');
         } else {
-
             $inString = (0 !== intval($params["in_string"]));
             $useDefault = (0 !== intval($params["use_default"]));
 

@@ -286,7 +286,6 @@ class Translation extends BaseAction implements EventSubscriberInterface
         }
 
         if ($fp = @fopen($file, 'w')) {
-
             $texts = $event->getTranslatableStrings();
             $customs = $event->getCustomFallbackStrings();
             $globals = $event->getGlobalFallbackStrings();
@@ -295,7 +294,6 @@ class Translation extends BaseAction implements EventSubscriberInterface
             $translations[$event->getDomain()] = [];
 
             foreach ($texts as $key => $text) {
-
                 if (!empty($customs[$key])) {
                     $translations[$event->getDomain()][$text] = $customs[$key];
                 }
@@ -338,7 +336,6 @@ class Translation extends BaseAction implements EventSubscriberInterface
 
             @fclose($fp);
         }
-
     }
 
     protected function normalizePath($path)

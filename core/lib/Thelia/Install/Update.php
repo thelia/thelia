@@ -109,7 +109,6 @@ class Update
                 $dbConfig['user'],
                 $dbConfig['password']
             );
-
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }

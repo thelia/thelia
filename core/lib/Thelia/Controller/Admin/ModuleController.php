@@ -388,7 +388,6 @@ class ModuleController extends AbstractCrudController
                     'moduleId' => $module_id,
                     'moduleData' => $arrayData
                 ]);
-
             } else {
                 $status = 500;
 
@@ -397,7 +396,6 @@ class ModuleController extends AbstractCrudController
                     [ '%id' => $module_id]
                 );
             }
-
         } else {
             $status = 404;
 
@@ -466,5 +464,4 @@ class ModuleController extends AbstractCrudController
 
         return new JsonResponse([ 'title' => $title, 'body' => $content], $status);
     }
-
 }

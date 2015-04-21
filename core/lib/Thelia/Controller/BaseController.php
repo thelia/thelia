@@ -229,7 +229,6 @@ abstract class BaseController extends ContainerAware
         $this->getParserContext()->clearForm($aBaseForm);
 
         return $form;
-
     }
 
     /**
