@@ -12,10 +12,17 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Thelia\Tools\URL;
+
 class AdminController extends BaseAdminController
 {
     public function indexAction()
     {
+        if (!$this->getSecurityContext()->hasAdminUser()) {
+            return new RedirectResponse(URL::getInstance()->absoluteUrl($this->getRoute("admin.login")));
+        }
+
         return $this->render("home");
     }
 
