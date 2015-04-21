@@ -271,6 +271,13 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         }
 
+        $baseSourceFilePath = ConfigQuery::read('images_library_path');
+        if ($baseSourceFilePath === null) {
+            $baseSourceFilePath = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+        } else {
+            $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
+        }
+
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
             if (! is_null($width)) {
@@ -294,15 +301,14 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             }
 
             // Put source image file path
-            $source_filepath = sprintf(
-                "%s%s/%s/%s",
-                THELIA_ROOT,
-                ConfigQuery::read('images_library_path', 'local'.DS.'media'.DS.'images'),
+            $sourceFilePath = sprintf(
+                '%s/%s/%s',
+                $baseSourceFilePath,
                 $this->objectType,
                 $result->getFile()
             );
 
-            $event->setSourceFilepath($source_filepath);
+            $event->setSourceFilepath($sourceFilePath);
             $event->setCacheSubdirectory($this->objectType);
 
             $loopResultRow = new LoopResultRow($result);
@@ -310,7 +316,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $loopResultRow
                 ->set("ID", $result->getId())
                 ->set("LOCALE", $this->locale)
-                ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
+                ->set("ORIGINAL_IMAGE_PATH", $sourceFilePath)
                 ->set("TITLE", $result->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $result->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $result->getVirtualColumn('i18n_DESCRIPTION'))
