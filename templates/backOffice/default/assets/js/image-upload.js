@@ -16,7 +16,6 @@ $(function($){
         var imageDropzone = new Dropzone("#images-dropzone", {
             dictDefaultMessage : $('.btn-browse').html(),
             uploadMultiple: false,
-            maxFilesize: 8,
             acceptedFiles: 'image/png, image/gif, image/jpeg'
         });    
 
