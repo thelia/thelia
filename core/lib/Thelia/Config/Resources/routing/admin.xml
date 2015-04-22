@@ -210,13 +210,17 @@
         <default key="_controller">Thelia\Controller\Admin\OrderController::updateAddress</default>
     </route>
 
-    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}">
+    <route id="admin.order.pdf.invoice" path="/admin/order/pdf/invoice/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateInvoicePdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
-    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}">
+    <route id="admin.order.pdf.delivery" path="/admin/order/pdf/delivery/{order_id}/{browser}">
         <default key="_controller">Thelia\Controller\Admin\OrderController::generateDeliveryPdf</default>
+        <default key="browser">0</default>
+        <requirement key="browser">[0|1]</requirement>
         <requirement key="order_id">\d+</requirement>
     </route>
 
