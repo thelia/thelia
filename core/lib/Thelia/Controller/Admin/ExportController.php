@@ -164,7 +164,7 @@ class ExportController extends BaseAdminController
 
         $event = new ImportExportEvent($formatter, $handler);
 
-        $filename = $formatter::FILENAME . "." . $formatter->getExtension();
+        $filename = $handler->getFilename() . "." . $formatter->getExtension();
 
         if ($archiveBuilder === null) {
             $data = $handler->buildData($lang);
@@ -223,7 +223,7 @@ class ExportController extends BaseAdminController
                 $filename
             );
 
-            return $archiveBuilder->buildArchiveResponse($formatter::FILENAME);
+            return $archiveBuilder->buildArchiveResponse($handler->getFilename());
         }
     }
 

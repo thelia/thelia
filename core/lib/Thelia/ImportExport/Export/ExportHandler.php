@@ -29,6 +29,9 @@ use Thelia\ImportExport\AbstractHandler;
  */
 abstract class ExportHandler extends AbstractHandler
 {
+    /** @var string Default filename. */
+    const DEFAULT_FILENAME = "data";
+
     protected $locale;
 
     /** @var  array */
@@ -195,6 +198,16 @@ abstract class ExportHandler extends AbstractHandler
     public function isImageExport()
     {
         return $this->isImageExport;
+    }
+
+    /**
+     * Get filename
+     *
+     * @return string
+     */
+    public function getFilename()
+    {
+        return static::DEFAULT_FILENAME;
     }
 
     /**
