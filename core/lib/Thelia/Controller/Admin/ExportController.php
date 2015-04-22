@@ -208,6 +208,7 @@ class ExportController extends BaseAdminController
                 ->setLang($lang)
             ;
 
+            $event->setData($data);
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter
