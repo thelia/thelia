@@ -40,13 +40,13 @@ class ProductStockImport extends ImportHandler
              */
             $this->checkMandatoryColumns($row);
 
-            $obj = ProductSaleElementsQuery::create()->findPk($row["id"]);
+            $obj = ProductSaleElementsQuery::create()->findOneByRef($row["ref"]);
 
             if ($obj === null) {
                 $errors[] = $this->translator->trans(
-                    "The product sale element reference %id doesn't exist",
+                    "The product sale element reference %ref doesn't exist",
                     [
-                        "%id" => $row["id"]
+                        "%ref" => $row["ref"]
                     ]
                 );
             } else {
@@ -66,7 +66,7 @@ class ProductStockImport extends ImportHandler
 
     protected function getMandatoryColumns()
     {
-        return ["id", "stock"];
+        return ["ref", "stock"];
     }
 
     /**
