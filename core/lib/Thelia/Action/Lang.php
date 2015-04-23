@@ -21,6 +21,7 @@ use Thelia\Core\Event\Lang\LangEvent;
 use Thelia\Core\Event\Lang\LangToggleDefaultEvent;
 use Thelia\Core\Event\Lang\LangUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\TemplateHelperInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Lang\LangUrlEvent;
@@ -38,9 +39,13 @@ class Lang extends BaseAction implements EventSubscriberInterface
     /** @var TemplateHelperInterface  */
     protected $templateHelper;
 
-    public function __construct(TemplateHelperInterface $templateHelper)
+    /** @var  Request */
+    protected $request;
+
+    public function __construct(TemplateHelperInterface $templateHelper, Request $request)
     {
         $this->templateHelper = $templateHelper;
+        $this->request = $request;
     }
 
     public function update(LangUpdateEvent $event)
@@ -103,6 +108,18 @@ class Lang extends BaseAction implements EventSubscriberInterface
 
             $lang->setDispatcher($event->getDispatcher())
                 ->delete();
+
+            $session = $this->request->getSession();
+
+            // If we've just deleted the current admin edition language, set it to the default one.
+            if ($lang->getId() == $session->getAdminEditionLang()->getId()) {
+                $session->setAdminEditionLang(LangModel::getDefaultLanguage());
+            }
+
+            // If we've just deleted the current admin language, set it to the default one.
+            if ($lang->getId() == $session->getLang()->getId()) {
+                $session->setLang(LangModel::getDefaultLanguage());
+            }
 
             $event->setLang($lang);
         }
