@@ -14,6 +14,7 @@ namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\Criterion\Exception\InvalidValueException;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\Exception\LoopException;
@@ -31,12 +32,27 @@ abstract class ExportHandler extends AbstractHandler
 {
     protected $locale;
 
+    /** @var  Translator */
+    protected $translator;
+
+    /**
+     * Translation domain to use for translating headers. Set it to null in extended classes if you do not want to translate.
+     */
+    const TRANSLATION_DOMAIN = null;
+
     /** @var  array */
     protected $order = array();
 
     protected $isImageExport = false;
 
     protected $isDocumentExport = false;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+
+        $this->translator = $container->get('thelia.translator');
+    }
 
     /**
      * @return array
@@ -215,5 +231,24 @@ abstract class ExportHandler extends AbstractHandler
     {
         $indexHeaders = $this->getOrder();
         return array_combine($indexHeaders, $indexHeaders);
+    }
+
+    protected function trans($key)
+    {
+        return is_null($this::TRANSLATION_DOMAIN) ? $key : $this->translator->trans($key, [], $this::TRANSLATION_DOMAIN);
+    }
+
+    /**
+     * @return array Heading row with translated values to display.
+     */
+    public function getTranslatedHeading()
+    {
+        $translatedHeading = array();
+
+        foreach ($this->getHeading() as $alias => $header) {
+            $translatedHeading[$alias] = $this->trans($header);
+        }
+
+        return $translatedHeading;
     }
 }

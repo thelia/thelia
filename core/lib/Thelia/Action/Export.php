@@ -75,15 +75,13 @@ class Export extends BaseAction implements EventSubscriberInterface
         $handler = $event->getHandler();
         $formatter = $event->getFormatter();
 
-        if ($handler instanceof ExportHandler &&
-            $formatter instanceof CSVFormatter
-        ) {
+        if ($formatter instanceof CSVFormatter) {
             // Get existing data
             $formatterData = $event->getData();
             $data = $formatterData->getData();
 
             // Get heading labels
-            $heading = $handler->getHeading();
+            $heading = $handler->getTranslatedHeading();
 
             // Complete heading row (with all keys)
             // - Use label if possible
