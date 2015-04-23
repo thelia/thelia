@@ -15,8 +15,11 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cache\CacheEvent;
+use Thelia\Core\Event\ImportExport;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter;
+use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 
@@ -58,6 +61,79 @@ class Export extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Before a CSV Export
+     *
+     * Replace labels into heading row
+     * Add a heading row with translated column names manually
+     *
+     * Of course the export has to use a CSVFormatter.
+     *
+     * @param ImportExport $event
+     */
+    public function addHeadingRow(ImportExport $event)
+    {
+        $handler = $event->getHandler();
+        $formatter = $event->getFormatter();
+
+        if ($handler instanceof ExportHandler &&
+            $formatter instanceof CSVFormatter
+        ) {
+            // Get existing data
+            $formatterData = $event->getData();
+            $data = $formatterData->getData();
+
+            // Get heading labels
+            $heading = $handler->getHeading();
+
+            // Complete heading row (with all keys)
+            // - Use label if possible
+            // - Use alias else
+            $orderCols = array_keys($formatterData->getRow(0));
+            $orderCols = array_combine($orderCols, $orderCols);
+            $headingRow = array_merge($orderCols, $heading);
+
+            // Add heading row to the top of data
+            array_unshift($data, $headingRow);
+
+            // Update event's data
+            $formatterData->setData($data);
+            $event->setData($formatterData);
+        }
+
+    }
+
+    /**
+     * After a CSV Export
+     *
+     * Removes the first row, which is automatically added by encode method of CSVFormatter
+     * (The heading row with column names was just add in "before" event)
+     *
+     * @param ImportExport $event
+     * @return mixed|string
+     */
+    public function deleteDefaultHeadingRow(ImportExport $event)
+    {
+        $formatter = $event->getFormatter();
+
+        if ($formatter instanceof CSVFormatter) {
+            $content = $event->getContent();
+
+            // Heading row
+            // Replace it
+
+            if (false === $firstRow = strpos($content, $formatter->lineReturn)) {
+                return $content;
+            }
+
+            // Remove old first row and concatenate the rest
+            $content = substr($content, $firstRow + strlen($formatter->lineReturn));
+
+            $event->setContent($content);
+        }
+
+    }
+
+    /**
      * Returns an array of event names this subscriber wants to listen to.
      *
      * The array keys are event names and the value can be:
@@ -82,6 +158,8 @@ class Export extends BaseAction implements EventSubscriberInterface
         return array(
             TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION => array("changeCategoryPosition", 128),
             TheliaEvents::EXPORT_CHANGE_POSITION => array("changeExportPosition", 128),
+            TheliaEvents::EXPORT_BEFORE_ENCODE => array('addHeadingRow', 128),
+            TheliaEvents::EXPORT_AFTER_ENCODE => array('deleteDefaultHeadingRow', 128),
         );
     }
 }

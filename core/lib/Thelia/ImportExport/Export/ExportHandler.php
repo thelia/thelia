@@ -202,4 +202,18 @@ abstract class ExportHandler extends AbstractHandler
      * @return ModelCriteria|array|BaseLoop
      */
     abstract public function buildDataSet(Lang $lang);
+
+    /**
+     * Customize heading row
+     *
+     * Set values to each columns of your export
+     * instead of using aliases
+     *
+     * @return array
+     */
+    public function getHeading()
+    {
+        $indexHeaders = $this->getOrder();
+        return array_combine($indexHeaders, $indexHeaders);
+    }
 }
