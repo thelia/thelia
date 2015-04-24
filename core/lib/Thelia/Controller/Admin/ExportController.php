@@ -174,7 +174,7 @@ class ExportController extends BaseAdminController
 
             $formattedContent = $formatter
                 ->setOrder($handler->getOrder())
-                ->encode($data)
+                ->encode($event->getData())
             ;
 
             $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
@@ -208,11 +208,12 @@ class ExportController extends BaseAdminController
                 ->setLang($lang)
             ;
 
+            $event->setData($data);
             $this->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
             $formattedContent = $formatter
                 ->setOrder($handler->getOrder())
-                ->encode($data)
+                ->encode($event->getData())
             ;
 
             $this->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
