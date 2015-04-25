@@ -149,8 +149,7 @@ class Content extends BaseContent implements FileModelParentInterface
             throw $ex;
         }
 
-
-       return $this;
+        return $this;
     }
 
     public function preUpdate(ConnectionInterface $con = null)
