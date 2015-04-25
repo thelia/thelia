@@ -39,9 +39,8 @@ class Content extends BaseAction implements EventSubscriberInterface
 {
     public function create(ContentCreateEvent $event)
     {
-        $content = new ContentModel();
-
-        $content
+        $content = (new ContentModel)
+            ->setDispatcher($event->getDispatcher())
             ->setVisible($event->getVisible())
             ->setLocale($event->getLocale())
             ->setTitle($event->getTitle())
