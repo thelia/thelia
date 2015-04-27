@@ -129,11 +129,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         $modules = $moduleValidator->getModulesDependOf();
 
         if (count($modules) > 0) {
-            $moduleList = '';
-            foreach ($modules as $module) {
-                $moduleList .= ', ' . $module['code'];
-            }
-            $moduleList = ltrim($moduleList, ', ');
+            $moduleList = implode(', ', array_column($modules, 'code'));
 
             $message = (count($modules) == 1)
                 ? Translator::getInstance()->trans(
