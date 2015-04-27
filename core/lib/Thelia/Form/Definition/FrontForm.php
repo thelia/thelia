@@ -29,4 +29,5 @@ final class FrontForm
     const ADDRESS_UPDATE = 'thelia.front.address.update';
     const CONTACT = 'thelia.front.contact';
     const NEWSLETTER = 'thelia.front.newsletter';
+    const CART_ADD = 'thelia.cart.add';
 }

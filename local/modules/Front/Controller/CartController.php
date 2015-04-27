@@ -31,6 +31,7 @@ use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CartAdd;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -182,15 +183,16 @@ class CartController extends BaseFrontController
     private function getAddCartForm(Request $request)
     {
         if ($request->isMethod("post")) {
-            $cartAdd = new CartAdd($request);
+            $cartAdd = $this->createForm(FrontForm::CART_ADD);
         } else {
-            $cartAdd = new CartAdd(
-                $request,
+            $cartAdd = $this->createForm(
+                FrontForm::CART_ADD,
                 "form",
                 array(),
                 array(
                     'csrf_protection'   => false,
-                )
+                ),
+                $this->container
             );
         }
 
