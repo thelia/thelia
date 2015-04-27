@@ -41,7 +41,7 @@ use Thelia\Tools\URL;
 class Session extends BaseSession
 {
     /**
-     * @param bool $forceDefault
+     * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
      *
      * @return \Thelia\Model\Lang|null
      */
@@ -70,7 +70,7 @@ class Session extends BaseSession
     /**
      * Return current currency
      *
-     * @param bool $forceDefault If default currency forced
+     * @param bool $forceDefault if true, the default currency will be returned if no current currency is defined.
      *
      * @return Currency
      */
@@ -105,6 +105,9 @@ class Session extends BaseSession
         return $this;
     }
 
+    /**
+     * @return Lang the current edition language in the back-office
+     */
     public function getAdminEditionLang()
     {
         $lang = $this->get('thelia.admin.edition.lang');
@@ -116,7 +119,11 @@ class Session extends BaseSession
         return $lang;
     }
 
-    public function setAdminEditionLang($lang)
+    /**
+     * @param Lang $lang the current edition language to set in the back-office
+     * @return $this
+     */
+    public function setAdminEditionLang(Lang $lang)
     {
         $this->set('thelia.admin.edition.lang', $lang);
 
