@@ -54,7 +54,7 @@ abstract class ExportHandler extends AbstractHandler
     {
         parent::__construct($container);
 
-        $this->translator = $container->get('thelia.translator');
+        $this->translator = Translator::getInstance();
     }
 
     /**
