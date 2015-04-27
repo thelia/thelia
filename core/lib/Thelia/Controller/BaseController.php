@@ -88,14 +88,15 @@ abstract class BaseController extends ContainerAware
      * @param $status
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function pdfResponse($pdf, $fileName, $status = 200)
+    protected function pdfResponse($pdf, $fileName, $status = 200, $browser = false)
     {
+
         return Response::create(
             $pdf,
             $status,
             array(
                 'Content-type' => "application/pdf",
-                'Content-Disposition' => sprintf('Attachment;filename=%s.pdf', $fileName),
+                'Content-Disposition' => $browser == false ? sprintf('Attachment;filename=%s.pdf', $fileName) : '',
             )
         );
     }
@@ -246,7 +247,7 @@ abstract class BaseController extends ContainerAware
      * @param bool $checkAdminUser
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function generateOrderPdf($order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true)
+    protected function generateOrderPdf($order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true, $browser = false)
     {
         $order = OrderQuery::create()->findPk($order_id);
 
@@ -271,7 +272,7 @@ abstract class BaseController extends ContainerAware
             $this->dispatch(TheliaEvents::GENERATE_PDF, $pdfEvent);
 
             if ($pdfEvent->hasPdf()) {
-                return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef());
+                return $this->pdfResponse($pdfEvent->getPdf(), $order->getRef(), 200, $browser);
             }
         } catch (\Exception $e) {
             Tlog::getInstance()->error(

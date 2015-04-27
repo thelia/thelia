@@ -310,13 +310,18 @@
                                                     <table class="table table-striped table-condensed table-left-aligned">
                                                         <caption class="clearfix">
                                                             {intl l='Invoice informations'}
-                                                            <div class="pull-right">
-                                                                <a class="btn btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/%id" id=$ID}">
+                                                            <div>
+                                                            <div class="btn-group">
+                                                                <a class="btn btn-primary" title="{intl l='View invoice PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=1 id=$ID}" target="_blank">
+                                                                    <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Invoice'}
+                                                                </a>
+                                                                <a class="btn btn-primary" title="{intl l='Download invoice as PDF'}" href="{url path="/admin/order/pdf/invoice/%id/%browser" browser=0 id=$ID}">
                                                                     <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Invoice'}
                                                                 </a>
                                                                 <a class="btn btn-primary js-update-order-address" data-address-id="{$INVOICE_ADDRESS}" title="{intl l='Edit invoice address'}" href="#edit_order_address_dialog" data-toggle="modal">
                                                                     <span class="glyphicon glyphicon-edit"></span>
                                                                 </a>
+                                                            </div>
                                                             </div>
                                                         </caption>
                                                         <tbody>
@@ -385,13 +390,18 @@
                                                     <table class="table table-striped table-condensed table-left-aligned">
                                                         <caption class="clearfix">
                                                             {intl l='Delivery address'}
-                                                            <div class="pull-right">
-                                                                <a class="btn btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id" id=$ID}">
+                                                            <div>
+                                                            <div class="btn-group">
+                                                                <a class="btn btn-primary" title="{intl l='View purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=1 id=$ID}" target="_blank">
+                                                                    <span class="glyphicon glyphicon glyphicon-eye-open"></span> {intl l='PDF | Purchase order'}
+                                                                </a>
+                                                                <a class="btn btn-primary" title="{intl l='Download purchase order as PDF'}" href="{url path="/admin/order/pdf/delivery/%id/%browser" browser=0 id=$ID}">
                                                                     <span class="glyphicon glyphicon-cloud-download"></span> {intl l='PDF | Purchase order'}
                                                                 </a>
                                                                 <a class="btn btn-primary js-update-order-address" data-address-id="{$DELIVERY_ADDRESS}" title="{intl l='Edit delivery address'}" href="#edit_order_address_dialog" data-toggle="modal">
                                                                     <span class="glyphicon glyphicon-edit"></span>
                                                                 </a>
+                                                            </div>
                                                             </div>
                                                         </caption>
                                                         <tbody>
