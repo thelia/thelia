@@ -176,8 +176,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.action.lang" class="Thelia\Action\Lang">
+        <service id="thelia.action.lang" class="Thelia\Action\Lang" scope="request">
             <argument type="service" id="thelia.template_helper" />
+            <argument type="service" id="request"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
