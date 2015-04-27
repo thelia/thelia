@@ -116,7 +116,10 @@ class Content extends BaseContent implements FileModelParentInterface
      * Here pre and post insert event are fired
      *
      * @param $defaultFolderId
+     *
      * @throws \Exception
+     *
+     * @return $this Return $this, allow chaining
      */
     public function create($defaultFolderId)
     {
@@ -145,6 +148,8 @@ class Content extends BaseContent implements FileModelParentInterface
 
             throw $ex;
         }
+
+        return $this;
     }
 
     public function preUpdate(ConnectionInterface $con = null)

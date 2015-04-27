@@ -129,7 +129,12 @@ class Module extends BaseAction implements EventSubscriberInterface
         $modules = $moduleValidator->getModulesDependOf();
 
         if (count($modules) > 0) {
-            $moduleList = implode(', ', array_column($modules, 'code'));
+            $moduleList = '';
+            foreach ($modules as $module) {
+                $moduleList .= ', ' . $module['code'];
+            }
+            $moduleList = ltrim($moduleList, ', ');
+
             $message = (count($modules) == 1)
                 ? Translator::getInstance()->trans(
                     '%s has dependency to module %s. You have to deactivate this module before.'
