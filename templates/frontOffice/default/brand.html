@@ -49,7 +49,7 @@
 {block name="main-content"}
 {hook name="brand.top" brand="$brand_id"}
     {if $brand_id}
-    <div class="main layout-col-2-left">
+    <div class="main row">
         {$limit={$smarty.get.limit|default:8}}
         {$product_page={$smarty.get.page|default:1}}
         {$product_order={$smarty.get.order|default:'alpha'}}
@@ -57,7 +57,7 @@
 
         {hook name="brand.main-top" brand="$brand_id"}
 
-        <article class="col-main {$mode}" role="main" aria-labelledby="main-label">
+        <article class="col-main col-md-9 col-md-push-3 {$mode}" role="main" aria-labelledby="main-label">
 
             {hook name="brand.content-top" brand="$brand_id"}
 
@@ -117,10 +117,10 @@
                             </span><!-- /.sort-by -->
 
                             <span class="view-mode">
-                                <span class="view-mode-label">{intl l="View as"}:</span>
+                                <span class="view-mode-label sr-only">{intl l="View as"}:</span>
                                 <span class="view-mode-btn">
-                                    <a href="{url path={navigate to="current"} mode="grid"}" data-toggle="view" role="button" title="{intl l='Grid'}" rel="nofollow" class="btn btn-grid"><i class="icon-grid"></i></a>
-                                    <a href="{url path={navigate to="current"} mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="icon-list"></i></a>
+                                    <a href="{url path={navigate to="current"} mode="grid"}" data-toggle="view" role="button" title="{intl l='Grid'}" rel="nofollow" class="btn btn-grid"><i class="fa fa-th"></i></a>
+                                    <a href="{url path={navigate to="current"} mode="list"}" data-toggle="view" role="button" title="{intl l="List"}" rel="nofollow" class="btn btn-list"><i class="fa fa-th-list"></i></a>
                                 </span>
                             </span><!-- /.view-mode -->
                         </div><!-- /.sorter -->
@@ -128,7 +128,7 @@
 
                     <div id="category-products">
                         <div class="products-content">
-                            <ul class="product-col-4">
+                            <ul class="list-unstyled product-col-4">
                                 {loop type="product" name="product_list" brand=$ID limit=$limit page=$product_page order=$product_order}
                                     {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
                                 {/loop}
@@ -139,15 +139,15 @@
                     <div class="toolbar toolbar-bottom" role="toolbar">
                         {if $amount > $limit}
                             <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
-                                <strong id="pagination-label-{$toolbar}}" class="pagination-label">{intl l="Pagination"}</strong>
-                                <ul class="pagination">
+                                <strong id="pagination-label-{$toolbar}}" class="pagination-label sr-only">{intl l="Pagination"}</strong>
+                                <ul class="pagination pagination-sm">
                                     {if $product_page le 1}
                                         <li class="disabled">
-                                            <span class="prev"><i class="icon-prev"></i></span>
+                                            <span class="prev"><i class="fa fa-caret-left"></i></span>
                                         </li>
                                     {else}
                                         <li>
-                                            <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="icon-prev"></i></a>
+                                            <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
                                         </li>
                                     {/if}
 
@@ -174,7 +174,7 @@
                 {/ifloop}
 
                 {elseloop rel="product_list"}
-                    <div class="address-warning">
+                    <div class="address-warning alert alert-warning">
                         {intl l="No products available in this brand"}
                     </div>
                 {/elseloop}
@@ -183,7 +183,7 @@
             {/loop}
         </article>
 
-        <aside class="col-left" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
+        <aside class="col-left col-md-3 col-md-pull-9" role="complementary" itemscope itemtype="http://schema.org/WPSideBar">
             {include file="includes/brand-menu.html"}
         </aside>
 
@@ -196,13 +196,13 @@
         <div class="col-main brands" role="main" aria-labelledby="main-label">
             {hook name="brand.content-top"}
             {ifloop rel="brands"}
-            <ul>
+            <ul class="list-unstyled">
                 {loop name="brands" type="brand"}
                 <li class="item">
-                    <article>
-                        <div class="brand-info">
+                    <article class="row">
+                        <div class="brand-info col-sm-7">
                             {ifloop rel="brand_logo"}
-                            <a href="{$URL nofilter}" tabindex="-1" class="brand-image">
+                            <a href="{$URL nofilter}" tabindex="-1" class="brand-image col-sm-2">
                                 {loop name="brand_logo" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders" limit="1"}
                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                 {/loop}

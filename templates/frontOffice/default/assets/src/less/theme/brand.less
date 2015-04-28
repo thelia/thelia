@@ -1,0 +1,44 @@
+// Thelia : Brand
+.brands-grid,
+.brands-list {
+  // Animation
+  @media (min-width: @screen-tablet) {
+    .brand-image {
+      > .mask {
+        background-color: @brand-primary;
+        background-color: rgba(red(@brand-primary), green(@brand-primary), blue(@brand-primary), .4);
+        .opacity(0);
+        .transition(opacity 300ms ease-in-out 50ms);
+      }
+      &:hover,
+      &:focus {
+        .mask {
+          .opacity(1);
+        }
+      }
+    }
+  }
+}
+
+
+// Contents Grid
+.brands-grid {
+  .item {
+    .brand-image {
+      > img  { .img-responsive(); width: 100%; }
+    }
+  }
+}
+
+// Content List
+.brands-list {
+  .item {
+    + .item { border-top: 1px solid #ededed; }
+    > article {
+
+      .brand-image {
+        > img { .img-responsive(); width: 100%; }
+      }
+    }
+  }
+}

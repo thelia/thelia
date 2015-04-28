@@ -38,7 +38,7 @@
                         <div class="form-group group-email{if $error} has-error{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <div class="control-input">
-                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
+                            <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control input-sm" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
                             {if $error}
                                 <span class="help-block">{$message}</span>
                                 {assign var="error_focus" value="true"}
@@ -65,7 +65,7 @@
                             <div class="form-group {if $error} has-error{/if}">
                                 <label for="{$label_attr.for}" class="sr-only">{$label}</label>
                                 <div class="control-input">
-                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
+                                    <input type="password" name="{$name}" id="{$label_attr.for}" class="form-control input-sm" maxlength="255" autocomplete="off"{if !isset($error_focus)} autofocus{/if}>
                                     {if $error}
                                         <span class="help-block">{$message}</span>
                                     {/if}

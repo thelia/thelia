@@ -40,7 +40,7 @@
     {if $product_id}
     <div class="main">
         {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1"}
-        <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
+        <article id="product" class="col-main row" role="main" itemscope itemtype="http://schema.org/Product">
 
             {$pse_count=$PSE_COUNT}
 
@@ -63,7 +63,7 @@
                {hook name="product.gallery" product="{$ID}"}
             {/ifhook}
             {elsehook rel="product.gallery"}
-            <section id="product-gallery">
+            <section id="product-gallery" class="col-sm-6">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
                     {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="borders" limit="1"}
@@ -76,7 +76,7 @@
                 <div id="product-thumbnails" class="carousel slide" style="position:relative;">
                     <div class="carousel-inner">
                         <div class="item active">
-                            <ul>
+                            <ul class="list-inline">
                                 {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" limit="5"}
                                 <li>
                                     <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
@@ -105,15 +105,15 @@
                         {/ifloop}
                     </div>
                     {ifloop rel="image.carouselsup"}
-                        <a class="left carousel-control" href="#product-thumbnails" data-slide="prev"><i class="icon-prev"></i></a>
-                        <a class="right carousel-control" href="#product-thumbnails" data-slide="next"><i class="icon-next"></i></a>
+                        <a class="left carousel-control" href="#product-thumbnails" data-slide="prev"><i class="fa fa-caret-left"></i></a>
+                        <a class="right carousel-control" href="#product-thumbnails" data-slide="next"><i class="fa fa-caret-right"></i></a>
                     {/ifloop}
                 </div>
                 {/ifloop}
             </section>
             {/elsehook}
 
-            <section id="product-details">
+            <section id="product-details" class="col-sm-6">
                 {hook name="product.details-top" product="{$ID}"}
 
                 <div class="product-info">
@@ -141,7 +141,7 @@
 
                 <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                     <div class="availability">
-                        <span class="availibity-label">{intl l="Availability"}: </span>
+                        <span class="availibity-label sr-only">{intl l="Availability"}: </span>
                         <span itemprop="availability" href="{$current_stock_href}" class="" id="pse-availability">
                             <span class="in">{intl l='In Stock'}</span>
                             <span class="out">{intl l='Out of Stock'}</span>
@@ -198,14 +198,14 @@
                             <div class="option option-option">
                                 <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
                                 <div class="option-content">
-                                    <select id="option-{$ID}" name="option-{$ID}" class="form-control pse-option" data-attribute="{$ID}"></select>
+                                    <select id="option-{$ID}" name="option-{$ID}" class="form-control input-sm pse-option" data-attribute="{$ID}"></select>
                                 </div>
                             </div>
                             {/loop}
                             <div class="option option-fallback">
                                 <label for="option-fallback" class="option-heading">{intl l="Options"}</label>
                                 <div class="option-content">
-                                    <select id="option-fallback" name="option-fallback" class="form-control pse-option pse-fallback" data-attribute="0"></select>
+                                    <select id="option-fallback" name="option-fallback" class="form-control input-sm pse-option pse-fallback" data-attribute="0"></select>
                                 </div>
                             </div>
                         </fieldset>
@@ -221,7 +221,7 @@
                             {if $error }
                                 <span class="help-block">{$message}</span>
                             {elseif $value != "" && !$error}
-                                <span class="help-block"><i class="icon-ok"></i></span>
+                                <span class="help-block"><i class="fa fa-check"></i></span>
                             {/if}
                         </div>
                         {/form_field}
@@ -284,7 +284,7 @@
                 {/capture}
             {/strip}
 
-            <section id="product-tabs">
+            <section id="product-tabs" class="col-sm-12">
                 {hookblock name="product.additional" product="{product attr="id"}" fields="id,class,title,content"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
@@ -358,12 +358,12 @@
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
                 {loop type="product" name="prev_product" id="{$PREVIOUS}"}
-                    <li class="previous"><a href="{$URL nofilter}">{intl l="Previous product"}</a></li>
+                    <li class="previous"><a href="{$URL nofilter}" class="btn-default">{intl l="Previous product"}</a></li>
                 {/loop}
             {/if}
             {if $HAS_NEXT == 1}
                 {loop type="product" name="next_product" id="{$NEXT}"}
-                    <li class="next"><a href="{$URL nofilter}">{intl l="Next product"}</a></li>
+                    <li class="next"><a href="{$URL nofilter}" class="btn-default">{intl l="Next product"}</a></li>
                 {/loop}
             {/if}
         </ul>

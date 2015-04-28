@@ -1,0 +1,44 @@
+// Thelia : Folder
+
+// Content List
+#folder-contents {
+    .contents > ul { .contents-list; }
+}
+
+//.contents-grid,
+.contents-list {
+    // Animation
+    @media (min-width: @screen-tablet) {
+        .content-image {
+            display: block;
+            overflow: hidden;
+            position: relative;
+            > .mask {
+                background-color: @brand-primary;
+                background-color: rgba(red(@brand-primary), green(@brand-primary), blue(@brand-primary), .4);
+                .opacity(0);
+                .transition(opacity 300ms ease-in-out 50ms);
+            }
+            &:hover,
+            &:focus {
+                .mask {
+                    visibility: visible;
+                    .opacity(1);
+                }
+            }
+
+        }
+    }
+}
+
+// Content List
+.contents-list {
+    .item {
+        + .item { border-top: 1px solid #ededed; }
+        > article {
+            .content-image {
+                > img { width: 100%; }
+            }
+        }
+    }
+}

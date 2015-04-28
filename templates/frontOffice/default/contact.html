@@ -27,7 +27,7 @@
 
                 {hook name="contact.form-top"}
 
-                <fieldset id="contact-info" class="panel">
+                <fieldset id="contact-info" class="panel panel-default">
                     <div class="panel-heading">
                         {intl l="Send us a message"}
                     </div>
@@ -42,7 +42,7 @@
                                         <span class="help-block">{$message}</span>
                                         {assign var="error_focus" value="true"}
                                     {elseif $value != "" && !$error}
-                                        <span class="help-block"><i class="icon-ok"></i></span>
+                                        <span class="help-block"><i class="fa fa-check"></i></span>
                                     {/if}
                                 </div>
                             </div><!--/.form-group-->

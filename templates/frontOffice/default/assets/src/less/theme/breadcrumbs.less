@@ -1,0 +1,11 @@
+
+// Thelia: Breadcrumb
+.breadcrumb {
+    padding: 0;
+    > li {
+       &+li:before {
+           .fa-icon();
+           content: @fa-var-angle-right;
+       }
+   }
+}

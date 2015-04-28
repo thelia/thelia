@@ -30,9 +30,9 @@
                 {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
             {/ifhook}
             {elsehook rel="order-payment-gateway.body"}
-                <div id="payment-success" class="panel">
+                <div id="payment-success" class="panel panel-default">
                     <div class="panel-heading">
-                        <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
+                        <h3 class="panel-title">{intl l="You choose to pay by"} : <span class="payment-method label label-primary">{loop name="payment-module" type="module" id=$PAYMENT_MODULE}{$TITLE}{/loop}</span></h3>
                     </div>
 
                     <div class="panel-body">

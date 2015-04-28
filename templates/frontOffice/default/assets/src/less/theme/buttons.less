@@ -1,0 +1,73 @@
+// Thelia : Buttons
+
+// Buttons
+.btn {
+
+    // Remove Box Shadow
+    &:active,
+    &.active {
+        .box-shadow(none);
+    }
+
+    // Primary Buttons
+    &.btn_add_to_cart,
+    &.btn-cart,
+    &.btn-checkout,
+    &.btn-checkout-next,
+    &.btn-checkout-home,
+    &.btn-contact,
+    &.btn-forgot,
+    &.btn-login,
+    &.btn-proceed-checkout,
+    &.btn-register,
+    &.btn-submit { .btn-primary; }
+
+    // Secondary Buttons
+    &.btn-back,
+    &.btn-continue-shopping {
+        .btn-secondary;
+    }
+
+    // Keep old style button
+    &.btn-add-address,
+    &.btn-cart-update,
+    &.btn-coupon,
+    &.btn-filter,
+    &.btn-grid,
+    &.btn-jumbotron,
+    &.btn-list,
+    &.btn-login-mini,
+    &.btn-search,
+    &.btn-subscribe { .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border); }
+
+    // Account Address and Account orders
+    &.btn-edit-address,
+    &.btn-order-details,
+    &.btn-remove-address {
+        border: 1px solid @btn-primary-border;
+
+        &:hover,
+        &:focus {
+            border-color: @text-color;
+            color: @text-color;
+        }
+    }
+
+    // Checkout Step 3
+    &.btn-change-address {
+        &:before {
+            .fa-icon();
+            content: @fa-var-pencil;
+            border: 1px solid @brand-primary;
+            border-radius: @border-radius-base;
+            font-size: ceil(@font-size-base * 1.2);
+        }
+        &:hover,
+        &:focus {
+            &:before {
+                border-color: @link-hover-color;
+                color: @link-hover-color;
+            }
+        }
+    }
+}

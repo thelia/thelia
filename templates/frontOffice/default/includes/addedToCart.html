@@ -45,7 +45,7 @@
             <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
         </div>
         <div class="products-content">
-            <ul class="products-grid product-col-3 hover-effect">
+            <ul class="list-unstyled products-grid product-col-3 hover-effect">
                 {loop type="accessory" name="accessories" product="$ID" order="random" limit="3"}
                     {include file="includes/single-product.html" product_id=$ACCESSORY_ID hasBtn=false hasDescription=false width="218" height="146"}
                 {/loop}

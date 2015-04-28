@@ -1,0 +1,50 @@
+// Thelia : Folder
+
+// Folder Info
+.folder-description {
+    margin-bottom: 20px;
+}
+
+// Content List
+#folder-contents {
+    .contents > ul { .contents-list; }
+}
+
+//.contents-grid,
+.contents-list {
+    // Animation
+    @media (min-width: @screen-tablet) {
+        .content-image {
+            display: block;
+            overflow: hidden;
+            position: relative;
+            > .mask {
+                display: block;
+                overflow: visible;
+                position: absolute;
+                top: 0; left: 0;
+                visibility: hidden;
+                width: 100%; height: 100%;
+            }
+        }
+    }
+}
+
+// Content List
+.contents-list {
+    .item {
+        padding-bottom: 15px;
+        + .item { padding-top: 15px; }
+        > article {
+            margin-left: 0;
+
+            .content-image {
+                margin-bottom: 15px; padding: 0;
+            }
+
+            .content-info {
+                .name { margin-top: 0; }
+            }
+        }
+    }
+}

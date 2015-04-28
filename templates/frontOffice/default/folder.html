@@ -45,7 +45,7 @@
     {hook name="folder.top" folder="$folder_id"}
     <div class="main">
         {hook name="folder.main-top" folder="$folder_id"}
-        <div class="col-main contents-list" role="main" aria-labelledby="main-label">
+        <div class="col-main contents-list list-unstyled" role="main" aria-labelledby="main-label">
 
         {hook name="folder.content-top" folder="$folder_id"}
 
@@ -66,20 +66,20 @@
                 <div id="folder-contents">
                     <div class="contents">
                         {ifloop rel="folder_content"}
-                            <ul>
+                            <ul class="list-unstyled">
                                 {loop name="folder_content" type="content" folder="$ID"}
                                     <li class="item">
-                                        <article>
+                                        <article class="row">
                                             {ifloop rel="content_thumbnail"}
-                                            <a href="{$URL nofilter}" tabindex="-1" class="content-image">
+                                            <a href="{$URL nofilter}" tabindex="-1" class="content-image col-sm-2">
                                                 {loop name="content_thumbnail" type="image" width="369" height="247" content=$ID limit="1"}
-                                                    <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
+                                                    <img src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$TITLE}">
                                                 {/loop}
                                                 <span class="mask"></span>
                                             </a>
                                             {/ifloop}
 
-                                            <div class="content-info">
+                                            <div class="content-info col-sm-7">
                                                 <h3 class="name"><a href="{$URL nofilter}">{$TITLE}</a></h3>
 
                                                 {if $CHAPO}
@@ -94,7 +94,7 @@
                             </ul>
                         {/ifloop}
                         {elseloop  rel="folder_content"}
-                            <div class="folder-warning">
+                            <div class="folder-warning alert alert-warning">
                                 {intl l="No Contents in this folder."}
                             </div>
                         {/elseloop}
