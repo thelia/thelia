@@ -11000,15 +11000,12 @@ fieldset[disabled] .btn.btn-subscribe.active {
 .form-control:focus::-webkit-input-placeholder {
   color: #eeeeee;
 }
-/*#form-login-mini {
-    .form-control { .input-sm; }
-    .btn { .btn-sm; }
-    width: 200px;
-
-    .mini-forgot-password {
-        font-size: @font-size-small;
-    }
-}*/
+#form-login-mini {
+  width: 200px;
+}
+#form-login-mini .mini-forgot-password {
+  font-size: 12px;
+}
 #form-login,
 #form-forgotpassword {
   background: #f5f5f5;
