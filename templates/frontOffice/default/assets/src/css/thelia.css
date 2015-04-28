@@ -8507,7 +8507,7 @@ header .header .language-container .currency-switch .select {
 }
 .block {
   background: transparent;
-  border: 1px solid none;
+  border: 1px solid transparent;
   border-radius: 0;
   box-shadow: none;
 }
@@ -11239,7 +11239,7 @@ fieldset[disabled] .btn.btn-subscribe.active {
 }
 .option {
   background: #ffffff;
-  border: 1px solid 0;
+  border: 1px solid transparent;
   border-radius: 0;
 }
 .option .option-heading {
@@ -11262,7 +11262,7 @@ fieldset[disabled] .btn.btn-subscribe.active {
 }
 #product #product-details .product-cart {
   background: #ffffff;
-  border: 1px solid 0;
+  border: 1px solid transparent;
   border-radius: 0;
 }
 #product #product-tabs .nav-tabs {

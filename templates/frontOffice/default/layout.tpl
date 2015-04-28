@@ -56,7 +56,7 @@ GNU General Public License : http://www.gnu.org/licenses/
         <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
     {/block}
 
-    {stylesheets file='assets/src/css/thelia.css'}
+    {stylesheets file='assets/dist/css/thelia.min.css'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
 
@@ -65,8 +65,8 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
-    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/src/img/favicon.ico'}">
-    <link rel="icon" type="image/png" href="{image file='assets/src/img/favicon.png'}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/dist/img/favicon.ico'}">
+    <link rel="icon" type="image/png" href="{image file='assets/dist/img/favicon.png'}" />
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
@@ -77,12 +77,12 @@ GNU General Public License : http://www.gnu.org/licenses/
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
-    {javascripts file="assets/src/js/vendors/html5shiv.js"}
+    {javascripts file="assets/dist/js/vendors/html5shiv.min.js"}
         <script>window.html5 || document.write('<script src="{$asset_url}"><\/script>');</script>
     {/javascripts}
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
-    {javascripts file="assets/src/js/vendors/respond.js"}
+    {javascripts file="assets/dist/js/vendors/respond.min.js"}
         <script>window.respond || document.write('<script src="{$asset_url}"><\/script>');</script>
     {/javascripts}
     <![endif]-->
@@ -127,7 +127,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <div class="header row">
                     <h1 class="logo container hidden-xs">
                         <a href="{navigate to="index"}" title="{$store_name}">
-                            <img src="{image file='assets/src/img/logo.gif'}" alt="{$store_name}">
+                            <img src="{image file='assets/dist/img/logo.gif'}" alt="{$store_name}">
                         </a>
                     </h1>
                     {hook name="main.navbar-primary"}
@@ -240,7 +240,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <!-- Jquery -->
     <!--[if lt IE 9]><script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> <![endif]-->
     <!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script><!--<![endif]-->
-    {javascripts file="assets/src/js/vendors/jquery.js"}
+    {javascripts file="assets/dist/js/vendors/jquery.min.js"}
         <script>window.jQuery || document.write('<script src="{$asset_url}"><\/script>');</script>
     {/javascripts}
 
@@ -251,11 +251,11 @@ GNU General Public License : http://www.gnu.org/licenses/
     {/if}
 
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    {javascripts file="assets/src/js/vendors/bootstrap.js"}
+    {javascripts file="assets/dist/js/vendors/bootstrap.min.js"}
         <script>if(typeof($.fn.modal) === 'undefined') { document.write('<script src="{$asset_url}"><\/script>'); }</script>
     {/javascripts}
 
-    {javascripts file="assets/src/js/vendors/bootbox.js"}
+    {javascripts file="assets/dist/js/vendors/bootbox.js"}
         <script src="{$asset_url}"></script>
     {/javascripts}
 
@@ -268,7 +268,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="javascript-initialization"}{/block}
 
     <!-- Custom scripts -->
-    <script src="{javascript file='assets/src/js/main.js'}"></script>
+    <script src="{javascript file='assets/dist/js/min.js'}"></script>
 
     {hook name="main.body-bottom"}
 </body>
