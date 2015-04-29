@@ -341,11 +341,10 @@ td.product,
     }
 }
 
-.products-grid,
-.products-list {
+.products-content > ul {
     // Animation
     @media (min-width: @screen-tablet) {
-        .product-image { 
+        .product-image {
             > .mask {
                 border-radius: @border-radius-base;
             }
@@ -481,6 +480,7 @@ td.product,
             .transition(background-color 300ms ease-in-out);
             padding: 6px;
             .product-info {
+                padding: 0;
                 .short-description { font-size: 11px; }
             }
         }
@@ -548,7 +548,7 @@ td.product,
                         margin-bottom: @line-height-computed;
                         .regular-price,
                         .special-price,
-                        .old-price { display: block; }
+                        .old-price { display: block; width: 100%; }
                     }
                 }
             }

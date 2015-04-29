@@ -1,4 +1,4 @@
-<li class="item">
+<li class="item {$colClass|default:"col-md-3"}">
     {if $PSE_COUNT > 1}
         {assign var="hasSubmit" value = false}
     {else}
@@ -8,11 +8,11 @@
 	{if not $product_id}
 	   {assign var="product_id" value=$ID}
 	{/if}
-    <article itemscope itemtype="http://schema.org/Product">
+    <article class="row" itemscope itemtype="http://schema.org/Product">
 		
 		{hook name="singleproduct.top" product="{$product_id}"}
 
-        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if}">
+        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if} col-sm-3">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
                 <img itemprop="image" src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$productTitle}">
             {/loop}
@@ -22,7 +22,7 @@
             <span class="mask"></span>
         </a>
 
-        <div class="product-info">
+        <div class="product-info col-sm-6">
             <h2 class="name"><a href="{$URL nofilter}"><span itemprop="name">{$productTitle}</span></a></h2>
             {if $hasDescription}
             <div class="description" itemprop="description">
@@ -41,7 +41,7 @@
             {/if}
         {/if}
 
-        <div class="product-price">
+        <div class="product-price col-sm-3">
             <div class="price-container row" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
                 <meta itemprop="category" content="{category attr="title"}">
                 {* List of condition : NewCondition, DamagedCondition, UsedCondition, RefurbishedCondition *}

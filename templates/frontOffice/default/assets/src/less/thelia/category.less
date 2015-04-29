@@ -1,16 +1,7 @@
 // Thelia : Category
 
 // Category
-.grid {
-    .products-content > ul { .products-grid; }
-}
-
-.list {
-    .products-content > ul { .products-list; }
-}
-
-.products-grid,
-.products-list {
+.products-content > ul {
     // Animation
     @media (min-width: @screen-tablet) {
         .product-image {
@@ -27,26 +18,9 @@
             }
         }
     }
-}
-
-
-// Products Grid
-.products-grid {
-    .make-row();
-    .list-unstyled();
-    .item { .make-sm-column(4); .make-md-column(4); .clearfix(); } // default
-    &.product-col-2 > .item { .make-md-column(6); }
-    &.product-col-3 > .item { .make-md-column(4); }
-    &.product-col-4 > .item { .make-md-column(3); }
-    &.product-col-5 > .item { .make-md-column(2.4); }
-    &.product-col-6 > .item { .make-md-column(2); }
 
     .item {
-        margin-bottom: @line-height-computed;
-
         .product-info {
-            .name { margin: 4px 0; }
-            .description { .visible-xs; }
             .short-description { display: block; margin-bottom: 5px; }
         }
 
@@ -56,26 +30,54 @@
     }
 }
 
-// Product List
-.products-list {
-    .item {
-        + .item { padding-top: 15px; }
-        > article {
-            .make-row();
-            margin-left: 0;
+.grid {
+    .products-content > ul {
+        .item {
+            margin-bottom: @line-height-computed;
 
-            .product-image {
-                .make-sm-column(3);
-                margin-bottom: 15px; padding: 0;
+            > article {
+                margin: 0;
+
+                .product-image {
+                    padding: 0;
+                }
+
+                .name { margin: 4px 0; }
+
+                .product-image,
+                .product-info,
+                .product-price {
+                    width: 100%;
+                    float: none;
+                }
             }
 
-            .product-info {
-                .make-sm-column(6);
-                .name { margin-top: 0; }
-            }
+            .description { .visible-xs; }
 
             .product-price {
-                .make-sm-column(3);
+                padding: 0;
+            }
+        }
+    }
+}
+
+.list {
+    .products-content > ul {
+        .item {
+            width: 100%;
+            float: none;
+
+            + .item { padding-top: 15px; }
+            > article {
+                margin-left: 0;
+
+                .product-image {
+                    margin-bottom: 15px; padding: 0;
+                }
+
+                .product-info {
+                    .name { margin-top: 0; }
+                }
             }
         }
     }
