@@ -10133,6 +10133,51 @@ header .header .language-container .currency-switch .select {
           transform: translate(0, 0);
   content: "\f105";
 }
+.btn-secondary {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary.focus,
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  color: #333333;
+  background-color: #dcdcdc;
+  border-color: #adadad;
+}
+.btn-secondary:active,
+.btn-secondary.active,
+.open > .dropdown-toggle.btn-secondary {
+  background-image: none;
+}
+.btn-secondary.disabled,
+.btn-secondary[disabled],
+fieldset[disabled] .btn-secondary,
+.btn-secondary.disabled:hover,
+.btn-secondary[disabled]:hover,
+fieldset[disabled] .btn-secondary:hover,
+.btn-secondary.disabled:focus,
+.btn-secondary[disabled]:focus,
+fieldset[disabled] .btn-secondary:focus,
+.btn-secondary.disabled.focus,
+.btn-secondary[disabled].focus,
+fieldset[disabled] .btn-secondary.focus,
+.btn-secondary.disabled:active,
+.btn-secondary[disabled]:active,
+fieldset[disabled] .btn-secondary:active,
+.btn-secondary.disabled.active,
+.btn-secondary[disabled].active,
+fieldset[disabled] .btn-secondary.active {
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+.btn-secondary .badge {
+  color: #f5f5f5;
+  background-color: #333333;
+}
 .btn:active,
 .btn.active {
   box-shadow: none;
@@ -10598,6 +10643,9 @@ fieldset[disabled] .btn.btn-submit.active {
 }
 .btn.btn-back,
 .btn.btn-continue-shopping {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #cccccc;
   border-radius: 0;
   background-color: #f7f7f7;
   border-color: #f7f7f7;
@@ -10606,6 +10654,74 @@ fieldset[disabled] .btn.btn-submit.active {
   font-weight: 600;
   text-align: left;
   text-shadow: none;
+}
+.btn.btn-back:hover,
+.btn.btn-continue-shopping:hover,
+.btn.btn-back:focus,
+.btn.btn-continue-shopping:focus,
+.btn.btn-back.focus,
+.btn.btn-continue-shopping.focus,
+.btn.btn-back:active,
+.btn.btn-continue-shopping:active,
+.btn.btn-back.active,
+.btn.btn-continue-shopping.active,
+.open > .dropdown-toggle.btn.btn-back,
+.open > .dropdown-toggle.btn.btn-continue-shopping {
+  color: #333333;
+  background-color: #dcdcdc;
+  border-color: #adadad;
+}
+.btn.btn-back:active,
+.btn.btn-continue-shopping:active,
+.btn.btn-back.active,
+.btn.btn-continue-shopping.active,
+.open > .dropdown-toggle.btn.btn-back,
+.open > .dropdown-toggle.btn.btn-continue-shopping {
+  background-image: none;
+}
+.btn.btn-back.disabled,
+.btn.btn-continue-shopping.disabled,
+.btn.btn-back[disabled],
+.btn.btn-continue-shopping[disabled],
+fieldset[disabled] .btn.btn-back,
+fieldset[disabled] .btn.btn-continue-shopping,
+.btn.btn-back.disabled:hover,
+.btn.btn-continue-shopping.disabled:hover,
+.btn.btn-back[disabled]:hover,
+.btn.btn-continue-shopping[disabled]:hover,
+fieldset[disabled] .btn.btn-back:hover,
+fieldset[disabled] .btn.btn-continue-shopping:hover,
+.btn.btn-back.disabled:focus,
+.btn.btn-continue-shopping.disabled:focus,
+.btn.btn-back[disabled]:focus,
+.btn.btn-continue-shopping[disabled]:focus,
+fieldset[disabled] .btn.btn-back:focus,
+fieldset[disabled] .btn.btn-continue-shopping:focus,
+.btn.btn-back.disabled.focus,
+.btn.btn-continue-shopping.disabled.focus,
+.btn.btn-back[disabled].focus,
+.btn.btn-continue-shopping[disabled].focus,
+fieldset[disabled] .btn.btn-back.focus,
+fieldset[disabled] .btn.btn-continue-shopping.focus,
+.btn.btn-back.disabled:active,
+.btn.btn-continue-shopping.disabled:active,
+.btn.btn-back[disabled]:active,
+.btn.btn-continue-shopping[disabled]:active,
+fieldset[disabled] .btn.btn-back:active,
+fieldset[disabled] .btn.btn-continue-shopping:active,
+.btn.btn-back.disabled.active,
+.btn.btn-continue-shopping.disabled.active,
+.btn.btn-back[disabled].active,
+.btn.btn-continue-shopping[disabled].active,
+fieldset[disabled] .btn.btn-back.active,
+fieldset[disabled] .btn.btn-continue-shopping.active {
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+.btn.btn-back .badge,
+.btn.btn-continue-shopping .badge {
+  color: #f5f5f5;
+  background-color: #333333;
 }
 @media (min-width: 992px) {
   .btn.btn-back,
@@ -11681,6 +11797,9 @@ header .header .logo {
 }
 .pager .next > a,
 .pager .previous > a {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #cccccc;
   border-radius: 0;
   background-color: #f7f7f7;
   border-color: #f7f7f7;
@@ -11689,6 +11808,74 @@ header .header .logo {
   font-weight: 600;
   text-align: left;
   text-shadow: none;
+}
+.pager .next > a:hover,
+.pager .previous > a:hover,
+.pager .next > a:focus,
+.pager .previous > a:focus,
+.pager .next > a.focus,
+.pager .previous > a.focus,
+.pager .next > a:active,
+.pager .previous > a:active,
+.pager .next > a.active,
+.pager .previous > a.active,
+.open > .dropdown-toggle.pager .next > a,
+.open > .dropdown-toggle.pager .previous > a {
+  color: #333333;
+  background-color: #dcdcdc;
+  border-color: #adadad;
+}
+.pager .next > a:active,
+.pager .previous > a:active,
+.pager .next > a.active,
+.pager .previous > a.active,
+.open > .dropdown-toggle.pager .next > a,
+.open > .dropdown-toggle.pager .previous > a {
+  background-image: none;
+}
+.pager .next > a.disabled,
+.pager .previous > a.disabled,
+.pager .next > a[disabled],
+.pager .previous > a[disabled],
+fieldset[disabled] .pager .next > a,
+fieldset[disabled] .pager .previous > a,
+.pager .next > a.disabled:hover,
+.pager .previous > a.disabled:hover,
+.pager .next > a[disabled]:hover,
+.pager .previous > a[disabled]:hover,
+fieldset[disabled] .pager .next > a:hover,
+fieldset[disabled] .pager .previous > a:hover,
+.pager .next > a.disabled:focus,
+.pager .previous > a.disabled:focus,
+.pager .next > a[disabled]:focus,
+.pager .previous > a[disabled]:focus,
+fieldset[disabled] .pager .next > a:focus,
+fieldset[disabled] .pager .previous > a:focus,
+.pager .next > a.disabled.focus,
+.pager .previous > a.disabled.focus,
+.pager .next > a[disabled].focus,
+.pager .previous > a[disabled].focus,
+fieldset[disabled] .pager .next > a.focus,
+fieldset[disabled] .pager .previous > a.focus,
+.pager .next > a.disabled:active,
+.pager .previous > a.disabled:active,
+.pager .next > a[disabled]:active,
+.pager .previous > a[disabled]:active,
+fieldset[disabled] .pager .next > a:active,
+fieldset[disabled] .pager .previous > a:active,
+.pager .next > a.disabled.active,
+.pager .previous > a.disabled.active,
+.pager .next > a[disabled].active,
+.pager .previous > a[disabled].active,
+fieldset[disabled] .pager .next > a.active,
+fieldset[disabled] .pager .previous > a.active {
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+.pager .next > a .badge,
+.pager .previous > a .badge {
+  color: #f5f5f5;
+  background-color: #333333;
 }
 @media (min-width: 992px) {
   .pager .next > a,
@@ -11760,6 +11947,9 @@ header .header .logo {
   margin-right: .4em;
 }
 #category-products .btn-cart {
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #cccccc;
   border-radius: 0;
   background-color: #f7f7f7;
   border-color: #f7f7f7;
@@ -11768,6 +11958,86 @@ header .header .logo {
   font-weight: 600;
   text-align: left;
   text-shadow: none;
+}
+#category-products .btn-cart:hover,
+#category-products .btn-cart:focus,
+#category-products .btn-cart.focus,
+#category-products .btn-cart:active,
+#category-products .btn-cart.active,
+.open > .dropdown-toggle#category-products .btn-cart {
+  color: #333333;
+  background-color: #dcdcdc;
+  border-color: #adadad;
+}
+#category-products .btn-cart:active,
+#category-products .btn-cart.active,
+.open > .dropdown-toggle#category-products .btn-cart {
+  background-image: none;
+}
+#category-products .btn-cart.disabled,
+#category-products .btn-cart[disabled],
+fieldset[disabled] #category-products .btn-cart,
+#category-products .btn-cart.disabled:hover,
+#category-products .btn-cart[disabled]:hover,
+fieldset[disabled] #category-products .btn-cart:hover,
+#category-products .btn-cart.disabled:focus,
+#category-products .btn-cart[disabled]:focus,
+fieldset[disabled] #category-products .btn-cart:focus,
+#category-products .btn-cart.disabled.focus,
+#category-products .btn-cart[disabled].focus,
+fieldset[disabled] #category-products .btn-cart.focus,
+#category-products .btn-cart.disabled:active,
+#category-products .btn-cart[disabled]:active,
+fieldset[disabled] #category-products .btn-cart:active,
+#category-products .btn-cart.disabled.active,
+#category-products .btn-cart[disabled].active,
+fieldset[disabled] #category-products .btn-cart.active {
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+#category-products .btn-cart .badge {
+  color: #f5f5f5;
+  background-color: #333333;
+}
+#category-products .btn-cart:hover,
+#category-products .btn-cart:focus,
+#category-products .btn-cart.focus,
+#category-products .btn-cart:active,
+#category-products .btn-cart.active,
+.open > .dropdown-toggle#category-products .btn-cart {
+  color: #333333;
+  background-color: #dcdcdc;
+  border-color: #adadad;
+}
+#category-products .btn-cart:active,
+#category-products .btn-cart.active,
+.open > .dropdown-toggle#category-products .btn-cart {
+  background-image: none;
+}
+#category-products .btn-cart.disabled,
+#category-products .btn-cart[disabled],
+fieldset[disabled] #category-products .btn-cart,
+#category-products .btn-cart.disabled:hover,
+#category-products .btn-cart[disabled]:hover,
+fieldset[disabled] #category-products .btn-cart:hover,
+#category-products .btn-cart.disabled:focus,
+#category-products .btn-cart[disabled]:focus,
+fieldset[disabled] #category-products .btn-cart:focus,
+#category-products .btn-cart.disabled.focus,
+#category-products .btn-cart[disabled].focus,
+fieldset[disabled] #category-products .btn-cart.focus,
+#category-products .btn-cart.disabled:active,
+#category-products .btn-cart[disabled]:active,
+fieldset[disabled] #category-products .btn-cart:active,
+#category-products .btn-cart.disabled.active,
+#category-products .btn-cart[disabled].active,
+fieldset[disabled] #category-products .btn-cart.active {
+  background-color: #f5f5f5;
+  border-color: #cccccc;
+}
+#category-products .btn-cart .badge {
+  color: #f5f5f5;
+  background-color: #333333;
 }
 @media (min-width: 992px) {
   #category-products .btn-cart {
