@@ -7,49 +7,42 @@
 
 // Content List
 #brands {
-  .brands > ul { .brands-list; }
-}
+  .brands > ul {
+    .item {
+      padding-bottom: 15px;
+      + .item { padding-top: 15px; }
+      > article {
+        margin-left: 0;
 
-.brands-grid,
-.brands-list {
-  // Animation
-  @media (min-width: @screen-tablet) {
-    .brand-image {
-      display: block;
-      overflow: hidden;
-      position: relative;
-      > .mask {
-        display: block;
-        overflow: visible;
-        position: absolute;
-        top: 0; left: 0;
-        visibility: hidden;
-        width: 100%; height: 100%;
-      }
-      &:hover,
-      &:focus {
-        .mask {
-          visibility: visible;
+        .brand-image {
+          margin-bottom: 15px; padding: 0;
+        }
+
+        .brand-info {
+          .name { margin-top: 0; }
         }
       }
     }
-  }
-}
 
-// Content List
-.brands-list {
-  .item {
-    padding-bottom: 15px;
-    + .item { padding-top: 15px; }
-    > article {
-      margin-left: 0;
-
+    @media (min-width: @screen-tablet) {
       .brand-image {
-        margin-bottom: 15px; padding: 0;
-      }
-
-      .brand-info {
-        .name { margin-top: 0; }
+        display: block;
+        overflow: hidden;
+        position: relative;
+        > .mask {
+          display: block;
+          overflow: visible;
+          position: absolute;
+          top: 0; left: 0;
+          visibility: hidden;
+          width: 100%; height: 100%;
+        }
+        &:hover,
+        &:focus {
+          .mask {
+            visibility: visible;
+          }
+        }
       }
     }
   }
