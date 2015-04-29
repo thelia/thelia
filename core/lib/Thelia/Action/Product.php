@@ -12,9 +12,11 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
@@ -305,7 +307,17 @@ class Product extends BaseAction implements EventSubscriberInterface
             }
 
             // Delete all product attributes sale elements
-            ProductSaleElementsQuery::create()->filterByProduct($product)->delete($con);
+            AttributeCombinationQuery::create()
+                ->filterByProductSaleElements($product->getProductSaleElementss())
+                ->delete($con)
+            ;
+
+            //Delete all productSaleElements except the default one (to keep price, weight, ean, etc...)
+            ProductSaleElementsQuery::create()
+                ->filterByProduct($product)
+                ->filterByIsDefault(1, Criteria::NOT_EQUAL)
+                ->delete($con)
+            ;
 
             // Update the product template
             $template_id = $event->getTemplateId();
@@ -317,8 +329,15 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $product->setTemplateId($template_id)->save($con);
 
-            // Create a new default product sale element
-            $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+            //Be sure that the product has a default productSaleElements
+            /** @var \Thelia\Model\ProductSaleElements $defaultPse */
+            if (null == $defaultPse = ProductSaleElementsQuery::create()
+                    ->filterByProduct($product)
+                    ->filterByIsDefault(1)
+                    ->findOne()) {
+                // Create a new default product sale element
+                $product->createProductSaleElement($con, 0, 0, 0, $event->getCurrencyId(), true);
+            }
 
             $product->clearProductSaleElementss();
 

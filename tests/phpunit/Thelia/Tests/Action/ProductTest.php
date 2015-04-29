@@ -343,6 +343,9 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
 
+        $oldProductSaleElements = $product->getDefaultSaleElements();
+        $this->assertEquals("Thelia\Model\ProductSaleElements", get_class($oldProductSaleElements), "There is no default pse for this product");
+
         $event = new ProductSetTemplateEvent($product, $templateId, $currencyId);
         $event->setDispatcher($this->getDispatcher());
 
@@ -357,17 +360,21 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals(1, count($productSaleElements), "after setting a new template, only 1 product_sale_elements must be present");
 
+        /** @var \Thelia\Model\ProductSaleElements $newProductSaleElements */
         $newProductSaleElements = $productSaleElements->getFirst();
 
         $this->assertEquals($updatedProduct->getRef(), $newProductSaleElements->getRef(), sprintf("PSE ref must be %s", $updatedProduct->getRef()));
         $this->assertTrue($newProductSaleElements->getIsDefault(), 'new PSE must be the default one for this product');
-        $this->assertEquals(0, $newProductSaleElements->getWeight(), "->testSetProductTemplate new PSE weight must be 0");
 
         $productPrice = $newProductSaleElements->getProductPrices()->getFirst();
 
-        $this->assertEquals(0, $productPrice->getPrice(), "->testSetProductTemplate price must be 0");
-        $this->assertEquals(0, $productPrice->getPromoPrice(), "->testSetProductTemplate promo price must be 0");
-        $this->assertEquals($currencyId, $productPrice->getCurrencyId());
+        $oldProductPrice = $oldProductSaleElements->getProductPrices()->getFirst();
+
+        $this->assertEquals($oldProductSaleElements->getWeight(), $newProductSaleElements->getWeight(), sprintf("->testSetProductTemplate new PSE weight must be %s", $oldProductSaleElements->getWeight()));
+
+        $this->assertEquals($oldProductPrice->getPrice(), $productPrice->getPrice(), sprintf("->testSetProductTemplate price must be %s", $oldProductPrice->getPrice()));
+        $this->assertEquals($oldProductPrice->getPromoPrice(), $productPrice->getPromoPrice(), sprintf("->testSetProductTemplate promo price must be %s", $oldProductPrice->getPromoPrice()));
+        $this->assertEquals($oldProductPrice->getCurrencyId(), $productPrice->getCurrencyId(), sprintf("->testSetProductTemplate currency_id must be %s", $oldProductPrice->getCurrencyId()));
 
         return $updatedProduct;
     }
