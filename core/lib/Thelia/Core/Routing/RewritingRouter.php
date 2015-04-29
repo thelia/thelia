@@ -23,9 +23,9 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
 use Thelia\Tools\URL;
 
 /**
@@ -203,6 +203,6 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
 
     protected function redirect($url, $status = 302)
     {
-        Redirect::exec($url, $status);
+        throw new RedirectException($url, $status);
     }
 }
