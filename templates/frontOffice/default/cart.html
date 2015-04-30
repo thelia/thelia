@@ -200,15 +200,15 @@
         </article>
 
         {ifloop rel="product_upsell"}
-            <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
+            <aside id="products-upsell" class="grid" role="complementary" aria-labelledby="products-upsell-label">
                 <div class="products-heading">
                     <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
                 </div>
 
                 <div class="products-content">
-                    <ul class="list-unstyled products-grid product-col-5 hover-effect">
+                    <ul class="products-grid list-unstyled row hover-effect">
                         {loop name="product_upsell" type="product" promo="yes" limit="5"}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
+                            {include file="includes/single-product.html" colClass="col-md-2" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
                         {/loop}
                     </ul>
                 </div>
