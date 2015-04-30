@@ -22,7 +22,8 @@ module.exports = function (grunt) {
                     paths: 'assets/src/css'
                 },
                 files: {
-                    'assets/src/css/thelia.css': 'assets/src/less/thelia.less'
+                    'assets/src/css/thelia.css': 'assets/src/less/thelia.less',
+                    'assets/dist/css/thelia.min.css': 'assets/src/less/thelia.less'
                 }
             }
         },
@@ -175,7 +176,8 @@ module.exports = function (grunt) {
         csscount: {
             dev: {
                 src: [
-                    'assets/src/css/thelia.css'
+                    'assets/src/css/thelia.css',
+                    'assets/dist/css/thelia.min.css'
                 ]
             }
         },
@@ -196,7 +198,7 @@ module.exports = function (grunt) {
                 }
             },
             cssmin: {
-                files: 'assets/src/css/thelia.css',
+                files: ['assets/src/css/thelia.css'],
                 tasks: ['autoprefixer', 'cssmin'],
                 options: {
                     spawn: false,
