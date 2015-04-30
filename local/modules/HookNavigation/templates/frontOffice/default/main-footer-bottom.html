@@ -1,6 +1,6 @@
 <nav class="nav-footer" role="navigation">
     <ul>
-        {loop name="footer_links" type="content" folder="2"}
+        {loop name="footer_links" type="content" folder=$bottomFolderId}
         <li><a href="{$URL}">{$TITLE}</a></li>
         {/loop}
     </ul>
