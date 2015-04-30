@@ -40,12 +40,12 @@
     <button type="button" class="btn btn-checkout pull-right" data-dismiss="modal"><span>{intl l="Continue Shopping"}</span></button>
 </div>
 {ifloop rel="accessories"}
-    <aside id="products-upsell" role="complementary" aria-labelledby="products-upsell-label">
+    <aside id="products-upsell" class="grid" role="complementary" aria-labelledby="products-upsell-label">
         <div class="products-heading">
             <h3 id="products-upsell-label">{intl l="Upsell Products"}</h3>
         </div>
         <div class="products-content">
-            <ul class="list-unstyled products-grid product-col-3 hover-effect">
+            <ul class="list-unstyled row products-grid">
                 {loop type="accessory" name="accessories" product="$ID" order="random" limit="3"}
                     {include file="includes/single-product.html" product_id=$ACCESSORY_ID hasBtn=false hasDescription=false width="218" height="146"}
                 {/loop}
