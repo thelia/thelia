@@ -43,7 +43,7 @@
 
                 <div id="delivery-address" class="panel panel-default">
                     <div class="panel-heading clearfix">
-                        <a href="{url path="/address/create" next={navigate to='current'} }" class="btn btn-add-address btn-link">{intl l="Add a new address"}</a>
+                        <a href="{url path="/address/create" next={navigate to='current'} }" class="btn btn-link pull-right"><i class="fa fa-plus"></i> {intl l="Add a new address"}</a>
                         {intl l="Choose your delivery address"}
                         {if $error}
                             <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
@@ -105,9 +105,9 @@
                                 </td>
                                 <td>
                                     <div class="group-btn">
-                                        <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="btn btn-edit-address" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="fa fa-pencil"></i> <span class="sr-only">{intl l="Edit"}</span></a>
+                                        <a href="{url path="/address/update/%id" id=$ID next={navigate to="current"}}" class="btn btn-primary" data-toggle="tooltip" title="{intl l="Edit this address"}"><i class="fa fa-pencil"></i> <span class="sr-only">{intl l="Edit"}</span></a>
                                         {if $DEFAULT != 1}
-                                            <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-remove-address" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="fa fa-remove"></i> <span class="sr-only">{intl l="Cancel"}</span></a>
+                                            <a href="{url path="/address/delete/%id" id=$ID}" class="btn btn-primary" data-confirm="{intl l="Do you really want to delete this address ?"}" data-confirm-callback="address.delete" title="{intl l="Remove this address"}" data-toggle="tooltip"><i class="fa fa-remove"></i> <span class="sr-only">{intl l="Cancel"}</span></a>
                                         {/if}
                                     </div>
                                 </td>
@@ -136,8 +136,8 @@
 
                 {hook name="order-delivery.form-bottom"}
 
-                <a href="{url path="/cart"}" role="button" class="btn btn-back btn-default"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
+                <a href="{url path="/cart"}" role="button" class="btn btn-default"><span>{intl l="Back"}</span></a>
+                <button type="submit" class="btn btn-primary pull-right"><span>{intl l="Next Step"}</span></button>
 
             </form>
             {/form}

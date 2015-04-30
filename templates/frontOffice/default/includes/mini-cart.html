@@ -25,7 +25,7 @@
                             <h3 class="name" style="margin:0">
                                 {$TITLE}
                             </h3>
-                            <a href="{token_url path="/cart/delete/$ITEM_ID"}" class="btn btn-remove"><i class="fa fa-trash"></i> <span>{intl l="Remove"}</span></a>
+                            <a href="{token_url path="/cart/delete/$ITEM_ID"}" class="btn btn-link"><i class="fa fa-trash"></i> <span>{intl l="Remove"}</span></a>
                         </td>
                         <td class="unitprice text-center">
                             {if $IS_PROMO == 1}
@@ -43,8 +43,8 @@
                     <tr>
                         <td colspan="2" class="empty">
                             <a href="{url path="/cart"}" role="button" class="btn btn-default btn-sm"><span>{intl l="View Cart"}</span></a>
-                            <a href="{url path="/order/delivery"}" role="button" class="btn btn-warning btn-sm"><span>{intl l="Checkout"}</span></a>
-                            {*<button type="submit" name="checkout" class="btn btn-warning btn-sm"><span>{intl l="Checkout"}</span></button>*}
+                            <a href="{url path="/order/delivery"}" role="button" class="btn btn-primary btn-sm"><span>{intl l="Checkout"}</span></a>
+                            {*<button type="submit" name="checkout" class="btn btn-primary btn-sm"><span>{intl l="Checkout"}</span></button>*}
                         </td>
                         <td class="total">
                             <div class="total-price">

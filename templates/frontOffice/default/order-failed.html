@@ -39,7 +39,7 @@
                         <p>{$failed_order_message}</p>
                     {/if}
 
-                    <a href="{url path="/order/invoice"}" role="button" class="btn btn-checkout"><span>{intl l="Try again"}</span></a>
+                    <a href="{url path="/order/invoice"}" role="button" class="btn btn-primary"><span>{intl l="Try again"}</span></a>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
 
             {hook name="order-failed.bottom"}
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-checkout-home"><span>{intl l="Go home"}</span></a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-default"><span>{intl l="Go home"}</span></a>
 
         </article>
     </div>

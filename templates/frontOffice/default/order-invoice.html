@@ -166,7 +166,7 @@
                                             <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
                                             <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
                                             <span class="input-group-btn">
-                                                <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                                <button type="submit" class="btn btn-default">{intl l="Ok"}</button>
                                             </span>
                                         </div>
                                         {if $error}<span class="help-block">{$message}</span>{/if}
@@ -286,7 +286,7 @@
                             </div>
                         {/loop}
 
-                            <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
+                            <a href="#" class="btn btn-change-address btn-link hidden"><i class="fa fa-pencil"></i> {intl l="Change address"}</a>
                         </div>
 
                     </div>
@@ -347,8 +347,8 @@
                 </div>
                 {/form_field}
 
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back btn-default"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-default"><span>{intl l="Back"}</span></a>
+                <button type="submit" class="btn btn-primary pull-right"><span>{intl l="Next Step"}</span></button>
             </form>
             {/form}
             {hook name="order-invoice.bottom"}

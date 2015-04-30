@@ -88,7 +88,7 @@
                                         {/loop}
                                     </dl>
                                 </div>
-                                <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-remove"><i class="fa fa-trash"></i> {intl l="Remove"}</a>
+                                <a href="{token_url path="/cart/delete/%item_id" item_id=$ITEM_ID success_url={url path='/cart'}}" class="btn btn-link"><i class="fa fa-trash"></i> {intl l="Remove"}</a>
                             </td>
                             <td class="unitprice">
                                 {if $IS_PROMO == 1}
@@ -116,7 +116,7 @@
                                                 <input name="quantity" class="form-control" type="number" min="1" max="{$STOCK}" value ="{$QUANTITY}">
                                             {/if}
                                         </div>
-                                        <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-cart-update sr-only">{intl l="+"}</button>
+                                        <button type="submit" title="{intl l="Update Quantity"}" class="btn btn-primary sr-only">{intl l="+"}</button>
                                     </form>
                                 </div>
                             </td>
@@ -147,7 +147,7 @@
                                             <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
-                                        <a class="btn btn-change-country" href="#"><i class="fa fa-refresh"></i> {intl l="update"}</a>
+                                        <a class="btn btn-link btn-change-country" href="#"><i class="fa fa-refresh"></i> {intl l="update"}</a>
                                     </div>
                                     {/if}
                                     {if $delivery_id != 0 }
@@ -185,8 +185,8 @@
                 </table>
             </div>
 
-            <a href="{navigate to="index"}" role="button" class="btn btn-continue-shopping btn-default"><span>{intl l="Continue Shopping"}</span></a>
-            <a href="{url path="/order/delivery"}" class="btn btn-checkout">{intl l="Proceed checkout"}</a>
+            <a href="{navigate to="index"}" role="button" class="btn btn-default"><span>{intl l="Continue Shopping"}</span></a>
+            <a href="{url path="/order/delivery"}" class="btn btn-primary pull-right">{intl l="Proceed checkout"}</a>
 
             {/ifloop}
             {elseloop rel="cartloop"}
