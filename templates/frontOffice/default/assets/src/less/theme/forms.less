@@ -1,13 +1,11 @@
 // Thelia : Forms
 
-
 // Forms : Placeholder
 .form-control {
     &:focus {
         .placeholder(@gray-lighter);
     }
 }
-
 
 // Form Login Mini
 #form-login-mini {
@@ -17,7 +15,6 @@
         font-size: @font-size-small;
     }
 }
-
 
 // Form Login
 #form-login,
@@ -29,7 +26,10 @@
         font-weight: bold;
     }
 
-    .btn-login { display:block; width:100%; }
+    .btn-login {
+        display: block;
+        width: 100%;
+    }
 
     @media (min-width: @screen-tablet) {
         .group-btn {
@@ -41,6 +41,8 @@
             }
         }
     }
-    @media (min-width: @screen-desktop) { width: 45%; }
+    @media (min-width: @screen-desktop) {
+        width: 45%;
+    }
 
 }

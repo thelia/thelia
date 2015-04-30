@@ -7,7 +7,9 @@
     margin-bottom: 0;
     text-align: center;
 
-    > a { color: inherit; }
+    > a {
+        color: inherit;
+    }
 
     &:before {
         .fa-icon();
@@ -26,7 +28,9 @@
         > tr {
             > th,
             > td {
-                &.image { border-right-color: transparent; }
+                &.image {
+                    border-right-color: transparent;
+                }
             }
         }
     }
@@ -78,13 +82,14 @@
                 }
             }
             &.empty {
-                border-bottom-color: transparent; border-left-color: transparent;
+                border-bottom-color: transparent;
+                border-left-color: transparent;
             }
         }
     }
 }
 
-.table-order-total{
+.table-order-total {
     td {
         &.total {
             .price {
@@ -92,7 +97,8 @@
             }
         }
         &.empty {
-            border-bottom-color: transparent; border-left-color: transparent;
+            border-bottom-color: transparent;
+            border-left-color: transparent;
         }
     }
 }

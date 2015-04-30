@@ -1,9 +1,10 @@
-
 // Thelia: Toolbar (Products Sorter)
 .toolbar {
     line-height: 50px;
 
-    .sorter-container, .pagination-container { height: 50px; }
+    .sorter-container, .pagination-container {
+        height: 50px;
+    }
 
     // Sorter
     .sorter-container {
@@ -15,7 +16,11 @@
         // View Mode
         .view-mode {
             > .view-mode-btn {
-                a { padding: 0 6px; font-size: ceil(@font-size-base * 1.5); text-decoration: none; }
+                a {
+                    padding: 0 6px;
+                    font-size: ceil(@font-size-base * 1.5);
+                    text-decoration: none;
+                }
                 font-size: 24px;
             }
         }
@@ -23,11 +28,13 @@
 
     // Pagination
     .pagination-container {
-         text-align: center;
+        text-align: center;
     }
 }
 
 .no-js .toolbar {
-  .limiter,
-  .sort-by { display : none; }
+    .limiter,
+    .sort-by {
+        display: none;
+    }
 }

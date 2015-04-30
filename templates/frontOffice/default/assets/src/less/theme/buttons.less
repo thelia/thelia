@@ -1,5 +1,6 @@
 // Thelia : Buttons
-.btn-primary {}
+.btn-primary {
+}
 
 .btn-secondary {
     .btn-default;
@@ -25,7 +26,9 @@
     &.btn-login,
     &.btn-proceed-checkout,
     &.btn-register,
-    &.btn-submit { .btn-primary; }
+    &.btn-submit {
+        .btn-primary;
+    }
 
     // Secondary Buttons
     &.btn-back,
@@ -43,7 +46,9 @@
     &.btn-list,
     &.btn-login-mini,
     &.btn-search,
-    &.btn-subscribe { .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border); }
+    &.btn-subscribe {
+        .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
+    }
 
     // Account Address and Account orders
     &.btn-edit-address,

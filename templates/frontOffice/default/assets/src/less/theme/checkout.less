@@ -3,10 +3,11 @@
 // Step 2
 #delivery-address {
     .panel-heading {
-        > .btn-add-address { text-transform: none; }
+        > .btn-add-address {
+            text-transform: none;
+        }
     }
 }
-
 
 // Step 3
 #cart-address {
@@ -17,7 +18,9 @@
 }
 
 #payment-method.panel {
-    .panel-body { text-align: center; }
+    .panel-body {
+        text-align: center;
+    }
     .radio {
         // Add a hover state
         label {
@@ -27,7 +30,8 @@
                 .opacity(.4);
                 &:hover,
                 &:focus {
-                    .opacity(1); .transition(opacity 200ms ease-in-out);
+                    .opacity(1);
+                    .transition(opacity 200ms ease-in-out);
                 }
             }
         }
@@ -35,9 +39,9 @@
 }
 
 #payment-method {
-  .list-group-item {
-    border: none;
-  }
+    .list-group-item {
+        border: none;
+    }
 }
 
 .js #payment-method {
@@ -56,12 +60,13 @@
 
         .step-nb {
             border-right: 1px solid @text-color;
-            font-size: 30px; line-height: 0;
+            font-size: 30px;
+            line-height: 0;
             font-weight: 600;
             padding-right: 6px;
             vertical-align: middle;
         }
-    
+
         .step-label {
             font-size: ceil(@font-size-base * 1.4);
             font-weight: 100;
@@ -69,13 +74,15 @@
             padding-left: 6px;
             vertical-align: middle;
         }
-        
+
         &:hover,
         &:focus,
         &:active,
         &.active {
             color: #fff;
-            .step-nb { border-right: 1px solid #fff; }
+            .step-nb {
+                border-right: 1px solid #fff;
+            }
         }
 
         &.active {
