@@ -3526,7 +3526,7 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
     (3, 'en_US', 'Miss', 'Miss'),
     (1, 'fr_FR', 'M.', 'Monsieur'),
     (2, 'fr_FR', 'Mme', 'Madame'),
-    (3, 'fr_FR', 'Mademoiselle', 'Mademoiselle'),
+    (3, 'fr_FR', 'Mlle', 'Mademoiselle'),
     (1, 'es_ES', NULL, NULL),
     (2, 'es_ES', NULL, NULL),
     (3, 'es_ES', NULL, NULL)

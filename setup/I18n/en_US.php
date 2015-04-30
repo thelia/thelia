@@ -572,6 +572,7 @@ return array(
     'Mexico' => 'Mexico',
     'Micronesia' => 'Micronesia',
     'Miss' => 'Miss',
+    'Miss_short' => 'Miss',
     'Misses' => 'Misses',
     'Mister' => 'Mister',
     'Module - Edit JavaScript' => 'Module - Edit JavaScript',
