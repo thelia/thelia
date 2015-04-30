@@ -9205,92 +9205,6 @@ header .header .language-container .currency-switch .select {
   display: block;
   font-size: 2.2em;
 }
-.table-order thead > tr > th.image,
-.table-order tbody > tr > th.image,
-.table-order tfooter > tr > th.image,
-.table-order thead > tr > td.image,
-.table-order tbody > tr > td.image,
-.table-order tfooter > tr > td.image {
-  border-right-color: transparent;
-}
-.table-order thead th {
-  background-color: #f5f5f5;
-  text-transform: uppercase;
-}
-.table-order tbody td.unitprice .price {
-  color: #7a7a7a;
-}
-.table-order tbody td.unitprice .old-price .price {
-  font-size: 14px;
-}
-.table-order tbody td.unitprice .secondary-price .price {
-  font-size: 14px;
-  font-weight: normal;
-}
-.table-order tbody td.subprice .price {
-  color: #f49a17;
-}
-.table-order tfoot td.shipping .price {
-  color: #7a7a7a;
-  font-size: 19px;
-}
-.table-order tfoot td.total .price {
-  font-size: 19px;
-}
-.table-order tfoot td.empty {
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-}
-.table-order-total td.total .price {
-  font-size: 19px;
-}
-.table-order-total td.empty {
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-}
-.table-cart thead > tr > th.image,
-.table-cart tbody > tr > th.image,
-.table-cart tfooter > tr > th.image,
-.table-cart thead > tr > td.image,
-.table-cart tbody > tr > td.image,
-.table-cart tfooter > tr > td.image {
-  border-right-color: transparent;
-}
-.table-cart thead th {
-  background-color: #f5f5f5;
-  text-transform: uppercase;
-}
-.table-cart tbody td.unitprice .price {
-  color: #7a7a7a;
-}
-.table-cart tbody td.unitprice .old-price .price {
-  font-size: 14px;
-}
-.table-cart tbody td.unitprice .secondary-price .price {
-  font-size: 14px;
-  font-weight: normal;
-}
-.table-cart tbody td.subprice .price {
-  color: #f49a17;
-}
-.table-cart tfoot td.shipping .price {
-  color: #7a7a7a;
-  font-size: 19px;
-}
-.table-cart tfoot td.total .price {
-  font-size: 19px;
-}
-.table-cart tfoot td.empty {
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-}
-.table-cart-total td.total .price {
-  font-size: 19px;
-}
-.table-cart-total td.empty {
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-}
 .cart-warning {
   text-align: center;
 }
@@ -10616,6 +10530,65 @@ fieldset[disabled] .btn.btn-subscribe.active {
 }
 #account .panel-body {
   padding: 25px;
+}
+.table-order thead > tr > th.image,
+.table-cart thead > tr > th.image,
+.table-order tbody > tr > th.image,
+.table-cart tbody > tr > th.image,
+.table-order tfooter > tr > th.image,
+.table-cart tfooter > tr > th.image,
+.table-order thead > tr > td.image,
+.table-cart thead > tr > td.image,
+.table-order tbody > tr > td.image,
+.table-cart tbody > tr > td.image,
+.table-order tfooter > tr > td.image,
+.table-cart tfooter > tr > td.image {
+  border-right-color: transparent;
+}
+.table-order thead th,
+.table-cart thead th {
+  background-color: #f5f5f5;
+  text-transform: uppercase;
+}
+.table-order tbody td.unitprice .price,
+.table-cart tbody td.unitprice .price {
+  color: #7a7a7a;
+}
+.table-order tbody td.unitprice .old-price .price,
+.table-cart tbody td.unitprice .old-price .price {
+  font-size: 14px;
+}
+.table-order tbody td.unitprice .secondary-price .price,
+.table-cart tbody td.unitprice .secondary-price .price {
+  font-size: 14px;
+  font-weight: normal;
+}
+.table-order tbody td.subprice .price,
+.table-cart tbody td.subprice .price {
+  color: #f49a17;
+}
+.table-order tfoot td.shipping .price,
+.table-cart tfoot td.shipping .price {
+  color: #7a7a7a;
+  font-size: 19px;
+}
+.table-order tfoot td.total .price,
+.table-cart tfoot td.total .price {
+  font-size: 19px;
+}
+.table-order tfoot td.empty,
+.table-cart tfoot td.empty {
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+}
+.table-order-total td.total .price,
+.table-cart-total td.total .price {
+  font-size: 19px;
+}
+.table-order-total td.empty,
+.table-cart-total td.empty {
+  border-bottom-color: transparent;
+  border-left-color: transparent;
 }
 .products-heading .btn-all {
   float: right;
