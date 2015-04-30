@@ -202,11 +202,10 @@
                     <article class="row">
                         <div class="brand-info col-sm-7">
                             {ifloop rel="brand_logo"}
-                            <a href="{$URL nofilter}" tabindex="-1" class="brand-image col-sm-2">
+                            <a href="{$URL nofilter}" tabindex="-1" class="brand-image overlay col-sm-2">
                                 {loop name="brand_logo" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders" limit="1"}
                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                 {/loop}
-                                <span class="mask"></span>
                             </a>
                             {/ifloop}
 

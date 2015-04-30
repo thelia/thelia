@@ -71,11 +71,10 @@
                                     <li class="item">
                                         <article class="row">
                                             {ifloop rel="content_thumbnail"}
-                                            <a href="{$URL nofilter}" tabindex="-1" class="content-image col-sm-2">
+                                            <a href="{$URL nofilter}" tabindex="-1" class="content-image overlay col-sm-2">
                                                 {loop name="content_thumbnail" type="image" width="369" height="247" content=$ID limit="1"}
                                                     <img src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$TITLE}">
                                                 {/loop}
-                                                <span class="mask"></span>
                                             </a>
                                             {/ifloop}
 

@@ -12,14 +12,13 @@
 		
 		{hook name="singleproduct.top" product="{$product_id}"}
 
-        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if} col-sm-3">
+        <a href="{$URL nofilter}" itemprop="url" tabindex="-1" class="product-image{if $hasQuickView == true} product-quickview{/if} overlay col-sm-3">
             {loop name="product_thumbnail" type="image" product=$product_id width="{$width}" height="{$height}" resize_mode="borders" limit="1"}
                 <img itemprop="image" src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$productTitle}">
             {/loop}
             {elseloop rel="product_thumbnail"}
                 <img itemprop="image" src="{image file='assets/img/218x146.png'}" class="img-responsive" alt="{$productTitle}">
             {/elseloop}
-            <span class="mask"></span>
         </a>
 
         <div class="product-info col-sm-6">

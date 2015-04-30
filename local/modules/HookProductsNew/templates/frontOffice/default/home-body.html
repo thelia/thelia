@@ -21,7 +21,7 @@
                     {/loop}
                     {/loop}
 
-                    <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image">
+                    <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image overlay">
                         {ifloop rel="image_product_new" }
                         <img itemprop="image" class="img-responsive"
                         {loop name="image_product_new" type="image" limit="1" product="{$ID}" force_return="true" width="280" height="196" resize_mode="borders"}
@@ -32,7 +32,6 @@
                         {elseloop rel="image_product_new"}
                         <img itemprop="image" src="{image file='assets/img/280x196.png'}" alt="Product #{$LOOP_COUNT}">
                         {/elseloop}
-                        <span class="mask"></span>
                     </a>
 
                     <a href="{$URL}" class="product-info">
