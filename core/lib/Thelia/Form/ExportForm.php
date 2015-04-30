@@ -25,15 +25,6 @@ use Thelia\Model\LangQuery;
  */
 class ExportForm extends BaseForm
 {
-    protected $translator;
-
-    public function __construct(Request $request, $type = "form", $data = array(), $options = array())
-    {
-        $this->translator = Translator::getInstance();
-
-        parent::__construct($request, $type, $data, $options);
-    }
-
     protected function buildForm()
     {
         $this->formBuilder
