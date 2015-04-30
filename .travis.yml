@@ -8,7 +8,7 @@ matrix:
   allow_failures:
   - php: nightly
 env:
-- DB_USER=root
+- DB_USER=root DB_HOST=127.0.0.1
 before_script:
 - sudo apt-get update -qq
 - sudo apt-get install -y language-pack-fr language-pack-fr-base
@@ -17,7 +17,7 @@ before_script:
 - composer install --prefer-dist --dev
 - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS
   thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
-- php Thelia thelia:install --db_host=localhost --db_username=$DB_USER --db_name=thelia
+- php Thelia thelia:install --db_host=$DB_HOST --db_username=$DB_USER --db_name=thelia
 - php setup/faker.php
 - php Thelia module:refresh
 - php Thelia module:activate Colissimo
