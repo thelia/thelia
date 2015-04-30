@@ -227,7 +227,7 @@
                         {/form_field}
 
                         <div class="form-group group-btn">
-                            <button id="pse-submit" type="submit" class="btn btn_add_to_cart btn-primary">{intl l="Add to cart"}</button>
+                            <button id="pse-submit" type="submit" class="btn btn_add_to_cart btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Add to cart"}</button>
                         </div>
                     </fieldset>
 
@@ -358,12 +358,12 @@
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
                 {loop type="product" name="prev_product" id="{$PREVIOUS}"}
-                    <li class="previous"><a href="{$URL nofilter}" class="btn btn-default">{intl l="Previous product"}</a></li>
+                    <li class="previous"><a href="{$URL nofilter}" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Previous product"}</a></li>
                 {/loop}
             {/if}
             {if $HAS_NEXT == 1}
                 {loop type="product" name="next_product" id="{$NEXT}"}
-                    <li class="next"><a href="{$URL nofilter}" class="btn btn-primary">{intl l="Next product"}</a></li>
+                    <li class="next"><a href="{$URL nofilter}" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Next product"}</a></li>
                 {/loop}
             {/if}
         </ul>

@@ -3005,7 +3005,7 @@ fieldset[disabled] .btn {
 .btn-default {
   color: #f49a17;
   background-color: #f7f7f7;
-  border-color: #f7f7f7;
+  border-color: #cccccc;
 }
 .btn-default:hover,
 .btn-default:focus,
@@ -3015,7 +3015,7 @@ fieldset[disabled] .btn {
 .open > .dropdown-toggle.btn-default {
   color: #f49a17;
   background-color: #dedede;
-  border-color: #d8d8d8;
+  border-color: #adadad;
 }
 .btn-default:active,
 .btn-default.active,
@@ -3041,7 +3041,7 @@ fieldset[disabled] .btn-default:active,
 .btn-default[disabled].active,
 fieldset[disabled] .btn-default.active {
   background-color: #f7f7f7;
-  border-color: #f7f7f7;
+  border-color: #cccccc;
 }
 .btn-default .badge {
   color: #f7f7f7;
@@ -9346,89 +9346,49 @@ header .header .language-container .currency-switch .select {
           transform: translate(0, 0);
   content: "\f105";
 }
-/*.btn-primary {
-}
-
-.btn-secondary {
-    .btn-default;
-}
-
-// Buttons
 .btn {
-
-    // Remove Box Shadow
-    &:active,
-    &.active {
-        .box-shadow(none);
-    }
-
-    // Primary Buttons
-    &.btn_add_to_cart,
-    &.btn-cart,
-    &.btn-checkout,
-    &.btn-checkout-next,
-    &.btn-checkout-home,
-    &.btn-contact,
-    &.btn-forgot,
-    &.btn-login,
-    &.btn-proceed-checkout,
-    &.btn-register,
-    &.btn-submit {
-        .btn-primary;
-    }
-
-    // Secondary Buttons
-    &.btn-back,
-    &.btn-continue-shopping {
-        .btn-secondary;
-    }
-
-    // Keep old style button
-    &.btn-add-address,
-    &.btn-cart-update,
-    &.btn-coupon,
-    &.btn-filter,
-    &.btn-grid,
-    &.btn-jumbotron,
-    &.btn-list,
-    &.btn-login-mini,
-    &.btn-search,
-    &.btn-subscribe {
-        .button-variant(@btn-primary-color; @btn-primary-bg; @btn-primary-border);
-    }
-
-    // Account Address and Account orders
-    &.btn-edit-address,
-    &.btn-order-details,
-    &.btn-remove-address {
-        border: 1px solid @btn-primary-border;
-
-        &:hover,
-        &:focus {
-            border-color: @text-color;
-            color: @text-color;
-        }
-    }
-
-    // Checkout Step 3
-    &.btn-change-address {
-        &:before {
-            .fa-icon();
-            content: @fa-var-pencil;
-            border: 1px solid @brand-primary;
-            border-radius: @border-radius-base;
-            font-size: ceil(@font-size-base * 1.2);
-        }
-        &:hover,
-        &:focus {
-            &:before {
-                border-color: @link-hover-color;
-                color: @link-hover-color;
-            }
-        }
-    }
+  transition: all 0.3s ease-in-out;
+  border-radius: 0;
+  text-align: left;
+  font-weight: 600;
 }
-*/
+.btn:active,
+.btn.active {
+  box-shadow: none;
+}
+@media (min-width: 992px) {
+  .btn {
+    padding: 2px 15px 2px 5px;
+  }
+}
+.btn-primary {
+  font-style: italic;
+  border-left: 3px solid #f9c478;
+}
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #f49a17;
+  color: #b66f09;
+}
+.btn-default {
+  border-left: 3px solid #cccccc;
+}
+.btn-default:hover,
+.btn-default:focus {
+  background-color: #f7f7f7;
+}
+.btn-default:active,
+.btn-primary:active,
+.btn-default.active,
+.btn-primary.active,
+.btn-default:active:hover,
+.btn-primary:active:hover,
+.btn-default.active:hover,
+.btn-primary.active:hover {
+  background-color: #d5d5d5;
+  border-color: #6f6f6f;
+  color: #fff;
+}
 .form-control:focus::-moz-placeholder {
   color: #eeeeee;
   opacity: 1;
@@ -10091,129 +10051,6 @@ label {
 header .header .logo {
   float: none;
 }
-/* Custom button */
-.btn-primary {
-  /*border-left: 3px solid lighten(@brand-primary, 20%);
-    border-radius: 0;
-    color: #fff;
-    font-style: italic;
-    font-weight: 600;
-    text-align: left;
-    text-shadow: none;
-
-    @media (min-width: @screen-desktop) {
-        padding: 2px 15px 2px 5px;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: @brand-primary;
-        color: @link-hover-color;
-        text-decoration: none;
-    }
-
-    &:active,
-    &.active {
-        &,
-        &:hover {
-            background-image: none;
-            background-color: darken(@gray-lighter, 10%);
-            border-color: darken(@gray-lighter, 50%);
-            .box-shadow(none);
-            color: #fff;
-            outline: 0;
-        }
-    }
-
-    &:before {
-        .fa-icon();
-        content: @fa-var-chevron-right;
-        font-size: 1em;
-        line-height: 0;
-        margin: 0 .4em 0 4px;
-    }*/
-}
-.btn-secondary {
-  /*border-radius: 0;
-    background-color: #f7f7f7;
-    border-color: #f7f7f7;
-    border-left: 3px solid darken(@gray-light, 10%);
-    color: @link-color;
-    font-weight: 600;
-    text-align: left;
-    text-shadow: none;
-
-    @media (min-width: @screen-desktop) {
-        padding: 2px 15px 2px 5px;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: #f7f7f7;
-    }
-
-    &:active,
-    &.active {
-        &,
-        &:hover {
-            background-image: none;
-            background-color: darken(@gray-lighter, 10%);
-            border-color: darken(@gray-lighter, 50%);
-            .box-shadow(none);
-            color: #fff;
-            outline: 0;
-        }
-    }
-
-    &:before {
-        .fa-icon();
-        content: @fa-var-chevron-left;
-        font-size: 1em;
-        line-height: 0;
-        margin: 0 .4em 0 4px;
-    }*/
-}
-.pager .next > a,
-.pager .previous > a {
-  /*border-radius: 0;
-    background-color: #f7f7f7;
-    border-color: #f7f7f7;
-    border-left: 3px solid darken(@gray-light, 10%);
-    color: @link-color;
-    font-weight: 600;
-    text-align: left;
-    text-shadow: none;
-
-    @media (min-width: @screen-desktop) {
-        padding: 2px 15px 2px 5px;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: #f7f7f7;
-    }
-
-    &:active,
-    &.active {
-        &,
-        &:hover {
-            background-image: none;
-            background-color: darken(@gray-lighter, 10%);
-            border-color: darken(@gray-lighter, 50%);
-            .box-shadow(none);
-            color: #fff;
-            outline: 0;
-        }
-    }
-
-    &:before {
-        .fa-icon();
-        content: @fa-var-chevron-left;
-        font-size: 1em;
-        line-height: 0;
-        margin: 0 .4em 0 4px;
-    }*/
-}
 .pager .previous a:before {
   display: inline-block;
   font: normal normal normal 14px/1 FontAwesome;
@@ -10239,17 +10076,6 @@ header .header .logo {
           transform: translate(0, 0);
   content: "\f054";
   margin-right: .4em;
-}
-#category-products .btn-cart {
-  /*.btn-secondary;
-
-    &:before {
-        content: @fa-var-shopping-cart;
-        font-size: 1.3em;
-    }*/
-}
-.btn-remove {
-  font-style: italic;
 }
 .page-home #carousel .carousel-control {
   background-image: none;
@@ -10438,6 +10264,9 @@ td.product .name > a:focus,
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+#products-new .overlay:before {
+  border-radius: 3px 3px 0 0;
+}
 #category-products .item > article .product-info .description {
   font-size: .83em;
   line-height: 1.3;
@@ -10459,9 +10288,6 @@ td.product .name > a:focus,
 #category-products .item > article .product-price .product-btn {
   min-height: 26px;
 }
-.grid .toolbar .view-mode a.btn-grid {
-  background-color: #efefef;
-}
 .grid #category-products .item {
   border-right: 1px solid #e8e8e8;
   margin: 0;
@@ -10475,9 +10301,6 @@ td.product .name > a:focus,
 }
 .grid #category-products .item > article .product-info .description {
   margin-left: 4px;
-}
-.list .toolbar .view-mode a.btn-list {
-  background-color: #efefef;
 }
 .list #category-products .item > article .product-price .price-container {
   margin-bottom: 20px;
@@ -11168,46 +10991,6 @@ td.product .name > a:focus,
   text-transform: uppercase;
   font-weight: 100;
   font-size: 16px;
-}
-.checkout-progress {
-  /*.btn-step {
-        border-radius: 0;
-        border: none;
-        border-top: 1px solid @text-color;
-        color: @text-color;
-        padding: 12px;
-        text-align: left;
-        width: 100%;
-
-        &:hover,
-        &:focus,
-        &:active,
-        &.active {
-            background-color: @brand-primary;
-        }
-
-        &.disabled,
-        &[disabled] {
-            &,
-            &:hover,
-            &:focus,
-            &:active,
-            &.active {
-                background-color: #f5f5f5;
-            }
-        }
-    }
-
-    @media (min-width: @screen-tablet) {
-        .btn-step {
-            border-top: 0;
-            padding: 20px;
-            width: auto;
-            + .btn-step {
-                border-left: 1px solid @text-color;
-            }
-        }
-    }*/
 }
 #google-map {
   border: none;

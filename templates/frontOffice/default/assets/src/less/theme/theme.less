@@ -220,99 +220,8 @@ header .header .logo {
     float: none;
 }
 
-/* Custom button */
-.btn-primary {
-    /*border-left: 3px solid lighten(@brand-primary, 20%);
-    border-radius: 0;
-    color: #fff;
-    font-style: italic;
-    font-weight: 600;
-    text-align: left;
-    text-shadow: none;
-
-    @media (min-width: @screen-desktop) {
-        padding: 2px 15px 2px 5px;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: @brand-primary;
-        color: @link-hover-color;
-        text-decoration: none;
-    }
-
-    &:active,
-    &.active {
-        &,
-        &:hover {
-            background-image: none;
-            background-color: darken(@gray-lighter, 10%);
-            border-color: darken(@gray-lighter, 50%);
-            .box-shadow(none);
-            color: #fff;
-            outline: 0;
-        }
-    }
-
-    &:before {
-        .fa-icon();
-        content: @fa-var-chevron-right;
-        font-size: 1em;
-        line-height: 0;
-        margin: 0 .4em 0 4px;
-    }*/
-}
-
-.btn-secondary {
-    /*border-radius: 0;
-    background-color: #f7f7f7;
-    border-color: #f7f7f7;
-    border-left: 3px solid darken(@gray-light, 10%);
-    color: @link-color;
-    font-weight: 600;
-    text-align: left;
-    text-shadow: none;
-
-    @media (min-width: @screen-desktop) {
-        padding: 2px 15px 2px 5px;
-    }
-
-    &:hover,
-    &:focus {
-        background-color: #f7f7f7;
-    }
-
-    &:active,
-    &.active {
-        &,
-        &:hover {
-            background-image: none;
-            background-color: darken(@gray-lighter, 10%);
-            border-color: darken(@gray-lighter, 50%);
-            .box-shadow(none);
-            color: #fff;
-            outline: 0;
-        }
-    }
-
-    &:before {
-        .fa-icon();
-        content: @fa-var-chevron-left;
-        font-size: 1em;
-        line-height: 0;
-        margin: 0 .4em 0 4px;
-    }*/
-}
-
 // Pager
 .pager {
-    .next,
-    .previous {
-        > a {
-            .btn-secondary;
-        }
-    }
-
     .previous a:before {
         .fa-icon();
         content: @fa-var-chevron-left;
@@ -323,21 +232,6 @@ header .header .logo {
         content: @fa-var-chevron-right;
         margin-right: .4em;
     }
-}
-
-// Products List
-#category-products .btn-cart {
-    /*.btn-secondary;
-
-    &:before {
-        content: @fa-var-shopping-cart;
-        font-size: 1.3em;
-    }*/
-}
-
-// Cart - Remove button
-.btn-remove {
-    font-style: italic;
 }
 
 // Carousel
@@ -570,6 +464,14 @@ td.product,
     }
 }
 
+#products-new {
+    .overlay {
+        &:before {
+            border-radius: @border-radius-base @border-radius-base 0 0;
+        }
+    }
+}
+
 #category-products {
     .item {
         > article {
@@ -601,9 +503,6 @@ td.product,
 
 // Products Grid
 .grid {
-    .toolbar .view-mode a.btn-grid {
-        background-color: #efefef;
-    }
     #category-products {
         .item {
             border-right: 1px solid #e8e8e8;
@@ -626,9 +525,6 @@ td.product,
 
 // Products List
 .list {
-    .toolbar .view-mode a.btn-list {
-        background-color: #efefef;
-    }
     #category-products {
         .item {
             > article {
@@ -1377,47 +1273,6 @@ td.product,
             font-size: ceil(@font-size-base * 1.1);
         }
     }
-}
-
-.checkout-progress {
-    /*.btn-step {
-        border-radius: 0;
-        border: none;
-        border-top: 1px solid @text-color;
-        color: @text-color;
-        padding: 12px;
-        text-align: left;
-        width: 100%;
-
-        &:hover,
-        &:focus,
-        &:active,
-        &.active {
-            background-color: @brand-primary;
-        }
-
-        &.disabled,
-        &[disabled] {
-            &,
-            &:hover,
-            &:focus,
-            &:active,
-            &.active {
-                background-color: #f5f5f5;
-            }
-        }
-    }
-
-    @media (min-width: @screen-tablet) {
-        .btn-step {
-            border-top: 0;
-            padding: 20px;
-            width: auto;
-            + .btn-step {
-                border-left: 1px solid @text-color;
-            }
-        }
-    }*/
 }
 
 // Page Contact
