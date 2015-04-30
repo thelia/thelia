@@ -2121,7 +2121,7 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 {foreach $locales as $locale}
     (1, '{$locale}', {intl l='Mr.' locale=$locale}, {intl l='Mister' locale=$locale}),
     (2, '{$locale}', {intl l='Mrs' locale=$locale}, {intl l='Misses' locale=$locale}),
-    (3, '{$locale}', {intl l='Miss' locale=$locale}, {intl l='Miss' locale=$locale}){if ! $locale@last},{/if}
+    (3, '{$locale}', {intl l='Miss_short' locale=$locale}, {intl l='Miss' locale=$locale}){if ! $locale@last},{/if}
 
 {/foreach}
 ;

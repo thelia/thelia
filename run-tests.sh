@@ -7,13 +7,13 @@
 set -e
 
 echo "backup DB"
-mysqldump -h localhost -u $DB_USER thelia >../thelia.sql
+mysqldump -h $DB_HOST -u $DB_USER thelia >../thelia.sql
 
 echo "phpunit"
 ./bin/phpunit
 
 echo "restore DB"
-mysql -h localhost -u $DB_USER thelia <../thelia.sql
+mysql -h $DB_HOST -u $DB_USER thelia <../thelia.sql
 
 echo "deactivate modules only needed by phpunit tests"
 php Thelia module:refresh
