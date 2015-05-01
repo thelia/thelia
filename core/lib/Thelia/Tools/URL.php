@@ -55,6 +55,14 @@ class URL
     }
 
     /**
+     * @param RequestContext $requestContext
+     */
+    public function setRequestContext(RequestContext $requestContext)
+    {
+        $this->requestContext = $requestContext;
+    }
+
+    /**
      * Return this class instance, only once instanciated.
      *
      * @throws \RuntimeException if the class has not been instanciated.

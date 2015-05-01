@@ -143,8 +143,8 @@ class ParamInitMiddleware implements HttpKernelInterface
                 return Lang::getDefaultLanguage();
             }
 
-            //if each lang had is own domain, we redirect the user to the good one.
-            if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+            //if each lang has its own domain, we redirect the user to the good one.
+            if (ConfigQuery::isMultiDomainActivated()) {
                 //if lang domain is different from actuel domain, redirect to the good one
                 if (rtrim($lang->getUrl(), "/") != $request->getSchemeAndHttpHost()) {
                     // TODO : search if http status 302 is the good one.
@@ -162,7 +162,7 @@ class ParamInitMiddleware implements HttpKernelInterface
 
         //check if lang is not defined. If not we have to search the good one.
         if (null === $request->getSession()->getLang(false)) {
-            if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+            if (ConfigQuery::isMultiDomainActivated()) {
                 //find lang with domain
                 return LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
             }

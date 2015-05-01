@@ -32,6 +32,7 @@ class RewritingResolver
     public $locale;
     public $otherParameters;
     public $redirectedToUrl;
+    public $rewrittenUrl;
 
     public function __construct($url = null)
     {
@@ -46,6 +47,7 @@ class RewritingResolver
     {
         $rewrittenUrl = ltrim($rewrittenUrl, '/');
         $rewrittenUrl = urldecode($rewrittenUrl);
+        $this->rewrittenUrl = $rewrittenUrl;
         $this->search = $this->rewritingUrlQuery->getResolverSearch($rewrittenUrl);
 
         if ($this->search->count() == 0) {

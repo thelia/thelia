@@ -26,6 +26,9 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\LangQuery;
+use Thelia\Model\RewritingUrlQuery;
+use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
 /**
@@ -184,9 +187,11 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                     $request->query->set($rewrittenUrlData->view . '_id', $rewrittenUrlData->viewId);
                 }
             }
+
             if (null !== $rewrittenUrlData->locale) {
-                $request->query->set('locale', $rewrittenUrlData->locale);
+                $this->manageLocale($rewrittenUrlData, $request);
             }
+
 
             foreach ($rewrittenUrlData->otherParameters as $parameter => $value) {
                 $request->query->set($parameter, $value);
@@ -199,6 +204,24 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
             );
         }
         throw new ResourceNotFoundException();
+    }
+
+    protected function manageLocale(RewritingResolver $rewrittenUrlData, Request $request)
+    {
+        $lang = LangQuery::create()
+            ->findOneByLocale($rewrittenUrlData->locale);
+
+        $langSession = $request->getSession()->getLang();
+
+        if ($lang != $langSession) {
+            if (ConfigQuery::isMultiDomainActivated()) {
+                $this->redirect(
+                    sprintf("%s/%s", $lang->getUrl(), $rewrittenUrlData->rewrittenUrl)
+                );
+            } else {
+                $request->getSession()->setLang($lang);
+            }
+        }
     }
 
     protected function redirect($url, $status = 302)
