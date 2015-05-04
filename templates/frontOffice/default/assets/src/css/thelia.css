@@ -10859,13 +10859,6 @@ td.product .name > a:focus,
   border: 1px solid #f5f5f5;
   margin-bottom: 0;
 }
-#account-address .table-address .btn span {
-  font: 0/0 a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-}
 #account-orders .panel-body {
   padding-left: 0;
   padding-right: 0;
