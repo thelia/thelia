@@ -30,7 +30,7 @@
         <div class="products-content">
             <ul class="products-grid list-unstyled row">
                 {loop name="product_promo" type="product" limit="5" promo="yes"}
-                    {include file="includes/single-product.html" colClass="col-md-2" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
+                    {include file="includes/single-product.html" colClass="col-md-2 col-sm-4" product_id=$ID hasBtn=false hasDescription=false width="218" height="146"}
                 {/loop}
             </ul>
         </div>
