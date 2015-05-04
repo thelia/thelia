@@ -9861,9 +9861,6 @@ a {
   display: none;
 }
 #brands .brands > ul .item > article .brand-image > img {
-  display: block;
-  max-width: 100%;
-  height: auto;
   width: 100%;
 }
 .page-404 .main {
