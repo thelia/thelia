@@ -8349,9 +8349,6 @@ header .header .language-container .currency-switch .select {
 .account-info li {
   margin-bottom: 20px;
 }
-.account-address .btn-add-address {
-  margin-bottom: 10px;
-}
 .table-order tbody td.product .name {
   margin-top: 0;
 }
@@ -8712,35 +8709,6 @@ header .header .language-container .currency-switch .select {
 .block-carousel .block-carousel-control .carousel-control:focus {
   background-color: #000;
   color: #fff;
-}
-.btn.btn-add-address,
-.btn.btn-checkout,
-.btn.btn-checkout-next,
-.btn.btn-checkout-home {
-  float: right;
-}
-.btn.btn-change-account,
-.btn.btn-change-password {
-  padding: 0;
-}
-.btn.btn-edit-address,
-.btn.btn-order-details,
-.btn.btn-remove-address {
-  margin-bottom: 10px;
-  padding: 4px 9px;
-}
-.btn.btn-change-address {
-  padding: 0;
-}
-.btn.btn-change-address:before {
-  margin-right: .4em;
-  padding: 4px 9px;
-}
-.btn.btn-cancel {
-  padding-left: 0;
-}
-.btn.btn-remove {
-  padding-left: 0;
 }
 #form-login,
 #form-forgotpassword {
@@ -9224,9 +9192,6 @@ header .header .language-container .currency-switch .select {
   content: "\f071";
   display: block;
   font-size: 2.2em;
-}
-#delivery-address .panel-heading > .btn-add-address {
-  text-transform: none;
 }
 #cart-address .panel {
   box-shadow: none;
@@ -10761,22 +10726,6 @@ td.product .name > a:focus,
     margin-top: 5px;
     width: 50%;
   }
-}
-#account-address .btn-add-address,
-#delivery-address .btn-add-address {
-  text-decoration: none !important;
-}
-#account-address .btn-add-address:before,
-#delivery-address .btn-add-address:before {
-  content: '+';
-  font-size: 45px;
-  line-height: 0;
-  font-style: normal;
-  font-weight: 100;
-  position: relative;
-  top: 10px;
-  -webkit-font-smoothing: antialiased;
-  margin-right: .1em;
 }
 #delivery-address.panel .panel-body {
   padding: 0;
