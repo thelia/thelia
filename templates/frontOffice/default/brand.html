@@ -90,7 +90,7 @@
                     <hr/>
                     {assign var="amount" value="{count type="product" brand="$ID"}"}
                     <div class="toolbar toolbar-top" role="toolbar">
-                        <div class="sorter-container">
+                        <div class="sorter-container clearfix">
                             <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
 
                             <span class="limiter">
@@ -138,7 +138,7 @@
 
                     <div class="toolbar toolbar-bottom" role="toolbar">
                         {if $amount > $limit}
-                            <div class="pagination-container" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
+                            <div class="pagination-container clearfix" role="pagination" aria-labelledby="pagination-label-{$toolbar}}">
                                 <strong id="pagination-label-{$toolbar}}" class="pagination-label sr-only">{intl l="Pagination"}</strong>
                                 <ul class="pagination pagination-sm">
                                     {if $product_page le 1}

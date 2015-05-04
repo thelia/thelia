@@ -197,14 +197,14 @@
                             {loop name="attributes" type="attribute" product="$product_id" order="manual"}
                             <div class="option option-option">
                                 <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
-                                <div class="option-content">
+                                <div class="option-content clearfix">
                                     <select id="option-{$ID}" name="option-{$ID}" class="form-control input-sm pse-option" data-attribute="{$ID}"></select>
                                 </div>
                             </div>
                             {/loop}
                             <div class="option option-fallback">
                                 <label for="option-fallback" class="option-heading">{intl l="Options"}</label>
-                                <div class="option-content">
+                                <div class="option-content clearfix">
                                     <select id="option-fallback" name="option-fallback" class="form-control input-sm pse-option pse-fallback" data-attribute="0"></select>
                                 </div>
                             </div>
