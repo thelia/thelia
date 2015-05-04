@@ -358,12 +358,12 @@
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
                 {loop type="product" name="prev_product" id="{$PREVIOUS}"}
-                    <li class="previous"><a href="{$URL nofilter}" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Previous product"}</a></li>
+                    <li class="previous"><a href="{$URL nofilter}"><i class="fa fa-chevron-left"></i> {intl l="Previous product"}</a></li>
                 {/loop}
             {/if}
             {if $HAS_NEXT == 1}
                 {loop type="product" name="next_product" id="{$NEXT}"}
-                    <li class="next"><a href="{$URL nofilter}" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Next product"}</a></li>
+                    <li class="next"><a href="{$URL nofilter}"><i class="fa fa-chevron-right"></i> {intl l="Next product"}</a></li>
                 {/loop}
             {/if}
         </ul>
