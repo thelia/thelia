@@ -10037,6 +10037,14 @@ header .header .logo {
   font-size: 18px;
   font-weight: bold;
 }
+.products-heading .btn-all,
+.products-heading .btn-all:hover,
+.products-heading .btn-all:focus {
+  color: #7a7a7a;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: 600;
+}
 .products-heading .short-description {
   background-color: #f5f5f5;
   margin-bottom: 10px;
