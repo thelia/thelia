@@ -268,7 +268,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="javascript-initialization"}{/block}
 
     <!-- Custom scripts -->
-    <script src="{javascript file='assets/dist/js/min.js'}"></script>
+    <script src="{javascript file='assets/dist/js/thelia.min.js'}"></script>
 
     {hook name="main.body-bottom"}
 </body>
