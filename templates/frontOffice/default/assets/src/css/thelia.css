@@ -8361,13 +8361,6 @@ header .header .language-container .currency-switch .select {
 #delivery-address .panel-heading {
   position: relative;
 }
-#delivery-address .panel-heading > .btn-add-address {
-  position: absolute;
-  top: 7px;
-  right: 10px;
-  margin: 0;
-  padding: 0;
-}
 .list-payment {
   margin-bottom: 0;
 }
@@ -8717,13 +8710,6 @@ header .header .language-container .currency-switch .select {
 #form-login legend,
 #form-forgotpassword legend {
   margin-bottom: 10px;
-}
-#form-login .forgot-password,
-#form-forgotpassword .forgot-password,
-#form-login .btn-cancel,
-#form-forgotpassword .btn-cancel {
-  float: left;
-  padding-left: 0;
 }
 .label-new {
   display: inline;
@@ -10108,14 +10094,6 @@ header .header .logo {
   font-size: 18px;
   font-weight: bold;
 }
-.products-heading h2 .btn-all,
-.products-heading h2 .btn-all:hover,
-.products-heading h2 .btn-all:focus {
-  color: #7a7a7a;
-  font-size: 16px;
-  font-style: italic;
-  font-weight: 600;
-}
 .products-heading .short-description {
   background-color: #f5f5f5;
   margin-bottom: 10px;
@@ -10902,10 +10880,6 @@ td.product .name > a:focus,
 #account-orders .table-orders thead > tr > th {
   background-color: #f5f5f5;
   border-bottom-width: 1px;
-}
-#account-orders .btn-order-details {
-  font-style: italic;
-  padding: 0;
 }
 #account-orders .table-order-products thead > tr > th,
 #account-orders .table-order-products tbody > tr > th,
