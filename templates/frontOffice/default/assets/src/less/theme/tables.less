@@ -4,10 +4,17 @@
 
     thead,
     tbody,
-    tfooter {
+    tfoot {
         > tr {
             > th,
             > td {
+                padding: 14px;
+                text-align: center;
+                vertical-align: middle;
+                &.product {
+                    text-align: left;
+                }
+
                 &.image {
                     border-right-color: transparent;
                 }
@@ -19,11 +26,22 @@
         th {
             background-color: #f5f5f5;
             text-transform: uppercase;
+            border-bottom-width: 1px;
+
+            &.subprice {
+                color: @brand-primary;
+            }
         }
     }
 
     tbody {
         td {
+            &.price,
+            &.qty,
+            &.subprice {
+                padding: 35px 10px;
+            }
+
             &.unitprice {
                 .price {
                     color: @text-color;
@@ -49,6 +67,23 @@
     }
 
     tfoot {
+        th,
+        td {
+            background-color: #f5f5f5;
+
+            &.empty {
+                background: transparent;
+            }
+
+            &.total {
+                background-color: #666;
+                color: #fff;
+                .price {
+                    color: inherit;
+                }
+            }
+        }
+
         td {
             &.shipping {
                 .price {
@@ -65,6 +100,12 @@
                 border-bottom-color: transparent;
                 border-left-color: transparent;
             }
+        }
+
+        th.total {
+            text-transform: uppercase;
+            font-weight: 100;
+            font-size: ceil(@font-size-base * 1.1);
         }
     }
 }

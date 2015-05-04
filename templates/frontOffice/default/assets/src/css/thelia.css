@@ -9319,6 +9319,11 @@ header .header .language-container .currency-switch .select {
 }
 .checkout-progress .btn-step {
   padding: 16px 24px;
+  background: #eeeeee;
+  color: #555555;
+}
+.checkout-progress .btn-step + .btn-step {
+  border-left: 1px solid #555555;
 }
 .checkout-progress .btn-step .step-nb {
   border-right: 1px solid #7a7a7a;
@@ -9340,6 +9345,7 @@ header .header .language-container .currency-switch .select {
 .checkout-progress .btn-step:active,
 .checkout-progress .btn-step.active {
   color: #fff;
+  background: #f49a17;
 }
 .checkout-progress .btn-step:hover .step-nb,
 .checkout-progress .btn-step:focus .step-nb,
@@ -9348,6 +9354,7 @@ header .header .language-container .currency-switch .select {
   border-right: 1px solid #fff;
 }
 .checkout-progress .btn-step.active {
+  background: #f49a17;
   cursor: default;
   display: inherit;
   pointer-events: none;
@@ -9392,6 +9399,11 @@ header .header .language-container .currency-switch .select {
 }
 .contents-list .item > article .content-image > img {
   width: 100%;
+}
+a {
+  -webkit-transition: all 0.3s ease-in-out;
+  -o-transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 .breadcrumb {
   padding: 0;
@@ -9663,24 +9675,67 @@ header .header .language-container .currency-switch .select {
 #account .panel-body {
   padding: 25px;
 }
+.table-order thead > tr > th,
+.table-cart thead > tr > th,
+.table-order tbody > tr > th,
+.table-cart tbody > tr > th,
+.table-order tfoot > tr > th,
+.table-cart tfoot > tr > th,
+.table-order thead > tr > td,
+.table-cart thead > tr > td,
+.table-order tbody > tr > td,
+.table-cart tbody > tr > td,
+.table-order tfoot > tr > td,
+.table-cart tfoot > tr > td {
+  padding: 14px;
+  text-align: center;
+  vertical-align: middle;
+}
+.table-order thead > tr > th.product,
+.table-cart thead > tr > th.product,
+.table-order tbody > tr > th.product,
+.table-cart tbody > tr > th.product,
+.table-order tfoot > tr > th.product,
+.table-cart tfoot > tr > th.product,
+.table-order thead > tr > td.product,
+.table-cart thead > tr > td.product,
+.table-order tbody > tr > td.product,
+.table-cart tbody > tr > td.product,
+.table-order tfoot > tr > td.product,
+.table-cart tfoot > tr > td.product {
+  text-align: left;
+}
 .table-order thead > tr > th.image,
 .table-cart thead > tr > th.image,
 .table-order tbody > tr > th.image,
 .table-cart tbody > tr > th.image,
-.table-order tfooter > tr > th.image,
-.table-cart tfooter > tr > th.image,
+.table-order tfoot > tr > th.image,
+.table-cart tfoot > tr > th.image,
 .table-order thead > tr > td.image,
 .table-cart thead > tr > td.image,
 .table-order tbody > tr > td.image,
 .table-cart tbody > tr > td.image,
-.table-order tfooter > tr > td.image,
-.table-cart tfooter > tr > td.image {
+.table-order tfoot > tr > td.image,
+.table-cart tfoot > tr > td.image {
   border-right-color: transparent;
 }
 .table-order thead th,
 .table-cart thead th {
   background-color: #f5f5f5;
   text-transform: uppercase;
+  border-bottom-width: 1px;
+}
+.table-order thead th.subprice,
+.table-cart thead th.subprice {
+  color: #f49a17;
+}
+.table-order tbody td.price,
+.table-cart tbody td.price,
+.table-order tbody td.qty,
+.table-cart tbody td.qty,
+.table-order tbody td.subprice,
+.table-cart tbody td.subprice {
+  padding: 35px 10px;
 }
 .table-order tbody td.unitprice .price,
 .table-cart tbody td.unitprice .price {
@@ -9699,6 +9754,31 @@ header .header .language-container .currency-switch .select {
 .table-cart tbody td.subprice .price {
   color: #f49a17;
 }
+.table-order tfoot th,
+.table-cart tfoot th,
+.table-order tfoot td,
+.table-cart tfoot td {
+  background-color: #f5f5f5;
+}
+.table-order tfoot th.empty,
+.table-cart tfoot th.empty,
+.table-order tfoot td.empty,
+.table-cart tfoot td.empty {
+  background: transparent;
+}
+.table-order tfoot th.total,
+.table-cart tfoot th.total,
+.table-order tfoot td.total,
+.table-cart tfoot td.total {
+  background-color: #666;
+  color: #fff;
+}
+.table-order tfoot th.total .price,
+.table-cart tfoot th.total .price,
+.table-order tfoot td.total .price,
+.table-cart tfoot td.total .price {
+  color: inherit;
+}
 .table-order tfoot td.shipping .price,
 .table-cart tfoot td.shipping .price {
   color: #7a7a7a;
@@ -9712,6 +9792,12 @@ header .header .language-container .currency-switch .select {
 .table-cart tfoot td.empty {
   border-bottom-color: transparent;
   border-left-color: transparent;
+}
+.table-order tfoot th.total,
+.table-cart tfoot th.total {
+  text-transform: uppercase;
+  font-weight: 100;
+  font-size: 16px;
 }
 .table-order-total td.total .price,
 .table-cart-total td.total .price {
@@ -10944,83 +11030,6 @@ td.product .name > a:focus,
 .table-cart-mini tbody > tr > td,
 .table-cart-mini tfoot > tr > td {
   vertical-align: middle;
-}
-.table-cart thead > tr > th,
-.table-order thead > tr > th,
-.table-cart tbody > tr > th,
-.table-order tbody > tr > th,
-.table-cart tfoot > tr > th,
-.table-order tfoot > tr > th,
-.table-cart thead > tr > td,
-.table-order thead > tr > td,
-.table-cart tbody > tr > td,
-.table-order tbody > tr > td,
-.table-cart tfoot > tr > td,
-.table-order tfoot > tr > td {
-  padding: 14px;
-  text-align: center;
-  vertical-align: middle;
-}
-.table-cart thead > tr > th.product,
-.table-order thead > tr > th.product,
-.table-cart tbody > tr > th.product,
-.table-order tbody > tr > th.product,
-.table-cart tfoot > tr > th.product,
-.table-order tfoot > tr > th.product,
-.table-cart thead > tr > td.product,
-.table-order thead > tr > td.product,
-.table-cart tbody > tr > td.product,
-.table-order tbody > tr > td.product,
-.table-cart tfoot > tr > td.product,
-.table-order tfoot > tr > td.product {
-  text-align: left;
-}
-.table-cart tbody > tr > td.price,
-.table-order tbody > tr > td.price,
-.table-cart tbody > tr > td.qty,
-.table-order tbody > tr > td.qty,
-.table-cart tbody > tr > td.subprice,
-.table-order tbody > tr > td.subprice {
-  padding: 35px 10px;
-}
-.table-cart thead > tr > th,
-.table-order thead > tr > th {
-  border-bottom-width: 1px;
-}
-.table-cart thead > tr > th.subprice,
-.table-order thead > tr > th.subprice {
-  color: #f49a17;
-}
-.table-cart tfoot > tr > th,
-.table-order tfoot > tr > th,
-.table-cart tfoot > tr > td,
-.table-order tfoot > tr > td {
-  background-color: #f5f5f5;
-}
-.table-cart tfoot > tr > th.empty,
-.table-order tfoot > tr > th.empty,
-.table-cart tfoot > tr > td.empty,
-.table-order tfoot > tr > td.empty {
-  background: transparent;
-}
-.table-cart tfoot > tr > th.total,
-.table-order tfoot > tr > th.total,
-.table-cart tfoot > tr > td.total,
-.table-order tfoot > tr > td.total {
-  background-color: #666;
-  color: #fff;
-}
-.table-cart tfoot > tr > th.total .price,
-.table-order tfoot > tr > th.total .price,
-.table-cart tfoot > tr > td.total .price,
-.table-order tfoot > tr > td.total .price {
-  color: inherit;
-}
-.table-cart tfoot th.total,
-.table-order tfoot th.total {
-  text-transform: uppercase;
-  font-weight: 100;
-  font-size: 16px;
 }
 #google-map {
   border: none;

@@ -57,6 +57,12 @@
 .checkout-progress {
     .btn-step {
         padding: 16px 24px;
+        background: @gray-lighter;
+        color: @gray;
+
+        + .btn-step {
+            border-left: 1px solid @gray;
+        }
 
         .step-nb {
             border-right: 1px solid @text-color;
@@ -80,12 +86,15 @@
         &:active,
         &.active {
             color: #fff;
+            background: @brand-primary;
+            
             .step-nb {
                 border-right: 1px solid #fff;
             }
         }
 
         &.active {
+            background: @brand-primary;
             cursor: default;
             display: inherit;
             pointer-events: none; // Future-proof disabling of clicks
