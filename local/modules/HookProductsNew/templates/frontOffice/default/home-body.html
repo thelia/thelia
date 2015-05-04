@@ -6,7 +6,7 @@
     <div class="products-content">
         <ul class="list-unstyled products-grid row">
             {loop name="product_new" type="product" limit="4" new="yes"}
-            <li class="item col-md-3">
+            <li class="item col-md-3 col-sm-4">
                 <article itemscope itemtype="http://schema.org/Product">
                     <!-- Use the meta tag to specify content that is not visible on the page in any way -->
                     {$product_id=$ID}
@@ -23,7 +23,7 @@
 
                     <a href="{$URL}" itemprop="url" tabindex="-1" class="product-image overlay">
                         {ifloop rel="image_product_new" }
-                        <img itemprop="image" class="img-responsive"
+                        <img itemprop="image" class="img-responsive center-block"
                         {loop name="image_product_new" type="image" limit="1" product="{$ID}" force_return="true" width="280" height="196" resize_mode="borders"}
                         src="{$IMAGE_URL}"
                         {/loop}
