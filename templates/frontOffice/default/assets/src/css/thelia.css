@@ -9296,6 +9296,9 @@ a {
   border-color: #6f6f6f;
   color: #fff;
 }
+.btn-link {
+  font-weight: normal;
+}
 .form-control:focus::-moz-placeholder {
   color: #eeeeee;
   opacity: 1;
