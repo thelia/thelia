@@ -64,7 +64,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected function findRelativePath($filePath, $mode)
     {
-        $absolutePath = realpath(THELIA_ROOT . $filePath);
+        $absolutePath = THELIA_ROOT . $filePath;
 
         return $this->findAbsolutePath($absolutePath, $mode);
     }
@@ -80,6 +80,7 @@ class TlogDestinationFile extends AbstractTlogDestination
 
                 touch($filePath);
                 chmod($filePath, 0666);
+                $this->filePath = $filePath;
             }
 
             if ($this->fh) {
