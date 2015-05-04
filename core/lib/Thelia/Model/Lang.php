@@ -43,21 +43,23 @@ class Lang extends BaseLang
         if ($this->getId() === null) {
             throw new \RuntimeException("impossible to just uncheck default language, choose a new one");
         }
-        $con = Propel::getWriteConnection(LangTableMap::DATABASE_NAME);
-        $con->beginTransaction();
-        try {
-            LangQuery::create()
-                ->filterByByDefault(1)
-                ->update(array('ByDefault' => 0), $con);
+        if (!$this->getByDefault()) {
+            $con = Propel::getWriteConnection(LangTableMap::DATABASE_NAME);
+            $con->beginTransaction();
+            try {
+                LangQuery::create()
+                    ->filterByByDefault(1)
+                    ->update(array('ByDefault' => 0), $con);
 
-            $this
-                ->setByDefault(1)
-                ->save($con);
+                $this
+                    ->setByDefault(1)
+                    ->save($con);
 
-            $con->commit();
-        } catch (PropelException $e) {
-            $con->rollBack();
-            throw $e;
+                $con->commit();
+            } catch (PropelException $e) {
+                $con->rollBack();
+                throw $e;
+            }
         }
     }
 
