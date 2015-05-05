@@ -354,13 +354,37 @@
     </div>
 </div>
 
+{* Delete confirmation dialog *}
+
+{capture "delete_customer_dialog"}
+<input type="hidden" name="page" value="{$page}">
+<input type="hidden" name="customer_id" id="delete_customer_id">
+
+{hook name="customer.delete-form" location="customer_delete_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "delete_customer_dialog"
+    dialog_title    = {intl l="Delete customer"}
+    dialog_message  = {intl l="Do you really want to delete this customer ?"}
+
+    form_action         = {token_url path='/admin/customer/delete'}
+    form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+    form_id             = "form_delete_customer"
+}
+
 {/block}
 
 {block name="javascript-initialization"}
 
+<script type="text/javascript">
+    $(".customer-delete").click(function(){
+        $("#delete_customer_id").val($(this).attr("data-id"));
+    });
+</script>
 
-    <script>
-    </script>
 {/block}
 
 {block name="javascript-last-call"}
