@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /*      This file is part of the Thelia package.                                     */
 /*                                                                                   */
@@ -19,15 +20,15 @@ use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
 /**
- * Class FrontHook
- * @package HookCurrency\Hook
+ * Class FrontHook.
+ *
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>, Etienne PERRIERE <eperriere@openstudio.fr> - OpenStudio
  */
-class FrontHook extends BaseHook {
-
+class FrontHook extends BaseHook
+{
     public function onMainNavbarPrimary(HookRenderEvent $event)
     {
-        $content = $this->render("main-navbar-primary.html");
+        $content = $this->render('main-navbar-primary.html');
         $event->add($content);
     }
 
@@ -35,13 +36,13 @@ class FrontHook extends BaseHook {
     {
         $bodyConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID);
 
-        $content = trim($this->render("main-footer-body.html", ['bodyFolderId' => $bodyConfig]));
-        if ("" != $content){
+        $content = trim($this->render('main-footer-body.html', ['bodyFolderId' => $bodyConfig]));
+        if ('' != $content) {
             $event->add(array(
-                "id" => "navigation-footer-body",
-                "class" => "links",
-                "title" => $this->trans("Latest articles", array(), HookNavigation::MESSAGE_DOMAIN.'.fo.default'),
-                "content" => $content
+                'id' => 'navigation-footer-body',
+                'class' => 'links',
+                'title' => $this->trans('Latest articles', array(), HookNavigation::MESSAGE_DOMAIN.'.fo.default'),
+                'content' => $content,
             ));
         }
     }
@@ -50,8 +51,7 @@ class FrontHook extends BaseHook {
     {
         $bottomConfig = HookNavigation::getConfigValue(HookNavigationConfigValue::FOOTER_BOTTOM_FOLDER_ID);
 
-        $content = $this->render("main-footer-bottom.html", ['bottomFolderId' => $bottomConfig]);
+        $content = $this->render('main-footer-bottom.html', ['bottomFolderId' => $bottomConfig]);
         $event->add($content);
     }
-
-} 
+}

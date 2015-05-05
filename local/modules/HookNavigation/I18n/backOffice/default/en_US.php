@@ -8,5 +8,5 @@ return array(
     'HookNavigation configuration' => 'HookNavigation configuration',
 
     'Folder in footer body' => 'Folder in footer body',
-    'Folder in footer bottom' => 'Folder in footer bottom'
+    'Folder in footer bottom' => 'Folder in footer bottom',
 );

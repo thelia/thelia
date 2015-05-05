@@ -8,8 +8,8 @@ use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Form\Exception\FormValidationException;
 
 /**
- * Class HookNavigationConfigController
- * @package HookNavigation\Controller
+ * Class HookNavigationConfigController.
+ *
  * @author Etienne PERRIERE <eperriere@openstudio.fr> - OpenStudio
  */
 class HookNavigationConfigController extends BaseAdminController
@@ -22,12 +22,12 @@ class HookNavigationConfigController extends BaseAdminController
         $this->getSession()->getFlashBag()->set('bodyConfig', $bodyConfig);
         $this->getSession()->getFlashBag()->set('bottomConfig', $bottomConfig);
 
-        return $this->render("hooknavigation-configuration");
+        return $this->render('hooknavigation-configuration');
     }
 
     public function saveAction()
     {
-        $baseForm = $this->createForm("hooknavigation.configuration");
+        $baseForm = $this->createForm('hooknavigation.configuration');
 
         $errorMessage = null;
 
@@ -35,9 +35,8 @@ class HookNavigationConfigController extends BaseAdminController
             $form = $this->validateForm($baseForm);
             $data = $form->getData();
 
-            HookNavigation::setConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID, is_bool($data["footer_body_folder_id"]) ? (int) ($data["footer_body_folder_id"]) : $data["footer_body_folder_id"]);
-            HookNavigation::setConfigValue(HookNavigationConfigValue::FOOTER_BOTTOM_FOLDER_ID, is_bool($data["footer_bottom_folder_id"]) ? (int) ($data["footer_bottom_folder_id"]) : $data["footer_bottom_folder_id"]);
-
+            HookNavigation::setConfigValue(HookNavigationConfigValue::FOOTER_BODY_FOLDER_ID, is_bool($data['footer_body_folder_id']) ? (int) ($data['footer_body_folder_id']) : $data['footer_body_folder_id']);
+            HookNavigation::setConfigValue(HookNavigationConfigValue::FOOTER_BOTTOM_FOLDER_ID, is_bool($data['footer_bottom_folder_id']) ? (int) ($data['footer_bottom_folder_id']) : $data['footer_bottom_folder_id']);
         } catch (FormValidationException $ex) {
             // Invalid data entered
             $errorMessage = $this->createStandardFormValidationErrorMessage($ex);
@@ -57,7 +56,7 @@ class HookNavigationConfigController extends BaseAdminController
             ;
         } else {
             $this->getParserContext()
-                ->set("success", true)
+                ->set('success', true)
             ;
         }
 

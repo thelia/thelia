@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /* This file is part of the Thelia package.                                          */
 /*                                                                                   */
@@ -15,10 +16,8 @@ namespace HookNavigation\Model\Config;
 use HookNavigation\Model\Config\Base\HookNavigationConfigValue as BaseHookNavigationConfigValue;
 
 /**
- * Class HookNavigationConfigValue
- * @package HookNavigation\Model\Config
+ * Class HookNavigationConfigValue.
  */
 class HookNavigationConfigValue extends BaseHookNavigationConfigValue
 {
 }
-

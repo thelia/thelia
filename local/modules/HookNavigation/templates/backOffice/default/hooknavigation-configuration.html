@@ -63,15 +63,11 @@
 
                                 <select id="{$label_attr.for}" class="form-control" name="{$name}" >
                                     <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
-                                    {foreach $choices as $choice}
-                                        <option value="{$choice->value}"
-                                            {if $bodyConfig == $choice->value}
-                                                selected
-                                            {/if}
-                                        >
-                                            {$choice->label}
+                                    {loop type="folder" name="folder_list_body"}
+                                        <option value="{$ID}" {if $bodyConfig == $ID}selected{/if}>
+                                            {$TITLE}
                                         </option>
-                                    {/foreach}
+                                    {/loop}
                                 </select>
 
                                 {if ! empty($label_attr.help)}
@@ -94,15 +90,11 @@
 
                                 <select id="{$label_attr.for}" class="form-control" name="{$name}" >
                                     <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
-                                    {foreach $choices as $choice}
-                                        <option value="{$choice->value}"
-                                            {if $bottomConfig == $choice->value}
-                                                selected
-                                            {/if}
-                                        >
-                                            {$choice->label}
+                                    {loop type="folder" name="folder_list_bottom"}
+                                        <option value="{$ID}" {if $bottomConfig == $ID}selected{/if}>
+                                            {$TITLE}
                                         </option>
-                                    {/foreach}
+                                    {/loop}
                                 </select>
 
                                 {if ! empty($label_attr.help)}

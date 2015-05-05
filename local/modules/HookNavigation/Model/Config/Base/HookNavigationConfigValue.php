@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /* This file is part of the Thelia package.                                          */
 /*                                                                                   */
@@ -13,12 +14,10 @@
 namespace HookNavigation\Model\Config\Base;
 
 /**
- * Class HookNavigationConfigValue
- * @package HookNavigation\Model\Config\Base
+ * Class HookNavigationConfigValue.
  */
 class HookNavigationConfigValue
 {
-    const FOOTER_BODY_FOLDER_ID = "footer_body_folder_id";
-    const FOOTER_BOTTOM_FOLDER_ID = "footer_bottom_folder_id";
+    const FOOTER_BODY_FOLDER_ID = 'footer_body_folder_id';
+    const FOOTER_BOTTOM_FOLDER_ID = 'footer_bottom_folder_id';
 }
-
