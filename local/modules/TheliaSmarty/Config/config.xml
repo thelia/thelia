@@ -138,6 +138,14 @@
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="event_dispatcher"/>
         </service>
+
+        <service id="smarty.plugin.cache" class="TheliaSmarty\Template\Plugins\Cache" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+
+            <argument type="service" id="request" />
+            <argument>%kernel.cache_dir%</argument>
+            <argument>%kernel.debug%</argument>
+        </service>
     </services>
 
 </config>
