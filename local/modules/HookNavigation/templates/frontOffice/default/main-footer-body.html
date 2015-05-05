@@ -1,6 +1,6 @@
 {ifloop rel="blog.articles"}
 <ul>
-    {loop type="content" name="blog.articles" folder="1" limit="3"}
+    {loop type="content" name="blog.articles" folder=$bodyFolderId limit=3}
     <li>
         <a href="{$URL}">
             <h4 class="block-subtitle">{$TITLE}</h4>

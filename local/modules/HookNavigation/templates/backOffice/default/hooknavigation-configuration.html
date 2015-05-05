@@ -1,0 +1,116 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+    {$admin_current_location = 'modules'}
+{/block}
+
+{block name="page-title"}{intl d="hooknavigation.bo.default" l='HookNavigation configuration'}{/block}
+
+{block name="check-resource"}admin.module{/block}
+{block name="check-access"}view{/block}
+{block name="check-module"}HookNavigation{/block}
+
+{block name="main-content"}
+    <div class="container" id="wrapper">
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin'}">{intl l="Home" d="hooknavigation.bo.default"}</a></li>
+            <li><a href="{url path='/admin/modules'}">{intl l="Modules" d="hooknavigation.bo.default"}</a></li>
+            <li>{intl l="HookNavigation configuration" d="hooknavigation.bo.default"}</li>
+        </ul>
+
+        <div class="general-block-decorator">
+            <div class="title title-without-tabs">
+                {intl l="Configure hooknavigation" d="hooknavigation.bo.default"}
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    {if $success}
+                        <div class="alert alert-success">
+                            {intl l="Configuration correctly saved" d="hooknavigation.bo.default"}
+                        </div>
+                    {/if}
+
+                    {form name="hooknavigation.configuration"}
+                        <form action="{$current_url}" method="post">
+                            {include "includes/inner-form-toolbar.html" hide_flags = 1 close_url={url path='/admin/modules'}}
+                            <br/>
+
+                            {form_field form=$form field="success_url"}
+                            <input type="hidden" name="{$name}" value="{url path='/admin/modules'}" />
+                            {/form_field}
+
+                            {form_hidden_fields form=$form}
+
+                            {flash type="bodyConfig"}
+                                {assign var='bodyConfig' value=$MESSAGE}
+                            {/flash}
+                            {flash type="bottomConfig"}
+                                {assign var='bottomConfig' value=$MESSAGE}
+                            {/flash}
+
+                            {form_field form=$form field="footer_body_folder_id"}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label class="control-label" for="{$label_attr.for}">
+                                    {$label}
+                                    {if $required}<span class="required">*</span>{/if}
+
+                                    {form_error form=$form field="footer_body_folder_id"}
+                                    <br />
+                                    <span class="error">{$message}</span>
+                                    {/form_error}
+                                </label>
+
+                                <select id="{$label_attr.for}" class="form-control" name="{$name}" >
+                                    <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
+                                    {loop type="folder" name="folder_list_body"}
+                                        <option value="{$ID}" {if $bodyConfig == $ID}selected{/if}>
+                                            {$TITLE}
+                                        </option>
+                                    {/loop}
+                                </select>
+
+                                {if ! empty($label_attr.help)}
+                                    <span class="help-block">{$label_attr.help}</span>
+                                {/if}
+                            </div>
+                            {/form_field}
+
+                            {form_field form=$form field="footer_bottom_folder_id"}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label class="control-label" for="{$label_attr.for}">
+                                    {$label}
+                                    {if $required}<span class="required">*</span>{/if}
+
+                                    {form_error form=$form field="footer_bottom_folder_id"}
+                                    <br />
+                                    <span class="error">{$message}</span>
+                                    {/form_error}
+                                </label>
+
+                                <select id="{$label_attr.for}" class="form-control" name="{$name}" >
+                                    <option>--- {intl l="Select a folder" d="hooknavigation.bo.default"} ---</option>
+                                    {loop type="folder" name="folder_list_bottom"}
+                                        <option value="{$ID}" {if $bottomConfig == $ID}selected{/if}>
+                                            {$TITLE}
+                                        </option>
+                                    {/loop}
+                                </select>
+
+                                {if ! empty($label_attr.help)}
+                                    <span class="help-block">{$label_attr.help}</span>
+                                {/if}
+                            </div>
+                            {/form_field}
+
+                            {include "includes/inner-form-toolbar.html" hide_flags = 1 close_url={url path='/admin/modules'} page_bottom = 1}
+                        </form>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
+
+{block name="javascript-initialization"}
+{/block}

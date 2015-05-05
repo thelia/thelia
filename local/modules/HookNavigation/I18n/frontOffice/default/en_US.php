@@ -1,8 +1,6 @@
 <?php
 
 return array(
-    'Categories' => 'Categories',
-    'Home' => 'Home',
+    'Latest articles' => 'Latest articles',
     'No articles currently' => 'No articles currently',
-    'Toggle navigation' => 'Toggle navigation',
 );
