@@ -23,7 +23,7 @@ If you want to customize the default template of Thelia, there are two possible 
 
 ### Simple configuration
 The simple process to update this template is to work into the `assets/src` directory.
-In fact, this folder contain the non compiled version of assets.
+In fact, this folder contain the non minified version of assets.
 
 You can change change css rules and js code easily.
 
