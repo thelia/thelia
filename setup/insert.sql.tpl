@@ -72,7 +72,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 
 ('customer_change_email', '0', 0, 0, NOW(), NOW()),
 ('customer_confirm_email', '1', 0, 0, NOW(), NOW()),
-('form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW())
+('form.secret', 'ThisIsNotASecret', 0, 0, NOW(), NOW()),
+('smarty_cache_disabled', '0', 0, 0, NOW(), NOW())
 ;
 
 INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namespace`, `created_at`, `updated_at`) VALUES
@@ -1439,7 +1440,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, '{$locale}', {intl l='[Firewall] Activate the firewall' locale=$locale}, NULL, NULL, NULL),
     (59, '{$locale}', {intl l='Allow slash ended uri' locale=$locale}, NULL, NULL, NULL),
     (60, '{$locale}', {intl l='Show error message instead of a white page on a server error' locale=$locale}, NULL, NULL, NULL),
-    (61, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (61, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL),
+    (62, '{$locale}', {intl l='Disable the smarty cache plugin (1 : disabled, 0 : enabled)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
