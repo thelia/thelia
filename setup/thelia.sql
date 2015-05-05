@@ -780,6 +780,7 @@ CREATE TABLE `order_address`
     `zipcode` VARCHAR(10) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `phone` VARCHAR(20),
+    `cellphone` VARCHAR(20),
     `country_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
