@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
 
 /**
@@ -39,7 +40,7 @@ class CategoryQuery extends BaseCategoryQuery
      */
     public static function findAllChild($categoryId, $depth = 0, $currentPos = 0)
     {
-        $result = array();
+        $result = [];
 
         if (is_array($categoryId)) {
             foreach ($categoryId as $categorySingleId) {
@@ -49,7 +50,7 @@ class CategoryQuery extends BaseCategoryQuery
             $currentPos++;
 
             if ($depth == $currentPos && $depth != 0) {
-                return;
+                return [];
             }
 
             $categories = self::create()
@@ -59,6 +60,35 @@ class CategoryQuery extends BaseCategoryQuery
             foreach ($categories as $category) {
                 array_push($result, $category);
                 $result = array_merge($result, (array) self::findAllChild($category->getId(), $depth, $currentPos));
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * Return all category IDs of a category tree, starting at $categoryId, up to a depth of $depth
+     *
+     * @param  int|int[] $categoryId the category id or an array of category ids
+     * @param  int $depth max tree traversal depth
+     * @return int[]
+     */
+    public static function getCategoryTreeIds($categoryId, $depth = 1)
+    {
+        $result = is_array($categoryId) ? $categoryId : [ $categoryId ];
+
+        if ($depth > 1) {
+            $categories = self::create()
+                ->filterByParent($categoryId, Criteria::IN)
+                ->withColumn('id')
+                ->find();
+
+            foreach ($categories as $category) {
+                $result = array_merge(
+                    $result,
+                    self::getCategoryTreeIds($category->getId(), $depth - 1)
+                );
             }
         }
 
