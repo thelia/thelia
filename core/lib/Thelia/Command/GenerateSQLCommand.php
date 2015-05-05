@@ -122,6 +122,7 @@ class GenerateSQLCommand extends ContainerAwareCommand
         $finder = Finder::create()
             ->name('*.php')
             ->depth(0)
+            ->sortByName()
             ->in(THELIA_SETUP_DIRECTORY . 'I18n');
 
         // limit to only some locale(s)
