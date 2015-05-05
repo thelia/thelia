@@ -10291,24 +10291,28 @@ td.product .name > a:focus,
 #product-thumbnails .carousel-control {
   width: 17px !important;
 }
+#product-thumbnails .carousel-control .fa {
+  position: absolute;
+  top: 50%;
+}
 #product-thumbnails .carousel-control.left {
   border-right: 7px solid #ccc;
   color: #ccc;
   text-align: left;
 }
-#product-thumbnails .carousel-control.left > .fa-var-caret-left {
+#product-thumbnails .carousel-control.left > .fa-caret-left {
   left: 0;
   margin-left: 0;
   margin-top: -15px;
 }
-#product-thumbnails .carousel-control.left > .fa-var-caret-left:before {
+#product-thumbnails .carousel-control.left > .fa-caret-left:before {
   color: inherit;
 }
 #product-thumbnails .carousel-control.right {
   border-left: 7px solid #ccc;
   text-align: right;
 }
-#product-thumbnails .carousel-control.right > .fa-var-caret-right {
+#product-thumbnails .carousel-control.right > .fa-caret-right {
   left: auto;
   right: 0;
   margin-left: 0;

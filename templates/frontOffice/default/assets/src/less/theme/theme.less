@@ -590,11 +590,17 @@ td.product,
 #product-thumbnails {
     .carousel-control {
         width: 17px !important;
+
+        .fa {
+            position: absolute;
+            top: 50%;
+        }
+
         &.left {
             border-right: 7px solid #ccc;
             color: #ccc;
             text-align: left;
-            > .fa-var-caret-left {
+            > .fa-caret-left {
                 left: 0;
                 margin-left: 0;
                 margin-top: -15px;
@@ -606,7 +612,7 @@ td.product,
         &.right {
             border-left: 7px solid #ccc;
             text-align: right;
-            > .fa-var-caret-right {
+            > .fa-caret-right {
                 left: auto;
                 right: 0;
                 margin-left: 0;
