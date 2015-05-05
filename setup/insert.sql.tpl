@@ -1440,7 +1440,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, '{$locale}', {intl l='[Firewall] Activate the firewall' locale=$locale}, NULL, NULL, NULL),
     (59, '{$locale}', {intl l='Allow slash ended uri' locale=$locale}, NULL, NULL, NULL),
     (60, '{$locale}', {intl l='Show error message instead of a white page on a server error' locale=$locale}, NULL, NULL, NULL),
-    (61, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (61, '{$locale}', {intl l='Filename of the error page' locale=$locale}, NULL, NULL, NULL),
     (62, '{$locale}', {intl l='Disable the smarty cache plugin (1 : disabled, 0 : enabled)' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}

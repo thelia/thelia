@@ -1439,7 +1439,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'en_US', '[Firewall] Activate the firewall', NULL, NULL, NULL),
     (59, 'en_US', 'Allow slash ended uri', NULL, NULL, NULL),
     (60, 'en_US', 'Show error message instead of a white page on a server error', NULL, NULL, NULL),
-    (61, 'en_US', 'Filename of the error page', NULL, NULL, NULL),    (62, 'en_US', 'Disable the smarty cache plugin (1 : disabled, 0 : enabled)', NULL, NULL, NULL),
+    (61, 'en_US', 'Filename of the error page', NULL, NULL, NULL),
+    (62, 'en_US', 'Disable the smarty cache plugin (1 : disabled, 0 : enabled)', NULL, NULL, NULL),
     (1, 'es_ES', NULL, NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL, NULL),
@@ -1484,7 +1485,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'es_ES', NULL, NULL, NULL, NULL),
     (59, 'es_ES', NULL, NULL, NULL, NULL),
     (60, 'es_ES', NULL, NULL, NULL, NULL),
-    (61, 'es_ES', NULL, NULL, NULL, NULL),    (62, 'es_ES', NULL, NULL, NULL, NULL),
+    (61, 'es_ES', NULL, NULL, NULL, NULL),
+    (62, 'es_ES', NULL, NULL, NULL, NULL),
     (1, 'fr_FR', 'Vérifier la présence de produits en stock (1) ou l\'ignorer (0) lors de l\'affichage et la modification des quantités commandées', NULL, NULL, NULL),
     (2, 'fr_FR', 'Nom du modèle de front-office actif', NULL, NULL, NULL),
     (3, 'fr_FR', 'Nom du modèle de back-office actif', NULL, NULL, NULL),
@@ -1529,7 +1531,8 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (58, 'fr_FR', '[Pare-feu] Activer le pare-feu', NULL, NULL, NULL),
     (59, 'fr_FR', 'Autoriser les URI terminées par un slash', NULL, NULL, NULL),
     (60, 'fr_FR', 'Afficher un message d\'erreur à la place d\'une page blanche lors d\'une erreur serveur', NULL, NULL, NULL),
-    (61, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL)    (62, 'fr_FR', 'Désactiver le plugin de cache smarty (1 : désactivé, 0 : activé)', NULL, NULL, NULL)
+    (61, 'fr_FR', 'Nom du fichier de la page d\'erreur', NULL, NULL, NULL),
+    (62, 'fr_FR', 'Désactiver le plugin de cache smarty (1 : désactivé, 0 : activé)', NULL, NULL, NULL)
 ;
 
 INSERT INTO `module_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
