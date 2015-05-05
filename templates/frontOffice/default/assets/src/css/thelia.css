@@ -8491,96 +8491,6 @@ header .header .language-container .currency-switch .select {
 #form-forgotpassword legend {
   margin-bottom: 10px;
 }
-.label-new {
-  display: inline;
-  padding: .2em .6em .3em;
-  font-size: 75%;
-  font-weight: bold;
-  line-height: 1;
-  color: #ffffff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-  background-color: #5bc0de;
-}
-a.label-new:hover,
-a.label-new:focus {
-  color: #ffffff;
-  text-decoration: none;
-  cursor: pointer;
-}
-.label-new:empty {
-  display: none;
-}
-.btn .label-new {
-  position: relative;
-  top: -1px;
-}
-.label-new[href]:hover,
-.label-new[href]:focus {
-  background-color: #31b0d5;
-}
-.label-sale {
-  display: inline;
-  padding: .2em .6em .3em;
-  font-size: 75%;
-  font-weight: bold;
-  line-height: 1;
-  color: #ffffff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-  background-color: #d9534f;
-}
-a.label-sale:hover,
-a.label-sale:focus {
-  color: #ffffff;
-  text-decoration: none;
-  cursor: pointer;
-}
-.label-sale:empty {
-  display: none;
-}
-.btn .label-sale {
-  position: relative;
-  top: -1px;
-}
-.label-sale[href]:hover,
-.label-sale[href]:focus {
-  background-color: #c9302c;
-}
-.label-delivered {
-  display: inline;
-  padding: .2em .6em .3em;
-  font-size: 75%;
-  font-weight: bold;
-  line-height: 1;
-  color: #ffffff;
-  text-align: center;
-  white-space: nowrap;
-  vertical-align: baseline;
-  border-radius: .25em;
-  background-color: #5cb85c;
-}
-a.label-delivered:hover,
-a.label-delivered:focus {
-  color: #ffffff;
-  text-decoration: none;
-  cursor: pointer;
-}
-.label-delivered:empty {
-  display: none;
-}
-.btn .label-delivered {
-  position: relative;
-  top: -1px;
-}
-.label-delivered[href]:hover,
-.label-delivered[href]:focus {
-  background-color: #449d44;
-}
 #filters {
   margin-bottom: 20px;
 }
@@ -9613,6 +9523,96 @@ a {
 .block-carousel .block-carousel-control .carousel-control:focus {
   background-color: #000;
   color: #fff;
+}
+.label-new {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #5bc0de;
+}
+a.label-new:hover,
+a.label-new:focus {
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.label-new:empty {
+  display: none;
+}
+.btn .label-new {
+  position: relative;
+  top: -1px;
+}
+.label-new[href]:hover,
+.label-new[href]:focus {
+  background-color: #31b0d5;
+}
+.label-sale {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #d9534f;
+}
+a.label-sale:hover,
+a.label-sale:focus {
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.label-sale:empty {
+  display: none;
+}
+.btn .label-sale {
+  position: relative;
+  top: -1px;
+}
+.label-sale[href]:hover,
+.label-sale[href]:focus {
+  background-color: #c9302c;
+}
+.label-delivered {
+  display: inline;
+  padding: .2em .6em .3em;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  color: #ffffff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25em;
+  background-color: #5cb85c;
+}
+a.label-delivered:hover,
+a.label-delivered:focus {
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.label-delivered:empty {
+  display: none;
+}
+.btn .label-delivered {
+  position: relative;
+  top: -1px;
+}
+.label-delivered[href]:hover,
+.label-delivered[href]:focus {
+  background-color: #449d44;
 }
 .products-heading .btn-all {
   float: right;
