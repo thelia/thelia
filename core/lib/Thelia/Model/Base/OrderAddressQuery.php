@@ -32,6 +32,7 @@ use Thelia\Model\Map\OrderAddressTableMap;
  * @method     ChildOrderAddressQuery orderByZipcode($order = Criteria::ASC) Order by the zipcode column
  * @method     ChildOrderAddressQuery orderByCity($order = Criteria::ASC) Order by the city column
  * @method     ChildOrderAddressQuery orderByPhone($order = Criteria::ASC) Order by the phone column
+ * @method     ChildOrderAddressQuery orderByCellphone($order = Criteria::ASC) Order by the cellphone column
  * @method     ChildOrderAddressQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
  * @method     ChildOrderAddressQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildOrderAddressQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -47,6 +48,7 @@ use Thelia\Model\Map\OrderAddressTableMap;
  * @method     ChildOrderAddressQuery groupByZipcode() Group by the zipcode column
  * @method     ChildOrderAddressQuery groupByCity() Group by the city column
  * @method     ChildOrderAddressQuery groupByPhone() Group by the phone column
+ * @method     ChildOrderAddressQuery groupByCellphone() Group by the cellphone column
  * @method     ChildOrderAddressQuery groupByCountryId() Group by the country_id column
  * @method     ChildOrderAddressQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildOrderAddressQuery groupByUpdatedAt() Group by the updated_at column
@@ -85,6 +87,7 @@ use Thelia\Model\Map\OrderAddressTableMap;
  * @method     ChildOrderAddress findOneByZipcode(string $zipcode) Return the first ChildOrderAddress filtered by the zipcode column
  * @method     ChildOrderAddress findOneByCity(string $city) Return the first ChildOrderAddress filtered by the city column
  * @method     ChildOrderAddress findOneByPhone(string $phone) Return the first ChildOrderAddress filtered by the phone column
+ * @method     ChildOrderAddress findOneByCellphone(string $cellphone) Return the first ChildOrderAddress filtered by the cellphone column
  * @method     ChildOrderAddress findOneByCountryId(int $country_id) Return the first ChildOrderAddress filtered by the country_id column
  * @method     ChildOrderAddress findOneByCreatedAt(string $created_at) Return the first ChildOrderAddress filtered by the created_at column
  * @method     ChildOrderAddress findOneByUpdatedAt(string $updated_at) Return the first ChildOrderAddress filtered by the updated_at column
@@ -100,6 +103,7 @@ use Thelia\Model\Map\OrderAddressTableMap;
  * @method     array findByZipcode(string $zipcode) Return ChildOrderAddress objects filtered by the zipcode column
  * @method     array findByCity(string $city) Return ChildOrderAddress objects filtered by the city column
  * @method     array findByPhone(string $phone) Return ChildOrderAddress objects filtered by the phone column
+ * @method     array findByCellphone(string $cellphone) Return ChildOrderAddress objects filtered by the cellphone column
  * @method     array findByCountryId(int $country_id) Return ChildOrderAddress objects filtered by the country_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderAddress objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderAddress objects filtered by the updated_at column
@@ -191,7 +195,7 @@ abstract class OrderAddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CUSTOMER_TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `PHONE`, `COUNTRY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `order_address` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CUSTOMER_TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `PHONE`, `CELLPHONE`, `COUNTRY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `order_address` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -623,6 +627,35 @@ abstract class OrderAddressQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderAddressTableMap::PHONE, $phone, $comparison);
+    }
+
+    /**
+     * Filter the query on the cellphone column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCellphone('fooValue');   // WHERE cellphone = 'fooValue'
+     * $query->filterByCellphone('%fooValue%'); // WHERE cellphone LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $cellphone The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderAddressQuery The current query, for fluid interface
+     */
+    public function filterByCellphone($cellphone = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($cellphone)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $cellphone)) {
+                $cellphone = str_replace('*', '%', $cellphone);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(OrderAddressTableMap::CELLPHONE, $cellphone, $comparison);
     }
 
     /**

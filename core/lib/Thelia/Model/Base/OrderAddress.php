@@ -128,6 +128,12 @@ abstract class OrderAddress implements ActiveRecordInterface
     protected $phone;
 
     /**
+     * The value for the cellphone field.
+     * @var        string
+     */
+    protected $cellphone;
+
+    /**
      * The value for the country_id field.
      * @var        int
      */
@@ -567,6 +573,17 @@ abstract class OrderAddress implements ActiveRecordInterface
     }
 
     /**
+     * Get the [cellphone] column value.
+     *
+     * @return   string
+     */
+    public function getCellphone()
+    {
+
+        return $this->cellphone;
+    }
+
+    /**
      * Get the [country_id] column value.
      *
      * @return   int
@@ -853,6 +870,27 @@ abstract class OrderAddress implements ActiveRecordInterface
     } // setPhone()
 
     /**
+     * Set the value of [cellphone] column.
+     *
+     * @param      string $v new value
+     * @return   \Thelia\Model\OrderAddress The current object (for fluent API support)
+     */
+    public function setCellphone($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->cellphone !== $v) {
+            $this->cellphone = $v;
+            $this->modifiedColumns[OrderAddressTableMap::CELLPHONE] = true;
+        }
+
+
+        return $this;
+    } // setCellphone()
+
+    /**
      * Set the value of [country_id] column.
      *
      * @param      int $v new value
@@ -989,16 +1027,19 @@ abstract class OrderAddress implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderAddressTableMap::translateFieldName('Phone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->phone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderAddressTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderAddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->cellphone = (null !== $col) ? (string) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderAddressTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->country_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderAddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderAddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderAddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderAddressTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1011,7 +1052,7 @@ abstract class OrderAddress implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 14; // 14 = OrderAddressTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 15; // 15 = OrderAddressTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\OrderAddress object", 0, $e);
@@ -1329,6 +1370,9 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->isColumnModified(OrderAddressTableMap::PHONE)) {
             $modifiedColumns[':p' . $index++]  = '`PHONE`';
         }
+        if ($this->isColumnModified(OrderAddressTableMap::CELLPHONE)) {
+            $modifiedColumns[':p' . $index++]  = '`CELLPHONE`';
+        }
         if ($this->isColumnModified(OrderAddressTableMap::COUNTRY_ID)) {
             $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
         }
@@ -1381,6 +1425,9 @@ abstract class OrderAddress implements ActiveRecordInterface
                         break;
                     case '`PHONE`':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
+                        break;
+                    case '`CELLPHONE`':
+                        $stmt->bindValue($identifier, $this->cellphone, PDO::PARAM_STR);
                         break;
                     case '`COUNTRY_ID`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
@@ -1487,12 +1534,15 @@ abstract class OrderAddress implements ActiveRecordInterface
                 return $this->getPhone();
                 break;
             case 11:
-                return $this->getCountryId();
+                return $this->getCellphone();
                 break;
             case 12:
-                return $this->getCreatedAt();
+                return $this->getCountryId();
                 break;
             case 13:
+                return $this->getCreatedAt();
+                break;
+            case 14:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1535,9 +1585,10 @@ abstract class OrderAddress implements ActiveRecordInterface
             $keys[8] => $this->getZipcode(),
             $keys[9] => $this->getCity(),
             $keys[10] => $this->getPhone(),
-            $keys[11] => $this->getCountryId(),
-            $keys[12] => $this->getCreatedAt(),
-            $keys[13] => $this->getUpdatedAt(),
+            $keys[11] => $this->getCellphone(),
+            $keys[12] => $this->getCountryId(),
+            $keys[13] => $this->getCreatedAt(),
+            $keys[14] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1625,12 +1676,15 @@ abstract class OrderAddress implements ActiveRecordInterface
                 $this->setPhone($value);
                 break;
             case 11:
-                $this->setCountryId($value);
+                $this->setCellphone($value);
                 break;
             case 12:
-                $this->setCreatedAt($value);
+                $this->setCountryId($value);
                 break;
             case 13:
+                $this->setCreatedAt($value);
+                break;
+            case 14:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1668,9 +1722,10 @@ abstract class OrderAddress implements ActiveRecordInterface
         if (array_key_exists($keys[8], $arr)) $this->setZipcode($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setCity($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setPhone($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCountryId($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[11], $arr)) $this->setCellphone($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCountryId($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
     }
 
     /**
@@ -1693,6 +1748,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         if ($this->isColumnModified(OrderAddressTableMap::ZIPCODE)) $criteria->add(OrderAddressTableMap::ZIPCODE, $this->zipcode);
         if ($this->isColumnModified(OrderAddressTableMap::CITY)) $criteria->add(OrderAddressTableMap::CITY, $this->city);
         if ($this->isColumnModified(OrderAddressTableMap::PHONE)) $criteria->add(OrderAddressTableMap::PHONE, $this->phone);
+        if ($this->isColumnModified(OrderAddressTableMap::CELLPHONE)) $criteria->add(OrderAddressTableMap::CELLPHONE, $this->cellphone);
         if ($this->isColumnModified(OrderAddressTableMap::COUNTRY_ID)) $criteria->add(OrderAddressTableMap::COUNTRY_ID, $this->country_id);
         if ($this->isColumnModified(OrderAddressTableMap::CREATED_AT)) $criteria->add(OrderAddressTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(OrderAddressTableMap::UPDATED_AT)) $criteria->add(OrderAddressTableMap::UPDATED_AT, $this->updated_at);
@@ -1769,6 +1825,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         $copyObj->setZipcode($this->getZipcode());
         $copyObj->setCity($this->getCity());
         $copyObj->setPhone($this->getPhone());
+        $copyObj->setCellphone($this->getCellphone());
         $copyObj->setCountryId($this->getCountryId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -2693,6 +2750,7 @@ abstract class OrderAddress implements ActiveRecordInterface
         $this->zipcode = null;
         $this->city = null;
         $this->phone = null;
+        $this->cellphone = null;
         $this->country_id = null;
         $this->created_at = null;
         $this->updated_at = null;

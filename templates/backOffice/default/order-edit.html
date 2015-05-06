@@ -379,6 +379,10 @@
                                                                 <th>{intl l="Phone"}</th>
                                                                 <td>{$PHONE}</td>
                                                             </tr>
+                                                            <tr data-field-class="js-cellphone">
+                                                                <th>{intl l="Cellphone"}</th>
+                                                                <td>{$CELLPHONE}</td>
+                                                            </tr>
                                                         {/loop}
                                                         </tbody>
                                                     </table>
@@ -454,6 +458,10 @@
                                                                 <tr data-field-class="js-phone">
                                                                     <th>{intl l="Phone"}</th>
                                                                     <td>{$PHONE}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-cellphone">
+                                                                    <th>{intl l="Cellphone"}</th>
+                                                                    <td>{$CELLPHONE}</td>
                                                                 </tr>
                                                             {/loop}
                                                         {/elsehook}
@@ -587,6 +595,13 @@
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-phone" value="{$value}" title="{$label}" placeholder="{intl l='Phone'}">
+                </div>
+            {/form_field}
+
+            {form_field field='cellphone'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control js-cellphone" value="{$value}" title="{$label}" placeholder="{intl l='Cellphone'}">
                 </div>
             {/form_field}
 

@@ -183,7 +183,8 @@ class OrderController extends BaseAdminController
                 $form->get("city")->getData(),
                 $form->get("country")->getData(),
                 $form->get("phone")->getData(),
-                $form->get("company")->getData()
+                $form->get("company")->getData(),
+                $form->get("cellphone")->getData()
             );
             $event->setOrderAddress($orderAddress);
             $event->setOrder($order);

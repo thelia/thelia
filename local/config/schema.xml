@@ -672,6 +672,7 @@
     <column name="zipcode" required="true" size="10" type="VARCHAR" />
     <column name="city" required="true" size="255" type="VARCHAR" />
     <column name="phone" size="20" type="VARCHAR" />
+    <column name="cellphone" size="20" type="VARCHAR" />
     <column name="country_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="customer_title" name="fk_order_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_title_id" />
