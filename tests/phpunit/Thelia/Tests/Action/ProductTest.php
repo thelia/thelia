@@ -124,7 +124,9 @@ class ProductTest extends TestCaseWithURLToolSetup
             ->setVisible(1)
             ->setDefaultCategory($defaultCategory)
             ->setBrandId($brandId)
-            ->setDispatcher($this->getDispatcher());
+            ->setRef($product->getRef())
+            ->setDispatcher($this->getDispatcher())
+
         ;
 
         $action = new Product();
@@ -359,12 +361,12 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertEquals($updatedProduct->getRef(), $newProductSaleElements->getRef(), sprintf("PSE ref must be %s", $updatedProduct->getRef()));
         $this->assertTrue($newProductSaleElements->getIsDefault(), 'new PSE must be the default one for this product');
-        $this->assertEquals(0, $newProductSaleElements->getWeight());
+        $this->assertEquals(0, $newProductSaleElements->getWeight(), "->testSetProductTemplate new PSE weight must be 0");
 
         $productPrice = $newProductSaleElements->getProductPrices()->getFirst();
 
-        $this->assertEquals(0, $productPrice->getPrice());
-        $this->assertEquals(0, $productPrice->getPromoPrice());
+        $this->assertEquals(0, $productPrice->getPrice(), "->testSetProductTemplate price must be 0");
+        $this->assertEquals(0, $productPrice->getPromoPrice(), "->testSetProductTemplate promo price must be 0");
         $this->assertEquals($currencyId, $productPrice->getCurrencyId());
 
         return $updatedProduct;
