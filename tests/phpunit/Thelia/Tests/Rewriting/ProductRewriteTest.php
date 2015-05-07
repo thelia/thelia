@@ -26,6 +26,9 @@ class ProductRewriteTest extends BaseRewritingObject
      */
     public function getObject()
     {
-        return new Product();
+        $product = new Product();
+        $product->setRef(uniqid());
+
+        return $product;
     }
 }
