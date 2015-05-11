@@ -219,7 +219,7 @@
                 <div id="cart-address" class="row">
                     {ifhook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
+                        {hook name="order-invoice.delivery-address" module={order attr="delivery_module"}}
                     {/ifhook}
                     {elsehook rel="order-invoice.delivery-address"}
                     <div class="panel panel-default col-sm-6">
@@ -315,7 +315,7 @@
                                         {/loop}
                                         {$TITLE}
                                     </label>
-                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
+                                    {hook name="order-invoice.payment-extra" module={$paymentModuleId}}
                                 </li>
                             {/loop}
                         </ul>
@@ -336,7 +336,7 @@
                                             {$termsAndConditionsUrl=$URL}
                                         {/loop}
                                     {/if}
-                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="{$termsAndConditionsUrl nofilter}"}.
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link={$termsAndConditionsUrl nofilter}}.
                                 </label>
                                 {if $error }
                                     <span class="help-block">{$message}</span>
