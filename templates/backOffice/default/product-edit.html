@@ -32,6 +32,9 @@
                         </div>
 
                         <div class="col-md-5 actions">
+                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cloneProductModal">
+                                Clone this product
+                            </button>
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
                             <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
@@ -190,6 +193,38 @@
         </div>
     </div>
 
+
+    <div class="modal fade" id="cloneProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3>Clone product</h3>
+                </div>
+                {form name="thelia.admin.product.clone"}
+                <form method="post" action="{url path='/admin/products/clone'}" class="form-inline" role="form" {form_enctype form=$form}>
+                    <div class="modal-body">
+                        {form_hidden_fields form=$form}
+
+                        {form_field form=$form field="productId"}
+                        <input type="hidden" name="{$name}" value="{product attr='id'}">
+                        {/form_field}
+
+                        <div class="form-group">
+                            {form_field form=$form field="newRef"}
+                            <label for="{$label_attr.for}">{intl l="{$label}"} </label>
+                            <input type="text" name="{$name}" value="{$value}" id="{$label_attr.for}" class="form-control" required >
+                            {/form_field}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-default">Go, clone it !</button>
+                    </div>
+                </form>
+                {/form}
+            </div>
+        </div>
+    </div>
 {/block}
 
 {block name="javascript-initialization"}

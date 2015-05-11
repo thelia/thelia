@@ -35,6 +35,7 @@ final class AdminForm
     const CATEGORY_DOCUMENT_MODIFICATION = 'thelia.admin.category.document.modification';
 
     const PRODUCT_CREATION = 'thelia.admin.product.creation';
+    const PRODUCT_CLONE = 'thelia.admin.product.clone';
     const PRODUCT_MODIFICATION = 'thelia.admin.product.modification';
     const PRODUCT_DETAILS_MODIFICATION = 'thelia.admin.product.details.modification';
     const PRODUCT_IMAGE_MODIFICATION = 'thelia.admin.product.image.modification';

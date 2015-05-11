@@ -31,6 +31,7 @@
         <form name="thelia.admin.category.document.modification" class="Thelia\Form\CategoryDocumentModification"/>
 
         <form name="thelia.admin.product.creation" class="Thelia\Form\ProductCreationForm"/>
+        <form name="thelia.admin.product.clone" class="Thelia\Form\ProductCloneForm"/>
         <form name="thelia.admin.product.modification" class="Thelia\Form\ProductModificationForm"/>
         <form name="thelia.admin.product.details.modification" class="Thelia\Form\ProductDetailsModificationForm"/>
         <form name="thelia.admin.product.image.modification" class="Thelia\Form\ProductImageModification"/>
