@@ -10401,6 +10401,7 @@ td.product .name > a:focus,
   background-color: #e6e6e6;
   font-size: 12px;
   padding-left: 35px;
+  width: inherit;
   box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.075);
 }
 .block.block-newsletter .block-content form .form-group .form-control::-moz-placeholder {
