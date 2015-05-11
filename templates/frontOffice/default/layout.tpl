@@ -203,8 +203,12 @@ GNU General Public License : http://www.gnu.org/licenses/
                 <footer class="footer-info" role="contentinfo">
                     <div class="container">
                         <div class="info row">
-                            {hook name="main.footer-bottom"}
-                            <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
+                            <div class="col-lg-9">
+                                {hook name="main.footer-bottom"}
+                            </div>
+                            <div class="col-lg-3">
+                                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
+                            </div>
                         </div>
                     </div>
                 </footer>
@@ -214,7 +218,7 @@ GNU General Public License : http://www.gnu.org/licenses/
                     <div class="container">
                         <div class="info row">
                             <nav class="nav-footer col-lg-9" role="navigation">
-                                <ul class="list-inline">
+                                <ul class="list-unstyled list-inline">
                                     {$folder_information={config key="information_folder_id"}}
                                     {if $folder_information}
                                         {loop name="footer_links" type="content" folder=$folder_information}
