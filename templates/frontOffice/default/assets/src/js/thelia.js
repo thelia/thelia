@@ -380,7 +380,7 @@ var pseManager = (function($){
         var doAjax = ($(window).width() > 768) ? true : false;
 
         // Main Navigation Hover
-        $('.nav-secondary')
+        $('.navbar')
             .on('click.subnav', '[data-toggle=dropdown]', function (event) {
                 if ($(this).parent().hasClass('open') && $(this).is(event.target)) { return false; }
             })
