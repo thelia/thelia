@@ -267,7 +267,7 @@ class BaseAdminController extends BaseController
     protected function getUrlLanguage($locale = null)
     {
         // Check if the functionality is activated
-        if (!ConfigQuery::read("one_domain_foreach_lang", false)) {
+        if (!ConfigQuery::isMultiDomainActivated()) {
             return null;
         }
 

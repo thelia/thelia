@@ -57,7 +57,7 @@ class LangController extends BaseAdminController
 
         return $this->render('languages', array_merge($param, array(
             'lang_without_translation' => ConfigQuery::getDefaultLangWhenNoTranslationAvailable(),
-            'one_domain_per_lang' => ConfigQuery::read("one_domain_foreach_lang", false)
+            'one_domain_per_lang' => ConfigQuery::isMultiDomainActivated()
         )));
     }
 

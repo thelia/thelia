@@ -279,5 +279,20 @@ class ConfigQuery extends BaseConfigQuery
     {
         static::write("error_message.page_name", $v);
     }
+
+    public static function getAdminCacheHomeStatsTTL()
+    {
+        return intval(static::read("admin_cache_home_stats_ttl", 600));
+    }
+
+    /**
+     * check if Thelia multi domain is activated. (Means one domain for each language)
+     *
+     * @return bool
+     */
+    public static function isMultiDomainActivated()
+    {
+        return (bool) self::read("one_domain_foreach_lang", false);
+    }
 }
 // ConfigQuery

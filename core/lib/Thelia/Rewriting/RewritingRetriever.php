@@ -49,7 +49,7 @@ class RewritingRetriever
         $this->search = $this->rewritingUrlQuery->getViewUrlQuery($view, $viewLocale, $viewId);
 
         $allParametersWithoutView = array();
-        if (null !== $viewId) {
+        if (null !== $viewLocale) {
             $allParametersWithoutView['locale'] = $viewLocale;
         }
         if (null !== $viewId) {
