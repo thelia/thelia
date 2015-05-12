@@ -243,7 +243,7 @@ class RequestListener implements EventSubscriberInterface
             if (null !== $referrer) {
                 $session = $request->getSession();
 
-                if (ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+                if (ConfigQuery::isMultiDomainActivated()) {
                     $components = parse_url($referrer);
                     $lang = LangQuery::create()
                         ->filterByUrl(sprintf("%s://%s", $components["scheme"], $components["host"]), ModelCriteria::LIKE)
