@@ -721,9 +721,15 @@ function clearTables($con)
 
     \Thelia\Model\ProductImageQuery::create()->find($con)->delete($con);
 
-    $customer = Thelia\Model\CustomerQuery::create()
+    $customer = \Thelia\Model\CustomerQuery::create()
         ->find($con);
     $customer->delete($con);
+
+    $sale = \Thelia\Model\SaleQuery::create()->find($con);
+    $sale->delete($con);
+
+    $saleProduct = \Thelia\Model\SaleProductQuery::create()->find($con);
+    $saleProduct->delete($con);
 
     echo "Tables cleared with success\n";
 

@@ -208,6 +208,9 @@ try {
 
     \Thelia\Model\SaleQuery::create()->find()->delete();
 
+    \Thelia\Model\SaleProductQuery::create()->find()->delete();
+
+
     \Thelia\Model\MetaDataQuery::create()->find()->delete();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
