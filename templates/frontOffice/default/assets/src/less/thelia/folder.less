@@ -1,0 +1,37 @@
+// Thelia : Folder
+
+// Folder Info
+.folder-description {
+    margin-bottom: 20px;
+}
+
+// Content List
+#folder-contents {
+    .contents > ul {
+        .contents-list;
+    }
+}
+
+// Content List
+.contents-list {
+    .item {
+        padding-bottom: 15px;
+        + .item {
+            padding-top: 15px;
+        }
+        > article {
+            margin-left: 0;
+
+            .content-image {
+                margin-bottom: 15px;
+                padding: 0;
+            }
+
+            .content-info {
+                .name {
+                    margin-top: 0;
+                }
+            }
+        }
+    }
+}

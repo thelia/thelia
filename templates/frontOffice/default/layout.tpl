@@ -56,28 +56,17 @@ GNU General Public License : http://www.gnu.org/licenses/
         <meta name="description" content="{if $page_description}{$page_description}{else}{$store_description|strip|truncate:120}{/if}">
     {/block}
 
-    {* Stylesheets *}
-    {*<link rel="stylesheet" href="{stylesheet file='assets/css/styles.css'}">*}
-
-    {* To use the embedded less compiler :
-       1) Comment the stylesheet function above, to prevent ce style.css to be included
-       2) Uncomment the following stylesheets function, to trigger styles.less compilation
-       3) In your back-office, set the process_assets configuration variable to 1,
-       4) Run your shop in developpement ode, usinf index_dev.php
-    *}
-
-    {stylesheets file='assets/less/styles.less' filters='less'}
+    {stylesheets file='assets/dist/css/thelia.min.css'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
-
 
     {hook name="main.stylesheet"}
 
     {block name="stylesheet"}{/block}
 
     {* Favicon *}
-    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/img/favicon.ico'}">
-    <link rel="icon" type="image/png" href="{image file='assets/img/favicon.png'}" />
+    <link rel="shortcut icon" type="image/x-icon" href="{image file='assets/dist/img/favicon.ico'}">
+    <link rel="icon" type="image/png" href="{image file='assets/dist/img/favicon.png'}" />
 
     {* Feeds *}
     <link rel="alternate" type="application/rss+xml" title="{intl l='All products'}" href="{url path="/feed/catalog/%lang" lang=$lang_locale}" />
@@ -87,186 +76,204 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {* HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries *}
     <!--[if lt IE 9]>
-    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
+    {javascripts file="assets/dist/js/vendors/html5shiv.min.js"}
+        <script>window.html5 || document.write('<script src="{$asset_url}"><\/script>');</script>
+    {/javascripts}
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    {javascripts file="assets/dist/js/vendors/respond.min.js"}
+        <script>window.respond || document.write('<script src="{$asset_url}"><\/script>');</script>
+    {/javascripts}
     <![endif]-->
+
     {hook name="main.head-bottom"}
 </head>
 <body class="{block name="body-class"}{/block}" itemscope itemtype="http://schema.org/WebPage">
-{hook name="main.body-top"}
-<!-- Accessibility -->
-<a class="sr-only" href="#content">{intl l="Skip to content"}</a>
+    {hook name="main.body-top"}
 
-<div class="page" role="document">
+    <!-- Accessibility -->
+    <a class="sr-only" href="#content">{intl l="Skip to content"}</a>
 
-<div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
-    {hook name="main.header-top"}
-    <div class="navbar navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">
-        <div class="container">
+    <div class="page" role="document">
 
-            <div class="navbar-header">
-                <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-secondary">
-                    <span class="sr-only">{intl l="Toggle navigation"}</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{navigate to="index"}">{$store_name}</a>
-            </div>
+        <div class="header-container" itemscope itemtype="http://schema.org/WPHeader">
+            {hook name="main.header-top"}
+            <div class="navbar navbar-default navbar-secondary" itemscope itemtype="http://schema.org/SiteNavigationElement">
+                <div class="container">
 
-            {ifhook rel="main.navbar-secondary"}
-            {* Place everything within .nav-collapse to hide it until above 768px *}
-            <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
-                {hook name="main.navbar-secondary"}
-            </nav>
-            {/ifhook}
-        </div>
-    </div>
-
-
-    <header class="container" role="banner">
-        <div class="header">
-            <h1 class="logo">
-                <a href="{navigate to="index"}" title="{$store_name}">
-                    <img src="{image file='assets/img/logo.gif'}" alt="{$store_name}">
-                </a>
-            </h1>
-            {hook name="main.navbar-primary"}
-        </div>
-    </header><!-- /.header -->
-
-    {hook name="main.header-bottom"}
-</div><!-- /.header-container -->
-
-<main class="main-container" role="main">
-    <div class="container">
-        {hook name="main.content-top"}
-        {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
-        <div id="content">{block name="main-content"}{/block}</div>
-        {hook name="main.content-bottom"}
-    </div><!-- /.container -->
-</main><!-- /.main-container -->
-
-<section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
-
-    {ifhook rel="main.footer-top"}
-    <section class="footer-block">
-        <div class="container">
-            <div class="blocks block-col-3">
-                {hook name="main.footer-top"}
-            </div>
-        </div>
-    </section>
-    {/ifhook}
-    {elsehook rel="main.footer-top"}
-    <section class="footer-banner">
-        <div class="container">
-            <div class="banner banner-col-3">
-                <div class="col">
-                    <span class="icon-truck icon-flip-horizontal"></span>
-                    {intl l="Free shipping"} <small>{intl l="Orders over $50"}</small>
-                </div>
-                <div class="col">
-                    <span class="icon-credit-card"></span>
-                    {intl l="Secure payment"} <small>{intl l="Multi-payment platform"}</small>
-                </div>
-                <div class="col">
-                    <span class="icon-info"></span>
-                    {intl l="Need help ?"} <small>{intl l="Questions ? See our F.A.Q."}</small>
-                </div>
-            </div>
-        </div>
-    </section><!-- /.footer-banner -->
-    {/elsehook}
-
-    {ifhook rel="main.footer-body"}
-    <section class="footer-block">
-        <div class="container">
-            <div class="blocks block-col-4">
-                {hookblock name="main.footer-body"  fields="id,class,title,content"}
-                    {forhook rel="main.footer-body"}
-                    <div class="col">
-                        <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
-                            <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
-                            <div class="block-content">
-                                {$content nofilter}
-                            </div>
-                        </section>
+                    <div class="navbar-header">
+                        <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-secondary">
+                            <span class="sr-only">{intl l="Toggle navigation"}</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <a class="navbar-brand visible-xs" href="{navigate to="index"}">{$store_name}</a>
                     </div>
-                    {/forhook}
-                {/hookblock}
+
+                    {ifhook rel="main.navbar-secondary"}
+                        {* Place everything within .nav-collapse to hide it until above 768px *}
+                        <nav class="navbar-collapse collapse nav-secondary" role="navigation" aria-label="{intl l="Secondary Navigation"}">
+                            {hook name="main.navbar-secondary"}
+                        </nav>
+                    {/ifhook}
+                </div>
             </div>
-        </div>
-    </section>
-    {/ifhook}
 
-    {ifhook rel="main.footer-bottom"}
-    <footer class="footer-info" role="contentinfo">
-        <div class="container">
-            <div class="info">
-                {hook name="main.footer-bottom"}
-                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
-            </div>
-        </div>
-    </footer>
-    {/ifhook}
-    {elsehook rel="main.footer-bottom"}
-    <footer class="footer-info" role="contentinfo">
-        <div class="container">
-            <div class="info">
-                <nav class="nav-footer" role="navigation">
-                    <ul>
-                        {$folder_information={config key="information_folder_id"}}
-                        {if $folder_information}
-                            {loop name="footer_links" type="content" folder=$folder_information}
-                                <li><a href="{$URL nofilter}">{$TITLE}</a></li>
-                            {/loop}
-                        {/if}
-                        <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
-                    </ul>
-                </nav>
-                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
-            </div>
-        </div>
-    </footer><!-- /.footer-info -->
-    {/elsehook}
 
-</section><!-- /.footer-container -->
+            <header class="container" role="banner">
+                <div class="header row">
+                    <h1 class="logo container hidden-xs">
+                        <a href="{navigate to="index"}" title="{$store_name}">
+                            <img src="{image file='assets/dist/img/logo.gif'}" alt="{$store_name}">
+                        </a>
+                    </h1>
+                    {hook name="main.navbar-primary"}
+                </div>
+            </header><!-- /.header -->
 
-</div><!-- /.page -->
+            {hook name="main.header-bottom"}
+        </div><!-- /.header-container -->
 
-{block name="before-javascript-include"}{/block}
-<!-- JavaScript -->
-<!--[if lt IE 9]><script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> <!--<![endif]-->
-<script>
-    if (typeof jQuery == 'undefined') {
-        document.write(unescape("%3Cscript src='{javascript file='assets/js/libs/jquery.js'}' %3E%3C/script%3E"));
-    }
-</script>
+        <main class="main-container" role="main">
+            <div class="container">
+                {hook name="main.content-top"}
+                {block name="breadcrumb"}{include file="misc/breadcrumb.tpl"}{/block}
+                <div id="content">{block name="main-content"}{/block}</div>
+                {hook name="main.content-bottom"}
+            </div><!-- /.container -->
+        </main><!-- /.main-container -->
 
-<script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
-{* do no try to load messages_en, as this file does not exists *}
-{if $lang_code != 'en'}
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{$lang_code}.js"></script>
-{/if}
+        <section class="footer-container" itemscope itemtype="http://schema.org/WPFooter">
 
-<script src="{javascript file='assets/js/bootstrap/bootstrap.js'}"></script>
+            {ifhook rel="main.footer-top"}
+                <section class="footer-block">
+                    <div class="container">
+                        <div class="blocks row">
+                            {hook name="main.footer-top"}
+                        </div>
+                    </div>
+                </section>
+            {/ifhook}
+            {elsehook rel="main.footer-top"}
+                <section class="footer-banner">
+                    <div class="container">
+                        <div class="banner row banner-col-3">
+                            <div class="col col-sm-4">
+                                <span class="fa fa-truck fa-flip-horizontal"></span>
+                                {intl l="Free shipping"} <small>{intl l="Orders over $50"}</small>
+                            </div>
+                            <div class="col col-sm-4">
+                                <span class="fa fa-credit-card"></span>
+                                {intl l="Secure payment"} <small>{intl l="Multi-payment platform"}</small>
+                            </div>
+                            <div class="col col-sm-4">
+                                <span class="fa fa-info"></span>
+                                {intl l="Need help ?"} <small>{intl l="Questions ? See our F.A.Q."}</small>
+                            </div>
+                        </div>
+                    </div>
+                </section><!-- /.footer-banner -->
+            {/elsehook}
 
-<script src="{javascript file='assets/js/plugins/bootbox/bootbox.js'}"></script>
+            {ifhook rel="main.footer-body"}
+                <section class="footer-block">
+                    <div class="container">
+                        <div class="blocks row">
+                            {hookblock name="main.footer-body"  fields="id,class,title,content"}
+                            {forhook rel="main.footer-body"}
+                                <div class="col col-sm-3">
+                                    <section {if $id} id="{$id}"{/if} class="block {if $class} block-{$class}{/if}">
+                                        <div class="block-heading"><h3 class="block-title">{$title}</h3></div>
+                                        <div class="block-content">
+                                            {$content nofilter}
+                                        </div>
+                                    </section>
+                                </div>
+                            {/forhook}
+                            {/hookblock}
+                        </div>
+                    </div>
+                </section>
+            {/ifhook}
 
-{hook name="main.after-javascript-include"}
+            {ifhook rel="main.footer-bottom"}
+                <footer class="footer-info" role="contentinfo">
+                    <div class="container">
+                        <div class="info row">
+                            <div class="col-lg-9">
+                                {hook name="main.footer-bottom"}
+                            </div>
+                            <div class="col-lg-3">
+                                <section class="copyright">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            {/ifhook}
+            {elsehook rel="main.footer-bottom"}
+                <footer class="footer-info" role="contentinfo">
+                    <div class="container">
+                        <div class="info row">
+                            <nav class="nav-footer col-lg-9" role="navigation">
+                                <ul class="list-unstyled list-inline">
+                                    {$folder_information={config key="information_folder_id"}}
+                                    {if $folder_information}
+                                        {loop name="footer_links" type="content" folder=$folder_information}
+                                            <li><a href="{$URL nofilter}">{$TITLE}</a></li>
+                                        {/loop}
+                                    {/if}
+                                    <li><a href="{url path="/contact"}">{intl l="Contact Us"}</a></li>
+                                </ul>
+                            </nav>
+                            <section class="copyright col-lg-3">{intl l="Copyright"} &copy; <time datetime="{'Y-m-d'|date}">{'Y'|date}</time> <a href="http://thelia.net" rel="external">Thelia</a></section>
+                        </div>
+                    </div>
+                </footer><!-- /.footer-info -->
+            {/elsehook}
 
-{block name="after-javascript-include"}{/block}
+        </section><!-- /.footer-container -->
 
-{hook name="main.javascript-initialization"}
+    </div><!-- /.page -->
 
-{block name="javascript-initialization"}{/block}
+    {block name="before-javascript-include"}{/block}
+    <!-- JavaScript -->
 
-<!-- Custom scripts -->
-<script src="{javascript file='assets/js/script.js'}"></script>
+    <!-- Jquery -->
+    <!--[if lt IE 9]><script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> <![endif]-->
+    <!--[if (gte IE 9)|!(IE)]><!--><script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script><!--<![endif]-->
+    {javascripts file="assets/dist/js/vendors/jquery.min.js"}
+        <script>window.jQuery || document.write('<script src="{$asset_url}"><\/script>');</script>
+    {/javascripts}
 
-{hook name="main.body-bottom"}
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
+    {* do no try to load messages_en, as this file does not exists *}
+    {if $lang_code != 'en'}
+        <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{$lang_code}.js"></script>
+    {/if}
+
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    {javascripts file="assets/dist/js/vendors/bootstrap.min.js"}
+        <script>if(typeof($.fn.modal) === 'undefined') { document.write('<script src="{$asset_url}"><\/script>'); }</script>
+    {/javascripts}
+
+    {javascripts file="assets/dist/js/vendors/bootbox.js"}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {hook name="main.after-javascript-include"}
+
+    {block name="after-javascript-include"}{/block}
+
+    {hook name="main.javascript-initialization"}
+
+    {block name="javascript-initialization"}{/block}
+
+    <!-- Custom scripts -->
+    <script src="{javascript file='assets/dist/js/thelia.min.js'}"></script>
+
+    {hook name="main.body-bottom"}
 </body>
 </html>

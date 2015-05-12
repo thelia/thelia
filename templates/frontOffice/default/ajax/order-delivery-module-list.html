@@ -47,5 +47,5 @@
         {hook name="order-delivery.javascript" module="$ID"}
     {/loop}
 {/ifloop}
-{elseloop rel="deliveries"}<div class="deliveries-warning">{intl l="<strong>Sorry!</strong> We are not able to give you a delivery method for your order."}</div>{/elseloop}
+{elseloop rel="deliveries"}<div class="alert alert-warning">{intl l="<strong>Sorry!</strong> We are not able to give you a delivery method for your order."}</div>{/elseloop}
 {/form}

@@ -1,0 +1,110 @@
+// Products Heading
+.products-heading {
+    .btn-all {
+        float: right;
+        font-size: .6em;
+    }
+    h3 {
+        top: -14px !important;
+        margin: 0;
+    }
+}
+
+// Availibility
+.availability {
+
+    // In Stock
+    .in-stock {
+        color: @brand-success;
+        font-style: italic;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        .in {
+            display: block;
+        }
+        .out {
+            display: none;
+        }
+
+        .quantity {
+            font-style: italic;
+        }
+    }
+    // Out of Stock
+    .out-of-stock {
+        color: @brand-warning;
+        font-style: italic;
+        font-weight: bold;
+        text-transform: uppercase;
+
+        .in {
+            display: none;
+        }
+        .out {
+            display: block;
+        }
+    }
+}
+
+// Option block
+.option {
+    background: @option-bg;
+    border: 1px solid @option-border;
+    border-radius: @option-border-radius;
+
+    .option-heading {
+        border-bottom: 1px solid @option-heading-border;
+        color: @option-heading-color;
+        font-size: @option-heading-font-size;
+        font-weight: bold;
+    }
+    .option-content {
+        .radio label,
+        .checkbox label {
+            font-weight: 100;
+        }
+    }
+}
+
+// Product Details
+#product {
+
+    // Product Gallery
+    #product-gallery {
+        border-right: 1px solid #f5f5f5;
+        padding-right: 20px;
+    }
+
+    // Product Details
+    #product-details {
+        .name {
+            font-size: ceil(@font-size-base*1.5);
+            font-weight: 400;
+        }
+        .product-cart {
+            background: @option-bg;
+            border: 1px solid @option-border;
+            border-radius: @option-border-radius;
+        }
+    }
+
+    // Product Tabs
+    #product-tabs {
+        .nav-tabs {
+            border-bottom: 1px solid @nav-tabs-border-color;
+            li {
+                text-transform: uppercase;
+            }
+        }
+
+        .tab-content {
+            border: 1px solid @nav-tabs-border-color;
+            border-radius: 0 0 @border-radius-base @border-radius-base;
+            padding: 30px 15px;
+            min-height: 180px;
+            height: auto !important;
+            height: 180px;
+        }
+    }
+}

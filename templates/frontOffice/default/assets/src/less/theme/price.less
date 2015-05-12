@@ -1,0 +1,20 @@
+// Thelia: Price
+
+// Price
+.price {
+    color: @brand-primary;
+    font-size: ceil(@font-size-base * 1.4);
+    font-weight: bold;
+    font-style: italic;
+    white-space: nowrap;
+}
+
+// Old price
+.old-price {
+    .price {
+        color: @text-color;
+        font-size: ceil(@font-size-base * 1.1);
+        font-weight: 600;
+        text-decoration: line-through;
+    }
+}

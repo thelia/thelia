@@ -1,0 +1,53 @@
+// Thelia : Buttons
+.btn {
+    .transition(all 0.3s ease-in-out);
+    border-radius: 0;
+    text-align: left;
+    font-weight: 600;
+
+    &:active,
+    &.active {
+        .box-shadow(none);
+    }
+
+    @media (min-width: @screen-desktop) {
+        padding: 2px 15px 2px 5px;
+    }
+}
+
+.btn-primary {
+    font-style: italic;
+    border-left: 3px solid lighten(@brand-primary, 20%);
+
+    &:hover,
+    &:focus {
+        background-color: @brand-primary;
+        color: @link-hover-color;
+    }
+}
+
+.btn-default {
+    border-left: 3px solid darken(@gray-light, 10%);
+
+    &:hover,
+    &:focus {
+        background-color: #f7f7f7;
+    }
+}
+
+.btn-default,
+.btn-primary {
+    &:active,
+    &.active {
+        &,
+        &:hover {
+            background-color: darken(@gray-lighter, 10%);
+            border-color: darken(@gray-lighter, 50%);
+            color: #fff;
+        }
+    }
+}
+
+.btn-link {
+    font-weight: normal;
+}

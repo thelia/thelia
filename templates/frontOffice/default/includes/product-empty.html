@@ -10,13 +10,12 @@
     </div>
 
     <div class="products-content">
-        <ul class="products-grid product-col-4">
+        <ul class="list-unstyled row">
             {for $count=1 to 4}
-            <li class="item">
+            <li class="item col-md-3">
                 <article>
-                    <a href="{url path="/admin"}" tabindex="-1" class="product-image">
-                        <img src="{image file='assets/img/280x196.png'}" alt="{intl l="Demo product title"}">
-                        <span class="mask"></span>
+                    <a href="{url path="/admin"}" tabindex="-1" class="product-image overlay">
+                        <img src="{image file='assets/dist/img/280x196.png'}" class="img-responsive" alt="{intl l="Demo product title"}">
                     </a>
                     <a href="{url path="/admin"}" class="product-info">
                         <h3 class="name">{intl l="Demo product title"}</h3>

@@ -76,7 +76,7 @@
         {* Addresses *}
         <div id="order-addresses" class="row">
             <div class="col-md-6 col-sm-12">
-                <div class="panel">
+                <div class="panel panel-default">
                     <div class="panel-heading">{intl l="Delivery"}</div>
                     <div class="panel-body">
                         <h4>{intl l="Delivery Mode"}</h4>
@@ -107,7 +107,7 @@
                 </div>
             </div>
             <div class="col-md-6 col-sm-12">
-                <div class="panel">
+                <div class="panel panel-default">
                     <div class="panel-heading">{intl l="Billing"}</div>
                     <div class="panel-body">
                         <h4>{intl l="Billing Mode"}</h4>
@@ -145,7 +145,7 @@
         {hook name="account-order.after-addresses" order="{$order_id}"}
 
         {* products *}
-        <table class="table table-order order-products">
+        <table class="table table-order table-bordered order-products">
             <thead>
                 <tr>
                     <th class="product">
@@ -233,7 +233,7 @@
 
         <div class="row">
             <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
-                <table class="table order-total table-order table-order-total">
+                <table class="table order-total table-order table-bordered table-order-total">
                     <tfoot>
                         {if $DISCOUNT}
                         <tr>

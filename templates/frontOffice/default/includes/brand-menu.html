@@ -7,7 +7,7 @@
     <div class="block-heading"><h3 class="block-title" id="brands-label">{intl l="Brands"}</h3></div>
     <div class="block-content">
         <nav class="nav-brands">
-            <ul  id="brand" class="accordion">
+            <ul id="brand" class="accordion">
                 {loop name="brands-list" type="brand"}
                     <li><a href="{$URL nofilter}">{$TITLE} ({count type="product" brand="{$ID}"})</a></li>
                 {/loop}

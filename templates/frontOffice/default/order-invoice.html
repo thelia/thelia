@@ -37,7 +37,7 @@
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                <table class="table table-cart">
+                <table class="table table-cart table-bordered">
                     <colgroup>
                         <col width="150">
                         <col>
@@ -141,7 +141,7 @@
 
                 <div class="row">
                     <div class="col-md-6 col-md-offset-6 col-sm-9 col-sm-offset-3 col-xs-12">
-                        <table class="table table-cart table-cart-total">
+                        <table class="table table-cart table-bordered table-cart-total">
                             <tfoot>
                             {$discount={order attr="discount"}}
                             {if $discount}
@@ -166,7 +166,7 @@
                                             <label class="control-label sr-only" for="code">{intl l='Code :'}</label>
                                             <input id="coupon" class="form-control" type="text" name="{$name}" value="{$value}" placeholder="{intl l='Coupon code'}" required>
                                             <span class="input-group-btn">
-                                                <button type="submit" class="btn btn-coupon">{intl l="Ok"}</button>
+                                                <button type="submit" class="btn btn-default">{intl l="Ok"}</button>
                                             </span>
                                         </div>
                                         {if $error}<span class="help-block">{$message}</span>{/if}
@@ -216,13 +216,13 @@
 
                 {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                <div id="cart-address">
+                <div id="cart-address" class="row">
                     {ifhook rel="order-invoice.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="order-invoice.delivery-address" module="{order attr="delivery_module"}"}
+                        {hook name="order-invoice.delivery-address" module={order attr="delivery_module"}}
                     {/ifhook}
                     {elsehook rel="order-invoice.delivery-address"}
-                    <div class="panel">
+                    <div class="panel panel-default col-sm-6">
                         {loop type="address" name="delivery-address" id={order attr="delivery_address"}}
                         <div class="panel-heading">{intl l="Delivery address"}</div>
                         <div class="panel-body">
@@ -245,11 +245,11 @@
                     {/elsehook}
 
                     {form_field field='invoice-address'}
-                    <div class="panel">
+                    <div class="panel panel-default col-sm-6">
                         <div class="panel-heading">{intl l="Billing address"}</div>
 
                         {if $error}
-                            <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                            <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                         {/if}
 
                         <div class="panel-body">
@@ -286,7 +286,7 @@
                             </div>
                         {/loop}
 
-                            <a href="#" class="btn btn-change-address hidden">{intl l="Change address"}</a>
+                            <a href="#" class="btn btn-change-address btn-link hidden"><i class="fa fa-pencil"></i> {intl l="Change address"}</a>
                         </div>
 
                     </div>
@@ -296,11 +296,11 @@
 
                 {form_field field='payment-module'}
 
-                <div id="payment-method" class="panel">
+                <div id="payment-method" class="panel panel-default">
                     <div class="panel-heading">{intl l="Choose your payment method"}</div>
 
                     {if $error}
-                        <span class="help-block"><span class="icon-remove"></span> {$message}</span>
+                        <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
                     {/if}
 
                     <div class="panel-body">
@@ -315,7 +315,7 @@
                                         {/loop}
                                         {$TITLE}
                                     </label>
-                                    {hook name="order-invoice.payment-extra" module="{$paymentModuleId}"}
+                                    {hook name="order-invoice.payment-extra" module={$paymentModuleId}}
                                 </li>
                             {/loop}
                         </ul>
@@ -336,7 +336,7 @@
                                             {$termsAndConditionsUrl=$URL}
                                         {/loop}
                                     {/if}
-                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link="{$termsAndConditionsUrl nofilter}"}.
+                                    {intl l="I've read and agreed on <a href='%link' class='terms-quickview'>Terms &amp; Conditions</a>" link={$termsAndConditionsUrl nofilter}}.
                                 </label>
                                 {if $error }
                                     <span class="help-block">{$message}</span>
@@ -347,8 +347,8 @@
                 </div>
                 {/form_field}
 
-                <a href="{url path="/order/delivery"}" role="button" class="btn btn-back"><span>{intl l="Back"}</span></a>
-                <button type="submit" class="btn btn-checkout-next"><span>{intl l="Next Step"}</span></button>
+                <a href="{url path="/order/delivery"}" role="button" class="btn btn-default"><i class="fa fa-chevron-left"></i> {intl l="Back"}</a>
+                <button type="submit" class="btn btn-primary pull-right"><i class="fa fa-chevron-right"></i> {intl l="Next Step"}</button>
             </form>
             {/form}
             {hook name="order-invoice.bottom"}
