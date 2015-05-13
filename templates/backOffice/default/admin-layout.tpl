@@ -244,7 +244,7 @@
 	{* -- Javascript section ------------------------------------------------ *}
 
 	{block name="before-javascript-include"}{/block}
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
     <script>
         if (typeof jQuery == 'undefined') {
             {javascripts file='assets/js/libs/jquery.js'}
