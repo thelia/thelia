@@ -12,6 +12,40 @@
         <div class="collapse navbar-collapse" id="navbar-primary">
             <ul class="nav navbar-nav navbar-categories">
                 <li><a href="{navigate to="index"}" class="home">{intl l="Home" d="hooknavigation.fo.default"}</a></li>
+                {loop type="category" name="category.navigation" parent="0" need_count_child="yes"}
+                {if $CHILD_COUNT > 0}
+                    <li class="dropdown">
+                        <a href="{$URL}" class="dropdown-toggle">{$TITLE}</a>
+                        <ul class="dropdown-menu" role="menu">
+                            {loop type="category" name="sub-cat" parent="{$ID}"}
+                                <li><a href="{$URL}">{$TITLE}</a></li>    
+                            {/loop}
+                        </ul>
+                    </li>
+                {else}
+                    <li><a href="{$URL}">{$TITLE}</a></li>
+                {/if}
+                {/loop}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{* classic navbar without dropdown
+<nav class="navbar navbar-default nav-main" role="navigation" itemscope itemtype="http://schema.org/SiteNavigationElement">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-primary">
+                <span class="sr-only">{intl l="Toggle navigation" d="hooknavigation.fo.default"}</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand visible-xs" href="{navigate to="index"}">{intl l="Categories" d="hooknavigation.fo.default"}</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-primary">
+            <ul class="nav navbar-nav navbar-categories">
+                <li><a href="{navigate to="index"}" class="home">{intl l="Home" d="hooknavigation.fo.default"}</a></li>
                 {loop type="category" name="category.navigation" parent="0"}
                 <li><a href="{$URL}">{$TITLE}</a></li>
                 {/loop}
@@ -19,3 +53,4 @@
         </div>
     </div>
 </nav>
+*}
