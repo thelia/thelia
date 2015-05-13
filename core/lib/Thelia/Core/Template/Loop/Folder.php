@@ -50,6 +50,7 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
             Argument::createIntTypeArgument('content'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
             new Argument(
@@ -186,6 +187,31 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition())
             ;
+
+            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+                // Find previous and next folder
+                $previous = FolderQuery::create()
+                    ->filterByParent($folder->getParent())
+                    ->filterByPosition($folder->getPosition(), Criteria::LESS_THAN)
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $next = FolderQuery::create()
+                    ->filterByParent($folder->getParent())
+                    ->filterByPosition($folder->getPosition(), Criteria::GREATER_THAN)
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1)
+                ;
+            }
+
             $this->addOutputFields($loopResultRow, $folder);
 
             $loopResult->addRow($loopResultRow);
