@@ -27,6 +27,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Form\ContactForm;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -41,7 +42,6 @@ class ContactController extends BaseFrontController
      */
     public function sendAction()
     {
-        $error_message = false;
         $contactForm = $this->createForm(FrontForm::CONTACT);
 
         try {
@@ -56,21 +56,23 @@ class ContactController extends BaseFrontController
 
             $this->getMailer()->send($message);
 
+            if (null !== $successUrl = $this->retrieveSuccessUrl($contactForm)) {
+                return $this->generateRedirect($successUrl);
+            }
+
+            return $this->generateRedirectFromRoute('contact.success');
+
         } catch (FormValidationException $e) {
             $error_message = $e->getMessage();
         }
 
-        if ($error_message !== false) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
+        Tlog::getInstance()->error(sprintf('Error during sending contact mail : %s', $error_message));
 
-            $contactForm->setErrorMessage($error_message);
+        $contactForm->setErrorMessage($error_message);
 
-            $this->getParserContext()
-                ->addForm($contactForm)
-                ->setGeneralError($error_message)
-            ;
-        } else {
-            return $this->generateRedirectFromRoute('contact.success');
-        }
+        $this->getParserContext()
+            ->addForm($contactForm)
+            ->setGeneralError($error_message)
+        ;
     }
 }
