@@ -139,7 +139,7 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $toMethod = $this->getNavigateToMethod($to);
 
-        return $this->$toMethod();
+        return $this->applyNoAmpAndTarget($params, $this->$toMethod());
     }
 
     protected function generateViewUrlFunction($params, $forAdmin)
