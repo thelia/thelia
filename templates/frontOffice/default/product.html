@@ -39,7 +39,7 @@
 {block name="main-content"}
     {if $product_id}
     <div class="main">
-        {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1"}
+        {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
         <article id="product" class="col-main" role="main" itemscope itemtype="http://schema.org/Product">
 
             {$pse_count=$PSE_COUNT}
