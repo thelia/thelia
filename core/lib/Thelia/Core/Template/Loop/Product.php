@@ -69,6 +69,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             Argument::createFloatTypeArgument('min_weight'),
             Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('with_prev_next_info', false),
+            Argument::createBooleanOrBothTypeArgument('with_prev_next_visible', Type\BooleanOrBothType::ANY),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
@@ -323,22 +324,34 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         ;
 
         if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+            $visible = $this->getWithPrevNextVisible();
+
             // Find previous and next category
-            $previous = ProductQuery::create()
+            $previousSearch = ProductQuery::create()
                 ->joinProductCategory()
                 ->where('ProductCategory.category_id = ?', $default_category_id)
                 ->filterByPosition($product->getPosition(), Criteria::LESS_THAN)
                 ->orderByPosition(Criteria::DESC)
-                ->findOne()
             ;
 
-            $next = ProductQuery::create()
+            if ($visible !== Type\BooleanOrBothType::ANY) {
+                $previousSearch->filterByVisible($visible ? 1 : 0);
+            }
+
+            $previous = $previousSearch->findOne();
+
+            $nextSearch = ProductQuery::create()
                 ->joinProductCategory()
                 ->where('ProductCategory.category_id = ?', $default_category_id)
                 ->filterByPosition($product->getPosition(), Criteria::GREATER_THAN)
                 ->orderByPosition(Criteria::ASC)
-                ->findOne()
             ;
+
+            if ($visible !== Type\BooleanOrBothType::ANY) {
+                $nextSearch->filterByVisible($visible ? 1 : 0);
+            }
+
+            $next = $nextSearch->findOne();
 
             $loopResultRow
                 ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
