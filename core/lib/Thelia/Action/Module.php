@@ -76,6 +76,7 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
     }
 
+
     public function checkToggleActivation(ModuleToggleActivationEvent $event)
     {
         if (true === $event->isNoCheck()) {
@@ -85,8 +86,14 @@ class Module extends BaseAction implements EventSubscriberInterface
         if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
             try {
                 if ($module->getActivate() == BaseModule::IS_ACTIVATED) {
+                    if ($event->isRecursive()) {
+                        $this->recursiveDeactivation($event);
+                    }
                     $this->checkDeactivation($module);
                 } else {
+                    if ($event->isRecursive()) {
+                        $this->recursiveActivation($event);
+                    }
                     $this->checkActivation($module);
                 }
             } catch (\Exception $ex) {
@@ -136,8 +143,7 @@ class Module extends BaseAction implements EventSubscriberInterface
                 )
                 : Translator::getInstance()->trans(
                     '%s have dependencies to module %s. You have to deactivate these modules before.'
-                )
-            ;
+                );
 
             throw new ModuleException(
                 sprintf($message, $moduleList, $moduleValidator->getModuleDefinition()->getCode())
@@ -145,6 +151,53 @@ class Module extends BaseAction implements EventSubscriberInterface
         }
 
         return true;
+    }
+
+
+    /**
+     * Get dependencies of the current module and activate it if needed
+     *
+     * @param ModuleToggleActivationEvent $event
+     *
+     */
+    public function recursiveActivation(ModuleToggleActivationEvent $event)
+    {
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+            $dependencies = $moduleValidator->getCurrentModuleDependencies();
+            foreach ($dependencies as $defMod) {
+                $submodule = ModuleQuery::create()
+                    ->findOneByCode($defMod["code"]);
+                if ($submodule && $submodule->getActivate() != BaseModule::IS_ACTIVATED) {
+                    $subevent = new ModuleToggleActivationEvent($submodule->getId());
+                    $subevent->setRecursive(true);
+                    $event->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get modules having current module in dependence and deactivate it if needed
+     *
+     * @param ModuleToggleActivationEvent $event
+     *
+     */
+    public function recursiveDeactivation(ModuleToggleActivationEvent $event)
+    {
+        if (null !== $module = ModuleQuery::create()->findPk($event->getModuleId())) {
+            $moduleValidator = new ModuleValidator($module->getAbsoluteBaseDir());
+            $dependencies = $moduleValidator->getModulesDependOf(true);
+            foreach ($dependencies as $defMod) {
+                $submodule = ModuleQuery::create()
+                    ->findOneByCode($defMod["code"]);
+                if ($submodule && $submodule->getActivate() == BaseModule::IS_ACTIVATED) {
+                    $subevent = new ModuleToggleActivationEvent($submodule->getId());
+                    $subevent->setRecursive(true);
+                    $event->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $subevent);
+                }
+            }
+        }
     }
 
     public function delete(ModuleDeleteEvent $event)

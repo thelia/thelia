@@ -386,6 +386,20 @@ class ModuleValidator
         return $dependantModules;
     }
 
+    public function getCurrentModuleDependencies(){
+        $dependencies = [];
+        if (0 !== count($this->moduleDescriptor->required)) {
+            foreach ($this->moduleDescriptor->required->module as $dependency) {
+                $dependencies[] = [
+                   "code" => (string)$dependency,
+                   "version" => (string)$dependency['version'],
+                ];
+            }
+        }
+
+        return $dependencies;
+    }
+
     /**
      * @param ModuleDefinition $moduleDefinition
      */

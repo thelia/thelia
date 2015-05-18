@@ -30,6 +30,12 @@ class ModuleToggleActivationEvent extends ModuleEvent
     protected $noCheck;
 
     /**
+     * @var bool
+     */
+    protected $recursive;
+
+
+    /**
      * @param int $module_id
      */
     public function __construct($module_id)
@@ -73,6 +79,24 @@ class ModuleToggleActivationEvent extends ModuleEvent
     {
         $this->noCheck = $noCheck;
 
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isRecursive()
+    {
+        return $this->recursive;
+    }
+
+    /**
+     * @param boolean $recursive
+     * @return $this;
+     */
+    public function setRecursive($recursive)
+    {
+        $this->recursive = $recursive;
         return $this;
     }
 }
