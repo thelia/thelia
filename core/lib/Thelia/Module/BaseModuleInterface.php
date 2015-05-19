@@ -16,15 +16,15 @@ use Propel\Runtime\Connection\ConnectionInterface;
 
 interface BaseModuleInterface
 {
-    public function install(ConnectionInterface $con);
+    public function install(ConnectionInterface $con = null);
 
-    public function preActivation(ConnectionInterface $con);
+    public function preActivation(ConnectionInterface $con = null);
 
-    public function postActivation(ConnectionInterface $con);
+    public function postActivation(ConnectionInterface $con = null);
 
-    public function preDeactivation(ConnectionInterface $con);
+    public function preDeactivation(ConnectionInterface $con = null);
 
-    public function postDeactivation(ConnectionInterface $con);
+    public function postDeactivation(ConnectionInterface $con = null);
 
-    public function destroy(ConnectionInterface $con, $deleteModuleData = false);
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
 }

@@ -509,7 +509,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *
      * @param ConnectionInterface $con
      */
-    public function install(ConnectionInterface $con)
+    public function install(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
     }
@@ -533,7 +533,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *
      * @return bool true to continue module activation, false to prevent it.
      */
-    public function preActivation(ConnectionInterface $con)
+    public function preActivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
         return true;
@@ -544,7 +544,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      *
      * @param ConnectionInterface $con
      */
-    public function postActivation(ConnectionInterface $con)
+    public function postActivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
     }
@@ -555,13 +555,13 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * @param  ConnectionInterface $con
      * @return bool                true to continue module de-activation, false to prevent it.
      */
-    public function preDeactivation(ConnectionInterface $con)
+    public function preDeactivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
         return true;
     }
 
-    public function postDeactivation(ConnectionInterface $con)
+    public function postDeactivation(ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
     }
@@ -573,7 +573,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * @param ConnectionInterface $con
      * @param bool                $deleteModuleData if true, the module should remove all its data from the system.
      */
-    public function destroy(ConnectionInterface $con, $deleteModuleData = false)
+    public function destroy(ConnectionInterface $con = null, $deleteModuleData = false)
     {
         // Override this method to do something useful.
     }
