@@ -20,6 +20,7 @@ use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
@@ -47,8 +48,6 @@ use Thelia\Form\ProductModificationForm;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvQuery;
-use Thelia\Model\AttributeCombination;
-use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\AttributeQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
@@ -57,25 +56,15 @@ use Thelia\Model\Country;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Feature;
-use Thelia\Model\FeatureProduct;
-use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\MetaData;
 use Thelia\Model\MetaDataQuery;
 use Thelia\Model\Product;
-use Thelia\Model\ProductAssociatedContent;
 use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\ProductDocument;
-use Thelia\Model\ProductDocumentI18n;
-use Thelia\Model\ProductDocumentI18nQuery;
 use Thelia\Model\ProductDocumentQuery;
-use Thelia\Model\ProductI18n;
-use Thelia\Model\ProductI18nQuery;
-use Thelia\Model\ProductImage;
-use Thelia\Model\ProductImageI18n;
-use Thelia\Model\ProductImageI18nQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
@@ -1819,10 +1808,6 @@ class ProductController extends AbstractSeoCrudController
 
     /*
      * PRODUCT CLONING PROCESS
-     *
-     *  Vars prefixes :
-     * op = Original Product
-     * cp = Clone Product
      */
 
     /**
@@ -1843,338 +1828,26 @@ class ProductController extends AbstractSeoCrudController
             // Check the form against constraints violations
             $form = $this->validateForm($cpf, "POST");
 
-            // Get the form field values
-            $data = $form->getData();
+            // Build and dispatch event
+            $event = new ProductCloneEvent(
+                $form->getData()['newRef'],
+                $form->getData()['productId'],
+                $lang
+            );
 
-            $opId = $data['productId'];
-
-            $cpId = $this->createCloneProduct($data, $lang, $opId);
-
-            $this->setCloneFeatureCombination($opId, $cpId);
-
-            $this->setProductAssociatedContent($opId, $cpId);
-
-            $this->setCloneI18n($lang, $opId, $cpId);
-
-            $this->setCloneImage($opId, $cpId);
-
-            $this->setCloneDocument($opId, $cpId);
+            $this->dispatch(TheliaEvents::PRODUCT_CLONE_CREATE, $event);
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',
-                array('product_id' => $cpId)
+                array('product_id' => $event->getCpId())
             );
         } catch (FormValidationException $e) {
             throw new \Exception($this->createStandardFormValidationErrorMessage($e));
         }
     }
 
-    /**
-     * Main cloning process
-     * Call functions to build the base product, its PSEs, and things depending on PSEs
-     *
-     * @param $data
-     * @param $lang
-     * @param $opId
-     * @return null
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    public function createCloneProduct($data, $lang, $opId)
-    {
-        $cpId = null;
-        $cpRef = $data['newRef'];
-
-        // Get original product's PSEs
-        $opPSEs = ProductSaleElementsQuery::create()
-            ->orderByIsDefault(Criteria::DESC)
-            ->findByProductId($opId);
-
-        foreach ($opPSEs as $key => $opPSE) {
-            if ($opPSE->getIsDefault() == 1) {
-
-                // Get default PSE corresponding price
-                $opPrice = ProductPriceQuery::create()
-                    ->findOneByProductSaleElementsId($opPSE->getId());
-
-                // Get original product's default title
-                $opDefaultI18nTitle = ProductI18nQuery::create()
-                    ->filterById($opId)
-                    ->filterByLocale($lang, Criteria::EQUAL)
-                    ->select('title')
-                    ->findOne();
-
-                // Get original product
-                $op = ProductQuery::create()
-                    ->findOneById($opId);
-
-                // Build event and dispatch creation of the product and its default PSE
-                $cp = $this->createCloneEvent($opDefaultI18nTitle, $cpRef, $lang, $op, $opPrice, $opPSE->getWeight());
-
-                // Set other product info
-                $cpIdAndPSEId = $this->setCloneDefaultInfo($cp, $op, $opPSE, $opPrice->getPromoPrice());
-
-                $cpDefaultPSEId = $cpIdAndPSEId['cpDefaultPSEId'];
-                $cpId = $cpIdAndPSEId['cpId'];
-
-                // Set attribute combination
-                $this->setCloneAttributeCombination($opPSE->getId(), $cpDefaultPSEId);
-            } else {
-                // Create other PSEs and associated prices
-                $cpPSE = $this->addCloneBaseInfo($cpId, $cpRef, $key, $opPSE);
-
-                // Set attribute combination
-                $this->setCloneAttributeCombination($opPSE->getId(), $cpPSE->getId());
-            }
-        }
-
-        return $cpId;
-    }
 
 
-    public function createCloneEvent($opDefaultI18nTitle, $cpRef, $lang, $op, $opPrice, $opWeight)
-    {
-        $event = new ProductCreateEvent();
-        $event
-            ->setTitle($opDefaultI18nTitle)
-            ->setRef($cpRef)
-            ->setLocale($lang)
-            ->setVisible(0)
-            ->setVirtual($op->getVirtual())
-            ->setTaxRuleId($op->getTaxRuleId())
-            ->setDefaultCategory($op->getDefaultCategoryId())
-            ->setBasePrice($opPrice->getPrice())
-            ->setCurrencyId($opPrice->getCurrencyId())
-            ->setBaseWeight($opWeight);
 
-        $this->dispatch(TheliaEvents::PRODUCT_CREATE, $event);
 
-        return $event->getProduct();
-    }
-
-    public function addCloneBaseInfo($cpId, $cpRef, $key, $opPSE)
-    {
-        $cpPSE = new ProductSaleElements();
-        $cpPSE
-            ->setProductId($cpId)
-            ->setRef($cpRef.'-'.($key + 1))
-            ->setQuantity($opPSE->getQuantity())
-            ->setPromo($opPSE->getPromo())
-            ->setNewness($opPSE->getNewness())
-            ->setWeight($opPSE->getWeight())
-            ->setIsDefault(0)
-            ->setEanCode($opPSE->getEanCode())
-            ->save();
-
-        // Get original PSE's price
-        $opPrice = ProductPriceQuery::create()
-            ->findOneByProductSaleElementsId($opPSE->getId());
-
-        // Create PSE corresponding price
-        $cpPSEPrice = new ProductPrice();
-        $cpPSEPrice
-            ->setProductSaleElementsId($cpPSE->getId())
-            ->setCurrencyId($opPrice->getCurrencyId())
-            ->setPrice($opPrice->getPrice())
-            ->setPromoPrice($opPrice->getPromoPrice())
-            ->setFromDefaultCurrency($opPrice->getFromDefaultCurrency())
-            ->save();
-
-        return $cpPSE;
-    }
-
-    public function setCloneDefaultInfo($cp, $op, $opPSE, $opPromoPrice)
-    {
-        // Get new product's ID
-        $cpId = $cp->getId();
-
-        // Set other product's information
-        $cp
-            ->setBrandId($op->getBrandId())
-            ->setTemplateId($op->getTemplateId())
-            ->save();
-
-        // Set other information of default PSE
-        $cpDefaultPSE = ProductSaleElementsQuery::create()
-            ->findOneByProductId($cpId);
-        $cpDefaultPSE
-            ->setQuantity($opPSE->getQuantity())
-            ->setPromo($opPSE->getPromo())
-            ->setNewness($opPSE->getNewness())
-            ->setEanCode($opPSE->getEanCode())
-            ->save();
-
-        // Set default promo price
-        $cpDefaultPrice = ProductPriceQuery::create()
-            ->findOneByProductSaleElementsId($cpDefaultPSE->getId());
-        $cpDefaultPrice
-            ->setPromoPrice($opPromoPrice)
-            ->save();
-
-        return ['cpId' => $cpId, 'cpDefaultPSEId' => $cpDefaultPSE->getId()];
-    }
-
-    public function setCloneAttributeCombination($opPSEId, $cpPSEId)
-    {
-        // Get original product attribute for current PSE
-        $opAttrCombi = AttributeCombinationQuery::create()
-            ->findOneByProductSaleElementsId($opPSEId);
-
-        $cpAttrCombi = new AttributeCombination();
-        $cpAttrCombi
-            ->setAttributeId($opAttrCombi->getAttributeId())
-            ->setAttributeAvId($opAttrCombi->getAttributeAvId())
-            ->setProductSaleElementsId($cpPSEId)
-            ->save();
-    }
-
-    public function setCloneFeatureCombination($opId, $cpId)
-    {
-        // Get original product features
-        $opFeatures = FeatureProductQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone product features
-        foreach ($opFeatures as $opFeature) {
-            $cpFeatureProduct = new FeatureProduct();
-            $cpFeatureProduct
-                ->setProductId($cpId)
-                ->setFeatureId($opFeature->getFeatureId())
-                ->setFeatureAvId($opFeature->getFeatureAvId())
-                ->setFreeTextValue($opFeature->getFreeTextValue())
-                ->setPosition($opFeature->getPosition())
-                ->save();
-        }
-    }
-
-    public function setProductAssociatedContent($opId, $cpId)
-    {
-        // Get original product associated contents
-        $opAssocConts = ProductAssociatedContentQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone product associated contents
-        foreach ($opAssocConts as $opAssocCont) {
-            $cpProdAssocCont = new ProductAssociatedContent();
-            $cpProdAssocCont
-                ->setProductId($cpId)
-                ->setContentId($opAssocCont->getContentId())
-                ->setPosition($opAssocCont->getPosition())
-                ->save();
-        }
-    }
-
-    public function setCloneI18n($lang, $opId, $cpId)
-    {
-        // Get original product i18n
-        $opI18ns = ProductI18nQuery::create()
-            ->findById($opId);
-
-        /* For each original I18n
-         * - If it's the same language as the one at the product creation, update information
-         * - If not, create a new ProductI18n for the language
-         */
-        foreach ($opI18ns as $opI18n) {
-            if ($opI18n->getLocale() == $lang) {
-                $cpI18n = ProductI18nQuery::create()
-                    ->filterByLocale($lang)
-                    ->findOneById($cpId);
-
-                $cpI18n
-                    ->setChapo($opI18n->getChapo())
-                    ->setDescription($opI18n->getDescription())
-                    ->setPostscriptum($opI18n->getPostscriptum())
-                    ->setMetaTitle($opI18n->getMetaTitle())
-                    ->setMetaDescription($opI18n->getMetadescription())
-                    ->setMetaKeywords($opI18n->getMetaKeywords())
-                    ->save();
-            } else {
-                $cpI18n = new ProductI18n();
-                $cpI18n
-                    ->setId($cpId)
-                    ->setLocale($opI18n->getLocale())
-                    ->setTitle($opI18n->getTitle())
-                    ->setChapo($opI18n->getChapo())
-                    ->setDescription($opI18n->getDescription())
-                    ->setPostscriptum($opI18n->getPostscriptum())
-                    ->setMetaTitle($opI18n->getMetaTitle())
-                    ->setMetaDescription($opI18n->getMetadescription())
-                    ->setMetaKeywords($opI18n->getMetaKeywords())
-                    ->save();
-            }
-        }
-    }
-
-    public function setCloneImage($opId, $cpId)
-    {
-        // Get original product images
-        $opImages = ProductImageQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone's images
-        foreach ($opImages as $opImage) {
-            $cpImage = new ProductImage();
-            $cpImage
-                ->setProductId($cpId)
-                ->setFile($opImage->getFile())
-                ->setVisible($opImage->getVisible())
-                ->setPosition($opImage->getPosition())
-                ->save();
-
-            // Get original product images I18n
-            $opImageI18ns = ProductImageI18nQuery::create()
-                ->findById($opImage->getId());
-
-            // Set clone's images I18n
-            foreach ($opImageI18ns as $opImageI18n) {
-                $cpImageI18n = new ProductImageI18n();
-                $cpImageI18n
-                    ->setId($cpImage->getId())
-                    ->setLocale($opImageI18n->getLocale())
-                    ->setTitle($opImageI18n->getTitle())
-                    ->setChapo($opImageI18n->getChapo())
-                    ->setDescription($opImageI18n->getDescription())
-                    ->setPostscriptum($opImageI18n->getPostscriptum())
-                    ->save();
-            }
-        }
-    }
-
-    public function setCloneDocument($opId, $cpId)
-    {
-        // Get original product documents
-        $opDocuments = ProductDocumentQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone's documents
-        foreach ($opDocuments as $opDocument) {
-            $cpDocument = new ProductDocument();
-            $cpDocument
-                ->setProductId($cpId)
-                ->setFile($opDocument->getFile())
-                ->setVisible($opDocument->getVisible())
-                ->setPosition($opDocument->getPosition())
-                ->save();
-
-            // Get original product documents I18n
-            $opDocumentI18ns = ProductDocumentI18nQuery::create()
-                ->findById($opDocument->getId());
-
-            // Set clone's documents I18n
-            foreach ($opDocumentI18ns as $opDocumentI18n) {
-                $cpDocumentI18n = new ProductDocumentI18n();
-                $cpDocumentI18n
-                    ->setId($cpDocument->getId())
-                    ->setLocale($opDocumentI18n->getLocale())
-                    ->setTitle($opDocumentI18n->getTitle())
-                    ->setChapo($opDocumentI18n->getChapo())
-                    ->setDescription($opDocumentI18n->getDescription())
-                    ->setPostscriptum($opDocumentI18n->getPostscriptum())
-                    ->save();
-            }
-        }
-    }
-
-    /*
-     * End of cloning process
-     */
 }

@@ -28,7 +28,7 @@ class ProductCloneForm extends BaseForm
                         'methods' => [[$this, 'checkRefDifferent']]
                     ])
                 ],
-                'label' => 'Product reference must be different',
+                'label' => $this->translator->trans('Product reference (must be unique)'),
                 'label_attr'  => array('for' => 'newRef')
             ])
         ;
@@ -41,7 +41,7 @@ class ProductCloneForm extends BaseForm
             ->find();
 
         if (count($originalRef) !== 0) {
-            $context->addViolation($this->translator->trans('Product reference must be different'));
+            $context->addViolation($this->translator->trans('This product reference is already assigned to another product.'));
         }
     }
 }

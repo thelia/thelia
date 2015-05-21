@@ -33,7 +33,7 @@
 
                         <div class="col-md-5 actions">
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cloneProductModal">
-                                Clone this product
+                                {intl l="Clone"}
                             </button>
                             <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
@@ -199,7 +199,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3>Clone product</h3>
+                    <h3>{intl l="Clone product"}</h3>
                 </div>
                 {form name="thelia.admin.product.clone"}
                 <form method="post" action="{url path='/admin/products/clone'}" class="form-inline" role="form" {form_enctype form=$form}>
@@ -218,7 +218,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-default">Go, clone it !</button>
+                        <button type="submit" class="btn btn-default">{intl l="OK"}</button>
                     </div>
                 </form>
                 {/form}
