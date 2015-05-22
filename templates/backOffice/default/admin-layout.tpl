@@ -66,6 +66,10 @@
 		{hook name="main.before-topbar" location="before_topbar" }
 
 		<div class="topbar">
+            <button type="button" class="hidden-sm hidden-xs" id="main-navbar-collapse">
+                <span></span>
+            </button>
+
 			<div class="container">
 
 		        <div class="row">
@@ -285,11 +289,21 @@
                         $showLeftPush = $('#main-navbar-collapse'),
                         $body = $('body');
 
+                initNavbarHeight();
+
+                $(window).on('resize', function() {
+                    initNavbarHeight();
+                });
+
+                doTooltip();
+                manageCollapse();
 
                 $showLeftPush.on('click', function() {
                     $showLeftPush.toggleClass('active');
-                    $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
+
+                    doTooltip();
+                    manageCollapse();
                 });
 
                 /**
@@ -299,6 +313,8 @@
                     var $link = $(this);
 
                     $link.on('click', $menuLeft, function() {
+                        initNavbarHeight();
+
                         if (!$menuLeft.hasClass('open') && $(window).innerWidth > 991) {
                             return false;
                         }
@@ -308,9 +324,38 @@
                 var $showTop = $('#main-navbar-collapse-mobile');
                 $showTop.on('click', function() {
                     $showTop.toggleClass('active');
-                    $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
                 });
+
+                function doTooltip() {
+                    if ($menuLeft.is('.closed')) {
+                        $('> ul > li > a', $menuLeft).tooltip({
+                            placement: 'right'
+                        });
+
+                        $('#orders_menu a, #tools_menu a').tooltip('destroy');
+                    } else {
+                        $('> ul > li > a', $menuLeft).tooltip('destroy');
+                    }
+                }
+
+                function manageCollapse() {
+                    $('[data-toggle="collapse"]').next('ul').removeClass('in');
+
+                    if ($menuLeft.is('.closed')) {
+                        $('[data-toggle="collapse"]').on('click', function () {
+                            return false;
+                        });
+                    } else {
+                        $('[data-toggle="collapse"]').on('click', function () {
+                            $(this).next('ul').collapse('toggle');
+                        });
+                    }
+                }
+
+                function initNavbarHeight() {
+                    $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
+                }
             });
         })(jQuery);
     </script>

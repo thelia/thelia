@@ -5,10 +5,6 @@
 </button>
 
 <nav id="main-navbar" class="closed" role="navigation">
-    <button type="button" class="hidden-sm hidden-xs" id="main-navbar-collapse">
-        <span></span>
-    </button>
-
     <ul class="list-unstyled">
         <li class="{if $admin_current_location == 'home'}active{/if}" id="home_menu">
             <a href="{url path='/admin/home'}" title="{intl l="Home"}"><span class="icon-home"></span> <span class="item-text">{intl l="Home"}</span></a>
@@ -151,7 +147,7 @@
 
         {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
             <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-                <a {intl l="Tools"} data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
+                <a title="{intl l="Tools"}" data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
                     <span class="icon-tools"></span>
                     <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
                 </a>
