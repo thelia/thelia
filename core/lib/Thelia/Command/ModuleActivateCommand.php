@@ -15,6 +15,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Thelia\Core\Event\Module\ModuleToggleActivationEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ModuleQuery;
@@ -35,12 +36,17 @@ class ModuleActivateCommand extends BaseModuleGenerate
         $this
             ->setName("module:activate")
             ->setDescription("Activates a module")
+            ->addOption(
+                "with-dependencies",
+                null,
+                InputOption::VALUE_NONE,
+                'activate module recursively'
+            )
             ->addArgument(
                 "module",
                 InputArgument::REQUIRED,
                 "module to activate"
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -57,11 +63,17 @@ class ModuleActivateCommand extends BaseModuleGenerate
             throw new \RuntimeException(sprintf("module %s is already actived", $moduleCode));
         }
 
+
         try {
             $event = new ModuleToggleActivationEvent($module->getId());
+            if ($input->getOption("with-dependencies")) {
+                $event->setRecursive(true);
+            }
+
             $this->getDispatcher()->dispatch(TheliaEvents::MODULE_TOGGLE_ACTIVATION, $event);
         } catch (\Exception $e) {
-            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(), $e->getMessage()));
+            throw new \RuntimeException(sprintf("Activation fail with Exception : [%d] %s", $e->getCode(),
+                $e->getMessage()));
         }
 
         //impossible to change output class in CommandTester...
