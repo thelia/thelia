@@ -474,7 +474,7 @@ var pseManager = (function($){
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
                         $(".cart-container").html($(data).html());
-                        $.ajax({url:"ajax/addCartMessage", data:{ product_id: product_id, pse_id: pse_id },
+                        $.ajax({url:"/ajax/addCartMessage", data:{ product_id: product_id, pse_id: pse_id },
                             success: function (data) {
                                 // Hide all currently active bootbox dialogs
                                 bootbox.hideAll();
