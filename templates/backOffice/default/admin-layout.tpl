@@ -66,6 +66,10 @@
 		{hook name="main.before-topbar" location="before_topbar" }
 
 		<div class="topbar">
+            <button type="button" class="hidden-sm hidden-xs" id="main-navbar-collapse">
+                <span></span>
+            </button>
+
 			<div class="container">
 
 		        <div class="row">
@@ -285,11 +289,15 @@
                         $showLeftPush = $('#main-navbar-collapse'),
                         $body = $('body');
 
+                doTooltip();
+                manageCollapse();
 
                 $showLeftPush.on('click', function() {
                     $showLeftPush.toggleClass('active');
-                    $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
+
+                    doTooltip();
+                    manageCollapse();
                 });
 
                 /**
@@ -308,9 +316,32 @@
                 var $showTop = $('#main-navbar-collapse-mobile');
                 $showTop.on('click', function() {
                     $showTop.toggleClass('active');
-                    $body.toggleClass('push-to-right');
                     $menuLeft.toggleClass('open').toggleClass('closed');
                 });
+
+                function doTooltip() {
+                    if ($menuLeft.is('.closed')) {
+                        $('> ul > li > a', $menuLeft).tooltip({
+                            placement: 'right'
+                        });
+                    } else {
+                        $('> ul > li > a', $menuLeft).tooltip('destroy');
+                    }
+                }
+
+                function manageCollapse() {
+                    $('[data-toggle="collapse"]').next('ul').removeClass('in');
+
+                    if ($menuLeft.is('.closed')) {
+                        $('[data-toggle="collapse"]').on('click', function () {
+                            return false;
+                        });
+                    } else {
+                        $('[data-toggle="collapse"]').on('click', function () {
+                            $(this).next('ul').collapse('toggle');
+                        });
+                    }
+                }
             });
         })(jQuery);
     </script>

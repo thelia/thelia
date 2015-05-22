@@ -7,15 +7,15 @@
 // -------------
 
 #main-navbar {
-    background: #26272B;
-    position: fixed;
+    background: #333;
+    position: absolute;
     width: 240px;
     height: 100%;
     left: -157px;
     top: 0;
     z-index: 1000;
-    .transition(all 0.3s ease);
-    padding-top: 50px;
+    .transition(all 0.3s ease-in-out);
+    padding-top: 49px;
 
     > ul > li {
         position: relative;
@@ -194,14 +194,20 @@
 
 #main-navbar-collapse {
     position: absolute;
-    left: 239px;
-    top: 65px;
+    left: 20px;
+    top: 8px;
     cursor: pointer;
-    padding: 14px 30px 19px 8px;
-    background: #26272B;
-    border: 1px solid @gray;
-    border-radius: 0 5px 5px 0;
-    border-left-color: @gray-dark;
+    padding: 15px 20px;
+    background: none;
+    border: none;
+    z-index: 1001;
+    text-align: right;
+    outline: none;
+    .transition(all 0.3s ease-in-out);
+
+    @media (max-width: 1325px) {
+        .hide;
+    }
 
     span {
         &,
@@ -209,10 +215,12 @@
         &:after {
             cursor: pointer;
             border-radius: 1px;
-            height: 3px;
-            width: 20px;
+            height: 1px;
+            width: 15px;
             background: white;
             position: absolute;
+            right: 10px;
+            margin: 0 auto;
             display: block;
             content: '';
             .transition(all 0.3s ease-in-out);
@@ -220,20 +228,30 @@
 
         &:before {
             top: -6px;
+            width: 10px;
         }
 
         &:after {
             bottom: -6px;
+            width: 20px;
+        }
+
+        &:before,
+        &:after {
+            right: 0;
         }
     }
 
     &.active {
+        left: 180px;
+
         span {
             background: none;
 
             &:before,
             &:after {
                 top: 0;
+                width: 15px;
             }
 
             &:before {
@@ -253,8 +271,11 @@
     top: 8px;
     right: 10px;
     left: auto;
-    border-left: 1px solid @gray;
-    border-radius: 5px;
+
+    &.active {
+        right: 10px;
+        left: auto;
+    }
 
     @media (max-width: 1325px) {
         .show;
