@@ -462,6 +462,8 @@ jQuery(function($){
             jQPlotInstance.replot( { resetAxes: true } );
         });
 
+        $('#main-navbar').height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
+
     }
     {/literal}
 

@@ -291,7 +291,7 @@
 
                 initNavbarHeight();
 
-                $('window').on('resize', function() {
+                $(window).on('resize', function() {
                     initNavbarHeight();
                 });
 
@@ -313,6 +313,8 @@
                     var $link = $(this);
 
                     $link.on('click', $menuLeft, function() {
+                        initNavbarHeight();
+
                         if (!$menuLeft.hasClass('open') && $(window).innerWidth > 991) {
                             return false;
                         }
@@ -330,6 +332,8 @@
                         $('> ul > li > a', $menuLeft).tooltip({
                             placement: 'right'
                         });
+
+                        $('#orders_menu a, #tools_menu a').tooltip('destroy');
                     } else {
                         $('> ul > li > a', $menuLeft).tooltip('destroy');
                     }
