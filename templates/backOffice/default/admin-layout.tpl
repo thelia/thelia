@@ -289,6 +289,12 @@
                         $showLeftPush = $('#main-navbar-collapse'),
                         $body = $('body');
 
+                initNavbarHeight();
+
+                $('window').on('resize', function() {
+                    initNavbarHeight();
+                });
+
                 doTooltip();
                 manageCollapse();
 
@@ -341,6 +347,10 @@
                             $(this).next('ul').collapse('toggle');
                         });
                     }
+                }
+
+                function initNavbarHeight() {
+                    $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
                 }
             });
         })(jQuery);
