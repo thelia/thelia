@@ -268,7 +268,13 @@ GNU General Public License : http://www.gnu.org/licenses/
     {block name="after-javascript-include"}{/block}
 
     {hook name="main.javascript-initialization"}
-
+    <script>
+        var url_site = '{config key="url_site"}';
+        if(url_site.charAt(url_site.length-1) != '/') {
+            url_site = url_site + '/';
+        }
+    
+    </script>
     {block name="javascript-initialization"}{/block}
 
     <!-- Custom scripts -->
