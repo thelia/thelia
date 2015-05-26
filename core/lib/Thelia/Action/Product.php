@@ -22,6 +22,7 @@ use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Log\Tlog;
 use Thelia\Model\AttributeCombinationQuery;
@@ -44,7 +45,6 @@ use Thelia\Model\ProductSaleElementsProductDocument;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
 use Thelia\Model\ProductSaleElementsProductImage;
 use Thelia\Model\ProductSaleElementsProductImageQuery;
-use Thelia\Model\RewritingUrlQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Model\AccessoryQuery;
 use Thelia\Model\Accessory;
@@ -123,12 +123,7 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     /*******************
      * CLONING PROCESS *
-     *******************
-     *
-     * Vars prefixes :
-     * op = Original Product
-     * cp = Clone Product
-     */
+     *******************/
 
     /**
      * @param ProductCloneEvent $event
@@ -137,126 +132,172 @@ class Product extends BaseAction implements EventSubscriberInterface
     {
         // Get important datas
         $lang = $event->getLang();
-        $opId = $event->getProductId();
-
-        $op = ProductQuery::create()
-            ->findOneById($opId);
-
-        $opDefaultI18n = ProductI18nQuery::create()
-            ->filterByLocale($lang, Criteria::EQUAL)
-            ->findOneById($opId);
-
-        $opDefaultPrice = ProductPriceQuery::create()
-            ->findOneByProductSaleElementsId($op->getDefaultSaleElements()->getId());
-
-        $opPSEs = ProductSaleElementsQuery::create()
-            ->orderByIsDefault(Criteria::DESC)
-            ->findByProductId($opId);
-
-        // Cloning process
-
-        $cp = $this->createClone($op, $opDefaultI18n, $opDefaultPrice, $event);
-
+        $originalProduct = $event->getOriginalProduct();
         $dispatcher = $event->getDispatcher();
 
-        $cp = $this->updateClone($cp, $op, $opDefaultI18n, $opDefaultPrice, $dispatcher);
+        $originalProductDefaultI18n = ProductI18nQuery::create()
+            ->findPk([$originalProduct->getId(), $lang]);
 
-        $cpPSEId = $cp->getDefaultSaleElements()->getId();
+        $originalProductDefaultPrice = ProductPriceQuery::create()
+            ->findOneByProductSaleElementsId($originalProduct->getDefaultSaleElements()->getId());
+/*
+        $originalProductPSEs = ProductSaleElementsQuery::create()
+            ->orderByIsDefault(Criteria::DESC)
+            ->findByProductId($originalProduct->getId());
+*/
+        // Cloning process
 
-        $this->setCloneFiles($opId, $cp, $dispatcher);
+        $clonedProduct = $this->createClone($originalProduct, $originalProductDefaultI18n, $originalProductDefaultPrice, $event);
+
+        $this->removeCloneDefaultPSE($clonedProduct, $originalProductDefaultPrice, $dispatcher);
+
+        $clonedProduct = $this->updateClone($clonedProduct, $originalProduct, $originalProductDefaultPrice, $dispatcher);
+
+        $this->setCloneFeatureCombination($originalProduct->getId(), $clonedProduct->getId(), $dispatcher);
+
+        $this->setCloneAssociatedContent($originalProduct->getId(), $clonedProduct, $dispatcher);
+
+/*
+        $this->setCloneFiles($originalProduct->getId(), $clonedProduct, $dispatcher);
 
         // PSEs handling
-        foreach ($opPSEs as $key => $opPSE) {
-            if (!$opPSE->getIsDefault()) {
-                $currencyId = ProductPriceQuery::create()
-                    ->findOneByProductSaleElementsId($opPSE->getId())
-                    ->getCurrencyId();
+        foreach ($originalProductPSEs as $key => $originalProductPSE) {
+            $currencyId = ProductPriceQuery::create()
+                ->findOneByProductSaleElementsId($originalProductPSE->getId())
+                ->getCurrencyId();
 
-                $cpPSEId = $this->createClonePSE($cp, $op, $opPSE, $key, $currencyId, $dispatcher);
+            $clonedProductPSEId = $this->createClonePSE($clonedProduct, $originalProductPSE, $currencyId, $dispatcher);
+
+            $this->updateClonePSE($clonedProduct, $clonedProductPSEId, $originalProduct, $originalProductPSE, $key, $dispatcher);
+
+            // PSE associated images
+            $originalProductPSEImages = ProductSaleElementsProductImageQuery::create()
+                ->findByProductSaleElementsId($originalProductPSE->getId());
+
+            if (null !== $originalProductPSEImages) {
+                $this->setClonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
             }
 
-            $this->updateClonePSE($cp, $cpPSEId, $op, $opPSE, $key, $dispatcher);
+            // PSE associated documents
+            $originalProductPSEDocuments = ProductSaleElementsProductDocumentQuery::create()
+                ->findByProductSaleElementsId($originalProductPSE->getId());
 
-            $this->setCloneAttributeCombination($opPSE->getId(), $cpPSEId);
-
-            // Set PSE associated images & documents
-            $opPSEImages = ProductSaleElementsProductImageQuery::create()
-                ->findByProductSaleElementsId($opPSE->getId());
-
-            $opPSEDocuments = ProductSaleElementsProductDocumentQuery::create()
-                ->findByProductSaleElementsId($opPSE->getId());
-
-            if (count($opPSEImages) > 0 || count($opPSEDocuments) > 0) {
-                $this->setClonePSEAssociatedImages($cp->getId(), $cpPSEId, $opPSEImages);
-                $this->setClonePSEAssociatedDocuments($cp->getId(), $cpPSEId, $opPSEDocuments);
+            if (null !== $originalProductPSEDocuments) {
+                $this->setClonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
             }
         }
-
-        $this->setCloneFeatureCombination($opId, $cp->getId(), $dispatcher);
-
-        $this->setCloneProductAssociatedContent($opId, $cp, $dispatcher);
-
-        $this->setCloneI18n($lang, $op, $cp, $dispatcher);
+*/
     }
 
-    public function createClone(ProductModel $op, $opDefaultI18n, $opDefaultPrice, ProductCloneEvent $event)
+    public function createClone(ProductModel $originalProduct, $originalProductDefaultI18n, $originalProductDefaultPrice, ProductCloneEvent $event)
     {
         // Build event and dispatch creation of the clone product
         $createCloneEvent = new ProductCreateEvent();
         $createCloneEvent
-            ->setTitle($opDefaultI18n->getTitle())
+            ->setTitle($originalProductDefaultI18n->getTitle())
             ->setRef($event->getRef())
             ->setLocale($event->getLang())
             ->setVisible(0)
-            ->setVirtual($op->getVirtual())
-            ->setTaxRuleId($op->getTaxRuleId())
-            ->setDefaultCategory($op->getDefaultCategoryId())
-            ->setBasePrice($opDefaultPrice->getPrice())
-            ->setCurrencyId($opDefaultPrice->getCurrencyId())
-            ->setBaseWeight($op->getDefaultSaleElements()->getWeight());
+            ->setVirtual($originalProduct->getVirtual())
+            ->setTaxRuleId($originalProduct->getTaxRuleId())
+            ->setDefaultCategory($originalProduct->getDefaultCategoryId())
+            ->setBasePrice($originalProductDefaultPrice->getPrice())
+            ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
+            ->setBaseWeight($originalProduct->getDefaultSaleElements()->getWeight());
 
         $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_CREATE, $createCloneEvent);
 
-        $event->setCpId($createCloneEvent->getProduct()->getId());
+        // Set cloned product ID to ProductCloneEvent for redirection
+        $event->setClonedProduct($createCloneEvent->getProduct());
 
         return $createCloneEvent->getProduct();
     }
 
-    public function updateClone(ProductModel $cp, ProductModel $op, $opDefaultI18n, $opDefaultPrice, EventDispatcherInterface $dispatcher)
+    public function removeCloneDefaultPSE(ProductModel $clonedProduct, $originalProductDefaultPrice, EventDispatcherInterface $dispatcher)
     {
-        // Set other product's information
-        $cpUpdateEvent = new ProductUpdateEvent($cp->getId());
-        $cpUpdateEvent
-            ->setRef($cp->getRef())
-            ->setVisible($cp->getVisible())
-            ->setVirtual($cp->getVirtual())
-            ->setTitle($opDefaultI18n->getTitle())
-            ->setLocale($opDefaultI18n->getLocale())
-
-            ->setBasePrice($opDefaultPrice->getPrice())
-            ->setBaseWeight($op->getDefaultSaleElements()->getWeight())
-            ->setTaxRuleId($op->getTaxRuleId())
-            ->setCurrencyId($opDefaultPrice->getCurrencyId())
-
-            ->setChapo($opDefaultI18n->getChapo())
-            ->setDescription($opDefaultI18n->getDescription())
-            ->setPostscriptum($opDefaultI18n->getPostscriptum())
-            ->setBrandId($op->getBrandId())
-
-            ->setDefaultCategory($op->getDefaultCategoryId());
-
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE, $cpUpdateEvent);
-
-        $cp = $cpUpdateEvent->getProduct();
-
-        // Set clone's template
-        $cpUpdateTemplateEvent = new ProductSetTemplateEvent($cp, $op->getTemplateId(), $opDefaultPrice->getCurrencyId());
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_SET_TEMPLATE, $cpUpdateTemplateEvent);
-
-        return $cp;
+        $removeClonePSEEvent = new ProductSaleElementDeleteEvent($clonedProduct->getDefaultSaleElements()->getId(), $originalProductDefaultPrice->getCurrencyId());
+        $dispatcher->dispatch(TheliaEvents::PRODUCT_DELETE_PRODUCT_SALE_ELEMENT, $removeClonePSEEvent);
     }
 
-    public function setCloneFiles($opId, ProductModel $cp, EventDispatcherInterface $dispatcher)
+    public function updateClone(ProductModel $clonedProduct, ProductModel $originalProduct, $originalProductDefaultPrice, EventDispatcherInterface $dispatcher)
+    {
+        // Get original product's I18ns
+        $originalProductI18ns = ProductI18nQuery::create()
+            ->findById($originalProduct->getId());
+
+        foreach ($originalProductI18ns as $originalProductI18n) {
+
+            $clonedProductUpdateEvent = new ProductUpdateEvent($clonedProduct->getId());
+            $clonedProductUpdateEvent
+                ->setRef($clonedProduct->getRef())
+                ->setVisible($clonedProduct->getVisible())
+                ->setVirtual($clonedProduct->getVirtual())
+
+                ->setLocale($originalProductI18n->getLocale())
+                ->setTitle($originalProductI18n->getTitle())
+                ->setChapo($originalProductI18n->getChapo())
+                ->setDescription($originalProductI18n->getDescription())
+                ->setPostscriptum($originalProductI18n->getPostscriptum())
+
+                ->setBasePrice($originalProductDefaultPrice->getPrice())
+                ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
+                ->setBaseWeight($originalProduct->getDefaultSaleElements()->getWeight())
+                ->setTaxRuleId($originalProduct->getTaxRuleId())
+                ->setBrandId($originalProduct->getBrandId())
+                ->setDefaultCategory($originalProduct->getDefaultCategoryId());
+
+            $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE, $clonedProductUpdateEvent);
+
+            // SEO info
+            $originalProductSeoUrl = $clonedProduct->generateRewrittenUrl($originalProductI18n->getLocale());
+
+            $clonedProductUpdateSeoEvent = new UpdateSeoEvent($clonedProduct->getId());
+            $clonedProductUpdateSeoEvent
+                ->setLocale($originalProductI18n->getLocale())
+                ->setMetaTitle($originalProductI18n->getMetaTitle())
+                ->setMetaDescription($originalProductI18n->getMetaDescription())
+                ->setMetaKeywords($originalProductI18n->getMetaKeywords())
+                ->setUrl($originalProductSeoUrl);
+            $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_SEO, $clonedProductUpdateSeoEvent);
+        }
+
+        $clonedProduct = $clonedProductUpdateEvent->getProduct();
+
+        // Set clone's template
+        $clonedProductUpdateTemplateEvent = new ProductSetTemplateEvent($clonedProduct, $originalProduct->getTemplateId(), $originalProductDefaultPrice->getCurrencyId());
+        $dispatcher->dispatch(TheliaEvents::PRODUCT_SET_TEMPLATE, $clonedProductUpdateTemplateEvent);
+
+        return $clonedProduct;
+    }
+
+    public function setCloneFeatureCombination($originalProductId, $clonedProductId, EventDispatcherInterface $dispatcher)
+    {
+        // Get original product features
+        $originalProductFeatures = FeatureProductQuery::create()
+            ->findByProductId($originalProductId);
+
+        // Set clone product features
+        foreach ($originalProductFeatures as $originalProductFeature) {
+            $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent($clonedProductId, $originalProductFeature->getFeatureId(), $originalProductFeature->getFeatureAvId());
+            $dispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
+        }
+    }
+
+    public function setCloneAssociatedContent($originalProductId, ProductModel $clonedProduct, EventDispatcherInterface $dispatcher)
+    {
+        // Get original product associated contents
+        $originalProductAssocConts = ProductAssociatedContentQuery::create()
+            ->findByProductId($originalProductId);
+
+        // Set clone product associated contents
+        foreach ($originalProductAssocConts as $originalProductAssocCont) {
+            $clonedProductCreatePAC = new ProductAddContentEvent($clonedProduct, $originalProductAssocCont->getContentId());
+            $dispatcher->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
+        }
+    }
+
+
+    public function setCloneFiles($originalProductId, ProductModel $clonedProduct, EventDispatcherInterface $dispatcher)
     {
         $types = ['images', 'documents'];
 
@@ -265,31 +306,32 @@ class Product extends BaseAction implements EventSubscriberInterface
         foreach ($types as $type) {
             switch ($type) {
                 case 'images':
-                    $opFiles = ProductImageQuery::create()
-                        ->findByProductId($opId);
+                    $originalProductFiles = ProductImageQuery::create()
+                        ->findByProductId($originalProductId);
                     break;
 
                 case 'documents':
-                    $opFiles = ProductDocumentQuery::create()
-                        ->findByProductId($opId);
+                    $originalProductFiles = ProductDocumentQuery::create()
+                        ->findByProductId($originalProductId);
                     break;
             }
 
             // Set clone's files
-            foreach ($opFiles as $opFile) {
-                $srcPath = THELIA_LOCAL_DIR . 'media' . DS . $type . DS . 'product' . DS . $opFile->getFile();
-                $ext = substr($srcPath, -3);
+            foreach ($originalProductFiles as $originalProductFile) {
+                $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
 
                 if ($fs->exists($srcPath)) {
+                    $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
+
                     switch ($type) {
                         case 'images':
-                            $fileName = $cp->getRef().'.'.$ext;
-                            $cpFile = new ProductImage();
+                            $fileName = $clonedProduct->getRef().'.'.$ext;
+                            $clonedProductFile = new ProductImage();
                             break;
 
                         case 'documents':
-                            $fileName = substr($opFile->getFile(), 0, -4).'-'.$cp->getRef().'.'.$ext;
-                            $cpFile = new ProductDocument();
+                            $fileName = pathinfo($originalProductFile->getFile(), PATHINFO_FILENAME).'-'.$clonedProduct->getRef().'.'.$ext;
+                            $clonedProductFile = new ProductDocument();
                             break;
                     }
 
@@ -298,42 +340,41 @@ class Product extends BaseAction implements EventSubscriberInterface
                     $fs->copy($srcPath, $srcTmp, true);
 
                     // Get file mimeType
-                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
-                    $fileMimeType = finfo_file($finfo, $srcPath);
-                    finfo_close($finfo);
+                    $finfo = new \finfo();
+                    $fileMimeType = $finfo->file($srcPath, FILEINFO_MIME_TYPE);
 
                     // Get file event's parameters
-                    $cpFile
-                        ->setProductId($cp->getId())
-                        ->setVisible($opFile->getVisible())
-                        ->setPosition($opFile->getPosition())
-                        ->setLocale($cp->getLocale())
-                        ->setTitle($cp->getTitle());
+                    $clonedProductFile
+                        ->setProductId($clonedProduct->getId())
+                        ->setVisible($originalProductFile->getVisible())
+                        ->setPosition($originalProductFile->getPosition())
+                        ->setLocale($clonedProduct->getLocale())
+                        ->setTitle($clonedProduct->getTitle());
 
-                    $cpCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType, filesize($srcPath), null, true);
+                    $clonedProductCopiedFile = new UploadedFile($srcPath, $fileName, $fileMimeType, filesize($srcPath), null, true);
 
                     // Create and dispatch event
-                    $cpCreateFileEvent = new FileCreateOrUpdateEvent($cp->getId());
-                    $cpCreateFileEvent
-                        ->setModel($cpFile)
-                        ->setUploadedFile($cpCopiedFile)
-                        ->setParentName($cp->getTitle());
+                    $clonedProductCreateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
+                    $clonedProductCreateFileEvent
+                        ->setModel($clonedProductFile)
+                        ->setUploadedFile($clonedProductCopiedFile)
+                        ->setParentName($clonedProduct->getTitle());
 
                     switch ($type) {
                         case 'images':
-                            $dispatcher->dispatch(TheliaEvents::IMAGE_SAVE, $cpCreateFileEvent);
+                            $dispatcher->dispatch(TheliaEvents::IMAGE_SAVE, $clonedProductCreateFileEvent);
 
                             // Get original product image I18n
-                            $opFileI18ns = ProductImageI18nQuery::create()
-                                ->findById($opFile->getId());
+                            $originalProductFileI18ns = ProductImageI18nQuery::create()
+                                ->findById($originalProductFile->getId());
                             break;
 
                         case 'documents':
-                            $dispatcher->dispatch(TheliaEvents::DOCUMENT_SAVE, $cpCreateFileEvent);
+                            $dispatcher->dispatch(TheliaEvents::DOCUMENT_SAVE, $clonedProductCreateFileEvent);
 
                             // Get original product document I18n
-                            $opFileI18ns = ProductDocumentI18nQuery::create()
-                                ->findById($opFile->getId());
+                            $originalProductFileI18ns = ProductDocumentI18nQuery::create()
+                                ->findById($originalProductFile->getId());
                             break;
                     }
 
@@ -341,26 +382,26 @@ class Product extends BaseAction implements EventSubscriberInterface
                     $fs->rename($srcTmp, $srcPath);
 
                     // Set clone files I18n
-                    foreach ($opFileI18ns as $opFileI18n) {
+                    foreach ($originalProductFileI18ns as $originalProductFileI18n) {
                         // Update file with current I18n info. Update or create I18n according to existing or absent Locale in DB
-                        $cpFile
-                            ->setLocale($opFileI18n->getLocale())
-                            ->setTitle($opFileI18n->getTitle())
-                            ->setDescription($opFileI18n->getDescription())
-                            ->setChapo($opFileI18n->getChapo())
-                            ->setPostscriptum($opFileI18n->getPostscriptum());
+                        $clonedProductFile
+                            ->setLocale($originalProductFileI18n->getLocale())
+                            ->setTitle($originalProductFileI18n->getTitle())
+                            ->setDescription($originalProductFileI18n->getDescription())
+                            ->setChapo($originalProductFileI18n->getChapo())
+                            ->setPostscriptum($originalProductFileI18n->getPostscriptum());
 
                         // Create and dispatch event
-                        $cpUpdateFileEvent = new FileCreateOrUpdateEvent($cp->getId());
-                        $cpUpdateFileEvent->setModel($cpFile);
+                        $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
+                        $clonedProductUpdateFileEvent->setModel($clonedProductFile);
 
                         switch ($type) {
                             case 'images':
-                                $dispatcher->dispatch(TheliaEvents::IMAGE_UPDATE, $cpUpdateFileEvent);
+                                $dispatcher->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
                                 break;
 
                             case 'documents':
-                                $dispatcher->dispatch(TheliaEvents::DOCUMENT_UPDATE, $cpUpdateFileEvent);
+                                $dispatcher->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
                                 break;
                         }
                     }
@@ -371,194 +412,82 @@ class Product extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createClonePSE(ProductModel $cp, $opPSE, $currencyId, EventDispatcherInterface $dispatcher)
+
+    public function createClonePSE(ProductModel $clonedProduct, $originalProductPSE, $currencyId, EventDispatcherInterface $dispatcher)
     {
-        $attrCombiList = AttributeCombinationQuery::create()
-            ->findByProductSaleElementsId($opPSE->getId());
+        $attributeCombinationList = AttributeCombinationQuery::create()
+            ->select(['ATTRIBUTE_AV_ID'])
+            ->findByProductSaleElementsId($originalProductPSE->getId());
 
-        $attributeAvList = [];
 
-        foreach ($attrCombiList as $attrCombi) {
-            array_push($attributeAvList, $attrCombi);
-        }
+        $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($clonedProduct, $attributeCombinationList, $currencyId);
+        $dispatcher->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
 
-        $cpCreatePSEEvent = new ProductSaleElementCreateEvent($cp, $attributeAvList, $currencyId);
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $cpCreatePSEEvent);
-
-        return $cpCreatePSEEvent->getProductSaleElement()->getId();
+        return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
 
-    public function updateClonePSE(ProductModel $cp, $cpPSEId, ProductModel $op, $opPSE, $key, EventDispatcherInterface $dispatcher)
+    public function updateClonePSE(ProductModel $clonedProduct, $clonedProductPSEId, ProductModel $originalProduct, $originalProductPSE, $key, EventDispatcherInterface $dispatcher)
     {
-        $opPSEPrice = ProductPriceQuery::create()
-            ->findOneByProductSaleElementsId($opPSE->getId());
+        $originalProductPSEPrice = ProductPriceQuery::create()
+            ->findOneByProductSaleElementsId($originalProductPSE->getId());
 
-        $cpUpdatePSEEvent = new ProductSaleElementUpdateEvent($cp, $cpPSEId);
-        $cpUpdatePSEEvent
-            ->setReference($cp->getRef().'-'.($key + 1))
-            ->setIsdefault($opPSE->getIsDefault())
+        $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($clonedProduct, $clonedProductPSEId);
+        $clonedProductUpdatePSEEvent
+            ->setReference($clonedProduct->getRef().'-'.($key + 1))
+            ->setIsdefault($originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
 
-            ->setWeight($opPSE->getWeight())
-            ->setQuantity($opPSE->getQuantity())
-            ->setOnsale($opPSE->getPromo())
-            ->setIsnew($opPSE->getNewness())
-            ->setEanCode($opPSE->getEanCode())
-            ->setTaxRuleId($op->getTaxRuleId())
+            ->setWeight($originalProductPSE->getWeight())
+            ->setQuantity($originalProductPSE->getQuantity())
+            ->setOnsale($originalProductPSE->getPromo())
+            ->setIsnew($originalProductPSE->getNewness())
+            ->setEanCode($originalProductPSE->getEanCode())
+            ->setTaxRuleId($originalProduct->getTaxRuleId())
 
-            ->setPrice($opPSEPrice->getPrice())
-            ->setSalePrice($opPSEPrice->getPromoPrice())
-            ->setCurrencyId($opPSEPrice->getCurrencyId());
+            ->setPrice($originalProductPSEPrice->getPrice())
+            ->setSalePrice($originalProductPSEPrice->getPromoPrice())
+            ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
 
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $cpUpdatePSEEvent);
+        $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
     }
 
-    public function setCloneAttributeCombination($opPSEId, $cpPSEId)
+    public function setClonePSEAssociatedImages($clonedProductId, $clonedProductPSEId, $originalProductPSEImages)
     {
-        // Get original product attribute for current PSE
-        $opAttrCombi = AttributeCombinationQuery::create()
-            ->findOneByProductSaleElementsId($opPSEId);
-
-        $cpAttrCombi = $opAttrCombi->copy();
-        $cpAttrCombi
-            ->setProductSaleElementsId($cpPSEId)
-            ->save();
-    }
-
-    public function setClonePSEAssociatedImages($cpId, $cpPSEId, $opPSEImages)
-    {
-        foreach ($opPSEImages as $opPSEImage) {
-            $opImagePosition = ProductImageQuery::create()
-                ->findOneById($opPSEImage->getProductImageId())
+        foreach ($originalProductPSEImages as $originalProductPSEImage) {
+            $originalProductImagePosition = ProductImageQuery::create()
+                ->findPk($originalProductPSEImage->getProductImageId())
                 ->getPosition();
 
-            $cpImageIdToLinkToPSE = ProductImageQuery::create()
-                ->filterByProductId($cpId)
-                ->findOneByPosition($opImagePosition)
+            $clonedProductImageIdToLinkToPSE = ProductImageQuery::create()
+                ->filterByProductId($clonedProductId)
+                ->findOneByPosition($originalProductImagePosition)
                 ->getId();
 
             $assoc = new ProductSaleElementsProductImage();
             $assoc
-                ->setProductSaleElementsId($cpPSEId)
-                ->setProductImageId($cpImageIdToLinkToPSE)
+                ->setProductSaleElementsId($clonedProductPSEId)
+                ->setProductImageId($clonedProductImageIdToLinkToPSE)
                 ->save();
         }
     }
 
-    public function setClonePSEAssociatedDocuments($cpId, $cpPSEId, $opPSEDocuments)
+    public function setClonePSEAssociatedDocuments($clonedProductId, $clonedProductPSEId, $originalProductPSEDocuments)
     {
-        foreach ($opPSEDocuments as $opPSEDocument) {
-            $opDocumentPosition = ProductDocumentQuery::create()
-                ->findOneById($opPSEDocument->getProductDocumentId())
+        foreach ($originalProductPSEDocuments as $originalProductPSEDocument) {
+            $originalProductDocumentPosition = ProductDocumentQuery::create()
+                ->findPk($originalProductPSEDocument->getProductDocumentId())
                 ->getPosition();
 
-            $cpDocumentIdToLinkToPSE = ProductDocumentQuery::create()
-                ->filterByProductId($cpId)
-                ->findOneByPosition($opDocumentPosition)
+            $clonedProductDocumentIdToLinkToPSE = ProductDocumentQuery::create()
+                ->filterByProductId($clonedProductId)
+                ->findOneByPosition($originalProductDocumentPosition)
                 ->getId();
 
             $assoc = new ProductSaleElementsProductDocument();
             $assoc
-                ->setProductSaleElementsId($cpPSEId)
-                ->setProductDocumentId($cpDocumentIdToLinkToPSE)
+                ->setProductSaleElementsId($clonedProductPSEId)
+                ->setProductDocumentId($clonedProductDocumentIdToLinkToPSE)
                 ->save();
-        }
-    }
-
-    public function setCloneFeatureCombination($opId, $cpId, EventDispatcherInterface $dispatcher)
-    {
-        // Get original product features
-        $opFeatures = FeatureProductQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone product features
-        foreach ($opFeatures as $opFeature) {
-            $cpCreateFeatureEvent = new FeatureProductUpdateEvent($cpId, $opFeature->getFeatureId(), $opFeature->getFeatureAvId());
-            $dispatcher->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $cpCreateFeatureEvent);
-        }
-    }
-
-    public function setCloneProductAssociatedContent($opId, ProductModel $cp, EventDispatcherInterface $dispatcher)
-    {
-        // Get original product associated contents
-        $opAssocConts = ProductAssociatedContentQuery::create()
-            ->findByProductId($opId);
-
-        // Set clone product associated contents
-        foreach ($opAssocConts as $opAssocCont) {
-            $cpCreatePAC = new ProductAddContentEvent($cp, $opAssocCont->getContentId());
-            $dispatcher->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $cpCreatePAC);
-        }
-    }
-
-    public function setCloneI18n($lang, ProductModel $op, ProductModel $cp, EventDispatcherInterface $dispatcher)
-    {
-        // Get original product's I18ns
-        $opI18ns = ProductI18nQuery::create()
-            ->findById($op->getId());
-
-        $i = 1;
-
-        foreach ($opI18ns as $opI18n) {
-            $opSeoUrl = RewritingUrlQuery::create()
-                ->filterByViewId($op->getId())
-                ->findOneByViewLocale($opI18n->getLocale())
-                ->getUrl();
-
-            $SeoRewritings = RewritingUrlQuery::create()
-                ->find();
-
-            // Some tests not to duplicate URL
-            foreach ($SeoRewritings as $SeoRewriting) {
-                while ($SeoRewriting->getUrl() === $opSeoUrl) {
-                    if (substr($opSeoUrl, -4) === 'html') {
-                        $opSeoUrl = substr($opSeoUrl, 0, -5) . '-' . $i . '.html';
-                    } elseif (substr($opSeoUrl, -3) === 'htm') {
-                        $opSeoUrl = substr($opSeoUrl, 0, -4) . '-' . $i . '.htm';
-                    } elseif (substr($opSeoUrl, -3) === 'php') {
-                        $opSeoUrl = substr($opSeoUrl, 0, -4) . '-' . $i . '.php';
-                    }
-                }
-            }
-
-            // Update I18n if it's not the same language as the one at the product creation
-            if ($opI18n->getLocale() != $lang) {
-                $opPsePrice = ProductPriceQuery::create()
-                    ->findOneByProductSaleElementsId($op->getDefaultSaleElements()->getId());
-
-                $cpUpdateEvent = new ProductUpdateEvent($cp->getId());
-                $cpUpdateEvent
-                    ->setRef($cp->getRef())
-                    ->setVisible($cp->getVisible())
-                    ->setVirtual($cp->getVirtual())
-
-                    ->setLocale($opI18n->getLocale())
-                    ->setTitle($opI18n->getTitle())
-                    ->setChapo($opI18n->getChapo())
-                    ->setDescription($opI18n->getDescription())
-                    ->setPostscriptum($opI18n->getPostscriptum())
-
-                    ->setBasePrice($opPsePrice->getPrice())
-                    ->setCurrencyId($opPsePrice->getCurrencyId())
-                    ->setBaseWeight($op->getDefaultSaleElements()->getWeight())
-                    ->setTaxRuleId($op->getTaxRuleId())
-                    ->setBrandId($op->getBrandId())
-                    ->setDefaultCategory($op->getDefaultCategoryId());
-
-                $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE, $cpUpdateEvent);
-            }
-
-            // SEO info
-            $cpUpdateSeoEvent = new UpdateSeoEvent($cp->getId());
-            $cpUpdateSeoEvent
-                ->setLocale($opI18n->getLocale())
-                ->setMetaTitle($opI18n->getMetaTitle())
-                ->setMetaDescription($opI18n->getMetaDescription())
-                ->setMetaKeywords($opI18n->getMetaKeywords())
-                ->setUrl($opSeoUrl);
-            $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_SEO, $cpUpdateSeoEvent);
-
-            $i++;
         }
     }
 
@@ -922,7 +851,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::PRODUCT_CREATE                    => array("create", 128),
-            TheliaEvents::PRODUCT_CLONE_CREATE              => array("cloneProduct", 128),
+            TheliaEvents::PRODUCT_CLONE                     => array("cloneProduct", 128),
             TheliaEvents::PRODUCT_UPDATE                    => array("update", 128),
             TheliaEvents::PRODUCT_DELETE                    => array("delete", 128),
             TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => array("toggleVisibility", 128),

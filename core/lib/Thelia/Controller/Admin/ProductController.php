@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
+use Thelia\Core\Event\File\FileCloneEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
@@ -31,6 +32,7 @@ use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCloneEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
@@ -1816,38 +1818,54 @@ class ProductController extends AbstractSeoCrudController
      */
     public function cloneAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE])) {
             return $response;
         }
 
         // Initialize vars
-        $cpf = $this->createForm(AdminForm::PRODUCT_CLONE);
+        $cloneProductForm = $this->createForm(AdminForm::PRODUCT_CLONE);
         $lang = $this->getSession()->getLang()->getLocale();
 
         try {
             // Check the form against constraints violations
-            $form = $this->validateForm($cpf, "POST");
+            $form = $this->validateForm($cloneProductForm, "POST");
 
-            // Build and dispatch event
-            $event = new ProductCloneEvent(
+            $originalProduct = ProductQuery::create()
+                ->findPk($form->getData()['productId']);
+
+            // Build and dispatch product clone event
+
+            $productCloneEvent = new ProductCloneEvent(
                 $form->getData()['newRef'],
-                $form->getData()['productId'],
-                $lang
+                $lang,
+                $originalProduct
             );
+            $this->dispatch(TheliaEvents::PRODUCT_CLONE, $productCloneEvent);
 
-            $this->dispatch(TheliaEvents::PRODUCT_CLONE_CREATE, $event);
+            // Build and dispatch file clone event
+
+            $fileCloneEvent = new FileCloneEvent(
+                $originalProduct->getId(),
+                $productCloneEvent->getClonedProduct()
+            );
+            $this->dispatch(TheliaEvents::FILE_CLONE, $fileCloneEvent);
+
+            // Build and dispatch PSE clone event
+
+            $PSECloneEvent = new ProductSaleElementCloneEvent(
+                $originalProduct,
+                $productCloneEvent->getClonedProduct()
+            );
+            $this->dispatch(TheliaEvents::PSE_CLONE, $PSECloneEvent);
+
+            // Return
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',
-                array('product_id' => $event->getCpId())
+                array('product_id' => $productCloneEvent->getClonedProduct()->getId())
             );
         } catch (FormValidationException $e) {
             throw new \Exception($this->createStandardFormValidationErrorMessage($e));
         }
     }
-
-
-
-
-
 }

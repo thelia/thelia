@@ -10,74 +10,45 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Product;
+namespace Thelia\Core\Event\File;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Product;
 
-class ProductCloneEvent extends ActionEvent
+/**
+ * Event fired when cloning a product's files
+ *
+ * Class FileCloneEvent
+ * @package Thelia\Core\Event\File
+ * @author Etienne Perriere <eperriere@openstudio.fr>
+ */
+class FileCloneEvent extends ActionEvent
 {
-    protected $ref;
-    protected $lang;
-    protected $originalProduct = array();
+    protected $originalProductId;
     protected $clonedProduct = array();
 
     public function __construct(
-        $ref,
-        $lang,
-        $originalProduct
+        $originalProductId,
+        $clonedProduct
     ) {
-        $this->ref = $ref;
-        $this->lang = $lang;
-        $this->originalProduct = $originalProduct;
+        $this->originalProductId = $originalProductId;
+        $this->clonedProduct = $clonedProduct;
     }
 
     /**
      * @return mixed
      */
-    public function getRef()
+    public function getOriginalProductId()
     {
-        return $this->ref;
+        return $this->originalProductId;
     }
 
     /**
-     * @param mixed $ref
+     * @param mixed $originalProductId
      */
-    public function setRef($ref)
+    public function setOriginalProductId($originalProductId)
     {
-        $this->ref = $ref;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLang()
-    {
-        return $this->lang;
-    }
-
-    /**
-     * @param mixed $lang
-     */
-    public function setLang($lang)
-    {
-        $this->lang = $lang;
-    }
-
-    /**
-     * @return Product
-     */
-    public function getOriginalProduct()
-    {
-        return $this->originalProduct;
-    }
-
-    /**
-     * @param Product $originalProduct
-     */
-    public function setOriginalProduct($originalProduct)
-    {
-        $this->originalProduct = $originalProduct;
+        $this->originalProductId = $originalProductId;
     }
 
     /**
@@ -95,4 +66,6 @@ class ProductCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
+
+
 }

@@ -69,6 +69,10 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <service id="thelia.action.file" class="Thelia\Action\File">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
         <service id="thelia.action.image" class="Thelia\Action\Image">
             <argument type="service" id="thelia.file_manager"/>
             <tag name="kernel.event_subscriber"/>

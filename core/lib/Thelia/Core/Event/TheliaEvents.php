@@ -239,8 +239,6 @@ final class TheliaEvents
     const PRODUCT_CREATE            = "action.createProduct";
     const AFTER_CREATEPRODUCT  = "action.after_createproduct";
 
-    const PRODUCT_CLONE_CREATE = "action.createCloneProduct";
-
     const BEFORE_UPDATEPRODUCT = "action.before_updateProduct";
     const PRODUCT_UPDATE            = "action.updateProduct";
     const AFTER_UPDATEPRODUCT  = "action.after_updateProduct";
@@ -279,6 +277,15 @@ final class TheliaEvents
     const VIRTUAL_PRODUCT_ORDER_DOWNLOAD_RESPONSE = "action.virtualProduct.downloadResponse";
 
     // -- END PRODUCT EVENTS ---------------------------------------------------------
+
+
+    // -- CLONE EVENTS ------------------------------------------------------------
+
+    const PRODUCT_CLONE = "action.cloneProduct";
+    const FILE_CLONE = "action.cloneFile";
+    const PSE_CLONE = "action.clonePSE";
+
+    // -- END CLONE EVENTS ------------------------------------------------------------
 
 
     // -- SHIPPING ZONE MANAGEMENT

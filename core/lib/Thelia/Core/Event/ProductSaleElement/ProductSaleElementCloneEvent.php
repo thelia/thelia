@@ -10,58 +10,29 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event\Product;
+namespace Thelia\Core\Event\ProductSaleElement;
 
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Model\Product;
 
-class ProductCloneEvent extends ActionEvent
+/**
+ * Event fired when cloning a product's PSEs
+ *
+ * Class ProductSaleElementCloneEvent
+ * @package Thelia\Core\Event\ProductSaleElement
+ * @author Etienne Perriere <eperriere@openstudio.fr>
+ */
+class ProductSaleElementCloneEvent extends ActionEvent
 {
-    protected $ref;
-    protected $lang;
     protected $originalProduct = array();
     protected $clonedProduct = array();
 
     public function __construct(
-        $ref,
-        $lang,
-        $originalProduct
+        $originalProduct,
+        $clonedProduct
     ) {
-        $this->ref = $ref;
-        $this->lang = $lang;
         $this->originalProduct = $originalProduct;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRef()
-    {
-        return $this->ref;
-    }
-
-    /**
-     * @param mixed $ref
-     */
-    public function setRef($ref)
-    {
-        $this->ref = $ref;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getLang()
-    {
-        return $this->lang;
-    }
-
-    /**
-     * @param mixed $lang
-     */
-    public function setLang($lang)
-    {
-        $this->lang = $lang;
+        $this->clonedProduct = $clonedProduct;
     }
 
     /**
@@ -95,4 +66,6 @@ class ProductCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
+
+
 }
