@@ -262,6 +262,10 @@
     {javascripts file='assets/js/bootstrap/bootstrap.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+    
+    {javascripts file='assets/js/libs/jquery.toolbar.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
     {block name="javascript-initialization"}{/block}
     <script>
@@ -356,6 +360,18 @@
                 function initNavbarHeight() {
                     $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
                 }
+                
+                // Toolbar managment
+                $('.btn-toolbar').each(function() {
+                    var $btn = $(this),
+                        $content = $btn.next('.toolbar-options');
+
+                    $btn.toolbar({
+                        content: $content
+                    });
+
+                });
+
             });
         })(jQuery);
     </script>

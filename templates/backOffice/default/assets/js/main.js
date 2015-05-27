@@ -1,47 +1,7 @@
 (function($, window, document){
     
     $(function(){
-
-        // -- Init datepicker --
-        if($('.date').length){
-            //$('.date').datepicker();
-        }
-
-        // -- Init tablesorter --
-        /*if($('.tablesorter').length){
-            $('.tablesorter').tablesorter({                
-                widgets: ["filter", "stickyHeaders"],
-                widthFixed : false,
-                widgetOptions : {
-                    filter_cssFilter : 'input-medium form-control',
-                    filter_formatter : {
-                        
-                        2 : function($cell, indx){                            
-                            return $.tablesorter.filterFormatter.uiDateCompare( $cell, indx, {
-                                dateFormat: "dd/mm/yy",
-                                changeMonth : true,
-                                changeYear : true,
-                                compare : '='
-                            });
-                        },
-                        
-                        3 : function($cell, indx){
-                            return $.tablesorter.filterFormatter.uiRange( $cell, indx, {
-                                value: 1,
-                                min: 1,
-                                max: 50,
-                                delayed: true,
-                                valueToHeader: false,
-                                exactMatch: false
-                            });
-                        }
-                    }
-                }
-            });
-        }*/
-
-
-
+        
         // -- Bootstrap tooltip --
         if($('[rel="tooltip"]').length){            
             $('[rel="tooltip"]').tooltip();
@@ -146,7 +106,7 @@
                 console.log('An error occurred while reading from JSON file');
             });
 
-        }
+        }                    
 
     });
     
