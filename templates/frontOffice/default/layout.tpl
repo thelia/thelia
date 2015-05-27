@@ -271,6 +271,7 @@ GNU General Public License : http://www.gnu.org/licenses/
     <script>
        // fix path for addCartMessage
        // if you use '/' in your URL rewriting, the cart message is not displayed
+       // addCartMessageUrl is used in thelia.js to update the mini-cart content
        var addCartMessageUrl = "{url path='ajax/addCartMessage'}";
     </script>
     {block name="javascript-initialization"}{/block}
