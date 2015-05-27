@@ -474,7 +474,8 @@ var pseManager = (function($){
                 $.ajax({type: "POST", data: $(this).serialize(), url: url_action,
                     success: function(data){
                         $(".cart-container").html($(data).html());
-                        $.ajax({url:url_site + "ajax/addCartMessage", data:{ product_id: product_id, pse_id: pse_id },
+                        // addCartMessageUrl is initialized in layout.tpl
+                        $.ajax({url:addCartMessageUrl, data:{ product_id: product_id, pse_id: pse_id },
                             success: function (data) {
                                 // Hide all currently active bootbox dialogs
                                 bootbox.hideAll();
