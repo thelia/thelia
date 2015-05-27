@@ -63,6 +63,11 @@ class NewsletterController extends BaseFrontController
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
+            // If a success URL is defined in the form, redirect to it instead of re-displaying the same template.
+            if (null !== $response = $this->generateSuccessRedirect($form)) {
+                return $response;
+            }
+
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
