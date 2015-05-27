@@ -217,6 +217,19 @@ class UrlGenerator extends AbstractSmartyPlugin
         return $newUrl;
     }
 
+    protected function applyNoAmpAndTarget($params, $url)
+    {
+        $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+        $target = $this->getParam($params, 'target', null);
+        if ($noamp == null) {
+            $url = str_replace('&', '&amp;', $url);
+        }
+        if ($target != null) {
+            $url .= '#'.$target;
+        }
+        return $url;
+    }
+
     /**
      * Set the _previous_url request attribute, to define the previous URL, or
      * prevent saving the current URL as the previous one.
