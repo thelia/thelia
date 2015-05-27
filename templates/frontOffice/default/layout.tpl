@@ -269,11 +269,9 @@ GNU General Public License : http://www.gnu.org/licenses/
 
     {hook name="main.javascript-initialization"}
     <script>
-        var url_site = '{config key="url_site"}';
-        if(url_site.charAt(url_site.length-1) != '/') {
-            url_site = url_site + '/';
-        }
-    
+       // fix path for addCartMessage
+       // if you use '/' in your URL rewriting, the cart message is not displayed
+       var addCartMessageUrl = "{url path='ajax/addCartMessage'}";
     </script>
     {block name="javascript-initialization"}{/block}
 
