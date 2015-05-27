@@ -12,6 +12,7 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -121,33 +122,39 @@ class File extends BaseAction implements EventSubscriberInterface
                     // Set temporary source file as original one
                     $fs->rename($srcTmp, $srcPath);
 
-                    // Set clone files I18n
-                    foreach ($originalProductFileI18ns as $originalProductFileI18n) {
-                        // Update file with current I18n info. Update or create I18n according to existing or absent Locale in DB
-                        $clonedProductFile
-                            ->setLocale($originalProductFileI18n->getLocale())
-                            ->setTitle($originalProductFileI18n->getTitle())
-                            ->setDescription($originalProductFileI18n->getDescription())
-                            ->setChapo($originalProductFileI18n->getChapo())
-                            ->setPostscriptum($originalProductFileI18n->getPostscriptum());
-
-                        // Create and dispatch event
-                        $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
-                        $clonedProductUpdateFileEvent->setModel($clonedProductFile);
-
-                        switch ($type) {
-                            case 'images':
-                                $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
-                                break;
-
-                            case 'documents':
-                                $event->getDispatcher()->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
-                                break;
-                        }
-                    }
+                    // Clone file's I18n
+                    $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $clonedProduct, $type, $event->getDispatcher());
                 } else {
                     Tlog::getInstance()->addWarning("Failed to find media file $srcPath");
                 }
+            }
+        }
+    }
+
+    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $clonedProduct, $type, EventDispatcherInterface $dispatcher)
+    {
+        // Set clone files I18n
+        foreach ($originalProductFileI18ns as $originalProductFileI18n) {
+            // Update file with current I18n info. Update or create I18n according to existing or absent Locale in DB
+            $clonedProductFile
+                ->setLocale($originalProductFileI18n->getLocale())
+                ->setTitle($originalProductFileI18n->getTitle())
+                ->setDescription($originalProductFileI18n->getDescription())
+                ->setChapo($originalProductFileI18n->getChapo())
+                ->setPostscriptum($originalProductFileI18n->getPostscriptum());
+
+            // Create and dispatch event
+            $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
+            $clonedProductUpdateFileEvent->setModel($clonedProductFile);
+
+            switch ($type) {
+                case 'images':
+                    $dispatcher->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
+                    break;
+
+                case 'documents':
+                    $dispatcher->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
+                    break;
             }
         }
     }

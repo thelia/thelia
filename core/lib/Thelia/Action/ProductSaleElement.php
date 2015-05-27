@@ -309,7 +309,13 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
+    /*******************
+     * CLONING PROCESS *
+     *******************/
+
     /**
+     * Clone product's PSEs and associated datas
+     *
      * @param ProductSaleElementCloneEvent $event
      */
     public function clonePSE(ProductSaleElementCloneEvent $event)
@@ -338,7 +344,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findByProductSaleElementsId($originalProductPSE->getId());
 
             if (null !== $originalProductPSEImages) {
-                $this->setClonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
+                $this->clonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
             }
 
             // PSE associated documents
@@ -346,7 +352,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findByProductSaleElementsId($originalProductPSE->getId());
 
             if (null !== $originalProductPSEDocuments) {
-                $this->setClonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
+                $this->clonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
             }
         }
     }
@@ -388,7 +394,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
     }
 
-    public function setClonePSEAssociatedImages($clonedProductId, $clonedProductPSEId, $originalProductPSEImages)
+    public function clonePSEAssociatedImages($clonedProductId, $clonedProductPSEId, $originalProductPSEImages)
     {
         foreach ($originalProductPSEImages as $originalProductPSEImage) {
             $originalProductImagePosition = ProductImageQuery::create()
@@ -409,7 +415,7 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function setClonePSEAssociatedDocuments($clonedProductId, $clonedProductPSEId, $originalProductPSEDocuments)
+    public function clonePSEAssociatedDocuments($clonedProductId, $clonedProductPSEId, $originalProductPSEDocuments)
     {
         foreach ($originalProductPSEDocuments as $originalProductPSEDocument) {
             $originalProductDocumentPosition = ProductDocumentQuery::create()
@@ -429,6 +435,10 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->save();
         }
     }
+
+    /***************
+     * END CLONING *
+     ***************/
 
     /**
      * {@inheritDoc}

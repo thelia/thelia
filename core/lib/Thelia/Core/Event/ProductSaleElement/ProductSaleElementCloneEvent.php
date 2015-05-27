@@ -66,6 +66,4 @@ class ProductSaleElementCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
-
-
 }

@@ -66,6 +66,4 @@ class FileCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
-
-
 }
