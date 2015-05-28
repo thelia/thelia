@@ -41,7 +41,6 @@ class NewsletterController extends BaseFrontController
 
     public function subscribeAction()
     {
-        $errorMessage = false;
         $newsletterForm = $this->createForm(FrontForm::NEWSLETTER);
 
         try {
@@ -63,10 +62,23 @@ class NewsletterController extends BaseFrontController
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
-            // If a success URL is defined in the form, redirect to it instead of re-displaying the same template.
-            if (null !== $response = $this->generateSuccessRedirect($form)) {
-                return $response;
+            if ($this->getRequest()->isXmlHttpRequest()) {
+                $response = new JsonResponse([
+                    "success" => true,
+                    "message" => $this->getTranslator()->trans(
+                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                    )
+                ]);
+            } else {
+                // If a success URL is defined in the form, redirect to it, otherwise display the default newsletter template
+                if ($newsletterForm->hasSuccessUrl()) {
+                    $response = $this->generateSuccessRedirect($newsletterForm);
+                } else {
+                    $response = $this->generateRedirectFromRoute('newsletter.view');
+                }
             }
+
+            return $response;
 
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
@@ -74,34 +86,24 @@ class NewsletterController extends BaseFrontController
             Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
         }
 
-
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
-            $response = new JsonResponse();
+            return new JsonResponse([
+                "success" => false,
+                "message" => $errorMessage
+            ]);
+        }
 
-            if ($errorMessage) {
-                $response = $response->setContent(array(
-                    "success" => false,
-                    "message" => $errorMessage
-                ));
-            } else {
-                $response = $response->setContent(array(
-                    "success" => true,
-                    "message" => $this->getTranslator()->trans(
-                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
-                    )
-                ));
-            }
+        $newsletterForm->setErrorMessage($errorMessage);
+        $this->getParserContext()->setGeneralError($errorMessage);
 
-            return $response;
+        $this->getParserContext()->addForm($newsletterForm);
 
+        // If an error URL is defined in the form, redirect to it, otherwise use the defaut view
+        if ($newsletterForm->hasErrorUrl()) {
+            $response = $this->generateSuccessRedirect($newsletterForm);
         } else {
-            if ($errorMessage) {
-                $newsletterForm->setErrorMessage($errorMessage);
-                $this->getParserContext()->setGeneralError($errorMessage);
-            }
-
-            $this->getParserContext()->addForm($newsletterForm);
+            $response = $this->generateRedirectFromRoute('newsletter.view');
         }
     }
 }

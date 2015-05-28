@@ -24,8 +24,8 @@ use Thelia\Model\ConfigQuery;
  * @package HookSocial\Controller
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Configuration extends BaseAdminController {
-
+class Configuration extends BaseAdminController
+{
     public function saveAction()
     {
 
@@ -45,9 +45,11 @@ class Configuration extends BaseAdminController {
             $data = $vform->getData();
 
             foreach ($data as $name => $value) {
-                if (! in_array($name , array('success_url', 'error_message')))
+                if (! $form->isTemplateDefinedHiddenFieldName($name)) {
                     ConfigQuery::write("hooksocial_" . $name, $value, false, true);
-                Tlog::getInstance()->debug(sprintf("%s => %s", $name, $value ));
+                }
+
+                Tlog::getInstance()->debug(sprintf("%s => %s", $name, $value));
             }
         } catch (\Exception $e) {
             $resp["error"] = 1;
@@ -56,5 +58,4 @@ class Configuration extends BaseAdminController {
 
         return JsonResponse::create($resp);
     }
-
-} 
+}
