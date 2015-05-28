@@ -33,7 +33,6 @@ class TaxCreationForm extends BaseForm
     {
         if (! $this->container) {
             throw new \LogicException(Translator::getInstance()->trans("The container should not be null in this form. Please use the FormFactory to get an instance."));
-
         }
         /** @var TaxEngine $taxEngine */
         $taxEngine = $this->container->get('thelia.taxEngine');

@@ -90,7 +90,6 @@ abstract class BaseController extends ContainerAware
      */
     protected function pdfResponse($pdf, $fileName, $status = 200, $browser = false)
     {
-
         return Response::create(
             $pdf,
             $status,
