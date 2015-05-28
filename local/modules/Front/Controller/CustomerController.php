@@ -136,7 +136,7 @@ class CustomerController extends BaseFrontController
 
         // Redirect to error URL if defined
         if ($passwordLost->hasErrorUrl()) {
-            $this->generateErrorRedirect($passwordLost);
+            return $this->generateErrorRedirect($passwordLost);
         }
     }
 
@@ -228,7 +228,7 @@ class CustomerController extends BaseFrontController
 
             // Redirect to error URL if defined
             if ($customerCreation->hasErrorUrl()) {
-                $this->generateErrorRedirect($customerCreation);
+                return $this->generateErrorRedirect($customerCreation);
             }
         }
     }
@@ -308,7 +308,7 @@ class CustomerController extends BaseFrontController
 
             // Redirect to error URL if defined
             if ($customerPasswordUpdateForm->hasErrorUrl()) {
-                $this->generateErrorRedirect($customerPasswordUpdateForm);
+                return $this->generateErrorRedirect($customerPasswordUpdateForm);
             }
         }
     }
@@ -395,7 +395,7 @@ class CustomerController extends BaseFrontController
 
             // Redirect to error URL if defined
             if ($customerProfileUpdateForm->hasErrorUrl()) {
-                $this->generateErrorRedirect($customerProfileUpdateForm);
+                return $this->generateErrorRedirect($customerProfileUpdateForm);
             }
         }
     }
