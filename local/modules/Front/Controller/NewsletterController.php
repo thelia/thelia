@@ -41,6 +41,8 @@ class NewsletterController extends BaseFrontController
 
     public function subscribeAction()
     {
+        $errorMessage = false;
+
         $newsletterForm = $this->createForm(FrontForm::NEWSLETTER);
 
         try {
@@ -70,16 +72,11 @@ class NewsletterController extends BaseFrontController
                     )
                 ]);
             } else {
-                // If a success URL is defined in the form, redirect to it, otherwise display the default newsletter template
+                // If a success URL is defined in the form, redirect to it
                 if ($newsletterForm->hasSuccessUrl()) {
-                    $response = $this->generateSuccessRedirect($newsletterForm);
-                } else {
-                    $response = $this->generateRedirectFromRoute('newsletter.view');
+                    return $this->generateSuccessRedirect($newsletterForm);
                 }
             }
-
-            return $response;
-
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
@@ -94,16 +91,16 @@ class NewsletterController extends BaseFrontController
             ]);
         }
 
-        $newsletterForm->setErrorMessage($errorMessage);
-        $this->getParserContext()->setGeneralError($errorMessage);
+        if ($errorMessage) {
+            $newsletterForm->setErrorMessage($errorMessage);
+            $this->getParserContext()->setGeneralError($errorMessage);
+        }
 
         $this->getParserContext()->addForm($newsletterForm);
 
         // If an error URL is defined in the form, redirect to it, otherwise use the defaut view
-        if ($newsletterForm->hasErrorUrl()) {
-            $response = $this->generateSuccessRedirect($newsletterForm);
-        } else {
-            $response = $this->generateRedirectFromRoute('newsletter.view');
+        if ($errorMessage && $newsletterForm->hasErrorUrl()) {
+            return $this->generateErrorRedirect($newsletterForm);
         }
     }
 }

@@ -93,6 +93,11 @@ class AddressController extends BaseFrontController
                 ->addForm($addressCreate)
                 ->setGeneralError($message)
             ;
+
+            // Redirect to error URL if defined
+            if ($addressCreate->hasErrorUrl()) {
+                return $this->generateErrorRedirect($addressCreate);
+            }
         }
     }
 
