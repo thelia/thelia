@@ -390,7 +390,7 @@ abstract class BaseController extends ContainerAware
      */
     protected function generateErrorRedirect(BaseForm $form = null)
     {
-        if (null !== $url = $this->retrieveSuccessUrl($form)) {
+        if (null !== $url = $this->retrieveErrorUrl($form)) {
             return $this->generateRedirect($url);
         }
 
