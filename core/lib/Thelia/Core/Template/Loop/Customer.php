@@ -13,6 +13,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -21,6 +22,8 @@ use Thelia\Core\Template\Element\SearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CustomerQuery;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Model\Map\NewsletterTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -74,7 +77,8 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                     ))
                 ),
                 'lastname'
-            )
+            ),
+            Argument::createBooleanOrBothTypeArgument("newsletter", Type\BooleanOrBothType::ANY)
         );
     }
 
@@ -121,6 +125,26 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
     public function buildModelCriteria()
     {
         $search = CustomerQuery::create();
+
+        // Join newsletter
+        $newsletter = $this->getNewsletter();
+
+        // if newsletter === "*" or false, it'll be a left join
+        $join = new Join(
+            CustomerTableMap::EMAIL,
+            NewsletterTableMap::EMAIL,
+            true === $newsletter ? Criteria::INNER_JOIN : Criteria::LEFT_JOIN
+        );
+
+        $search
+            ->addJoinObject($join)
+            ->withColumn("IF(ISNULL(".NewsletterTableMap::EMAIL."), 0, 1)", "is_registered_to_newsletter")
+        ;
+
+        // If "*" === $newsletter, no filter will be applied, so it won't change anything
+        if (false === $newsletter) {
+            $search->having("is_registered_to_newsletter = 0");
+        }
 
         $current = $this->getCurrent();
 
@@ -206,6 +230,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Customer $customer */
         foreach ($loopResult->getResultDataCollection() as $customer) {
             $loopResultRow = new LoopResultRow($customer);
 
@@ -219,6 +244,7 @@ class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoop
                 ->set("RESELLER", $customer->getReseller())
                 ->set("SPONSOR", $customer->getSponsor())
                 ->set("DISCOUNT", $customer->getDiscount())
+                ->set("NEWSLETTER", $customer->getVirtualColumn("is_registered_to_newsletter"))
             ;
             $this->addOutputFields($loopResultRow, $customer);
 
