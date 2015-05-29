@@ -66,6 +66,8 @@
         <loop class="Thelia\Core\Template\Loop\Export" name="export" />
         <loop class="Thelia\Core\Template\Loop\Sale" name="sale"/>
         <loop class="Thelia\Core\Template\Loop\ModuleConfig" name="module-config"/>
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElementsDocument" name="product-sale-elements-document" />
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElementsImage" name="product-sale-elements-image" />
     </loops>
 
 </config>
