@@ -40,11 +40,10 @@ class File extends BaseAction implements EventSubscriberInterface
     {
         $originalProductId = $event->getOriginalProductId();
         $clonedProduct = $event->getClonedProduct();
-        $types = ['images', 'documents'];
 
         $fs = new Filesystem();
 
-        foreach ($types as $type) {
+        foreach ($event->getTypes() as $type) {
             switch ($type) {
                 case 'images':
                     $originalProductFiles = ProductImageQuery::create()

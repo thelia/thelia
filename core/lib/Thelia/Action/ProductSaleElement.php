@@ -344,7 +344,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findByProductSaleElementsId($originalProductPSE->getId());
 
             if (null !== $originalProductPSEImages) {
-                $this->clonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
+                $this->clonePSEAssociatedFiles($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages, $type = 'image');
+                //$this->clonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
             }
 
             // PSE associated documents
@@ -352,7 +353,8 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
                 ->findByProductSaleElementsId($originalProductPSE->getId());
 
             if (null !== $originalProductPSEDocuments) {
-                $this->clonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
+                $this->clonePSEAssociatedFiles($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments, $type = 'document');
+                //$this->clonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
             }
         }
     }
@@ -392,6 +394,57 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
 
         $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
+    }
+
+    public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
+    {
+        foreach ($originalProductPSEFiles as $originalProductPSEFile) {
+
+            // Get file's original position
+            switch ($type) {
+                case 'image':
+                    $originalProductFilePositionQuery = ProductImageQuery::create();
+                    $originalProductPSEFileId = $originalProductPSEFile->getProductImageId();
+                    break;
+                case 'document':
+                    $originalProductFilePositionQuery = ProductDocumentQuery::create();
+                    $originalProductPSEFileId = $originalProductPSEFile->getProductDocumentId();
+                    break;
+            }
+            $originalProductFilePosition = $originalProductFilePositionQuery
+                ->select(['POSITION'])
+                ->findPk($originalProductPSEFileId);
+
+            // Get cloned file ID to link to the cloned PSE
+            switch ($type) {
+                case 'image':
+                    $clonedProductFileIdToLinkToPSEQuery = ProductImageQuery::create();
+                    break;
+                case 'document':
+                    $clonedProductFileIdToLinkToPSEQuery = ProductDocumentQuery::create();
+                    break;
+            }
+            $clonedProductFileIdToLinkToPSE = $clonedProductFileIdToLinkToPSEQuery
+                ->filterByProductId($clonedProductId)
+                ->filterByPosition($originalProductFilePosition)
+                ->select(['ID'])
+                ->findOne();
+
+            // Save association
+            switch ($type) {
+                case 'image':
+                    $assoc = new ProductSaleElementsProductImage();
+                    $assoc->setProductImageId($clonedProductFileIdToLinkToPSE);
+                    break;
+                case 'document':
+                    $assoc = new ProductSaleElementsProductDocument();
+                    $assoc->setProductDocumentId($clonedProductFileIdToLinkToPSE);
+                    break;
+            }
+            $assoc
+                ->setProductSaleElementsId($clonedProductPSEId)
+                ->save();
+        }
     }
 
     public function clonePSEAssociatedImages($clonedProductId, $clonedProductPSEId, $originalProductPSEImages)

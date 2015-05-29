@@ -26,13 +26,16 @@ class ProductSaleElementCloneEvent extends ActionEvent
 {
     protected $originalProduct = array();
     protected $clonedProduct = array();
+    protected $types = array();
 
     public function __construct(
         $originalProduct,
-        $clonedProduct
+        $clonedProduct,
+        $types
     ) {
         $this->originalProduct = $originalProduct;
         $this->clonedProduct = $clonedProduct;
+        $this->types = $types;
     }
 
     /**
@@ -66,4 +69,21 @@ class ProductSaleElementCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * @param array $types
+     */
+    public function setTypes($types)
+    {
+        $this->types = $types;
+    }
+
 }

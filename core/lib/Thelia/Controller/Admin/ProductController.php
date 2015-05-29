@@ -15,7 +15,6 @@ namespace Thelia\Controller\Admin;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\FeatureProduct\FeatureProductDeleteEvent;
 use Thelia\Core\Event\FeatureProduct\FeatureProductUpdateEvent;
-use Thelia\Core\Event\File\FileCloneEvent;
 use Thelia\Core\Event\MetaData\MetaDataCreateOrUpdateEvent;
 use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
@@ -32,7 +31,6 @@ use Thelia\Core\Event\Product\ProductEvent;
 use Thelia\Core\Event\Product\ProductSetTemplateEvent;
 use Thelia\Core\Event\Product\ProductToggleVisibilityEvent;
 use Thelia\Core\Event\Product\ProductUpdateEvent;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCloneEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
@@ -1834,31 +1832,12 @@ class ProductController extends AbstractSeoCrudController
                 ->findPk($form->getData()['productId']);
 
             // Build and dispatch product clone event
-
             $productCloneEvent = new ProductCloneEvent(
                 $form->getData()['newRef'],
                 $lang,
                 $originalProduct
             );
             $this->dispatch(TheliaEvents::PRODUCT_CLONE, $productCloneEvent);
-
-            // Build and dispatch file clone event
-
-            $fileCloneEvent = new FileCloneEvent(
-                $originalProduct->getId(),
-                $productCloneEvent->getClonedProduct()
-            );
-            $this->dispatch(TheliaEvents::FILE_CLONE, $fileCloneEvent);
-
-            // Build and dispatch PSE clone event
-
-            $PSECloneEvent = new ProductSaleElementCloneEvent(
-                $originalProduct,
-                $productCloneEvent->getClonedProduct()
-            );
-            $this->dispatch(TheliaEvents::PSE_CLONE, $PSECloneEvent);
-
-            // Return
 
             return $this->generateRedirectFromRoute(
                 'admin.products.update',

@@ -18,9 +18,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Thelia\Core\Event\File\FileCloneEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
+use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCloneEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
@@ -141,17 +143,46 @@ class Product extends BaseAction implements EventSubscriberInterface
         $originalProductDefaultPrice = ProductPriceQuery::create()
             ->findOneByProductSaleElementsId($originalProduct->getDefaultSaleElements()->getId());
 
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        $types = ['images', 'documents'];
+
         // Cloning process
+        try {
+            $clonedProduct = $this->createClone($originalProduct, $originalProductDefaultI18n,
+                $originalProductDefaultPrice, $event);
 
-        $clonedProduct = $this->createClone($originalProduct, $originalProductDefaultI18n, $originalProductDefaultPrice, $event);
+            $this->removeCloneDefaultPSE($clonedProduct, $originalProductDefaultPrice, $dispatcher);
 
-        $this->removeCloneDefaultPSE($clonedProduct, $originalProductDefaultPrice, $dispatcher);
+            $clonedProduct = $this->updateClone($clonedProduct, $originalProduct, $originalProductDefaultPrice,
+                $dispatcher);
 
-        $clonedProduct = $this->updateClone($clonedProduct, $originalProduct, $originalProductDefaultPrice, $dispatcher);
+            $this->cloneFeatureCombination($originalProduct->getId(), $clonedProduct->getId(), $dispatcher);
 
-        $this->cloneFeatureCombination($originalProduct->getId(), $clonedProduct->getId(), $dispatcher);
+            $this->cloneAssociatedContent($originalProduct->getId(), $clonedProduct, $dispatcher);
 
-        $this->cloneAssociatedContent($originalProduct->getId(), $clonedProduct, $dispatcher);
+            // Build and dispatch file clone event
+            $fileCloneEvent = new FileCloneEvent(
+                $originalProduct->getId(),
+                $clonedProduct,
+                $types
+            );
+            $dispatcher->dispatch(TheliaEvents::FILE_CLONE, $fileCloneEvent);
+
+            // Build and dispatch PSE clone event
+            $PSECloneEvent = new ProductSaleElementCloneEvent(
+                $originalProduct,
+                $clonedProduct,
+                $types
+            );
+            $dispatcher->dispatch(TheliaEvents::PSE_CLONE, $PSECloneEvent);
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
     }
 
     public function createClone(ProductModel $originalProduct, $originalProductDefaultI18n, $originalProductDefaultPrice, ProductCloneEvent $event)

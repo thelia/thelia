@@ -26,13 +26,16 @@ class FileCloneEvent extends ActionEvent
 {
     protected $originalProductId;
     protected $clonedProduct = array();
+    protected $types = array();
 
     public function __construct(
         $originalProductId,
-        $clonedProduct
+        $clonedProduct,
+        $types
     ) {
         $this->originalProductId = $originalProductId;
         $this->clonedProduct = $clonedProduct;
+        $this->types = $types;
     }
 
     /**
@@ -66,4 +69,21 @@ class FileCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+    /**
+     * @param array $types
+     */
+    public function setTypes($types)
+    {
+        $this->types = $types;
+    }
+
 }
