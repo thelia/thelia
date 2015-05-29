@@ -9,7 +9,7 @@ return array(
     'An account at %store_name has been created by one of our managers.' => 'Un compte client %store_name a été créé pour vous.',
     'Billing address:' => 'Adresse de facturation : ',
     'Copyright' => 'Copyright',
-    'Customer billing address:' => 'Addresse de facturation',
+    'Customer billing address:' => 'Adresse de facturation',
     'Customer delivery address:' => 'Adresse de livraison',
     'Delivery address:' => 'Adresse de livraison : ',
     'Delivery method:' => 'Livré par : ',
