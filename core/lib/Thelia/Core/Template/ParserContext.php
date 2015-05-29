@@ -109,8 +109,10 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
 
+        $this->set(get_class($form) . ":" . $form->getType(), $form);
+
         // Set form error information
-        $formErrorInformation[get_class($form)] = [
+        $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
             'data'         => $form->getForm()->getData(),
             'hasError'     => $form->hasError(),
             'errorMessage' => $form->getErrorMessage(),
@@ -135,8 +137,8 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
 
-        if (isset($formErrorInformation[$formClass])) {
-            $formInfo = $formErrorInformation[$formClass];
+        if (isset($formErrorInformation[$formClass.":".$formType])) {
+            $formInfo = $formErrorInformation[$formClass.":".$formType];
 
             if (is_array($formInfo['data'])) {
                 $form = $this->formFactory->createForm($formId, $formType, $formInfo['data']);
@@ -162,6 +164,8 @@ class ParserContext implements \IteratorAggregate
 
                 return $form;
             }
+        } elseif (isset ($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
+            return $this->store[$formClass . ":" . $formType];
         }
 
         return null;
