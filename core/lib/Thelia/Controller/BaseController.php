@@ -355,10 +355,25 @@ abstract class BaseController extends ContainerAware
     {
         $response = null;
         if (null !== $url = $this->retrieveSuccessUrl($form)) {
-            $response = $this->generateRedirect($url);
+            return $this->generateRedirect($url);
         }
 
-        return $response;
+        return null;
+    }
+
+    /**
+     * create an instance of RedirectReponse if a success url is present, return null otherwise
+     *
+     * @param  BaseForm                                        $form
+     * @return null|\Symfony\Component\HttpFoundation\Response
+     */
+    protected function generateErrorRedirect(BaseForm $form = null)
+    {
+        if (null !== $url = $this->retrieveErrorUrl($form)) {
+            return $this->generateRedirect($url);
+        }
+
+        return null;
     }
 
     /**
