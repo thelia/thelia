@@ -49,7 +49,7 @@ class ConfigStoreController extends BaseAdminController
             return $response;
         }
 
-        $error_msg = false;
+        $error_msg = $ex = false;
         $response = null;
         $configStoreForm = $this->createForm(AdminForm::CONFIG_STORE);
 
@@ -60,7 +60,7 @@ class ConfigStoreController extends BaseAdminController
 
             // Update store
             foreach ($data as $name => $value) {
-                if (! in_array($name, array('success_url', 'error_message'))) {
+                if (! $configStoreForm->isTemplateDefinedHiddenFieldName($name)) {
                     ConfigQuery::write($name, $value, false);
                 }
             }
