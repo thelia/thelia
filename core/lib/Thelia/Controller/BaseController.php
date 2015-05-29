@@ -90,7 +90,6 @@ abstract class BaseController extends ContainerAware
      */
     protected function pdfResponse($pdf, $fileName, $status = 200, $browser = false)
     {
-
         return Response::create(
             $pdf,
             $status,
@@ -299,11 +298,34 @@ abstract class BaseController extends ContainerAware
      */
     protected function retrieveSuccessUrl(BaseForm $form = null)
     {
+        return $this->retrieveFormBasedUrl('success_url', $form);
+    }
+
+    /**
+     * Search error url in a form if present, in the query string otherwise
+     *
+     * @param  BaseForm          $form
+     * @return mixed|null|string
+     */
+    protected function retrieveErrorUrl(BaseForm $form = null)
+    {
+        return $this->retrieveFormBasedUrl('error_url', $form);
+    }
+    /**
+     * Search url in a form parameter, or in a request parameter.
+     *
+     * @param  string $parameterName the form parameter name, or request parameter name.
+     * @param  BaseForm  $form the form
+     * @return mixed|null|string
+     */
+    protected function retrieveFormBasedUrl($parameterName, BaseForm $form = null)
+    {
         $url = null;
+
         if ($form != null) {
-            $url = $form->getSuccessUrl();
+            $url = $form->getFormDefinedUrl($parameterName, $form);
         } else {
-            $url = $this->getRequest()->get("success_url");
+            $url = $this->getRequest()->get($parameterName);
         }
 
         return $url;
@@ -353,7 +375,6 @@ abstract class BaseController extends ContainerAware
      */
     protected function generateSuccessRedirect(BaseForm $form = null)
     {
-        $response = null;
         if (null !== $url = $this->retrieveSuccessUrl($form)) {
             return $this->generateRedirect($url);
         }
@@ -369,7 +390,7 @@ abstract class BaseController extends ContainerAware
      */
     protected function generateErrorRedirect(BaseForm $form = null)
     {
-        if (null !== $url = $this->retrieveErrorUrl($form)) {
+        if (null !== $url = $this->retrieveSuccessUrl($form)) {
             return $this->generateRedirect($url);
         }
 
