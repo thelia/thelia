@@ -386,8 +386,7 @@ class ModuleValidator
         return $dependantModules;
     }
 
-    public function getCurrentModuleDependencies()
-    {
+    public function getCurrentModuleDependencies(){
         $dependencies = [];
         if (0 !== count($this->moduleDescriptor->required)) {
             foreach ($this->moduleDescriptor->required->module as $dependency) {

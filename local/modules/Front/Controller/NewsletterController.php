@@ -42,7 +42,6 @@ class NewsletterController extends BaseFrontController
     public function subscribeAction()
     {
         $errorMessage = false;
-
         $newsletterForm = $this->createForm(FrontForm::NEWSLETTER);
 
         try {
@@ -64,43 +63,40 @@ class NewsletterController extends BaseFrontController
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
-            if ($this->getRequest()->isXmlHttpRequest()) {
-                $response = new JsonResponse([
-                    "success" => true,
-                    "message" => $this->getTranslator()->trans(
-                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
-                    )
-                ]);
-            } else {
-                // If a success URL is defined in the form, redirect to it
-                if ($newsletterForm->hasSuccessUrl()) {
-                    return $this->generateSuccessRedirect($newsletterForm);
-                }
-            }
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
             Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
         }
 
+
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
-            return new JsonResponse([
-                "success" => false,
-                "message" => $errorMessage
-            ]);
-        }
+            $response = new JsonResponse();
 
-        if ($errorMessage) {
-            $newsletterForm->setErrorMessage($errorMessage);
-            $this->getParserContext()->setGeneralError($errorMessage);
-        }
+            if ($errorMessage) {
+                $response = $response->setContent(array(
+                    "success" => false,
+                    "message" => $errorMessage
+                ));
+            } else {
+                $response = $response->setContent(array(
+                    "success" => true,
+                    "message" => $this->getTranslator()->trans(
+                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                    )
+                ));
+            }
 
-        $this->getParserContext()->addForm($newsletterForm);
+            return $response;
 
-        // If an error URL is defined in the form, redirect to it, otherwise use the defaut view
-        if ($errorMessage && $newsletterForm->hasErrorUrl()) {
-            return $this->generateErrorRedirect($newsletterForm);
+        } else {
+            if ($errorMessage) {
+                $newsletterForm->setErrorMessage($errorMessage);
+                $this->getParserContext()->setGeneralError($errorMessage);
+            }
+
+            $this->getParserContext()->addForm($newsletterForm);
         }
     }
 }

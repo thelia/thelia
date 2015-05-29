@@ -74,10 +74,5 @@ class ContactController extends BaseFrontController
             ->addForm($contactForm)
             ->setGeneralError($error_message)
         ;
-
-        // Redirect to error URL if defined
-        if ($contactForm->hasErrorUrl()) {
-            return $this->generateErrorRedirect($contactForm);
-        }
     }
 }
