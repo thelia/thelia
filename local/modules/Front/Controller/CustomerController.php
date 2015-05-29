@@ -34,6 +34,8 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Form\CustomerLogin;
+use Thelia\Form\CustomerPasswordUpdateForm;
+use Thelia\Form\CustomerProfileUpdateForm;
 use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
@@ -133,11 +135,6 @@ class CustomerController extends BaseFrontController
             ->addForm($passwordLost)
             ->setGeneralError($message)
         ;
-
-        // Redirect to error URL if defined
-        if ($passwordLost->hasErrorUrl()) {
-            return $this->generateErrorRedirect($passwordLost);
-        }
     }
 
     public function newPasswordSentAction()
@@ -225,16 +222,12 @@ class CustomerController extends BaseFrontController
                 ->addForm($customerCreation)
                 ->setGeneralError($message)
             ;
-
-            // Redirect to error URL if defined
-            if ($customerCreation->hasErrorUrl()) {
-                return $this->generateErrorRedirect($customerCreation);
-            }
         }
     }
 
     /**
-     * Prepare customer data update.
+     * Update customer data. On success, redirect to success_url if exists.
+     * Otherwise, display the same view again.
      */
     public function viewAction()
     {
@@ -305,11 +298,6 @@ class CustomerController extends BaseFrontController
                 ->addForm($customerPasswordUpdateForm)
                 ->setGeneralError($message)
             ;
-
-            // Redirect to error URL if defined
-            if ($customerPasswordUpdateForm->hasErrorUrl()) {
-                return $this->generateErrorRedirect($customerPasswordUpdateForm);
-            }
         }
     }
 
@@ -392,11 +380,6 @@ class CustomerController extends BaseFrontController
                 ->addForm($customerProfileUpdateForm)
                 ->setGeneralError($message)
             ;
-
-            // Redirect to error URL if defined
-            if ($customerProfileUpdateForm->hasErrorUrl()) {
-                return $this->generateErrorRedirect($customerProfileUpdateForm);
-            }
         }
     }
 
