@@ -13,6 +13,9 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
+use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Controller\Api\BaseApiController;
+use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Model\ConfigQuery;
 
 /**
@@ -25,6 +28,9 @@ use Thelia\Model\ConfigQuery;
 class Request extends BaseRequest
 {
     private $resolvedPathInfo;
+
+    /** @var string */
+    protected $controllerType = null;
 
     /**
      * Filter PathInfo to allow slash ending uri
@@ -97,5 +103,59 @@ class Request extends BaseRequest
         }
 
         return $string;
+    }
+
+    /**
+     * @param string $controllerType
+     */
+    public function setControllerType($controllerType)
+    {
+        $this->controllerType = $controllerType;
+    }
+
+    /**
+     * Detects where does the request
+     *
+     * <code>
+     * // Detect if the request comes from the api
+     * if ($request->fromControllerType(BaseApiController::CONTROLLER_TYPE)) {...}
+     * </code>
+     *
+     * @param $controllerType
+     * @return bool
+     */
+    public function fromControllerType($controllerType)
+    {
+        return $this->controllerType === $controllerType;
+    }
+
+    /**
+     * Detect if the request comes from the api
+     *
+     * @return bool
+     */
+    public function fromApi()
+    {
+        return $this->controllerType === BaseApiController::CONTROLLER_TYPE;
+    }
+
+    /**
+     * Detect if the request comes from the admin
+     *
+     * @return bool
+     */
+    public function fromAdmin()
+    {
+        return $this->controllerType === BaseAdminController::CONTROLLER_TYPE;
+    }
+
+    /**
+     * Detect if the request comes from the front
+     *
+     * @return bool
+     */
+    public function fromFront()
+    {
+        return $this->controllerType === BaseFrontController::CONTROLLER_TYPE;
     }
 }

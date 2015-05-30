@@ -22,6 +22,8 @@ use Thelia\Model\ModuleQuery;
 
 class BaseFrontController extends BaseController
 {
+    const CONTROLLER_TYPE = 'front';
+
     protected $currentRouter = "router.front";
 
     public function checkAuth()
@@ -29,6 +31,14 @@ class BaseFrontController extends BaseController
         if ($this->getSecurityContext()->hasCustomerUser() === false) {
             throw new RedirectException($this->retrieveUrlFromRouteId('customer.login.process'));
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
     }
 
     protected function checkCartNotEmpty()

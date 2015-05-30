@@ -31,6 +31,8 @@ use Thelia\Tools\URL;
 
 class BaseAdminController extends BaseController
 {
+    const CONTROLLER_TYPE = 'admin';
+
     const TEMPLATE_404 = "404";
 
     /**
@@ -80,6 +82,14 @@ class BaseAdminController extends BaseController
         }
 
         return $this->pageNotFound();
+    }
+
+    /**
+     * @return string
+     */
+    public function getControllerType()
+    {
+        return self::CONTROLLER_TYPE;
     }
 
     /**

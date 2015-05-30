@@ -576,6 +576,13 @@ abstract class BaseController extends ContainerAware
     }
 
     /**
+     * Return controller type
+     *
+     * @return string
+     */
+    abstract public function getControllerType();
+
+    /**
      * @param null|mixed $template
      * @return \Thelia\Core\Template\ParserInterface instance parser
      */

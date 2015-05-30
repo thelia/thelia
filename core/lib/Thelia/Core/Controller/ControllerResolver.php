@@ -16,6 +16,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseController
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Psr\Log\LoggerInterface;
+use Thelia\Controller\BaseController;
 
 /**
  * ControllerResolver that supports "a:b:c", "service:method" and class::method" notations in routes definition
@@ -76,7 +77,13 @@ class ControllerResolver extends BaseControllerResolver
             throw new \InvalidArgumentException(sprintf('Class "%s" does not exist.', $class));
         }
 
+        /** @var BaseController $controller */
         $controller = new $class();
+
+        $this->container->get('request')->setControllerType(
+            $controller->getControllerType()
+        );
+
         if ($controller instanceof ContainerAwareInterface) {
             $controller->setContainer($this->container);
         }
