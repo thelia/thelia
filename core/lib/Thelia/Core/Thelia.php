@@ -268,6 +268,20 @@ class Thelia extends Kernel
                 }
             }
 
+            $globalLoader = new XmlFileLoader($container, new FileLocator(THELIA_CONF_DIR));
+            $globalConfigPath = THELIA_CONF_DIR . DS . 'config.xml';
+
+            if (is_file($globalConfigPath) && is_readable($globalConfigPath)) {
+                $globalLoader->load('config.xml');
+            }
+
+            $globalEnvConfigFile = sprintf('config_%s.xml', $this->environment);
+            $globalEnvConfigPath = THELIA_CONF_DIR . DS . $globalEnvConfigFile;
+
+            if (is_file($globalEnvConfigPath) && is_readable($globalEnvConfigPath)) {
+                $globalLoader->load($globalEnvConfigPath);
+            }
+
             /** @var ParserInterface $parser */
             $parser = $container->getDefinition('thelia.parser');
 
