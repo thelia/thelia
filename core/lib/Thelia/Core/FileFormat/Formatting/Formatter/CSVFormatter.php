@@ -160,10 +160,10 @@ class CSVFormatter extends AbstractFormatter
         $result = array();
 
         if( count( $raw) > 0){
-            $keys = str_getcsv($raw[0], $this->delimiter);
+            $keys = str_getcsv($raw[0], $this->delimiter, $this->stringDelimiter);
             unset($raw[0]);
             foreach($raw as $line){
-                $result[] = array_combine($keys,str_getcsv($line, ';') );
+                $result[] = array_combine($keys,str_getcsv($line, $this->delimiter, $this->stringDelimiter) );
             }
         }
 
