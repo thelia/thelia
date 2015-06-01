@@ -345,7 +345,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             if (null !== $originalProductPSEImages) {
                 $this->clonePSEAssociatedFiles($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages, $type = 'image');
-                //$this->clonePSEAssociatedImages($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEImages);
             }
 
             // PSE associated documents
@@ -354,7 +353,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
 
             if (null !== $originalProductPSEDocuments) {
                 $this->clonePSEAssociatedFiles($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments, $type = 'document');
-                //$this->clonePSEAssociatedDocuments($clonedProduct->getId(), $clonedProductPSEId, $originalProductPSEDocuments);
             }
         }
     }
