@@ -153,17 +153,17 @@ class CSVFormatter extends AbstractFormatter
      */
     public function decode($rawData)
     {
-        $rawData = str_replace("\r".$this->lineReturn, $this->lineReturn, $rawData);
+        $rawData = str_replace("\r" . $this->lineReturn, $this->lineReturn, $rawData);
         $rawData = str_replace("\r", $this->lineReturn, $rawData);
         $raw = explode($this->lineReturn, $rawData);
 
         $result = array();
 
-        if( count( $raw) > 0){
+        if (count($raw) > 0) {
             $keys = str_getcsv($raw[0], $this->delimiter, $this->stringDelimiter);
             unset($raw[0]);
-            foreach($raw as $line){
-                $result[] = array_combine($keys,str_getcsv($line, $this->delimiter, $this->stringDelimiter) );
+            foreach ($raw as $line) {
+                $result[] = array_combine($keys, str_getcsv($line, $this->delimiter, $this->stringDelimiter));
             }
         }
 
