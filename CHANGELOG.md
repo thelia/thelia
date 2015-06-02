@@ -4,6 +4,7 @@
 - New translation domain that allows to redefine translation strings globally or specifically to a domain. By the way, we can safely update Thelia, modules, templates without overwriting specific translations.       
 - Remove ```currency_rate_update_url``` in ```setup/insert.sql```
 - Add Cellphone to order address
+- Add AnyListTypeArgument for loop argument
 
 # 2.2.0-alpha1
 

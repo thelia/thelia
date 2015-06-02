@@ -142,6 +142,28 @@ class Argument
         );
     }
 
+    /**
+     * This method is available from Thelia 2.2 version
+     *
+     * @param $name
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     * @return Argument
+     */
+    public static function createAnyListTypeArgument($name, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\AnyListType()
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
     public static function createEnumListTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
     {
         return new Argument(
