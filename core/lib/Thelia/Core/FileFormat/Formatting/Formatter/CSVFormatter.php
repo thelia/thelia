@@ -156,33 +156,11 @@ class CSVFormatter extends AbstractFormatter
         $raw = explode($this->lineReturn, $rawData);
         $decoded = [];
 
-        if (count($raw) > 0) {
-            $keys = explode($this->delimiter, array_shift($raw));
-            $keysLength = count($keys);
-
-            foreach ($keys as &$key) {
-                $key = trim($key, $this->stringDelimiter);
-            }
-
-            $columns = count($keys);
-
-            while (null !== $row = array_shift($raw)) {
-                $newRow = [];
-                $row = explode($this->delimiter, $row);
-
-                if (count($row) >= $keysLength) {
-                    for ($i = 0; $i < $columns; ++$i) {
-                        $value = trim($row[$i], $this->stringDelimiter);
-
-                        if (false !== $unserialized = @unserialize($row[$i])) {
-                            $value = $unserialized;
-                        }
-
-                        $newRow[$keys[$i]] = $value;
-                    }
-
-                    $decoded[] = $newRow;
-                }
+        if( count( $raw) > 0){
+            $keys = str_getcsv($raw[0], $this->delimiter, $this->stringDelimiter);
+            unset($raw[0]);
+            foreach($raw as $line){
+                $result[] = array_combine($keys,str_getcsv($line, $this->delimiter, $this->stringDelimiter) );
             }
         }
 
