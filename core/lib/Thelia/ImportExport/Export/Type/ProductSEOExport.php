@@ -20,8 +20,8 @@ use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
 use Thelia\Model\Product;
-use Thelia\Model\ProductAssociatedContentQuery;
 use Thelia\Model\Lang;
+use Thelia\Model\ProductQuery;
 
 /**
  * Class ProductSEOExport
@@ -61,25 +61,14 @@ class ProductSEOExport extends ExportHandler
     {
         $locale = $this->locale = $lang->getLocale();
 
-        /**
-         * Join objects
-         */
+        $query = ProductQuery::create();
         $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
         $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
 
-        $query = ProductAssociatedContentQuery::create()
-            ->useProductQuery()
-                ->addJoinObject($productJoin, "product_join")
-                ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
-                ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
-                ->addAsColumn("product_REF", ProductTableMap::REF)
-                ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
-                ->addAsColumn("product_seo_TITLE", ProductI18nTableMap::META_TITLE)
-                ->addAsColumn("product_seo_META_DESCRIPTION", ProductI18nTableMap::META_DESCRIPTION)
-                ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
-            ->endUse()
+        $query
             ->addJoinObject($urlJoin, "rewriting_url_join")
-            ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . " = ?", $locale, null, \PDO::PARAM_STR)
+            ->addJoinCondition("rewriting_url_join", RewritingUrlTableMap::VIEW_LOCALE . " = ?", $locale, null,
+                \PDO::PARAM_STR)
             ->addJoinCondition(
                 "rewriting_url_join",
                 RewritingUrlTableMap::VIEW . " = ?",
@@ -87,7 +76,17 @@ class ProductSEOExport extends ExportHandler
                 null,
                 \PDO::PARAM_STR
             )
-            ->addJoinCondition("rewriting_url_join", "ISNULL(".RewritingUrlTableMap::REDIRECTED.")")
+            ->addJoinCondition("rewriting_url_join", "ISNULL(" . RewritingUrlTableMap::REDIRECTED . ")")
+            ->addJoinObject($productJoin, "product_join")
+            ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR);
+
+        $query
+            ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
+            ->addAsColumn("product_REF", ProductTableMap::REF)
+            ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
+            ->addAsColumn("product_seo_TITLE", ProductI18nTableMap::META_TITLE)
+            ->addAsColumn("product_seo_META_DESCRIPTION", ProductI18nTableMap::META_DESCRIPTION)
+            ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
             ->addAsColumn("product_URL", RewritingUrlTableMap::URL)
             ->select([
                 "product_REF",
@@ -97,8 +96,7 @@ class ProductSEOExport extends ExportHandler
                 "product_seo_TITLE",
                 "product_seo_META_DESCRIPTION",
                 "product_seo_META_KEYWORDS",
-            ])
-        ;
+            ]);
 
         return $query;
     }
