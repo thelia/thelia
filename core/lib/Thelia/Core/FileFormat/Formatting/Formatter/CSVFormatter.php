@@ -156,7 +156,7 @@ class CSVFormatter extends AbstractFormatter
         $rawData = str_replace("\r" . $this->lineReturn, $this->lineReturn, $rawData);
         $rawData = str_replace("\r", $this->lineReturn, $rawData);
         $raw = explode($this->lineReturn, $rawData);
-        $decoded = [];
+        $result = [];
 
         if (count($raw) > 0) {
             $keys = str_getcsv($raw[0], $this->delimiter, $this->stringDelimiter);
@@ -166,7 +166,7 @@ class CSVFormatter extends AbstractFormatter
             }
         }
 
-        return (new FormatterData())->setData($decoded);
+        return (new FormatterData())->setData($result);
     }
 
     /**
