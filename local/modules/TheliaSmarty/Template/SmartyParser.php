@@ -450,7 +450,7 @@ class SmartyParser extends Smarty implements ParserInterface
         ]);
 
         $this->parserContext->setCurrentTemplateInfo($realTemplateName, $parameters);
-
+        
         return $this->internalRenderer('file', $realTemplateName, $parameters, $compressOutput);
     }
 
