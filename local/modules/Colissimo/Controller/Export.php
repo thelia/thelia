@@ -130,9 +130,10 @@ class Export extends BaseAdminController
             }
 
             return Response::create(
-                $export,
+                utf8_decode($export),
                 200,
                 array(
+                    "Content-Encoding"=>"ISO-8889-1",
                     "Content-Type"=>"application/csv-tab-delimited-table",
                     "Content-disposition"=>"filename=export.csv"
                 )
