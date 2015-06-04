@@ -63,6 +63,11 @@ abstract class BaseLoop
     private static $cacheCount = [];
 
     /**
+     * @var \Thelia\Cache\Loop\CacheLoopInterface
+     */
+    private $cache;
+
+    /**
      * Create a new Loop
      *
      * @param ContainerInterface $container
@@ -78,6 +83,8 @@ abstract class BaseLoop
         $this->request = $container->get('request');
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
+
+        $this->cache = $container->get('thelia.cache.loop');
 
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
@@ -250,6 +257,11 @@ abstract class BaseLoop
         return $arg;
     }
 
+    public function getArgs()
+    {
+        return $this->args;
+    }
+
     /**
      * Return a loop argument value
      *
@@ -416,8 +428,8 @@ abstract class BaseLoop
     {
         $hash = $this->args->getHash();
 
-        if (($isCaching = $this->isCaching()) && isset(self::$cacheLoopResult[$hash])) {
-            return self::$cacheLoopResult[$hash];
+        if (($isCaching = $this->isCaching()) && $this->cache->has($this)) {
+            return $this->cache->get($this);
         }
 
         $results = [];
@@ -454,7 +466,7 @@ abstract class BaseLoop
         $parsedResults = $this->parseResults($loopResult);
 
         if ($isCaching) {
-            self::$cacheLoopResult[$hash] = $parsedResults;
+            $this->cache->set($this, $parsedResults);
         }
 
         return $parsedResults;

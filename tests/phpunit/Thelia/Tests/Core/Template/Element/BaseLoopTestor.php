@@ -14,6 +14,7 @@ namespace Thelia\Tests\Core\Template\Element;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Cache\Loop\ArrayCacheLoop;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
@@ -55,24 +56,6 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 
         $request->setSession($session);
 
-        /*$stubEventdispatcher = $this->getMockBuilder('\Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $stubSecurityContext = $this->getMockBuilder('\Thelia\Core\Security\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();*/
-
-        /*$stubAdapter->expects($this->any())
-            ->method('getTranslator')
-            ->will($this->returnValue($stubTranslator));*/
-
-        /*$this->request = new Request();
-        $this->request->setSession(new Session(new MockArraySessionStorage()));
-
-        $this->dispatcher = new EventDispatcher();
-
-        $this->securityContext = new SecurityContext($this->request);*/
 
         $stubRouterAdmin = $this->getMockBuilder('\Symfony\Component\Routing\Router')
             ->disableOriginalConstructor()
@@ -101,6 +84,7 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
         $this->container->set('router.admin', $stubRouterAdmin);
         $this->container->set('thelia.url.manager', new URL($this->container));
         $this->container->set('thelia.taxEngine', new TaxEngine($request));
+        $this->container->set('thelia.cache.loop', new ArrayCacheLoop());
 
         $this->instance = $this->getTestedInstance();
         $this->instance->initializeArgs($this->getMandatoryArguments());

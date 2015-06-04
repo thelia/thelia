@@ -13,6 +13,7 @@
 namespace Thelia\Tests\ImportExport\Export;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Thelia\Cache\Loop\ArrayCacheLoop;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\CustomerQuery;
@@ -40,6 +41,8 @@ class ExportHandlerTest extends ContainerAwareTestCase
                 "address" => "Thelia\\Core\\Template\\Loop\\Address",
             ]
         );
+
+        $container->set('thelia.cache.loop', new ArrayCacheLoop());
     }
 
     public function setUp()
