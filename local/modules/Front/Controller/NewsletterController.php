@@ -38,7 +38,6 @@ use Thelia\Model\Customer;
  */
 class NewsletterController extends BaseFrontController
 {
-
     public function subscribeAction()
     {
         $errorMessage = false;
@@ -55,48 +54,42 @@ class NewsletterController extends BaseFrontController
 
             /** @var Customer $customer */
             if (null !== $customer = $this->getSecurityContext()->getCustomerUser()) {
-                $event->setFirstname($customer->getFirstname());
-                $event->setLastname($customer->getLastname());
+                $event
+                    ->setFirstname($customer->getFirstname())
+                    ->setLastname($customer->getLastname());
             } else {
-                $event->setFirstname($form->get('firstname')->getData());
-                $event->setLastname($form->get('lastname')->getData());
+                $event
+                    ->setFirstname($form->get('firstname')->getData())
+                    ->setLastname($form->get('lastname')->getData());
             }
 
             $this->dispatch(TheliaEvents::NEWSLETTER_SUBSCRIBE, $event);
 
-            if ($this->getRequest()->isXmlHttpRequest()) {
-                $response = new JsonResponse([
-                    "success" => true,
-                    "message" => $this->getTranslator()->trans(
-                        "Thanks for signing up! We'll keep you posted whenever we have any new updates."
-                    )
-                ]);
-            } else {
-                // If a success URL is defined in the form, redirect to it
-                if ($newsletterForm->hasSuccessUrl()) {
-                    return $this->generateSuccessRedirect($newsletterForm);
-                }
+            // If a success URL is defined in the form, redirect to it, otherwise use the defaut view
+            if ($newsletterForm->hasSuccessUrl() && !$this->getRequest()->isXmlHttpRequest()) {
+                return $this->generateSuccessRedirect($newsletterForm);
             }
         } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
 
             Tlog::getInstance()->error(sprintf('Error during newsletter subscription : %s', $errorMessage));
+
+            $newsletterForm->setErrorMessage($errorMessage);
         }
 
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             return new JsonResponse([
-                "success" => false,
-                "message" => $errorMessage
-            ]);
+                "success" => ($errorMessage) ? false : true,
+                "message" => ($errorMessage) ? $errorMessage : $this->getTranslator()->trans(
+                    "Thanks for signing up! We'll keep you posted whenever we have any new updates."
+                )
+            ], ($errorMessage) ? 500 : 200);
         }
 
-        if ($errorMessage) {
-            $newsletterForm->setErrorMessage($errorMessage);
-            $this->getParserContext()->setGeneralError($errorMessage);
-        }
-
-        $this->getParserContext()->addForm($newsletterForm);
+        $this->getParserContext()
+            ->setGeneralError($errorMessage)
+            ->addForm($newsletterForm);
 
         // If an error URL is defined in the form, redirect to it, otherwise use the defaut view
         if ($errorMessage && $newsletterForm->hasErrorUrl()) {

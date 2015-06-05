@@ -457,7 +457,6 @@ var pseManager = (function($){
                 );
                 return false;
             }
-            return;
         });
 
         // Product AddtoCard - OnSubmit
@@ -495,63 +494,55 @@ var pseManager = (function($){
                 });
                 return false;
             }
-            return;
         });
 
 
         // Toolbar
-        var $category_products = $ ('#category-products');
-        if ($category_products.size() > 0) {
-            var $parent = $category_products.parent();
+        var $category_products = $('#category-products');
+        var $parent = $category_products.parent();
 
-            $parent.on('click.view-mode', '[data-toggle=view]', function () {
-                if (($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list'))) { return; }
+        $parent.on('click.view-mode', '[data-toggle=view]', function () {
+            if (($(this).hasClass('btn-grid') && $parent.hasClass('grid')) || ($(this).hasClass('btn-list') && $parent.hasClass('list'))) { return; }
 
-                // Add loader effect
-                $loader.show();
-                setTimeout(function () { $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
+            // Add loader effect
+            $loader.show();
+            setTimeout(function () { $parent.toggleClass('grid').toggleClass('list'); $loader.hide(); }, 400);
 
-                return false;
-            });
-        }
+            return false;
+        });
 
         // Login
         var $form_login = $('#form-login');
-        if ($form_login.size() > 0) {
-            $form_login.on('change.account', ':radio', function () {
-                if ($(this).val() === '0') {
-                    $('#password', $form_login).val('').prop('disabled', true); // Disabled (new customer)
-                }
-                else {
-                    $('#password', $form_login).prop('disabled', false); // Enabled
-                }
-            }).find(':radio:checked').trigger('change.account');
-        }
+        $form_login.on('change.account', ':radio', function () {
+            if ($(this).val() === '0') {
+                $('#password', $form_login).val('').prop('disabled', true); // Disabled (new customer)
+            }
+            else {
+                $('#password', $form_login).prop('disabled', false); // Enabled
+            }
+        }).find(':radio:checked').trigger('change.account');
 
         // Mini Newsletter Subscription
-        var $form_newsletter = $('#form-newsletter-mini');
-        if ($form_newsletter.size() > 0) {
-            $form_newsletter.on('submit.newsletter', function () {
-
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: $(this).attr('method'),
-                    data: $(this).serialize(),
-                    dataType: 'json',
-                    success: function (json) {
-                        var $msg = '';
-                        if (json.success) {
-                            $msg = json.message;
-                        } else {
-                            $msg = json.message;
-                        }
-                        bootbox.alert($msg);
+        $('#form-newsletter-mini').on('submit.newsletter', function () {
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function (json) {
+                    bootbox.alert(json.message);
+                },
+                error: function(jqXHR) {
+                    try {
+                        bootbox.alert($.parseJSON(jqXHR.responseText).message);
+                    } catch (err) { // if not json response
+                        bootbox.alert(jqXHR.responseText);
                     }
-                });
-
-                return false;
+                }
             });
-        }
+
+            return false;
+        });
 
 
         // Forgot Password
@@ -638,6 +629,5 @@ var pseManager = (function($){
         });
 
     });
-
 
 })(jQuery);
