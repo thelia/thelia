@@ -86,6 +86,7 @@
 
         convert_urls: false,
         relative_urls : false,
-        document_base_url : "{url path="/"}"
+        // Use file to get an url without index.php or index_dev.php
+        document_base_url : "{url file="/"}"
     });
 </script>

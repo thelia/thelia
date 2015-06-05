@@ -720,6 +720,7 @@ if(isset($_POST['submit'])){
         $src = $base_url . $cur_dir . rawurlencode($file);
         $mini_src = $src_thumb = $thumbs_path.$subdir. $file;
         $src_thumb_url = $base_url . $cur_thumbs_dir.$subdir. $file;
+        $mini_src_url = $base_url .$thumbs_dir.$subdir. $file;
         //add in thumbs folder if not exist
         if(!file_exists($src_thumb)){
             try {
@@ -739,6 +740,7 @@ if(isset($_POST['submit'])){
 
         if($img_width<45 && $img_height<38){
             $mini_src=$current_path.$rfm_subfolder.$subdir.$file;
+            $mini_src_url= $base_url.$upload_dir.$rfm_subfolder.$subdir.$file;
             $show_original_mini=true;
         }
     }
@@ -802,7 +804,7 @@ if(isset($_POST['submit'])){
                     <div class="img-container-mini">
                         <span></span>
                         <?php if($mini_src!=""){ ?>
-                            <img alt="<?php echo $filename." thumbnails";?>" class="<?php echo $show_original_mini ? "original" : "" ?> <?php echo $is_icon_thumb_mini ? "icon" : "" ?>" src="<?php echo $mini_src; ?>">
+                            <img alt="<?php echo $filename." thumbnails";?>" class="<?php echo $show_original_mini ? "original" : "" ?> <?php echo $is_icon_thumb_mini ? "icon" : "" ?>" src="<?php echo $mini_src_url; ?>">
                         <?php } ?>
                     </div>
                 </div>
