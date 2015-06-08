@@ -161,7 +161,10 @@
                     $('#delivery-module-list-block').load(
                         '{url path="/order/deliveryModuleList"}',
     {literal}
-                        {country_id: $(this).data('country')}
+                        {
+                            country_id: $(this).data('country'),
+                            address_id: $(this).attr('value')
+                        }
     {/literal}
                     );
                 }
