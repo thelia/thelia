@@ -5,6 +5,28 @@
 - Remove ```currency_rate_update_url``` in ```setup/insert.sql```
 - Add Cellphone to order address
 - Add AnyListTypeArgument for loop argument
+- New command ```module:position```. This command can changes module position
+- Fix session serialisation
+- Create a template context
+- Allow relative path for the file logger from THELIA_ROOT constant
+- Form error information are stored in the user session
+- Fix redirection with slash ended uri. Fix #1331
+- Config ```images_library_path``` and ```documents_library_path``` are now used everywhere
+- Messages dispatched before and after content creation
+- Add link to open pdf directly in browser in BO order/update
+- Added wysiwyg.js hook where it was missing.
+- Fix hook attribute in pdf template. The hook was never called.
+- Cellphone column Added in order_address table
+- Default front office template revamped : 
+    - bower and grunt can be used (but not mandatory, you can still use assetic)
+    - less than 4095 css selectors (IE9 compatibility)
+    - bootstrap is now fully used
+    - this template is documented in its readme
+- Force locale in session when loading a rewriten url
+- Thelia is now fully usable with HTTPS protocol
+- Do not delete the default product_sale_elements when the template of a product change
+- Added standard 'error_url' parameter, like 'success_url'
+- controller type can be found in the request (#1238)
 
 # 2.2.0-alpha1
 
