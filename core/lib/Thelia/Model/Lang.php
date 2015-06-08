@@ -11,7 +11,6 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Core\Translation\Translator;
 use Thelia\Model\Base\Lang as BaseLang;
-
 use Thelia\Model\Map\LangTableMap;
 
 class Lang extends BaseLang

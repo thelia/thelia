@@ -8,7 +8,6 @@ use Propel\Runtime\Propel;
 use Thelia\Core\Event\Country\CountryEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Base\Country as BaseCountry;
-
 use Thelia\Model\Map\CountryTableMap;
 use Thelia\Core\Translation\Translator;
 

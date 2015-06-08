@@ -22,10 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
 use Symfony\Component\Routing\Router;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
-
 use Thelia\Core\Template\TemplateHelper;
 use Thelia\Exception\OrderException;
-
 use Thelia\Core\Security\Exception\AuthenticationException;
 
 /**

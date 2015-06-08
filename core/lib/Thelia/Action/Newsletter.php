@@ -15,7 +15,6 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Newsletter\NewsletterEvent;
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Model\NewsletterQuery;
 use Thelia\Model\Newsletter as NewsletterModel;
 

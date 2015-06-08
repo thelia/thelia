@@ -3,7 +3,6 @@
 namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\Cart\CartItemDuplicationItem;
@@ -120,7 +119,7 @@ class Cart extends BaseCart
 
         if ($discount) {
             $total -= $this->getDiscount();
-            if($total < 0) {
+            if ($total < 0) {
                 $total = 0;
             }
         }
@@ -188,7 +187,6 @@ class Cart extends BaseCart
     public function isVirtual()
     {
         foreach ($this->getCartItems() as $cartItem) {
-
             if (0 < $cartItem->getProductSaleElements()->getWeight()) {
                 return false;
             }

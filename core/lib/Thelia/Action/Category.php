@@ -13,13 +13,10 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Category as CategoryModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Category\CategoryUpdateEvent;
 use Thelia\Core\Event\Category\CategoryCreateEvent;
 use Thelia\Core\Event\Category\CategoryDeleteEvent;

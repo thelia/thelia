@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Model\ContentQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 use Thelia\Core\Template\Loop\Content;
 
 /**

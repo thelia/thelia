@@ -392,5 +392,4 @@ class ModuleHookController extends AbstractCrudController
 
         return new JsonResponse($result);
     }
-
 }

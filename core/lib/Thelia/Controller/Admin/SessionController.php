@@ -18,7 +18,6 @@ use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Lang;

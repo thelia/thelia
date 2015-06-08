@@ -35,12 +35,10 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementDeleteEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
-
 use Thelia\Core\HttpFoundation\JsonResponse;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Security\AccessManager;
-
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Core\Template\Loop\Image;
 use Thelia\Form\Exception\FormValidationException;
@@ -75,13 +73,11 @@ use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Country;
 use Thelia\Model\Product;
-
 use Thelia\Form\ProductCreationForm;
 use Thelia\Form\ProductModificationForm;
 use Thelia\Form\ProductSaleElementUpdateForm;
 use Thelia\Form\ProductDefaultSaleElementUpdateForm;
 use Thelia\Form\ProductCombinationGenerationForm;
-
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
 use Thelia\Tools\NumberFormat;

@@ -43,7 +43,6 @@ class TlogDestinationFile extends AbstractTlogDestination
         }
 
         return $this->filePath;
-
     }
 
     protected function getOpenMode()
@@ -61,7 +60,6 @@ class TlogDestinationFile extends AbstractTlogDestination
                 $this->findAbsolutePath($filePath, $mode);
             }
         }
-
     }
 
     protected function findRelativePath($filePath, $mode)

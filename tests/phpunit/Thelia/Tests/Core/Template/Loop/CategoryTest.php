@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 use Thelia\Core\Template\Loop\Category;
 
 /**
