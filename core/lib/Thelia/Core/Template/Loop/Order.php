@@ -267,6 +267,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('TOTAL_TAX', $tax)
                 ->set('TOTAL_AMOUNT', $amount - $tax)
                 ->set('TOTAL_TAXED_AMOUNT', $amount)
+                ->set('WEIGHT', $order->getWeight())
                 ->set('HAS_PAID_STATUS', $order->isPaid())
                 ->set('IS_PAID', $order->isPaid(false))
                 ->set('IS_CANCELED', $order->isCancelled())
