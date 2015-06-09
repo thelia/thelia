@@ -164,7 +164,7 @@ class ParserContext implements \IteratorAggregate
 
                 return $form;
             }
-        } elseif (isset ($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
+        } elseif (isset($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
             return $this->store[$formClass . ":" . $formType];
         }
 

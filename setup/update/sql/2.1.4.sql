@@ -15,11 +15,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (@max_id+1, 'en_US', 'Export modal or page - top', '', ''),
-    (@max_id+2, 'en_US', 'Export modal or page - bottom', '', ''),
-    (@max_id+1, 'es_ES', NULL, '', ''),
-    (@max_id+2, 'es_ES', NULL, '', ''),
-    (@max_id+1, 'fr_FR', 'Modal ou page d\'export - en haut', '', ''),
-    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', ''),
-;
+    (@max_id+2, 'en_US', 'Export modal or page - bottom', '', ''),    (@max_id+1, 'es_ES', NULL, '', ''),
+    (@max_id+2, 'es_ES', NULL, '', ''),    (@max_id+1, 'fr_FR', 'Modal ou page d\'export - en haut', '', ''),
+    (@max_id+2, 'fr_FR', 'Modal ou page d\'export - en bas', '', '');
 
 SET FOREIGN_KEY_CHECKS = 1;

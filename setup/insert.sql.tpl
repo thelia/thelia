@@ -6,6 +6,7 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 (5, 'Russian', 'ru', 'ru_RU', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW()),
 (6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW());
 
+
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (1, 'check-available-stock', '1', 0, 0, NOW(), NOW()),
 (2, 'active-front-template', 'default', 0, 0, NOW(), NOW()),

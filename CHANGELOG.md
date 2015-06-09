@@ -5,6 +5,31 @@
 - Remove ```currency_rate_update_url``` in ```setup/insert.sql```
 - Add Cellphone to order address
 - Add AnyListTypeArgument for loop argument
+- New command ```module:position```. This command can changes module position
+- Fix session serialisation
+- Create a template context
+- Allow relative path for the file logger from THELIA_ROOT constant
+- Form error information are stored in the user session
+- Fix redirection with slash ended uri. Fix #1331
+- Config ```images_library_path``` and ```documents_library_path``` are now used everywhere
+- Messages dispatched before and after content creation
+- Add link to open pdf directly in browser in BO order/update
+- Added wysiwyg.js hook where it was missing.
+- Fix hook attribute in pdf template. The hook was never called.
+- Cellphone column Added in order_address table
+- Default front office template revamped : 
+    - bower and grunt can be used (but not mandatory, you can still use assetic)
+    - less than 4095 css selectors (IE9 compatibility)
+    - bootstrap is now fully used
+    - this template is documented in its readme
+- Force locale in session when loading a rewriten url
+- Thelia is now fully usable with HTTPS protocol
+- Do not delete the default product_sale_elements when the template of a product change
+- Added standard 'error_url' parameter, like 'success_url'
+- controller type can be found in the request (#1238)
+- new helper to get order weight
+- update selected delivery address in order process when customer change it
+- new hooks for delivery modules in backoffice and pdf to add extra information
 
 # 2.2.0-alpha1
 
@@ -63,6 +88,13 @@
 # 2.1.4
 
 - Add ```export.top``` and ```export.bottom``` hooks
+- Fix slash ended rewritten url redirection
+- Remove ```currency_rate_update_url``` in ```setup/insert.sql```
+- Allow relative path for the file logger from THELIA_ROOT
+- Fixed product loop behavior when category_default is set
+- Force locale in session when loading a rewriten url
+- Add port parameter for installing thelia with cli tools
+- Change default param of the isPaid function, true is the good default parameter.
 
 # 2.1.3
 
@@ -233,6 +265,16 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
+
+# 2.0.8
+- Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
+- Force rediction on admin login even when connected to the front
+
+# 2.0.7
+- Change TokenProvider behavior to be more flexible
+- More secure csrf token
+- Fix ```templates/backOffice/default/includes/inner-form-toolbar.html``` change currency destination
+- Fix install bug if the admin password doesn't match
 
 # 2.0.6
 - Do not register previous url on XmlHttpRequest
