@@ -21,7 +21,7 @@
                         {assign var="isDeliveryMethodChecked" value="1"}
                     {/if}
                         <label for="delivery-method_{$ID}">
-                            <input type="radio" name="{$name}" id="delivery-method_{$ID}"{if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
+                            <input type="radio" name="{$name}" id="delivery-method_{$ID}" class="js-change-delivery-method" {if $isDeliveryMethodChecked} checked="checked"{/if} value="{$ID}">
                             <p>
                                 <strong>{$TITLE}</strong>
                                 <br>

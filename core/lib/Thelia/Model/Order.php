@@ -122,8 +122,8 @@ class Order extends BaseOrder
     /**
      * Compute this order amount.
      *
-     * The order amount amount is only avaible once the order is persisted in database.
-     * Duting invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     * The order amount is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
      *
      * @param  float|int $tax             (output only) returns the tax amount for this order
      * @param  bool      $includePostage  if true, the postage cost is included to the total
@@ -171,6 +171,26 @@ class Order extends BaseOrder
         }
 
         return $total;
+    }
+
+    /**
+     * Compute this order weight.
+     *
+     * The order weight is only available once the order is persisted in database.
+     * During invoice process, use all cart methods instead of order methods (the order doest not exists at this moment)
+     *
+     * @return float
+     */
+    public function getWeight()
+    {
+        $weight = 0;
+
+        /* browse all products */
+        foreach ($this->getOrderProducts() as $orderProduct) {
+            $weight += $orderProduct->getQuantity() * (double)$orderProduct->getWeight();
+        }
+
+        return $weight;
     }
 
     /**

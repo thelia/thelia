@@ -502,13 +502,28 @@ class OrderController extends BaseFrontController
 
     public function getDeliveryModuleListAjaxAction()
     {
+        $this->checkXmlHttpRequest();
+
         $country = $this->getRequest()->get(
             'country_id',
             $this->container->get('thelia.taxEngine')->getDeliveryCountry()->getId()
         );
 
-        $this->checkXmlHttpRequest();
-        $args = array('country' => $country);
+        // Change the delivery address if customer has changed it
+        $session = $this->getSession();
+        $addressId = $this->getRequest()->get('address_id', null);
+        if (null !== $addressId && $addressId !== $session->getOrder()->getChoosenDeliveryAddress()) {
+            $address = AddressQuery::create()->findPk($addressId);
+            if (null !== $address && $address->getCustomerId() === $session->getCustomerUser()->getId()) {
+                $session->getOrder()->setChoosenDeliveryAddress($addressId);
+                $args["address"] = $addressId;
+            }
+        }
+
+        $args = array(
+            'country' => $country,
+            'address' => $session->getOrder()->getChoosenDeliveryAddress()
+        );
 
         return $this->render('ajax/order-delivery-module-list', $args);
     }
