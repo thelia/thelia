@@ -255,6 +255,9 @@
                                                 {/if}
                                                 </tbody>
                                             </table>
+
+                                            {hook name="order-edit.customer-information-bottom" order_id=$order_id customer_id=$CUSTOMER}
+
                                         </div>
 
                                         <div class="table-responsive">
@@ -273,6 +276,9 @@
                                                 </tr>
                                                 </tbody>
                                             </table>
+
+                                            {hook name="order-edit.payment-module-bottom" order_id=$order_id module_id=$PAYMENT_MODULE}
+
                                         </div>
 
                                         {hook name="order-edit.cart-bottom" location="order-edit-cart-bottom" order_id=$order_id}
@@ -298,7 +304,7 @@
                                             </div>
                                         </div>
 
-                                        {loop name="payment-module" type="module" id=$DELIVERY_MODULE}
+                                        {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}
 
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Name"}</dt>
@@ -308,6 +314,8 @@
                                             <dt>{intl l="Description"}</dt>
                                             <dd>{$DESCRIPTION}</dd>
                                         </dl>
+
+                                        {hook name="order-edit.delivery-module-bottom" order_id=$order_id module_id=$DELIVERY_MODULE}
 
                                         {/loop}
 

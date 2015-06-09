@@ -274,6 +274,8 @@
                 <p>
                     <span>{loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}</span>
                 </p>
+
+                {hook name="delivery.after-delivery-module" order=$order_id module_id=$DELIVERY_MODULE}
             </td>
         </tr>
         <tr>
