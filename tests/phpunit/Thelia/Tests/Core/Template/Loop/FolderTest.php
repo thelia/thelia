@@ -14,7 +14,6 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Model\FolderQuery;
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 use Thelia\Core\Template\Loop\Folder;
 
 /**

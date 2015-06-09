@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Constraints\UrlValidator;
 use Thelia\Model\ConfigQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Rewriting\RewritingRetriever;
-
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

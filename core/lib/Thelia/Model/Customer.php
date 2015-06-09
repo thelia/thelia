@@ -4,14 +4,10 @@ namespace Thelia\Model;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
-
 use Thelia\Model\Base\Customer as BaseCustomer;
-
 use Thelia\Model\Exception\InvalidArgumentException;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
-
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;

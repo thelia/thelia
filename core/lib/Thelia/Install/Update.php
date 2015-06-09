@@ -51,14 +51,16 @@ class Update
         '12' => '2.0.5',
         '13' => '2.0.6',
         '14' => '2.0.7',
-        '15' => '2.1.0-alpha1',
-        '16' => '2.1.0-alpha2',
-        '17' => '2.1.0-beta1',
-        '18' => '2.1.0-beta2',
-        '19' => '2.1.0',
-        '20' => '2.1.1',
-        '21' => '2.1.2',
-        '22' => '2.1.3',
+        '15' => '2.0.8',
+        '16' => '2.1.0-alpha1',
+        '17' => '2.1.0-alpha2',
+        '18' => '2.1.0-beta1',
+        '19' => '2.1.0-beta2',
+        '20' => '2.1.0',
+        '21' => '2.1.1',
+        '22' => '2.1.2',
+        '23' => '2.1.3',
+        '24' => '2.1.4',
     );
 
     /** @var bool */
@@ -107,7 +109,6 @@ class Update
                 $dbConfig['user'],
                 $dbConfig['password']
             );
-
         } catch (\PDOException $ex) {
             throw new UpdateException('Wrong connection information' . $ex->getMessage());
         }

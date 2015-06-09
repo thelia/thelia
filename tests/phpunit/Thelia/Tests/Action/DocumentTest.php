@@ -15,7 +15,6 @@ namespace Thelia\Tests\Action;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
-
 use Thelia\Action\Document;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Files\FileManager;

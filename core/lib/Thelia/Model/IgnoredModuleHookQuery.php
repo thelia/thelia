@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Model\Base\IgnoredModuleHookQuery as BaseIgnoredModuleHookQuery;
 
-
 /**
  * Skeleton subclass for performing query and update operations on the 'ignored_module_hook' table.
  *
@@ -17,5 +16,4 @@ use Thelia\Model\Base\IgnoredModuleHookQuery as BaseIgnoredModuleHookQuery;
  */
 class IgnoredModuleHookQuery extends BaseIgnoredModuleHookQuery
 {
-
 } // IgnoredModuleHookQuery

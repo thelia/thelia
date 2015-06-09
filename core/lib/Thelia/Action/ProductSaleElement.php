@@ -13,7 +13,6 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
@@ -26,7 +25,6 @@ use Thelia\Core\Event\ProductSaleElement\ProductSaleElementUpdateEvent;
 use Thelia\Model\ProductPriceQuery;
 use Propel\Runtime\Propel;
 use Thelia\Model\AttributeAvQuery;
-
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;

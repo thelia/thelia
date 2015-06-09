@@ -14,7 +14,6 @@ namespace Thelia\Core\Security\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\UserProvider\UserProviderInterface;
-
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Symfony\Component\Validator\Exception\ValidatorException;

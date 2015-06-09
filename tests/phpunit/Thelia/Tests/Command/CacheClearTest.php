@@ -18,7 +18,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Action\Cache;
 use Thelia\Core\Application;
 use Thelia\Command\CacheClear;
-
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Tests\ContainerAwareTestCase;
 

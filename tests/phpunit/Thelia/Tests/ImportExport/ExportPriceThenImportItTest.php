@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Thelia\Tests\ImportExport;
+
 use Propel\Runtime\Propel;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\Translation\Translator;
@@ -18,7 +19,6 @@ use Thelia\ImportExport\Export\Type\ProductPricesExport;
 use Symfony\Component\DependencyInjection\Container;
 use Thelia\ImportExport\Import\Type\ProductPricesImport;
 use Thelia\Model\Lang;
-
 
 /**
  * Class ExportPriceThenImportItTest

@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache as BaseHttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-
 use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 
 /**
