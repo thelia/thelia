@@ -704,6 +704,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1383, 'tab-document.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1384, 'export.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1385, 'export.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1386, 'order-edit.customer-information-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1387, 'order-edit.payment-module-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1388, 'order-edit.delivery-module-bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 
 (2001, 'invoice.css', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2002, 'invoice.header', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -728,6 +731,7 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2020, 'delivery.after-addresses', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2021, 'delivery.after-summary', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 
+
 (2022, 'order-placed.additional-payment-info', 1, 1, 0, 1, 1, 1, NOW(), NOW()),
 
 (2023, 'wysiwyg.js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
@@ -739,7 +743,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2028, 'order-edit.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2029, 'order-edit.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2030, 'order-edit.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2032, 'invoice.after-payment-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2080,6 +2087,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1383, '{$locale}', {intl l='Tab document - bottom' locale=$locale}, '', ''),
     (1384, '{$locale}', {intl l='Export modal or page - top' locale=$locale}, '', ''),
     (1385, '{$locale}', {intl l='Export modal or page - bottom' locale=$locale}, '', ''),
+    (1386, '{$locale}', {intl l='Order - customer information bottom' locale=$locale}, '', ''),
+    (1387, '{$locale}', {intl l='Order - payment module bottom' locale=$locale}, '', ''),
+    (1388, '{$locale}', {intl l='Order - delivery module bottom' locale=$locale}, '', ''),
 
     (2001, '{$locale}', {intl l='Invoice - CSS' locale=$locale}, NULL, NULL),
     (2002, '{$locale}', {intl l='Invoice - in the header' locale=$locale}, NULL, NULL),
@@ -2111,8 +2121,10 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2028, '{$locale}', {intl l='Order - Before product list' locale=$locale}, NULL, NULL),
     (2029, '{$locale}', {intl l='Order - Before starting product row' locale=$locale}, NULL, NULL),
     (2030, '{$locale}', {intl l='Order - After closing product row' locale=$locale}, NULL, NULL),
-    (2031, '{$locale}', {intl l='Order - After product list' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
-
+    (2031, '{$locale}', {intl l='Order - After product list' locale=$locale}, NULL, NULL),
+    (2032, '{$locale}', {intl l='Invoice - After payment module' locale=$locale}, NULL, NULL),
+    (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
+    (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
