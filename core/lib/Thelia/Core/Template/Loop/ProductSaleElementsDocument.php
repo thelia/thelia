@@ -19,6 +19,7 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\ProductSaleElementsProductDocumentQuery;
+use Propel\Runtime\ActiveQuery\Criteria;
 
 /**
  * Class ProductSaleElementsDocument
@@ -117,7 +118,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                 case "position":
                     $query
                         ->useProductDocumentQuery()
-                            ->orderByPosition()
+                            ->orderByPosition(Criteria::ASC)
                         ->endUse()
                     ;
                     break;
@@ -125,7 +126,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                 case "position-reverse":
                     $query
                         ->useProductDocumentQuery()
-                            ->orderByPosition()
+                            ->orderByPosition(Criteria::DESC)
                         ->endUse()
                     ;
                     break;
