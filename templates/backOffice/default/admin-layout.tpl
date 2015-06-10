@@ -372,7 +372,8 @@
                     });
 
                     $('a', '.tool-items').on('click', function(){
-                        if (!$(this).attr('data-toggle')) {
+                        // If you want to prevent a link is followed, add .no-follow-link class to your link
+                        if (!$(this).attr('data-toggle') && !$(this).is('.no-follow-link')) {
                             window.location = $(this).attr('href');
                         }
                     });

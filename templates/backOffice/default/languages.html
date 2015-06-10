@@ -75,7 +75,7 @@
                                         </div>
                                         <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="UPDATE"}
-                                                <a class="lang-change" data-id="{$ID}" title="{intl l='Change this language'}">
+                                                <a class="lang-change no-follow-link" data-id="{$ID}" title="{intl l='Change this language'}">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                 </a>
                                             {/loop}
