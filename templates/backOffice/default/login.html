@@ -1,4 +1,4 @@
-{extends file="admin-layout.tpl"}
+{extends file="simple-layout.tpl"}
 
 {* -- We do not check admin login on this page *}
 {block name="check-auth"}{/block}
@@ -6,8 +6,7 @@
 {block name="page-title"}{intl l='Welcome'}{/block}
 
 {block name="main-content"}
-<div class="loginpage">
-	<div id="wrapper" class="container">
+
 	
 		<div class="row">
             <div class="col-md-12">
@@ -80,8 +79,6 @@
 
 		{hook name="index.bottom" location="index_bottom" }
 
-	</div>
-</div>
 {/block}
 
 {block name="javascript-initialization"}
