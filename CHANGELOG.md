@@ -1,11 +1,12 @@
 # 2.2.0-beta1
 
-- Fix currency create action to set the by_default field properly. 
+- Fix currency create action to set the by_default field properly.
+- Add missing column default_template_id in category_version table
 
 # 2.2.0-alpha2
 
 - Add a front office way to make an address the default one
-- New translation domain that allows to redefine translation strings globally or specifically to a domain. By the way, we can safely update Thelia, modules, templates without overwriting specific translations.       
+- New translation domain that allows to redefine translation strings globally or specifically to a domain. By the way, we can safely update Thelia, modules, templates without overwriting specific translations.
 - Remove ```currency_rate_update_url``` in ```setup/insert.sql```
 - Add Cellphone to order address
 - Add AnyListTypeArgument for loop argument
@@ -21,7 +22,7 @@
 - Added wysiwyg.js hook where it was missing.
 - Fix hook attribute in pdf template. The hook was never called.
 - Cellphone column Added in order_address table
-- Default front office template revamped : 
+- Default front office template revamped :
     - bower and grunt can be used (but not mandatory, you can still use assetic)
     - less than 4095 css selectors (IE9 compatibility)
     - bootstrap is now fully used
@@ -75,13 +76,13 @@
 - Add 62 new admin hook
 - Add stacked current form into parser context. It allows to have nested forms while using the new way to write forms.
 - Module information and documentation could be viewed directly from the module list
-- Add the possibility to translate text in the sql files (insert.sql, update/sql/\*.sql). to generate sql files use command `php Thelia generate:sql`. Translation can be made in the back office, in the translation page.   
+- Add the possibility to translate text in the sql files (insert.sql, update/sql/\*.sql). to generate sql files use command `php Thelia generate:sql`. Translation can be made in the back office, in the translation page.
 - format_date smarty function now handle symfony form type ```date```, ```datetime``` and ```time``` view value.
 - Allow BaseController::generateOrderPdf to generate a pdf without having the rights
 - SHOW_HOOK now displays parameters
 - Add fallback for email template for mails sent from a module. If the template file does not exist in the current email template, it will use the one that comes with the module.
 - Add dispatch of console events
-- Refactor VirtualProductDelivery module. The email sending is now triggered from a new event to gain more flexibility. Now, email messages use smarty file templates located in `templates/email/default`.     
+- Refactor VirtualProductDelivery module. The email sending is now triggered from a new event to gain more flexibility. Now, email messages use smarty file templates located in `templates/email/default`.
 - Added capability to use translator in module functions `preActivation` and `postActivation`
 - Add environment aware database connection
 - new 'asset' Smarty function, to get the URL of an arbitrary file from template assets, such as a video or a font.
