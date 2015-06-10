@@ -66,16 +66,11 @@
             {hook name="template.attributes-table-row" location="template_attributes_table_row" }
 
             <td class="actions">
-                <div class="btn-toolbar btn toolbar-primary">
-                    <span class="glyphicon glyphicon-cog"></span>
-                </div>
-                <div class="toolbar-options hidden">
-                    {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
-                       <a class="delete-attribute" title="{intl l='Delete this attribute'}" href="#delete_attribute_dialog" data-id="{$ID}" data-toggle="modal">
+                {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
+                    <a class="btn btn-default btn-xs delete-attribute" title="{intl l='Delete this attribute'}" href="#delete_attribute_dialog" data-id="{$ID}" data-toggle="modal">
                         <span class="glyphicon glyphicon-trash"></span>
-                       </a>
-                    {/loop}
-                </div>
+                    </a>
+                {/loop}
             </td>
         </tr>
          {/loop}

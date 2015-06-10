@@ -198,14 +198,9 @@
                                 <td></td>
                                 <td class="object-title"><a href="{url path="/admin/categories/update" category_id={$ID}}">{$TITLE}</a></td>
                                 <td class="actions">
-                                    <div class="btn-toolbar btn toolbar-primary">
-                                        <span class="glyphicon glyphicon-cog"></span>
-                                    </div>
-                                    <div class="toolbar-options hidden">
-                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                            <a title="{intl l='Edit this category'}" href="{url path="/admin/categories/update" category_id={$ID}}"><span class="glyphicon glyphicon-edit"></span></a>
-                                        {/loop}
-                                    </div>
+                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path="/admin/categories/update" category_id={$ID}}"><span class="glyphicon glyphicon-edit"></span></a>
+                                    {/loop}
                                 </td>
                             </tr>
                             {/loop}
@@ -252,14 +247,9 @@
 
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
-                                                <a title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
+                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        {/loop}
                                     </td>
                                 </tr>
 
@@ -298,14 +288,9 @@
 
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
+                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        {/loop}
                                     </td>
                                 </tr>
 
@@ -344,14 +329,9 @@
 
 
                                     <td class="actions">
-                                        <div class="btn-toolbar btn toolbar-primary">
-                                            <span class="glyphicon glyphicon-cog"></span>
-                                        </div>
-                                        <div class="toolbar-options hidden">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a title="{intl l='Edit this content'}" href="{url path="/admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                            {/loop}
-                                        </div>
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
+                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="/admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        {/loop}
                                     </td>
                                 </tr>
 
