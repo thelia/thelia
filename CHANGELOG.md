@@ -1,3 +1,7 @@
+# 2.2.0-beta1
+
+- Fix currency create action to set the by_default field properly. 
+
 # 2.2.0-alpha2
 
 - Add a front office way to make an address the default one

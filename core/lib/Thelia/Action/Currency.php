@@ -49,6 +49,8 @@ class Currency extends BaseAction implements EventSubscriberInterface
     {
         $currency = new CurrencyModel();
 
+        $isDefault = CurrencyQuery::create()->count() === 0;
+
         $currency
             ->setDispatcher($event->getDispatcher())
             ->setLocale($event->getLocale())
@@ -56,6 +58,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setSymbol($event->getSymbol())
             ->setRate($event->getRate())
             ->setCode(strtoupper($event->getCode()))
+            ->setByDefault($isDefault)
             ->save()
         ;
 
