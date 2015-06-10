@@ -57,193 +57,115 @@
 </head>
 
 <body>
-	{* display top bar only if admin is connected *}
+    <div id="wrapper">
+        
+        {* display top bar only if admin is connected *}
+        {loop name="top-bar-auth" type="auth" role="ADMIN"}
 
-	{loop name="top-bar-auth" type="auth" role="ADMIN"}
+            {* -- Brand bar section ------------------------------------------------- *}
 
-	    {* -- Brand bar section ------------------------------------------------- *}
+            {hook name="main.before-topbar" location="before_topbar" }
 
-		{hook name="main.before-topbar" location="before_topbar" }
+            <!-- Navigation -->
+            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</a>
+                </div>
+                <!-- /.navbar-header -->
 
-		<div class="topbar">
-            <button type="button" class="hidden-sm hidden-xs" id="main-navbar-collapse">
-                <span></span>
-            </button>
-
-			<div class="container">
-
-		        <div class="row">
-		            <div class="col-md-12 clearfix">
-		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-
-                        <div class="clearfix pull-right hidden-xs hidden-sm">
-                            <div class="button-toolbar pull-right" role="toolbar">
-
-                                {hook name="main.topbar-top" }
-
-                                <div class="btn-group">
-                                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                                    <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
-                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-                                        <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-                                    </ul>
-                                </div>
-
-                                <div class="btn-group">
-                                    {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                                    <button class="btn btn-default">
-                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
-                                    </button>
-                                    {/loop}
-
-                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {loop type="lang" name="ui-lang"}
-                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
-                                        {/loop}
-                                     </ul>
-                                </div>
-
-                                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                                    <form class="navbar-form pull-right hidden-xs hidden-sm" action="{url path='/admin/search'}">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                                        </div>
-                                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                                    </form>
-                                {/loop}
-
-
-                                {hook name="main.topbar-bottom" }
-
-                            </div>
-                        </div>
-
-		            </div>
-
-		    		{hook name="main.inside-topbar" location="inside_topbar" }
-
-		        </div>
-
-		    </div>
-		</div>
-
-		{hook name="main.after-topbar" location="after_topbar" }
-
-	    {* -- Top menu section -------------------------------------------------- *}
-		{include file="includes/main-menu.html"}
-
-        <div class="visible-sm visible-xs">
-            <div class="container">
-
-                <div class="button-toolbar" id="btn-toolbar-mobile" role="toolbar">
-
+                <ul class="nav navbar-top-links navbar-right">                
                     {hook name="main.topbar-top" }
+                    
+                    <div class="btn-group">
+                        <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                        <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
+                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
+                            <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
+                        </ul>
+                    </div>
 
-                    <div class="clearfix">
-                        <div class="btn-group pull-left">
-                            <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                            <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> <span class="hidden-xs">{admin attr="firstname"} {admin attr="lastname"}</span></button>
-                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-                                <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-                            </ul>
-                        </div>
+                    <div class="btn-group">
+                        {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
+                        <button class="btn btn-default">
+                            <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
+                        </button>
+                        {/loop}
 
-                        <div class="btn-group pull-right">
-                            {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                                <button class="btn btn-default">
-                                    <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
-                                </button>
+                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            {loop type="lang" name="ui-lang"}
+                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                             {/loop}
-
-                            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                {loop type="lang" name="ui-lang"}
-                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
-                                {/loop}
-                            </ul>
-                        </div>
+                         </ul>
                     </div>
+                </ul>
+                <!-- /.navbar-top-links -->
 
-                    {hook name="main.topbar-bottom" }
-
+                <div class="navbar-default sidebar" role="navigation">
+                    <div class="sidebar-nav navbar-collapse">
+                        
+                        {include file="includes/main-menu.html"}
+                        
+                        {hook name="main.inside-topbar" location="inside_topbar" }
+                    </div>
+                    <!-- /.sidebar-collapse -->
                 </div>
+                <!-- /.navbar-static-side -->
+                
+                {hook name="main.after-topbar" location="after_topbar" }
+            </nav>
 
-                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                    <form id="mobile-search-engine" action="{url path='/admin/search'}">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
-                            </span>
-                        </div>
-                    </form>
-                {/loop}
+            <div id="page-wrapper">                        
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">Dashboard</h1>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                
+                {* -- Main page content section ----------------------------------------- *}
+                {hook name="main.before-content" location="before_content"}
+                
+                <div class="row">
+                    {block name="main-content"}Put here the content of the template{/block}
+                </div>
+                
+                {hook name="main.after-content" location="after_content"}                
+                
+            </div>
+        {/loop}
+
+        {hook name="main.before-footer" location="before_footer" }
+
+        <footer class="footer">
+            <div class="container">
+                <p>{intl l='&copy; Thelia 2013'}
+                - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
+                - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
+                - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
+                </p>
+
+                {hook name="main.in-footer" location="in_footer" }
 
             </div>
-        </div>
+        </footer>
 
-	{/loop}
-
-    {* A basic brandbar is displayed if user is not connected *}
-
-	{elseloop rel="top-bar-auth"}
-    <div class="topbar">
-        <div class="container">
-
-            <div class="row">
-                <div class="col-md-12 clearfix">
-                    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-                    <div class="clearfix pull-right hidden-xs">
-                        <div class="button-toolbar pull-right" role="toolbar">
-                            <div class="btn-group">
-                                <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-	{/elseloop}
-
-    {* -- Main page content section ----------------------------------------- *}
-    {hook name="main.before-content" location="before_content"}
-
-	{block name="main-content"}Put here the content of the template{/block}
-
-    {hook name="main.after-content" location="after_content"}
-    {* -- Footer section ---------------------------------------------------- *}
-
-    {hook name="main.before-footer" location="before_footer" }
-
-    <hr />
-    <footer class="footer">
-        <div class="container">
-            <p>{intl l='&copy; Thelia 2013'}
-            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
-            - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
-            - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
-            </p>
-
-            {hook name="main.in-footer" location="in_footer" }
-
-        </div>
-    </footer>
-
-    {hook name="main.after-footer" location="after_footer" }
+        {hook name="main.after-footer" location="after_footer" }
+    </div> <!-- #wrapper -->
 
 	{* -- Javascript section ------------------------------------------------ *}
 
