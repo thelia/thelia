@@ -9,4 +9,6 @@ UPDATE `config` SET `value`='beta1' WHERE `name`='thelia_extra_version';
 -- fix currency already created
 update currency set by_default = 0 where by_default is NULL;
 
+ALTER TABLE `category_version` ADD COLUMN `default_template_id` INTEGER AFTER  `position`;
+
 SET FOREIGN_KEY_CHECKS = 1;
