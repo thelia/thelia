@@ -82,34 +82,33 @@
                 <ul class="nav navbar-top-links navbar-right">                
                     {hook name="main.topbar-top" }
                     
-                    <div class="btn-group">
+                    <li>
                         <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                        <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
+                    </li>
+                    <li class="dropdown">
                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}
                             <span class="caret"></span>
-                        </button>
+                        </button>                        
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
                             <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
                         </ul>
-                    </div>
-
-                    <div class="btn-group">
+                    </li>
+                    <li>
                         {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                        <button class="btn btn-default">
+                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                             <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
+                            <span class="caret"></span>
                         </button>
                         {/loop}
 
-                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                            <span class="caret"></span>
-                        </button>
                         <ul class="dropdown-menu">
                             {loop type="lang" name="ui-lang"}
-                            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
+                                <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                             {/loop}
                          </ul>
-                    </div>
+                    </li>
                 </ul>
                 <!-- /.navbar-top-links -->
 
