@@ -370,6 +370,11 @@
                         content: $content
                     });
 
+                    $('a', '.tool-items').on('click', function(){
+                        if (!$(this).attr('data-toggle')) {
+                            window.location = $(this).attr('href');
+                        }
+                    });
                 });
 
             });

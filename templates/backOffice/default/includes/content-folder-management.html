@@ -72,9 +72,12 @@
                                 {hook name="product.folders-table-row" location="product_folders_table_row" }
 
                                 <td class="actions">
-                                    <div class="btn-group">
+                                    <div class="btn-toolbar btn btn-primary">
+                                        <i class="glyphicon glyphicon-cog"></i>
+                                    </div>
+                                    <div class="toolbar-options hidden">
                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs delete-folder" title="{intl l='Remove the product from this category'}" href="#delete_folder_dialog" data-id="{$ID}" data-toggle="modal">
+                                            <a class="delete-folder" title="{intl l='Remove the product from this category'}" href="#delete_folder_dialog" data-id="{$ID}" data-toggle="modal">
                                                 <span class="glyphicon glyphicon-trash"></span>
                                             </a>
                                         {/loop}
