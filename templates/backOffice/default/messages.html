@@ -76,15 +76,15 @@
                                                     </div>
                                                     <div class="toolbar-options hidden">
                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                                        {/loop}
 
                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
-                                                           <a class="message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                           <a class="message-delete" title="{intl l='Delete this mailing template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                        {/loop}
         		                                    </div>
         		                                {else}
-        		                                    <i title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+        		                                    <span title="{intl l='This mailing template could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
         	                                    {/if}
         	                                </td>
         	                            </tr>

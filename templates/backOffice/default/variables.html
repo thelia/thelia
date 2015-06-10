@@ -113,18 +113,18 @@
                                                 <i class="glyphicon glyphicon-cog"></i>
                                             </div>
                                             <div class="toolbar-options hidden">
-                                                 <a class="cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><i class="glyphicon glyphicon-remove"></i></a>
+                                                 <a class="cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><span class="glyphicon glyphicon-remove"></span></a>
 
                                                  {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.variable" access="UPDATE"}
-                                                     <a class="config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                     <a class="config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
                                                  {/loop}
 
                                                  {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.variable" access="DELETE"}
-                                                     <a class="config-delete" title="{intl l='Delete this variable'}" href="#delete_variable_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                     <a class="config-delete" title="{intl l='Delete this variable'}" href="#delete_variable_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                  {/loop}
   		                                    </div>
   		                                {else}
-  		                                    <i title="{intl l='This variable could not be changed.'}" class="glyphicon glyphicon-ban-circle"></i>
+  		                                    <span title="{intl l='This variable could not be changed.'}" class="glyphicon glyphicon-ban-circle"></span>
   	                                    {/if}
   	                                </td>
   	                            </tr>
