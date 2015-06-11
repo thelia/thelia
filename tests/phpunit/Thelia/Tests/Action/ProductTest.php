@@ -447,7 +447,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $this->assertFalse($cloneProduct->isNew(), 'IsNew must be false');
         $this->assertEquals('fr_FR', $cloneProduct->getLocale(), 'Locale must be equal');
-        $this->assertEquals($originalProduct->getTitle(), $cloneProduct->getTitle(), 'Title must be equal');
+        $this->assertEquals($originalProductDefaultI18n->getTitle(), $cloneProduct->getTitle(), 'Title must be equal');
         $this->assertEquals($newRef, $cloneProduct->getRef(), 'Ref must be equal');
         $this->assertEquals(0, $cloneProduct->getVisible(), 'Visible must be false');
         $this->assertEquals($originalProduct->getDefaultCategoryId(), $cloneProduct->getDefaultCategoryId(), 'Default categories must be equal');
@@ -728,7 +728,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                             ->findOneByPosition($originalProductFile->getPosition());
 
                         // Check if the cloned file exists and ProductDocument info
-                        $this->assertFileExists($cloneProductFile->getFile(), 'Cloned document doesn\'t exist');
+                        $this->assertFileExists($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), 'Cloned document doesn\'t exist');
                         $this->assertEquals(
                             $fileMimeType,
                             $finfo->file($cloneProductFile->getFile(), FILEINFO_MIME_TYPE),
