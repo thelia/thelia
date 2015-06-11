@@ -78,6 +78,7 @@
                     <a class="navbar-brand" href="index.html">
                         {images file='assets/img/logo-white.png'}
                             <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
+                            <span>{intl l='Version %ver' ver="{$THELIA_VERSION}"}</span>
                         {/images}
                     </a>
                 </div>
@@ -87,10 +88,10 @@
                     {hook name="main.topbar-top" }
                     
                     <li>
-                        <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                        <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
                     </li>
                     <li class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                        <button class="dropdown-toggle" data-toggle="dropdown">
                             <span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}
                             <span class="caret"></span>
                         </button>                        
@@ -101,7 +102,7 @@
                     </li>
                     <li>
                         {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <button class="dropdown-toggle" data-toggle="dropdown">
                             <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
                             <span class="caret"></span>
                         </button>

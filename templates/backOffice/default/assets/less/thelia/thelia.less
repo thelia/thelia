@@ -1,4 +1,5 @@
 @import "variables.less";
+@import "mixins.less";
 @import "navbar.less";
 @import "scaffolding.less";
 @import "type.less";
@@ -57,10 +58,25 @@
             margin-right: 15px;
         }
         
-        a,
-        button {
+        > a,
+        > button {
+            font-weight: normal;
             padding: 15px;
-            min-height: 50px;   
+            min-height: 50px;
+            color: @navbar-default-link-color;
+            .transition(all 0.3s ease-in-out);
+
+            &,
+            &:hover,
+            &:focus {
+                background: none;
+                border: none;
+            }
+
+            &:hover,
+            &:focus {
+                color: @brand-primary;
+            }
         }
     }
     
