@@ -223,6 +223,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 ->set("META_KEYWORDS", $category->getVirtualColumn('i18n_META_KEYWORDS'))
                 ->set("VISIBLE", $category->getVisible() ? "1" : "0")
                 ->set("POSITION", $category->getPosition())
+                ->set("TEMPLATE", $category->getDefaultTemplateId())
 
             ;
 
