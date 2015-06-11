@@ -2,6 +2,8 @@
 
 - Fix currency create action to set the by_default field properly.
 - Add missing column default_template_id in category_version table
+- The product parameter of the feature_value loop is no longer mandatory
+- The product parameter new $PRODUCT variable is deprecated. $PRODUCT_ID should be used instead.
 
 # 2.2.0-alpha2
 
