@@ -99,15 +99,18 @@
                                                 {hook name="countries.table-row" location="countries_table_row" country_id={$ID} }
 
                                                 <td class="actions">
-                                                    <div class="btn-group">
+                                                    <div class="btn-toolbar btn toolbar-primary">
+                                                        <span class="glyphicon glyphicon-cog"></span>
+                                                    </div>
+                                                    <div class="toolbar-options hidden">
                                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.country" access="UPDATE"}
-                                                            <a class="btn btn-default btn-xs country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/%id" id=$ID}">
+                                                            <a class="country-change" title="{intl l='Change this country'}" href="{url path="/admin/configuration/country/update/%id" id=$ID}">
                                                                 <span class="glyphicon glyphicon-edit"></span>
                                                             </a>
                                                         {/loop}
 
                                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.country" access="DELETE"}
-                                                            <a class="btn btn-default btn-xs country-delete" title="{intl l='Delete this country'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                            <a class="country-delete" title="{intl l='Delete this country'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                                 <span class="glyphicon glyphicon-trash"></span>
                                                             </a>
                                                         {/loop}

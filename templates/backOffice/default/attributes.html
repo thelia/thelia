@@ -104,25 +104,26 @@
                                         {hook name="attributes.table-row" location="attributes_table_row" attribute_id={$ID} }
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
-                                            <div class="btn-group">
-                                                <a class="btn btn-default btn-xs attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-minus"></span>
-                                                </a>
-                                                <a class="btn btn-default btn-xs attribute-add-to-all" title="{intl l='Add this attribute to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
                                             </div>
-                                            {/loop}
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
+                                                    <a class="attribute-remove-from-all" title="{intl l='Remove this attribute from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>
+                                                    <a class="attribute-add-to-all" title="{intl l='Add this attribute to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                {/loop}
 
-                                            <div class="btn-group">
-    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-    	                                        {/loop}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="UPDATE"}
+                                                    <a class="attribute-change" title="{intl l='Change this product attribute'}" href="{url path='/admin/configuration/attributes/update' attribute_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                {/loop}
 
-    	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs attribute-delete" title="{intl l='Delete this product attribute'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
-    	                                        {/loop}
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.attribute" access="DELETE"}
+                                                    <a class="attribute-delete" title="{intl l='Delete this product attribute'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                {/loop}
                                             </div>
                                         </td>
                                     </tr>

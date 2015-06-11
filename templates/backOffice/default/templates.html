@@ -87,13 +87,16 @@
                                         {hook name="templates.table-row" location="templates_table_row" template_id=$ID}
 
                                         <td class="actions">
-                                            <div class="btn-group">
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+    	                                            <a class="template-change" title="{intl l='Change this product template'}" href="{url path='/admin/configuration/templates/update' template_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.template" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+    	                                            <a class="template-delete" title="{intl l='Delete this product template'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>
                                         </td>

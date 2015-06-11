@@ -63,14 +63,17 @@
                                             {intl l='Superadministrator'}
                                         {/if}
                                     </td>
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}
-                                                <a class="btn btn-default btn-xs js-delete-api" title="{intl l='Delete this api access'}" href="#api_delete_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                <a class="js-delete-api" title="{intl l='Delete this api access'}" href="#api_delete_dialog" data-id="{$api.Id}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>

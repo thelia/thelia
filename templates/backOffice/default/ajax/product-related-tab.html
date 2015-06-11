@@ -106,13 +106,11 @@
                                 {hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
 
 		                        <td class="actions">
-		                            <div class="btn-group">
-		                                {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-		                                   <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
-		                                    <span class="glyphicon glyphicon-trash"></span>
-		                                   </a>
-		                                {/loop}
-		                            </div>
+                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs delete-content" title="{intl l='Delete this content'}" href="#delete_content_dialog" data-id="{$CONTENT_ID}" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {/loop}
 		                        </td>
 		                    </tr>
 		                     {/loop}
@@ -227,13 +225,11 @@
                                 {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
 
 		                        <td class="actions">
-		                            <div class="btn-group">
-		                                {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
-		                                   <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
-		                                    <span class="glyphicon glyphicon-trash"></span>
-		                                   </a>
-		                                {/loop}
-		                            </div>
+                                    {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                    <a class="btn btn-default btn-xs delete-accessory" title="{intl l='Delete this accessory'}" href="#delete_accessory_dialog" data-id="{$ACCESSORY_ID}" data-toggle="modal">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </a>
+                                    {/loop}
 		                        </td>
 		                    </tr>
 		                     {/loop}
@@ -333,13 +329,11 @@
 	                            {hook name="product.categories-table-row" location="product_categories_table_row" }
 
 	                            <td class="actions">
-	                                <div class="btn-group">
-	                                    {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
-	                                       <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
-	                                        <span class="glyphicon glyphicon-trash"></span>
-	                                       </a>
-	                                    {/loop}
-	                                </div>
+                                    {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
+                                        <a class="btn btn-default btn-xs delete-category" title="{intl l='Remove the product from this category'}" href="#delete_category_dialog" data-id="{$ID}" data-toggle="modal">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </a>
+                                    {/loop}
 	                            </td>
 	                        </tr>
 	                        {/loop}

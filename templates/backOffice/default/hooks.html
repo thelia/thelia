@@ -141,17 +141,20 @@
                                     {hook name="hooks.table-row" location="hooks_table_row" hook_id={$ID} }
 
                                     <td class="actions">
-                                        <div class="btn-group">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.hook" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/hook/update/`$ID`"}">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                            </a>
+                                                <a class="hook-change" title="{intl l='Change this hook'}" href="{url path="/admin/hook/update/`$ID`"}">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                </a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.hook" access="DELETE"}
-                                            <a class="btn btn-default btn-xs hook-delete" title="{intl l='Delete this hook'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-                                                <span class="glyphicon glyphicon-trash"></span>
-                                            </a>
+                                                <a class="hook-delete" title="{intl l='Delete this hook'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                </a>
                                             {/loop}
                                         </div>
                                     </td>

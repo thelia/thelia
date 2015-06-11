@@ -104,24 +104,26 @@
                                         {hook name="features.table-row" location="features_table_row" feature_id={$ID} }
 
                                         <td class="actions">
-                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-                                            <div class="btn-group">
-                                                <a class="btn btn-default btn-xs feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-minus"></span>
-                                                </a>
-                                                <a class="btn btn-default btn-xs feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
-                                                    <span class="glyphicon glyphicon-plus"></span>
-                                                </a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
                                             </div>
-                                            {/loop}
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
 
-                                            <div class="btn-group">
+                                                    <a class="feature-remove-from-all" title="{intl l='Remove this feature from all product templates'}" href="#remove_from_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-minus"></span>
+                                                    </a>
+                                                    <a class="feature-add-to-all" title="{intl l='Add this feature to all product templates'}" href="#add_to_all_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <span class="glyphicon glyphicon-plus"></span>
+                                                    </a>
+                                                {/loop}
+
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-    	                                            <a class="btn btn-default btn-xs feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+    	                                            <a class="feature-change" title="{intl l='Change this product feature'}" href="{url path='/admin/configuration/features/update' feature_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
     	                                        {/loop}
 
     	                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.feature" access="DELETE"}
-    	                                            <a class="btn btn-default btn-xs feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+    	                                            <a class="feature-delete" title="{intl l='Delete this product feature'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
     	                                        {/loop}
                                             </div>
                                         </td>

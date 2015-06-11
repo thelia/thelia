@@ -140,15 +140,18 @@
                                             {hook name='brands.table-row' location='brands_table_row' brand_id={$ID}}
 
                                             <td class="actions">
-                                                <div class="btn-group">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.brand" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs brand-change" title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/%id" id=$ID}">
+                                                        <a class="brand-change" title="{intl l='Change this brand'}" href="{url path="/admin/brand/update/%id" id=$ID}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}
 
                                                     {loop type="auth" name="can_delete" role="ADMIN" resource="admin.brand" access="DELETE"}
-                                                        <a class="btn btn-default btn-xs brand-delete" title="{intl l='Delete this brand'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                        <a class="brand-delete" title="{intl l='Delete this brand'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                             <span class="glyphicon glyphicon-trash"></span>
                                                         </a>
                                                     {/loop}

@@ -153,13 +153,11 @@
     				                                    {hook name="features-value.table-row" location="features_value_table_row" feature_id={$feature_id} }
 
     				                                    <td class="actions">
-    				                                        <div class="btn-group">
-    				                                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
-    				                                               <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
-    				                                                <span class="glyphicon glyphicon-trash"></span>
-    				                                               </a>
-    				                                            {/loop}
-    				                                        </div>
+                                                            {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.feature" access="UPDATE"}
+                                                                <a class="btn btn-default btn-xs value-delete" title="{intl l='Delete this value'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                                    <span class="glyphicon glyphicon-trash"></span>
+                                                                </a>
+                                                            {/loop}
     				                                    </td>
     				                                </tr>
     				                                 {/loop}

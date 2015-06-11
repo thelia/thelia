@@ -70,15 +70,18 @@
                                         </div>
                                     </td>
                                     <td class="actions">
-                                        <div class="btn-group">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs lang-change" data-id="{$ID}" title="{intl l='Change this language'}">
+                                                <a class="lang-change no-follow-link" data-id="{$ID}" title="{intl l='Change this language'}">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                 </a>
                                             {/loop}
                                             {if !$IS_DEFAULT}
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.language" access="DELETE"}
-                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="btn btn-default btn-xs lang-delete" title="{intl l="Delete this language"}">
+                                                <a href="#delete_dialog" data-toggle="modal" data-id="{$ID}" class="lang-delete" title="{intl l="Delete this language"}">
                                                     <span class="glyphicon glyphicon-trash"></span>
                                                 </a>
                                             {/loop}

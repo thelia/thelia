@@ -161,15 +161,18 @@
                                             {hook name="currencies.table-row" location="currencies_table_row" currency_id={$ID} }
 
                                             <td class="actions">
-                                                <div class="btn-group">
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
                                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.currency" access="UPDATE"}
-                                                        <a class="btn btn-default btn-xs currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
+                                                        <a class="currency-change" title="{intl l='Change this currency'}" href="{url path='/admin/configuration/currencies/update' currency_id="$ID"}">
                                                             <span class="glyphicon glyphicon-edit"></span>
                                                         </a>
                                                     {/loop}
                                                     {if !$IS_DEFAULT}
                                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.currency" access="DELETE"}
-                                                            <a class="btn btn-default btn-xs currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
+                                                            <a class="currency-delete" title="{intl l='Delete this currency'}" href="#delete_dialog" data-id="{$ID}" data-toggle="modal">
                                                                 <span class="glyphicon glyphicon-trash"></span>
                                                             </a>
                                                         {/loop}

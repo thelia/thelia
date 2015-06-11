@@ -262,6 +262,10 @@
     {javascripts file='assets/js/bootstrap/bootstrap.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
+    
+    {javascripts file='assets/js/libs/jquery.toolbar.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
     {block name="javascript-initialization"}{/block}
     <script>
@@ -356,6 +360,33 @@
                 function initNavbarHeight() {
                     $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
                 }
+
+                // Init event trigger
+                var event = 'hover';
+
+                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                    event = 'click';
+                }
+
+                // Toolbar managment
+                $('.btn-toolbar').each(function() {
+                    var $btn = $(this),
+                        $content = $btn.next('.toolbar-options');
+
+                    $btn.toolbar({
+                        event: event,
+                        content: $content,
+                        style: 'info'
+                    });
+
+                    $('a', '.tool-items').on('click', function(){
+                        // If you want to prevent a link is followed, add .no-follow-link class to your link
+                        if (!$(this).attr('data-toggle') && !$(this).is('.no-follow-link')) {
+                            window.location = $(this).attr('href');
+                        }
+                    });
+                });
+
             });
         })(jQuery);
     </script>
