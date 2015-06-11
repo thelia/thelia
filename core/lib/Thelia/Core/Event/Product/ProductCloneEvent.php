@@ -21,6 +21,7 @@ class ProductCloneEvent extends ActionEvent
     protected $lang;
     protected $originalProduct = array();
     protected $clonedProduct = array();
+    protected $types = array('images', 'documents');
 
     public function __construct(
         $ref,
@@ -95,4 +96,14 @@ class ProductCloneEvent extends ActionEvent
     {
         $this->clonedProduct = $clonedProduct;
     }
+
+    /**
+     * @return array
+     */
+    public function getTypes()
+    {
+        return $this->types;
+    }
+
+
 }

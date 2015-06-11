@@ -1806,17 +1806,13 @@ class ProductController extends AbstractSeoCrudController
         return $status;
     }
 
-    /*
-     * PRODUCT CLONING PROCESS
-     */
-
     /**
      * @return mixed|\Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
     public function cloneAction()
     {
-        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE, AccessManager::DELETE])) {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
             return $response;
         }
 

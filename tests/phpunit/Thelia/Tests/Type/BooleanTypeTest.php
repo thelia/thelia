@@ -29,7 +29,7 @@ class BooleanTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($booleanType->isValid('true'));
         $this->assertTrue($booleanType->isValid('no'));
         $this->assertTrue($booleanType->isValid('off'));
-        $this->assertTrue($booleanType->isValid(1));
+        $this->assertTrue($booleanType->isValid(0));
         $this->assertTrue($booleanType->isValid('false'));
         $this->assertFalse($booleanType->isValid('foo'));
         $this->assertFalse($booleanType->isValid(2));

@@ -12,12 +12,10 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Thelia\Core\Event\File\FileCloneEvent;
 use Thelia\Core\Event\File\FileCreateOrUpdateEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Log\Tlog;
 use Thelia\Model\ProductDocument;
@@ -30,18 +28,15 @@ use Thelia\Model\ProductImageQuery;
 /**
  * Class File
  *
- *
  * @package Thelia\Action
  * @author Etienne Perriere <eperriere@openstudio.fr>
  */
 class File extends BaseAction implements EventSubscriberInterface
 {
-    public function cloneFile(FileCloneEvent $event)
+    public function cloneFile(ProductCloneEvent $event)
     {
-        $originalProductId = $event->getOriginalProductId();
+        $originalProductId = $event->getOriginalProduct()->getId();
         $clonedProduct = $event->getClonedProduct();
-
-        $fs = new Filesystem();
 
         foreach ($event->getTypes() as $type) {
             switch ($type) {
@@ -60,7 +55,7 @@ class File extends BaseAction implements EventSubscriberInterface
             foreach ($originalProductFiles as $originalProductFile) {
                 $srcPath = $originalProductFile->getUploadDir() . DS . $originalProductFile->getFile();
 
-                if ($fs->exists($srcPath)) {
+                if (file_exists($srcPath)) {
                     $ext = pathinfo($srcPath, PATHINFO_EXTENSION);
 
                     switch ($type) {
@@ -77,7 +72,7 @@ class File extends BaseAction implements EventSubscriberInterface
 
                     // Copy a temporary file of the source file as it will be deleted by IMAGE_SAVE or DOCUMENT_SAVE event
                     $srcTmp = $srcPath.'.tmp';
-                    $fs->copy($srcPath, $srcTmp, true);
+                    copy($srcPath, $srcTmp);
 
                     // Get file mimeType
                     $finfo = new \finfo();
@@ -119,10 +114,10 @@ class File extends BaseAction implements EventSubscriberInterface
                     }
 
                     // Set temporary source file as original one
-                    $fs->rename($srcTmp, $srcPath);
+                    rename($srcTmp, $srcPath);
 
                     // Clone file's I18n
-                    $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $clonedProduct, $type, $event->getDispatcher());
+                    $this->cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, $event);
                 } else {
                     Tlog::getInstance()->addWarning("Failed to find media file $srcPath");
                 }
@@ -130,7 +125,7 @@ class File extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $clonedProduct, $type, EventDispatcherInterface $dispatcher)
+    public function cloneFileI18n($originalProductFileI18ns, $clonedProductFile, $type, ProductCloneEvent $event)
     {
         // Set clone files I18n
         foreach ($originalProductFileI18ns as $originalProductFileI18n) {
@@ -143,16 +138,16 @@ class File extends BaseAction implements EventSubscriberInterface
                 ->setPostscriptum($originalProductFileI18n->getPostscriptum());
 
             // Create and dispatch event
-            $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($clonedProduct->getId());
+            $clonedProductUpdateFileEvent = new FileCreateOrUpdateEvent($event->getClonedProduct()->getId());
             $clonedProductUpdateFileEvent->setModel($clonedProductFile);
 
             switch ($type) {
                 case 'images':
-                    $dispatcher->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
+                    $event->getDispatcher()->dispatch(TheliaEvents::IMAGE_UPDATE, $clonedProductUpdateFileEvent);
                     break;
 
                 case 'documents':
-                    $dispatcher->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
+                    $event->getDispatcher()->dispatch(TheliaEvents::DOCUMENT_UPDATE, $clonedProductUpdateFileEvent);
                     break;
             }
         }

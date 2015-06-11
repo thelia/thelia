@@ -12,14 +12,12 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCloneEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\ProductSaleElement\ProductSaleElementCreateEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
-use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductSaleElements;
@@ -316,28 +314,28 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
     /**
      * Clone product's PSEs and associated datas
      *
-     * @param ProductSaleElementCloneEvent $event
+     * @param ProductCloneEvent $event
      */
-    public function clonePSE(ProductSaleElementCloneEvent $event)
+    public function clonePSE(ProductCloneEvent $event)
     {
-        $originalProduct = $event->getOriginalProduct();
         $clonedProduct = $event->getClonedProduct();
-        $dispatcher = $event->getDispatcher();
 
         // Get original product's PSEs
         $originalProductPSEs = ProductSaleElementsQuery::create()
             ->orderByIsDefault(Criteria::DESC)
-            ->findByProductId($originalProduct->getId());
+            ->findByProductId($event->getOriginalProduct()->getId());
 
         // Handle PSEs
         foreach ($originalProductPSEs as $key => $originalProductPSE) {
             $currencyId = ProductPriceQuery::create()
-                ->findOneByProductSaleElementsId($originalProductPSE->getId())
-                ->getCurrencyId();
+                ->filterByProductSaleElementsId($originalProductPSE->getId())
+                ->select('CURRENCY_ID')
+                ->findOne();
 
-            $clonedProductPSEId = $this->createClonePSE($clonedProduct, $originalProductPSE, $currencyId, $dispatcher);
+            // The default PSE, created at the same time as the clone product, is overwritten
+            $clonedProductPSEId = $this->createClonePSE($event, $originalProductPSE, $currencyId);
 
-            $this->updateClonePSE($clonedProduct, $clonedProductPSEId, $originalProduct, $originalProductPSE, $key, $dispatcher);
+            $this->updateClonePSE($event, $clonedProductPSEId, $originalProductPSE, $key);
 
             // PSE associated images
             $originalProductPSEImages = ProductSaleElementsProductImageQuery::create()
@@ -357,26 +355,27 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function createClonePSE(ProductModel $clonedProduct, $originalProductPSE, $currencyId, EventDispatcherInterface $dispatcher)
+    public function createClonePSE(ProductCloneEvent $event, $originalProductPSE, $currencyId)
     {
         $attributeCombinationList = AttributeCombinationQuery::create()
+            ->filterByProductSaleElementsId($originalProductPSE->getId())
             ->select(['ATTRIBUTE_AV_ID'])
-            ->findByProductSaleElementsId($originalProductPSE->getId());
+            ->find();
 
-        $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($clonedProduct, $attributeCombinationList, $currencyId);
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
+        $clonedProductCreatePSEEvent = new ProductSaleElementCreateEvent($event->getClonedProduct(), $attributeCombinationList, $currencyId);
+        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_PRODUCT_SALE_ELEMENT, $clonedProductCreatePSEEvent);
 
         return $clonedProductCreatePSEEvent->getProductSaleElement()->getId();
     }
 
-    public function updateClonePSE(ProductModel $clonedProduct, $clonedProductPSEId, ProductModel $originalProduct, $originalProductPSE, $key, EventDispatcherInterface $dispatcher)
+    public function updateClonePSE(ProductCloneEvent $event, $clonedProductPSEId, $originalProductPSE, $key)
     {
         $originalProductPSEPrice = ProductPriceQuery::create()
             ->findOneByProductSaleElementsId($originalProductPSE->getId());
 
-        $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($clonedProduct, $clonedProductPSEId);
+        $clonedProductUpdatePSEEvent = new ProductSaleElementUpdateEvent($event->getClonedProduct(), $clonedProductPSEId);
         $clonedProductUpdatePSEEvent
-            ->setReference($clonedProduct->getRef().'-'.($key + 1))
+            ->setReference($event->getClonedProduct()->getRef().'-'.($key + 1))
             ->setIsdefault($originalProductPSE->getIsDefault())
             ->setFromDefaultCurrency(0)
 
@@ -385,13 +384,13 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             ->setOnsale($originalProductPSE->getPromo())
             ->setIsnew($originalProductPSE->getNewness())
             ->setEanCode($originalProductPSE->getEanCode())
-            ->setTaxRuleId($originalProduct->getTaxRuleId())
+            ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
 
             ->setPrice($originalProductPSEPrice->getPrice())
             ->setSalePrice($originalProductPSEPrice->getPromoPrice())
             ->setCurrencyId($originalProductPSEPrice->getCurrencyId());
 
-        $dispatcher->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
+        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE_PRODUCT_SALE_ELEMENT, $clonedProductUpdatePSEEvent);
     }
 
     public function clonePSEAssociatedFiles($clonedProductId, $clonedProductPSEId, $originalProductPSEFiles, $type)
@@ -441,48 +440,6 @@ class ProductSaleElement extends BaseAction implements EventSubscriberInterface
             }
             $assoc
                 ->setProductSaleElementsId($clonedProductPSEId)
-                ->save();
-        }
-    }
-
-    public function clonePSEAssociatedImages($clonedProductId, $clonedProductPSEId, $originalProductPSEImages)
-    {
-        foreach ($originalProductPSEImages as $originalProductPSEImage) {
-            $originalProductImagePosition = ProductImageQuery::create()
-                ->select(['POSITION'])
-                ->findPk($originalProductPSEImage->getProductImageId());
-
-            $clonedProductImageIdToLinkToPSE = ProductImageQuery::create()
-                ->filterByProductId($clonedProductId)
-                ->filterByPosition($originalProductImagePosition)
-                ->select(['ID'])
-                ->findOne();
-
-            $assoc = new ProductSaleElementsProductImage();
-            $assoc
-                ->setProductSaleElementsId($clonedProductPSEId)
-                ->setProductImageId($clonedProductImageIdToLinkToPSE)
-                ->save();
-        }
-    }
-
-    public function clonePSEAssociatedDocuments($clonedProductId, $clonedProductPSEId, $originalProductPSEDocuments)
-    {
-        foreach ($originalProductPSEDocuments as $originalProductPSEDocument) {
-            $originalProductDocumentPosition = ProductDocumentQuery::create()
-                ->select(['POSITION'])
-                ->findPk($originalProductPSEDocument->getProductDocumentId());
-
-            $clonedProductDocumentIdToLinkToPSE = ProductDocumentQuery::create()
-                ->filterByProductId($clonedProductId)
-                ->filterByPosition($originalProductDocumentPosition)
-                ->select(['ID'])
-                ->findOne();
-
-            $assoc = new ProductSaleElementsProductDocument();
-            $assoc
-                ->setProductSaleElementsId($clonedProductPSEId)
-                ->setProductDocumentId($clonedProductDocumentIdToLinkToPSE)
                 ->save();
         }
     }

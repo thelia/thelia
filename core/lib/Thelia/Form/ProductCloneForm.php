@@ -1,4 +1,14 @@
 <?php
+/*************************************************************************************/
+/*      This file is part of the Thelia package.                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*      email : dev@thelia.net                                                       */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      For the full copyright and license information, please view the LICENSE.txt  */
+/*      file that was distributed with this source code.                             */
+/*************************************************************************************/
 
 namespace Thelia\Form;
 
@@ -38,9 +48,9 @@ class ProductCloneForm extends BaseForm
     {
         $originalRef = ProductQuery::create()
             ->filterByRef($value, Criteria::EQUAL)
-            ->find();
+            ->count();
 
-        if (count($originalRef) !== 0) {
+        if ($originalRef !== 0) {
             $context->addViolation($this->translator->trans('This product reference is already assigned to another product.'));
         }
     }
