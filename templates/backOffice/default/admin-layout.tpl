@@ -100,7 +100,7 @@
                             <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
                         </ul>
                     </li>
-                    <li>
+                    <li class="dropdown">
                         {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
                         <button class="dropdown-toggle" data-toggle="dropdown">
                             <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
