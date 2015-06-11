@@ -23,7 +23,7 @@
             {hookblock name="main.top-menu-customer" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'customer'}active{/if}" id="customers_menu">
 
-                    <a title="{intl l="Customers"}" data-toggle="collapse" href="#collapse-customer" {if $admin_current_location != 'customer'}class="collapsed"{/if}>
+                    <a title="{intl l="Customers"}" href="#collapse-customer" {if $admin_current_location == 'customer'}class="open"{/if}>
                         <span class="icon-customers"></span>
                         <span class="item-text">{intl l="Customers"} <span class="caret"></span></span>
                     </a>
@@ -53,7 +53,7 @@
     {loop name="menu-auth-order" type="auth" role="ADMIN" resource="admin.order" access="VIEW"}
     <li class="{if $admin_current_location == 'order'}active{/if}" id="orders_menu">
 
-        <a title="{intl l="Orders"}" data-toggle="collapse" href="#collapse-orders" {if $admin_current_location != 'order'}class="collapsed"{/if}>
+        <a title="{intl l="Orders"}" href="#collapse-orders" {if $admin_current_location == 'order'}class="open"{/if}>
             <span class="icon-orders"></span>
             <span class="item-text">{intl l="Orders"} <span class="caret"></span></span>
         </a>
@@ -94,7 +94,7 @@
             {hookblock name="main.top-menu-catalog" fields="id,class,url,title"}
             <li class="{if $admin_current_location == 'catalog'}active{/if}" id="catalog_menu">
 
-                <a title="{intl l="Catalog"}" data-toggle="collapse" href="#collapse-catalog" {if $admin_current_location != 'catalog'}class="collapsed"{/if}>
+                <a title="{intl l="Catalog"}" href="#collapse-catalog" {if $admin_current_location == 'catalog'}class="open"{/if}>
                     <span class="icon-catalog"></span>
                     <span class="item-text">{intl l="Catalog"} <span class="caret"></span></span>
                 </a>
@@ -126,7 +126,7 @@
             {hookblock name="main.top-menu-content" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'content'}active{/if}" id="contents_menu">
 
-                    <a title="{intl l="Folders"}" data-toggle="collapse" href="#collapse-content" {if $admin_current_location != 'content'}class="collapsed"{/if}>
+                    <a title="{intl l="Folders"}" href="#collapse-content" {if $admin_current_location == 'content'}class="open"{/if}>
                         <span class="icon-records"></span>
                         <span class="item-text">{intl l="Folders"} <span class="caret"></span></span>
                     </a>
@@ -155,7 +155,7 @@
 
     {loop name="menu-auth-tools" type="auth" role="ADMIN" resource="admin.tools"  access="VIEW"}
         <li class="{if $admin_current_location == 'tools'}active{/if}" id="tools_menu">
-            <a title="{intl l="Tools"}" data-toggle="collapse" href="#collapse-tools" {if $admin_current_location != 'tools'}class="collapsed"{/if}>
+            <a title="{intl l="Tools"}" href="#collapse-tools" {if $admin_current_location == 'tools'}class="open"{/if}>
                 <span class="icon-tools"></span>
                 <span class="item-text">{intl l="Tools"} <span class="caret"></span></span>
             </a>
@@ -198,7 +198,7 @@
         {ifhook rel="main.top-menu-modules"}
             {hookblock name="main.top-menu-modules" fields="id,class,url,title"}
             <li class="{if $admin_current_location == 'modules'}active{/if}" id="modules_menu">
-                <a title="{intl l="Modules"}" data-toggle="collapse" href="#collapse-modules" {if $admin_current_location != 'modules'}class="collapsed"{/if}>
+                <a title="{intl l="Modules"}" href="#collapse-modules" {if $admin_current_location == 'modules'}class="open"{/if}>
                     <span class="icon-modules"></span>
                     <span class="item-text">{intl l="Modules"}<span class="caret"></span></span>
                 </a>
@@ -229,7 +229,7 @@
         {ifhook rel="main.top-menu-configuration"}
             {hookblock name="main.top-menu-configuration" fields="id,class,url,title"}
                 <li class="{if $admin_current_location == 'configuration'}active{/if}" id="config_menu">
-                    <a title="{intl l="Configuration"}" data-toggle="collapse" href="#collapse-configuration" {if $admin_current_location != 'configuration'}class="collapsed"{/if}>
+                    <a title="{intl l="Configuration"}" href="#collapse-configuration" {if $admin_current_location == 'configuration'}class="open"{/if}>
                         <span class="icon-configuration"></span>
                         <span class="item-text">{intl l="Configuration"}<span class="caret"></span></span>
                     </a>

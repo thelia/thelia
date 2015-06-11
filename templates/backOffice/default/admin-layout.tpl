@@ -191,7 +191,16 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/libs/metis-menu.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     {block name="javascript-initialization"}{/block}
+
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     <script>
         (function($) {
             $(document).ready(function(){
@@ -208,81 +217,6 @@
                         console.log($firstField);
                         $firstField.focus();
                     });
-                }
-
-                /**
-                 * Managment of navigation toggle
-                 */
-                var $menuLeft = $('#main-navbar'),
-                        $showLeftPush = $('#main-navbar-collapse'),
-                        $body = $('body');
-
-                initNavbarHeight();
-
-                $(window).on('resize', function() {
-                    initNavbarHeight();
-                });
-
-                doTooltip();
-                manageCollapse();
-
-                $showLeftPush.on('click', function() {
-                    $showLeftPush.toggleClass('active');
-                    $menuLeft.toggleClass('open').toggleClass('closed');
-
-                    doTooltip();
-                    manageCollapse();
-                });
-
-                /**
-                 * Block bootstrap collapse effect on mini navigation
-                 */
-                $('[data-toggle="collapse"]', $menuLeft).each(function() {
-                    var $link = $(this);
-
-                    $link.on('click', $menuLeft, function() {
-                        initNavbarHeight();
-
-                        if (!$menuLeft.hasClass('open') && $(window).innerWidth > 991) {
-                            return false;
-                        }
-                    });
-                });
-
-                var $showTop = $('#main-navbar-collapse-mobile');
-                $showTop.on('click', function() {
-                    $showTop.toggleClass('active');
-                    $menuLeft.toggleClass('open').toggleClass('closed');
-                });
-
-                function doTooltip() {
-                    if ($menuLeft.is('.closed')) {
-                        $('> ul > li > a', $menuLeft).tooltip({
-                            placement: 'right'
-                        });
-
-                        $('#orders_menu a, #tools_menu a').tooltip('destroy');
-                    } else {
-                        $('> ul > li > a', $menuLeft).tooltip('destroy');
-                    }
-                }
-
-                function manageCollapse() {
-                    $('[data-toggle="collapse"]').next('ul').removeClass('in');
-
-                    if ($menuLeft.is('.closed')) {
-                        $('[data-toggle="collapse"]').on('click', function () {
-                            return false;
-                        });
-                    } else {
-                        $('[data-toggle="collapse"]').on('click', function () {
-                            $(this).next('ul').collapse('toggle');
-                        });
-                    }
-                }
-
-                function initNavbarHeight() {
-                    $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
                 }
 
                 // Init event trigger

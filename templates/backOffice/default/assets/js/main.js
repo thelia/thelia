@@ -1,6 +1,8 @@
 (function($, window, document){
     
     $(function(){
+
+        $('#side-menu').metisMenu();
         
         $(window).bind("load resize", function() {
             topOffset = 52;
