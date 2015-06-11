@@ -80,19 +80,22 @@
                                         {/if}
                                     </td>
                                     {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {* if admin is current admin :
                                                 - can UPDATE anyway
                                                 - cannot delete himself
                                             *}
                                             {if $can_update}
-                                                <a class="btn btn-default btn-xs js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/if}
 
                                             {if $ID != {admin attr="id"}}
                                                 {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.administrator" access="DELETE"}
-                                                    <a class="btn btn-default btn-xs js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                                    <a class="js-delete-administrator" title="{intl l='Delete this administrator'}" href="#administrator_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                                 {/loop}
                                             {/if}
                                         </div>

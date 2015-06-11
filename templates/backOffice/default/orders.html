@@ -137,14 +137,16 @@
 		                                {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
                                         <td>
-		                                    <div class="btn-group">
-
-				                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-				                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            <div class="btn-toolbar btn toolbar-primary">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </div>
+                                            <div class="toolbar-options hidden">
+                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+                                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                     {if $STATUS !== 5}
-				                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                     {/if}
-				                                {/loop}
+                                                {/loop}
 				                            </div>
 		                                </td>
 		                            </tr>

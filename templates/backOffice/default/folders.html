@@ -303,14 +303,17 @@
                                         }
                                     </td>
 
-                                    <td>
-                                        <div class="btn-group">
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this content'}" href="{url path="admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
-                                                <a class="btn btn-default btn-xs content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>

@@ -121,7 +121,7 @@
 
                     {hook name="modules.table-row" location="modules_table_row" }
 
-                    <td class="text-right">
+                    <td class="actions">
                         {if $module_type == 2}
                             {ifloop rel="area-attached"}
                                 {$zones=""}
@@ -141,32 +141,35 @@
 
                             <a class="{if ! $ACTIVE}disabled {/if} btn {$btnstyle} btn-xs config-btn-{$ID}" title="{$title}" href="{url path="/admin/configuration/shipping_zones/update/%id" id=$ID}">{$icon nofilter}{intl l="Shipping zones"}</a>
                         {/if}
-                        <div class="btn-group">
+                        <div class="separate-from-left btn-toolbar btn toolbar-primary">
+                            <span class="glyphicon glyphicon-cog"></span>
+                        </div>
+                        <div class="toolbar-options hidden">
                             {if $EXISTS}
 
                                 {if $CONFIGURABLE == 1}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="{if ! $ACTIVE}disabled {/if} btn btn-primary btn-xs config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}">{intl l="Configure"}</a>
+                                        <a class="{if ! $ACTIVE}disabled {/if} config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
                                     {/loop}
                                 {/if}
 
                                 {if $HOOKABLE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                <a class="{if ! $ACTIVE}disabled {/if} btn btn-default btn-xs" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
+                                <a class="{if ! $ACTIVE}disabled {/if}" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
                             {/loop}
                                 {/if}
 
                                 {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
+                                    <a title="{intl l='Read the documentation of this module'}" href="{url path="/admin/module/documentation/$ID"}"></a>
                                 {/loop*}
 
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module" access="UPDATE"}
-                                    <a class="btn btn-default btn-xs" title="{intl l='Edit this module'}" href="{url path="/admin/module/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                    <a title="{intl l='Edit this module'}" href="{url path="/admin/module/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                 {/loop}
                             {/if}
 
                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.module" access="DELETE"}
-                                <a class="btn btn-default btn-xs module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                <a class="module-delete-action" title="{intl l='Delete this module'}" href="#delete_module_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                             {/loop}
                         </div>
                     </td>

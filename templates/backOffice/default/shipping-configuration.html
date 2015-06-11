@@ -81,13 +81,16 @@
 
                                     {hook name="shipping-configuration.table-row" location="shipping_configuration_table_row" area_id={$ID} }
 
-                                    <td nowrap class="text-center">
-                                        <div class="btn-group">
+                                    <td nowrap class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.shipping-configuration" access="UPDATE"}
-                                               <a class="btn btn-default btn-xs area-configuration-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}"><i class="glyphicon glyphicon-edit"></i></a>
+                                               <a class="area-configuration-change" title="{intl l='Change this shipping zone'}" href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.shipping-configuration" access="DELETE"}
-                                                <a class="btn btn-default btn-xs area-configuration-delete" title="{intl l='Delete this shipping zone'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
+                                                <a class="area-configuration-delete" title="{intl l='Delete this shipping zone'}"  href="#delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
