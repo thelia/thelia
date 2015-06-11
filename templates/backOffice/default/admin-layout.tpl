@@ -75,7 +75,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.html">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</a>
+                    <a class="navbar-brand" href="index.html">
+                        {images file='assets/img/logo-white.png'}
+                            <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
+                        {/images}
+                    </a>
                 </div>
                 <!-- /.navbar-header -->
 
