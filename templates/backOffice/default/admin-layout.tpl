@@ -367,6 +367,7 @@
                         $content = $btn.next('.toolbar-options');
 
                     $btn.toolbar({
+                        event: 'click',
                         content: $content,
                         style: 'info'
                     });
