@@ -26,9 +26,15 @@
 
     ul li {
         border-bottom: 1px solid #000;
+    }
 
-        a.active {
-            background-color: #eee;
+    a {
+        color: @navbar-default-link-color;
+
+        &:hover,
+        &:focus {
+            color: @navbar-default-link-hover-color;
+            background-color: @navbar-default-link-hover-bg;
         }
     }
 }
