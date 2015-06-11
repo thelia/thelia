@@ -73,7 +73,7 @@
                         <span class="sr-only">Toggle navigation</span>
                         <span></span>
                     </button>
-                    <a class="navbar-brand" href="index.html">
+                    <a class="navbar-brand" href="{url path='/admin/home'}">
                         {images file='assets/img/logo-white.png'}
                             <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
                             <span>{intl l='Version %ver' ver="{$THELIA_VERSION}"}</span>
@@ -133,7 +133,7 @@
                 
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header">Dashboard</h1>
+                        <h1 class="page-header">{block name="page-title"}{/block}</h1>
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
