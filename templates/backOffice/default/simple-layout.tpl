@@ -56,49 +56,96 @@
     <![endif]-->
 </head>
 
-<body>
-            
+<body class="login-page">
+
+    {hook name="main.before-topbar" location="before_topbar" }
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{url path='/admin'}">
+                    {images file='assets/img/logo-white.png'}
+                        <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
+                        <span>{intl l='Version %ver' ver="{$THELIA_VERSION}"}</span>
+                    {/images}
+                </a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                {hook name="main.topbar-top" }
+
+                <li>
+                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                </li>
+            </ul>
+            <!-- /.navbar-top-links -->
+        </div>
+
+        {hook name="main.after-topbar" location="after_topbar" }
+    </nav>
+
+
     <div class="container">
-        {block name="main-content"}{/block}
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">{block name="page-title"}{/block}</h1>
+            </div>
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+
+        {* -- Main page content section ----------------------------------------- *}
+        {hook name="main.before-content" location="before_content"}
+
+        <div class="row">
+            {block name="main-content"}Put here the content of the template{/block}
+        </div>
+
+        {hook name="main.after-content" location="after_content"}
     </div>
 
-    {hook name="main.before-footer" location="before_footer" }
+{hook name="main.before-footer" location="before_footer" }
 
-    <footer class="footer">
-        <div class="container">
-            <p>{intl l='&copy; Thelia 2013'}
+<footer class="footer">
+    <div class="container">
+        <p>{intl l='&copy; Thelia 2013'}
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
             - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
             - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
-            </p>
+        </p>
 
-            {hook name="main.in-footer" location="in_footer" }
+        {hook name="main.in-footer" location="in_footer" }
 
-        </div>
-    </footer>
+    </div>
+</footer>
 
-    {hook name="main.after-footer" location="after_footer" }
-    
+{hook name="main.after-footer" location="after_footer" }
 
-	{* -- Javascript section ------------------------------------------------ *}
+{* -- Javascript section ------------------------------------------------ *}
 
-	{block name="before-javascript-include"}{/block}
-    <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
-    <script>
-        if (typeof jQuery == 'undefined') {
-            {javascripts file='assets/js/libs/jquery.js'}
-            document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
-            {/javascripts}
-        }
-    </script>
+{block name="before-javascript-include"}{/block}
+<script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
+<script>
+    if (typeof jQuery == 'undefined') {
+        {javascripts file='assets/js/libs/jquery.js'}
+        document.write(unescape("%3Cscript src='{$asset_url}' %3E%3C/script%3E"));
+        {/javascripts}
+    }
+</script>
 
-	{block name="after-javascript-include"}{/block}
+{block name="after-javascript-include"}{/block}
 
-    {block name="javascript-initialization"}{/block}
+{javascripts file='assets/js/bootstrap/bootstrap.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}
 
-	{* Modules scripts are included now *}
-    {hook name='main.footer-js' location="footer_js"}
+{block name="javascript-initialization"}{/block}
 
-    {block name="javascript-last-call"}{/block}
-    </body>
+{* Modules scripts are included now *}
+{hook name='main.footer-js' location="footer_js"}
+
+{block name="javascript-last-call"}{/block}
+</body>
 </html>
