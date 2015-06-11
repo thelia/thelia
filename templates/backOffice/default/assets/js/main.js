@@ -22,7 +22,48 @@
             if (height > topOffset) {
                 $("#page-wrapper").css("min-height", (height - topOffset - 25) + "px");
             }
-        });        
+        });
+
+        var testModal = $(".modal-force-show");
+        if(testModal.length > 0) {
+            testModal.modal("show");
+        }
+
+        // Autofocus first form field on modal
+        var $modal = $('.modal');
+        if ($modal.length > 0) {
+            $modal.on('shown.bs.modal', function() {
+                var $firstField = $('input:visible:first', $modal);
+                console.log($firstField);
+                $firstField.focus();
+            });
+        }
+
+        // Init event trigger
+        var event = 'hover';
+
+        if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            event = 'click';
+        }
+
+        // Toolbar managment
+        $('.btn-toolbar').each(function() {
+            var $btn = $(this),
+                $content = $btn.next('.toolbar-options');
+
+            $btn.toolbar({
+                event: event,
+                content: $content,
+                style: 'info'
+            });
+
+            $('a', '.tool-items').on('click', function(){
+                // If you want to prevent a link is followed, add .no-follow-link class to your link
+                if (!$(this).attr('data-toggle') && !$(this).is('.no-follow-link')) {
+                    window.location = $(this).attr('href');
+                }
+            });
+        });
 
         // -- Bootstrap tooltip --
         if($('[rel="tooltip"]').length){            

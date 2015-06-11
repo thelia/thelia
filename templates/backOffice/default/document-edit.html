@@ -127,13 +127,6 @@
     </div>
 {/block}
 
-{block name="javascript-initialization"}
-    {javascripts file='assets/js/main.js'}
-        <script src="{$asset_url}"></script>
-    {/javascripts}
-
-{/block}
-
 {block name="javascript-last-call"}
     {hook name="document.edit-js" location="document-edit-js" document_id={$documentId} }
 
