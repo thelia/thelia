@@ -4,6 +4,7 @@
 - Add missing column default_template_id in category_version table
 - The product parameter of the feature_value loop is no longer mandatory
 - The product parameter new $PRODUCT variable is deprecated. $PRODUCT_ID should be used instead.
+- Fix smarty `format_date` function to use consistent format when `locale` attribute is used.
 
 # 2.2.0-alpha2
 
