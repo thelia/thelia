@@ -46,7 +46,7 @@
  			</div>
             {/loop}
 
-	 		<div class="grid-container">
+	 		<div class="row">
 
                 {* Do not display shop information block if user none of the required authorizations *}
 
@@ -101,7 +101,7 @@
                 {/capture}
 
                 {if trim($smarty.capture.shop_information_block_content) ne ""}
-                    <div class="grid-box">
+                    <div class="col-md-4">
                         <div class="general-block-decorator">
                             <div class="title title-without-tabs">{intl l="Shop Informations"}</div>
                             <div class="table-responsive">
@@ -116,7 +116,7 @@
                 {/if}
 
                 {loop type="auth" name="can_view" role="ADMIN" resource="admin.order" access="VIEW"}
-				<div class="grid-box">
+				<div class="col-md-4">
 					<div class="general-block-decorator">
 						<div class="title title-without-tabs">{intl l="Sales statistics"}</div>
 
@@ -258,7 +258,7 @@
                 </div>
                 {/loop}
 
-                <div class="grid-box">
+                <div class="col-md-4">
                     <div class="general-block-decorator">
                         <div class="title title-without-tabs">{intl l="Thelia informations"}</div>
                         <div class="table-responsive">
@@ -284,7 +284,7 @@
 
                 {hookblock name="home.block" fields="id,title,content"}
                     {forhook rel="home.block"}
-                        <div class="grid-box">
+                        <div class="col-md-4">
                             <div {if $id}id="{$id}"{/if} class="general-block-decorator">
                                 {if $title}<div class="title title-without-tabs">{$title}</div>{/if}
                                 {$content}
@@ -313,9 +313,6 @@
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
     {javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
-        <script type="text/javascript" src="{$asset_url}"></script>
-    {/javascripts}
-    {javascripts file='assets/js/blocksit.min.js'}
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
 
@@ -460,9 +457,7 @@ jQuery(function($){
 
         $(window).bind('resize', function(event, ui) {
             jQPlotInstance.replot( { resetAxes: true } );
-        });
-
-        $('#main-navbar').height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
+        });        
 
     }
     {/literal}
@@ -478,38 +473,7 @@ jQuery(function($){
         $('#latest-thelia-version').text(data);
     }).fail(function() {
         $('#latest-thelia-version').text("Unavailable");
-    });
-
-    // Grid setup
-    var currentGridNbCol = 0;
-
-    function refreshGrid() {
-        var winWidth = $(window).width();
-        var gridNbCol = 0;
-
-        if(winWidth < 480) {
-            gridNbCol = 1
-        } else if(winWidth < 768) {
-            gridNbCol = 2
-        } else {
-            gridNbCol = 3;
-        }
-
-        currentGridNbCol = gridNbCol;
-
-        $('.grid-container').BlocksIt({
-            numOfCol: gridNbCol,
-            offsetX: 5,
-            offsetY: 5,
-            blockElement: '.grid-box'
-        });
-
-    }
-
-    $(window).resize(function() {
-        refreshGrid();
-    });
-    refreshGrid();
+    });    
 
 });
 

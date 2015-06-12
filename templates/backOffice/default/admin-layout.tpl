@@ -57,193 +57,117 @@
 </head>
 
 <body>
-	{* display top bar only if admin is connected *}
+    <div id="wrapper">
+        
+        {* display top bar only if admin is connected *}
+        {loop name="top-bar-auth" type="auth" role="ADMIN"}
 
-	{loop name="top-bar-auth" type="auth" role="ADMIN"}
+            {* -- Brand bar section ------------------------------------------------- *}
 
-	    {* -- Brand bar section ------------------------------------------------- *}
+            {hook name="main.before-topbar" location="before_topbar" }
 
-		{hook name="main.before-topbar" location="before_topbar" }
+            <!-- Navigation -->
+            <nav class="navbar navbar-default navbar-static-top" role="navigation">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span></span>
+                    </button>
+                    <a class="navbar-brand" href="{url path='/admin/home'}">
+                        {images file='assets/img/logo-white.png'}
+                            <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
+                            <span>{intl l='Version %ver' ver="{$THELIA_VERSION}"}</span>
+                        {/images}
+                    </a>
+                </div>
+                <!-- /.navbar-header -->
 
-		<div class="topbar">
-            <button type="button" class="hidden-sm hidden-xs" id="main-navbar-collapse">
-                <span></span>
-            </button>
-
-			<div class="container">
-
-		        <div class="row">
-		            <div class="col-md-12 clearfix">
-		      		    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-
-                        <div class="clearfix pull-right hidden-xs hidden-sm">
-                            <div class="button-toolbar pull-right" role="toolbar">
-
-                                {hook name="main.topbar-top" }
-
-                                <div class="btn-group">
-                                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                                    <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}</button>
-                                    <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-                                        <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-                                    </ul>
-                                </div>
-
-                                <div class="btn-group">
-                                    {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                                    <button class="btn btn-default">
-                                        <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
-                                    </button>
-                                    {/loop}
-
-                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        {loop type="lang" name="ui-lang"}
-                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
-                                        {/loop}
-                                     </ul>
-                                </div>
-
-                                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                                    <form class="navbar-form pull-right hidden-xs hidden-sm" action="{url path='/admin/search'}">
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                                        </div>
-                                        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                                    </form>
-                                {/loop}
-
-
-                                {hook name="main.topbar-bottom" }
-
-                            </div>
-                        </div>
-
-		            </div>
-
-		    		{hook name="main.inside-topbar" location="inside_topbar" }
-
-		        </div>
-
-		    </div>
-		</div>
-
-		{hook name="main.after-topbar" location="after_topbar" }
-
-	    {* -- Top menu section -------------------------------------------------- *}
-		{include file="includes/main-menu.html"}
-
-        <div class="visible-sm visible-xs">
-            <div class="container">
-
-                <div class="button-toolbar" id="btn-toolbar-mobile" role="toolbar">
-
+                <ul class="nav navbar-top-links navbar-right">                
                     {hook name="main.topbar-top" }
+                    
+                    <li>
+                        <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
+                    </li>
+                    <li class="dropdown">
+                        <button class="dropdown-toggle" data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-user"></span> {admin attr="firstname"} {admin attr="lastname"}
+                            <span class="caret"></span>
+                        </button>                        
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
+                            <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
+                        <button class="dropdown-toggle" data-toggle="dropdown">
+                            <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
+                            <span class="caret"></span>
+                        </button>
+                        {/loop}
 
-                    <div class="clearfix">
-                        <div class="btn-group pull-left">
-                            <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                            <button class="btn btn-primary"><span class="glyphicon glyphicon-user"></span> <span class="hidden-xs">{admin attr="firstname"} {admin attr="lastname"}</span></button>
-                            <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li><a class="profile" href="{url path='admin/configuration/administrators'}"><span class="glyphicon glyphicon-edit"></span> {intl l="Profil"}</a></li>
-                                <li><a class="logout" href="{url path='admin/logout'}" title="{intl l='Close administation session'}"><span class="glyphicon glyphicon-off"></span> {intl l="Logout"}</a></li>
-                            </ul>
-                        </div>
-
-                        <div class="btn-group pull-right">
-                            {loop type="lang" name="ui-lang" id="{lang attr='id'}"}
-                                <button class="btn btn-default">
-                                    <img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}
-                                </button>
+                        <ul class="dropdown-menu">
+                            {loop type="lang" name="ui-lang"}
+                                <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                             {/loop}
+                         </ul>
+                    </li>
+                </ul>
+                <!-- /.navbar-top-links -->
 
-                            <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                {loop type="lang" name="ui-lang"}
-                                    <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
-                                {/loop}
-                            </ul>
-                        </div>
+                <div class="navbar-default sidebar" role="navigation">
+                    <div class="sidebar-nav navbar-collapse">
+                        
+                        {include file="includes/main-menu.html"}
+                        
+                        {hook name="main.inside-topbar" location="inside_topbar" }
                     </div>
-
-                    {hook name="main.topbar-bottom" }
-
+                    <!-- /.sidebar-collapse -->
                 </div>
+                <!-- /.navbar-static-side -->
+                
+                {hook name="main.after-topbar" location="after_topbar" }
+            </nav>
 
-                {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
-                    <form id="mobile-search-engine" action="{url path='/admin/search'}">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
-                            <span class="input-group-btn">
-                                <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span></button>
-                            </span>
-                        </div>
-                    </form>
-                {/loop}
+            <div id="page-wrapper">                        
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">{block name="page-title"}{/block}</h1>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                
+                {* -- Main page content section ----------------------------------------- *}
+                {hook name="main.before-content" location="before_content"}
+                
+                <div class="row">
+                    {block name="main-content"}Put here the content of the template{/block}
+                </div>
+                
+                {hook name="main.after-content" location="after_content"}                
+                
+            </div>
+        {/loop}
+
+        {hook name="main.before-footer" location="before_footer" }
+
+        <footer class="footer">
+            <div class="container">
+                <p>{intl l='&copy; Thelia 2013'}
+                - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
+                - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
+                - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
+                </p>
+
+                {hook name="main.in-footer" location="in_footer" }
 
             </div>
-        </div>
+        </footer>
 
-	{/loop}
-
-    {* A basic brandbar is displayed if user is not connected *}
-
-	{elseloop rel="top-bar-auth"}
-    <div class="topbar">
-        <div class="container">
-
-            <div class="row">
-                <div class="col-md-12 clearfix">
-                    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
-                    <div class="clearfix pull-right hidden-xs">
-                        <div class="button-toolbar pull-right" role="toolbar">
-                            <div class="btn-group">
-                                <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank" class="btn btn-default"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-	{/elseloop}
-
-    {* -- Main page content section ----------------------------------------- *}
-    {hook name="main.before-content" location="before_content"}
-
-	{block name="main-content"}Put here the content of the template{/block}
-
-    {hook name="main.after-content" location="after_content"}
-    {* -- Footer section ---------------------------------------------------- *}
-
-    {hook name="main.before-footer" location="before_footer" }
-
-    <hr />
-    <footer class="footer">
-        <div class="container">
-            <p>{intl l='&copy; Thelia 2013'}
-            - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
-            - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
-            - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
-            </p>
-
-            {hook name="main.in-footer" location="in_footer" }
-
-        </div>
-    </footer>
-
-    {hook name="main.after-footer" location="after_footer" }
+        {hook name="main.after-footer" location="after_footer" }
+    </div> <!-- #wrapper -->
 
 	{* -- Javascript section ------------------------------------------------ *}
 
@@ -267,129 +191,15 @@
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file='assets/js/libs/metis-menu.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     {block name="javascript-initialization"}{/block}
-    <script>
-        (function($) {
-            $(document).ready(function(){
-                var testModal = $(".modal-force-show");
-                if(testModal.length > 0) {
-                    testModal.modal("show");
-                }
 
-                // Autofocus first form field on modal
-                var $modal = $('.modal');
-                if ($modal.length > 0) {
-                    $modal.on('shown.bs.modal', function() {
-                        var $firstField = $('input:visible:first', $modal);
-                        console.log($firstField);
-                        $firstField.focus();
-                    });
-                }
-
-                /**
-                 * Managment of navigation toggle
-                 */
-                var $menuLeft = $('#main-navbar'),
-                        $showLeftPush = $('#main-navbar-collapse'),
-                        $body = $('body');
-
-                initNavbarHeight();
-
-                $(window).on('resize', function() {
-                    initNavbarHeight();
-                });
-
-                doTooltip();
-                manageCollapse();
-
-                $showLeftPush.on('click', function() {
-                    $showLeftPush.toggleClass('active');
-                    $menuLeft.toggleClass('open').toggleClass('closed');
-
-                    doTooltip();
-                    manageCollapse();
-                });
-
-                /**
-                 * Block bootstrap collapse effect on mini navigation
-                 */
-                $('[data-toggle="collapse"]', $menuLeft).each(function() {
-                    var $link = $(this);
-
-                    $link.on('click', $menuLeft, function() {
-                        initNavbarHeight();
-
-                        if (!$menuLeft.hasClass('open') && $(window).innerWidth > 991) {
-                            return false;
-                        }
-                    });
-                });
-
-                var $showTop = $('#main-navbar-collapse-mobile');
-                $showTop.on('click', function() {
-                    $showTop.toggleClass('active');
-                    $menuLeft.toggleClass('open').toggleClass('closed');
-                });
-
-                function doTooltip() {
-                    if ($menuLeft.is('.closed')) {
-                        $('> ul > li > a', $menuLeft).tooltip({
-                            placement: 'right'
-                        });
-
-                        $('#orders_menu a, #tools_menu a').tooltip('destroy');
-                    } else {
-                        $('> ul > li > a', $menuLeft).tooltip('destroy');
-                    }
-                }
-
-                function manageCollapse() {
-                    $('[data-toggle="collapse"]').next('ul').removeClass('in');
-
-                    if ($menuLeft.is('.closed')) {
-                        $('[data-toggle="collapse"]').on('click', function () {
-                            return false;
-                        });
-                    } else {
-                        $('[data-toggle="collapse"]').on('click', function () {
-                            $(this).next('ul').collapse('toggle');
-                        });
-                    }
-                }
-
-                function initNavbarHeight() {
-                    $menuLeft.height($(document).height() - $('.topbar').height() + 1); // +1 because border 1px
-                }
-
-                // Init event trigger
-                var event = 'hover';
-
-                if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                    event = 'click';
-                }
-
-                // Toolbar managment
-                $('.btn-toolbar').each(function() {
-                    var $btn = $(this),
-                        $content = $btn.next('.toolbar-options');
-
-                    $btn.toolbar({
-                        event: event,
-                        content: $content,
-                        style: 'info'
-                    });
-
-                    $('a', '.tool-items').on('click', function(){
-                        // If you want to prevent a link is followed, add .no-follow-link class to your link
-                        if (!$(this).attr('data-toggle') && !$(this).is('.no-follow-link')) {
-                            window.location = $(this).attr('href');
-                        }
-                    });
-                });
-
-            });
-        })(jQuery);
-    </script>
+    {javascripts file='assets/js/main.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
 	{* Modules scripts are included now *}
     {hook name='main.footer-js' location="footer_js"}
