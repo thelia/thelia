@@ -234,12 +234,13 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product features
         foreach ($originalProductFeatures as $originalProductFeature) {
             // Check if the feature value is a text one or not
-            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null)
+            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
                 $value = $originalProductFeature->getFreeTextValue();
-            elseif ($originalProductFeature->getFeatureAvId() != null && $originalProductFeature->getFreeTextValue() == null)
+            } elseif ($originalProductFeature->getFeatureAvId() != null && $originalProductFeature->getFreeTextValue() == null) {
                 $value = $originalProductFeature->getFeatureAvId();
-            else
+            } else {
                 throw new \Exception('Feature value is not defined');
+            }
 
             $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
                 $event->getClonedProduct()->getId(),
@@ -247,8 +248,9 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $value
             );
 
-            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null)
+            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
                 $clonedProductCreateFeatureEvent->setIsTextValue(true);
+            }
 
             $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
         }

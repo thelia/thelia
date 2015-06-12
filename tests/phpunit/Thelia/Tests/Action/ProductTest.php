@@ -456,7 +456,7 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         $clonedProductSaleElements = $cloneProduct->getProductSaleElementss();
 
-        $this->assertEquals(1, count($clonedProductSaleElements), 'There is not only one default PSE (maybe more, maybe none)');
+        $this->assertCount(1, $clonedProductSaleElements, 'There is not only one default PSE (maybe more, maybe none)');
 
         $clonedDefaultPSE = $clonedProductSaleElements->getFirst();
 
@@ -641,6 +641,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @covers \Thelia\Action\File::cloneFile
      * @depends testCloneAssociatedContent
      * @param ProductCloneEvent $event
      * @return ProductCloneEvent
@@ -752,6 +753,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @covers Thelia\Action\ProductSaleElement::createClonePSE
      * @depends testCloneFile
      * @param ProductCloneEvent $event
      * @return ProductCloneEvent
@@ -807,6 +809,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @covers \Thelia\Action\ProductSaleElement::updateClonePSE
      * @depends testCreateClonePSE
      * @param array $params
      * @return array
@@ -867,6 +870,7 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
+     * @covers \Thelia\Action\ProductSaleElement::clonePSEAssociatedFiles
      * @depends testUpdateClonePSE
      * @param array $params
      */
@@ -940,6 +944,5 @@ class ProductTest extends TestCaseWithURLToolSetup
                     break;
             }
         }
-
     }
 }
