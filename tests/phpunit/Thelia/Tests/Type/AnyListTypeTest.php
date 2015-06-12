@@ -30,12 +30,32 @@ class AnyListTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testFormatAnyListType()
     {
-        $AnyListType = new AnyListType();
+        $anyListType = new AnyListType();
 
-        $AnyListFormat = $AnyListType->getFormattedValue('string_1,string_2,string_3');
+        $anyListFormat = $anyListType->getFormattedValue('string_1,string_2,string_3');
 
-        $this->assertTrue(is_array($AnyListFormat));
-        $this->assertEquals(count($AnyListFormat), 3);
-        $this->assertEquals($AnyListFormat[1], 'string_2');
+        $this->assertTrue(is_array($anyListFormat));
+        $this->assertCount(3, $anyListFormat);
+        $this->assertEquals($anyListFormat[1], 'string_2');
+
+    }
+
+    public function testEmptyAnyListType()
+    {
+        $anyListType = new AnyListType();
+
+        $this->assertNull($anyListType->getFormattedValue(null));
+        $this->assertNull($anyListType->getFormattedValue(''));
+    }
+
+    public function testSimpleStringAnyListType()
+    {
+        $anyListType = new AnyListType();
+
+        $result = $anyListType->getFormattedValue('foo');
+
+        $this->assertTrue(is_array($result));
+        $this->assertCount(1, $result);
+        $this->assertEquals('foo', $result[0]);
     }
 }
