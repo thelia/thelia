@@ -106,7 +106,7 @@ class Image extends BaseCachedFile implements EventSubscriberInterface
                 throw new ImageException(sprintf("Source image file %s does not exists.", $source_file));
             }
 
-            // Create a chached version of the original image in the web space, if not exists
+            // Create a cached version of the original image in the web space, if not exists
 
             if (! file_exists($originalImagePathInCache)) {
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');

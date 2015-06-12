@@ -635,6 +635,8 @@ return array(
     'If a translation is missing or incomplete :' => 'Si une traduction est manquante ou incomplète :',
     'If yes, redirections through Redirect::exec() will be displayed as links' => 'Si oui, les redirections générés pas Redirect::exec seront affichés par des liens',
     'If you change the template, all the prices will be reset and you have to configure them again.' => 'En changeant de template, les prix vont être réinitialiser et vous devrez les reconfigurer',
+    'Clone product' => 'Cloner le produit',
+    'Clone' => 'Cloner',
     'If your aim is just to translate text for your website, please use the user mode.<br>' => 'Si votre but est simplement de traduire votre site, veuillez utiliser le mode utilisateur.<br>',
     'Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.' => 'La chaîne semble contient une variable smarty (&#36;). Si c\'est le cas elle ne peut pas être traduite correctement',
     'Image information' => 'Information de l\'image',

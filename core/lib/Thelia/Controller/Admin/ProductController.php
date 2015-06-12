@@ -20,6 +20,7 @@ use Thelia\Core\Event\MetaData\MetaDataDeleteEvent;
 use Thelia\Core\Event\Product\ProductAddAccessoryEvent;
 use Thelia\Core\Event\Product\ProductAddCategoryEvent;
 use Thelia\Core\Event\Product\ProductAddContentEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Core\Event\Product\ProductCombinationGenerationEvent;
 use Thelia\Core\Event\Product\ProductCreateEvent;
 use Thelia\Core\Event\Product\ProductDeleteAccessoryEvent;
@@ -1113,7 +1114,7 @@ class ProductController extends AbstractSeoCrudController
                 $this->processSingleProductSaleElementUpdate($data);
             }
 
-            // If we have to stay on the same page, do not redirect to the succesUrl, just redirect to the edit page again.
+            // If we have to stay on the same page, do not redirect to the successUrl, just redirect to the edit page again.
             if ($this->getRequest()->get('save_mode') == 'stay') {
                 return $this->redirectToEditionTemplate($this->getRequest());
             }
@@ -1803,5 +1804,43 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return $status;
+    }
+
+    /**
+     * @return mixed|\Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     */
+    public function cloneAction()
+    {
+        if (null !== $response = $this->checkAuth($this->resourceCode, $this->getModuleCode(), [AccessManager::CREATE, AccessManager::UPDATE])) {
+            return $response;
+        }
+
+        // Initialize vars
+        $cloneProductForm = $this->createForm(AdminForm::PRODUCT_CLONE);
+        $lang = $this->getSession()->getLang()->getLocale();
+
+        try {
+            // Check the form against constraints violations
+            $form = $this->validateForm($cloneProductForm, "POST");
+
+            $originalProduct = ProductQuery::create()
+                ->findPk($form->getData()['productId']);
+
+            // Build and dispatch product clone event
+            $productCloneEvent = new ProductCloneEvent(
+                $form->getData()['newRef'],
+                $lang,
+                $originalProduct
+            );
+            $this->dispatch(TheliaEvents::PRODUCT_CLONE, $productCloneEvent);
+
+            return $this->generateRedirectFromRoute(
+                'admin.products.update',
+                array('product_id' => $productCloneEvent->getClonedProduct()->getId())
+            );
+        } catch (FormValidationException $e) {
+            throw new \Exception($this->createStandardFormValidationErrorMessage($e));
+        }
     }
 }

@@ -279,10 +279,20 @@ final class TheliaEvents
     // -- END PRODUCT EVENTS ---------------------------------------------------------
 
 
+    // -- CLONE EVENTS ------------------------------------------------------------
+
+    const PRODUCT_CLONE = "action.cloneProduct";
+    const FILE_CLONE = "action.cloneFile";
+    const PSE_CLONE = "action.clonePSE";
+
+    // -- END CLONE EVENTS ------------------------------------------------------------
+
+
     // -- SHIPPING ZONE MANAGEMENT
 
     const SHIPPING_ZONE_ADD_AREA = 'action.shippingZone.addArea';
     const SHIPPING_ZONE_REMOVE_AREA = 'action.shippingZone.removeArea';
+
     // -- END SHIPPING ZONE MANAGEMENT
 
 
@@ -411,6 +421,28 @@ final class TheliaEvents
     const IMAGE_POSTPROCESSING = "action.postProcessImage";
 
     /**
+     * Sent on image cache clear request
+     */
+    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_SAVE = "action.saveImages";
+
+    /**
+     * Save given images
+     */
+    const IMAGE_UPDATE = "action.updateImages";
+    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
+    const IMAGE_TOGGLE_VISIBILITY = "action.toggleImageVisibility";
+
+    /**
+     * Delete given image
+     */
+    const IMAGE_DELETE = "action.deleteImage";
+
+    /**
      * Sent on document processing
      */
     const DOCUMENT_PROCESS = "action.processDocument";
@@ -436,28 +468,6 @@ final class TheliaEvents
      * Delete given document
      */
     const DOCUMENT_DELETE = "action.deleteDocument";
-
-    /**
-     * Sent on image cache clear request
-     */
-    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
-
-    /**
-     * Save given images
-     */
-    const IMAGE_SAVE = "action.saveImages";
-
-    /**
-     * Save given images
-     */
-    const IMAGE_UPDATE = "action.updateImages";
-    const IMAGE_UPDATE_POSITION = "action.updateImagePosition";
-    const IMAGE_TOGGLE_VISIBILITY = "action.toggleImageVisibility";
-
-    /**
-     * Delete given image
-     */
-    const IMAGE_DELETE = "action.deleteImage";
 
     /**
      * Sent when creating a Coupon

@@ -16,11 +16,14 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\File\FileDeleteEvent;
+use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
 use Thelia\Model\ProductAssociatedContent;
@@ -102,6 +105,174 @@ class Product extends BaseAction implements EventSubscriberInterface
         $event->setProduct($product);
     }
 
+    /*******************
+     * CLONING PROCESS *
+     *******************/
+
+    /**
+     * @param ProductCloneEvent $event
+     * @throws \Exception
+     */
+    public function cloneProduct(ProductCloneEvent $event)
+    {
+        $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+
+        try {
+            // Get important datas
+            $lang = $event->getLang();
+            $originalProduct = $event->getOriginalProduct();
+            $dispatcher = $event->getDispatcher();
+
+            $originalProductDefaultI18n = ProductI18nQuery::create()
+                ->findPk([$originalProduct->getId(), $lang]);
+
+            $originalProductDefaultPrice = ProductPriceQuery::create()
+                ->findOneByProductSaleElementsId($originalProduct->getDefaultSaleElements()->getId());
+
+            // Cloning process
+
+            $this->createClone($event, $originalProductDefaultI18n, $originalProductDefaultPrice);
+
+            $this->updateClone($event, $originalProductDefaultPrice);
+
+            $this->cloneFeatureCombination($event);
+
+            $this->cloneAssociatedContent($event);
+
+            // Dispatch event for file cloning
+            $dispatcher->dispatch(TheliaEvents::FILE_CLONE, $event);
+
+            // Dispatch event for PSE cloning
+            $dispatcher->dispatch(TheliaEvents::PSE_CLONE, $event);
+
+            $con->commit();
+        } catch (\Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
+    }
+
+    public function createClone(ProductCloneEvent $event, $originalProductDefaultI18n, $originalProductDefaultPrice)
+    {
+        // Build event and dispatch creation of the clone product
+        $createCloneEvent = new ProductCreateEvent();
+        $createCloneEvent
+            ->setTitle($originalProductDefaultI18n->getTitle())
+            ->setRef($event->getRef())
+            ->setLocale($event->getLang())
+            ->setVisible(0)
+            ->setVirtual($event->getOriginalProduct()->getVirtual())
+            ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
+            ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId())
+            ->setBasePrice($originalProductDefaultPrice->getPrice())
+            ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
+            ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
+            ->setDispatcher($event->getDispatcher());
+
+        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_CREATE, $createCloneEvent);
+
+        $event->setClonedProduct($createCloneEvent->getProduct());
+    }
+
+    public function updateClone(ProductCloneEvent $event, $originalProductDefaultPrice)
+    {
+        // Get original product's I18ns
+        $originalProductI18ns = ProductI18nQuery::create()
+            ->findById($event->getOriginalProduct()->getId());
+
+        foreach ($originalProductI18ns as $originalProductI18n) {
+            $clonedProductUpdateEvent = new ProductUpdateEvent($event->getClonedProduct()->getId());
+            $clonedProductUpdateEvent
+                ->setRef($event->getClonedProduct()->getRef())
+                ->setVisible($event->getClonedProduct()->getVisible())
+                ->setVirtual($event->getClonedProduct()->getVirtual())
+
+                ->setLocale($originalProductI18n->getLocale())
+                ->setTitle($originalProductI18n->getTitle())
+                ->setChapo($originalProductI18n->getChapo())
+                ->setDescription($originalProductI18n->getDescription())
+                ->setPostscriptum($originalProductI18n->getPostscriptum())
+
+                ->setBasePrice($originalProductDefaultPrice->getPrice())
+                ->setCurrencyId($originalProductDefaultPrice->getCurrencyId())
+                ->setBaseWeight($event->getOriginalProduct()->getDefaultSaleElements()->getWeight())
+                ->setTaxRuleId($event->getOriginalProduct()->getTaxRuleId())
+                ->setBrandId($event->getOriginalProduct()->getBrandId())
+                ->setDefaultCategory($event->getOriginalProduct()->getDefaultCategoryId());
+
+            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE, $clonedProductUpdateEvent);
+
+            // SEO info
+            $clonedProductUpdateSeoEvent = new UpdateSeoEvent($event->getClonedProduct()->getId());
+            $clonedProductUpdateSeoEvent
+                ->setLocale($originalProductI18n->getLocale())
+                ->setMetaTitle($originalProductI18n->getMetaTitle())
+                ->setMetaDescription($originalProductI18n->getMetaDescription())
+                ->setMetaKeywords($originalProductI18n->getMetaKeywords())
+                ->setUrl(null);
+            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_UPDATE_SEO, $clonedProductUpdateSeoEvent);
+        }
+
+        $event->setClonedProduct($clonedProductUpdateEvent->getProduct());
+
+        // Set clone's template
+        $clonedProductUpdateTemplateEvent = new ProductSetTemplateEvent(
+            $event->getClonedProduct(),
+            $event->getOriginalProduct()->getTemplateId(),
+            $originalProductDefaultPrice->getCurrencyId()
+        );
+        $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_SET_TEMPLATE, $clonedProductUpdateTemplateEvent);
+    }
+
+    public function cloneFeatureCombination(ProductCloneEvent $event)
+    {
+        // Get original product features
+        $originalProductFeatures = FeatureProductQuery::create()
+            ->findByProductId($event->getOriginalProduct()->getId());
+
+        // Set clone product features
+        foreach ($originalProductFeatures as $originalProductFeature) {
+            // Check if the feature value is a text one or not
+            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
+                $value = $originalProductFeature->getFreeTextValue();
+            } elseif ($originalProductFeature->getFeatureAvId() != null && $originalProductFeature->getFreeTextValue() == null) {
+                $value = $originalProductFeature->getFeatureAvId();
+            } else {
+                throw new \Exception('Feature value is not defined');
+            }
+
+            $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
+                $event->getClonedProduct()->getId(),
+                $originalProductFeature->getFeatureId(),
+                $value
+            );
+
+            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
+                $clonedProductCreateFeatureEvent->setIsTextValue(true);
+            }
+
+            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
+        }
+    }
+
+    public function cloneAssociatedContent(ProductCloneEvent $event)
+    {
+        // Get original product associated contents
+        $originalProductAssocConts = ProductAssociatedContentQuery::create()
+            ->findByProductId($event->getOriginalProduct()->getId());
+
+        // Set clone product associated contents
+        foreach ($originalProductAssocConts as $originalProductAssocCont) {
+            $clonedProductCreatePAC = new ProductAddContentEvent($event->getClonedProduct(), $originalProductAssocCont->getContentId());
+            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
+        }
+    }
+
+    /***************
+     * END CLONING *
+     ***************/
+
     /**
      * Change a product
      *
@@ -129,7 +300,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->save($con)
                 ;
 
-                // Update default category (ifd required)
+                // Update default category (if required)
                 $product->updateDefaultCategory($event->getDefaultCategory());
 
                 $event->setProduct($product);
@@ -379,12 +550,12 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
     {
-        // If the feature is not free text, it may have one ore more values.
-        // If the value exists, we do not change it
-        // If the value does not exists, we create it.
+        // If the feature is not free text, it may have one or more values.
+        // If the value exists, we do not change it.
+        // If the value does not exist, we create it.
         //
         // If the feature is free text, it has only a single value.
-        // Etiher create or update it.
+        // Else create or update it.
 
         $featureProductQuery = FeatureProductQuery::create()
             ->filterByFeatureId($event->getFeatureId())
@@ -458,6 +629,7 @@ class Product extends BaseAction implements EventSubscriberInterface
     {
         return array(
             TheliaEvents::PRODUCT_CREATE                    => array("create", 128),
+            TheliaEvents::PRODUCT_CLONE                     => array("cloneProduct", 128),
             TheliaEvents::PRODUCT_UPDATE                    => array("update", 128),
             TheliaEvents::PRODUCT_DELETE                    => array("delete", 128),
             TheliaEvents::PRODUCT_TOGGLE_VISIBILITY         => array("toggleVisibility", 128),
@@ -481,9 +653,9 @@ class Product extends BaseAction implements EventSubscriberInterface
             TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE      => array("updateFeatureProductValue", 128),
             TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE      => array("deleteFeatureProductValue", 128),
 
-            // Those two has to be executed before
+            // Those two have to be executed before
             TheliaEvents::IMAGE_DELETE                      => array("deleteImagePSEAssociations", 192),
-            TheliaEvents::DOCUMENT_DELETE                      => array("deleteDocumentPSEAssociations", 192),
+            TheliaEvents::DOCUMENT_DELETE                   => array("deleteDocumentPSEAssociations", 192),
         );
     }
 }

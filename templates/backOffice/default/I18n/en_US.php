@@ -635,6 +635,8 @@ return array(
     'If a translation is missing or incomplete :' => 'If a translation is missing or incomplete :',
     'If yes, redirections through Redirect::exec() will be displayed as links' => 'If yes, redirections through Redirect::exec() will be displayed as links',
     'If you change the template, all the prices will be reset and you have to configure them again.' => 'If you change the template, all the prices will be reset and you have to configure them again.',
+    'Clone product' => 'Clone product',
+    'Clone' => 'Clone',
     'If your aim is just to translate text for your website, please use the user mode.<br>' => 'If your aim is just to translate text for your website, please use the user mode.<br>',
     'Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.' => 'Il seems that this string contains a Smarty variable (&#36;). If \'s the case, it cannot be transleted properly.',
     'Image information' => 'Image information',
