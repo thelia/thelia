@@ -731,7 +731,7 @@ class ProductTest extends TestCaseWithURLToolSetup
                         $this->assertFileExists($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), 'Cloned document doesn\'t exist');
                         $this->assertEquals(
                             $fileMimeType,
-                            $finfo->file($cloneProductFile->getFile(), FILEINFO_MIME_TYPE),
+                            $finfo->file($cloneProductFile->getUploadDir().DS.$cloneProductFile->getFile(), FILEINFO_MIME_TYPE),
                             'ProductDocument\'s mime type must be equal'
                         );
 
