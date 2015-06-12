@@ -5,6 +5,7 @@
 - The product parameter of the feature_value loop is no longer mandatory
 - The product parameter new $PRODUCT variable is deprecated. $PRODUCT_ID should be used instead.
 - Fix smarty `format_date` function to use consistent format when `locale` attribute is used.
+- A product and all it's dependencies can now be cloned
 
 # 2.2.0-alpha2
 
