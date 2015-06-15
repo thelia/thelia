@@ -183,6 +183,24 @@ class SecurityContext
     final public function isGranted(array $roles, array $resources, array $modules, array $accesses)
     {
         // Find a user which matches the required roles.
+        $user = $this->checkRole($roles);
+
+        if (null === $user) {
+            return false;
+        } else {
+            return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
+        }
+    }
+
+    /**
+     * look if a user has the required role.
+     *
+     * @param array $roles
+     * @return null|UserInterface
+     */
+    public function checkRole(array $roles)
+    {
+        // Find a user which matches the required roles.
         $user = $this->getCustomerUser();
 
         if (! $this->hasRequiredRole($user, $roles)) {
@@ -193,11 +211,7 @@ class SecurityContext
             }
         }
 
-        if (null === $user) {
-            return false;
-        } else {
-            return $this->isUserGranted($roles, $resources, $modules, $accesses, $user);
-        }
+        return $user;
     }
 
     /**
