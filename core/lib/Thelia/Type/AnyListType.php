@@ -26,12 +26,12 @@ class AnyListType extends BaseType
 
     public function isValid($values)
     {
-        return true;
+        return false === empty($values);
     }
 
     public function getFormattedValue($values)
     {
-        return explode(',', $values);
+        return $this->isValid($values) ? explode(',', $values) : null;
     }
 
     public function getFormType()
