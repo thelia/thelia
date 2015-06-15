@@ -182,6 +182,7 @@ class SecurityContext
         return true;
     }
 
+
     /**
     * Sets the authenticated admin user.
     *
