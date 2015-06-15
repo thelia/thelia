@@ -52,7 +52,7 @@ class Security extends AbstractSmartyPlugin
         $accesses = $this->explode($this->getParam($params, 'access'));
 
         if (! $this->securityContext->isGranted($roles, $resources, $modules, $accesses)) {
-            if (! $this->securityContext->hasLoggedInUser()) {
+            if (null === $this->securityContext->checkRole($roles)) {
                 // The current user is not logged-in.
                 $ex = new AuthenticationException(
                     sprintf(
@@ -68,8 +68,7 @@ class Security extends AbstractSmartyPlugin
                 if (null != $loginTpl) {
                     $ex->setLoginTemplate($loginTpl);
                 }
-            }
-            else {
+            } else {
                 // We have a logged-in user, who do not have the proper permission. Issue an AuthorizationException.
                 $ex = new AuthorizationException(
                     sprintf(
