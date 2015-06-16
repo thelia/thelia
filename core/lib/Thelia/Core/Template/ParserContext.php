@@ -181,7 +181,7 @@ class ParserContext implements \IteratorAggregate
     {
         $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
 
-        $formClass = get_class($form);
+        $formClass = get_class($form) . ':' . $form->getType();
 
         if (isset($formErrorInformation[$formClass])) {
             unset($formErrorInformation[$formClass]);
