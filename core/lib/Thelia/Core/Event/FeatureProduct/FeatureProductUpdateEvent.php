@@ -18,6 +18,7 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     protected $feature_id;
     protected $feature_value;
     protected $is_text_value;
+    protected $locale;
 
     public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
     {
@@ -73,5 +74,15 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         $this->is_text_value = $is_text_value;
 
         return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
     }
 }

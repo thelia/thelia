@@ -826,6 +826,7 @@ class ProductController extends AbstractSeoCrudController
                     }
 
                     $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
+                    $event->setLocale($this->getCurrentEditionLocale());
 
                     $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
 

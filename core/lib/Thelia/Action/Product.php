@@ -15,10 +15,15 @@ namespace Thelia\Action;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureAv;
+use Thelia\Model\FeatureAvI18n;
+use Thelia\Model\FeatureAvI18nQuery;
+use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
 use Thelia\Model\ProductI18nQuery;
@@ -558,32 +563,77 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Else create or update it.
 
         $featureProductQuery = FeatureProductQuery::create()
-            ->filterByFeatureId($event->getFeatureId())
             ->filterByProductId($event->getProductId())
+            ->filterByFeatureId($event->getFeatureId())
         ;
 
-        if ($event->getIsTextValue() !== true) {
+        // FeatureId is enough to find unique FeatureProduct with FreeTextValue
+        // Moreover, FeatureAvId might not exist at the creation of the FreeTextValue
+        if ($event->getIsTextValue() != true) {
             $featureProductQuery->filterByFeatureAvId($event->getFeatureValue());
         }
 
         $featureProduct = $featureProductQuery->findOne();
 
+        // If the FeatureProduct does not exist
         if ($featureProduct == null) {
             $featureProduct = new FeatureProduct();
 
             $featureProduct
                 ->setDispatcher($event->getDispatcher())
-
                 ->setProductId($event->getProductId())
                 ->setFeatureId($event->getFeatureId())
             ;
+
+            // If it's a free_text_value, create a feature_av to handle i18n
+            if ($event->getIsTextValue() == true) {
+                $featureProduct->setFreeTextValue(true);
+
+                $createFeatureAvEvent = new FeatureAvCreateEvent();
+                $createFeatureAvEvent
+                    ->setFeatureId($event->getFeatureId())
+                    ->setLocale($event->getLocale())
+                    ->setTitle($event->getFeatureValue());
+                $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_CREATE, $createFeatureAvEvent);
+
+                $featureAvId = $createFeatureAvEvent->getFeatureAv()->getId();
+            }
+        } // Else if the FeatureProduct exists and is a free text value
+        elseif ($featureProduct != null && $event->getIsTextValue() == true) {
+
+            // Get the Feature's FeatureAv
+            $freeTextFeatureAv = FeatureAvQuery::create()
+                ->findOneByFeatureId($event->getFeatureId());
+
+            // Get the FeatureAv's FeatureAvI18n by locale
+            $freeTextFeatureAvI18n = FeatureAvI18nQuery::create()
+                ->filterById($freeTextFeatureAv->getId())
+                ->findOneByLocale($event->getLocale());
+
+            // If $freeTextFeatureAvI18n is null, no corresponding i18n exist, so create a FeatureAvI18n
+            if ($freeTextFeatureAvI18n == null) {
+                $featureAvI18n = new FeatureAvI18n();
+                $featureAvI18n
+                    ->setId($freeTextFeatureAv->getId())
+                    ->setLocale($event->getLocale())
+                    ->setTitle($event->getFeatureValue())
+                    ->save();
+
+                $featureAvId = $featureAvI18n->getId();
+            } else {
+                // Else update the existing one
+                $freeTextFeatureAvI18n
+                    ->setTitle($event->getFeatureValue())
+                    ->save();
+
+                $featureAvId = $freeTextFeatureAvI18n->getId();
+            }
+        } // Else the FeatureProduct exists and is not a free text value
+        else {
+            $featureAvId = $event->getFeatureValue();
         }
 
-        if ($event->getIsTextValue() == true) {
-            $featureProduct->setFreeTextValue($event->getFeatureValue());
-        } else {
-            $featureProduct->setFeatureAvId($event->getFeatureValue());
-        }
+        $featureProduct->setFeatureAvId($featureAvId);
 
         $featureProduct->save();
 
