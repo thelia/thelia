@@ -289,7 +289,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page} limit=10}
+                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit=10}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
@@ -325,6 +325,7 @@
                                                 loop_ref       = "order-list"
                                                 max_page_count = 10
                                                 page_url       = "{url path="/admin/customer/update" customer_id=$customer_id page=$page}"
+                                                page_param_name = "page_order"
                                                 }
                                             </td>
                                         </tr>
