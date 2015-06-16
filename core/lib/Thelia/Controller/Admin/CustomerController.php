@@ -173,7 +173,8 @@ class CustomerController extends AbstractCrudController
     {
         return array(
                 'customer_id' => $this->getRequest()->get('customer_id', 0),
-                'page'        => $this->getRequest()->get('page', 1)
+                'page'        => $this->getRequest()->get('page', 1),
+                'page_order'  => $this->getRequest()->get('page_order', 1)
         );
     }
 
