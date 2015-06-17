@@ -97,7 +97,7 @@
                                                         <div class="col-md-12">
                                                             {custom_render_form_field field='html_message'}
                                                                 <textarea {$disable_html} {form_field_attributes field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
-                                                                <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                                <div id="{$name}" style="height: 500px;"></div>
                                                             {/custom_render_form_field}
                                                         </div>
                                                     </div>
@@ -136,8 +136,8 @@
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             {custom_render_form_field field='text_message'}
-                                                            <textarea {$disable_html} {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value}</textarea>
-                                                            <div id="{$name}" style="height: 500px;">{$value}</div>
+                                                            <textarea {$disable_html} {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                            <div id="{$name}" style="height: 500px;"></div>
                                                         </div>
                                                         {/custom_render_form_field}
                                                     </div>
@@ -268,7 +268,7 @@
 {/block}
 
 {block name="javascript-initialization"}
-<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.9/ace.js"></script>
 <script>
     (function($) {
 
@@ -293,12 +293,12 @@
 
             editor[value].setTheme("ace/theme/monokai");
             editor[value].getSession().setMode("ace/mode/smarty");
+            editor[value].setValue(textarea.text());
+            editor[value].getSelection().clearSelection();
 
             editor[value].getSession().on("change", function () {
-                textarea.val(editor[value].getSession().getValue());
+                textarea.text(editor[value].getSession().getValue());
             });
-
-            textarea.val(editor[value].getSession().getValue());
         });
 
         $('select.textarea-toggle').change();
