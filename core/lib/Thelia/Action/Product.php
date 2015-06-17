@@ -20,7 +20,6 @@ use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvI18n;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
@@ -239,9 +238,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product features
         foreach ($originalProductFeatures as $originalProductFeature) {
             // Check if the feature value is a text one or not
-            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
+            if ($originalProductFeature->getFeatureAvId() === null && $originalProductFeature->getFreeTextValue() !== null) {
+                // This is for retrocompatibility
                 $value = $originalProductFeature->getFreeTextValue();
-            } elseif ($originalProductFeature->getFeatureAvId() != null && $originalProductFeature->getFreeTextValue() == null) {
+            } elseif ($originalProductFeature->getFeatureAvId() !== null) {
                 $value = $originalProductFeature->getFeatureAvId();
             } else {
                 throw new \Exception('Feature value is not defined');
@@ -253,7 +253,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $value
             );
 
-            if ($originalProductFeature->getFeatureAvId() == null && $originalProductFeature->getFreeTextValue() != null) {
+            if ($originalProductFeature->getFeatureAvId() === null && $originalProductFeature->getFreeTextValue() !== null) {
                 $clonedProductCreateFeatureEvent->setIsTextValue(true);
             }
 
@@ -562,21 +562,23 @@ class Product extends BaseAction implements EventSubscriberInterface
         // If the feature is free text, it has only a single value.
         // Else create or update it.
 
+        $featureAvId = $event->getFeatureValue();
+
         $featureProductQuery = FeatureProductQuery::create()
             ->filterByProductId($event->getProductId())
             ->filterByFeatureId($event->getFeatureId())
         ;
 
-        // FeatureId is enough to find unique FeatureProduct with FreeTextValue
-        // Moreover, FeatureAvId might not exist at the creation of the FreeTextValue
-        if ($event->getIsTextValue() != true) {
+        // If $event->getFeatureValue() is null, the user requested the creation of a free_text_value
+        // Otherwise, it's either an update of an existing free_text_value or a new link with defined feature_av
+        if ($event->getFeatureValue() !== null) {
             $featureProductQuery->filterByFeatureAvId($event->getFeatureValue());
         }
 
         $featureProduct = $featureProductQuery->findOne();
 
         // If the FeatureProduct does not exist
-        if ($featureProduct == null) {
+        if ($featureProduct === null) {
             $featureProduct = new FeatureProduct();
 
             $featureProduct
@@ -585,8 +587,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setFeatureId($event->getFeatureId())
             ;
 
-            // If it's a free_text_value, create a feature_av to handle i18n
-            if ($event->getIsTextValue() == true) {
+            // If it's a free_text_value, create a FeatureAv to handle i18n
+            if ($event->getIsTextValue() === true) {
                 $featureProduct->setFreeTextValue(true);
 
                 $createFeatureAvEvent = new FeatureAvCreateEvent();
@@ -599,7 +601,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 $featureAvId = $createFeatureAvEvent->getFeatureAv()->getId();
             }
         } // Else if the FeatureProduct exists and is a free text value
-        elseif ($featureProduct != null && $event->getIsTextValue() == true) {
+        elseif ($featureProduct !== null && $event->getIsTextValue() === true) {
 
             // Get the Feature's FeatureAv
             $freeTextFeatureAv = FeatureAvQuery::create()
@@ -611,7 +613,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->findOneByLocale($event->getLocale());
 
             // If $freeTextFeatureAvI18n is null, no corresponding i18n exist, so create a FeatureAvI18n
-            if ($freeTextFeatureAvI18n == null) {
+            if ($freeTextFeatureAvI18n === null) {
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())

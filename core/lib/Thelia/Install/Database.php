@@ -51,7 +51,7 @@ class Database
         }
 
         if (!$connection instanceof \PDO) {
-            throw new \InvalidArgumentException("A PDO connection shoud be provided");
+            throw new \InvalidArgumentException("A PDO connection should be provided");
         }
 
         $this->connection = $connection;
@@ -259,5 +259,13 @@ class Database
                 $dbName
             )
         );
+    }
+
+    /**
+     * @return PDO
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 }
