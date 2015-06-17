@@ -44,7 +44,7 @@
         // Styles (CSS or LESS) available in the editor could be defined in assets/css/editor.less file.
         {stylesheets file='assets/css/editor.less' filters='less' source='Tinymce'}
         content_css: "{$asset_url}",
-        importcss_append: true
+        importcss_append: true,
         {/stylesheets}
         // Use file to get an url without index.php or index_dev.php
         document_base_url : "{url file="/"}"
