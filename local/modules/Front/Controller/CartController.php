@@ -63,7 +63,7 @@ class CartController extends BaseFrontController
 
             if ($this->getRequest()->isXmlHttpRequest()) {
                 $this->changeViewForAjax();
-            } else if (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
+            } elseif (null !== $response = $this->generateSuccessRedirect($cartAdd)) {
                 return $response;
             }
 
@@ -77,7 +77,6 @@ class CartController extends BaseFrontController
         } catch (FormValidationException $e) {
             $message = $e->getMessage();
         }
-
 
         if ($message) {
             $cartAdd->setErrorMessage($message);
@@ -102,7 +101,7 @@ class CartController extends BaseFrontController
 
             if ($this->getRequest()->isXmlHttpRequest()) {
                 $this->changeViewForAjax();
-            } else if (null !== $response = $this->generateSuccessRedirect()) {
+            } elseif (null !== $response = $this->generateSuccessRedirect()) {
                 return $response;
             }
 
@@ -119,7 +118,6 @@ class CartController extends BaseFrontController
         $cartEvent->setCartItemId($this->getRequest()->get("cart_item"));
 
         try {
-
             $this->getTokenProvider()->checkToken(
                 $this->getRequest()->query->get('_token')
             );
@@ -144,7 +142,10 @@ class CartController extends BaseFrontController
         // If Ajax Request
         if ($this->getRequest()->isXmlHttpRequest()) {
             $request = $this->getRequest();
-            $request->attributes->set('_view', "includes/mini-cart");
+
+            $view = $request->get('ajax-view', "includes/mini-cart");
+
+            $request->attributes->set('_view', $view);
         }
     }
 
