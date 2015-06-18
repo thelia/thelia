@@ -124,11 +124,12 @@
                                                 </caption>
                                                 <thead>
                                                     <tr>
-                                                       <th class="col-md-7">{intl l="Product"}</th>
+                                                       <th class="col-md-6">{intl l="Product"}</th>
+                                                       {hook name="order-edit.table-header" location="order_edit_table_header" }
                                                        <th class="col-md-1 text-right">{intl l="Unit. price"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Tax"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Unit taxed price"}</th>
-                                                       <th class="col-md-1 text-right">{intl l="Quantity"}</th>
+                                                       <th class="text-right">{intl l="Quantity"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Taxed total"}</th>
                                                     </tr>
                                                 </thead>
@@ -168,6 +169,7 @@
                                                             {/ifloop}
                                                             {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
+                                                        {hook name="order-edit.table-row" location="order_edit_table_row" order_product_id={$ID} }
                                                         <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
@@ -181,17 +183,17 @@
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total without discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT symbol=$orderCurrency}</strong></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$DISCOUNT symbol=$orderCurrency}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
-                                                        <td class="text-right">
+                                                        <td colspan="100" class="text-right">
                                                             {loop type="order_coupon" name="couponcode" order=$ID}
                                                                 {$CODE}{if $LOOP_COUNT != $LOOP_TOTAL}, {/if}
                                                             {/loop}
@@ -203,12 +205,12 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total including discount"}</strong></td>
-                                                        <td class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE symbol=$orderCurrency}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Postage"}</strong></td>
-                                                        <td class="text-right">
+                                                        <td colspan="100" class="text-right">
                                                             <strong>{format_money number=$POSTAGE symbol=$orderCurrency}</strong>
                                                             <em title="{intl l='Taxes'}">({format_money number=$POSTAGE_TAX symbol=$orderCurrency})</em>
                                                         </td>
@@ -216,14 +218,14 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Weight"}</strong></td>
-                                                        <td class="text-right">
+                                                        <td colspan="100" class="text-right">
                                                             <strong>{format_number number=$WEIGHT} {intl l="Kg"}</strong>
                                                         </td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3" class="last"><strong>{intl l="Total"}</strong></td>
-                                                        <td class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
