@@ -685,6 +685,8 @@ return array(
     'Order - delivery module bottom' => 'Commande - en bas du module de livraison',
     'Order - payment module bottom' => 'Commande - en bas du module de paiement',
     'Order - product list' => 'Commande - liste produit',
+    'Order - table header' => 'Commande - colonne tableau',
+    'Order - table row' => 'Commande - ligne tableau',
     'Order confirmation - after the order summary' => 'Confirmation de commande - après les récapitulatif de commande',
     'Order confirmation sent to the customer' => 'Confirmation de commande envoyée au client',
     'Order details - CSS stylesheet' => 'Détail d\'une commande - feuille de style CSS',

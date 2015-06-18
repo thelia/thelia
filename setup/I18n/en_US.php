@@ -685,6 +685,8 @@ return array(
     'Order - delivery module bottom' => 'Order - delivery module bottom',
     'Order - payment module bottom' => 'Order - payment module bottom',
     'Order - product list' => 'Order - product list',
+    'Order - table header' => 'Order - table header',
+    'Order - table row' => 'Order - table row',
     'Order confirmation - after the order summary' => 'Order confirmation - after the order summary',
     'Order confirmation sent to the customer' => 'Order confirmation sent to the customer',
     'Order details - CSS stylesheet' => 'Order details - CSS stylesheet',
