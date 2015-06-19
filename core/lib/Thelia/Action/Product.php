@@ -16,6 +16,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Feature\FeatureAvCreateEvent;
+use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Model\AttributeCombinationQuery;
@@ -569,16 +570,16 @@ class Product extends BaseAction implements EventSubscriberInterface
             ->filterByFeatureId($event->getFeatureId())
         ;
 
-        // If $event->getFeatureValue() is null, the user requested the creation of a free_text_value
-        // Otherwise, it's either an update of an existing free_text_value or a new link with defined feature_av
-        if ($event->getFeatureValue() !== null) {
+        // If it's not a free text value, we can filter by the event's featureValue (which is an ID)
+        if ($event->getFeatureValue() !== null && $event->getIsTextValue() === false) {
             $featureProductQuery->filterByFeatureAvId($event->getFeatureValue());
         }
 
         $featureProduct = $featureProductQuery->findOne();
 
-        // If the FeatureProduct does not exist
+        // If the FeatureProduct does not exist, create it
         if ($featureProduct === null) {
+
             $featureProduct = new FeatureProduct();
 
             $featureProduct
@@ -603,17 +604,18 @@ class Product extends BaseAction implements EventSubscriberInterface
         } // Else if the FeatureProduct exists and is a free text value
         elseif ($featureProduct !== null && $event->getIsTextValue() === true) {
 
-            // Get the Feature's FeatureAv
+            // Get the FeatureAv
             $freeTextFeatureAv = FeatureAvQuery::create()
+                ->filterByFeatureProduct($featureProduct)
                 ->findOneByFeatureId($event->getFeatureId());
 
-            // Get the FeatureAv's FeatureAvI18n by locale
+            // Get the FeatureAvI18n by locale
             $freeTextFeatureAvI18n = FeatureAvI18nQuery::create()
                 ->filterById($freeTextFeatureAv->getId())
                 ->findOneByLocale($event->getLocale());
 
-            // If $freeTextFeatureAvI18n is null, no corresponding i18n exist, so create a FeatureAvI18n
-            if ($freeTextFeatureAvI18n === null) {
+            if ($freeTextFeatureAvI18n === null && !empty($featureAvId)) {
+                // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())
@@ -622,11 +624,27 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->save();
 
                 $featureAvId = $featureAvI18n->getId();
-            } else {
-                // Else update the existing one
-                $freeTextFeatureAvI18n
-                    ->setTitle($event->getFeatureValue())
-                    ->save();
+
+            } elseif ($freeTextFeatureAvI18n !== null && empty($featureAvId)) {
+                // I18n exists but new value is empty : delete FeatureAvI18n
+                $freeTextFeatureAvI18n->delete();
+
+                // Check if there are still some FeatureAvI18n for this FeatureAv
+                $freeTextFeatureAvI18ns = FeatureAvI18nQuery::create()
+                    ->findById($freeTextFeatureAv->getId());
+
+                // If there are no more FeatureAvI18ns for this FeatureAv, remove the corresponding FeatureProduct & FeatureAv
+                if (count($freeTextFeatureAvI18ns) == 0) {
+                    $deleteFeatureProductEvent = new FeatureProductDeleteEvent($event->getProductId(), $event->getFeatureId());
+                    $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_DELETE_VALUE, $deleteFeatureProductEvent);
+
+                    $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
+                    $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
+                }
+            } elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
+                // FeatureAvI18n found and the new value is not empty : update existing FeatureAvI18n
+                $freeTextFeatureAvI18n->setTitle($featureAvId);
+                $freeTextFeatureAvI18n->save();
 
                 $featureAvId = $freeTextFeatureAvI18n->getId();
             }

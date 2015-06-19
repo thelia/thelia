@@ -821,19 +821,16 @@ class ProductController extends AbstractSeoCrudController
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
 
                 foreach ($featureTextValues as $featureId => $featureValue) {
-                    // Considere empty text as empty feature value (e.g., we will delete it)
-                    if (empty($featureValue)) {
-                        // Check if the feature value exists (for another lang)
-                        $freeTextFeatureValue = FeatureProductQuery::create()
-                            ->filterByProductId($productId)
-                            ->filterByFreeTextValue(true)
-                            ->findOneByFeatureId($featureId);
 
-                        if ($freeTextFeatureValue !== null) {
-                            $updatedFeatures[] = $featureId;
-                        } else {
-                            continue;
-                        }
+                    // Check if a FeatureProduct exists for this product and this feature (for another lang)
+                    $freeTextFeatureProduct = FeatureProductQuery::create()
+                        ->filterByProductId($productId)
+                        ->filterByFreeTextValue(true)
+                        ->findOneByFeatureId($featureId);
+
+                    // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
+                    if (is_null($freeTextFeatureProduct) && empty($featureValue)) {
+                        continue;
                     }
 
                     $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
