@@ -239,10 +239,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product features
         foreach ($originalProductFeatures as $originalProductFeature) {
             // Check if the feature value is a text one or not
-            if ($originalProductFeature->getFreeTextValue() !== null) {
-                $value = $originalProductFeature->getFreeTextValue();
+            if ($originalProductFeature->getFreeTextValue() === true) {
+                $cloneFeatureValue = $originalProductFeature->getFreeTextValue();
             } elseif ($originalProductFeature->getFeatureAvId() !== null) {
-                $value = $originalProductFeature->getFeatureAvId();
+                $cloneFeatureValue = $originalProductFeature->getFeatureAvId();
             } else {
                 throw new \Exception('Feature value is not defined');
             }
@@ -250,10 +250,11 @@ class Product extends BaseAction implements EventSubscriberInterface
             $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
                 $event->getClonedProduct()->getId(),
                 $originalProductFeature->getFeatureId(),
-                $value
+                $cloneFeatureValue
             );
+            $clonedProductCreateFeatureEvent->setLocale($event->getLang());
 
-            if ($originalProductFeature->getFeatureAvId() === null && $originalProductFeature->getFreeTextValue() !== null) {
+            if ($originalProductFeature->getFreeTextValue() === true) {
                 $clonedProductCreateFeatureEvent->setIsTextValue(true);
             }
 
