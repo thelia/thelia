@@ -239,8 +239,7 @@ class Product extends BaseAction implements EventSubscriberInterface
         // Set clone product features
         foreach ($originalProductFeatures as $originalProductFeature) {
             // Check if the feature value is a text one or not
-            if ($originalProductFeature->getFeatureAvId() === null && $originalProductFeature->getFreeTextValue() !== null) {
-                // This is for retrocompatibility
+            if ($originalProductFeature->getFreeTextValue() !== null) {
                 $value = $originalProductFeature->getFreeTextValue();
             } elseif ($originalProductFeature->getFeatureAvId() !== null) {
                 $value = $originalProductFeature->getFeatureAvId();
