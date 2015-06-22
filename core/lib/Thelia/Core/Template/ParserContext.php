@@ -113,11 +113,12 @@ class ParserContext implements \IteratorAggregate
 
         // Set form error information
         $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
-            'data'         => $form->getForm()->getData(),
-            'hasError'     => $form->hasError(),
-            'errorMessage' => $form->getErrorMessage(),
-            'method'       => $this->request->getMethod(),
-            'timestamp'    => time()
+            'data'              => $form->getForm()->getData(),
+            'hasError'          => $form->hasError(),
+            'errorMessage'      => $form->getErrorMessage(),
+            'method'            => $this->request->getMethod(),
+            'timestamp'         => time(),
+            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
         ];
 
         $this->request->getSession()->setFormErrorInformation($formErrorInformation);
@@ -141,7 +142,14 @@ class ParserContext implements \IteratorAggregate
             $formInfo = $formErrorInformation[$formClass.":".$formType];
 
             if (is_array($formInfo['data'])) {
-                $form = $this->formFactory->createForm($formId, $formType, $formInfo['data']);
+                $form = $this->formFactory->createForm(
+                    $formId,
+                    $formType,
+                    $formInfo['data'],
+                    [
+                        'validation_groups' => $formInfo['validation_groups']
+                    ]
+                );
 
                 // If the form has errors, perform a validation, to restore the internal error context
                 // A controller (as the NewsletterController) may use the parserContext to redisplay a
