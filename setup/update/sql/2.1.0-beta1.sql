@@ -174,8 +174,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 11, 'fr_FR', 'Page des marques - au dessus de la zone de contenu principale', '', ''),
 (@max_id + 12, 'fr_FR', 'Page des marques - en dessous de la zone de contenu principale', '', ''),
 (@max_id + 13, 'fr_FR', 'Page des marques - feuille de style CSS', '', ''),
-(@max_id + 14, 'fr_FR', 'Page des marques - après l\'inclusion des javascript', '', ''),
-(@max_id + 15, 'fr_FR', 'Page des marques - initialisation du javascript', '', ''),
+(@max_id + 14, 'fr_FR', 'Page des marques - après l\'inclusion du JavaScript', '', ''),
+(@max_id + 15, 'fr_FR', 'Page des marques - initialisation du JavaScript', '', ''),
 (@max_id + 16, 'fr_FR', 'Page des marques - en haut de la sidebar', '', ''),
 (@max_id + 17, 'fr_FR', 'Page des marques - le corps de la sidebar', '', ''),
 (@max_id + 18, 'fr_FR', 'Page des marques - en bas de la sidebar', '', ''),
@@ -193,8 +193,8 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (@max_id + 30, 'fr_FR', 'Détail d\'une commande - Après les produits', '', ''),
 (@max_id + 31, 'fr_FR', 'Détail d\'une commande - en bas', '', ''),
 (@max_id + 32, 'fr_FR', 'Détail d\'une commande - feuille de style CSS', '', ''),
-(@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion des javascript', '', ''),
-(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du javascript', '', '')
+(@max_id + 33, 'fr_FR', 'Détail d\'une commande - après l\'inclusion du JavaScript', '', ''),
+(@max_id + 34, 'fr_FR', 'Détail d\'une commande - initialisation du JavaScript', '', '')
 ;
 
 
