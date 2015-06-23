@@ -7,6 +7,7 @@
 - Fix smarty `format_date` function to use consistent format when `locale` attribute is used.
 - A product and all it's dependencies can now be cloned
 - Fix index form error information session cleaning
+- Feature's free text values now handle i18n
 
 # 2.2.0-alpha2
 
