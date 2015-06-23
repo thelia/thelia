@@ -232,41 +232,29 @@ class Product extends BaseAction implements EventSubscriberInterface
 
     public function cloneFeatureCombination(ProductCloneEvent $event)
     {
-        // Get original product features
-        $originalProductFeatures = FeatureProductQuery::create()
+        // Get original product FeatureProduct list
+        $originalProductFeatureList = FeatureProductQuery::create()
             ->findByProductId($event->getOriginalProduct()->getId());
 
-        // Set clone product features
-        foreach ($originalProductFeatures as $originalProductFeature) {
+        // Set clone product FeatureProducts
+        foreach ($originalProductFeatureList as $originalProductFeature) {
 
-            // Get original free text values
-            $originalProductFreeTextValues = FeatureAvI18nQuery::create()
+            // Get original FeatureAvI18n list
+            $originalProductFeatureAvI18nList = FeatureAvI18nQuery::create()
                 ->findById($originalProductFeature->getFeatureAvId());
 
-            /* For each original free text i18n, create a clone one
-            foreach ($originalProductFreeTextValues as $originalProductFreeTextValue) {
-                $cloneFeatureAvCreateEvent = new FeatureAvCreateEvent();
-                $cloneFeatureAvCreateEvent
-                    ->setTitle($originalProductFreeTextValue->getTitle())
-                    ->setLocale($originalProductFreeTextValue->getLocale())
-                    ->setFeatureId($originalProductFeature->getFeatureId());
-
-                $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_CREATE, $cloneFeatureAvCreateEvent);
-
-                /**
-                 * Probleme : les id ne seront pas partagés par les différentes langues je pense
-
-            }*/
-            foreach ($originalProductFreeTextValues as $originalProductFreeTextValue) {
+            foreach ($originalProductFeatureAvI18nList as $originalProductFeatureAvI18n) {
+                // Create a FeatureProduct for each FeatureAv (not for each FeatureAvI18n)
                 $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
                     $event->getClonedProduct()->getId(),
                     $originalProductFeature->getFeatureId(),
-                    $originalProductFeature->getFeatureAvId() // ça doit etre l'ID d'une FeatureAv créée exprès. On pourra en récupérer la langue
+                    $originalProductFeature->getFeatureAvId()
                 );
-                $clonedProductCreateFeatureEvent->setLocale($originalProductFreeTextValue->getLocale());
+                $clonedProductCreateFeatureEvent->setLocale($originalProductFeatureAvI18n->getLocale());
 
+                // If it's a free text value, pass the FeatureAvI18n's title as featureValue to the event
                 if ($originalProductFeature->getFreeTextValue() !== null) {
-                    $clonedProductCreateFeatureEvent->setFeatureValue($originalProductFreeTextValue->getTitle());
+                    $clonedProductCreateFeatureEvent->setFeatureValue($originalProductFeatureAvI18n->getTitle());
                     $clonedProductCreateFeatureEvent->setIsTextValue(true);
                 }
 
@@ -569,13 +557,6 @@ class Product extends BaseAction implements EventSubscriberInterface
      */
     public function updateFeatureProductValue(FeatureProductUpdateEvent $event)
     {
-        // If the feature is not free text, it may have one or more values.
-        // If the value exists, we do not change it.
-        // If the value does not exist, we create it.
-        //
-        // If the feature is free text, it has only a single value.
-        // Else create or update it.
-
         // Prepare the FeatureAv's ID
         $featureAvId = $event->getFeatureValue();
 
