@@ -65,16 +65,16 @@
 			    {* -- Begin attributes management ------------------------------- *}
 
                 <div class="row">
-			         <div class="col-md-12">
-				         <div class="well well-sm">
-					       <div class="form-group">
-					           <p class="title title-without-tabs">{intl l='Product Attributes'}</p>
+			        <div class="col-md-12">
+				        <div class="well well-sm">
+					        <div class="form-group">
+					            <p class="title title-without-tabs">{intl l='Product Attributes'}</p>
 
 	                            <p>
 	                            {if $TEMPLATE}
 	                                {intl
-	                                  l="You can change template attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
-	                                  tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
+                                        l="You can change template attributes and their positions in <a href=\"%tpl_mgmt_url\" target=\"tpl_window\">the template configuration page</a>."
+                                        tpl_mgmt_url={url path='/admin/configuration/templates/update' template_id=$TEMPLATE}
 	                                }
 	                            {else}
 	                                {intl
@@ -104,23 +104,23 @@
 
 	                                            {hook name="product.attributes-table-row" location="product_attributes_table_row" }
 	                                        </tr>
-	                                         {/loop}
+	                                        {/loop}
 
-	                                         {elseloop rel="product-attributes"}
-	                                             <tr>
-	                                                 <td colspan="2">
-	                                                     <div class="alert alert-info">
-	                                                         {intl l="This product template does not contains any features"}
-	                                                     </div>
-	                                                 </td>
-	                                             </tr>
-	                                         {/elseloop}
+	                                        {elseloop rel="product-attributes"}
+	                                            <tr>
+	                                                <td colspan="2">
+	                                                    <div class="alert alert-info">
+	                                                        {intl l="This product template does not contains any features"}
+	                                                    </div>
+	                                                </td>
+	                                            </tr>
+	                                        {/elseloop}
 	                                    </tbody>
 	                                </table>
 	                            </div>
-					         </div>
-					     </div>
-					 </div>
+					        </div>
+					    </div>
+					</div>
 			    </div>
 
 			    {* -- Begin features management ---------------------------------- *}
@@ -178,53 +178,57 @@
 							                               {$selected[] = $FEATURE_AV_ID}
 							                            {/loop}
 
-								                         {capture "select_options"}
-								                         {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context="1" lang="$edit_language_id"}
-								                             <option value="{$ID}" {if in_array($ID, $selected)}selected="selected"{/if}>{$TITLE}</option>
+								                        {capture "select_options"}
+								                        {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context="1" lang="$edit_language_id"}
+								                            <option value="{$ID}" {if in_array($ID, $selected)}selected="selected"{/if}>{$TITLE}</option>
 
-								                             {$options_count = $LOOP_COUNT} {* LOOP_COUNT is only available inside the loop ! *}
-								                         {/loop}
-								                         {/capture}
+								                            {$options_count = $LOOP_COUNT} {* LOOP_COUNT is only available inside the loop ! *}
+								                        {/loop}
+								                        {/capture}
 
-								                         <div class="input-form">
-								                         <select multiple="multiple" name="feature_value[{$ID}][]" id="feature_value_{$ID}" size="{$options_count}" class="form-control">
-								                             {$smarty.capture.select_options nofilter}
-								                         </select>
-								                         </div>
+								                        <div class="input-form">
+								                            <select multiple="multiple" name="feature_value[{$ID}][]" id="feature_value_{$ID}" size="{$options_count}" class="form-control">
+								                            {$smarty.capture.select_options nofilter}
+								                            </select>
+								                        </div>
 
-													     <span class="help-block text-right">
-													         {intl l='Use Ctrl+click to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id={$ID}}
-													     </span>
-							                         {/ifloop}
+													    <span class="help-block text-right">
+													        {intl l='Use Ctrl+click to select more than one value. You can also <a href="#" class="clear_feature_value" data-id="%id">clear selected values</a>.' id={$ID}}
+													    </span>
+							                        {/ifloop}
 
-								                     {* Free text *}
+								                    {* Free text *}
 
-								                     {elseloop rel="product-features-av"}
-								                         {* Get the free text value *}
+								                    {elseloop rel="product-features-av"}
+								                        {* Get the free text value *}
                                                         {$feature_value=''}
 
-								                         {loop name="free-text-value" exclude_feature_availability="1" type="feature_value" product=$product_id feature=$ID  backend_context="1" lang="$edit_language_id"}
-								                            {$feature_value=$FREE_TEXT_VALUE}
-								                         {/loop}
+								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id"}
+                                                            {if $IS_FREE_TEXT && $FREE_TEXT_VALUE != 1}
+                                                                {$feature_value=$FREE_TEXT_VALUE}
+                                                            {else}
+								                                {$feature_value=$TITLE}
+                                                            {/if}
+								                        {/loop}
 
-								                         <input type="text" id="feature_text_value_{$ID}" name="feature_text_value[{$ID}]" title="{intl l='Enter here the feature value as free text'}" placeholder="{intl l='Feature value'}" class="form-control" value="{$feature_value|default:''}">
-								                     {/elseloop}
+								                        <input type="text" id="feature_text_value_{$ID}" name="feature_text_value[{$ID}]" title="{intl l='Enter here the feature value as free text'}" placeholder="{intl l='Feature value'}" class="form-control" value="{$feature_value|default:''}">
+								                    {/elseloop}
 							                    </td>
 
 										        {hook name="product.features-table-row" location="product_features_table_row" }
 
 										    </tr>
-										     {/loop}
+										    {/loop}
 
-										     {elseloop rel="product-features"}
-										         <tr>
-										             <td colspan="3">
-										                 <div class="alert alert-info">
-										                     {intl l="This product template does not contains any features"}
-										                 </div>
-										             </td>
-										         </tr>
-										     {/elseloop}
+										    {elseloop rel="product-features"}
+										        <tr>
+										            <td colspan="3">
+										                <div class="alert alert-info">
+										                    {intl l="This product template does not contains any features"}
+										                </div>
+										            </td>
+										        </tr>
+										    {/elseloop}
 										</tbody>
 				                    </table>
 				                </div>

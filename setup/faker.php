@@ -329,14 +329,17 @@ try {
         $featureId = $feature->getId();
         $featureList[$featureId] = array();
 
-        for ($j=0; $j<rand(-2, 5); $j++) { //let a chance for no av
-            $featureAv = new Thelia\Model\FeatureAv();
-            $featureAv->setFeature($feature);
-            $featureAv->setPosition($j);
-            setI18n($featureAv);
+        //hardcode chance to have no av
+        if ($i === 1 || $i === 3) {
+            for ($j = 0; $j < rand(1, 5); $j++) {
+                $featureAv = new Thelia\Model\FeatureAv();
+                $featureAv->setFeature($feature);
+                $featureAv->setPosition($j);
+                setI18n($featureAv);
 
-            $featureAv->save();
-            $featureList[$featureId][] = $featureAv->getId();
+                $featureAv->save();
+                $featureList[$featureId][] = $featureAv->getId();
+            }
         }
     }
 
@@ -591,17 +594,28 @@ try {
         }
 
         //associate features to products
+        $freeTextCreated = false;
         foreach ($featureList as $featureId => $featureAvId) {
             $featureProduct = new Thelia\Model\FeatureProduct();
             $featureProduct->setProductId($productId)
                 ->setFeatureId($featureId);
 
-            if (count($featureAvId) > 0) { //got some av
+            if ($freeTextCreated === false && count($featureAvId) === 0) { //set one feature as free text
+                $featureAv = new Thelia\Model\FeatureAv();
+                $featureAv->setFeatureId($featureId);
+                $featureAv->setPosition(1);
+                setI18n($featureAv);
+                $featureAv->save();
+
+                $featureProduct->setFeatureAvId($featureAv->getId());
+                $featureProduct->setFreeTextValue(true);
+                $freeTextCreated = true;
+            } elseif (count($featureAvId) > 0) { //got some av
                 $featureProduct->setFeatureAvId(
                     $featureAvId[array_rand($featureAvId, 1)]
                 );
-            } else { //no av
-                $featureProduct->setFreeTextValue(getRealText(10));
+            } else { //no av : no featureProduct
+                continue;
             }
 
             $featureProduct->save();

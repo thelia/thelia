@@ -56,6 +56,7 @@ use Thelia\Model\Country;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Feature;
+use Thelia\Model\FeatureProductQuery;
 use Thelia\Model\FeatureQuery;
 use Thelia\Model\FeatureTemplateQuery;
 use Thelia\Model\FolderQuery;
@@ -820,12 +821,20 @@ class ProductController extends AbstractSeoCrudController
                 $featureTextValues = $this->getRequest()->get('feature_text_value', array());
 
                 foreach ($featureTextValues as $featureId => $featureValue) {
-                    // considere empty text as empty feature value (e.g., we will delete it)
-                    if (empty($featureValue)) {
+
+                    // Check if a FeatureProduct exists for this product and this feature (for another lang)
+                    $freeTextFeatureProduct = FeatureProductQuery::create()
+                        ->filterByProductId($productId)
+                        ->filterByFreeTextValue(true)
+                        ->findOneByFeatureId($featureId);
+
+                    // If no corresponding FeatureProduct exists AND if the feature_text_value is empty, do nothing
+                    if (is_null($freeTextFeatureProduct) && empty($featureValue)) {
                         continue;
                     }
 
                     $event = new FeatureProductUpdateEvent($productId, $featureId, $featureValue, true);
+                    $event->setLocale($this->getCurrentEditionLocale());
 
                     $this->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $event);
 
@@ -844,7 +853,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        // If we have to stay on the same page, do not redirect to the succesUrl,
+        // If we have to stay on the same page, do not redirect to the successUrl,
         // just redirect to the edit page again.
         if ($this->getRequest()->get('save_mode') == 'stay') {
             return $this->redirectToEditionTemplate($this->getRequest());

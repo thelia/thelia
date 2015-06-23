@@ -18,15 +18,19 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
     protected $feature_id;
     protected $feature_value;
     protected $is_text_value;
+    protected $locale;
 
     public function __construct($product_id, $feature_id, $feature_value, $is_text_value = false)
     {
         $this->product_id = $product_id;
         $this->feature_id = $feature_id;
         $this->feature_value = $feature_value;
-        $this->is_text_value = $is_text_value;
+        $this->setIsTextValue($is_text_value);
     }
 
+    /**
+     * @return int the product id
+     */
     public function getProductId()
     {
         return $this->product_id;
@@ -65,13 +69,23 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
 
     public function getIsTextValue()
     {
-        return $this->is_text_value;
+        return (bool)$this->is_text_value;
     }
 
     public function setIsTextValue($is_text_value)
     {
-        $this->is_text_value = $is_text_value;
+        $this->is_text_value = (bool)$is_text_value;
 
         return $this;
+    }
+
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
     }
 }

@@ -577,10 +577,15 @@ class ProductTest extends TestCaseWithURLToolSetup
 
         // Check clone product's features
         foreach ($originalProductFeatures as $originalProductFeature) {
-            $cloneProductFeature = FeatureProductQuery::create()
+            $cloneProductFeatureQuery = FeatureProductQuery::create()
                 ->filterByProductId($event->getClonedProduct()->getId())
-                ->filterByFeatureId($originalProductFeature->getFeatureId())
-                ->findOneByFeatureAvId($originalProductFeature->getFeatureAvId());
+                ->filterByFeatureId($originalProductFeature->getFeatureId());
+
+            if ($originalProductFeature->getFreeTextValue() != 1) {
+                $cloneProductFeatureQuery->filterByFeatureAvId($originalProductFeature->getFeatureAvId());
+            }
+
+            $cloneProductFeature = $cloneProductFeatureQuery->findOne();
 
             $this->assertInstanceOf(
                 'Thelia\Model\FeatureProduct',
@@ -590,7 +595,13 @@ class ProductTest extends TestCaseWithURLToolSetup
 
             $this->assertEquals($event->getClonedProduct()->getId(), $cloneProductFeature->getProductId(), 'ProductID must be equal');
             $this->assertEquals($originalProductFeature->getFeatureId(), $cloneProductFeature->getFeatureId(), 'FeatureID must be equal');
-            $this->assertEquals($originalProductFeature->getFeatureAvId(), $cloneProductFeature->getFeatureAvId(), 'FeatureAvID must be equal');
+
+            if ($originalProductFeature->getFreeTextValue() == 1) {
+                $this->assertNotEquals($originalProductFeature->getFeatureAvId(), $cloneProductFeature->getFeatureAvId(), 'FeatureAvID can\'t be equal');
+            } else {
+                $this->assertEquals($originalProductFeature->getFeatureAvId(), $cloneProductFeature->getFeatureAvId(), 'FeatureAvID must be equal');
+            }
+
             $this->assertEquals($originalProductFeature->getFreeTextValue(), $cloneProductFeature->getFreeTextValue(), 'Free text value must be equal');
             $this->assertEquals($originalProductFeature->getPosition(), $cloneProductFeature->getPosition(), 'Position must be equal');
         }
