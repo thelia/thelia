@@ -28,6 +28,9 @@ class FeatureProductUpdateEvent extends FeatureProductEvent
         $this->setIsTextValue($is_text_value);
     }
 
+    /**
+     * @return int the product id
+     */
     public function getProductId()
     {
         return $this->product_id;

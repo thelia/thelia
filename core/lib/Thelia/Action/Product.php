@@ -238,27 +238,40 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         // Set clone product features
         foreach ($originalProductFeatures as $originalProductFeature) {
-            // Check if the feature value is a text one or not
-            if ($originalProductFeature->getFreeTextValue() === true) {
-                $cloneFeatureValue = $originalProductFeature->getFreeTextValue();
-            } elseif ($originalProductFeature->getFeatureAvId() !== null) {
-                $cloneFeatureValue = $originalProductFeature->getFeatureAvId();
-            } else {
-                throw new \Exception('Feature value is not defined');
+
+            // Get original free text values
+            $originalProductFreeTextValues = FeatureAvI18nQuery::create()
+                ->findById($originalProductFeature->getFeatureAvId());
+
+            /* For each original free text i18n, create a clone one
+            foreach ($originalProductFreeTextValues as $originalProductFreeTextValue) {
+                $cloneFeatureAvCreateEvent = new FeatureAvCreateEvent();
+                $cloneFeatureAvCreateEvent
+                    ->setTitle($originalProductFreeTextValue->getTitle())
+                    ->setLocale($originalProductFreeTextValue->getLocale())
+                    ->setFeatureId($originalProductFeature->getFeatureId());
+
+                $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_CREATE, $cloneFeatureAvCreateEvent);
+
+                /**
+                 * Probleme : les id ne seront pas partagés par les différentes langues je pense
+
+            }*/
+            foreach ($originalProductFreeTextValues as $originalProductFreeTextValue) {
+                $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
+                    $event->getClonedProduct()->getId(),
+                    $originalProductFeature->getFeatureId(),
+                    $originalProductFeature->getFeatureAvId() // ça doit etre l'ID d'une FeatureAv créée exprès. On pourra en récupérer la langue
+                );
+                $clonedProductCreateFeatureEvent->setLocale($originalProductFreeTextValue->getLocale());
+
+                if ($originalProductFeature->getFreeTextValue() !== null) {
+                    $clonedProductCreateFeatureEvent->setFeatureValue($originalProductFreeTextValue->getTitle());
+                    $clonedProductCreateFeatureEvent->setIsTextValue(true);
+                }
+
+                $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
             }
-
-            $clonedProductCreateFeatureEvent = new FeatureProductUpdateEvent(
-                $event->getClonedProduct()->getId(),
-                $originalProductFeature->getFeatureId(),
-                $cloneFeatureValue
-            );
-            $clonedProductCreateFeatureEvent->setLocale($event->getLang());
-
-            if ($originalProductFeature->getFreeTextValue() === true) {
-                $clonedProductCreateFeatureEvent->setIsTextValue(true);
-            }
-
-            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_FEATURE_UPDATE_VALUE, $clonedProductCreateFeatureEvent);
         }
     }
 
@@ -563,8 +576,10 @@ class Product extends BaseAction implements EventSubscriberInterface
         // If the feature is free text, it has only a single value.
         // Else create or update it.
 
+        // Prepare the FeatureAv's ID
         $featureAvId = $event->getFeatureValue();
 
+        // Search for existing FeatureProduct
         $featureProductQuery = FeatureProductQuery::create()
             ->filterByProductId($event->getProductId())
             ->filterByFeatureId($event->getFeatureId())
@@ -572,14 +587,13 @@ class Product extends BaseAction implements EventSubscriberInterface
 
         // If it's not a free text value, we can filter by the event's featureValue (which is an ID)
         if ($event->getFeatureValue() !== null && $event->getIsTextValue() === false) {
-            $featureProductQuery->filterByFeatureAvId($event->getFeatureValue());
+            $featureProductQuery->filterByFeatureAvId($featureAvId);
         }
 
         $featureProduct = $featureProductQuery->findOne();
 
         // If the FeatureProduct does not exist, create it
         if ($featureProduct === null) {
-
             $featureProduct = new FeatureProduct();
 
             $featureProduct
@@ -588,7 +602,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->setFeatureId($event->getFeatureId())
             ;
 
-            // If it's a free_text_value, create a FeatureAv to handle i18n
+            // If it's a free text value, create a FeatureAv to handle i18n
             if ($event->getIsTextValue() === true) {
                 $featureProduct->setFreeTextValue(true);
 
@@ -614,8 +628,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ->filterById($freeTextFeatureAv->getId())
                 ->findOneByLocale($event->getLocale());
 
+            // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
             if ($freeTextFeatureAvI18n === null && !empty($featureAvId)) {
-                // Nothing found for this lang and the new value is not empty : create FeatureAvI18n
                 $featureAvI18n = new FeatureAvI18n();
                 $featureAvI18n
                     ->setId($freeTextFeatureAv->getId())
@@ -624,9 +638,8 @@ class Product extends BaseAction implements EventSubscriberInterface
                     ->save();
 
                 $featureAvId = $featureAvI18n->getId();
-
-            } elseif ($freeTextFeatureAvI18n !== null && empty($featureAvId)) {
-                // I18n exists but new value is empty : delete FeatureAvI18n
+            } // Else if i18n exists but new value is empty : delete FeatureAvI18n
+            elseif ($freeTextFeatureAvI18n !== null && empty($featureAvId)) {
                 $freeTextFeatureAvI18n->delete();
 
                 // Check if there are still some FeatureAvI18n for this FeatureAv
@@ -640,9 +653,11 @@ class Product extends BaseAction implements EventSubscriberInterface
 
                     $deleteFeatureAvEvent = new FeatureAvDeleteEvent($freeTextFeatureAv->getId());
                     $event->getDispatcher()->dispatch(TheliaEvents::FEATURE_AV_DELETE, $deleteFeatureAvEvent);
+
+                    return;
                 }
-            } elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
-                // FeatureAvI18n found and the new value is not empty : update existing FeatureAvI18n
+            } // Else if a FeatureAvI18n is found and the new value is not empty : update existing FeatureAvI18n
+            elseif ($freeTextFeatureAvI18n !== null && !empty($featureAvId)) {
                 $freeTextFeatureAvI18n->setTitle($featureAvId);
                 $freeTextFeatureAvI18n->save();
 
