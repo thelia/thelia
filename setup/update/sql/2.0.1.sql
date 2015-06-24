@@ -51,7 +51,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max+6, 'es_ES', NULL),
 (@max+7, 'es_ES', NULL),
 (@max+8, 'es_ES', NULL),
-(@max, 'fr_FR', 'Informations sur la boutique'),
+(@max, 'fr_FR', 'Configuration des informations sur la boutique'),
 (@max+1, 'fr_FR', 'Variables de configuration'),
 (@max+2, 'fr_FR', 'Consulter les logs d\'administration'),
 (@max+3, 'fr_FR', 'Configuration du système de log'),
