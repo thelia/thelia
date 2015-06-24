@@ -607,6 +607,7 @@ return array(
     'Messages - table row' => 'Messages - ligne tableau',
     'Mexico' => 'Mexique',
     'Micronesia' => 'Micronésie',
+    'Mini cart' => 'Mini cart',
     'Miss' => 'Mademoiselle',
     'Miss_short' => 'Mlle',
     'Misses' => 'Madame',
