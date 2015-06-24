@@ -388,7 +388,7 @@ return array(
     'Do you really want to delete this language ?' => 'Do you really want to delete this language ?',
     'Do you really want to delete this mailing template ?' => 'Do you really want to delete this mailing template ?',
     'Do you really want to delete this module ?' => 'Do you really want to delete this module ?',
-    'Do you really want to delete this product ?' => 'Do you really want to delete this product ?',
+    "Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled." => "Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled.",
     'Do you really want to delete this profile ?' => 'Do you really want to delete this profile ?',
     'Do you really want to delete this sale ? All related products will no longer be on sale' => 'Do you really want to delete this sale ? All related products will no longer be on sale',
     'Do you really want to delete this shipping zone ?' => 'Do you really want to delete this shipping zone ?',
