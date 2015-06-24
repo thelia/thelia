@@ -343,8 +343,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-
-                // Get product's files to delete then after product deletion
+                // Get product's files to delete after product deletion
                 $fileList['images']['list'] = ProductImageQuery::create()
                     ->findByProductId($event->getProductId());
                 $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
