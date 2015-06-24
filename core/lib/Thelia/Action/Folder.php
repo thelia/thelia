@@ -85,7 +85,7 @@ class Folder extends BaseAction implements EventSubscriberInterface
 
                 // Delete folder
                 $folder->setDispatcher($event->getDispatcher())
-                    ->delete();
+                    ->delete($con);
 
                 $event->setFolder($folder);
 

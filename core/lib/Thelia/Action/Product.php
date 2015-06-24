@@ -355,7 +355,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 // Delete product
                 $product
                     ->setDispatcher($event->getDispatcher())
-                    ->delete()
+                    ->delete($con)
                 ;
 
                 $event->setProduct($product);

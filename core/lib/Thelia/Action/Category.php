@@ -119,7 +119,7 @@ class Category extends BaseAction implements EventSubscriberInterface
                 // Delete category
                 $category
                     ->setDispatcher($event->getDispatcher())
-                    ->delete();
+                    ->delete($con);
 
                 $event->setCategory($category);
 

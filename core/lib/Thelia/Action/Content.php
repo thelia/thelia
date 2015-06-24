@@ -136,7 +136,7 @@ class Content extends BaseAction implements EventSubscriberInterface
 
                 // Delete content
                 $content->setDispatcher($event->getDispatcher())
-                    ->delete();
+                    ->delete($con);
 
                 $event->setDefaultFolderId($defaultFolderId);
                 $event->setContent($content);
