@@ -85,6 +85,28 @@ class ModuleValidatorTest extends \PHPUnit_Framework_TestCase
         $moduleValidator->validate(false);
     }
 
+    public function authorsProvider()
+    {
+        return [
+            ['Module1', 2],
+            ['Module2', 1],
+            ['Module3', 1]
+        ];
+    }
+
+    /**
+     * @dataProvider authorsProvider
+     */
+    public function testAuthorsTag($path, $expectedAuthors)
+    {
+        $modulePath = __DIR__ . "/Authors/" . $path;
+
+        $moduleValidator = new ModuleValidator($modulePath, $this->getStubTranslator());
+        $moduleDefinition = $moduleValidator->getModuleDefinition();
+
+        $this->assertEquals($expectedAuthors, count($moduleDefinition->getAuthors()), sprintf("%d author(s) was expected for module %s", $expectedAuthors, $path));
+    }
+
     public function validatorProvider()
     {
         return [
