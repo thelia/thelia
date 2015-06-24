@@ -142,9 +142,9 @@
                                             </div>
                                             <div class="toolbar-options hidden">
                                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-                                                   <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                    <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                     {if $STATUS !== 5}
-                                                        <a class="btn btn-default btn-xs order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
+                                                        <a class="order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                     {/if}
                                                 {/loop}
 				                            </div>

@@ -664,7 +664,7 @@
 
     dialog_id       = "product_delete_dialog"
     dialog_title    = {intl l="Delete product"}
-    dialog_message  = {intl l="Do you really want to delete this product ?"}
+    dialog_message  = {intl l="Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled."}
 
     form_action         = {token_url path='/admin/products/delete'}
     form_content        = {$smarty.capture.product_delete_dialog nofilter}

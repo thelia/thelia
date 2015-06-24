@@ -290,7 +290,7 @@ return array(
     'Do you really want to delete this language ?' => 'Vuoi davvero eliminare questa lingua?',
     'Do you really want to delete this mailing template ?' => 'Vuoi davvero eliminare questo template ?',
     'Do you really want to delete this module ?' => 'Volete davvero cancellare questo modulo ?',
-    'Do you really want to delete this product ?' => 'Volete davvero cancellare questo prodotto ?',
+    "Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled." => 'Volete davvero cancellare questo prodotto ?',
     'Do you really want to delete this profile ?' => 'Volete davvero cancellare questo profilo ?',
     'Do you really want to delete this shipping configuration ?' => 'Volete davvero cancellare questa configurazione di spedizione ?',
     'Do you really want to delete this tax ?' => 'Vuoi davvero eliminare questa tassa?',

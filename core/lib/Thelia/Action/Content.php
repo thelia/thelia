@@ -21,11 +21,14 @@ use Thelia\Core\Event\Content\ContentDeleteEvent;
 use Thelia\Core\Event\Content\ContentRemoveFolderEvent;
 use Thelia\Core\Event\Content\ContentToggleVisibilityEvent;
 use Thelia\Core\Event\Content\ContentUpdateEvent;
+use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Event\UpdateSeoEvent;
+use Thelia\Model\ContentDocumentQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
+use Thelia\Model\ContentImageQuery;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Content as ContentModel;
 use Thelia\Model\Map\ContentTableMap;
@@ -116,13 +119,41 @@ class Content extends BaseAction implements EventSubscriberInterface
     public function delete(ContentDeleteEvent $event)
     {
         if (null !== $content = ContentQuery::create()->findPk($event->getContentId())) {
-            $defaultFolderId = $content->getDefaultFolderId();
+            $con = Propel::getWriteConnection(ContentTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-            $content->setDispatcher($event->getDispatcher())
-                ->delete();
+            try {
+                $defaultFolderId = $content->getDefaultFolderId();
 
-            $event->setDefaultFolderId($defaultFolderId);
-            $event->setContent($content);
+                // Get content's files to delete after content deletion
+                $fileList['images']['list'] = ContentImageQuery::create()
+                    ->findByContentId($event->getContentId());
+                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+                $fileList['documentList']['list'] = ContentDocumentQuery::create()
+                    ->findByContentId($event->getContentId());
+                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+                // Delete content
+                $content->setDispatcher($event->getDispatcher())
+                    ->delete($con);
+
+                $event->setDefaultFolderId($defaultFolderId);
+                $event->setContent($content);
+
+                // Dispatch delete content's files event
+                foreach ($fileList as $fileTypeList) {
+                    foreach ($fileTypeList['list'] as $fileToDelete) {
+                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                    }
+                }
+
+                $con->commit();
+            } catch (\Exception $e) {
+                $con->rollback();
+                throw $e;
+            }
         }
     }
 

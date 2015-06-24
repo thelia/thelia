@@ -26,8 +26,10 @@ use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageQuery;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Product as ProductModel;
@@ -337,12 +339,40 @@ class Product extends BaseAction implements EventSubscriberInterface
     public function delete(ProductDeleteEvent $event)
     {
         if (null !== $product = ProductQuery::create()->findPk($event->getProductId())) {
-            $product
-                ->setDispatcher($event->getDispatcher())
-                ->delete()
-            ;
+            $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
+            $con->beginTransaction();
 
-            $event->setProduct($product);
+            try {
+                // Get product's files to delete after product deletion
+                $fileList['images']['list'] = ProductImageQuery::create()
+                    ->findByProductId($event->getProductId());
+                $fileList['images']['type'] = TheliaEvents::IMAGE_DELETE;
+
+                $fileList['documentList']['list'] = ProductDocumentQuery::create()
+                    ->findByProductId($event->getProductId());
+                $fileList['documentList']['type'] = TheliaEvents::DOCUMENT_DELETE;
+
+                // Delete product
+                $product
+                    ->setDispatcher($event->getDispatcher())
+                    ->delete($con)
+                ;
+
+                $event->setProduct($product);
+
+                // Dispatch delete product's files event
+                foreach ($fileList as $fileTypeList) {
+                    foreach ($fileTypeList['list'] as $fileToDelete) {
+                        $fileDeleteEvent = new FileDeleteEvent($fileToDelete);
+                        $event->getDispatcher()->dispatch($fileTypeList['type'], $fileDeleteEvent);
+                    }
+                }
+
+                $con->commit();
+            } catch (\Exception $e) {
+                $con->rollback();
+                throw $e;
+            }
         }
     }
 
