@@ -41,6 +41,8 @@ abstract class ExportHandler extends AbstractHandler
 
     protected $isDocumentExport = false;
 
+    protected $rangeDate = null;
+
     /**
      * @return array
      *
@@ -85,6 +87,25 @@ abstract class ExportHandler extends AbstractHandler
     {
         $this->order = $order;
 
+        return $this;
+    }
+
+    /**
+     * @return array
+     *
+     * Use this method to access the range date.
+     *
+     */
+    public function getRangeDate()
+    {
+        return $this->rangeDate;
+    }
+
+    public function setRangeDate(array $range_date)
+    {
+        if (isset($rangeDate["start"]) && isset($rangeDate["end"])) {
+            $this->rangeDate = $rangeDate;
+        }
         return $this;
     }
 

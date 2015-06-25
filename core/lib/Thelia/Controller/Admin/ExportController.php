@@ -105,7 +105,15 @@ class ExportController extends BaseAdminController
                 );
             }
 
-            /**
+            $rangeDate = null;
+
+            if ($boundForm->get('range_date_start')->getData() && $boundForm->get('range_date_end')->getData()) {
+                $rangeDate = [];
+                $rangeDate['start'] = $boundForm->get('range_date_start')->getData();
+                $rangeDate['end'] = $boundForm->get('range_date_end')->getData();
+            }
+
+            /*
              * Return the generated Response
              */
 
@@ -115,7 +123,8 @@ class ExportController extends BaseAdminController
                 $archiveBuilder,
                 $lang,
                 $boundForm->get("images")->getData(),
-                $boundForm->get("documents")->getData()
+                $boundForm->get("documents")->getData(),
+                $rangeDate
             );
         } catch (FormValidationException $e) {
             $errorMessage = $this->createStandardFormValidationErrorMessage($e);
@@ -155,7 +164,8 @@ class ExportController extends BaseAdminController
         AbstractArchiveBuilder $archiveBuilder = null,
         Lang $lang = null,
         $includeImages = false,
-        $includeDocuments = false
+        $includeDocuments = false,
+        $rangeDate = null
     ) {
         /**
          * Build an event containing the formatter and the handler.
@@ -165,6 +175,10 @@ class ExportController extends BaseAdminController
         $event = new ImportExportEvent($formatter, $handler);
 
         $filename = $handler->getFilename() . "." . $formatter->getExtension();
+
+        if ($rangeDate !== null) {
+            $handler->setRangeDate($rangeDate);
+        }
 
         if ($archiveBuilder === null) {
             $data = $handler->buildData($lang);
