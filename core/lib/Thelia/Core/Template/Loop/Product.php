@@ -428,7 +428,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
     public function buildModelCriteria()
     {
-        Tlog::getInstance()->addInfo("-- Starting new product build criteria");
+        Tlog::getInstance()->debug("-- Starting new product build criteria");
 
         $currencyId = $this->getCurrency();
         if (null !== $currencyId) {
