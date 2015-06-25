@@ -16,13 +16,15 @@ SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
 
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
     (@max_id + 1, 'order-edit.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-    (@max_id + 2, 'order-edit.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+    (@max_id + 2, 'order-edit.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id + 3, 'mini-cart', 1, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 {foreach $locales as $locale}
     (@max_id + 1, '{$locale}', {intl l='Order - table header' locale=$locale}, '', ''),
-    (@max_id + 2, '{$locale}', {intl l='Order - table row' locale=$locale}, '', ''){if ! $locale@last},{/if}
+    (@max_id + 2, '{$locale}', {intl l='Order - table row' locale=$locale}, '', ''),
+    (@max_id + 3, '{$locale}', {intl l='Mini cart' locale=$locale}, '', ''){if ! $locale@last},{/if}
 {/foreach}
 ;
 

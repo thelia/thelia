@@ -11,16 +11,17 @@
 /*************************************************************************************/
 
 namespace HookCart\Hook;
+
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-
 
 /**
  * Class FrontHook
  * @package HookCurrency\Hook
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class FrontHook extends BaseHook {
+class FrontHook extends BaseHook
+{
 
     public function onMainHeadBottom(HookRenderEvent $event)
     {
@@ -40,4 +41,9 @@ class FrontHook extends BaseHook {
         $event->add($content);
     }
 
-} 
+    public function onMiniCart(HookRenderEvent $event)
+    {
+        $content = $this->render('mini-cart.html');
+        $event->add($content);
+    }
+}
