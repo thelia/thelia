@@ -1540,7 +1540,7 @@ DROP TABLE IF EXISTS `rewriting_url`;
 CREATE TABLE `rewriting_url`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `url` VARCHAR(255) NOT NULL,
+    `url` VARBINARY(255) NOT NULL,
     `view` VARCHAR(255),
     `view_id` VARCHAR(255),
     `view_locale` VARCHAR(255),
