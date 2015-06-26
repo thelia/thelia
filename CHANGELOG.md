@@ -8,6 +8,7 @@
 - A product and all it's dependencies can now be cloned
 - Fix index form error information session cleaning
 - Feature's free text values now handle i18n
+- URLs now have no problem with accents or case
 
 # 2.2.0-alpha2
 

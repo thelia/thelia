@@ -2079,7 +2079,7 @@ abstract class ProductQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-            ProductTableMap::removeInstanceFromPool($criteria);
+        ProductTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
             ProductTableMap::clearRelatedInstancePool();

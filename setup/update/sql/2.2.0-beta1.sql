@@ -29,4 +29,6 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 2, 'fr_FR', 'Commande - ligne tableau', '', ''),
     (@max_id + 3, 'fr_FR', 'Mini cart', '', '');
 
+ALTER TABLE `rewriting_url` CHANGE `url` `url` VARBINARY( 255 ) NOT NULL;
+
 SET FOREIGN_KEY_CHECKS = 1;
