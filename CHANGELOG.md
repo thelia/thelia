@@ -9,6 +9,7 @@
 - Fix index form error information session cleaning
 - Feature's free text values now handle i18n
 - URLs now have no problem with accents or case
+- Add order by ```weight``` and ```weight_reverse``` in  product sale elements loop
 
 # 2.2.0-alpha2
 
