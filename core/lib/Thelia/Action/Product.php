@@ -147,6 +147,8 @@ class Product extends BaseAction implements EventSubscriberInterface
 
             $this->cloneAssociatedContent($event);
 
+            $this->cloneAccessories($event);
+
             // Dispatch event for file cloning
             $dispatcher->dispatch(TheliaEvents::FILE_CLONE, $event);
 
@@ -275,6 +277,19 @@ class Product extends BaseAction implements EventSubscriberInterface
         foreach ($originalProductAssocConts as $originalProductAssocCont) {
             $clonedProductCreatePAC = new ProductAddContentEvent($event->getClonedProduct(), $originalProductAssocCont->getContentId());
             $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_CONTENT, $clonedProductCreatePAC);
+        }
+    }
+
+    public function cloneAccessories(ProductCloneEvent $event)
+    {
+        // Get original product accessories
+        $originalProductAccessoryList = AccessoryQuery::create()
+            ->findByProductId($event->getOriginalProduct()->getId());
+
+        // Set clone product accessories
+        foreach ($originalProductAccessoryList as $originalProductAccessory) {
+            $clonedProductAddAccessoryEvent = new ProductAddAccessoryEvent($event->getClonedProduct(), $originalProductAccessory->getAccessory());
+            $event->getDispatcher()->dispatch(TheliaEvents::PRODUCT_ADD_ACCESSORY, $clonedProductAddAccessoryEvent);
         }
     }
 

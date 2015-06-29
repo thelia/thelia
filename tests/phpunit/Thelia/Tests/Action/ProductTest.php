@@ -652,8 +652,50 @@ class ProductTest extends TestCaseWithURLToolSetup
     }
 
     /**
-     * @covers \Thelia\Action\File::cloneFile
      * @depends testCloneAssociatedContent
+     * @param ProductCloneEvent $event
+     * @return ProductCloneEvent
+     */
+    public function testCloneAccessories(ProductCloneEvent $event)
+    {
+        // Call function to test
+        $action = new Product();
+        $action->cloneAccessories($event);
+
+        // Get products' associated contents
+        $originalProductAccessoryList = AccessoryQuery::create()
+            ->findByProductId($event->getOriginalProduct()->getId());
+
+        $cloneProductAccessoryList = AccessoryQuery::create()
+            ->filterByProductId($event->getClonedProduct()->getId())
+            ->count();
+
+        $this->assertEquals(count($originalProductAccessoryList), $cloneProductAccessoryList, 'There must be the same quantity of accessories');
+
+        // Check clone product's accessories
+        foreach ($originalProductAccessoryList as $originalProductAccessory) {
+            $cloneProductAccessory = AccessoryQuery::create()
+                ->filterByProductId($event->getClonedProduct()->getId())
+                ->filterByPosition($originalProductAccessory->getPosition())
+                ->findOneByAccessory($originalProductAccessory->getAccessory());
+
+            $this->assertInstanceOf(
+                'Thelia\Model\Accessory',
+                $cloneProductAccessory,
+                'Instance of clone product accessory must be Thelia\Model\Accessory'
+            );
+
+            $this->assertEquals($event->getClonedProduct()->getId(), $cloneProductAccessory->getProductId(), 'ProductID must be equal');
+            $this->assertEquals($originalProductAccessory->getAccessory(), $cloneProductAccessory->getAccessory(), 'Accessory must be equal');
+            $this->assertEquals($originalProductAccessory->getPosition(), $cloneProductAccessory->getPosition(), 'Position must be equal');
+        }
+
+        return $event;
+    }
+
+    /**
+     * @covers \Thelia\Action\File::cloneFile
+     * @depends testCloneAccessories
      * @param ProductCloneEvent $event
      * @return ProductCloneEvent
      */
