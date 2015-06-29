@@ -78,6 +78,7 @@ class ArgumentCollection implements \Iterator
      * @param array $argumentNames Array with names of arguments to remove.
      *
      * @return ArgumentCollection
+     * @since 2.2.0-beta1
      */
     public function removeArguments(array $argumentNames)
     {
@@ -92,6 +93,7 @@ class ArgumentCollection implements \Iterator
      * @param string $argumentName Name of the argument to remove.
      *
      * @return ArgumentCollection
+     * @since 2.2.0-beta1
      */
     public function removeArgument($argumentName)
     {
