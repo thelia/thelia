@@ -68,6 +68,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                             'quantity', 'quantity_reverse',
                             'min_price', 'max_price',
                             'promo', 'new',
+                            'weight', 'weight_reverse',
                             'random'
                         )
                     )
@@ -141,6 +142,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                     break;
                 case "new":
                     $search->orderByNewness(Criteria::DESC);
+                    break;
+                case "weight":
+                    $search->orderByWeight(Criteria::ASC);
+                    break;
+                case "weight_reverse":
+                    $search->orderByWeight(Criteria::DESC);
                     break;
                 case "random":
                     $search->clearOrderByColumns();
