@@ -15,6 +15,8 @@ namespace TheliaSmarty\Template\Plugins;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\View\ChoiceView;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
@@ -217,6 +219,36 @@ class Form extends AbstractSmartyPlugin
                     $template->assign("choices", $formFieldView->vars['choices']);
                 }
             }
+        }
+
+        /* access to date */
+        if ($formFieldType instanceof DateType || $formFieldType instanceof DateTimeType) {
+            if ('choice' === $formFieldConfig->getOption('widget')) {
+                /* access to years */
+                if ( $formFieldConfig->getOption('years')) {
+                    $formFieldView->vars['years'] = $formFieldConfig->getOption('years');
+                    $template->assign("years", $formFieldView->vars['years']);
+                }
+
+                /* access to month */
+                if ( $formFieldConfig->getOption('months')) {
+                    $formFieldView->vars['months'] = $formFieldConfig->getOption('months');
+                    $template->assign("months", $formFieldView->vars['months']);
+                }
+
+                /* access to days */
+                if ( $formFieldConfig->getOption('days')) {
+                    $formFieldView->vars['days'] = $formFieldConfig->getOption('days');
+                    $template->assign("days", $formFieldView->vars['days']);
+                }
+
+                /* access to empty_value */
+                if ( $formFieldConfig->getOption('empty_value')) {
+                    $formFieldView->vars['empty_value'] = $formFieldConfig->getOption('empty_value');
+                    $template->assign("empty_value", $formFieldView->vars['empty_value']);
+                }
+            }
+
         }
 
         /* access to thelia type */
