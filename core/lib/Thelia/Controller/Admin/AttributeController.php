@@ -22,7 +22,6 @@ use Thelia\Model\AttributeQuery;
 use Thelia\Form\AttributeModificationForm;
 use Thelia\Form\AttributeCreationForm;
 use Thelia\Core\Event\UpdatePositionEvent;
-
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeEvent;
 

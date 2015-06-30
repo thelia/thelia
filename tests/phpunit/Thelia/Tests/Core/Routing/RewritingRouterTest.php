@@ -205,6 +205,5 @@ class RewritingRouterTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->fail('->matchRequest must throw a RedirectException');
-
     }
 }

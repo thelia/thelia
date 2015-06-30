@@ -12,6 +12,7 @@
 
 namespace Thelia\Coupon\Type;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Thelia\Condition\ConditionCollection;
 use Thelia\Condition\ConditionEvaluator;
@@ -19,6 +20,7 @@ use Thelia\Condition\Implementation\MatchForTotalAmount;
 use Thelia\Condition\Operators;
 use Thelia\Coupon\FacadeInterface;
 use Thelia\Model\CartItem;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductQuery;
@@ -111,7 +113,12 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch')
             ->will($this->returnCallback(function ($dummy, $cartEvent) {
                 $ci = new CartItem();
-                $ci->setId(3)->setPrice(123)->setPromo(0);
+                $ci
+                    ->setId(3)
+                    ->setPrice(123)
+                    ->setPromo(0)
+                    ->setProductId($this->freeProduct->getId())
+                ;
 
                 $cartEvent->setCartItem($ci);
             }));
@@ -140,16 +147,21 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
             ->method('getRequest')
             ->will($this->returnValue($stubRequest));
 
+        $country = CountryQuery::create()
+            ->findOneByByDefault(1);
+
+        $stubFacade->expects($this->any())
+            ->method('getDeliveryCountry')
+            ->will($this->returnValue($country));
+
         return $stubFacade;
     }
 
     public function generateMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade, $count)
     {
-        $product1 = new Product();
-        $product1->setId(10);
+        $product1 = ProductQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
 
-        $product2 = new Product();
-        $product2->setId(20);
+        $product2 = ProductQuery::create()->filterById($product1->getId(), Criteria::NOT_IN)->addAscendingOrderByColumn('RAND()')->findOne();
 
         $cartItem1Stub = $this->getMockBuilder('\Thelia\Model\CartItem')
             ->disableOriginalConstructor()
@@ -210,6 +222,8 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
         $stubFacade->expects($this->any())
             ->method('getCart')
             ->will($this->returnValue($cartStub));
+
+        return [$product1->getId(), $product2->getId()];
     }
 
     public function generateNoMatchingCart(\PHPUnit_Framework_MockObject_MockObject $stubFacade)
@@ -342,7 +356,9 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->generateMatchingCart($stubFacade, 1);
+        $products = $this->generateMatchingCart($stubFacade, 1);
+
+        $coupon->product_list = $products;
 
         $this->assertEquals(123.00, $coupon->exec());
     }
@@ -373,7 +389,9 @@ class FreeProductTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $this->generateMatchingCart($stubFacade, 2);
+        $products = $this->generateMatchingCart($stubFacade, 2);
+
+        $coupon->product_list = $products;
 
         $this->assertEquals(123.00, $coupon->exec());
     }

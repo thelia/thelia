@@ -4,7 +4,6 @@ namespace Thelia\Model;
 
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Core\Security\Role\Role;
-
 use Thelia\Core\Security\User\UserPermissionsTrait;
 use Thelia\Model\Base\Admin as BaseAdmin;
 use Propel\Runtime\Connection\ConnectionInterface;

@@ -14,7 +14,6 @@ namespace Thelia\Command;
 
 use Propel\Runtime\Propel;
 use Symfony\Component\Console\Input\InputInterface;
-
 use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Install\Database;
 

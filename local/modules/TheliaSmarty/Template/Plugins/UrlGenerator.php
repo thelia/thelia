@@ -147,7 +147,13 @@ class UrlGenerator extends AbstractSmartyPlugin
 
         $toMethod = $this->getNavigateToMethod($to);
 
-        return $this->$toMethod();
+        $url = URL::getInstance()->absoluteUrl(
+            $this->$toMethod(),
+            $this->getArgsFromParam($params, ['noamp', 'to', 'target']),
+            URL::WITH_INDEX_PAGE
+        );
+
+        return $this->applyNoAmpAndTarget($params, $url);
     }
 
     protected function generateViewUrlFunction($params, $forAdmin)
@@ -209,6 +215,19 @@ class UrlGenerator extends AbstractSmartyPlugin
         );
 
         return $newUrl;
+    }
+
+    protected function applyNoAmpAndTarget($params, $url)
+    {
+        $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
+        $target = $this->getParam($params, 'target', null);
+        if ($noamp == null) {
+            $url = str_replace('&', '&amp;', $url);
+        }
+        if ($target != null) {
+            $url .= '#'.$target;
+        }
+        return $url;
     }
 
     /**

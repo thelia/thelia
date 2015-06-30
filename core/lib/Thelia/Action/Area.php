@@ -21,7 +21,6 @@ use Thelia\Core\Event\Area\AreaUpdatePostageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\CountryQuery;
-
 use Thelia\Model\Area as AreaModel;
 
 /**

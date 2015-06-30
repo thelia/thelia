@@ -231,8 +231,7 @@ class FreeProduct extends AbstractRemoveOnProducts
 
             if ($freeProductCartItem instanceof CartItem) {
                 // The discount is the product price.
-                $discount = $freeProductCartItem->getPromo() ?
-                    $freeProductCartItem->getPromoPrice() : $freeProductCartItem->getPrice();
+                $discount = $freeProductCartItem->getRealTaxedPrice($this->facade->getDeliveryCountry());
             }
             // No eligible product was found !
         } else {

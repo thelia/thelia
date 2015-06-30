@@ -14,7 +14,6 @@ namespace Thelia\Controller\Admin;
 
 use Thelia\Core\Event\UpdateSeoEvent;
 use Thelia\Core\Security\AccessManager;
-
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Form\SeoForm;
 

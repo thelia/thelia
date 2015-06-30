@@ -82,7 +82,7 @@ return array(
     'Grid' => 'Grille',
     'Home' => 'Accueil',
     'I\'ve read and agreed on <a href=\'%link\' class=\'terms-quickview\'>Terms &amp; Conditions</a>' => 'J\'ai lu et j\'accepte <a href=\'%link\' class=\'terms-quickview\'>les conditions générales de vente</a>',
-    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Si rien ne se passe dans les 10 secondes, <a id="force-submit-payment-form" href="#">meri de cliquer ici</a>. ',
+    'If nothing happens within 10 seconds, <a id="force-submit-payment-form" href="#">please click here</a>.' => 'Si rien ne se passe dans les 10 secondes, <a id="force-submit-payment-form" href="#">merci de cliquer ici</a>. ',
     'In Stock' => 'Disponible',
     'Invoice REF' => 'Numéro de facture',
     'Invoice date' => 'Date de la facture',

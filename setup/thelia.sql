@@ -35,7 +35,7 @@ DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
@@ -3088,7 +3088,7 @@ DROP TABLE IF EXISTS `category_version`;
 CREATE TABLE `category_version`
 (
     `id` INTEGER NOT NULL,
-    `parent` INTEGER,
+    `parent` INTEGER DEFAULT 0,
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,

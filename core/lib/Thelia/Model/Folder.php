@@ -6,7 +6,6 @@ use Thelia\Core\Event\Folder\FolderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Files\FileModelParentInterface;
 use Thelia\Model\Base\Folder as BaseFolder;
-
 use Propel\Runtime\Connection\ConnectionInterface;
 
 class Folder extends BaseFolder implements FileModelParentInterface

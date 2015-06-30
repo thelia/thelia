@@ -344,7 +344,7 @@ class ModuleHookController extends AbstractCrudController
         /** @var IgnoredModuleHook $moduleHook */
         foreach ($ignoredModuleHooks as $moduleHook) {
             $className = $moduleHook->getClassname();
-            if (! in_array($className, $result)) {
+            if (null !== $className && ! in_array($className, $result)) {
                 $result[] = $className;
             }
         }
@@ -392,5 +392,4 @@ class ModuleHookController extends AbstractCrudController
 
         return new JsonResponse($result);
     }
-
 }

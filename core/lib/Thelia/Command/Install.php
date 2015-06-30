@@ -16,7 +16,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
-
 use Thelia\Install\CheckPermission;
 use Thelia\Install\Database;
 use Thelia\Tools\TokenProvider;
@@ -43,7 +42,8 @@ class Install extends ContainerAwareCommand
                 "db_host",
                 null,
                 InputOption::VALUE_OPTIONAL,
-                "host for your database"
+                "host for your database",
+                "localhost"
             )
             ->addOption(
                 "db_username",
@@ -62,6 +62,13 @@ class Install extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 "database name"
+            )
+            ->addOption(
+                "db_port",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "database port",
+                "3306"
             )
         ;
     }
@@ -84,7 +91,8 @@ class Install extends ContainerAwareCommand
             "host" => $input->getOption("db_host"),
             "dbName" => $input->getOption("db_name"),
             "username" => $input->getOption("db_username"),
-            "password" => $input->getOption("db_password")
+            "password" => $input->getOption("db_password"),
+            "port" => $input->getOption("db_port")
         );
 
         while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
@@ -188,7 +196,7 @@ class Install extends ContainerAwareCommand
         $configContent = str_replace("%PASSWORD%", $connectionInfo["password"], $configContent);
         $configContent = str_replace(
             "%DSN%",
-            sprintf("mysql:host=%s;dbname=%s", $connectionInfo["host"], $connectionInfo["dbName"]),
+            sprintf("mysql:host=%s;dbname=%s;port=%s", $connectionInfo["host"], $connectionInfo["dbName"], $connectionInfo['port']),
             $configContent
         );
 
@@ -210,11 +218,11 @@ class Install extends ContainerAwareCommand
             return false;
         }
 
-        $dsn = "mysql:host=%s";
+        $dsn = "mysql:host=%s;port=%s";
 
         try {
             $connection = new \PDO(
-                sprintf($dsn, $connectionInfo["host"]),
+                sprintf($dsn, $connectionInfo["host"], $connectionInfo["port"]),
                 $connectionInfo["username"],
                 $connectionInfo["password"]
             );
@@ -245,7 +253,7 @@ class Install extends ContainerAwareCommand
 
         $connectionInfo["host"] = $dialog->askAndValidate(
             $output,
-            $this->decorateInfo("Database host : "),
+            $this->decorateInfo("Database host [default: localhost] : "),
             function ($answer) {
                 $answer = trim($answer);
                 if (is_null($answer)) {
@@ -253,7 +261,24 @@ class Install extends ContainerAwareCommand
                 }
 
                 return $answer;
-            }
+            },
+            false,
+            "localhost"
+        );
+
+        $connectionInfo["port"] = $dialog->askAndValidate(
+            $output,
+            $this->decorateInfo("Database port [default: 3306]: "),
+            function ($answer) {
+                $answer = trim($answer);
+                if (is_null($answer)) {
+                    throw new \RuntimeException("You must specify a database port");
+                }
+
+                return $answer;
+            },
+            false,
+            "3306"
         );
 
         $connectionInfo["dbName"] = $dialog->askAndValidate(

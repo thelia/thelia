@@ -13,12 +13,9 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeAv as AttributeAvModel;
-
 use Thelia\Core\Event\TheliaEvents;
-
 use Thelia\Core\Event\Attribute\AttributeAvUpdateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvCreateEvent;
 use Thelia\Core\Event\Attribute\AttributeAvDeleteEvent;

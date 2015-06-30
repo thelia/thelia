@@ -13,7 +13,6 @@
 namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
 use Thelia\Core\Template\Loop\Document;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\CategoryDocumentQuery;
