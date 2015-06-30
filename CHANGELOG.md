@@ -10,6 +10,7 @@
 - Feature's free text values now handle i18n
 - URLs now have no problem with accents or case
 - Add order by ```weight``` and ```weight_reverse``` in  product sale elements loop
+- Add the ability to remove arguments in loops.
 
 # 2.2.0-alpha2
 

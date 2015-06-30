@@ -74,6 +74,36 @@ class ArgumentCollection implements \Iterator
         return $this;
     }
 
+    /**
+     * @param array $argumentNames Array with names of arguments to remove.
+     *
+     * @return ArgumentCollection
+     * @since 2.2.0-beta1
+     */
+    public function removeArguments(array $argumentNames)
+    {
+        foreach ($argumentNames as $argumentName) {
+            $this->removeArgument($argumentName);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $argumentName Name of the argument to remove.
+     *
+     * @return ArgumentCollection
+     * @since 2.2.0-beta1
+     */
+    public function removeArgument($argumentName)
+    {
+        if (isset($this->arguments[$argumentName])) {
+            unset($this->arguments[$argumentName]);
+        }
+
+        return $this;
+    }
+
     public function getCount()
     {
         return count($this->arguments);
