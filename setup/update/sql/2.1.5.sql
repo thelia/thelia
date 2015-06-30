@@ -9,4 +9,20 @@ UPDATE `config` SET `value`='' WHERE `name`='thelia_extra_version';
 ALTER TABLE `category` CHANGE `parent` `parent` INT( 11 ) NULL DEFAULT '0';
 ALTER TABLE `category_version` CHANGE `parent` `parent` INT( 11 ) NULL DEFAULT '0';
 
+SELECT @max_id := MAX(`id`) FROM hook;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+    (@max_id+1, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+    (@max_id+2, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+    (@max_id+1, 'en_US', 'Invoice - additional product information', '', ''),
+    (@max_id+1, 'fr_FR', 'Facture - informations additionnelles pour un produit', '', ''),
+    (@max_id+1, 'es_ES', NULL, '', ''),
+    (@max_id+2, 'en_US', 'Delivery - additional product information', '', ''),
+    (@max_id+2, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', ''),
+    (@max_id+2, 'es_ES', NULL, '', '')
+;
+
 SET FOREIGN_KEY_CHECKS = 1;

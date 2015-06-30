@@ -263,6 +263,8 @@
                 <p>{$QUANTITY}</p>
             </td>
         </tr>
+
+            {hook name="delivery.order-product" order="{$order_id}" order_product="{$ID}"}
         {/loop}
     </table>
 
