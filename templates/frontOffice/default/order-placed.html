@@ -30,7 +30,7 @@
                     {$orderCurrency=$SYMBOL}
                 {/loop}
             {ifhook rel="order-placed.body"}
-                {hook name="order-placed.body" module="$PAYMENT_MODULE"}
+                {hook name="order-placed.body" module="$PAYMENT_MODULE" placed_order_id=$placed_order_id}
             {/ifhook}
             {elsehook rel="order-placed.body"}
                 <div id="payment-success" class="panel">
