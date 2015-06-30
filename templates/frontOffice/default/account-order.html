@@ -209,10 +209,10 @@
                     <td class="qty"><p>{$QUANTITY}</p></td>
                     <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
                 </tr>
-                {ifhook rel="account-order.product"}
+                {ifhook rel="account-order.product-extra"}
                 <tr>
                     <td class="product-extra" colspan="5">
-                        {hook name="account-order.product" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
+                        {hook name="account-order.product-extra" order="{$order_id}" order_product="{$ID}" product="{$PRODUCT_ID}"}
                     </td>
                 </tr>
                 {/ifhook}
