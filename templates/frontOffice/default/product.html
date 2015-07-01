@@ -4,7 +4,7 @@
     {$product_id={product attr="id"}}
     {$pse_count=1}
     {$product_virtual={product attr="virtual"}}
-    {$check_availability={config key="check-available-stock" default="1"}}
+    {$check_availability={config key="check-available-stock" default=1}}
 {/block}
 
 {* Body Class *}
@@ -12,14 +12,14 @@
 
 {* Page Title *}
 {block name='no-return-functions' append}
-    {loop name="product.seo.title" type="product" id=$product_id limit="1" with_prev_next_info="1"}
-    {$page_title = {$META_TITLE}}
+    {loop name="product.seo.title" type="product" id=$product_id limit=1 with_prev_next_info=1}
+    {$page_title = $META_TITLE}
     {/loop}
 {/block}
 
 {* Meta *}
 {block name="meta"}
-    {loop name="product.seo.meta" type="product" id=$product_id limit="1" with_prev_next_info="1"}
+    {loop name="product.seo.meta" type="product" id=$product_id limit=1 with_prev_next_info=1}
     {include file="includes/meta-seo.html"}
     {/loop}
 {/block}
@@ -27,11 +27,11 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = []}
-    {loop type="product" name="product_breadcrumb" id=$product_id limit="1" with_prev_next_info="1"}
-        {loop name="category_path" type="category-path" category="{$DEFAULT_CATEGORY}"}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+    {loop type="product" name="product_breadcrumb" id=$product_id limit=1 with_prev_next_info=1}
+        {loop name="category_path" type="category-path" category=$DEFAULT_CATEGORY}
+            {$breadcrumbs[] = ['title' => $TITLE, 'url' => {$URL nofilter}]}
         {/loop}
-        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+        {$breadcrumbs[] = ['title' => $TITLE, 'url' => {$URL nofilter}]}
     {/loop}
 {/block}
 
@@ -39,34 +39,34 @@
 {block name="main-content"}
     {if $product_id}
     <div class="main">
-        {loop name="product.details" type="product" id=$product_id limit="1" with_prev_next_info="1" with_prev_next_visible="1"}
+        {loop name="product.details" type="product" id=$product_id limit=1 with_prev_next_info=1 with_prev_next_visible=1}
         <article id="product" class="col-main row" role="main" itemscope itemtype="http://schema.org/Product">
 
             {$pse_count=$PSE_COUNT}
 
             {* Use the meta tag to specify content that is not visible on the page in any way *}
-            {loop name="brand.feature" type="brand" product="{$ID}"}
+            {loop name="brand.feature" type="brand" product=$ID}
                 <meta itemprop="brand" content="{$TITLE}">
             {/loop}
 
             {* Add custom feature if needed
-            {loop name="isbn.feature" type="feature" product="{$ID}" title="isbn"}
-                {loop name="isbn.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+            {loop name="isbn.feature" type="feature" product=$ID title="isbn"}
+                {loop name="isbn.value" type="feature_value" feature=$ID product={product attr="id"}}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
             *}
 
-            {hook name="product.top" product="{$ID}"}
+            {hook name="product.top" product=$ID}
 
             {ifhook rel="product.gallery"}
-               {hook name="product.gallery" product="{$ID}"}
+               {hook name="product.gallery" product=$ID}
             {/ifhook}
             {elsehook rel="product.gallery"}
             <section id="product-gallery" class="col-sm-6">
                 {ifloop rel="image.main"}
                 <figure class="product-image">
-                    {loop type="image" name="image.main" product="{$ID}" width="560" height="445" resize_mode="borders" limit="1"}
+                    {loop type="image" name="image.main" product=$ID width=560 height=445 resize_mode="borders" limit=1}
                         <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" class="img-responsive" itemprop="image" data-toggle="magnify">
                     {/loop}
                 </figure>
@@ -77,10 +77,10 @@
                     <div class="carousel-inner">
                         <div class="item active">
                             <ul class="list-inline">
-                                {loop name="image.carousel" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" limit="5"}
+                                {loop name="image.carousel" type="image" product=$ID  width=560 height=445 resize_mode="borders" limit=5}
                                 <li>
                                     <a href="{$IMAGE_URL nofilter}" class="thumbnail {if $LOOP_COUNT == 1}active{/if}">
-                                        {loop type="image" name="image.thumbs" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
+                                        {loop type="image" name="image.thumbs" id=$ID product=$OBJECT_ID width=118 height=85 resize_mode="borders"}
                                             <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                         {/loop}
                                     </a>
@@ -91,10 +91,10 @@
                         {ifloop rel="image.carouselsup"}
                         <div class="item">
                             <ul class="list-inline">
-                                {loop name="image.carouselsup" type="image" product="{$ID}"  width="560" height="445" resize_mode="borders" offset="5"}
+                                {loop name="image.carouselsup" type="image" product=$ID  width=560 height=445 resize_mode="borders" offset=5}
                                     <li>
                                         <a href="{$IMAGE_URL nofilter}" class="thumbnail">
-                                            {loop type="image" name="image.thumbssup" id="{$ID}" product="$OBJECT_ID" width="118" height="85" resize_mode="borders"}
+                                            {loop type="image" name="image.thumbssup" id=$ID product=$OBJECT_ID width=118 height=85 resize_mode="borders"}
                                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                                             {/loop}
                                         </a>
@@ -114,13 +114,13 @@
             {/elsehook}
 
             <section id="product-details" class="col-sm-6">
-                {hook name="product.details-top" product="{$ID}"}
+                {hook name="product.details-top" product=$ID}
 
                 <div class="product-info">
                     <h1 class="name"><span itemprop="name">{$TITLE}</span><span id="pse-name" class="pse-name"></span></h1>
                     {if $REF}<span itemprop="sku" class="sku">{intl l='Ref.'}: <span id="pse-ref">{$REF}</span></span>{/if}
 
-                    {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
+                    {loop name="brand_info" type="brand" product=$ID limit=1}
                         <p><a href="{$URL nofilter}" title="{intl l="More information about this brand"}"><span itemprop="brand">{$TITLE}</span></a></p>
                     {/loop}
 
@@ -129,10 +129,10 @@
                     </div>{/if}
                 </div>
 
-                {loop type="sale" name="product-sale-info" product="{$ID}" active="1"}
+                {loop type="sale" name="product-sale-info" product=$ID active=1}
                     <div class="product-promo">
                         <p class="sale-label">{$SALE_LABEL}</p>
-                        <p class="sale-saving"> {intl l="Save %amount%sign on this product" amount={$PRICE_OFFSET_VALUE} sign={$PRICE_OFFSET_SYMBOL}}</p>
+                        <p class="sale-saving"> {intl l="Save %amount%sign on this product" amount=$PRICE_OFFSET_VALUE sign=$PRICE_OFFSET_SYMBOL}</p>
                         {if $HAS_END_DATE}
                             <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
                         {/if}
@@ -171,8 +171,8 @@
 
                 </div>
 
-                {form name="thelia.cart.add" }
-                <form id="form-product-details" action="{url path="/cart/add" }" method="post" class="form-product">
+                {form name="thelia.cart.add"}
+                <form id="form-product-details" action="{url path="/cart/add"}" method="post" class="form-product">
                     {form_hidden_fields}
                     <input type="hidden" name="view" value="product">
                     <input type="hidden" name="product_id" value="{$ID}">
@@ -194,7 +194,7 @@
                     {if $pse_count > 1}
                         {* We have more than 1 combination: custom form *}
                         <fieldset id="pse-options" class="product-options">
-                            {loop name="attributes" type="attribute" product="$product_id" order="manual"}
+                            {loop name="attributes" type="attribute" product=$product_id order="manual"}
                             <div class="option option-option">
                                 <label for="option-{$ID}" class="option-heading">{$TITLE}</label>
                                 <div class="option-content clearfix">
@@ -218,7 +218,7 @@
                         <div class="form-group group-qty {if $error}has-error{elseif $value != "" && !$error}has-success{/if}">
                             <label for="{$label_attr.for}">{$label}</label>
                             <input type="number" name="{$name}" id="{$label_attr.for}" class="form-control" value="{$value|default:1}" min="1" required>
-                            {if $error }
+                            {if $error}
                                 <span class="help-block">{$message}</span>
                             {elseif $value != "" && !$error}
                                 <span class="help-block"><i class="fa fa-check"></i></span>
@@ -233,18 +233,18 @@
 
                 </form>
                 {/form}
-                {hook name="product.details-bottom" product="{$ID}"}
+                {hook name="product.details-bottom" product=$ID}
             </section>
 
             {strip}
                 {capture "additional"}
                     {ifloop rel="feature_info"}
                         <ul>
-                            {loop name="feature_info" type="feature" product="{$ID}"}
+                            {loop name="feature_info" type="feature" product=$ID}
                             {ifloop rel="feature_value_info"}
                                 <li>
                                     <strong>{$TITLE}</strong> :
-                                    {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                                    {loop name="feature_value_info" type="feature_value" feature=$ID product={product attr="id"}}
                                         {if $LOOP_COUNT > 1}, {else} {/if}
                                         <span>{if $IS_FREE_TEXT == 1}{$FREE_TEXT_VALUE}{else}{$TITLE}{/if}</span>
                                     {/loop}
@@ -258,10 +258,10 @@
 
             {strip}
                 {capture "brand_info"}
-                    {loop name="brand_info" type="brand" product="{$ID}" limit="1"}
+                    {loop name="brand_info" type="brand" product=$ID limit=1}
                         <p><strong><a href="{$URL nofilter}">{$TITLE}</a></strong></p>
 
-                        {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
+                        {loop name="brand.image" type="image" source="brand" id=$LOGO_IMAGE_ID width=218 height=146 resize_mode="borders"}
                             <p><a href="{$URL nofilter}"><img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$TITLE}"></a></p>
                         {/loop}
 
@@ -285,7 +285,7 @@
             {/strip}
 
             <section id="product-tabs" class="col-sm-12">
-                {hookblock name="product.additional" product="{product attr="id"}" fields="id,class,title,content"}
+                {hookblock name="product.additional" product={product attr="id"} fields="id,class,title,content"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
@@ -316,22 +316,22 @@
                 </div>
                 {/hookblock}
             </section>
-            {hook name="product.bottom" product="{$ID}"}
+            {hook name="product.bottom" product=$ID}
 
 {* javascript confiuguration to display pse *}
 {$pse=[]}
 {$combination_label=[]}
 {$combination_values=[]}
-{loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
-    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}", "promo" => "{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}" ]}
+{loop name="pse" type="product_sale_elements" product={product attr="id"}}
+    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => $REF, "ean" => $EAN, "quantity" => $QUANTITY, "price" => {format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}, "promo" => {format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}]}
     {$pse_combination=[]}
-    {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+    {loop name="combi" type="attribute_combination" product_sale_elements=$ID}
         {if ! $combination_label[$ATTRIBUTE_ID]}
-            {$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
+            {$combination_label[$ATTRIBUTE_ID]=["name" => $ATTRIBUTE_TITLE, "values" => []]}
         {/if}
         {if ! $combination_values[$ATTRIBUTE_AVAILABILITY_ID]}
             {$combination_label[$ATTRIBUTE_ID]["values"][]=$ATTRIBUTE_AVAILABILITY_ID}
-            {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=["{$ATTRIBUTE_AVAILABILITY_TITLE}", $ATTRIBUTE_ID]}
+            {$combination_values[$ATTRIBUTE_AVAILABILITY_ID]=[$ATTRIBUTE_AVAILABILITY_TITLE, $ATTRIBUTE_ID]}
         {/if}
         {$pse_combination[]=$ATTRIBUTE_AVAILABILITY_ID}
     {/loop}
@@ -342,10 +342,9 @@
     // Product sale elements
     var PSE_FORM = true;
     var PSE_COUNT = {$pse_count};
-    {if $check_availability == 0 || $product_virtual == 1 }
-        var PSE_CHECK_AVAILABILITY = false;
-    {else}
-        var PSE_CHECK_AVAILABILITY = true;
+    var PSE_CHECK_AVAILABILITY = true;
+    {if $check_availability == 0 || $product_virtual == 1}
+        PSE_CHECK_AVAILABILITY = false;
     {/if}
     var PSE_DEFAULT_AVAILABLE_STOCK = {config key="default_available_stock" default="100"};
     var PSE = {$pse|json_encode nofilter};
@@ -357,12 +356,12 @@
 
         <ul class="pager">
             {if $HAS_PREVIOUS == 1}
-                {loop type="product" name="prev_product" id="{$PREVIOUS}"}
+                {loop type="product" name="prev_product" id=$PREVIOUS}
                     <li class="previous"><a href="{$URL nofilter}"><i class="fa fa-chevron-left"></i> {intl l="Previous product"}</a></li>
                 {/loop}
             {/if}
             {if $HAS_NEXT == 1}
-                {loop type="product" name="next_product" id="{$NEXT}"}
+                {loop type="product" name="next_product" id=$NEXT}
                     <li class="next"><a href="{$URL nofilter}"><i class="fa fa-chevron-right"></i> {intl l="Next product"}</a></li>
                 {/loop}
             {/if}

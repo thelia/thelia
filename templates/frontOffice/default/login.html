@@ -6,13 +6,11 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Login"}, 'url'=>{url path="/login"}]
+        ['title' => {intl l="Login"}, 'url' => {url path="/login"}]
     ]}
 {/block}
 
-
 {block name="main-content"}
-
     {* This page should not replace the current previous URL *}
     {set_previous_url ignore_current="1"}
 
@@ -41,9 +39,9 @@
                             <input type="email" name="{$name}" id="{$label_attr.for}" value="{$value}" class="form-control input-sm" maxlength="255" {$attr} {if $required}aria-required="true" required{/if}{if !$value || $error} autofocus{/if}>
                             {if $error}
                                 <span class="help-block">{$message}</span>
-                                {assign var="error_focus" value="true"}
+                                {assign var="error_focus" value=true}
                             {elseif !$value}
-                                {assign var="error_focus" value="true"}
+                                {assign var="error_focus" value=true}
                             {/if}
                             </div>
                         </div>

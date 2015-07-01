@@ -11,8 +11,8 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Account"}, 'url'=>{url path="/account"}],
-        ['title' => {intl l="Update Profile"}, 'url'=>{url path="/account/update"}]
+        ['title' => {intl l="Account"}, 'url' => {url path="/account"}],
+        ['title' => {intl l="Update Profile"}, 'url' => {url path="/account/update"}]
     ]}
 {/block}
 
@@ -55,9 +55,9 @@
                                     </select>
                                     {if $error}
                                         <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
-                                    {elseif !$value}
-                                        {assign var="error_focus" value="true"}
+                                        {assign var="error_focus" value=true}
+                                     {elseif !$value}
+                                        {assign var="error_focus" value=true}
                                     {/if}
                                 </div>
                             </div><!--/.form-group-->
@@ -67,9 +67,9 @@
                             <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                             <div class="control-input col-sm-5">
                                 <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder firstname"}" value="{$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                {if $error }
+                                {if $error}
                                     <span class="help-block">{$message}</span>
-                                    {assign var="error_focus" value="true"}
+                                    {assign var="error_focus" value=true}
                                 {/if}
                             </div>
                         </div><!--/.form-group-->
@@ -79,9 +79,9 @@
                                 <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}{if $required} <span class="required">*</span>{/if}</label>
                                 <div class="control-input col-sm-5">
                                     <input type="text" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder lastname"}" value="{$value}" {if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                    {if $error }
+                                    {if $error}
                                         <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
+                                        {assign var="error_focus" value=true}
                                     {/if}
                                 </div>
                             </div><!--/.form-group-->
@@ -98,9 +98,9 @@
                                 {if !$customer_change_email}
                                     <div class="alert alert-info" role="alert">{intl l="If you want to change your email, please contact us."} <strong><a href="{url path="/contact"}" title="{intl l="Contact page"}">{intl l="Contact page"}</a></strong></div>
                                 {/if}
-                                {if $error }
+                                {if $error}
                                     <span class="help-block">{$message}</span>
-                                    {assign var="error_focus" value="true"}
+                                    {assign var="error_focus" value=true}
                                 {/if}
                             </div>
                         </div><!--/.form-group-->
@@ -113,9 +113,9 @@
 
                                 <div class="control-input col-sm-5">
                                     <input type="email" name="{$name}" id="{$label_attr.for}" class="form-control" maxlength="255" placeholder="{intl l="Placeholder email confirm"}" value="{$smarty.get.email|default:$value}"{if $required} aria-required="true" required{/if}{if !isset($error_focus) && $error} autofocus{/if}>
-                                    {if $error }
+                                    {if $error}
                                         <span class="help-block">{$message}</span>
-                                        {assign var="error_focus" value="true"}
+                                        {assign var="error_focus" value=true}
                                     {/if}
                                 </div>
                             </div><!--/.form-group-->
@@ -131,7 +131,7 @@
                             <label class="control-label" for="{$label_attr.for}">
                                 <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="{$value}"{if $checked} checked{/if}  {if $required} aria-required="true" required{/if}>{$label}
                             </label>
-                            {if $error }
+                            {if $error}
                                 <span class="help-block">{$message}</span>
                             {/if}
                         </div>

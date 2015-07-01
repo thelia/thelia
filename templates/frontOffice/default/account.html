@@ -35,7 +35,7 @@
                         {loop type="customer" name="customer.info"}
                         <div class="panel-body">
                             <p class="fn">{loop type="title" name="customer.title.info" id=$TITLE}{$SHORT}{/loop} {$FIRSTNAME|ucwords} {$LASTNAME|upper}</p>
-                            {loop type="address" name="address.default" default="true"}
+                            {loop type="address" name="address.default" default=true}
                             <ul class="list-info list-unstyled row">
                                 <li class="col-sm-4">
                                     <address class="adr">

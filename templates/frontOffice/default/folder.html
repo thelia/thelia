@@ -10,7 +10,7 @@
 {* Page Title *}
 {block name='no-return-functions' append}
     {if $folder_id}
-        {loop name="folder.seo.title" type="folder" id=$folder_id limit="1"}
+        {loop name="folder.seo.title" type="folder" id=$folder_id limit=1}
         {$page_title = {$META_TITLE}}
         {/loop}
     {/if}
@@ -19,7 +19,7 @@
 {* Meta *}
 {block name="meta"}
     {if $folder_id}
-        {loop name="folder.seo.meta" type="folder" id=$folder_id limit="1"}
+        {loop name="folder.seo.meta" type="folder" id=$folder_id limit=1}
             {include file="includes/meta-seo.html"}
         {/loop}
     {/if}
@@ -30,7 +30,7 @@
     {if $folder_id}
         {$breadcrumbs = []}
         {loop name="folder_path" type="folder-path" folder=$folder_id}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url' => {$URL nofilter}]}
         {/loop}
     {/if}
 {/block}
@@ -41,16 +41,16 @@
 
 {* Content *}
 {block name="main-content"}
-{assign var="$folder_id" value="{folder attr="id"}"}
-    {hook name="folder.top" folder="$folder_id"}
+{assign var=$folder_id value={folder attr="id"}}
+    {hook name="folder.top" folder=$folder_id}
     <div class="main">
-        {hook name="folder.main-top" folder="$folder_id"}
+        {hook name="folder.main-top" folder=$folder_id}
         <div class="col-main contents-list list-unstyled" role="main" aria-labelledby="main-label">
 
-        {hook name="folder.content-top" folder="$folder_id"}
+        {hook name="folder.content-top" folder=$folder_id}
 
         {if $folder_id}
-            {loop name="folder" type="folder" id=$folder_id limit="1"}
+            {loop name="folder" type="folder" id=$folder_id limit=1}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}
                     <div class="folder-chapo">
@@ -67,12 +67,12 @@
                     <div class="contents">
                         {ifloop rel="folder_content"}
                             <ul class="list-unstyled">
-                                {loop name="folder_content" type="content" folder="$ID"}
+                                {loop name="folder_content" type="content" folder=$ID}
                                     <li class="item">
                                         <article class="row">
                                             {ifloop rel="content_thumbnail"}
                                             <a href="{$URL nofilter}" tabindex="-1" class="content-image overlay col-sm-2">
-                                                {loop name="content_thumbnail" type="image" width="369" height="247" content=$ID limit="1"}
+                                                {loop name="content_thumbnail" type="image" width=369 height=247 content=$ID limit=1}
                                                     <img src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$TITLE}">
                                                 {/loop}
                                             </a>
@@ -103,7 +103,7 @@
                 {ifloop rel="blog.document"}
                 <div class="documents">
                     <ul>
-                    {loop name="blog.document"  type="document" folder="{$ID}"}
+                    {loop name="blog.document"  type="document" folder=$ID}
                     <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>
@@ -137,12 +137,12 @@
             {/ifloop}
         {/if}
 
-        {hook name="folder.content-bottom" folder="$folder_id"}
+        {hook name="folder.content-bottom" folder=$folder_id}
 
         </div>
-        {hook name="folder.main-bottom" folder="$folder_id"}
+        {hook name="folder.main-bottom" folder=$folder_id}
     </div>
-    {hook name="folder.bottom" folder="$folder_id"}
+    {hook name="folder.bottom" folder=$folder_id}
 {/block}
 
 {block name="stylesheet"}

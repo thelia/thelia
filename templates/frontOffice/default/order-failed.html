@@ -11,11 +11,10 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
-        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
+        ['title' => {intl l="Cart"}, 'url' => {url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url' => {url path="/order/pay"}]
     ]}
 {/block}
-
 
 {block name="main-content"}
     <div class="main">
@@ -52,7 +51,6 @@
         </article>
     </div>
 {/block}
-
 
 {block name="stylesheet"}
 {hook name="order-failed.stylesheet"}

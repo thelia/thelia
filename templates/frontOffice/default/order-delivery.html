@@ -12,14 +12,12 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
-        ['title' => {intl l="Billing and delivery"}, 'url'=>{url path="/order/delivery"}]
+        ['title' => {intl l="Cart"}, 'url' => {url path="/cart"}],
+        ['title' => {intl l="Billing and delivery"}, 'url' => {url path="/order/delivery"}]
     ]}
 {/block}
 
-
 {block name="main-content"}
-
     <div class="main">
         <article id="cart" class="col-main" role="main" aria-labelledby="main-label">
 
@@ -43,7 +41,7 @@
 
                 <div id="delivery-address" class="panel panel-default">
                     <div class="panel-heading clearfix">
-                        <a href="{url path="/address/create" next={navigate to='current'} }" class="btn btn-link pull-right"><i class="fa fa-plus"></i> {intl l="Add a new address"}</a>
+                        <a href="{url path="/address/create" next={navigate to='current'}}" class="btn btn-link pull-right"><i class="fa fa-plus"></i> {intl l="Add a new address"}</a>
                         {intl l="Choose your delivery address"}
                         {if $error}
                             <span class="help-block"><span class="fa fa-remove"></span> {$message}</span>
@@ -70,7 +68,7 @@
                                                 {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
                                                 <span class="label label-info   ">{intl l="Main Address"}</span>
                                             {else}
-                                                {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
+                                                {$LABEL|default:{intl l='Address %nb' nb=$LOOP_COUNT}}
                                             {/if}
                                         </label>
                                     </div>
@@ -147,12 +145,9 @@
 
         </article>
     </div>
-
-
 {/block}
 
 {block name="javascript-initialization"}
-
     <script type="text/javascript">
         jQuery(function($) {
             $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');

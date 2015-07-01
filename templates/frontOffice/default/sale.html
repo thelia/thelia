@@ -4,9 +4,9 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {loop name="sale-details" type="sale" id={$product_sale}}
+    {loop name="sale-details" type="sale" id=$product_sale}
         {$breadcrumbs = [
-            ['title' => "{$SALE_LABEL}", 'url'=>{url path="/sale" sale="{$ID}"}]
+            ['title' => $SALE_LABEL, 'url' => {url path="/sale" sale=$ID}]
         ]}
     {/loop}
 {/block}
@@ -25,7 +25,7 @@
             <h1 id="main-label" class="page-header">{$SALE_LABEL}</h1>
 
             <div class="sale-discount-information">
-                <p class="sale-saving"> {intl l="Save %amount%sign on these products" amount={$PRICE_OFFSET_VALUE} sign={$PRICE_OFFSET_SYMBOL}}</p>
+                <p class="sale-saving"> {intl l="Save %amount%sign on these products" amount=$PRICE_OFFSET_VALUE sign=$PRICE_OFFSET_SYMBOL}</p>
                 {if $HAS_END_DATE}
                     <p class="sale-period">{intl l="This offer is valid until %date" date={format_date date=$END_DATE output="date"}}</p>
                 {/if}
@@ -45,18 +45,18 @@
                 {/if}
             </div>
 
-            {assign var="amount" value="{count type="product" sale=$ID}"}
+            {assign var="amount" value={count type="product" sale=$ID}}
 
             {hook name="sale.top"}
 
-            {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount={$amount}}
+            {include file="includes/toolbar.html" toolbar="top" limit=$limit order=$product_order amount=$amount}
 
             <div id="category-products">
                 <div class="products-content">
                     {ifloop rel="product_list"}
                         <ul class="list-unstyled">
-                        {loop type="product" sale="{$ID}" name="product_list" limit=$limit page=$product_page order=$product_order}
-                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width="700" height="320"}
+                        {loop type="product" sale=$ID name="product_list" limit=$limit page=$product_page order=$product_order}
+                            {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true width=700 height=320}
                         {/loop}
                         </ul>
                     {/ifloop}
@@ -68,7 +68,7 @@
             </div><!-- /#category-products -->
 
             {ifloop rel="product_list"}
-                {include file="includes/toolbar.html" toolbar="bottom" amount={$amount}}
+                {include file="includes/toolbar.html" toolbar="bottom" amount=$amount}
             {/ifloop}
         {/loop}
 
@@ -88,7 +88,6 @@
 
 </div><!-- /.layout -->
 {/block}
-
 
 {block name="stylesheet"}
     {hook name="sale.stylesheet"}

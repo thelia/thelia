@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <!--
 generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
-{if $_lang_ != "" }lang : {$_lang_}{/if}
-{if $_context_ != "" }context : {$_context_}{/if}
+{if $_lang_ != ""}lang : {$_lang_}{/if}
+{if $_context_ != ""}context : {$_context_}{/if}
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
@@ -14,12 +14,12 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
         *}
     </url>
 
-{if $_context_ == "" || $_context_ == "catalog" }
+{if $_context_ == "" || $_context_ == "catalog"}
 
     <!-- categories -->
     {loop type="lang" name="category_lang"}
-        {if $_lang_ == "" || $_lang_ == $CODE }
-            {loop type="category" name="category" lang="$ID"}
+        {if $_lang_ == "" || $_lang_ == $CODE}
+            {loop type="category" name="category" lang=$ID}
             <url>
                 <loc>{$URL nofilter}</loc>
                 <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
@@ -30,8 +30,8 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
 
     <!-- products -->
     {loop type="lang" name="product_lang"}
-        {if $_lang_ == "" || $_lang_ == $CODE }
-            {loop type="product" name="product" lang="$ID"}
+        {if $_lang_ == "" || $_lang_ == $CODE}
+            {loop type="product" name="product" lang=$ID}
                 <url>
                     <loc>{$URL nofilter}</loc>
                     <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
@@ -42,11 +42,11 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
 
 {/if}
 
-{if $_context_ == "" || $_context_ == "content" }
+{if $_context_ == "" || $_context_ == "content"}
     <!-- folders -->
     {loop type="lang" name="folder_lang"}
-        {if $_lang_ == "" || $_lang_ == $CODE }
-            {loop type="folder" name="folder" lang="$ID"}
+        {if $_lang_ == "" || $_lang_ == $CODE}
+            {loop type="folder" name="folder" lang=$ID}
                 <url>
                     <loc>{$URL nofilter}</loc>
                     <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
@@ -57,8 +57,8 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
 
     <!-- contents -->
     {loop type="lang" name="content_lang"}
-        {if $_lang_ == "" || $_lang_ == $CODE }
-            {loop type="content" name="content" lang="$ID"}
+        {if $_lang_ == "" || $_lang_ == $CODE}
+            {loop type="content" name="content" lang=$ID}
             <url>
                 <loc>{$URL nofilter}</loc>
                 <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
@@ -68,6 +68,6 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
     {/loop}
 {/if}
 
-{hook name="sitemap.bottom" lang="$_lang_" context="$_context_"}
+{hook name="sitemap.bottom" lang=$_lang_ context=$_context_}
 
 </urlset>

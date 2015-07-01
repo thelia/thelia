@@ -10,7 +10,7 @@
 {* Page Title *}
 {block name='no-return-functions' append}
 {if $brand_id}
-    {loop name="brand.seo.title" type="brand" id=$brand_id limit="1"}
+    {loop name="brand.seo.title" type="brand" id=$brand_id limit=1}
     {$page_title = {$META_TITLE}}
     {/loop}
 {/if}
@@ -19,7 +19,7 @@
 {* Meta *}
 {block name="meta"}
 {if $brand_id}
-    {loop name="brand.seo.meta" type="brand" id=$brand_id limit="1"}
+    {loop name="brand.seo.meta" type="brand" id=$brand_id limit=1}
         {include file="includes/meta-seo.html"}
     {/loop}
 {/if}
@@ -37,17 +37,17 @@
 {if $brand_id}
     {$breadcrumbs = []}
     {if $brand_id}
-        {loop type="brand" name="brand-breadcrumb" id=$brand_id limit="1"}
-        {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+        {loop type="brand" name="brand-breadcrumb" id=$brand_id limit=1}
+        {$breadcrumbs[] = ['title' => {$TITLE}, 'url' => {$URL nofilter}]}
         {/loop}
     {else}
-        {$breadcrumbs[] = ['title' => {intl l="All brands"}, 'url'=> '']}
+        {$breadcrumbs[] = ['title' => {intl l="All brands"}, 'url' => '']}
     {/if}
 {/if}
 {/block}
 
 {block name="main-content"}
-{hook name="brand.top" brand="$brand_id"}
+{hook name="brand.top" brand=$brand_id}
     {if $brand_id}
     <div class="main row">
         {$limit={$smarty.get.limit|default:8}}
@@ -55,17 +55,17 @@
         {$product_order={$smarty.get.order|default:'alpha'}}
         {$mode=$smarty.get.mode|default:'grid'}
 
-        {hook name="brand.main-top" brand="$brand_id"}
+        {hook name="brand.main-top" brand=$brand_id}
 
         <article class="col-main col-md-9 col-md-push-3 {$mode}" role="main" aria-labelledby="main-label">
 
-            {hook name="brand.content-top" brand="$brand_id"}
+            {hook name="brand.content-top" brand=$brand_id}
 
-            {loop name="brand.info" type="brand" id=$brand_id limit="1"}
+            {loop name="brand.info" type="brand" id=$brand_id limit=1}
                 <section class="brand-description">
                     <h1 id="main-label" class="page-header">{$TITLE}</h1>
 
-                    {loop name="brand.image" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders"}
+                    {loop name="brand.image" type="image" source="brand" id=$LOGO_IMAGE_ID width=218 height=146 resize_mode="borders"}
                         <p><img itemprop="image" src="{$IMAGE_URL nofilter}" alt="{$TITLE}"></p>
                     {/loop}
 
@@ -88,19 +88,19 @@
 
                 {ifloop rel="product_list"}
                     <hr/>
-                    {assign var="amount" value="{count type="product" brand="$ID"}"}
+                    {assign var="amount" value={count type="product" brand=$ID}}
                     <div class="toolbar toolbar-top" role="toolbar">
                         <div class="sorter-container clearfix">
-                            <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb="{$amount}"}{else}{intl l="%nb Item" nb="{$amount}"}{/if}</span>
+                            <span class="amount">{if ($amount > 1)}{intl l="%nb Items" nb=$amount}{else}{intl l="%nb Item" nb=$amount}{/if}</span>
 
                             <span class="limiter">
                                 <label for="limit-top">{intl l="Show"}</label>
                                 <select id="limit-top" name="limit">
-                                    <option value="{url path={navigate to="current"} limit="4"}" {if $limit==4}selected{/if}>4</option>
-                                    <option value="{url path={navigate to="current"} limit="8"}" {if $limit==8}selected{/if}>8</option>
-                                    <option value="{url path={navigate to="current"} limit="12"}" {if $limit==12}selected{/if}>12</option>
-                                    <option value="{url path={navigate to="current"} limit="50"}" {if $limit==50}selected{/if}>50</option>
-                                    <option value="{url path={navigate to="current"} limit="100000"}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
+                                    <option value="{url path={navigate to="current"} limit=4}" {if $limit==4}selected{/if}>4</option>
+                                    <option value="{url path={navigate to="current"} limit=8}" {if $limit==8}selected{/if}>8</option>
+                                    <option value="{url path={navigate to="current"} limit=12}" {if $limit==12}selected{/if}>12</option>
+                                    <option value="{url path={navigate to="current"} limit=50}" {if $limit==50}selected{/if}>50</option>
+                                    <option value="{url path={navigate to="current"} limit=100000}" {if $limit==100000}selected{/if}>{intl l="All"}</option>
                                 </select>
                                 <span class="per-page">{intl l="per page"}</span>
                             </span><!-- /.limiter -->
@@ -130,7 +130,7 @@
                         <div class="products-content">
                             <ul class="list-unstyled">
                                 {loop type="product" name="product_list" brand=$ID limit=$limit page=$product_page order=$product_order}
-                                    {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
+                                    {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width=218 height=146}
                                 {/loop}
                             </ul>
                         </div>
@@ -147,13 +147,13 @@
                                         </li>
                                     {else}
                                         <li>
-                                            <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
+                                            <a href="{url path={navigate to="current"} page={$product_page-1}}" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
                                         </li>
                                     {/if}
 
                                     {pageloop rel="product_list"}
                                         <li{if $PAGE eq $CURRENT} class="active"{/if}>
-                                            <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a>
+                                            <a href="{url path={navigate to="current"} page=$PAGE}"> {$PAGE} </a>
                                         </li>
                                         {if $PAGE eq $LAST}
                                             {if $CURRENT eq $LAST}
@@ -162,7 +162,7 @@
                                                 </li>
                                             {else}
                                                 <li>
-                                                    <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
+                                                    <a href="{url path={navigate to="current"} page=$NEXT}" title="{intl l="Next"}" class="next"><i class="icon-next"></i></a>
                                                 </li>
                                             {/if}
                                         {/if}
@@ -179,7 +179,7 @@
                     </div>
                 {/elseloop}
 
-                {hook name="brand.content-bottom" brand="$brand_id"}
+                {hook name="brand.content-bottom" brand=$brand_id}
             {/loop}
         </article>
 
@@ -187,7 +187,7 @@
             {include file="includes/brand-menu.html"}
         </aside>
 
-        {hook name="brand.main-bottom" brand="$brand_id"}
+        {hook name="brand.main-bottom" brand=$brand_id}
 
     </div><!-- /.layout -->
     {else}
@@ -203,7 +203,7 @@
                         <div class="brand-info col-sm-7">
                             {ifloop rel="brand_logo"}
                             <a href="{$URL nofilter}" tabindex="-1" class="brand-image overlay col-sm-2">
-                                {loop name="brand_logo" type="image" source="brand" id={$LOGO_IMAGE_ID} width=218 height=146 resize_mode="borders" limit="1"}
+                                {loop name="brand_logo" type="image" source="brand" id=$LOGO_IMAGE_ID width=218 height=146 resize_mode="borders" limit=1}
                                 <img src="{$IMAGE_URL nofilter}" class="img-responsive" alt="{$TITLE}">
                                 {/loop}
                             </a>
@@ -229,7 +229,7 @@
         {hook name="brand.main-bottom"}
     </div>
     {/if}
-    {hook name="brand.bottom" brand="$brand_id"}
+    {hook name="brand.bottom" brand=$brand_id}
 {/block}
 
 {block name="stylesheet"}

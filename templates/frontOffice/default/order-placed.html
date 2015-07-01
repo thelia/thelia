@@ -11,11 +11,10 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
-        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
+        ['title' => {intl l="Cart"}, 'url' => {url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url' => {url path="/order/pay"}]
     ]}
 {/block}
-
 
 {block name="main-content"}
     <div class="main">
@@ -30,7 +29,7 @@
                     {$orderCurrency=$SYMBOL}
                 {/loop}
             {ifhook rel="order-placed.body"}
-                {hook name="order-placed.body" module="$PAYMENT_MODULE"}
+                {hook name="order-placed.body" module=$PAYMENT_MODULE}
             {/ifhook}
             {elsehook rel="order-placed.body"}
                 <div id="payment-success" class="panel panel-default">
@@ -47,12 +46,12 @@
                             <dt>{intl l="Date"} : </dt>
                             <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                             <dt>{intl l="Total"} : </dt>
-                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
+                            <dd>{format_money number=$TOTAL_TAXED_AMOUNT symbol={$orderCurrency}}</dd>
                         </dl>
 
                         {block name='additional-payment-info'}{/block}
 
-                        {hook name="order-placed.additional-payment-info" module="$PAYMENT_MODULE" placed_order_id=$placed_order_id}
+                        {hook name="order-placed.additional-payment-info" module=$PAYMENT_MODULE placed_order_id=$placed_order_id}
                     </div>
                 </div>
             {/elsehook}
@@ -64,7 +63,6 @@
 
     </div>
 {/block}
-
 
 {block name="stylesheet"}
 {hook name="order-placed.stylesheet"}
