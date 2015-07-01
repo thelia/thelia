@@ -66,8 +66,8 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="{url path='/admin'}">
                     {images file='assets/img/logo-white.png'}
-                        <img src="{$asset_url}" alt="{intl l='Version %ver' ver="{$THELIA_VERSION}"}">
-                        <span>{intl l='Version %ver' ver="{$THELIA_VERSION}"}</span>
+                        <img src="{$asset_url}" alt="thelia">
+                        <span></span>
                     {/images}
                 </a>
             </div>
