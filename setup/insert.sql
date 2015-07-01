@@ -748,7 +748,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2032, 'invoice.after-payment-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2256,7 +2258,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2031, 'en_US', 'Order - After product list', NULL, NULL),
     (2032, 'en_US', 'Invoice - After payment module', NULL, NULL),
     (2033, 'en_US', 'Invoice - After delivery module', NULL, NULL),
-    (2034, 'en_US', 'Delivery - After delivery module', NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL),
+    (2034, 'en_US', 'Delivery - After delivery module', NULL, NULL),
+    (2035, 'en_US', 'Invoice - additional product information', NULL, NULL),
+    (2036, 'en_US', 'Delivery - additional product information', NULL, NULL),    (1, 'es_ES', NULL, NULL, NULL),
     (2, 'es_ES', NULL, NULL, NULL),
     (3, 'es_ES', NULL, NULL, NULL),
     (4, 'es_ES', NULL, NULL, NULL),
@@ -2903,7 +2907,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2031, 'es_ES', NULL, NULL, NULL),
     (2032, 'es_ES', NULL, NULL, NULL),
     (2033, 'es_ES', NULL, NULL, NULL),
-    (2034, 'es_ES', NULL, NULL, NULL),    (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
+    (2034, 'es_ES', NULL, NULL, NULL),
+    (2035, 'es_ES', NULL, NULL, NULL),
+    (2036, 'es_ES', NULL, NULL, NULL),    (1, 'fr_FR', 'Choix du mode de paiement - en haut', NULL, NULL),
     (2, 'fr_FR', 'Choix du mode de paiement - adresse de livraison', NULL, NULL),
     (3, 'fr_FR', 'Choix du mode de paiement - zone de paiement supplémentaire', NULL, NULL),
     (4, 'fr_FR', 'Choix du mode de paiement - en bas', NULL, NULL),
@@ -3550,7 +3556,9 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2031, 'fr_FR', 'Commande - Après la liste des produits', NULL, NULL),
     (2032, 'fr_FR', 'Commande - après le module de paiement', NULL, NULL),
     (2033, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
-    (2034, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL);
+    (2034, 'fr_FR', 'Commande - après le module de livraison', NULL, NULL),
+    (2035, 'fr_FR', 'Facture - informations additionnelles pour un produit', NULL, NULL),
+    (2036, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', NULL, NULL);
 
 INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
     (1, 'en_US', 'Mr.', 'Mister'),
