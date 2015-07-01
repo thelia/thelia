@@ -796,7 +796,10 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2028, 'order-edit.before-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2029, 'order-edit.before-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2030, 'order-edit.after-order-product-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2031, 'order-edit.after-order-product-list', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+
+(2032, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2033, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 
@@ -1954,7 +1957,12 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 (2030, 'en_US', 'Order - After closing product row', '', ''),
 (2030, 'fr_FR', 'Commande - Après avoir fermé la ligne produit', '', ''),
 (2031, 'en_US', 'Order - After product list', '', ''),
-(2031, 'fr_FR', 'Commande - Après la liste des produits', '', '')
+(2031, 'fr_FR', 'Commande - Après la liste des produits', '', ''),
+
+(2032, 'en_US', 'Invoice - additional product information', '', ''),
+(2032, 'fr_FR', 'Facture - informations additionnelles pour un produit', '', ''),
+(2033, 'en_US', 'Delivery - additional product information', '', ''),
+(2033, 'fr_FR', 'Bon de livraison - informations additionnelles pour un produit', '', '')
 ;
 
 
