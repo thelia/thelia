@@ -11,6 +11,14 @@
 - URLs now have no problem with accents or case
 - Add order by ```weight``` and ```weight_reverse``` in  product sale elements loop
 - Add the ability to remove arguments in loops.
+- new back-office is enhanced with a group button actions and a new layout
+- Added an optionnal 'ajax-view' parameter to card add form
+- Add validation groups in form from parser context
+- Feature value are not translatable
+- Allow multiple authors in module.xml file. Fixed #1459
+- Display the mini cart with a hook. Fixed #1233
+- Add date range for order export
+- Klik&Pay is no more a submodule
 
 # 2.2.0-alpha2
 
@@ -98,6 +106,13 @@
 - Imagine package is updated to 0.6.2, which provides a better support for transparency.
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
+
+# 2.1.5
+- Klik&Pay is no more a submodule
+- default category's parent is now 0
+- check specific role in security module instead of checking if a user is logged in
+- add a customer page parameter for the order loop on the customer page 
+- keep break line in ACE editor
 
 # 2.1.4
 
@@ -279,6 +294,9 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
+
+# 2.0.9
+- Klik&Pay is no more a submodule
 
 # 2.0.8
 - Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
