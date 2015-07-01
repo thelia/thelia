@@ -207,7 +207,7 @@
                 <h3>{intl l="Delivery address"}</h3>
 				{ifhook rel="delivery.delivery-address"}
                 {* delivery module can customize the delivery address *}
-                {hook name="delivery.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+                {hook name="delivery.delivery-address" module=$DELIVERY_MODULE order=$order_id}
                 {/ifhook}
                 {elsehook rel="delivery.delivery-address"}                
 				<p>
@@ -264,7 +264,7 @@
             </td>
         </tr>
 
-            {hook name="delivery.order-product" order="{$order_id}" order_product="{$ID}"}
+            {hook name="delivery.order-product" order=$order_id order_product=$ID}
         {/loop}
     </table>
 
