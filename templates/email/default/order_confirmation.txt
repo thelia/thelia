@@ -5,7 +5,7 @@
 {/loop}
 {intl l="Hello,"}
 
-{intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
+{intl l="Here is the details of your order %ref placed on %date" ref=$REF date={format_date date=$INVOICE_DATE}}
 
 {intl l="Your delivery address"}
 {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
