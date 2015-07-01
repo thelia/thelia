@@ -282,6 +282,8 @@
                 <td><p class="align-center">{$QUANTITY}</p></td>
                 <td><p class="align-right">{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
             </tr>
+
+            {hook name="invoice.order-product" order="{$order_id}" order_product="{$ID}"}
         {/loop}
     </table>
 
