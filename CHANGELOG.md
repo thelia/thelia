@@ -1,3 +1,6 @@
+# 2.0.9
+- Klik&Pay is no more a submodule
+
 # 2.0.8
 - Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
 - Force rediction on admin login even when connected to the front

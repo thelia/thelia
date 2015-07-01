@@ -44,6 +44,7 @@ class Update
         '13' => '2.0.6',
         '14' => '2.0.7',
         '15' => '2.0.8',
+        '16' => '2.0.9',
     );
 
     protected function isLatestVersion($version)
