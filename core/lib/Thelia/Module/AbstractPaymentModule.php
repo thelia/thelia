@@ -36,7 +36,7 @@ abstract class AbstractPaymentModule extends BaseModule implements PaymentModule
         $parser = $this->getContainer()->get("thelia.parser");
 
         $parser->setTemplateDefinition(
-            $$parser->getTemplateHelper()->getActiveFrontTemplate()
+            $parser->getTemplateHelper()->getActiveFrontTemplate()
         );
 
         $renderedTemplate = $parser->render(
