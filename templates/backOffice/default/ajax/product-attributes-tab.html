@@ -91,18 +91,18 @@
 	                                            <th>{intl l='ID'}</th>
 	                                            <th>{intl l='Attribute Name'}</th>
 
-	                                            {hook name="product.attributes-table-header" location="product_attributes_table_header" }
+	                                            {hook name="product.attributes-table-header" location="product_attributes_table_header"}
 	                                        </tr>
 	                                    </thead>
 
 	                                    <tbody>
-	                                        {loop name="product-attributes" type="attribute" order="manual" product=$product_id backend_context="1" lang="$edit_language_id"}
+	                                        {loop name="product-attributes" type="attribute" order="manual" product=$product_id backend_context=1 lang=$edit_language_id}
 	                                        <tr>
 	                                            <td>{$ID}</td>
 
 	                                            <td>{$TITLE}</td>
 
-	                                            {hook name="product.attributes-table-row" location="product_attributes_table_row" }
+	                                            {hook name="product.attributes-table-row" location="product_attributes_table_row"}
 	                                        </tr>
 	                                        {/loop}
 
@@ -153,13 +153,13 @@
 	                                            <th>{intl l='Feature Name'}</th>
 						                        <th>{intl l='Feature value for this product'}</th>
 
-						                        {hook name="product.features-table-header" location="product_features_table_header" }
+						                        {hook name="product.features-table-header" location="product_features_table_header"}
 
 						                    </tr>
 						                </thead>
 
 										<tbody>
-										    {loop name="product-features" type="feature" order="manual" product=$product_id backend_context="1" lang="$edit_language_id"}
+										    {loop name="product-features" type="feature" order="manual" product=$product_id backend_context=1 lang=$edit_language_id}
 										    <tr>
 	                                            <td>{$ID}</td>
 
@@ -174,12 +174,12 @@
 
 		                                                {$selected = array()}
 
-							                            {loop name="free-text-value" exclude_free_text="true" type="feature_value" product=$product_id feature=$ID  backend_context="1" lang="$edit_language_id"}
+							                            {loop name="free-text-value" exclude_free_text="true" type="feature_value" product=$product_id feature=$ID  backend_context=1 lang=$edit_language_id}
 							                               {$selected[] = $FEATURE_AV_ID}
 							                            {/loop}
 
 								                        {capture "select_options"}
-								                        {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context="1" lang="$edit_language_id"}
+								                        {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context=1 lang=$edit_language_id}
 								                            <option value="{$ID}" {if in_array($ID, $selected)}selected="selected"{/if}>{$TITLE}</option>
 
 								                            {$options_count = $LOOP_COUNT} {* LOOP_COUNT is only available inside the loop ! *}
@@ -203,7 +203,7 @@
 								                        {* Get the free text value *}
                                                         {$feature_value=''}
 
-								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id"}
+								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context=1 lang=$edit_language_id}
                                                             {if $IS_FREE_TEXT && $FREE_TEXT_VALUE != 1}
                                                                 {$feature_value=$FREE_TEXT_VALUE}
                                                             {else}
@@ -215,7 +215,7 @@
 								                    {/elseloop}
 							                    </td>
 
-										        {hook name="product.features-table-row" location="product_features_table_row" }
+										        {hook name="product.features-table-row" location="product_features_table_row"}
 
 										    </tr>
 										    {/loop}

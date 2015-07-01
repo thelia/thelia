@@ -20,14 +20,14 @@
             <li><a href="{url path='/admin/configuration/templates'}">{intl l="Product templates"}</a></li>
         </ul>
 
-        {hook name="templates.top" location="templates_top" }
+        {hook name="templates.top" location="templates_top"}
 
         <div class="row">
             <div class="col-md-12">
                 <form action="#" method="post">
 	                <div class="general-block-decorator">
 
-	                    {if ! empty($general_error) }
+	                    {if ! empty($general_error)}
 	                        <div class="alert alert-danger">{$general_error}</div>
 	                    {/if}
 
@@ -50,7 +50,7 @@
     	                                        order='id'
     	                                        reverse_order='id_reverse'
     	                                        path='/admin/configuration/templates'
-    	                                        label="{intl l='ID'}"
+    	                                        label={intl l='ID'}
                                             }
                                         </th>
 
@@ -60,11 +60,11 @@
     	                                        order='alpha'
     	                                        reverse_order='alpha_reverse'
     	                                        path='/admin/configuration/templates'
-    	                                        label="{intl l='Title'}"
+    	                                        label={intl l='Title'}
                                             }
                                         </th>
 
-                                        {hook name="templates.table-header" location="templates_table_header" }
+                                        {hook name="templates.table-header" location="templates_table_header"}
 
                                         <th class="actions">{intl l="Actions"}</th>
                                     </tr>
@@ -120,7 +120,7 @@
             </div>
         </div>
 
-        {hook name="templates.bottom" location="templates_bottom" }
+        {hook name="templates.bottom" location="templates_bottom"}
 
     </div>
 </div>
@@ -160,7 +160,7 @@
             </div>
         {/form_field}
 
-        {hook name="template.create-form" location="template_create_form" }
+        {hook name="template.create-form" location="template_create_form"}
 
     {/capture}
 
@@ -177,14 +177,14 @@
         form_enctype       = {form_enctype}
         form_error_message = $form_error_message
     }
-{/form}
+{/form}`
 
 {* Delete confirmation dialog *}
 
 {capture "delete_dialog"}
     <input type="hidden" name="template_id" id="template_delete_id" value="" />
 
-    {hook name="template.delete-form" location="template_delete_form" }
+    {hook name="template.delete-form" location="template_delete_form"}
 
 {/capture}
 
@@ -221,5 +221,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="templates.js" location="templates-js" }
+    {hook name="templates.js" location="templates-js"}
 {/block}

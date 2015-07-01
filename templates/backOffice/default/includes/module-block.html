@@ -13,7 +13,7 @@
                    reverse_order='id_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
-                   label="{intl l='ID'}"
+                   label={intl l='ID'}
                 }
                 </th>
 
@@ -26,7 +26,7 @@
                    reverse_order='title_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
-                   label="{intl l='Name'}"
+                   label={intl l='Name'}
                 }
                 </th>
 
@@ -37,7 +37,7 @@
                    reverse_order='code_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
-                   label="{intl l='Code'}"
+                   label={intl l='Code'}
                 }
                 </th>
 
@@ -50,7 +50,7 @@
                    reverse_order='enabled_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
-                   label="{intl l='Enable/Disable'}"
+                   label={intl l='Enable/Disable'}
                 }
                 </th>
 
@@ -61,19 +61,19 @@
                    reverse_order='manual_reverse'
                    path={url path='/admin/modules'}
                    request_parameter_name='module_order'
-                   label="{intl l='Position'}"
+                   label={intl l='Position'}
                 }
                 </th>
 
-                {hook name="modules.table-header" location="modules_table_header" }
+                {hook name="modules.table-header" location="modules_table_header"}
 
                 <th class="actions">{intl l="Actions"}</th>
             </tr>
             </thead>
 
             <tbody>
-            {loop type="module" name="module.{$module_type}" module_type={$module_type|default:1} order=$module_order backend_context=1}
-                {loop type="auth" role="ADMIN" name="can_view_module.{$module_type}" access="VIEW" resource="admin.module" module=$CODE}
+            {loop type="module" name="module.$module_type" module_type={$module_type|default:1} order=$module_order backend_context=1}
+                {loop type="auth" role="ADMIN" name="can_view_module.$module_type" access="VIEW" resource="admin.module" module=$CODE}
                 <tr id="module-{$ID}" {if ! $EXISTS}class="warning"{/if}>
                     <td>{$ID}</td>
                     <td nowrap>
@@ -91,9 +91,9 @@
                             </div>
                             <noscript>
                                 {if $ACTIVE}
-                                    <a title="{intl l="Deactivate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
+                                    <a title="{intl l="Deactivate %title module" title=$TITLE}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="deactivation"}</a>
                                 {else}
-                                    <a title="{intl l="activate %title module" title={$TITLE}}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
+                                    <a title="{intl l="activate %title module" title=$TITLE}" href="{url path="/admin/module/toggle-activation/%id" id=$ID}">{intl l="activation"}</a>
                                 {/if}
                             </noscript>
                         </td>
@@ -116,7 +116,7 @@
                         </td>
                     {/if}
 
-                    {hook name="modules.table-row" location="modules_table_row" }
+                    {hook name="modules.table-row" location="modules_table_row"}
 
                     <td class="actions">
                         {if $module_type == 2}
@@ -126,7 +126,7 @@
                                     {$zones="`$zones`, `$NAME`"}
                                     {$zone_count=$LOOP_TOTAL}
                                 {/loop}
-                                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count={$zone_count}  zones={$zones|ltrim:', '}}}
+                                {$title={intl l='%count shipping zone(s) are attached to this module: %zones. Click here to change' count=$zone_count  zones={$zones|ltrim:', '}}}
                                 {$btnstyle="btn-info"}
                                 {$icon=''}
                             {/ifloop}
@@ -152,7 +152,7 @@
 
                                 {if $HOOKABLE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                <a class="{if ! $ACTIVE}disabled {/if}" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
+                                <a class="{if ! $ACTIVE}disabled {/if}" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module=$ID}" ><span class="glyphicon glyphicon-sort"></span></a>
                             {/loop}
                                 {/if}
 

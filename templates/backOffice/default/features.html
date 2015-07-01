@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/features'}">{intl l="Product features"}</a></li>
         </ul>
 
-        {hook name="features.top" location="features_top" }
+        {hook name="features.top" location="features_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -45,7 +45,7 @@
     	                                        order='id'
     	                                        reverse_order='id_reverse'
     	                                        path='/admin/configuration/features'
-    	                                        label="{intl l='ID'}"
+    	                                        label={intl l='ID'}
                                             }
                                         </th>
 
@@ -55,7 +55,7 @@
     	                                        order='alpha'
     	                                        reverse_order='alpha_reverse'
     	                                        path='/admin/configuration/features'
-    	                                        label="{intl l='Title'}"
+    	                                        label={intl l='Title'}
                                             }
                                         </th>
 
@@ -65,11 +65,11 @@
     	                                        order='manual'
     	                                        reverse_order='manual_reverse'
     	                                        path='/admin/configuration/features'
-    	                                        label="{intl l="Position"}"
+    	                                        label={intl l="Position"}
                                             }
                                         </th>
 
-                                        {hook name="features.table-header" location="features_table_header" }
+                                        {hook name="features.table-header" location="features_table_header"}
 
                                         <th class="actions">{intl l="Actions"}</th>
                                     </tr>
@@ -96,12 +96,12 @@
                                                 path="/admin/configuration/features/update-position"
                                                 url_parameter="feature_id"
                                                 in_place_edit_class="positionChange"
-                                                position="$POSITION"
-                                                id="$ID"
+                                                position=$POSITION
+                                                id=$ID
                                             }
                                         </td>
 
-                                        {hook name="features.table-row" location="features_table_row" feature_id={$ID} }
+                                        {hook name="features.table-row" location="features_table_row" feature_id=$ID}
 
                                         <td class="actions">
                                             <div class="btn-toolbar btn toolbar-primary">
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        {hook name="features.bottom" location="features_bottom" }
+        {hook name="features.bottom" location="features_bottom"}
 
     </div>
 </div>
@@ -172,10 +172,10 @@
                 {loop type="lang" name="default-lang" default_only="1"}
                     <div class="input-group">
                         <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Feature title'}" placeholder="{intl l='Title'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l="Enter here the feature name in the default language (%title)" title={$TITLE}}</div>
+                    <div class="help-block">{intl l="Enter here the feature name in the default language (%title)" title=$TITLE}</div>
 
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
@@ -199,7 +199,7 @@
             </div>
         {/form_field}
 
-        {hook name="feature.create-form" location="feature_create_form" }
+        {hook name="feature.create-form" location="feature_create_form"}
 
     {/capture}
 
@@ -210,7 +210,7 @@
         dialog_title = {intl l="Create a new feature"}
         dialog_body  = {$smarty.capture.creation_dialog nofilter}
 
-        dialog_ok_label     = {intl l="Create this feature"}
+        dialog_ok_label    = {intl l="Create this feature"}
 
         form_action        = {url path='/admin/configuration/features/create'}
         form_enctype       = {form_enctype}
@@ -223,7 +223,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="feature_id" id="feature_delete_id" value="" />
 
-    {hook name="feature.delete-form" location="feature_delete_form" }
+    {hook name="feature.delete-form" location="feature_delete_form"}
 
 {/capture}
 
@@ -244,7 +244,7 @@
 {capture "add_to_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_add_to_all_id" value="" />
 
-    {hook name="feature.add-to-all-form" location="feature_add_to_all_form" }
+    {hook name="feature.add-to-all-form" location="feature_add_to_all_form"}
 
 {/capture}
 
@@ -264,7 +264,7 @@
 {capture "remove_from_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_remove_from_all_id" value="" />
 
-    {hook name="feature.remove-to-all-form" location="feature_remove_to_all_form" }
+    {hook name="feature.remove-to-all-form" location="feature_remove_to_all_form"}
 
 {/capture}
 
@@ -336,5 +336,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="features.js" location="features-js" }
+    {hook name="features.js" location="features-js"}
 {/block}

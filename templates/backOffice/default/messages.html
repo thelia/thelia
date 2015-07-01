@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
         </ul>
 
-        {hook name="messages.top" location="messages_top" }
+        {hook name="messages.top" location="messages_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -42,14 +42,14 @@
         	                           <th>{intl l="Purpose"}</th>
                                        <th>{intl l="Name"}</th>
 
-                                       {hook name="messages.table-header" location="messages_table_header" }
+                                       {hook name="messages.table-header" location="messages_table_header"}
 
                                        <th>&nbsp;</th>
         	                        </tr>
                                 </thead>
 
                                 <tbody>
-        	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang="$lang_id"}
+        	                        {loop name="mailing-templates" type="message" secured="*" backend_context="1" lang=$lang_id}
         	                            <tr>
 
         	                               <td>{$TITLE}</td>
@@ -57,7 +57,7 @@
                                            <td>
                                            {if ! $SECURED}
                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                   <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}">{$NAME}</a>
+                                                   <a title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id=$ID}">{$NAME}</a>
                                                {/loop}
                                                {elseloop rel="can_change"}
                                                    {$NAME}
@@ -67,7 +67,7 @@
                                            {/if}
                                            </td>
 
-        	                                {hook name="messages.table-row" location="messages_table_row" message_id={$ID} }
+        	                                {hook name="messages.table-row" location="messages_table_row" message_id=$ID}
 
         	                                <td class="actions">
         	                                    {if ! $SECURED}
@@ -76,7 +76,7 @@
                                                     </div>
                                                     <div class="toolbar-options hidden">
                                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.message" access="UPDATE"}
-                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                           <a class="message-change" title="{intl l='Change this mailing template'}" href="{url path='/admin/configuration/messages/update' message_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                        {/loop}
 
                                                        {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.message" access="DELETE"}
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        {hook name="messages.bottom" location="messages_bottom" }
+        {hook name="messages.bottom" location="messages_bottom"}
 
     </div>
 </div>
@@ -137,12 +137,12 @@
 
                     <div class="input-group">
                         <input type="text" {form_field_attributes field="title"}>
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
             {/custom_render_form_field}
 
-            {hook name="message.create-form" location="message_create_form" }
+            {hook name="message.create-form" location="message_create_form"}
 
         {/capture}
 
@@ -166,7 +166,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="message_id" id="message_delete_id" value="" />
 
-        {hook name="message.delete-form" location="message_delete_form" }
+        {hook name="message.delete-form" location="message_delete_form"}
 
     {/capture}
 
@@ -202,5 +202,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="messages.js" location="messages-js" }
+    {hook name="messages.js" location="messages-js"}
 {/block}

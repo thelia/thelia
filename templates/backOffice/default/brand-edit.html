@@ -16,7 +16,7 @@
 {block name="main-content"}
     <div class="brand edit-brand">
         <div id="wrapper" class="container">
-            {loop name="brand_edit" type="brand" visible="*" id="{$brand_id}" backend_context="1" lang="$edit_language_id"}
+            {loop name="brand_edit" type="brand" visible="*" id=$brand_id backend_context="1" lang=$edit_language_id}
 
             <nav>
                 <ul class="breadcrumb">
@@ -33,14 +33,14 @@
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
-                            {intl l='Edit brand %title' title={$TITLE}}
+                            {intl l='Edit brand %title' title=$TITLE}
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-12">
 
-                            {hookblock name="brand.tab" brand_id="{$brand_id}" fields="id,title,href,content"}
+                            {hookblock name="brand.tab" brand_id=$brand_id fields="id,title,href,content"}
 
                                 {capture "brand_tab_tab"}
                                     {forhook rel="brand.tab"}
@@ -116,7 +116,7 @@
                                                             <select {form_field_attributes field='logo_image_id' extra_class='brand-image-selector'} >
                                                                 <option value="">{intl l="No logo image"}</option>
 
-                                                                {loop name="brand-images" type="image" brand=$ID width="90" height="90" resize_mode="crop"}
+                                                                {loop name="brand-images" type="image" brand=$ID width=90 height=90 resize_mode="crop"}
                                                                     <option value="{$ID}" data-img-src="{$IMAGE_URL nofilter}" {if $LOGO_IMAGE_ID == $ID}selected="selected"{/if}>{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
@@ -143,7 +143,7 @@
                                 <div class="tab-pane fade" id="seo">
                                     {include file = "includes/seo-tab.html"
                                         formAction = {url path='/admin/brand/seo/save'}
-                                        pageUrl    = "{url path='/admin/brand/update'}/$brand_id"
+                                        pageUrl    = {url path="/admin/brand/update/$brand_id"}
                                         closeUrl   = {url path='/admin/brand'}
                                         current_id = $brand_id
                                         seoType    = 'brand'
@@ -167,12 +167,12 @@
                                             file = "includes/inner-form-toolbar.html"
                                             hide_submit_buttons = true
                                             page_url = $pageUrl
-                                            close_url = {$closeUrl}
+                                            close_url = $closeUrl
                                             current_tab = "modules"
                                         }
                                     </div>
                                     {* bad fix : {hook name="brand.tab-content"} *}
-                                    {include file="includes/module-tab-content.html" hook="brand.tab-content" location="brand-edit" id="{$brand_id}" view="brand"}
+                                    {include file="includes/module-tab-content.html" hook="brand.tab-content" location="brand-edit" id=$brand_id view="brand"}
                                 </div>
                             </div>
                         </div>
@@ -240,6 +240,6 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name='brand.edit-js' location='brand-edit-js' brand_id={$brand_id}}
-    {hook name="wysiwyg.js" location="wysiwyg-brand-edit-js" }
+    {hook name='brand.edit-js' location='brand-edit-js' brand_id=$brand_id}
+    {hook name="wysiwyg.js" location="wysiwyg-brand-edit-js"}
 {/block}

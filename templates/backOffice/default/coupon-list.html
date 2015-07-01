@@ -22,7 +22,7 @@
             </ul>
         </nav>
 
-        {hook name="coupon.top" location="coupon_top" }
+        {hook name="coupon.top" location="coupon_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -33,7 +33,7 @@
                             <caption>
                                 {intl l='Coupons'}
 
-                                {hook name="coupon.list-caption" location="coupon_list_caption" }
+                                {hook name="coupon.list-caption" location="coupon_list_caption"}
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.coupon" access="CREATE"}
                                     <a class="btn btn-primary action-btn" title="{intl l='Create a new coupon'}" href="{url path='/admin/coupon/create'}">
@@ -50,7 +50,7 @@
                                         reverse_order='code-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Code'}"
+                                        label={intl l='Code'}
                                     }
                                     </th>
 
@@ -60,7 +60,7 @@
                                         reverse_order='title-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Title'}"
+                                        label={intl l='Title'}
                                     }
                                     </th>
 
@@ -70,7 +70,7 @@
                                         reverse_order='enabled-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Status'}"
+                                        label={intl l='Status'}
                                     }
                                     </th>
 
@@ -80,7 +80,7 @@
                                         reverse_order='expiration-date-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Expiration date'}"
+                                        label={intl l='Expiration date'}
                                     }
                                     </th>
 
@@ -90,7 +90,7 @@
                                         reverse_order='days-left-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Days before expiration'}"
+                                        label={intl l='Days before expiration'}
                                     }
                                     </th>
 
@@ -100,11 +100,11 @@
                                         reverse_order='usages-left-reverse'
                                         path={url path='/admin/coupon'}
                                         request_parameter_name='coupon_order'
-                                        label="{intl l='Usages left'}"
+                                        label={intl l='Usages left'}
                                     }
                                     </th>
 
-                                    {hook name="coupon.table-header" location="coupon_table_header" }
+                                    {hook name="coupon.table-header" location="coupon_table_header"}
 
                                     <th>{intl l="Actions"}</th>
                                 </tr>
@@ -151,7 +151,7 @@
                                             {/if}
                                         </td>
 
-                                        {hook name="coupon.table-row" location="coupon_table_row" coupon_id={$ID} }
+                                        {hook name="coupon.table-row" location="coupon_table_row" coupon_id=$ID}
 
                                         <td class="actions">
                                             <div class="btn-toolbar btn toolbar-primary">
@@ -184,7 +184,7 @@
                     </div>
                 </div>
 
-                {hook name="coupon.bottom" location="coupon_bottom" }
+                {hook name="coupon.bottom" location="coupon_bottom"}
 
             </div>
         </div>
@@ -195,7 +195,7 @@
     {capture "delete_dialog"}
         <input type="hidden" name="coupon_id" id="coupon_delete_id" value="" />
 
-        {hook name="coupon.delete-form" }
+        {hook name="coupon.delete-form"}
     {/capture}
 
     {include
@@ -245,5 +245,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="coupon.list-js" location="coupon-list-js" }
+    {hook name="coupon.list-js" location="coupon-list-js"}
 {/block}

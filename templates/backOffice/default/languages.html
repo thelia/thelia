@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/languages'}">{intl l="Languages"}</a></li>
         </ul>
 
-        {hook name="languages.top" location="languages_top" }
+        {hook name="languages.top" location="languages_top"}
 
         {if $error_message}
             <div class="row">
@@ -60,7 +60,7 @@
                                 {loop type="lang" name="lang.list" backend_context="1"}
                                 <tr>
                                     <td>{$ID}</td>
-                                    <td class="text-center"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$CODE}" /></td>
+                                    <td class="text-center"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$CODE}" /></td>
                                     <td>{$TITLE}</td>
                                     <td>{$CODE}</td>
                                     <td>{$LOCALE}</td>
@@ -172,7 +172,7 @@
             </div>
         </div>
 
-        {hook name="languages.bottom" location="languages_bottom" }
+        {hook name="languages.bottom" location="languages_bottom"}
 
     </div>
 </div>
@@ -239,7 +239,7 @@
             </div>
         {/form_field}
 
-        {hook name="language.create-form" location="language_create_form" }
+        {hook name="language.create-form" location="language_create_form"}
 
     {/capture}
 
@@ -263,7 +263,7 @@
 {capture "delete_dialog"}
     <input type="hidden" name="language_id" id="language_delete_id" value="" />
 
-    {hook name="languages.delete-form" location="languages_delete_form" }
+    {hook name="languages.delete-form" location="languages_delete_form"}
 
 {/capture}
 
@@ -345,5 +345,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="languages.js" location="languages-js" }
+    {hook name="languages.js" location="languages-js"}
 {/block}

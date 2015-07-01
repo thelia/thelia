@@ -13,12 +13,12 @@
 <div class="folder edit-folder">
 	<div id="wrapper" class="container">
 
-        {include file="includes/folder-breadcrumb.html" }
+        {include file="includes/folder-breadcrumb.html"}
 
         {hook name="folder-edit.top" folder_id=$folder_id}
 
         <div class="row">
-            {loop name="folder_edit" type="folder" visible="*" id="{$folder_id}" backend_context="1" lang="$edit_language_id"}
+            {loop name="folder_edit" type="folder" visible="*" id=$folder_id backend_context="1" lang=$edit_language_id}
 
             {* Define close url *}
             {assign var='close_url' value="{url path='/admin/folders' folder_id=$ID}"}
@@ -26,7 +26,7 @@
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
                     <div class="col-md-7 title">
-						{intl l='Edit folder %title' title={$TITLE}}
+						{intl l='Edit folder %title' title=$TITLE}
 		            </div>
 
                     <div class="col-md-5 actions">
@@ -39,7 +39,7 @@
 	            <div class="row">
 	                <div class="col-md-12">
 
-                        {hookblock name="folder.tab" id="{$folder_id}" fields="id,title,href,content"}
+                        {hookblock name="folder.tab" id=$folder_id fields="id,title,href,content"}
 
                             {capture "folder_tab_tab"}
                                 {forhook rel="folder.tab"}
@@ -183,13 +183,13 @@
                                     {include
                                     file = "includes/inner-form-toolbar.html"
                                     hide_submit_buttons = true
-                                    page_url  = {$pageUrl}
-                                    close_url = {$closeUrl}
+                                    page_url  = $pageUrl
+                                    close_url = $closeUrl
                                     current_tab = "modules"
                                     }
                                 </div>
                                 {* ugly fix : {hook name="folder.tab-content" id="{$folder_id}" view="folder"} *}
-                                {include file="includes/module-tab-content.html" hook="folder.tab-content" location="folder-edit" id="{$folder_id}" view="folder"}
+                                {include file="includes/module-tab-content.html" hook="folder.tab-content" location="folder-edit" id=$folder_id view="folder"}
 		                    </div>
 		                 </div>
                     </div>
@@ -287,7 +287,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="folder.edit-js" location="folder-edit-js" folder_id={$folder_id} }
+    {hook name="folder.edit-js" location="folder-edit-js" folder_id=$folder_id}
 
-    {hook name="wysiwyg.js" location="wysiwyg-folder-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-folder-edit-js"}
 {/block}

@@ -137,7 +137,7 @@
                         </div>
                     </div>
 
-                    {include file="includes/module-hook-block.html" hook_id="{$ID}" by_module="{$BY_MODULE}"}
+                    {include file="includes/module-hook-block.html" hook_id=$ID by_module=$BY_MODULE}
 
                 </div>
                 {/loop}
@@ -185,7 +185,7 @@
         </select>
     {/custom_render_form_field}
 
-    {hook name="module-hook.create-form" location="module_hook_create_form" }
+    {hook name="module-hook.create-form" location="module_hook_create_form"}
 
 {/capture}
 
@@ -210,7 +210,7 @@
 
 {capture "delete_module_dialog"}
     <input type="hidden" name="module_hook_id" id="delete_module_hook_id" value="" />
-    {hook name="module-hook.delete-form" location="module_hook_delete_form" }
+    {hook name="module-hook.delete-form" location="module_hook_delete_form"}
 {/capture}
 
 {include
@@ -433,5 +433,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="module-hook.js" location="module-hook-js" }
+    {hook name="module-hook.js" location="module-hook-js"}
 {/block}

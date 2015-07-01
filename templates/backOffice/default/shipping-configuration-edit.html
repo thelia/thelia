@@ -28,7 +28,7 @@
                 <div class="general-block-decorator">
 
                     <div class="col-md-12 title title-without-tabs">
-                        {intl l='Shipping zone "%title"' title={$NAME}}
+                        {intl l='Shipping zone "%title"' title=$NAME}
                     </div>
 
                     <div class="form-container">
@@ -130,7 +130,7 @@
                                                     </td>
                                                 {/elseloop}
                                             </tbody>
-                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
+                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id=$area_id}
                                         </table>
 
                                         {ifloop rel="country-area"}
@@ -166,7 +166,7 @@
         <input type="hidden" name="area_id" value="{$area_id}">
         <input type="hidden" name="country_id" id="delete-country-id" value="">
 
-        {hook name="shipping-configuration.country-delete-form" location="shipping_configuration_country_delete_form" }
+        {hook name="shipping-configuration.country-delete-form" location="shipping_configuration_country_delete_form"}
     {/capture}
 
     {include
@@ -213,5 +213,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" area_id={$area_id} }
+    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" area_id=$area_id}
 {/block}

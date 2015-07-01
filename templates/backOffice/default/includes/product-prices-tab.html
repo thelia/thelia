@@ -4,7 +4,7 @@
     {$default_product_sale_element_id = 0}
 
     {loop name="product.sales.elements.test" type="product_sale_elements" product=$product_id currency=$edit_currency_id backend_context="1"}
-        {loop name="product.combinations" type="attribute_combination" product_sale_elements="$ID"}
+        {loop name="product.combinations" type="attribute_combination" product_sale_elements=$ID}
             {$has_at_least_one_combination = true}
         {/loop}
 
@@ -144,7 +144,7 @@
 			                  </div>
                           {/form_field}
 
-			              {hook name="product.details-pricing-form" location="product_details_pricing_form" }
+			              {hook name="product.details-pricing-form" location="product_details_pricing_form"}
 			          </div>
 		        </div>
 
@@ -186,7 +186,7 @@
                             </div>
                          {/form_field}
 
-                         {hook name="product.details-details-form" location="product_details_details_form" }
+                         {hook name="product.details-details-form" location="product_details_details_form"}
                     </div>
                 </div>
 
@@ -240,7 +240,7 @@
 			            </div>
 			            {/form_field}
 
-			            {hook name="product.details-promotion-form" location="product_details_promotion_form" }
+			            {hook name="product.details-promotion-form" location="product_details_promotion_form"}
 			        </div>
                 </div>
 	        </div>
@@ -327,13 +327,13 @@
 					    </div>
 					</div>
 
-	                {hook name="product.before-combinations" location="product_before_combinations" }
+	                {hook name="product.before-combinations" location="product_before_combinations"}
 
 					<table class="table table-striped table-condensed table-responsive" id="combinations_list">
 					    <caption>
 					        {intl l='Attribute Combinations'}
 
-					        {hook name="product.combinations-list-caption" location="product_combinations_list_caption" }
+					        {hook name="product.combinations-list-caption" location="product_combinations_list_caption"}
 
 					        {loop type="auth" name="can_create" role="ADMIN" resource="admin.product" access="UPDATE"}
                             <a class="btn btn-primary action-btn" id="open_combination_builder" title="{intl l='Quickly create combinations using the combination builder'}" href="#combination_builder_dialog" data-toggle="modal">
@@ -464,13 +464,13 @@
                                 {/form_field}
                             </tr>
 
-                            {hook name="product.combinations-row" pse="$current_pse_id"}
+                            {hook name="product.combinations-row" pse=$current_pse_id}
 
 	                        {/for}
 					    </tbody>
 					</table>
 
-	                {hook name="product.after-combinations" location="product_after_combinations" }
+	                {hook name="product.after-combinations" location="product_after_combinations"}
 
 
                     {include
@@ -509,7 +509,7 @@
 		</div>
     {/if}
 
-    {hook name="product.after-combinations" location="product_after_combinations" }
+    {hook name="product.after-combinations" location="product_after_combinations"}
 
 </div>
 
@@ -619,7 +619,7 @@
 
     <input type="hidden" name="product_sale_element_id" id="combination_delete_id" value="" />
 
-    {hook name="product.combination-delete-form" location="product_combination_delete_form" }
+    {hook name="product.combination-delete-form" location="product_combination_delete_form"}
 
 {/capture}
 
@@ -680,7 +680,7 @@
 		            <li>
 		                <strong>{$TITLE}</strong>
 		                <ul class="list-unstyled">
-		                {loop name="product-attributes-av" type="attribute_availability" attribute="{$ID}" order="manual" backend_context="1" lang=$edit_language_id}
+		                {loop name="product-attributes-av" type="attribute_availability" attribute=$ID order="manual" backend_context="1" lang=$edit_language_id}
 		                    <li>
 			                    <div class="checkbox">
 			                        <label>

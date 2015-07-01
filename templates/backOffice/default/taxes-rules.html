@@ -22,7 +22,7 @@
                 </ul>
             </div>
 
-            {hook name="taxes-rules.top" location="taxes_rules_top" }
+            {hook name="taxes-rules.top" location="taxes_rules_top"}
 
             <div class="row">
                 <div class="col-md-12">
@@ -159,7 +159,7 @@
                 </div>
             </div>
 
-            {hook name="taxes-rules.bottom" location="taxes_rules_bottom" }
+            {hook name="taxes-rules.bottom" location="taxes_rules_bottom"}
 
         </div>
     </div>
@@ -238,16 +238,16 @@
             </div>
         {/form_tagged_fields}
 
-        {hook name="tax.create-form" location="tax_create_form" }
+        {hook name="tax.create-form" location="tax_create_form"}
 
     {/capture}
 
-        {include
-        file = "includes/generic-create-dialog.html"
+    {include
+    file = "includes/generic-create-dialog.html"
 
-        dialog_id    = "tax_create_dialog"
-        dialog_title = {intl l="Create a new tax"}
-        dialog_body  = {$smarty.capture.tax_create_dialog nofilter}
+    dialog_id    = "tax_create_dialog"
+    dialog_title = {intl l="Create a new tax"}
+    dialog_body  = {$smarty.capture.tax_create_dialog nofilter}
 
     dialog_ok_label     = {intl l="Create"}
     dialog_cancel_label = {intl l="Cancel"}
@@ -264,8 +264,7 @@
     {capture "tax_delete_dialog"}
         <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
 
-        {hook name="tax.delete-form" location="tax_delete_form" }
-
+        {hook name="tax.delete-form" location="tax_delete_form"}
     {/capture}
 
     {include
@@ -275,9 +274,9 @@
     dialog_title    = {intl l="Delete tax"}
     dialog_message  = {intl l="Do you really want to delete this tax ?"}
 
-form_action         = {token_url path='/admin/configuration/taxes/delete'}
-form_content        = {$smarty.capture.tax_delete_dialog nofilter}
-}
+    form_action         = {token_url path='/admin/configuration/taxes/delete'}
+    form_content        = {$smarty.capture.tax_delete_dialog nofilter}
+    }
 
 {* -- Add tax rule confirmation dialog ----------------------------------- *}
     {form name="thelia.admin.taxrule.add"}
@@ -316,15 +315,15 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
                 <textarea name="{$name}" id="{$label_attr.for}" rows="10" class="form-control wysiwyg">{if $error}{$value}{/if}</textarea>
             </div>
         {/form_field}
-        {hook name="tax-rule.create-form" location="tax_rule_create_form" }
+        {hook name="tax-rule.create-form" location="tax_rule_create_form"}
     {/capture}
 
-        {include
-        file = "includes/generic-create-dialog.html"
+    {include
+    file = "includes/generic-create-dialog.html"
 
-        dialog_id    = "tax_rule_create_dialog"
-        dialog_title = {intl l="Create a new tax rule"}
-        dialog_body  = {$smarty.capture.tax_rule_create_dialog nofilter}
+    dialog_id    = "tax_rule_create_dialog"
+    dialog_title = {intl l="Create a new tax rule"}
+    dialog_body  = {$smarty.capture.tax_rule_create_dialog nofilter}
 
     dialog_ok_label     = {intl l="Create"}
     dialog_cancel_label = {intl l="Cancel"}
@@ -341,7 +340,7 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     {capture "tax_rule_delete_dialog"}
         <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
 
-        {hook name="tax-rule.delete-form" location="tax_rule_delete_form" }
+        {hook name="tax-rule.delete-form" location="tax_rule_delete_form"}
 
     {/capture}
 
@@ -352,8 +351,8 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
     dialog_title    = {intl l="Delete tax rule"}
     dialog_message  = {intl l="Do you really want to delete this tax rule ?"}
 
-    form_action         = {token_url path='/admin/configuration/taxes_rules/delete'}
-    form_content        = {$smarty.capture.tax_rule_delete_dialog nofilter}
+    form_action     = {token_url path='/admin/configuration/taxes_rules/delete'}
+    form_content    = {$smarty.capture.tax_rule_delete_dialog nofilter}
 }
 
 {/block}
@@ -396,6 +395,6 @@ form_content        = {$smarty.capture.tax_delete_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="taxes-rules.js" location="taxes-rules-js" }
-    {hook name="wysiwyg.js" location="wysiwyg-tax-rules-js" }
+    {hook name="taxes-rules.js" location="taxes-rules-js"}
+    {hook name="wysiwyg.js" location="wysiwyg-tax-rules-js"}
 {/block}

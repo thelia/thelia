@@ -22,7 +22,7 @@
             <li><a href="#">{intl l="Orders"}</a></li>
         </ul>
 
-        {hook name="orders.top" location="orders_top" }
+        {hook name="orders.top" location="orders_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -44,7 +44,7 @@
                                         reverse_order='id-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='ID'}"
+                                        label={intl l='ID'}
                                     } </th>
 
                                     <th class="object-title">
@@ -54,7 +54,7 @@
                                         reverse_order='reference-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Reference'}"
+                                        label={intl l='Reference'}
                                     } </th>
 
                                     <th class="object-title">
@@ -64,7 +64,7 @@
                                         reverse_order='create-date-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Date & Hour'}"
+                                        label={intl l='Date & Hour'}
                                     } </th>
 
                                     <th class="object-title">
@@ -74,7 +74,7 @@
                                         reverse_order='company-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Company'}"
+                                        label={intl l='Company'}
                                     } </th>
 
                                     <th class="object-title">
@@ -84,7 +84,7 @@
                                         reverse_order='customer-name-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Cutomer Name'}"
+                                        label={intl l='Cutomer Name'}
                                      } </th>
 
                                     <th class="object-title text-right">{intl l='Amount'}</th>
@@ -96,7 +96,7 @@
                                         reverse_order='status-reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
-                                        label="{intl l='Status'}"
+                                        label={intl l='Status'}
                                     } </th>
 
 	                               {hook name="orders.table-header" location="orders_table_header" }
@@ -107,7 +107,7 @@
 
                             <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
+                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page=$order_page limit=#max_displayed_orders status=$status_filter|default:'*' search_term=$search_term search_in=$search_in}
 
                                     {loop type="currency" name="order-currency" id=$CURRENCY}
                                         {$orderCurrency=$SYMBOL}
@@ -139,9 +139,7 @@
                                        	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                        	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
                                         <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
-                                        {* *}
-                                        {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
-
+		                                {hook name="orders.table-row" location="orders_table_row" order_id=$ID}
                                         <td>
                                             <div class="btn-toolbar btn toolbar-primary">
                                                 <span class="glyphicon glyphicon-cog"></span>
@@ -168,9 +166,8 @@
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}"
+                                            page_url       = {url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in=$search_in}
                                         }
-
                                     </td>
                                 </tr>
                             </tfoot>
@@ -191,7 +188,7 @@
             </div>
         </div>
 
-        {hook name="orders.bottom" location="orders_bottom" }
+        {hook name="orders.bottom" location="orders_bottom"}
 
     </div>
 </div>
@@ -231,5 +228,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="orders.js" location="orders-js" }
+    {hook name="orders.js" location="orders-js"}
 {/block}

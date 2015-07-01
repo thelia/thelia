@@ -129,7 +129,7 @@ Use the optionnal $field_value parameter if no value is defined
 
                     <input type="{$type}" {$attributes nofilter} />
                 {elseif in_array($type, $thelia_types)}
-                    {if $attr and empty($attr.autocomplete)}
+                    {if $attr && empty($attr.autocomplete)}
                     <input type="number" {$attributes nofilter} />
                     {else}
                         {* You should implement the auto completion *}

@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
         </ul>
 
-        {hook name="shipping-zones.top" location="shipping_zones_top" }
+        {hook name="shipping-zones.top" location="shipping_zones_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -51,7 +51,7 @@
                                     <th>{intl l="Delivery module"}</th>
                                     <th>{intl l="Shipping zones for this module"}</th>
 
-                                   {hook name="shipping-zones.table-header" location="shipping_zones_table_header" }
+                                   {hook name="shipping-zones.table-header" location="shipping_zones_table_header"}
 
                                    <th class="text-center">{intl l="Actions"}</th>
     	                        </tr>
@@ -75,7 +75,7 @@
                                             {intl l="There are no shipping zones attached to this module."}
                                         {/elseloop}
                                     </td>
-                                    {hook name="shipping-zones.table-row" location="shipping_zones_table_row" module_id={$ID} }
+                                    {hook name="shipping-zones.table-row" location="shipping_zones_table_row" module_id=$ID}
 
                                     <td class="text-center">
                                         <div class="btn-group">
@@ -103,12 +103,12 @@
             </div>
         </div>
 
-        {hook name="shipping-zones.bottom" location="shipping_zones_bottom" }
+        {hook name="shipping-zones.bottom" location="shipping_zones_bottom"}
 
     </div>
 </div>
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-zones.js" location="shipping-zones-js" }
+    {hook name="shipping-zones.js" location="shipping-zones-js"}
 {/block}

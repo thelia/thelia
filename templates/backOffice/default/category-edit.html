@@ -19,7 +19,7 @@
             {hook name="category-edit.top" category_id=$category_id}
 
             <div class="row">
-                {loop name="category_edit" type="category" visible="*" id="{$category_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="category_edit" type="category" visible="*" id=$category_id backend_context="1" lang=$edit_language_id}
 
                 {* Define close url *}
                 {if $PARENT gt 0}
@@ -32,7 +32,7 @@
                 <div class="col-md-12 general-block-decorator">
                     <div class="row">
                         <div class="col-md-7 title">
-                            {intl l='Edit category %title' title={$TITLE}}
+                            {intl l='Edit category %title' title=$TITLE}
                         </div>
 
                         <div class="col-md-5 actions">
@@ -45,7 +45,7 @@
                     <div class="row">
                         <div class="col-md-12">
 
-                            {hookblock name="category.tab" id="{$category_id}" fields="id,title,href,content"}
+                            {hookblock name="category.tab" id=$category_id fields="id,title,href,content"}
 
                                 {capture "category_tab_tab"}
                                     {forhook rel="category.tab"}
@@ -142,7 +142,7 @@
                                                 close_url=$close_url
                                             }
 
-                                            <small>{intl l='Category created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</small>
+                                            <small>{intl l='Category created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</small>
 
                                         </form>
                                         {/form}
@@ -184,7 +184,7 @@
                                                         <div class="form-group">
                                                             <select name="folder_id" id="folder_id" class="form-control">
                                                                 <option value="">{intl l='Select a folder...'}</option>
-                                                                {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang="$edit_language_id"}
+                                                                {loop name="folders" type="folder-tree" folder="0" backend_context="1" lang=$edit_language_id}
                                                                     <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
                                                                 {/loop}
                                                             </select>
@@ -231,20 +231,20 @@
 
                                                         <th>{intl l='Content title'}</th>
 
-                                                        {hook name="category.contents-table-header" location="category_contents_table_header" }
+                                                        {hook name="category.contents-table-header" location="category_contents_table_header"}
 
                                                         <th class="actions">{intl l="Actions"}</th>
                                                     </tr>
                                                 </thead>
 
                                                 <tbody>
-                                                    {loop name="assigned_contents" type="associated_content" category="$ID" backend_context="1" lang="$edit_language_id"}
+                                                    {loop name="assigned_contents" type="associated_content" category=$ID backend_context=1 lang=$edit_language_id}
                                                     <tr>
                                                         <td>{$CONTENT_ID}</td>
 
                                                         <td><a href="{url path="/admin/content/update/%id" id=$CONTENT_ID}">{$TITLE}</a></td>
 
-                                                        {hook name="category.contents-table-row" location="category_contents_table_row" }
+                                                        {hook name="category.contents-table-row" location="category_contents_table_row"}
 
                                                         <td class="actions">
                                                             {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.category" access="UPDATE"}
@@ -286,13 +286,13 @@
                                         {include
                                         file = "includes/inner-form-toolbar.html"
                                         hide_submit_buttons = true
-                                        page_url  = {$pageUrl}
-                                        close_url = {$closeUrl}
+                                        page_url  = $pageUrl
+                                        close_url = $closeUrl
                                         current_tab = "modules"
                                         }
                                     </div>
                                     {* ugly fix : {hook name="category.tab-content" id="{$category_id}" view="category"} *}
-                                    {include file="includes/module-tab-content.html" hook="category.tab-content" location="category-edit" id="{$category_id}" view="category"}
+                                    {include file="includes/module-tab-content.html" hook="category.tab-content" location="category-edit" id=$category_id view="category"}
                                 </div>
                              </div>
                         </div>
@@ -426,5 +426,5 @@ $(function() {
 {block name="javascript-last-call"}
     {hook name="category.edit-js" location="category-edit-js" category_id=$category_id}
 
-    {hook name="wysiwyg.js" location="wysiwyg-category-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-category-edit-js"}
 {/block}

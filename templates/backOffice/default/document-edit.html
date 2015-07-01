@@ -9,12 +9,12 @@
 
         <div id="wrapper" class="container">
 
-            {loop type="document" name="document_edit" source="{$documentType}" id="{$documentId}" backend_context="1" lang="$edit_language_id" visible="*"}
+            {loop type="document" name="document_edit" source=$documentType id=$documentId backend_context="1" lang=$edit_language_id visible="*"}
                 <ul class="breadcrumb">
                     {foreach $breadcrumb as $label=>$link}
                         <li><a href="{$link}">{$label}</a></li>
                     {/foreach}
-                    <li>{intl l='Editing document "%name"' name="{$TITLE}"}</li>
+                    <li>{intl l='Editing document "%name"' name=$TITLE}</li>
                 </ul>
 
             {hook name="document-edit.top" document_id=$documentId}
@@ -24,12 +24,12 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit document "%name"' name="{$TITLE}"}
+        					   {intl l='Edit document "%name"' name=$TITLE}
         					</div>
 
                             <div class="form-container">
                                 <div class="col-md-12">
-        						    {form name="$formId"}
+        						    {form name=$formId}
         						    	<form method="POST" action="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}" enctype="multipart/form-data" class="clearfix">
 
                                             {include
@@ -43,7 +43,7 @@
         						        	{form_hidden_fields}
 
                                             {render_form_field field="success_url" value="{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}"}
-                                            {render_form_field field="locale" value="$edit_language_locale"}
+                                            {render_form_field field="locale" value=$edit_language_locale}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -91,7 +91,7 @@
                                                 hide_flags = true
 
                                                 page_url  = "{url path="/admin/document/type/%document/%id/update" document=$documentType id=$ID}"
-                                                close_url = "{url path="{$redirectUrl}" current_tab="documents"}"
+                                                close_url = "{url path=$redirectUrl current_tab="documents"}"
                                             }
                                         </form>
         							{/form}
@@ -113,11 +113,11 @@
                     <div class="col-md-12">
                         <div class="row inner-toolbar clearfix">
                             <div class="col-md-6 inner-actions pull-right">
-                                <a href="{url path="{$redirectUrl}" current_tab="documents"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
+                                <a href="{url path=$redirectUrl current_tab="documents"}" class="btn btn-default btn-info">{intl l='Back'} <span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                         </div>
                         <div class="alert alert-error">
-                            {intl l="Sorry, document ID=%id was not found." id={$documentId}}
+                            {intl l="Sorry, document ID=%id was not found." id=$documentId}
                         </div>
                     </div>
                 </div>
@@ -128,7 +128,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="document.edit-js" location="document-edit-js" document_id={$documentId} }
+    {hook name="document.edit-js" location="document-edit-js" document_id=$documentId}
 
-    {hook name="wysiwyg.js" location="wysiwyg-document-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-document-edit-js"}
 {/block}

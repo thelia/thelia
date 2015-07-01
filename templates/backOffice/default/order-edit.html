@@ -42,7 +42,7 @@
 
                                 <div class="row">
                                     <div class="col-md-7 title">
-                                        {intl l='Order %ref - ID %id' id={$ID} ref={$REF}}
+                                        {intl l='Order %ref - ID %id' id=$ID ref=$REF}
                                     </div>
 
                                     <div class="col-md-5 actions">
@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
 
-                                {hookblock name="order.tab" id={$order_id} fields="id,title,href,content"}
+                                {hookblock name="order.tab" id=$order_id fields="id,title,href,content"}
 
                                     {capture "order_tab_tab"}
                                         {forhook rel="order.tab"}
@@ -128,7 +128,7 @@
                                                 <thead>
                                                     <tr>
                                                        <th class="col-md-6">{intl l="Product"}</th>
-                                                       {hook name="order-edit.table-header" location="order_edit_table_header" }
+                                                       {hook name="order-edit.table-header" location="order_edit_table_header"}
                                                        <th class="col-md-1 text-right">{intl l="Unit. price"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Tax"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Unit taxed price"}</th>
@@ -152,7 +152,7 @@
                                                     <tr>
                                                         <td>
                                                             {ifloop rel="my_product_loop"}
-                                                                {loop type="product" name="my_product_loop" visible="*" ref="$REF"}
+                                                                {loop type="product" name="my_product_loop" visible="*" ref=$REF}
                                                                     <a href="{url path='/admin/products/update' product_id=$ID}">{$REF} - {$TITLE}</a>
                                                                     {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
                                                                 {/loop}
@@ -172,7 +172,7 @@
                                                             {/ifloop}
                                                             {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
-                                                        {hook name="order-edit.table-row" location="order_edit_table_row" order_product_id={$ID} }
+                                                        {hook name="order-edit.table-row" location="order_edit_table_row" order_product_id=$ID}}
                                                         <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
@@ -431,7 +431,7 @@
                                                         <tbody>
                                                         {ifhook rel="order-edit.bill-delivery-address"}
                                                             {* delivery module can customize the delivery address *}
-                                                            {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id={$order_id}}
+                                                            {hook name="order-edit.bill-delivery-address" module=$DELIVERY_MODULE order_id=$order_id}
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
                                                             {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
@@ -700,5 +700,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="order.edit-js" location="order-edit-js" order_id={$order_id} }
+    {hook name="order.edit-js" location="order-edit-js" order_id=$order_id}
 {/block}

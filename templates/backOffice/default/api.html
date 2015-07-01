@@ -45,9 +45,6 @@
                             <tbody>
 
                             {foreach $api_list as $api}
-
-
-
                                 <tr>
                                     <td >{$api.Label}</td>
                                     <td >{$api.ApiKey}</td>
@@ -161,8 +158,8 @@
         dialog_title    = {intl l="Delete api access"}
         dialog_message  = {intl l="Do you really want to delete this api access ?"}
 
-        form_action         = {url path='/admin/configuration/api/delete'}
-        form_content        = {$smarty.capture.api_delete_dialog nofilter}
+        form_action     = {url path='/admin/configuration/api/delete'}
+        form_content    = {$smarty.capture.api_delete_dialog nofilter}
     }
 
 {if $api_id > 0}

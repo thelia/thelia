@@ -13,12 +13,12 @@
     <div class="customers edit-customer">
 
         <div id="wrapper" class="container">
-            {loop name="customer_edit" type="customer" current="false" id="$customer_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="customer_edit" type="customer" current="false" id=$customer_id backend_context="1" lang=$edit_language_id}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
-                    <li>{intl l="Edit customer %firstname %lastname" firstname={$FIRSTNAME} lastname={$LASTNAME}}</li>
+                    <li>{intl l="Edit customer %firstname %lastname" firstname=$FIRSTNAME lastname=$LASTNAME}</li>
                 </ul>
 
             {hook name="customer-edit.top" customer_id=$customer_id}
@@ -28,7 +28,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-                                {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname={$FIRSTNAME} lastname={$LASTNAME} ref={$REF}}
+                                {intl l="Edit customer %firstname %lastname (Ref : %ref)" firstname=$FIRSTNAME lastname=$LASTNAME ref=$REF}
         					</div>
 
                             <div class="form-container">
@@ -53,7 +53,7 @@
         						        	{/form_field}
 
         					            	{if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
-                                            {loop name="address" type="address" customer="$customer_id" backend_context="1" default="true"}
+                                            {loop name="address" type="address" customer=$customer_id backend_context=1 default=true}
                                             <div class="col-md-6">
                                                 <p class="title title-without-tabs">{intl l="Customer informations"}</p>
 
@@ -208,7 +208,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                        {loop name="address" type="address" customer="$customer_id" backend_context="1" default="0"}
+                                                        {loop name="address" type="address" customer=$customer_id backend_context="1" default="0"}
                                                             <tr>
                                                                 <td>
                                                                     {$LABEL}
@@ -285,11 +285,11 @@
                                             <th>{intl l="Date & Hour"}</th>
                                             <th class="text-right">{intl l="Amount"}</th>
                                             <th>{intl l="Status"}</th>
-                                            {hook name="customer.orders-table-header" location="orders_table_header" customer_id=$customer_id }
+                                            {hook name="customer.orders-table-header" location="orders_table_header" customer_id=$customer_id}
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {loop type="order" name="order-list" customer="{$customer_id}" backend_context="1" status='*' page={$page_order} limit=10}
+                                        {loop type="order" name="order-list" customer=$customer_id backend_context="1" status='*' page=$page_order limit=10}
                                         {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
                                         {assign "orderStatusLabel" "order_$CODE"}
@@ -301,7 +301,7 @@
                                                 <td>
                                                     <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
                                                 </td>
-                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id }
+                                                {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id}
                                             </tr>
                                         {/loop}
 
@@ -347,7 +347,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, customer ID=%id was not found." id={$customer_id}}
+                            {intl l="Sorry, customer ID=%id was not found." id=$customer_id}
                         </div>
                     </div>
                 </div>
@@ -503,5 +503,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="customer.edit-js" location="customer-edit-js" }
+    {hook name="customer.edit-js" location="customer-edit-js"}
 {/block}

@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        {hook name="administrators.top" location="administrators_top" }
+        {hook name="administrators.top" location="administrators_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -45,7 +45,7 @@
                                     <th>{intl l="Last Name"}</th>
                                     <th>{intl l="Locale"}</th>
                                     <th>{intl l="Profile"}</th>
-                                    {hook name="adminisrators.header" location="administrator_list_header" }
+                                    {hook name="adminisrators.header" location="administrator_list_header"}
                                     <th class="col-md-1">{intl l="Actions"}</th>
                                 </tr>
                             </thead>
@@ -72,14 +72,14 @@
                                     <td data-field-class="js-locale">{$LOCALE}</td>
                                     <td data-field-class="js-profile" data-value="{$PROFILE}">
                                        {if $PROFILE}
-                                            {loop type="profile" name="admin-profile" id={$PROFILE}}
+                                            {loop type="profile" name="admin-profile" id=$PROFILE}
                                                 <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
                                             {/loop}
                                         {else}
                                             {intl l='Superadministrator'}
                                         {/if}
                                     </td>
-                                    {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
+                                    {hook name="administrators.row" location="administrator_list_row" admin_id=$ID}
                                     <td class="actions">
                                         <div class="btn-toolbar btn toolbar-primary">
                                             <span class="glyphicon glyphicon-cog"></span>
@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        {hook name="administrators.bottom" location="administrators_bottom" }
+        {hook name="administrators.bottom" location="administrators_bottom"}
 
     </div>
 </div>
@@ -202,7 +202,7 @@
 
         </div>
     {/form_field}
-    {hook name="administrator.create-form" location="administrator_create_form" }
+    {hook name="administrator.create-form" location="administrator_create_form"}
 {/capture}
 
     {include
@@ -306,7 +306,7 @@
 
         </div>
     {/form_field}
-    {hook name="administrator.update-form" location="administrator_update_form" }
+    {hook name="administrator.update-form" location="administrator_update_form"}
 {/capture}
 
     {include
@@ -331,7 +331,7 @@
 {capture "administrator_delete_dialog"}
     <input type="hidden" name="administrator_id" id="administrator_delete_id" value="" />
 
-    {hook name="administrator.delete-form" location="administrator_delete_form" }
+    {hook name="administrator.delete-form" location="administrator_delete_form"}
 
 {/capture}
 
@@ -402,5 +402,5 @@ jQuery(function($) {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="administrators.js" location="administrators-js" }
+    {hook name="administrators.js" location="administrators-js"}
 {/block}

@@ -14,13 +14,13 @@
 
     <div id="wrapper" class="container">
 
-        {loop name="config_edit" type="config" hidden="*" id="$variable_id" backend_context="1" lang="$edit_language_id"}
+        {loop name="config_edit" type="config" hidden="*" id=$variable_id backend_context="1" lang=$edit_language_id}
 
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a></li>
-            <li>{intl l='Editing variable "%name"' name={$NAME}}</li>
+            <li>{intl l='Editing variable "%name"' name=$NAME}</li>
         </ul>
 
 		{hook name="variables-edit.top" variable_id=$variable_id}
@@ -30,7 +30,7 @@
 				<div class="row">
 
 					<div class="col-md-12 title title-without-tabs">
-					   {intl l="Edit variable %name" name={$NAME}}
+					   {intl l="Edit variable %name" name=$NAME}
 					</div>
 
                     <div class="form-container">
@@ -92,7 +92,7 @@
 
                                     <div class="control-group">
                                         <div class="controls">
-                                            <p>{intl l='Variable created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</p>
+                                            <p>{intl l='Variable created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
                                         </div>
                                     </div>
 
@@ -114,7 +114,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="alert alert-error">
-                    {intl l="Sorry, variable ID=%id was not found." id={$variable_id}}
+                    {intl l="Sorry, variable ID=%id was not found." id=$variable_id}
                 </div>
             </div>
         </div>
@@ -125,6 +125,6 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="variable.edit-js" location="variable-edit-js" }
-    {hook name="wysiwyg.js" location="wysiwyg-variable-edit-js" }
+    {hook name="variable.edit-js" location="variable-edit-js"}
+    {hook name="wysiwyg.js" location="wysiwyg-variable-edit-js"}
 {/block}

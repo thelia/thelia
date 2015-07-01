@@ -44,7 +44,7 @@
                     <div class="row">
                         <div class="col-md-12">
 
-                            {hookblock name="product.tab" id="{$product_id}" fields="id,title,href,content"}
+                            {hookblock name="product.tab" id=$product_id fields="id,title,href,content"}
 
                                 {capture "product_tab_tab"}
                                     {forhook rel="product.tab"}
@@ -654,7 +654,7 @@ $(function() {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="product.edit-js" location="product-edit-js" product_id={$product_id} }
+    {hook name="product.edit-js" location="product-edit-js" product_id=$product_id}
 
-    {hook name="wysiwyg.js" location="wysiwyg-product-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-product-edit-js"}
 {/block}

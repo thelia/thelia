@@ -17,7 +17,7 @@
             </ul>
         </div>
 
-        {hook name="search.top" location="search_top" }
+        {hook name="search.top" location="search_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -46,7 +46,7 @@
                                 <th>
                                     {intl l="Email address"}
                                 </th>
-                                {hook name="customers.header" location="customer_list_header" }
+                                {hook name="customers.header" location="customer_list_header"}
 
                                 <th>
                                     {intl l="last order"}
@@ -64,7 +64,7 @@
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
 
-                                {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit=1}
                                 {assign "lastOrderDate" "{format_date date=$CREATE_DATE}"}
                                 {assign "lastOrderAmount" "{format_number number=$TOTAL_TAXED_AMOUNT}"}
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
@@ -85,7 +85,7 @@
                                     <td>
                                         {mailto address="{$EMAIL}" encode="hex"}
                                     </td>
-                                    {hook name="customers.row" location="customer_list_row" }
+                                    {hook name="customers.row" location="customer_list_row"}
 
                                     <td>
                                         {$lastOrderDate}
@@ -236,7 +236,7 @@
                                     <td>{$ID}</td>
 
                                     <td>
-                                        {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                                        {loop type="image" name="cat_image" source="product" source_id=$ID limit=1 width=50 height=50 resize_mode="crop" backend_context=1}
                                             <a href="{url path='/admin/products/update' product_id=$id_product}" title="{intl l='Edit this product'}">
                                                 <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                             </a>
@@ -350,7 +350,7 @@
             </div>
         </div>
 
-        {hook name="search.bottom" location="search_bottom" }
+        {hook name="search.bottom" location="search_bottom"}
 
     </div>
 </div>
@@ -361,7 +361,7 @@
 <input type="hidden" name="page" value="{$page}">
 <input type="hidden" name="customer_id" id="delete_customer_id">
 
-{hook name="customer.delete-form" location="customer_delete_form" }
+{hook name="customer.delete-form" location="customer_delete_form"}
 {/capture}
 
 {include
@@ -371,9 +371,9 @@
     dialog_title    = {intl l="Delete customer"}
     dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
-    form_action         = {token_url path='/admin/customer/delete'}
-    form_content        = {$smarty.capture.delete_customer_dialog nofilter}
-    form_id             = "form_delete_customer"
+    form_action     = {token_url path='/admin/customer/delete'}
+    form_content    = {$smarty.capture.delete_customer_dialog nofilter}
+    form_id         = "form_delete_customer"
 }
 
 {/block}
@@ -389,5 +389,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="search.js" location="search-js" }
+    {hook name="search.js" location="search-js"}
 {/block}

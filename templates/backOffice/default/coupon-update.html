@@ -18,12 +18,12 @@
                 <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
                 <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
                 <li><a href="{url path='admin/coupon'}">{intl l='Coupon'}</a></li>
-                <li>{intl l='Editing coupon "%title"' title="{$couponCode}"}</li>
+                <li>{intl l='Editing coupon "%title"' title=$couponCode}</li>
             </ul>
         </nav>
 
         {form name="thelia.admin.coupon.creation"}
-            {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=false title={intl l='Editing coupon "%title"' title={$couponCode}}}
+            {include file='coupon/form.html' formAction={url path={$formAction}} noConditions=false title={intl l='Editing coupon "%title"' title=$couponCode}}
         {/form}
     </div> <!-- #wrapper -->
 </div>
@@ -69,7 +69,7 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="coupon.update-js" location="coupon-update-js" coupon_id={$couponId} }
+    {hook name="coupon.update-js" location="coupon-update-js" coupon_id=$couponId}
 
-    {hook name="wysiwyg.js" location="wysiwyg-coupon-update-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-coupon-update-js"}
 {/block}
