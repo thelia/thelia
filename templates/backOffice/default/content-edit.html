@@ -48,7 +48,7 @@
 
                                 {hookblock name="content.tab" id=$content_id fields="id,title,href,content"}
 
-                                    {capture "content_tab_tab"}
+                                    {capture name="content_tab_tab"}
                                         {forhook rel="content.tab"}
                                         <li>
                                             <a href="#{$id}"
@@ -59,7 +59,7 @@
                                         {/forhook}
                                     {/capture}
 
-                                    {capture "content_tab_content"}
+                                    {capture name="content_tab_content"}
                                         {forhook rel="content.tab"}
                                         <div class="tab-pane fade" id="{$id}">
                                             {if $href}
@@ -220,7 +220,7 @@
     </div>
     {* Delete category confirmation dialog *}
 
-    {capture "delete_folder_dialog"}
+    {capture name="delete_folder_dialog"}
         <input type="hidden" name="content_id" value="{$content_id}"/>
         <input type="hidden" name="additional_folder_id" id="additional_folder_delete_id" value=""/>
         <input type="hidden" name="current_tab" value="association"/>

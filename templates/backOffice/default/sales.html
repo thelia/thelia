@@ -194,7 +194,7 @@
     {form name="thelia.admin.sale.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 			{form_hidden_fields}
 
             {loop type="lang" name="default-lang" default_only="1"}
@@ -251,7 +251,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="sale_id" id="sale_delete_id" value="" />
 
         {hook name="sale.delete-form" location="sale_delete_form"}

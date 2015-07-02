@@ -58,7 +58,7 @@
 
                                         {custom_render_form_field field='name'}
                                             <div class="input-group">
-                                                <input type="text" {form_field_attributes field="name" value={$NAME}}>
+                                                <input type="text" {form_field_attributes field="name" value={$NAME}} />
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
                                                 </span>
@@ -162,7 +162,7 @@
 
     {* Delete related content confirmation dialog *}
 
-    {capture "delete_country_dialog"}
+    {capture name="delete_country_dialog"}
         <input type="hidden" name="area_id" value="{$area_id}">
         <input type="hidden" name="country_id" id="delete-country-id" value="">
 

@@ -157,7 +157,7 @@
 {form name="thelia.admin.feature.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "creation_dialog"}
+    {capture name="creation_dialog"}
         {form_hidden_fields}
 
         {form_field field='success_url'}
@@ -220,7 +220,7 @@
 
 {* Delete confirmation dialog *}
 
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="feature_id" id="feature_delete_id" value="" />
 
     {hook name="feature.delete-form" location="feature_delete_form"}
@@ -241,7 +241,7 @@
 
 {* Add to all dialog *}
 
-{capture "add_to_all_dialog"}
+{capture name="add_to_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_add_to_all_id" value="" />
 
     {hook name="feature.add-to-all-form" location="feature_add_to_all_form"}
@@ -261,7 +261,7 @@
 
 {* Remove from all dialog *}
 
-{capture "remove_from_all_dialog"}
+{capture name="remove_from_all_dialog"}
     <input type="hidden" name="feature_id" id="feature_remove_from_all_id" value="" />
 
     {hook name="feature.remove-to-all-form" location="feature_remove_to_all_form"}

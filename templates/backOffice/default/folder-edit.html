@@ -21,7 +21,7 @@
             {loop name="folder_edit" type="folder" visible="*" id=$folder_id backend_context="1" lang=$edit_language_id}
 
             {* Define close url *}
-            {assign var='close_url' value="{url path='/admin/folders' folder_id=$ID}"}
+            {assign var='close_url' value={url path='/admin/folders' folder_id=$ID}}
 
             <div class="col-md-12 general-block-decorator">
                 <div class="row">
@@ -41,7 +41,7 @@
 
                         {hookblock name="folder.tab" id=$folder_id fields="id,title,href,content"}
 
-                            {capture "folder_tab_tab"}
+                            {capture name="folder_tab_tab"}
                                 {forhook rel="folder.tab"}
                                 <li>
                                     <a href="#{$id}"
@@ -52,7 +52,7 @@
                                 {/forhook}
                             {/capture}
 
-                            {capture "folder_tab_content"}
+                            {capture name="folder_tab_content"}
                                 {forhook rel="folder.tab"}
                                 <div class="tab-pane fade" id="{$id}">
                                     {if $href}

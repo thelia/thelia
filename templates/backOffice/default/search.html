@@ -157,7 +157,7 @@
                                     <td>{$orderInvoiceCompany}</td>
                                     <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
                                     <td>{$TOTAL_TAXED_AMOUNT}</td>
-                                    <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+                                    <td><span class="label label-{$orderStatusLabel}">{$orderStatus}</span></td>
 
                                     <td>
                                         <div class="btn-group">
@@ -357,7 +357,7 @@
 
 {* Delete confirmation dialog *}
 
-{capture "delete_customer_dialog"}
+{capture name="delete_customer_dialog"}
 <input type="hidden" name="page" value="{$page}">
 <input type="hidden" name="customer_id" id="delete_customer_id">
 
@@ -381,7 +381,7 @@
 {block name="javascript-initialization"}
 
 <script type="text/javascript">
-    $(".customer-delete").click(function(){
+    $(".customer-delete").click(function() {
         $("#delete_customer_id").val($(this).attr("data-id"));
     });
 </script>

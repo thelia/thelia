@@ -148,7 +148,7 @@
     {form name="thelia.admin.country.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "country_creation_dialog"}
+        {capture name="country_creation_dialog"}
 
             {form_hidden_fields exclude="locale"}
 
@@ -196,7 +196,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="country_id" id="country_delete_id" value="" />
 
         {hook name="country.delete-form" location="country_delete_form"}

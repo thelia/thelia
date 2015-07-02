@@ -9,7 +9,7 @@
                         <p class="title title-without-tabs">{intl l='Additional Folders'}</p>
                         <p>{intl l='A content could be attached to more than one folder. Select here the additional folders for this content.'}
                             {loop name="default_folder" type="folder" id=$DEFAULT_FOLDER}
-                            {intl l='You can change the default folder (%title) in the "General" tab.' title={$TITLE}}
+                            {intl l='You can change the default folder (%title) in the "General" tab.' title=$TITLE}
                             {/loop}
 
                             {$exclude_from_tree = "-1"}

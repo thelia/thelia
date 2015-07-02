@@ -222,7 +222,7 @@
     {form name="thelia.admin.customer.create"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "customer_creation_dialog"}
+        {capture name="customer_creation_dialog"}
 
             {form_hidden_fields}
 
@@ -360,7 +360,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_customer_dialog"}
+    {capture name="delete_customer_dialog"}
         <input type="hidden" name="page" value="{$page}">
         <input type="hidden" name="customer_id" id="delete_customer_id">
 
@@ -382,13 +382,11 @@
 {/block}
 
 {block name="javascript-initialization"}
-
-        <script type="text/javascript">
-            $(".customer-delete").click(function(){
-                $("#delete_customer_id").val($(this).attr("data-id"));
-            });
-        </script>
-
+    <script type="text/javascript">
+        $(".customer-delete").click(function(){
+            $("#delete_customer_id").val($(this).attr("data-id"));
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}

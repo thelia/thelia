@@ -171,9 +171,9 @@
 			                                                <div class="form-group">
 			                                                    <label>{$config->getTitle()}</label>
 				                                                {if $config->getType() == 2}
-				                                                    <input  class="form-control" type="text" name="config[{$classname}][{$config->getName()}]" value="{$config->getValue()}" />
-			                                                    {else if $config->getType() == 1}
-			                                                        <textarea  class="form-control" name="config[{$classname}][{$config->getName()}]">{$config->getValue()}</textarea>
+				                                                    <input class="form-control" type="text" name="config[{$classname}][{$config->getName()}]" value="{$config->getValue()}" />
+			                                                    {elseif $config->getType() == 1}
+			                                                        <textarea class="form-control" name="config[{$classname}][{$config->getName()}]">{$config->getValue()}</textarea>
 				                                                {/if}
 			                                                   <span class="help-block">{$config->getLabel()}</span>
 			                                                </div>

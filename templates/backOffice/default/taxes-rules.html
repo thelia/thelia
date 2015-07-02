@@ -174,7 +174,7 @@
     {/if}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "tax_create_dialog"}
+    {capture name="tax_create_dialog"}
 
         {form_hidden_fields}
 
@@ -261,7 +261,7 @@
 
 {* -- Delete tax confirmation dialog ----------------------------------- *}
 
-    {capture "tax_delete_dialog"}
+    {capture name="tax_delete_dialog"}
         <input type="hidden" name="tax_id" id="tax_delete_id" value="" />
 
         {hook name="tax.delete-form" location="tax_delete_form"}
@@ -288,7 +288,7 @@
     {/if}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "tax_rule_create_dialog"}
+    {capture name="tax_rule_create_dialog"}
 
         {form_hidden_fields}
 
@@ -337,7 +337,7 @@
 
 {* -- Delete tax rule confirmation dialog ----------------------------------- *}
 
-    {capture "tax_rule_delete_dialog"}
+    {capture name="tax_rule_delete_dialog"}
         <input type="hidden" name="tax_rule_id" id="tax_rule_delete_id" value="" />
 
         {hook name="tax-rule.delete-form" location="tax_rule_delete_form"}

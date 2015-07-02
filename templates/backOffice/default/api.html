@@ -144,7 +144,7 @@
 }
 {/form}
 
-    {capture "api_delete_dialog"}
+    {capture name="api_delete_dialog"}
         <input type="hidden" name="api_id" id="api_delete_id" value="" />
 
         {hook name="api.delete-form" location='api_delete_form'}
@@ -167,7 +167,7 @@
 
         {* Capture the dialog body, to pass it to the generic dialog *}
 
-    {capture "api_update_dialog"}
+    {capture name="api_update_dialog"}
         {form_field field='profile'}
             {form_hidden_fields}
             <div class="form-group {if $error}has-error{/if}">

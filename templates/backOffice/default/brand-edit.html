@@ -42,7 +42,7 @@
 
                             {hookblock name="brand.tab" brand_id=$brand_id fields="id,title,href,content"}
 
-                                {capture "brand_tab_tab"}
+                                {capture name="brand_tab_tab"}
                                     {forhook rel="brand.tab"}
                                     <li>
                                         <a href="#{$id}"
@@ -53,7 +53,7 @@
                                     {/forhook}
                                 {/capture}
 
-                                {capture "brand_tab_content"}
+                                {capture name="brand_tab_content"}
                                     {forhook rel="brand.tab"}
                                     <div class="tab-pane fade" id="{$id}">
                                         {if $href}

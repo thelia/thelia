@@ -380,7 +380,7 @@
 
 {* Delete accessory confirmation dialog *}
 
-{capture "delete_accessory_dialog"}
+{capture name="delete_accessory_dialog"}
     <input type="hidden" name="product_id" value="{$product_id}" />
     <input type="hidden" name="accessory_id" id="accessory_delete_id" value="" />
     <input type="hidden" name="accessory_category_id" id="accessory_category_delete_id" value="" />
@@ -401,7 +401,7 @@
 
 {* Delete category confirmation dialog *}
 
-{capture "delete_category_dialog"}
+{capture name="delete_category_dialog"}
     <input type="hidden" name="product_id" value="{$product_id}" />
     <input type="hidden" name="additional_category_id" id="additional_category_delete_id" value="" />
 

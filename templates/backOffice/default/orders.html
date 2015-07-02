@@ -13,197 +13,200 @@
     {assign order_page {$smarty.get.page|default:1}}
     {assign view_status {$smarty.get.status}}
     {assign status_filter {$smarty.get.status|assertType:'IntListType'}}
-<div class="orders">
+    <div class="orders">
 
-    <div id="wrapper" class="container">
+        <div id="wrapper" class="container">
 
-        <ul class="breadcrumb">
-            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
-            <li><a href="#">{intl l="Orders"}</a></li>
-        </ul>
+            <ul class="breadcrumb">
+                <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+                <li><a href="#">{intl l="Orders"}</a></li>
+            </ul>
 
-        {hook name="orders.top" location="orders_top"}
+            {hook name="orders.top" location="orders_top" }
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="general-block-decorator">
-                	<div class="table-responsive">
-	                    <table class="table table-striped table-condensed table-left-aligned">
-	                        <caption class="clearfix">
-	                           {intl l='Orders'}
-	                        </caption>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="general-block-decorator">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-condensed table-left-aligned">
+                                <caption class="clearfix">
+                                    {intl l='Orders'}
+                                </caption>
 
-                            {ifloop rel="order-list"}
+                                {ifloop rel="order-list"}
 
-	                        <thead>
-		                        <tr>
-                                    <th class="object-title">
-                                        {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='id'
-                                        reverse_order='id-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='ID'}
-                                    } </th>
+                                    <thead>
+                                    <tr>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='id'
+                                            reverse_order='id-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='ID'}"
+                                            } </th>
 
-                                    <th class="object-title">
-                                    {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='reference'
-                                        reverse_order='reference-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='Reference'}
-                                    } </th>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='reference'
+                                            reverse_order='reference-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='Reference'}"
+                                            } </th>
 
-                                    <th class="object-title">
-                                    {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='create-date'
-                                        reverse_order='create-date-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='Date & Hour'}
-                                    } </th>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='create-date'
+                                            reverse_order='create-date-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='Date & Hour'}"
+                                            } </th>
 
-                                    <th class="object-title">
-                                    {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='company'
-                                        reverse_order='company-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='Company'}
-                                    } </th>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='company'
+                                            reverse_order='company-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='Company'}"
+                                            } </th>
 
-                                    <th class="object-title">
-                                    {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='customer-name'
-                                        reverse_order='customer-name-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='Cutomer Name'}
-                                     } </th>
+                                        <th class="object-title">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='customer-name'
+                                            reverse_order='customer-name-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='Cutomer Name'}"
+                                            } </th>
 
-                                    <th class="object-title text-right">{intl l='Amount'}</th>
+                                        <th class="object-title text-right">{intl l='Amount'}</th>
 
-                                    <th class="object-title text-center">
-                                    {admin_sortable_header
-                                        current_order=$orders_order
-                                        order='status'
-                                        reverse_order='status-reverse'
-                                        path={url path='/admin/orders'}
-                                        request_parameter_name='orders_order'
-                                        label={intl l='Status'}
-                                    } </th>
+                                        <th class="object-title text-center">
+                                            {admin_sortable_header
+                                            current_order=$orders_order
+                                            order='status'
+                                            reverse_order='status-reverse'
+                                            path={url path='/admin/orders'}
+                                            request_parameter_name='orders_order'
+                                            label="{intl l='Status'}"
+                                            } </th>
 
-	                               {hook name="orders.table-header" location="orders_table_header" }
+                                        {hook name="orders.table-header" location="orders_table_header" }
 
-	                               <th class="actions">{intl l="Actions"}</th>
-		                        </tr>
-	                        </thead>
+                                        <th class="actions">{intl l="Actions"}</th>
+                                    </tr>
+                                    </thead>
 
-                            <tbody>
+                                    <tbody>
 
-                                {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page=$order_page limit=#max_displayed_orders status=$status_filter|default:'*' search_term=$search_term search_in=$search_in}
+                                    {loop type="order" name="order-list" customer="*" order=$orders_order backend_context="1" page={$order_page} limit="{#max_displayed_orders#}" status=$status_filter|default:'*' search_term=$search_term search_in="$search_in"}
 
                                     {loop type="currency" name="order-currency" id=$CURRENCY}
-                                        {$orderCurrency=$SYMBOL}
+                                    {$orderCurrency=$SYMBOL}
                                     {/loop}
 
                                     {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
-                                        {assign "orderInvoiceFirstName" $FIRSTNAME}
-                                        {assign "orderInvoiceLastName" $LASTNAME}
-                                        {assign "orderInvoiceCompany" $COMPANY}
+                                    {assign "orderInvoiceFirstName" $FIRSTNAME}
+                                    {assign "orderInvoiceLastName" $LASTNAME}
+                                    {assign "orderInvoiceCompany" $COMPANY}
                                     {/loop}
 
                                     {loop type="order-status" name="order-status" id=$STATUS}
-                                        {assign "orderStatus" $TITLE}
-                                        {assign "orderStatusCode" "order_$CODE"}
-                                        {if #$orderStatusCode# == ''}
-                                            {assign "defaultLabel" "label-default"}
-                                            {assign "orderStatusLabel" $CODE}
-                                        {else}
-                                            {assign "defaultLabel" ''}
-                                            {assign "orderStatusLabel" #$orderStatusCode#}
-                                        {/if}
+                                    {assign "orderStatus" $TITLE}
+                                    {assign "orderStatusCode" "order_$CODE"}
+                                    {if #$orderStatusCode# == ''}
+                                        {assign "defaultLabel" "label-default"}
+                                        {assign "orderStatusLabel" $CODE}
+                                    {else}
+                                        {assign "defaultLabel" ''}
+                                        {assign "orderStatusLabel" #$orderStatusCode#}
+                                    {/if}
                                     {/loop}
 
-                                    <tr>
-                                        <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$ID}</a></td>
-                                       	<td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
-                                       	<td>{format_date date=$CREATE_DATE}</td>
-                                       	<td>{$orderInvoiceCompany}</td>
-                                       	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
-                                        <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
-		                                {hook name="orders.table-row" location="orders_table_row" order_id=$ID}
-                                        <td>
-                                            <div class="btn-toolbar btn toolbar-primary">
-                                                <span class="glyphicon glyphicon-cog"></span>
-                                            </div>
-                                            <div class="toolbar-options hidden">
-                                                {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-                                                    <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <tr>
+                                            <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$ID}</a></td>
+                                            <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
+                                            <td>{format_date date=$CREATE_DATE}</td>
+                                            <td>{$orderInvoiceCompany}</td>
+                                            <td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                            <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
+                                            <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
+                                            {* *}
+                                            {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
+
+                                            <td>
+                                                <div class="btn-toolbar btn toolbar-primary">
+                                                    <span class="glyphicon glyphicon-cog"></span>
+                                                </div>
+                                                <div class="toolbar-options hidden">
+                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
+                                                        <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                     {if $STATUS !== 5}
                                                         <a class="order-cancel" title="{intl l='Cancel this order'}" href="#cancel_order_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-remove-sign"></span></a>
                                                     {/if}
-                                                {/loop}
-				                            </div>
-		                                </td>
-		                            </tr>
+                                                    {/loop}
+                                                </div>
+                                            </td>
+                                        </tr>
 
-                                {/loop}
+                                    {/loop}
 
-	                        </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="100">
-                                        {include
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <td colspan="100">
+                                            {include
                                             file = "includes/pagination.html"
 
                                             loop_ref       = "order-list"
                                             max_page_count = 10
-                                            page_url       = {url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in=$search_in}
-                                        }
-                                    </td>
-                                </tr>
-                            </tfoot>
-                            {/ifloop}
+                                            page_url       = "{url path="/admin/orders" status=$status_filter orders_order=$orders_order search_term=$search_term search_in="$search_in"}"
+                                            }
 
-                            {elseloop rel="order-list"}
-                                <tr>
-                                    <td colspan="8">
-                                        <div class="alert alert-info">
-                                            {intl l='You have no orders for the moment.'}
-                                        </div>
-                                    </td>
-                                </tr>
-                            {/elseloop}
-	                    </table>
-	                </div>
+                                        </td>
+                                    </tr>
+                                    </tfoot>
+                                {/ifloop}
+
+                                {elseloop rel="order-list"}
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="alert alert-info">
+                                                {intl l='You have no orders for the moment.'}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {/elseloop}
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {hook name="orders.bottom" location="orders_bottom"}
+
         </div>
-
-        {hook name="orders.bottom" location="orders_bottom"}
-
     </div>
-</div>
 
-{* Cancel order confirmation dialog *}
+    {* Cancel order confirmation dialog *}
 
-{capture "cancel_order_dialog"}
-    <input type="hidden" name="order_page" value="{$order_page}">
-    <input type="hidden" name="status" value="{$view_status}">
+    {capture "cancel_order_dialog"}
+        <input type="hidden" name="order_page" value="{$order_page}">
+        <input type="hidden" name="status" value="{$view_status}">
 
-    <input type="hidden" name="order_id" id="cancel_order_id" />
-    <input type="hidden" name="status_id" value="5" />
-{/capture}
+        <input type="hidden" name="order_id" id="cancel_order_id" />
+        <input type="hidden" name="status_id" value="5" />
+    {/capture}
 
-{include
+    {include
     file = "includes/generic-confirm-dialog.html"
 
     dialog_id       = "cancel_order_dialog"
@@ -213,7 +216,7 @@
     form_action         = {token_url path='/admin/order/update/status'}
     form_content        = {$smarty.capture.cancel_order_dialog nofilter}
     form_id             = "cancel-order-form"
-}
+    }
 
 {/block}
 

@@ -207,7 +207,7 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
 
-    {capture "creation_dialog"}
+    {capture name"creation_dialog"}
         {form_hidden_fields}
 
         {* Be sure to get the feature ID, even if the form could not be validated *}
@@ -262,7 +262,7 @@
 
 {* Delete value confirmation dialog *}
 
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="feature_id" value="{$feature_id}" />
     <input type="hidden" name="featureav_id" id="value_delete_id" value="" />
 {/capture}

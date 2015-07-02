@@ -155,7 +155,7 @@
     {form name="thelia.admin.config.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 
 			{form_hidden_fields}
 
@@ -222,7 +222,7 @@
 	        dialog_title = {intl l="Create a new variable"}
 	        dialog_body  = {$smarty.capture.creation_dialog nofilter}
 
-	        dialog_ok_label     = {intl l="Create this variable"}
+	        dialog_ok_label    = {intl l="Create this variable"}
 
 	        form_action        = {url path='/admin/configuration/variables/create'}
 	        form_enctype       = {form_enctype}
@@ -232,7 +232,7 @@
 
     {* Delete category confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="variable_id" id="variable_delete_id" value="" />
 
         {hook name="variable.delete-form" location="variable_delete_form"}
@@ -246,8 +246,8 @@
         dialog_title    = {intl l="Delete a variable"}
         dialog_message  = {intl l="Do you really want to delete this variable ?"}
 
-        form_action         = {token_url path='/admin/configuration/variables/delete'}
-        form_content        = {$smarty.capture.delete_dialog nofilter}
+        form_action     = {token_url path='/admin/configuration/variables/delete'}
+        form_content    = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}
 
@@ -276,7 +276,6 @@
             zis.data('original-value', field.val());
 
             zis.click(function(ev) {
-
                 if (!zis.is('.disabled')) {
                     zis.addClass('disabled');
                     field.val(zis.data('original-value'));

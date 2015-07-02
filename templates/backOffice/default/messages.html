@@ -118,7 +118,7 @@
     {form name="thelia.admin.message.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 		    {form_hidden_fields exclude="secured,success_url"}
 
             {render_form_field field="success_url" value={url path='/admin/configuration/messages/update' message_id='_ID_'}}
@@ -163,7 +163,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="message_id" id="message_delete_id" value="" />
 
         {hook name="message.delete-form" location="message_delete_form"}
@@ -185,9 +185,8 @@
 {block name="javascript-initialization"}
 <script>
     $(function() {
-
     	// Set proper message ID in delete from
-    	$('a.message-delete').click(function(ev) {
+    	$('a.message-delete').click(function(e) {
     		$('#message_delete_id').val($(this).data('id'));
      	});
 

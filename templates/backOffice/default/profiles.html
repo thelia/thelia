@@ -128,7 +128,7 @@
 {/if}
 
 {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "profile_create_dialog"}
+{capture name="profile_create_dialog"}
 
     {form_hidden_fields}
 
@@ -203,7 +203,7 @@
 
 {* -- Delete profile confirmation dialog ----------------------------------- *}
 
-{capture "profile_delete_dialog"}
+{capture name="profile_delete_dialog"}
     <input type="hidden" name="profile_id" id="profile_delete_id" value="" />
 
     {hook name="profile.delete-form" location="profile_delete_form"}

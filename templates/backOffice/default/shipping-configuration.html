@@ -111,7 +111,7 @@
     {* Adding a new Shipping zone *}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "creation_dialog"}
+    {capture name="creation_dialog"}
         {form name="thelia.admin.area.create"}
             {form_hidden_fields}
 
@@ -140,7 +140,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="area_id" id="shipping_configuration_delete_id" value="" />
 
         {hook name="shipping-configuration.delete-form" location="shipping_configuration_delete_form"}
@@ -161,7 +161,7 @@
 {block name="javascript-initialization"}
     <script>
         $(document).ready(function(){
-            $(".area-configuration-delete").click(function(e){
+            $(".area-configuration-delete").click(function() {
                 $("#shipping_configuration_delete_id").val($(this).data("id"));
             });
         });

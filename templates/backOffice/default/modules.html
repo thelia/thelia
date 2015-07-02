@@ -62,7 +62,7 @@
 
 {* Delete module confirmation dialog *}
 
-{capture "delete_module_dialog"}
+{capture name="delete_module_dialog"}
     <input type="hidden" name="module_id" id="delete_module_id" value="" />
 
     <div class="row">
@@ -141,7 +141,7 @@
     <script>
         $(document).ready(function() {
 
-            $("#module-install").on("submit", function(event) {
+            $("#module-install").on("submit", function() {
                 var $loader = $('<div class="loader"></div>');
                 $('body').append($loader);
                 $loader.show();

@@ -299,7 +299,7 @@
                                                 <td>{format_date date=$CREATE_DATE}</td>
                                                 <td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT}</td>
                                                 <td>
-                                                    <span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span>
+                                                    <span class="label label-{$orderStatusLabel}">{$orderStatus}</span>
                                                 </td>
                                                 {hook name="customer.orders-table-row" location="orders_table_row" customer_id=$customer_id}
                                             </tr>
@@ -361,7 +361,7 @@
 {form name="thelia.admin.address.create"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "address_creation_dialog"}
+    {capture name="address_creation_dialog"}
 
         {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
 
@@ -393,7 +393,7 @@
 
 	    {* Capture the dialog body, to pass it to the generic dialog *}
 
-	    {capture "address_update_dialog"}
+	    {capture name="address_update_dialog"}
 	        <input type="hidden" name="address_id" id="address_update_id" value="{$address_id}" />
 
 	        {include file='includes/customer_address_form_fields.html' customer_id=$customer_id page=$page}
@@ -420,7 +420,7 @@
 
 {* -- Confirm making an address the default --------------------------------- *}
 
-{capture "use_address_dialog"}
+{capture name="use_address_dialog"}
     <input type="hidden" name="address_id" id="address_use_id" value="" />
 
     <input type="hidden" name="customer_id" value="{$customer_id}">
@@ -440,7 +440,7 @@
 
 {* -- Delete confirmation dialog -------------------------------------------- *}
 
-{capture "delete_address_dialog"}
+{capture name="delete_address_dialog"}
     <input type="hidden" name="address_id" id="address_delete_id" value="" />
 
     <input type="hidden" name="customer_id" value="{$customer_id}">

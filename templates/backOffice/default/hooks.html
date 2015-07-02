@@ -197,7 +197,7 @@
 {form name="thelia.admin.hook.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "hook_creation_dialog"}
+    {capture name="hook_creation_dialog"}
 
         {form_hidden_fields exclude="locale,native"}
 
@@ -246,7 +246,7 @@
 
 
 {* Delete confirmation dialog *}
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="hook_id" id="hook_delete_id" value="" />
     {hook name="hook.delete-form" location="hook_delete_form"}
 {/capture}
@@ -310,7 +310,7 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
             "native": "{url path='/admin/hook/toggle-native'}",
             "activation": "{url path='/admin/hook/toggle-activation'}",
             "discover": "{url path='/admin/hooks/discover'}",
-            "discoverSave": "{url path='/admin/hooks/discover/save'}",
+            "discoverSave": "{url path='/admin/hooks/discover/save'}"
         };
 
         {literal}

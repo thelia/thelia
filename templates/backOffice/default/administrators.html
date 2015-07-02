@@ -128,7 +128,7 @@
 {/if}
 
 {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "administrator_create_dialog"}
+{capture name="administrator_create_dialog"}
 
     {form_hidden_fields}
 
@@ -232,7 +232,7 @@
 {/if}
 
 {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "administrator_update_dialog"}
+{capture name="administrator_update_dialog"}
 
     {form_hidden_fields}
 
@@ -328,7 +328,7 @@
 
 {* -- Delete administrator confirmation dialog ----------------------------------- *}
 
-{capture "administrator_delete_dialog"}
+{capture name="administrator_delete_dialog"}
     <input type="hidden" name="administrator_id" id="administrator_delete_id" value="" />
 
     {hook name="administrator.delete-form" location="administrator_delete_form"}

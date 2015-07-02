@@ -351,7 +351,7 @@
     {form name="thelia.admin.folder.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "folder_creation_dialog"}
+    {capture name="folder_creation_dialog"}
 
         {form_hidden_fields}
 
@@ -420,7 +420,7 @@
     {form name="thelia.admin.content.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "content_creation_dialog"}
+{capture name="content_creation_dialog"}
 
 {form_hidden_fields}
 
@@ -489,7 +489,7 @@
 
 {* -- Delete folder confirmation dialog ----------------------------------- *}
 
-{capture "folder_delete_dialog"}
+{capture name="folder_delete_dialog"}
     <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
 
     {hook name="folder.delete-form" location="folder_delete_form"}
@@ -509,7 +509,7 @@
 
 {* -- Delete content confirmation dialog ------------------------------------ *}
 
-{capture "content_delete_dialog"}
+{capture name="content_delete_dialog"}
     <input type="hidden" name="content_id" id="content_delete_id" value="" />
     <input type="hidden" name="folder_id" value="{$parent}" />
 
@@ -541,7 +541,6 @@
 
     <script>
         $(function() {
-
             // Set proper folder ID in delete from
             $('a.folder-delete').click(function(ev) {
                 $('#folder_delete_id').val($(this).data('id'));

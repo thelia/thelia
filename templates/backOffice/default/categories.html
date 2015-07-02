@@ -405,7 +405,7 @@
 {form name="thelia.admin.category.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "category_creation_dialog"}
+    {capture name="category_creation_dialog"}
 
         {form_hidden_fields exclude="parent,locale"}
 
@@ -459,7 +459,7 @@
 {form name="thelia.admin.product.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "product_creation_dialog"}
+    {capture name="product_creation_dialog"}
 
         {form_hidden_fields}
 
@@ -650,7 +650,7 @@
 
 {* -- Delete product confirmation dialog ------------------------------------ *}
 
-{capture "product_delete_dialog"}
+{capture name="product_delete_dialog"}
     <input type="hidden" name="product_id" id="product_delete_id" value="" />
     <input type="hidden" name="category_id" value="{$category_id}" />
     <input type="hidden" name="page" value="{$page}">
@@ -831,7 +831,7 @@
 
             function sanitizeFloat(numVal) {
                 return numVal.replace(",", ".");
-            };
+            }
 
         });
     </script>

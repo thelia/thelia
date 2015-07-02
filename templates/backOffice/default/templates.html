@@ -130,7 +130,7 @@
 {form name="thelia.admin.template.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "creation_dialog"}
+    {capture name="creation_dialog"}
         {form_hidden_fields}
 
         {form_field field='success_url'}
@@ -181,7 +181,7 @@
 
 {* Delete confirmation dialog *}
 
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="template_id" id="template_delete_id" value="" />
 
     {hook name="template.delete-form" location="template_delete_form"}
@@ -201,10 +201,8 @@
 {/block}
 
 {block name="javascript-initialization"}
-
     <script>
         $(function() {
-
             // Set proper template ID in delete from
             $('a.template-delete').click(function(ev) {
                 $('#template_delete_id').val($(this).data('id'));
