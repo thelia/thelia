@@ -237,7 +237,7 @@
             </section>
 
             {strip}
-                {capture "additional"}
+                {capture name="additional"}
                     {ifloop rel="feature_info"}
                         <ul>
                             {loop name="feature_info" type="feature" product=$ID}
@@ -257,7 +257,7 @@
             {/strip}
 
             {strip}
-                {capture "brand_info"}
+                {capture name="brand_info"}
                     {loop name="brand_info" type="brand" product=$ID limit=1}
                         <p><strong><a href="{$URL nofilter}">{$TITLE}</a></strong></p>
 

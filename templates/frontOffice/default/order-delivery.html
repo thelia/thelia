@@ -152,7 +152,7 @@
         jQuery(function($) {
             $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
 
-            $('.js-change-delivery-address').change(function(e) {
+            $('.js-change-delivery-address').change(function() {
                 if (this.checked) {
                     $('#delivery-module-list-block').load(
                         '{url path="/order/deliveryModuleList"}',
