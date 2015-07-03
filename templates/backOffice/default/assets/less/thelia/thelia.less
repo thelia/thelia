@@ -76,7 +76,7 @@
     .dropdown-menu {
         padding-top: 0;
         padding-bottom: 0;
-        border-radius: 0;
+        border-radius: @border-radius-base;
         background: @navbar-default-bg;
 
         .menu-links();
@@ -201,7 +201,7 @@ ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
     }
 
     .breadcrumb {
-        border-radius: 0;
+        border-radius: @border-radius-base;
         padding: 25px 0px 25px 30px;
         background: url("@{imgDir}/logo-light.png") left center no-repeat;
         float: left;
@@ -250,7 +250,7 @@ ul.navbar-top-menu li.dropdown:hover > ul.dropdown-menu {
 	margin: 0 auto 20px;
 	background-color: #fff;
 	border: 1px solid #e5e5e5;
-    border-radius: 5px;
+    border-radius: @border-radius-base;
 	.box-shadow(none);
 }
 
