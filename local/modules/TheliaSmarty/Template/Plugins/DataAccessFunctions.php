@@ -543,8 +543,8 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      *
      * If meta argument is specified then it will return an unique value.
      *
-     * @param $params
-     * @param $smarty
+     * @param array $params
+     * @param \Smarty $smarty
      *
      * @throws \InvalidArgumentException
      *
@@ -571,12 +571,22 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                 $out = MetaDataQuery::getVal($meta, $key, (int) $id);
             }
         } else {
-            throw new \InvalidArgumentException("key and id attributes are required in meta access function");
+            throw new \InvalidArgumentException("key and id arguments are required in meta access function");
         }
 
         self::$dataAccessCache[$cacheKey] = $out;
 
-        return $out;
+        if (!empty($params['out'])) {
+            $smarty->assign($params['out'], $out);
+
+            return $out !== null ? true : false;
+        } else {
+            if (is_array($out)) {
+                throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
+            }
+
+            return $out;
+        }
     }
 
     /**
