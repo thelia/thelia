@@ -157,13 +157,13 @@
                                 </li>
                             {else}
                                 <li>
-                                    <a href="{url path={navigate to="current"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
+                                    <a href="{url path={navigate to="current" noamp="1"} page={$product_page-1} }" title="{intl l="Previous"}" class="prev"><i class="fa fa-caret-left"></i></a>
                                 </li>
                             {/if}
 
                             {pageloop rel="product_list"}
                                 <li{if $PAGE eq $CURRENT} class="active"{/if}>
-                                    <a href="{url path={navigate to="current"} page=$PAGE }"> {$PAGE} </a>
+                                    <a href="{url path={navigate to="current" noamp="1"} page=$PAGE }"> {$PAGE} </a>
                                 </li>
                                 {if $PAGE eq $LAST}
                                     {if $CURRENT eq $LAST}
@@ -172,7 +172,7 @@
                                         </li>
                                     {else}
                                         <li>
-                                            <a href="{url path={navigate to="current"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="fa fa-caret-right"></i></a>
+                                            <a href="{url path={navigate to="current" noamp="1"} page={$NEXT} }" title="{intl l="Next"}" class="next"><i class="fa fa-caret-right"></i></a>
                                         </li>
                                     {/if}
                                 {/if}
