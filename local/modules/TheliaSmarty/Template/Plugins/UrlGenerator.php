@@ -74,9 +74,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             $mode
         );
 
-        $this->applyNoAmpAndTarget($params, $url);
-
-        return $url;
+        return $this->applyNoAmpAndTarget($params, $url);
     }
 
     /**
