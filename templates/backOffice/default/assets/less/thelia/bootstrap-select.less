@@ -14,7 +14,7 @@
         margin-bottom: 0;
 
         .btn{
-            .border-right-radius(0);
+            .border-right-radius(@border-radius-base);
         }
     }
 
@@ -112,9 +112,9 @@
     border: 0;
     padding: 0;
     margin: 0;
-    -webkit-border-radius: 0;
-       -moz-border-radius: 0;
-            border-radius: 0;
+    -webkit-border-radius: @border-radius-base;
+       -moz-border-radius: @border-radius-base;
+            border-radius: @border-radius-base;
     -webkit-box-shadow: none;
        -moz-box-shadow: none;
             box-shadow: none;

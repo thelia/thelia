@@ -5,7 +5,6 @@
 
 // Body reset
 // -------------------------
-
 body {
     background-color: #333;
     overflow-x: hidden;
@@ -19,4 +18,14 @@ body {
 
 a {
     font-weight: bold;
+
+    &:hover,
+    &:focus {
+        text-decoration: none;
+    }
+}
+
+a,
+.btn {
+    .transition(all 0.3s);
 }

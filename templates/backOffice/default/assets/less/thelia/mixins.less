@@ -19,6 +19,14 @@
                 border-top-color: @navbar-default-border;
             }
 
+            &.sidebar-search {
+                &.active,
+                &:active,
+                &:hover {
+                    border-top-color: lighten(@navbar-default-border, 10%);
+                }
+            }
+
             > a {
                 padding-top: 12px;
                 padding-bottom: 12px;

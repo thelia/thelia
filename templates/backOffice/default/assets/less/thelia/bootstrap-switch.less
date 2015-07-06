@@ -2,8 +2,7 @@
   display: inline-block;
   cursor: pointer;
   border-radius: @input-border-radius;
-  border: 1px solid;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border: 1px solid darken(@gray-lighter, 8%);
   position: relative;
   text-align: left;
   overflow: hidden;
@@ -106,8 +105,7 @@
     margin-bottom: -1px;
     z-index: 100;
     width: 34%;
-    border-left: 1px solid @btn-default-border;
-    border-right: 1px solid @btn-default-border;
+    .transition(all 0.3s);
   
     .button-variant(@btn-default-color, @btn-default-bg, @btn-default-border);
 
@@ -123,6 +121,7 @@
     text-align: center;
     z-index: 1;
     width: 33%;
+    .transition(all 0.3s);
 
     &.switch-left {
       .border-left-radius(@input-border-radius);
