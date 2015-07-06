@@ -87,10 +87,11 @@
                                 <tbody>
                                 {loop type="address" name="customer.addresses" customer="current"}
                                 <tr class="{if $DEFAULT == 1}address-primary{else}address-additional{/if}" id="customer-address-{$ID}">
-                                    <th>{if $DEFAULT === 1}
-                                            {intl l="Main Address"}
+                                    <th>
+                                        {if $DEFAULT === 1}
+                                            {$LABEL|default:$default}
+                                            <span class="label label-info   ">{intl l="Main Address"}</span>
                                         {else}
-                                            {$default={intl l='Address %nb' nb={$LOOP_COUNT}}}
                                             {$LABEL|default:$default}
                                         {/if}
                                     </th>
