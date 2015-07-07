@@ -154,8 +154,11 @@ class ModuleController extends AbstractCrudController
 
     protected function getRouteArguments($module_id = null)
     {
+        $request = $this->getRequest();
+
         return array(
-            'module_id' => $module_id === null ? $this->getRequest()->get('module_id') : $module_id,
+            'module_id' => $module_id === null ? $request->get('module_id') : $module_id,
+            'current_tab' => $request->get('current_tab', 'general'),
         );
     }
 

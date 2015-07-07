@@ -32,6 +32,8 @@
 
             <parameter key="document.brand">Thelia\Model\BrandDocument</parameter>
             <parameter key="image.brand">Thelia\Model\BrandImage</parameter>
+
+            <parameter key="image.module">Thelia\Model\ModuleImage</parameter>
         </parameter>
 
         <parameter key="import.base_url">/admin/import</parameter>

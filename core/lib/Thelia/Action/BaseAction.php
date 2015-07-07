@@ -85,7 +85,7 @@ class BaseAction
      * Toggle visibility for an object
      *
      * @param ModelCriteria               $query
-     * @param UpdateToggleVisibilityEvent $event
+     * @param ToggleVisibilityEvent $event
      *
      * @return mixed
      */
@@ -95,9 +95,7 @@ class BaseAction
             $newVisibility = !$object->getVisible();
             $object
                 ->setDispatcher($event->getDispatcher())
-
                 ->setVisible($newVisibility)
-
                 ->save()
             ;
 
