@@ -130,6 +130,9 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("IS_DEFAULT", $result->getByDefault())
                 ->set("DATE_FORMAT", $result->getDateFormat())
                 ->set("TIME_FORMAT", $result->getTimeFormat())
+                ->set("DECIMAL_SEPARATOR", $result->getDecimalSeparator())
+                ->set("THOUSANDS_SEPARATOR", $result->getThousandsSeparator())
+                ->set("DECIMAL_COUNT", $result->getDecimals())
                 ->set("POSITION", $result->getPosition())
             ;
 
