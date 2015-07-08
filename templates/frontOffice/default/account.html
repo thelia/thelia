@@ -168,7 +168,19 @@
                                     <td>{$REF}</td>
                                     <td>{format_date date=$CREATE_DATE}</td>
                                     <td>{format_number number=$TOTAL_TAXED_AMOUNT} {loop type="currency" name="order.currency" id={$CURRENCY}}{$SYMBOL}{/loop}</td>
-                                    <td>{loop type="order-status" name="order.status" id={$STATUS}}{assign "orderStatusLabel" "order_$CODE"}<span class="label label-{#$orderStatusLabel#}">{$TITLE}</span>{/loop}</td>
+                                    <td>
+                                        {loop type="order-status" name="order.status" id={$STATUS}}
+                                            {assign "orderStatusCode" "order_$CODE"}
+                                            {if #$orderStatusCode# == ''}
+                                                {assign "defaultLabel" "label-default"}
+                                                {assign "orderStatusLabel" $CODE}
+                                            {else}
+                                                {assign "defaultLabel" ''}
+                                                {assign "orderStatusLabel" #$orderStatusCode#}
+                                            {/if}
+                                            <span class="label {$defaultLabel} label-{$orderStatusLabel}">{$TITLE}</span>
+                                        {/loop}
+                                    </td>
                                     <td>
                                         <a href="{url path="/account/order/%id" id=$ID}" class="btn btn-link" data-toggle="tooltip" title="{intl l="View order %ref details" ref={$REF}}">{intl l="Order details"}</a>
                                     </td>

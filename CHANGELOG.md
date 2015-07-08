@@ -2,6 +2,7 @@
 
 - Add module image edition in backoffice
 - The language change links should now use the locale instead of the language code, e.g. http://www.yourshop/some-page?lang=fr_FR instead if http://www.yourshop/some-page?lang=fr. Backward compatibility is provided.
+- Order status added by modules have their CSS label color handled or have a default color
 
 # 2.2.0-beta1
 
@@ -17,7 +18,7 @@
 - Add order by ```weight``` and ```weight_reverse``` in  product sale elements loop
 - Add the ability to remove arguments in loops.
 - new back-office is enhanced with a group button actions and a new layout
-- Added an optionnal 'ajax-view' parameter to card add form
+- Added an optional 'ajax-view' parameter to card add form
 - Add validation groups in form from parser context
 - Feature value are not translatable
 - Allow multiple authors in module.xml file. Fixed #1459
