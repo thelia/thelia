@@ -43,9 +43,12 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('id', null),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('code'),
+            Argument::createAnyListTypeArgument('locale'),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createBooleanTypeArgument('default_only', false),
+            Argument::createBooleanTypeArgument('exclude_default', false),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -58,21 +61,29 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
     public function buildModelCriteria()
     {
-        $id      = $this->getId();
-        $exclude = $this->getExclude();
-        $default_only = $this->getDefaultOnly();
-
         $search = LangQuery::create();
 
-        if (! is_null($id)) {
-            $search->filterById($id);
+        if (null !== $id = $this->getId()) {
+            $search->filterById($id, Criteria::IN);
         }
 
-        if ($default_only) {
+        if (null !== $code = $this->getCode()) {
+            $search->filterByCode($code, Criteria::IN);
+        }
+
+        if (null !== $locale = $this->getLocale()) {
+            $search->filterByLocale($locale, Criteria::IN);
+        }
+
+        if ($this->getDefaultOnly()) {
             $search->filterByByDefault(true);
         }
 
-        if (! is_null($exclude)) {
+        if ($this->getExcludeDefault()) {
+            $search->filterByByDefault(false);
+        }
+
+        if (null !== $exclude = $this->getExclude()) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
@@ -106,6 +117,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var \Thelia\Model\Lang $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 
@@ -120,6 +132,7 @@ class Lang extends BaseLoop implements PropelSearchLoopInterface
                 ->set("TIME_FORMAT", $result->getTimeFormat())
                 ->set("POSITION", $result->getPosition())
             ;
+
             $this->addOutputFields($loopResultRow, $result);
 
             $loopResult->addRow($loopResultRow);
