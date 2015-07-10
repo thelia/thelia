@@ -946,5 +946,8 @@ return array(
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'è possibile combinare le imposte in regole fiscale e scegliere se sono applicati uno dopo l\'altro o allo stesso tempo: permette di applicare tasse su un prezzo già tassato o no.',
     'yyyy-mm-dd' => 'yyyy-mm-dd',
     'Welcome to Thelia administration !' => 'Benvenuti a Thelia amministrazione !',
-    'or' => 'o'
+    'or' => 'o',
+    'Search a module' => 'Ricerca di un modulo',
+    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Scoprite tutti i nostri moduli <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
+    'Search on Thelia Modules' => 'Ricerca sui Thelia Modules'
 );
