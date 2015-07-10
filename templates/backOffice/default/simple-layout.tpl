@@ -58,46 +58,19 @@
 
 <body class="login-page">
 
-    {hook name="main.before-topbar" location="before_topbar" }
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-static-top" role="navigation">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="{url path='/admin'}">
-                    {images file='assets/img/logo-white.png'}
-                        <img src="{$asset_url}" alt="thelia">
-                        <span></span>
-                    {/images}
-                </a>
-            </div>
-            <!-- /.navbar-header -->
-
-            <ul class="nav navbar-top-links navbar-right">
-                {hook name="main.topbar-top" }
-
-                <li>
-                    <a href="{navigate to="index"}" title="{intl l='View site'}" target="_blank"><span class="glyphicon glyphicon-eye-open"></span> {intl l="View shop"}</a>
-                </li>
-            </ul>
-            <!-- /.navbar-top-links -->
-        </div>
-
-        {hook name="main.after-topbar" location="after_topbar" }
-    </nav>
 
 
     <div class="container">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">{block name="page-title"}{/block}</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <!-- /.row -->
-
         {* -- Main page content section ----------------------------------------- *}
         {hook name="main.before-content" location="before_content"}
+
+        {images file='assets/img/logo-dark.png'}
+            <div id="logo">
+                <img src="{$asset_url}" alt="Thelia">
+            </div>
+        {/images}
+
+        <p class="text-center">{intl l="Welcome to Thelia administration !"}</p>
 
         <div class="row">
             {block name="main-content"}Put here the content of the template{/block}
@@ -110,7 +83,7 @@
 
 <footer class="footer">
     <div class="container">
-        <p>{intl l='&copy; Thelia 2013'}
+        <p class="text-center">{intl l='&copy; Thelia 2013'}
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
             - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
             - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
