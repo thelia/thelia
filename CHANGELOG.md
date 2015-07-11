@@ -1,3 +1,7 @@
+# 2.2.0-beta2
+
+- Add module image edition in backoffice
+
 # 2.2.0-beta1
 
 - Fix currency create action to set the by_default field properly.
