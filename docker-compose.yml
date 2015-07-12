@@ -1,0 +1,21 @@
+web:
+    build: ./docker/php
+    ports:
+        - "8080:80"
+    links:
+        - db:db
+    environment:
+        # see https://registry.hub.docker.com/u/jderusse/dns-gen/
+        - DOMAIN_NAME=thelia.docker
+    volumes:
+        - .:/var/www/html
+
+db:
+    image: mysql:5.5
+    ports:
+        - "3306:3306"
+
+tools:
+    build: ./docker/tools
+    volumes:
+        - .:/var/www/html
