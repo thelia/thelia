@@ -193,17 +193,20 @@
         </div>
     </div>
 
-
-    <div class="modal fade" id="cloneProductModal" tabindex="-1" aria-hidden="true">
+    {form name="thelia.admin.product.clone"}
+    <div class="modal fade{if $form_error} modal-force-show{/if}" id="cloneProductModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h3>{intl l="Clone product"}</h3>
                 </div>
-                {form name="thelia.admin.product.clone"}
-                <form method="post" action="{url path='/admin/products/clone'}" class="form-inline" role="form" {form_enctype form=$form}>
+                <form method="post" action="{url path='/admin/products/clone' product_id=$product_id}" class="form-inline" role="form" {form_enctype form=$form}>
                     <div class="modal-body">
+                        {if $form_error && $form_error_message}
+                            <div class="alert alert-danger">{$form_error_message}</div>
+                        {/if}
+
                         {form_hidden_fields form=$form}
 
                         {form_field form=$form field="productId"}
@@ -221,10 +224,10 @@
                         <button type="submit" class="btn btn-default">{intl l="OK"}</button>
                     </div>
                 </form>
-                {/form}
             </div>
         </div>
     </div>
+    {/form}
 {/block}
 
 {block name="javascript-initialization"}
