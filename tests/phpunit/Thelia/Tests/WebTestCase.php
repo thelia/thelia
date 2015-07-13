@@ -24,7 +24,7 @@ class WebTestCase extends \PHPUnit_Framework_TestCase
 {
     protected $isMultiDomainActivated;
 
-    public function setUp()
+    protected function setUp()
     {
         // We have to shut down the "One domain for each lang feature" before tests,
         // to prevent 302 redirections during the tests.
