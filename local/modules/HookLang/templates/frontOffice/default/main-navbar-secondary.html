@@ -3,7 +3,7 @@
         <a href="{url path="/login"}" class="language-label dropdown-toggle" data-toggle="dropdown">{lang attr="title"}</a>
         <ul class="dropdown-menu">
             {loop type="lang" name="lang_available" exclude="{lang attr="id"}"}
-            <li><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
+            <li><a href="{url path="{navigate to="current"}" lang={$LOCALE}}">{$TITLE}</a></li>
             {/loop}
         </ul>
     </li>

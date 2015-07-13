@@ -20,8 +20,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\HttpKernel\Exception\RedirectException;
+use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 use Thelia\Core\Translation\Translator;
+use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyQuery;
@@ -71,7 +72,7 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @inherited
+     * @inheritdoc
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true)
     {
@@ -86,7 +87,7 @@ class ParamInitMiddleware implements HttpKernelInterface
         return $this->app->handle($request, $type, $catch);
     }
 
-    protected function initParam(Request $request)
+    protected function initParam(TheliaRequest $request)
     {
         $lang = $this->detectLang($request);
 
@@ -95,16 +96,15 @@ class ParamInitMiddleware implements HttpKernelInterface
         }
 
         if ($lang) {
-            $request->getSession()
-                ->setLang($lang)
-            ;
+            $request->getSession()->setLang($lang);
         }
 
         $request->getSession()->setCurrency($this->defineCurrency($request));
+
         return null;
     }
 
-    protected function defineCurrency(Request $request)
+    protected function defineCurrency(TheliaRequest $request)
     {
         $currency = null;
         if ($request->query->has("currency")) {
@@ -128,47 +128,63 @@ class ParamInitMiddleware implements HttpKernelInterface
     }
 
     /**
-     * @param  Request                 $request
+     * @param  TheliaRequest $request
      * @return null|\Thelia\Model\Lang
      */
-    protected function detectLang(Request $request)
+    protected function detectLang(TheliaRequest $request)
     {
-        $lang = null;
-
-        //first priority => lang parameter present in request (get or post)
+        // first priority => lang parameter present in request (get or post)
         if ($request->query->has("lang")) {
-            $lang = LangQuery::create()->findOneByCode($request->query->get("lang"));
+            // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
+            // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
+            $requestedLangCodeOrLocale = $request->query->get("lang");
+
+            if (strlen($requestedLangCodeOrLocale) > 2) {
+                $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);
+            } else {
+                $lang = LangQuery::create()->findOneByCode($requestedLangCodeOrLocale);
+            }
 
             if (is_null($lang)) {
                 return Lang::getDefaultLanguage();
             }
 
-            //if each lang has its own domain, we redirect the user to the good one.
+            // if each lang has its own domain, we redirect the user to the proper one.
             if (ConfigQuery::isMultiDomainActivated()) {
-                //if lang domain is different from actuel domain, redirect to the good one
-                if (rtrim($lang->getUrl(), "/") != $request->getSchemeAndHttpHost()) {
-                    // TODO : search if http status 302 is the good one.
-                    $redirect = new RedirectResponse($lang->getUrl(), 302);
-                    return $redirect;
-                } else {
-                    //the user is actually on the good domain, nothing to change
-                    return null;
+                $domainUrl = $lang->getUrl();
+
+                if (! empty($domainUrl)) {
+                    // if lang domain is different from current domain, redirect to the proper one
+                    if (rtrim($domainUrl, "/") != $request->getSchemeAndHttpHost()) {
+                        // TODO : search if http status 302 is the good one.
+                        return new RedirectResponse($domainUrl, 302);
+                    } else {
+                        //the user is currently on the proper domain, nothing to change
+                        return null;
+                    }
                 }
+
+                Tlog::getInstance()->warning("The domain URL for language ".$lang->getTitle()." (id ".$lang->getId().") is not defined.");
+
+                return Lang::getDefaultLanguage();
+
             } else {
-                //one domain for all languages, the lang is set into session
+                // one domain for all languages, the lang has to be set into session
                 return $lang;
             }
         }
 
-        //check if lang is not defined. If not we have to search the good one.
+        // Next, check if lang is defined in the current session. If not we have to set one.
         if (null === $request->getSession()->getLang(false)) {
             if (ConfigQuery::isMultiDomainActivated()) {
-                //find lang with domain
+                // find lang with domain
                 return LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), ModelCriteria::LIKE)->findOne();
             }
 
-            //find default lang
+            // At this point, set the lang to the default one.
             return Lang::getDefaultLanguage();
         }
+
+        return null;
     }
 }

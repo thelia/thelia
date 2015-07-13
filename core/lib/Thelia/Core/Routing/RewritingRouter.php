@@ -27,7 +27,6 @@ use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Exception\UrlRewritingException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\LangQuery;
-use Thelia\Model\RewritingUrlQuery;
 use Thelia\Rewriting\RewritingResolver;
 use Thelia\Tools\URL;
 
@@ -45,7 +44,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
     protected $context;
 
     /**
-     * @var options, don't use for now but mandatory
+     * @var array options, don't use for now but mandatory
      */
     protected $options;
 
@@ -173,8 +172,23 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
                 }
             }
 
-            /* is the URL redirected ? */
+            // If we have a "lang" parameter, whe have to check if the found URL has the proper locale
+            // If it's not the case, find the rewritten URL with the requested locale, and redirect to it.
+            if (null ==! $requestedLocale = $request->get('lang')) {
+                if (null !== $requestedLang = LangQuery::create()->findOneByLocale($requestedLocale)) {
+                    if ($requestedLang->getLocale() != $rewrittenUrlData->locale) {
+                        $localizedUrl = $urlTool->retrieve(
+                            $rewrittenUrlData->view,
+                            $rewrittenUrlData->viewId,
+                            $requestedLang->getLocale()
+                        )->toString();
 
+                        $this->redirect($urlTool->absoluteUrl($localizedUrl), 301);
+                    }
+                }
+            }
+
+            /* is the URL redirected ? */
             if (null !== $rewrittenUrlData->redirectedToUrl) {
                 $this->redirect($urlTool->absoluteUrl($rewrittenUrlData->redirectedToUrl), 301);
             }
@@ -206,7 +220,7 @@ class RewritingRouter implements RouterInterface, RequestMatcherInterface
         throw new ResourceNotFoundException();
     }
 
-    protected function manageLocale(RewritingResolver $rewrittenUrlData, Request $request)
+    protected function manageLocale(RewritingResolver $rewrittenUrlData, TheliaRequest $request)
     {
         $lang = LangQuery::create()
             ->findOneByLocale($rewrittenUrlData->locale);
