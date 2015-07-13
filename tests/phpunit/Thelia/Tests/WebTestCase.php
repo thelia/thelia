@@ -13,6 +13,7 @@
 namespace Thelia\Tests;
 
 use Thelia\Core\Thelia;
+use Thelia\Model\ConfigQuery;
 
 /**
  * Class WebTestCase
@@ -21,6 +22,17 @@ use Thelia\Core\Thelia;
  */
 class WebTestCase extends \PHPUnit_Framework_TestCase
 {
+    protected $isMultiDomainActivated;
+
+    public function setUp()
+    {
+        // We have to shut down the "One domain for each lang feature" before tests,
+        // to prevent 302 redirections during the tests.
+        $this->isMultiDomainActivated = ConfigQuery::read('one_domain_foreach_lang');
+
+        ConfigQuery::write('one_domain_foreach_lang', false);
+    }
+
     /**
      * @var \Thelia\Core\Thelia
      */
@@ -51,6 +63,8 @@ class WebTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
+        ConfigQuery::write('one_domain_foreach_lang', $this->isMultiDomainActivated);
+
         if (null !== static::$kernel) {
             static::$kernel->shutdown();
         }
