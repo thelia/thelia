@@ -4,14 +4,38 @@
 
 // Base modal
 .modal {
-  form {
+    form {
         margin-bottom: 0;
     }
 }
 
 .modal-header {
+    text-transform: uppercase;
+    background: @brand-primary;
+    color: #fff;
+
     h3 {
         margin-bottom: 0;
+        color: #fff;
+    }
+
+    .close {
+        color: #fff;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: @brand-primary;
+        border: 1px solid #fff;
+        .opacity(1);
+        font-weight: lighter;
+        line-height: 1em;
+        font-size: 14px;
+
+        &:hover,
+        &:focus {
+            background: #fff;
+            color: @brand-primary;
+        }
     }
 }
 

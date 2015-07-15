@@ -1165,6 +1165,7 @@ return array(
     'Warning' => 'Attention',
     'Web site' => 'Site Web',
     'Weight<br />(Kg)' => 'Poids<br />(Kg)',
+    'Weight' => 'Poids',
     'Welcome' => 'Bienvenue',
     'Yes' => 'Oui',
     'Yesterday sales' => 'Ventes de la veille',

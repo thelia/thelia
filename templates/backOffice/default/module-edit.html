@@ -28,46 +28,56 @@
         <div class="row">
             <div class="col-md-12 general-block-decorator clearfix">
 
-                <div class="form-container">
+                <ul class="nav nav-tabs" id="tabbed-menu">
+                    <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
+                    <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="general">
+                        <div class="form-container">
 
-                {form name="thelia.admin.module.modification"}
+                            {form name="thelia.admin.module.modification"}
+                            <form method="POST" action="{url path="/admin/module/save"}" {form_enctype} >
 
-                <form method="POST" action="{url path="/admin/module/save"}" {form_enctype} >
+                                {include
+                                    file = "includes/inner-form-toolbar.html"
+                                    hide_submit_buttons = false
 
-                    {include
-                        file = "includes/inner-form-toolbar.html"
-                        hide_submit_buttons = false
+                                    page_url  = {url path="/admin/module/update/$module_id"}
+                                    close_url = {url path="/admin/modules"}
+                                }
 
-                        page_url  = {url path="/admin/module/update/$module_id"}
-                        close_url = {url path="/admin/modules"}
-                    }
+                                {* Be sure to get the module ID, even if the form could not be validated *}
+                                <input type="hidden" name="module_id" value="{$ID}" />
+                                <input type="hidden" name="current_tab" value="general" />
 
-                    {* Be sure to get the product ID, even if the form could not be validated *}
-                    <input type="hidden" name="module_id" value="{$ID}" />
+                                {form_hidden_fields}
 
-                    {form_hidden_fields}
+                                {render_form_field field="success_url" value={url path="/admin/modules"}}
 
-                    {render_form_field field="success_url" value={url path="/admin/modules"}}
+                                {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-                    {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
+                                {include file="includes/standard-description-form-fields.html"}
 
-                    {include file="includes/standard-description-form-fields.html"}
-
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="control-group">
-                                <label>&nbsp;</label>
-                                <div class="controls">
-                                    <p>{intl l='Module created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="control-group">
+                                            <label>&nbsp;</label>
+                                            <div class="controls">
+                                                <p>{intl l='Module created on %date_create. Last modification: %date_change' date_create={format_date date=$CREATE_DATE} date_change={format_date date=$UPDATE_DATE}}</p>
+                                            </div>
+                                         </div>
+                                    </div>
                                 </div>
-                             </div>
+
+                            </form>
+                            {/form}
                         </div>
                     </div>
-
-                    </form>
-                    {/form}
+                    <div class="tab-pane fade" id="images">
+                        {include file='includes/image-upload-form.html' imageType='module' parentId=$module_id}
+                    </div>
                 </div>
-
             </div>
         </div>
 
@@ -79,6 +89,46 @@
 
 </div>
 
+{/block}
+
+{block name="javascript-initialization"}
+    {javascripts file='assets/js/dropzone.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/image-upload.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    {javascripts file='assets/js/jquery-ui-1.10.3.custom.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
+    <script>
+        $(function() {
+            // Atomatic ajax tab load, if data-href is defined.
+            $('.nav-tabs a[data-href]').on('shown.bs.tab', function(ev) {
+                var $this = $(this);
+                $($this.attr('href')).load($this.data('href'), function(ev) {
+                    if($this.data('callback')) {
+                        eval($this.data('callback') + '();');
+                    }
+                });
+            });
+            $.imageUploadManager.initImageDropZone();
+            $('.use_default_rewriten_url').click(function(ev) {
+                alert("Not functionnal");
+                ev.preventDefault();
+            });
+            // Show proper tab, if defined
+            {if ! empty($current_tab)}
+            $('#tabbed-menu a[href="#{$current_tab}"]').tab('show')
+            {/if}
+            // Initialize folder select value
+            {if $module_id != 0}
+            $('#module_id').val("{$module_id}").change();
+            {/if}
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}

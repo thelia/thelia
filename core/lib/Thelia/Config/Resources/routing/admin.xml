@@ -292,7 +292,7 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::createAction</default>
     </route>
 
-    <route id="admin.products.create" path="/admin/products/clone">
+    <route id="admin.products.clone" path="/admin/products/clone">
         <default key="_controller">Thelia\Controller\Admin\ProductController::cloneAction</default>
     </route>
 

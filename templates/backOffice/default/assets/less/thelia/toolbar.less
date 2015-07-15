@@ -7,7 +7,7 @@
 .tool-container {
     background-color: #5e696d;
     background-size: 100% 100%;
-    border-radius: 6px;
+    border-radius: @border-radius-base;
     position: absolute;
 
     &.tool-top,
@@ -46,13 +46,13 @@
 .tool-top,
 .tool-bottom {
     .tool-item:first-child:hover{
-        border-top-left-radius: 6px;
-        border-bottom-left-radius: 6px;
+        border-top-left-radius: @border-radius-base;
+        border-bottom-left-radius: @border-radius-base;
     }
 
     .tool-item:last-child:hover{
-        border-top-right-radius: 6px;
-        border-bottom-right-radius: 6px;
+        border-top-right-radius: @border-radius-base;
+        border-bottom-right-radius: @border-radius-base;
     }
 }
 
@@ -62,13 +62,13 @@
 .tool-left {
     .tool-item:first-child:hover
     {
-        border-top-left-radius: 6px;
-        border-top-right-radius: 6px;
+        border-top-left-radius: @border-radius-base;
+        border-top-right-radius: @border-radius-base;
     }
 
     .tool-item:last-child:hover{
-        border-bottom-left-radius: 6px;
-        border-bottom-right-radius: 6px;
+        border-bottom-left-radius: @border-radius-base;
+        border-bottom-right-radius: @border-radius-base;
     }
 }
 

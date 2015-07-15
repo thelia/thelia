@@ -67,7 +67,8 @@
                                         <label for="delivery-address_{$ID}">
                                             <input type="radio" class="js-change-delivery-address" data-country="{$COUNTRY}" name="{$name}" value="{$ID}"{if $isDeliveryAddressChecked} checked="checked"{/if} id="delivery-address_{$ID}">
                                             {if $isDeliveryAddressChecked}
-                                                {intl l="Main Address"}
+                                                {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
+                                                <span class="label label-info   ">{intl l="Main Address"}</span>
                                             {else}
                                                 {$LABEL|default:{intl l='Address %nb' nb={$LOOP_COUNT}}}
                                             {/if}

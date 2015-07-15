@@ -29,6 +29,7 @@
 
     {block name="meta"}{/block}
 
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400italic,600,700%7COpen+Sans:300,400,400italic,600,700">
     {* -- Bootstrap CSS section --------------------------------------------- *}
 
     {block name="before-bootstrap-css"}{/block}
