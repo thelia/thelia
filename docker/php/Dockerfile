@@ -1,4 +1,5 @@
 FROM php:5.6-apache
+COPY docker-php-pecl-install /usr/local/bin/
 
 RUN apt-get update && apt-get install -y \
  libfreetype6-dev \
@@ -6,8 +7,10 @@ RUN apt-get update && apt-get install -y \
  libmcrypt-dev \
  libpng12-dev \
  libicu-dev \
-    && docker-php-ext-install intl pdo_mysql mcrypt \
+    && docker-php-ext-install intl pdo_mysql mcrypt mbstring \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd
+    && docker-php-ext-install gd \
+    && docker-php-pecl-install xdebug-2.3.3
 
-COPY config/php.ini /usr/local/etc/php
+RUN a2enmod rewrite
+COPY config/php.ini /usr/local/etc/php/

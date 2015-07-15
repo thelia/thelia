@@ -3,19 +3,21 @@ web:
     ports:
         - "8080:80"
     links:
-        - db:db
+        - mariaDB
     environment:
         # see https://registry.hub.docker.com/u/jderusse/dns-gen/
-        - DOMAIN_NAME=thelia.docker
+        #- DOMAIN_NAME=thelia.docker
     volumes:
         - .:/var/www/html
 
-db:
-    image: mysql:5.5
-    ports:
-        - "3306:3306"
+mariaDB:
+  image: mariadb
+  environment:
+    MYSQL_DATABASE: thelia
+    MYSQL_ROOT_PASSWORD: toor
 
-tools:
-    build: ./docker/tools
-    volumes:
-        - .:/var/www/html
+
+#tools:
+    #build: ./docker/tools
+    #volumes:
+    #    - .:/var/www/html
