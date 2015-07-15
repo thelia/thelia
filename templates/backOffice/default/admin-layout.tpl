@@ -155,7 +155,7 @@
         {hook name="main.before-footer" location="before_footer" }
 
         <footer class="footer">
-            <div class="container">
+            <div class="text-center">
                 <p>{intl l='&copy; Thelia 2013'}
                 - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
                 - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
