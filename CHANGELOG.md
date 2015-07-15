@@ -1,6 +1,7 @@
 # 2.2.0-beta2
 
 - Add module image edition in backoffice
+- The language change links should now use the locale instead of the language code, e.g. http://www.yourshop/some-page?lang=fr_FR instead if http://www.yourshop/some-page?lang=fr. Backward compatibility is provided.
 
 # 2.2.0-beta1
 
