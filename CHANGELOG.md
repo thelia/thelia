@@ -1,6 +1,7 @@
 # 2.2.0-beta2
 
 - Add module image edition in backoffice
+- Fix form serialization in session that contain uploaded files
 
 # 2.2.0-beta1
 
