@@ -1249,6 +1249,6 @@ return array(
     'Welcome to Thelia administration !' => 'Bienvenue sur l\'administration de Thelia !',
     'or' => 'ou',
     'Search a module' => 'Rechercher un module',
-    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Découvez tous nos modules sur <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
+    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Découvrez tous nos modules sur <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
     'Search on Thelia Modules' => 'Rechercher sur Thelia Modules'
 );
