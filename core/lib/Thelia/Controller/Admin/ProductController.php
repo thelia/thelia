@@ -1849,7 +1849,14 @@ class ProductController extends AbstractSeoCrudController
                 array('product_id' => $productCloneEvent->getClonedProduct()->getId())
             );
         } catch (FormValidationException $e) {
-            throw new \Exception($this->createStandardFormValidationErrorMessage($e));
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("Product clone"),
+                $e->getMessage(),
+                $cloneProductForm,
+                $e
+            );
+
+            return $this->redirectToEditionTemplate();
         }
     }
 }
