@@ -121,20 +121,26 @@
 
                                     {loop type="order-status" name="order-status" id=$STATUS}
                                         {assign "orderStatus" $TITLE}
-                                        {assign "orderStatusLabel" "order_$CODE"}
+                                        {assign "orderStatusCode" "order_$CODE"}
+                                        {if #$orderStatusCode# == ''}
+                                            {assign "defaultLabel" "label-default"}
+                                            {assign "orderStatusLabel" $CODE}
+                                        {else}
+                                            {assign "defaultLabel" ''}
+                                            {assign "orderStatusLabel" #$orderStatusCode#}
+                                        {/if}
                                     {/loop}
 
-		                            <tr>
-
+                                    <tr>
                                         <td><a href="{url path="/admin/order/update/%id" id=$ID}">{$ID}</a></td>
-		                               	<td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
-		                               	<td>{format_date date=$CREATE_DATE}</td>
-		                               	<td>{$orderInvoiceCompany}</td>
-		                               	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
-		                               	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
-		                               	<td class="text-center"><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
+                                       	<td><a href="{url path="/admin/order/update/%id" id=$ID}">{$REF}</a></td>
+                                       	<td>{format_date date=$CREATE_DATE}</td>
+                                       	<td>{$orderInvoiceCompany}</td>
+                                       	<td><a href="{url path='/admin/customer/update' customer_id=$CUSTOMER}">{$orderInvoiceFirstName|ucwords} {$orderInvoiceLastName|upper}</a></td>
+                                       	<td class="text-right">{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</td>
+                                        <td class="text-center"><span class="label {$defaultLabel} label-{$orderStatusLabel}">{$orderStatus}</span></td>
                                         {* *}
-		                                {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
+                                        {hook name="orders.table-row" location="orders_table_row" order_id={$ID} }
 
                                         <td>
                                             <div class="btn-toolbar btn toolbar-primary">
