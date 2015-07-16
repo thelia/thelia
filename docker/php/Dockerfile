@@ -18,3 +18,4 @@ RUN apt-get update && apt-get install -y \
 RUN a2enmod rewrite
 RUN usermod -u 1000 www-data
 COPY config/php.ini /usr/local/etc/php/
+COPY config/vhost/vhost.conf /etc/apache2/sites-enabled/
