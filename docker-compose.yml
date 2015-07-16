@@ -10,14 +10,20 @@ web:
     volumes:
         - .:/var/www/html
 
+phpmyadmin:
+  image: corbinu/docker-phpmyadmin
+  ports:
+    - "8081:80"
+  environment:
+    MYSQL_ROOT_UNSERNAME: root
+    MYSQL_ROOT_PASSWORD: toor
+    MYSQL_PORT_3306_TCP_ADDR: maria
+    MYSQL_PORT_3306_TCP_PORT: 3306
+  links:
+    - mariaDB:maria
+
 mariaDB:
   image: mariadb
   environment:
     MYSQL_DATABASE: thelia
     MYSQL_ROOT_PASSWORD: toor
-
-
-#tools:
-    #build: ./docker/tools
-    #volumes:
-    #    - .:/var/www/html

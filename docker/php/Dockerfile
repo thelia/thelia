@@ -7,10 +7,14 @@ RUN apt-get update && apt-get install -y \
  libmcrypt-dev \
  libpng12-dev \
  libicu-dev \
-    && docker-php-ext-install intl pdo_mysql mcrypt mbstring \
+ git \
+ zip \
+ libzip2 \
+    && docker-php-ext-install intl pdo_mysql mcrypt mbstring zip \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install gd \
     && docker-php-pecl-install xdebug-2.3.3
 
 RUN a2enmod rewrite
+RUN usermod -u 1000 www-data
 COPY config/php.ini /usr/local/etc/php/
