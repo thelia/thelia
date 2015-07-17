@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
  libicu-dev \
  git \
  zip \
- libzip2 \
+ libzip-dev \
     && docker-php-ext-install intl pdo_mysql mcrypt mbstring zip \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install gd \
