@@ -1250,5 +1250,6 @@ return array(
     'or' => 'or',
     'Search a module' => 'Search a module',
     'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !',
-    'Search on Thelia Modules' => 'Search on Thelia Modules'
+    'Search on Thelia Modules' => 'Search on Thelia Modules',
+    'Follow us' => 'Follow us'
 );

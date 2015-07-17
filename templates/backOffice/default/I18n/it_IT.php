@@ -949,5 +949,6 @@ return array(
     'or' => 'o',
     'Search a module' => 'Ricerca di un modulo',
     'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Scoprite tutti i nostri moduli <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
-    'Search on Thelia Modules' => 'Ricerca sui Thelia Modules'
+    'Search on Thelia Modules' => 'Ricerca sui Thelia Modules',
+    'Follow us' => 'Seguici'
 );
