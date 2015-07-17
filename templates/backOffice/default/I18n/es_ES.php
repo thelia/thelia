@@ -714,5 +714,4 @@ return array(
     'Search a module' => 'Buscar un módulo',
     'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Descubra todos nuestros módulos sobre <a href=\'http://thelia.net/modules\'>Thelia Modules</a> !',
     'Search on Thelia Modules' => 'Buscar en Thelia Modules',
-    'Follow us' => 'Síguenos'
 );

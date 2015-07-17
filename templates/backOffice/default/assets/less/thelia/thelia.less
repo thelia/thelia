@@ -602,13 +602,27 @@ ul.document-list {
     }
 }
 
+footer {
+    position: relative;
+}
+
 #follow-us {
+    text-align: center;
+
+    @media (min-width: @screen-sm-max) {
+        position: absolute;
+        right: 30px;
+        top: 30px;
+    }
+
     [class^="icon-"], [class*=" icon-"] {
         position: relative;
         top: 0;
     }
 
     a {
+        font-size: 20px;
+
         &:hover,
         &:focus {
             color: @text-color;

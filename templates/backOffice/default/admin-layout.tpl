@@ -165,6 +165,23 @@
                 {hook name="main.in-footer" location="in_footer" }
 
             </div>
+            <ul id="follow-us" class="list-unstyled list-inline">
+                <li>
+                    <a href="https://twitter.com/theliaecommerce" target="_blank">
+                        <span class="icon-twitter"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/theliaecommerce" target="_blank">
+                        <span class="icon-facebook"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://github.com/thelia/thelia" target="_blank">
+                        <span class="icon-github"></span>
+                    </a>
+                </li>
+            </ul>
         </footer>
 
         {hook name="main.after-footer" location="after_footer" }
