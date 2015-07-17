@@ -1246,4 +1246,9 @@ return array(
     'version' => 'Version',
     'warning' => 'warning',
     'you can combine taxes in tax rules and chose if they are applied one after the other or at the same time : it allows to apply taxes on an already taxed price or not.' => 'You can build tax rules where the taxes are applied on the sole product price, and tax rules where a tax is applied on the result of a previous tax calculation.',
+    'Welcome to Thelia administration !' => 'Welcome to Thelia administration !',
+    'or' => 'or',
+    'Search a module' => 'Search a module',
+    'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !' => 'Discover all our modules on <a href=\'http://thelia.net/modules\' target=\'_blank\'>Thelia Modules</a> !',
+    'Search on Thelia Modules' => 'Search on Thelia Modules',
 );

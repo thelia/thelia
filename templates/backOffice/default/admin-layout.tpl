@@ -155,7 +155,7 @@
         {hook name="main.before-footer" location="before_footer" }
 
         <footer class="footer">
-            <div class="container">
+            <div class="text-center">
                 <p>{intl l='&copy; Thelia 2013'}
                 - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
                 - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
@@ -165,6 +165,23 @@
                 {hook name="main.in-footer" location="in_footer" }
 
             </div>
+            <ul id="follow-us" class="list-unstyled list-inline">
+                <li>
+                    <a href="https://twitter.com/theliaecommerce" target="_blank">
+                        <span class="icon-twitter"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.facebook.com/theliaecommerce" target="_blank">
+                        <span class="icon-facebook"></span>
+                    </a>
+                </li>
+                <li>
+                    <a href="https://github.com/thelia/thelia" target="_blank">
+                        <span class="icon-github"></span>
+                    </a>
+                </li>
+            </ul>
         </footer>
 
         {hook name="main.after-footer" location="after_footer" }

@@ -54,7 +54,8 @@
             $btn.toolbar({
                 event: event,
                 content: $content,
-                style: 'info'
+                style: 'info',
+                position: 'right'
             });
 
             $('a', '.tool-items').on('click', function(){
