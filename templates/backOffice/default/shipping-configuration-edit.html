@@ -28,7 +28,7 @@
                 <div class="general-block-decorator">
 
                     <div class="col-md-12 title title-without-tabs">
-                        {intl l='Shipping zone "%title"' title={$NAME}}
+                        {intl l='Shipping zone "%title"' title=$NAME}
                     </div>
 
                     <div class="form-container">
@@ -58,7 +58,7 @@
 
                                         {custom_render_form_field field='name'}
                                             <div class="input-group">
-                                                <input type="text" {form_field_attributes field="name" value={$NAME}}>
+                                                <input type="text" {form_field_attributes field="name" value={$NAME}} />
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-primary" type="button">{intl l='Update'}</button>
                                                 </span>
@@ -130,7 +130,7 @@
                                                     </td>
                                                 {/elseloop}
                                             </tbody>
-                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id={$area_id} }
+                                            {hook name="shipping-configuration.edit" location="shipping-configuration-edit" area_id=$area_id}
                                         </table>
 
                                         {ifloop rel="country-area"}
@@ -162,11 +162,11 @@
 
     {* Delete related content confirmation dialog *}
 
-    {capture "delete_country_dialog"}
+    {capture name="delete_country_dialog"}
         <input type="hidden" name="area_id" value="{$area_id}">
         <input type="hidden" name="country_id" id="delete-country-id" value="">
 
-        {hook name="shipping-configuration.country-delete-form" location="shipping_configuration_country_delete_form" }
+        {hook name="shipping-configuration.country-delete-form" location="shipping_configuration_country_delete_form"}
     {/capture}
 
     {include
@@ -213,5 +213,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" area_id={$area_id} }
+    {hook name="shipping-configuration.edit-js" location="shipping-configuration-edit-js" area_id=$area_id}
 {/block}

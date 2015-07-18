@@ -10,7 +10,7 @@
 	    <div class="input-group">
 	        <select required="required" name="attribute_id" id="attribute_id" class="form-control">
 		        <option value="">{intl l='Select an attribute...'}</option>
-		        {loop name="free_attributes" type="attribute" exclude_template="$template_id" backend_context="1" lang="$edit_language_id"}
+		        {loop name="free_attributes" type="attribute" exclude_template=$template_id backend_context=1 lang=$edit_language_id}
 		            <option value="{$ID}">{$TITLE}</option>
 		        {/loop}
 		    </select>
@@ -38,14 +38,14 @@
 
             <th class="text-center">{intl l='Position'}</th>
 
-            {hook name="template.attributes-table-header" location="template_attributes_table_header" }
+            {hook name="template.attributes-table-header" location="template_attributes_table_header"}
 
             <th class="actions">{intl l="Actions"}</th>
         </tr>
     </thead>
 
     <tbody>
-        {loop name="assigned_attributes" type="attribute" template="$template_id" backend_context="1" lang="$edit_language_id"}
+        {loop name="assigned_attributes" type="attribute" template=$template_id backend_context=1 lang=$edit_language_id}
         <tr>
             <td>{$ID}</td>
 
@@ -63,7 +63,7 @@
              }
             </td>
 
-            {hook name="template.attributes-table-row" location="template_attributes_table_row" }
+            {hook name="template.attributes-table-row" location="template_attributes_table_row"}
 
             <td class="actions">
                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
@@ -89,7 +89,7 @@
 </div>
 {* Delete value confirmation dialog *}
 
-{capture "delete_attribute_dialog"}
+{capture name="delete_attribute_dialog"}
     <input type="hidden" name="template_id" value="{$template_id}" />
     <input type="hidden" name="attribute_id" id="attribute_delete_id" value="" />
 {/capture}

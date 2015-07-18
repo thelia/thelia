@@ -2,7 +2,7 @@
 
 {* Breadcrumb *}
 {block name='no-return-functions' append}
-    {$breadcrumbs = [['title' => {intl l="Newsletter"}, 'url'=>{url path="/newsletter"}]]}
+    {$breadcrumbs = [['title' => {intl l="Newsletter"}, 'url' => {url path="/newsletter"}]]}
 {/block}
 
 {block name="main-content"}
@@ -64,7 +64,6 @@
         </article>
     </div>
 {/block}
-
 
 {block name="stylesheet"}
     {hook name="newsletter.stylesheet"}

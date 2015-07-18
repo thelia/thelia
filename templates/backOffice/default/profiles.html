@@ -22,7 +22,7 @@
             </ul>
         </div>
 
-        {hook name="profiles.top" location="profiles_top" }
+        {hook name="profiles.top" location="profiles_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -113,7 +113,7 @@
             </div>
         </div>
 
-        {hook name="profiles.bottom" location="profiles_bottom" }
+        {hook name="profiles.bottom" location="profiles_bottom"}
 
     </div>
 </div>
@@ -128,7 +128,7 @@
 {/if}
 
 {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "profile_create_dialog"}
+{capture name="profile_create_dialog"}
 
     {form_hidden_fields}
 
@@ -181,7 +181,7 @@
             <input type="text" id="{$label_attr.for}" name="{$name}" title="{intl l='Postscriptum'}" placeholder="{intl l='Postscriptum'}" class="form-control" value="{if $form_error}{$value}{/if}">
         </div>
     {/form_field}
-    {hook name="profile.create-form" location="profile_create_form" }
+    {hook name="profile.create-form" location="profile_create_form"}
 {/capture}
 
     {include
@@ -203,10 +203,10 @@
 
 {* -- Delete profile confirmation dialog ----------------------------------- *}
 
-{capture "profile_delete_dialog"}
+{capture name="profile_delete_dialog"}
     <input type="hidden" name="profile_id" id="profile_delete_id" value="" />
 
-    {hook name="profile.delete-form" location="profile_delete_form" }
+    {hook name="profile.delete-form" location="profile_delete_form"}
 
 {/capture}
 
@@ -253,6 +253,6 @@ jQuery(function($) {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="profiles.js" location="profiles-js" }
-    {hook name="wysiwyg.js" location="wysiwyg-profiles-js" }
+    {hook name="profiles.js" location="profiles-js"}
+    {hook name="wysiwyg.js" location="wysiwyg-profiles-js"}
 {/block}

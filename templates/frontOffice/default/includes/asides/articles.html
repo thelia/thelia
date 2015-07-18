@@ -8,7 +8,7 @@
     <div class="block-content">
         <nav class="nav-categories">
             <ul id="category" class="accordion">
-                {loop name="blog.article"  type="content" current_folder="yes" exclude="{content attr="id"}"}
+                {loop name="blog.article"  type="content" current_folder="yes" exclude={content attr="id"}}
                     <li><a href="{$URL nofilter}">{$TITLE}</a></li>
                 {/loop}
             </ul>

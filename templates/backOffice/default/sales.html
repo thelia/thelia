@@ -20,7 +20,7 @@
                 <li><a href="{url path='/admin/sales'}">{intl l="Sales management"}</a></li>
             </ul>
 
-            {hook name="sales.top" location="sales_top" }
+            {hook name="sales.top" location="sales_top"}
 
             <div class="row">
                 <div class="col-md-12">
@@ -51,7 +51,7 @@
                                             order='id'
                                             reverse_order='id-reverse'
                                             path='/admin/sales'
-                                            label="{intl l='ID'}"
+                                            label={intl l='ID'}
                                             }
                                         </th>
 
@@ -61,7 +61,7 @@
                                             order='alpha'
                                             reverse_order='alpha-reverse'
                                             path='/admin/sales'
-                                            label="{intl l='Name'}"
+                                            label={intl l='Name'}
                                             }
                                         </th>
 
@@ -71,7 +71,7 @@
                                             order='active'
                                             reverse_order='active-reverse'
                                             path={url path='/admin/sales'}
-                                            label="{intl l='Active'}"
+                                            label={intl l='Active'}
                                             }
                                         </th>
 
@@ -81,7 +81,7 @@
                                             order='start-date'
                                             reverse_order='start-date-reverse'
                                             path={url path='/admin/sales'}
-                                            label="{intl l='Start Date'}"
+                                            label={intl l='Start Date'}
                                             }
                                         </th>
 
@@ -91,11 +91,11 @@
                                             order='end-date'
                                             reverse_order='end-date-reverse'
                                             path={url path='/admin/sales'}
-                                            label="{intl l='End Date'}"
+                                            label={intl l='End Date'}
                                             }
                                         </th>
 
-                                        {hook name="sales.table-header" location="sales_table_header" }
+                                        {hook name="sales.table-header" location="sales_table_header"}
 
                                         <th class="actions">{intl l='Actions'}</th>
                                     </tr>
@@ -145,7 +145,7 @@
                                                 {/if}
                                             </td>
 
-                                            {hook name="sales.table-row" location="sales_table_row" sale_id={$ID} }
+                                            {hook name="sales.table-row" location="sales_table_row" sale_id=$ID}
 
                                             <td class="actions">
                                                 <div class="btn-toolbar btn toolbar-primary">
@@ -183,7 +183,7 @@
                 </div>
             </div>
 
-            {hook name="sales.bottom" location="sales_bottom" }
+            {hook name="sales.bottom" location="sales_bottom"}
 
         </div>
     </div>
@@ -194,7 +194,7 @@
     {form name="thelia.admin.sale.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 			{form_hidden_fields}
 
             {loop type="lang" name="default-lang" default_only="1"}
@@ -229,7 +229,7 @@
                 {/loop}
             {/custom_render_form_field}
 
-            {hook name="sale.create-form" location="sale_create_form" }
+            {hook name="sale.create-form" location="sale_create_form"}
 
         {/capture}
 
@@ -251,10 +251,10 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="sale_id" id="sale_delete_id" value="" />
 
-        {hook name="sale.delete-form" location="sale_delete_form" }
+        {hook name="sale.delete-form" location="sale_delete_form"}
 
     {/capture}
 
@@ -272,16 +272,15 @@
     {* Delete confirmation dialog *}
 
     {include
-    file = "includes/generic-confirm-dialog.html"
+        file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "confirm_sale_status_reset"
-    dialog_title    = {intl l="Reset sale status for all products"}
-    dialog_message  = {intl l="This will reset the sale status of all products, and disable all active sales. Dou you really want to continue ?"}
+        dialog_id       = "confirm_sale_status_reset"
+        dialog_title    = {intl l="Reset sale status for all products"}
+        dialog_message  = {intl l="This will reset the sale status of all products, and disable all active sales. Dou you really want to continue ?"}
 
-    form_action         = {url path='/admin/sales/reset'}
-    form_content        = ''
-}
-
+        form_action         = {url path='/admin/sales/reset'}
+        form_content        = ''
+    }
 
 {/block}
 
@@ -323,7 +322,6 @@
     </script>
 {/block}
 
-
 {block name="javascript-last-call"}
-    {hook name="sales.js" location="sales-js" }
+    {hook name="sales.js" location="sales-js"}
 {/block}

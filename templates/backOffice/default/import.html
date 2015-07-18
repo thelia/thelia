@@ -31,7 +31,7 @@
                 </ul>
             </nav>
 
-            {hook name="imports.top" location="imports-top" }
+            {hook name="imports.top" location="imports-top"}
 
             {loop name="import-category" type="import-category" order=$category_order}
             {ifloop rel="import-categ-list"}
@@ -106,7 +106,7 @@
                                                 </td>
                                             </tr>
                                         {/loop}
-                                        {hook name="imports.row" category=$ID }
+                                        {hook name="imports.row" category=$ID}
                                         </tbody>
                                     </table>
                                 </div>
@@ -123,7 +123,7 @@
                 </div>
             {/elseloop}
 
-            {hook name="imports.bottom" location="imports-bottom" }
+            {hook name="imports.bottom" location="imports-bottom"}
 
         </div>
     </div>
@@ -199,5 +199,5 @@
             });
         });
     </script>
-    {hook name="imports.js" location="imports-js" }
+    {hook name="imports.js" location="imports-js"}
 {/block}

@@ -88,7 +88,7 @@
                         {custom_render_form_field field='virtual_document_id'}
                         <select {form_field_attributes field='virtual_document_id' extra_class='document-selector'} data-pse="{$PRODUCT_SALE_ELEMENT}" data-product="{$ID}">
                             <option value="0">{intl l="No document"}</option>
-                            {loop name="virtual-documents" type="document" product=$ID visible="0" }
+                            {loop name="virtual-documents" type="document" product=$ID visible="0"}
                             <option value="{$ID}" {if $value == $ID}selected="selected"{/if}>{$TITLE} ({$DOCUMENT_FILE})</option>
                             {/loop}
                         </select>

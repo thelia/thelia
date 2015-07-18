@@ -14,13 +14,13 @@
 
     <div id="wrapper" class="container">
 
-        {loop name="message_edit" type="message" secured="*" id="$message_id" backend_context="1" lang="$edit_language_id"}
+        {loop name="message_edit" type="message" secured="*" id=$message_id backend_context="1" lang=$edit_language_id}
 
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/messages'}">{intl l="Mailing templates"}</a></li>
-            <li>{intl l='Editing mailing template "%name"' name={$NAME}}</li>
+            <li>{intl l='Editing mailing template "%name"' name=$NAME}</li>
         </ul>
 
         {hook name="message-edit.top" message_id=$message_id}
@@ -30,7 +30,7 @@
 				<div class="row">
                     <div class="col-md-12 ">
                         <div class="title">
-                            {intl l='Edit mailing template "%name"' name={$NAME}}
+                            {intl l='Edit mailing template "%name"' name=$NAME}
                         </div>
 
                         <ul class="nav nav-tabs" id="tabbed-menu">
@@ -54,7 +54,7 @@
                                             {form_hidden_fields exclude="success_url,locale"}
 
                                             {render_form_field field='success_url' value="{url path='/admin/configuration/messages'}"}
-                                            {render_form_field field='locale' value="{$edit_language_locale}"}
+                                            {render_form_field field='locale' value=$edit_language_locale}
 
                                             {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
@@ -243,7 +243,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="alert alert-error">
-                    {intl l="Sorry, message ID=%id was not found." id={$message_id}}
+                    {intl l="Sorry, message ID=%id was not found." id=$message_id}
                 </div>
             </div>
         </div>
@@ -337,5 +337,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="message.edit-js" location="message-edit-js" message_id={$message_id} }
+    {hook name="message.edit-js" location="message-edit-js" message_id=$message_id}
 {/block}

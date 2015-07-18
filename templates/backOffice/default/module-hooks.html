@@ -137,7 +137,7 @@
                         </div>
                     </div>
 
-                    {include file="includes/module-hook-block.html" hook_id="{$ID}" by_module="{$BY_MODULE}"}
+                    {include file="includes/module-hook-block.html" hook_id=$ID by_module=$BY_MODULE}
 
                 </div>
                 {/loop}
@@ -162,7 +162,7 @@
 {form name="thelia.admin.module-hook.creation"}
 
 {* Capture the dialog body, to pass it to the generic dialog *}
-{capture "module_hook_creation_dialog"}
+{capture name="module_hook_creation_dialog"}
 
     {form_hidden_fields}
 
@@ -185,7 +185,7 @@
         </select>
     {/custom_render_form_field}
 
-    {hook name="module-hook.create-form" location="module_hook_create_form" }
+    {hook name="module-hook.create-form" location="module_hook_create_form"}
 
 {/capture}
 
@@ -208,9 +208,9 @@
 
 {* Delete module confirmation dialog *}
 
-{capture "delete_module_dialog"}
+{capture name="delete_module_dialog"}
     <input type="hidden" name="module_hook_id" id="delete_module_hook_id" value="" />
-    {hook name="module-hook.delete-form" location="module_hook_delete_form" }
+    {hook name="module-hook.delete-form" location="module_hook_delete_form"}
 {/capture}
 
 {include
@@ -250,7 +250,7 @@
     {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
         <script src="{$asset_url}"></script>
     {/javascripts}
-
+    {literal}
     <script>
         $(document).ready(function() {
            var url_management = "{url path="/admin/module-hooks/toggle-activation/"}";
@@ -430,8 +430,9 @@
 
         {include file="includes/hook-edition.js.inc"}
     </script>
+    {/literal}
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="module-hook.js" location="module-hook-js" }
+    {hook name="module-hook.js" location="module-hook-js"}
 {/block}

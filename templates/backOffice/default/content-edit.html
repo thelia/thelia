@@ -18,11 +18,11 @@
             {hook name="content-edit.top" content_id=$content_id}
 
             <div class="row">
-                {loop name="content_edit" type="content" visible="*" id="{$content_id}" backend_context="1" lang="$edit_language_id"}
+                {loop name="content_edit" type="content" visible="*" id=$content_id backend_context="1" lang=$edit_language_id}
                     <div class="col-md-12 general-block-decorator">
                         <div class="row">
                             <div class="col-md-7 title">
-                                {intl l='Edit content %title' title={$TITLE}}
+                                {intl l='Edit content %title' title=$TITLE}
                             </div>
 
                             <div class="col-md-5 actions">
@@ -46,9 +46,9 @@
                         <div class="row">
                             <div class="col-md-12">
 
-                                {hookblock name="content.tab" id="{$content_id}" fields="id,title,href,content"}
+                                {hookblock name="content.tab" id=$content_id fields="id,title,href,content"}
 
-                                    {capture "content_tab_tab"}
+                                    {capture name="content_tab_tab"}
                                         {forhook rel="content.tab"}
                                         <li>
                                             <a href="#{$id}"
@@ -59,7 +59,7 @@
                                         {/forhook}
                                     {/capture}
 
-                                    {capture "content_tab_content"}
+                                    {capture name="content_tab_content"}
                                         {forhook rel="content.tab"}
                                         <div class="tab-pane fade" id="{$id}">
                                             {if $href}
@@ -75,8 +75,7 @@
                                 {/hookblock}
 
                                 <ul class="nav nav-tabs" id="tabbed-menu">
-                                    <li class="active">
-                                        <a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
+                                    <li class="active"><a href="#general" data-toggle="tab">{intl l="General description"}</a></li>
                                     <li><a href="#seo" data-toggle="tab">{intl l="SEO"}</a></li>
                                     <li><a href="#association" data-toggle="tab">{intl l="Associations"}</a></li>
                                     <li><a href="#images" data-toggle="tab">{intl l="Images"}</a></li>
@@ -160,7 +159,7 @@
                                                     hide_submit_buttons = false
                                                     hide_flags = true
 
-                                                    close_url="{url path='/admin/folders' parent=$DEFAULT_FOLDER}"
+                                                    close_url={url path='/admin/folders' parent=$DEFAULT_FOLDER}
                                                     }
 
                                                     <small>{intl l='Folder created on %date_create. Last modification: %date_change' date_create="{format_date date=$CREATE_DATE}" date_change="{format_date date=$UPDATE_DATE}"}</small>
@@ -200,13 +199,13 @@
                                             {include
                                             file = "includes/inner-form-toolbar.html"
                                             hide_submit_buttons = true
-                                            page_url  = {$pageUrl}
-                                            close_url = {$closeUrl}
+                                            page_url  = $pageUrl
+                                            close_url = $closeUrl
                                             current_tab = "modules"
                                             }
                                         </div>
                                         {* ugly fix : {hook name="content.tab-content" id="{$content_id}" view="content"} *}
-                                        {include file="includes/module-tab-content.html" hook="content.tab-content" location="content-edit" id="{$content_id}" view="content"}
+                                        {include file="includes/module-tab-content.html" hook="content.tab-content" location="content-edit" id=$content_id view="content"}
                                     </div>
                                 </div>
                             </div>
@@ -221,25 +220,23 @@
     </div>
     {* Delete category confirmation dialog *}
 
-    {capture "delete_folder_dialog"}
+    {capture name="delete_folder_dialog"}
         <input type="hidden" name="content_id" value="{$content_id}"/>
         <input type="hidden" name="additional_folder_id" id="additional_folder_delete_id" value=""/>
         <input type="hidden" name="current_tab" value="association"/>
     {/capture}
 
     {include
-    file = "includes/generic-confirm-dialog.html"
+        file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_folder_dialog"
-    dialog_title    = {intl l="Remove associated folder"}
-    dialog_message  = {intl l="Do you really want to remove the content from this folder ?"}
+        dialog_id       = "delete_folder_dialog"
+        dialog_title    = {intl l="Remove associated folder"}
+        dialog_message  = {intl l="Do you really want to remove the content from this folder ?"}
 
-form_action     = {token_url path='/admin/content/folder/delete'}
-form_content    = {$smarty.capture.delete_folder_dialog nofilter}
-}
+        form_action     = {token_url path='/admin/content/folder/delete'}
+        form_content    = {$smarty.capture.delete_folder_dialog nofilter}
+    }
 {/block}
-
-
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/dropzone.js'}
@@ -329,7 +326,7 @@ form_content    = {$smarty.capture.delete_folder_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="content.edit-js" location="content-edit-js" content_id={$content_id} }
+    {hook name="content.edit-js" location="content-edit-js" content_id=$content_id}
 
-    {hook name="wysiwyg.js" location="wysiwyg-content-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-content-edit-js"}
 {/block}

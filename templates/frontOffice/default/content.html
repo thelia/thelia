@@ -10,8 +10,8 @@
 {* Page Title *}
 {block name='no-return-functions' append}
     {if {$content_id}}
-        {loop name="content.seo.title" type="content" id={$content_id} limit="1"}
-            {$page_title = {$META_TITLE}}
+        {loop name="content.seo.title" type="content" id=$content_id limit=1}
+            {$page_title = $META_TITLE}
         {/loop}
     {/if}
 {/block}
@@ -19,7 +19,7 @@
 {* Meta *}
 {block name="meta"}
     {if $content_id}
-        {loop name="content.seo.meta" type="content" id=$content_id limit="1"}
+        {loop name="content.seo.meta" type="content" id=$content_id limit=1}
             {include file="includes/meta-seo.html"}
         {/loop}
     {/if}
@@ -29,25 +29,25 @@
 {block name='no-return-functions' append}
     {if $content_id}
         {$breadcrumbs = []}
-        {loop type="content" name="content-breadcrumb" id=$content_id limit="1"}
-            {loop name="folder_path" type="folder-path" folder="{$DEFAULT_FOLDER}"}
-                {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+        {loop type="content" name="content-breadcrumb" id=$content_id limit=1}
+            {loop name="folder_path" type="folder-path" folder=$DEFAULT_FOLDER}
+                {$breadcrumbs[] = ['title' => {$TITLE}, 'url' => {$URL nofilter}]}
             {/loop}
-            {$breadcrumbs[] = ['title' => {$TITLE}, 'url'=> {$URL nofilter}]}
+            {$breadcrumbs[] = ['title' => {$TITLE}, 'url' => {$URL nofilter}]}
         {/loop}
     {/if}
 {/block}
 
 {block name="main-content"}
 {if $content_id}
-    {hook name="content.top" content="$content_id"}
+    {hook name="content.top" content=$content_id}
     <div class="main row">
-        {hook name="content.main-top" content="$content_id"}
+        {hook name="content.main-top" content=$content_id}
         <article id="content-main" class="col-main col-md-9 col-md-push-3" role="main" aria-labelledby="main-label">
 
-            {hook name="content.content-top" content="$content_id"}
+            {hook name="content.content-top" content=$content_id}
 
-            {loop name="blog.content" type="content" id=$content_id limit="1"}
+            {loop name="blog.content" type="content" id=$content_id limit=1}
                 <h1 id="main-label" class="page-header">{$TITLE}</h1>
                 {if $CHAPO}
                     <div class="chapo">
@@ -63,7 +63,7 @@
                 {ifloop rel="blog.document"}
                 <div class="documents">
                     <ul>
-                    {loop name="blog.document"  type="document" content="{$ID}"}
+                    {loop name="blog.document"  type="document" content=$ID}
                     <li><a href="{$DOCUMENT_URL nofilter}" target="_blank">{$TITLE}</a></li>
                     {/loop}  
                     </ul>
@@ -77,7 +77,7 @@
                 {/if}                
             {/loop}
 
-            {hook name="content.content-bottom" content="$content_id"}
+            {hook name="content.content-bottom" content=$content_id}
 
         </article>
 
@@ -85,9 +85,9 @@
             {include file="includes/asides/articles.html"}
         </aside>
 
-        {hook name="content.main-bottom" content="$content_id"}
+        {hook name="content.main-bottom" content=$content_id}
     </div><!-- /.layout -->
-    {hook name="content.bottom" content="$content_id"}
+    {hook name="content.bottom" content=$content_id}
 {else}
     <div class="main">
         <article id="content-main" class="col-main" role="main" aria-labelledby="main-label">

@@ -11,11 +11,10 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}],
-        ['title' => {intl l="Secure Payment"}, 'url'=>{url path="/order/pay"}]
+        ['title' => {intl l="Cart"}, 'url' => {url path="/cart"}],
+        ['title' => {intl l="Secure Payment"}, 'url' => {url path="/order/pay"}]
     ]}
 {/block}
-
 
 {block name="main-content"}
     <div class="main">
@@ -27,7 +26,7 @@
 
             {loop type="order" name="placed-order" id=$order_id}
             {ifhook rel="order-payment-gateway.body"}
-                {hook name="order-payment-gateway.body" module="$PAYMENT_MODULE"}
+                {hook name="order-payment-gateway.body" module=$PAYMENT_MODULE}
             {/ifhook}
             {elsehook rel="order-payment-gateway.body"}
                 <div id="payment-success" class="panel panel-default">
@@ -65,7 +64,7 @@
 
 {block name="javascript-initialization"}
 {ifhook rel="order-payment-gateway.javascript"}
-   {hook name="order-payment-gateway.javascript" module="$PAYMENT_MODULE"}
+   {hook name="order-payment-gateway.javascript" module=$PAYMENT_MODULE}
 {/ifhook}
 {elsehook rel="order-payment-gateway.javascript"}
     <script type="text/javascript">

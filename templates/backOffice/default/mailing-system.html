@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/mailingSystem'}">{intl l="Mailing system"}</a></li>
         </ul>
 
-        {hook name="mailing-system.top" location="mailing_system_top" }
+        {hook name="mailing-system.top" location="mailing_system_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -49,7 +49,7 @@
                                 <input type="hidden" id="smtp_enabled" name="{$name}" value="{if $form_error}{$value}{else}{if {config key="smtp.enabled"}}1{else}0{/if}{/if}">
 
                                 <div class="make-switch switch-small" id="enable-smtp" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                    <input type="checkbox" id="{$label_attr.for}" {if $form_error AND $value == 1 OR !$form_error AND {config key="smtp.enabled"} == 1}checked{/if}>
+                                    <input type="checkbox" id="{$label_attr.for}" {if $form_error && $value == 1 || !$form_error && {config key="smtp.enabled"} == 1}checked{/if}>
                                 </div>
                             </div>
                         {/form_field}
@@ -166,7 +166,7 @@
             </div>
         </div>
 
-        {hook name="mailing-system.bottom" location="mailing_system_bottom" }
+        {hook name="mailing-system.bottom" location="mailing_system_bottom"}
 
     </div>
 </div>
@@ -219,5 +219,5 @@ jQuery(function($) {
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="mailing-system.js" location="mainling-system-js" }
+    {hook name="mailing-system.js" location="mainling-system-js"}
 {/block}

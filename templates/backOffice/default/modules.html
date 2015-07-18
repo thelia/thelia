@@ -27,7 +27,7 @@
 *}
         </div>
 
-        {hook name="modules.top" location="modules_top" }
+        {hook name="modules.top" location="modules_top"}
 
         <div class="row">
 
@@ -55,14 +55,14 @@
             </div>
         </div>
 
-        {hook name="modules.bottom" location="modules_bottom" }
+        {hook name="modules.bottom" location="modules_bottom"}
 
     </div>
 </div>
 
 {* Delete module confirmation dialog *}
 
-{capture "delete_module_dialog"}
+{capture name="delete_module_dialog"}
     <input type="hidden" name="module_id" id="delete_module_id" value="" />
 
     <div class="row">
@@ -87,8 +87,8 @@
     dialog_title    = {intl l="Delete a module"}
     dialog_message  = {intl l="Do you really want to delete this module ?"}
 
-    form_action         = {token_url path='/admin/module/delete'}
-    form_content        = {$smarty.capture.delete_module_dialog nofilter}
+    form_action     = {token_url path='/admin/module/delete'}
+    form_content    = {$smarty.capture.delete_module_dialog nofilter}
 }
 
 <div class="modal fade" id="module-failed" tabindex="-1" role="dialog" aria-hidden="true">
@@ -141,7 +141,7 @@
     <script>
         $(document).ready(function() {
 
-            $("#module-install").on("submit", function(event) {
+            $("#module-install").on("submit", function() {
                 var $loader = $('<div class="loader"></div>');
                 $('body').append($loader);
                 $loader.show();
@@ -241,5 +241,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="modules.js" location="modules-js" }
+    {hook name="modules.js" location="modules-js"}
 {/block}

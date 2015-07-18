@@ -20,7 +20,7 @@
             <li><a href="{url path='/admin/configuration/variables'}">{intl l="System variables"}</a></li>
         </ul>
 
-        {hook name="variables.top" location="variables_top" }
+        {hook name="variables.top" location="variables_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -79,13 +79,13 @@
                                  }
                                  </th>
 
-                                 {hook name="variables.table-header" location="variables_table_header" }
+                                 {hook name="variables.table-header" location="variables_table_header"}
 
                                  <th>{intl l='Action'}</th>
   	                        </tr>
                           </thead>
                           <tbody>
-  	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1" lang="$lang_id" order="$order"}
+  	                        {loop name="config" type="config" hidden="0" secured="*" backend_context="1" lang=$lang_id order=$order}
   	                            <tr>
 
   	                               <td>{$TITLE}</td>
@@ -93,7 +93,7 @@
                                      <td>
                                      {if ! $SECURED}
                                          {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.variable" access="UPDATE"}
-                                             <a title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}">{$NAME}</a>
+                                             <a title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id=$ID}">{$NAME}</a>
                                          {/loop}
                                          {elseloop rel="can_change"}
                                              {$NAME}
@@ -111,7 +111,7 @@
   	                                    {/if}
   	                                </td>
 
-  	                                {hook name="variables.table-row" location="variables_table_row" config_id={$ID} }
+  	                                {hook name="variables.table-row" location="variables_table_row" config_id=$ID}
 
   	                                <td class="actions">
   	                                    {if ! $SECURED}
@@ -122,7 +122,7 @@
                                                  <a class="cancel-edit" id="cancel_edit_btn_{$ID}" data-id="{$ID}" title="{intl l='Cancel changes and revert to original value'}" href="#"><span class="glyphicon glyphicon-remove"></span></a>
 
                                                  {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.variable" access="UPDATE"}
-                                                     <a class="config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id="$ID"}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                     <a class="config-change" title="{intl l='Change this variable'}" href="{url path='/admin/configuration/variables/update' variable_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                                  {/loop}
 
                                                  {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.variable" access="DELETE"}
@@ -143,7 +143,7 @@
             </div>
         </div>
 
-        {hook name="variables.bottom" location="variables_bottom" }
+        {hook name="variables.bottom" location="variables_bottom"}
 
     </div>
 </div>
@@ -155,7 +155,7 @@
     {form name="thelia.admin.config.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 
 			{form_hidden_fields}
 
@@ -212,7 +212,7 @@
 		    {/form_field}
 
 
-            {hook name="variable.create-form" location="variable_create_form" }
+            {hook name="variable.create-form" location="variable_create_form"}
         {/capture}
 
 	    {include
@@ -222,7 +222,7 @@
 	        dialog_title = {intl l="Create a new variable"}
 	        dialog_body  = {$smarty.capture.creation_dialog nofilter}
 
-	        dialog_ok_label     = {intl l="Create this variable"}
+	        dialog_ok_label    = {intl l="Create this variable"}
 
 	        form_action        = {url path='/admin/configuration/variables/create'}
 	        form_enctype       = {form_enctype}
@@ -232,10 +232,10 @@
 
     {* Delete category confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="variable_id" id="variable_delete_id" value="" />
 
-        {hook name="variable.delete-form" location="variable_delete_form" }
+        {hook name="variable.delete-form" location="variable_delete_form"}
 
     {/capture}
 
@@ -246,8 +246,8 @@
         dialog_title    = {intl l="Delete a variable"}
         dialog_message  = {intl l="Do you really want to delete this variable ?"}
 
-        form_action         = {token_url path='/admin/configuration/variables/delete'}
-        form_content        = {$smarty.capture.delete_dialog nofilter}
+        form_action     = {token_url path='/admin/configuration/variables/delete'}
+        form_content    = {$smarty.capture.delete_dialog nofilter}
     }
 {/block}
 
@@ -276,7 +276,6 @@
             zis.data('original-value', field.val());
 
             zis.click(function(ev) {
-
                 if (!zis.is('.disabled')) {
                     zis.addClass('disabled');
                     field.val(zis.data('original-value'));
@@ -295,5 +294,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="variables.js" location="variables-js" }
+    {hook name="variables.js" location="variables-js"}
 {/block}

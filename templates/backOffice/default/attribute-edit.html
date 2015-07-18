@@ -20,7 +20,7 @@
     			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                 <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                 <li><a href="{url path='/admin/configuration/attributes'}">{intl l="Attributes"}</a></li>
-                <li>{intl l='Editing attribute "%name"' name={$TITLE}}</li>
+                <li>{intl l='Editing attribute "%name"' name=$TITLE}</li>
             </ul>
 
 		{hook name="attribute-edit.top" attribute_id=$attribute_id}
@@ -30,7 +30,7 @@
     				<div class="row">
 
     					<div class="col-md-12 title title-without-tabs">
-    					   {intl l='Edit attribute "%name"' name={$TITLE}}
+    					   {intl l='Edit attribute "%name"' name=$TITLE}
     					</div>
 
                         <div class="col-md-12">
@@ -96,7 +96,7 @@
     				                                            reverse_order='id_reverse'
     				                                            request_parameter_name='attributeav_order'
     				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
-    				                                            label="{intl l='ID'}"
+    				                                            label={intl l='ID'}
     				                                        }
     				                                    </th>
 
@@ -107,7 +107,7 @@
     				                                            reverse_order='alpha_reverse'
     				                                            request_parameter_name='attributeav_order'
     				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
-    				                                            label="{intl l='Value'}"
+    				                                            label={intl l='Value'}
     				                                        }
     				                                    </th>
 
@@ -118,7 +118,7 @@
     				                                            reverse_order='manual_reverse'
     				                                            request_parameter_name='attributeav_order'
     				                                            path={url path='/admin/configuration/attributes/update' attribute_id=$attribute_id}
-    				                                            label="{intl l="Position"}"
+    				                                            label={intl l="Position"}
     				                                        }
     				                                    </th>
 
@@ -145,8 +145,8 @@
     				                                        path={url path='/admin/configuration/attributes-av/update-position' attribute_id=$attribute_id}
     				                                        url_parameter="attributeav_id"
     				                                        in_place_edit_class="positionChange"
-    				                                        position="$POSITION"
-    				                                        id="$ID"
+    				                                        position=$POSITION
+    				                                        id=$ID
     				                                        }
     				                                    </td>
 
@@ -192,7 +192,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-error">
-                        {intl l="Sorry, attribute ID=%id was not found." id={$attribute_id}}
+                        {intl l="Sorry, attribute ID=%id was not found." id=$attribute_id}
                     </div>
                 </div>
             </div>
@@ -207,7 +207,7 @@
 
     {* Capture the dialog body, to pass it to the generic dialog *}
 
-    {capture "creation_dialog"}
+    {capture name="creation_dialog"}
         {form_hidden_fields}
 
         {* Be sure to get the attribute ID, even if the form could not be validated *}
@@ -226,13 +226,13 @@
             <div class="form-group {if $error}has-error{/if}">
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-                {loop type="lang" name="current-edit-lang" id="$edit_language_id"}
+                {loop type="lang" name="current-edit-lang" id=$edit_language_id}
                     <div class="input-group">
                         <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{intl l='Attribute title'}" placeholder="{intl l='Title'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{intl l={$TITLE}}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{intl l=$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l="Enter here the value in the current edit language (%title)" title={$TITLE}}</div>
+                    <div class="help-block">{intl l="Enter here the value in the current edit language (%title)" title=$TITLE}</div>
 
                     {form_field field='locale'}
                         <input type="hidden" name="{$name}" value="{$LOCALE}" />
@@ -241,7 +241,7 @@
             </div>
         {/form_field}
 
-        {hook name="attribute-value.create-form" location="attribute_value_create_form" }
+        {hook name="attribute-value.create-form" location="attribute_value_create_form"}
 
     {/capture}
 
@@ -262,7 +262,7 @@
 
 {* Delete value confirmation dialog *}
 
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="attribute_id" value="{$attribute_id}" />
     <input type="hidden" name="attributeav_id" id="value_delete_id" value="" />
 
@@ -329,5 +329,5 @@
 
 {block name="javascript-last-call"}
     {hook name="attribute.edit-js" location="attribute-edit-js" attribute_id=$attribute_id}
-    {hook name="wysiwyg.js" location="wysiwyg-attribute-edit-js" }
+    {hook name="wysiwyg.js" location="wysiwyg-attribute-edit-js"}
 {/block}

@@ -24,7 +24,7 @@
     <div class="panel-body">
         <p>
             {$msg}<br/>
-            {loop name="badresponseorder" type="order" id={$order_id}}
+            {loop name="badresponseorder" type="order" id=$order_id}
                 {$REF}
             {/loop}
             <br/>
@@ -36,7 +36,6 @@
     <span>{intl l="Home"}</span>
 </a>
 {/block}
-
 
 {block name="stylesheet"}
 {hook name="badresponseorder.stylesheet"}

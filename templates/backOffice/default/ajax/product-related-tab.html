@@ -31,7 +31,7 @@
 		                <div class="form-group">
 		                    <select name="folder_id" id="folder_id" class="form-control">
 		                        <option value="">{intl l='Select a folder...'}</option>
-		                        {loop name="folders" type="folder-tree" folder="0" backend_context="1" visible="*" lang="$edit_language_id"}
+		                        {loop name="folders" type="folder-tree" folder=0 backend_context=1 visible="*" lang=$edit_language_id}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -76,14 +76,14 @@
 
 		                        <th class="text-center">{intl l='Position'}</th>
 
-		                        {hook name="product.contents-table-header" location="product_contents_table_header" }
+		                        {hook name="product.contents-table-header" location="product_contents_table_header"}
 
 		                        <th class="actions">{intl l="Actions"}</th>
 		                    </tr>
 		                </thead>
 
 		                <tbody>
-		                    {loop name="assigned_contents" type="associated_content" visible="*" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    {loop name="assigned_contents" type="associated_content" visible="*" product=$product_id backend_context=1 lang=$edit_language_id}
 		                    <tr>
 		                        <td>{$CONTENT_ID}</td>
 
@@ -103,7 +103,7 @@
 		                          }
 		                         </td>
 
-                                {hook name="product.contents-table-row" location="product_contents_table_row-bottom" }
+                                {hook name="product.contents-table-row" location="product_contents_table_row-bottom"}
 
 		                        <td class="actions">
                                     {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
@@ -149,7 +149,7 @@
 		                <div class="form-group">
 		                    <select name="accessory_category_id" id="accessory_category_id" class="form-control">
 		                        <option value="">{intl l='Select a category...'}</option>
-		                        {loop name="categories" type="category-tree" category="0" backend_context="1" visible="*" lang="$edit_language_id"}
+		                        {loop name="categories" type="category-tree" category="0" backend_context=1 visible="*" lang=$edit_language_id}
 		                            <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px">{$TITLE}</option>
 		                        {/loop}
 		                    </select>
@@ -195,14 +195,14 @@
 
 		                        <th class="text-center">{intl l='Position'}</th>
 
-                                {hook name="product.accessories-table-header" location="product_accessories_table_header-bottom" }
+                                {hook name="product.accessories-table-header" location="product_accessories_table_header-bottom"}
 
 		                        <th class="actions">{intl l="Actions"}</th>
 		                    </tr>
 		                </thead>
 
 		                <tbody>
-		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product="$product_id" backend_context="1" lang="$edit_language_id"}
+		                    {loop name="assigned_accessories" order="accessory" visible="*" type="accessory" product=$product_id backend_context=1 lang=$edit_language_id}
 		                    <tr>
 		                        <td>{$ID}</td>
 
@@ -222,7 +222,7 @@
 		                          }
 		                         </td>
 
-                                {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom" }
+                                {hook name="product.accessories-table-row" location="product_accessories_table_row-bottom"}
 
 		                        <td class="actions">
                                     {loop type="auth" name="can_create" role="ADMIN" resources="admin.product" access="UPDATE"}
@@ -269,7 +269,7 @@
 	                    {/loop}
 
 	                    {$exclude_from_tree = "-1"}
-	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                    {loop name="additional_categories"  type="category" product=$product_id visible="*" exclude=$DEFAULT_CATEGORY backend_context=1 lang=$edit_language_id}
 	                        {$exclude_from_tree = "$exclude_from_tree,$ID"}
 	                    {/loop}
 
@@ -281,7 +281,7 @@
 
 	                        <select name="additional_category_id" id="accessory_category_id" class="form-control">
 	                            <option value="">{intl l='Select a category...'}</option>
-	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context="1" lang="$edit_language_id"}
+	                            {loop name="categories" type="category-tree" category="0" exclude=$exclude_from_tree visible="*" backend_context=1 lang=$edit_language_id}
 	                                <option value="{$ID}" style="padding-left: {3 + $LEVEL * 20}px" {if $DEFAULT_CATEGORY==$ID}disabled="disabled"{/if}>
 	                                    {$TITLE} {if $DEFAULT_CATEGORY==$ID}{intl l=' (default)'}{/if}
 	                                </option>
@@ -311,14 +311,14 @@
 
 	                            <th>{intl l='Category title'}</th>
 
-	                            {hook name="product.categories-table-header" location="product_categories_table_header" }
+	                            {hook name="product.categories-table-header" location="product_categories_table_header"}
 
 	                            <th class="actions">{intl l="Actions"}</th>
 	                        </tr>
 	                    </thead>
 
 	                    <tbody>
-	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context="1" lang="$edit_language_id"}
+	                        {loop name="additional_categories" type="category" visible="*" product=$product_id exclude=$DEFAULT_CATEGORY backend_context=1 lang=$edit_language_id}
 	                        <tr>
 	                            <td>{$ID}</td>
 
@@ -326,7 +326,7 @@
 	                                {$TITLE}
 	                            </td>
 
-	                            {hook name="product.categories-table-row" location="product_categories_table_row" }
+	                            {hook name="product.categories-table-row" location="product_categories_table_row"}
 
 	                            <td class="actions">
                                     {loop type="auth" name="can_delete" role="ADMIN" resources="admin.product" access="UPDATE"}
@@ -380,7 +380,7 @@
 
 {* Delete accessory confirmation dialog *}
 
-{capture "delete_accessory_dialog"}
+{capture name="delete_accessory_dialog"}
     <input type="hidden" name="product_id" value="{$product_id}" />
     <input type="hidden" name="accessory_id" id="accessory_delete_id" value="" />
     <input type="hidden" name="accessory_category_id" id="accessory_category_delete_id" value="" />
@@ -401,7 +401,7 @@
 
 {* Delete category confirmation dialog *}
 
-{capture "delete_category_dialog"}
+{capture name="delete_category_dialog"}
     <input type="hidden" name="product_id" value="{$product_id}" />
     <input type="hidden" name="additional_category_id" id="additional_category_delete_id" value="" />
 
@@ -526,7 +526,7 @@ $(function() {
         placement   : 'left',
         success     : function(response, newValue) {
             // The URL template
-            var url = "{url noamp='1' path='/admin/product/update-accessory-position' accessory_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
+            var url = "{url noamp='1' path='/admin/product/update-accessory-position' accessory_id='__ID__' position='__POS__' product_id=$product_id current_tab='related'}";
 
             // Perform subtitutions
             url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);
@@ -544,7 +544,7 @@ $(function() {
         placement   : 'left',
         success     : function(response, newValue) {
             // The URL template
-            var url = "{url noamp='1' path='/admin/product/update-content-position' content_id='__ID__' position='__POS__' product_id=$product_id current_tab='related' }";
+            var url = "{url noamp='1' path='/admin/product/update-content-position' content_id='__ID__' position='__POS__' product_id=$product_id current_tab='related'}";
 
             // Perform subtitutions
             url = url.replace('__ID__', $(this).data('id')).replace('__POS__', newValue);

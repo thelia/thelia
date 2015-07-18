@@ -14,13 +14,13 @@
 
     <div id="wrapper" class="container">
 
-        {loop type="module" id="$delivery_module_id" active="*" name="module.name" backend_context="1"}
+        {loop type="module" id=$delivery_module_id active="*" name="module.name" backend_context="1"}
 
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
             <li><a href="{url path='/admin/configuration/shipping_zones'}">{intl l="Shipping configuration"}</a></li>
-            <li>{intl l='Editing shipping configuration for module "%name"' name="{$TITLE}"}</li>
+            <li>{intl l='Editing shipping configuration for module "%name"' name=$TITLE}</li>
         </ul>
 
         {hook name="shipping-zones-edit.top" delivery_module_id=$delivery_module_id}
@@ -32,14 +32,13 @@
                     <div class="title title-without-tabs">
                         <div class="row">
                             <div class="col-md-10">
-                                {intl l='Shipping configuration of delivery module "%title"' title={$TITLE}}
+                                {intl l='Shipping configuration of delivery module "%title"' title=$TITLE}
                             </div>
                             <div class="col-md-2 text-right">
                                 <a href="{url path='/admin/configuration/shipping_zones'}" class="btn btn-sm btn-default">{intl l='Close'} <span class="glyphicon glyphicon-remove"></span></a>
                             </div>
                         </div>
                     </div>
-
 
                     <div class="form-container clearfix">
                         <div class="col-md-4">
@@ -126,7 +125,7 @@
 
     {* Delete related content confirmation dialog *}
 
-    {capture "delete_zone_dialog"}
+    {capture name="delete_zone_dialog"}
         {form name="thelia.shopping_zone_remove_area"}
             {form_hidden_fields}
 
@@ -141,7 +140,7 @@
             {form_field field='area_id'}
                 <input type="hidden" name="{$name}" value="" id="shipping-zone-id-delete" />
             {/form_field}
-            {hook name="zone.delete-form" location="zone_delete_form" module_id={$delivery_module_id} }
+            {hook name="zone.delete-form" location="zone_delete_form" module_id=$delivery_module_id}
         {/form}
     {/capture}
 
@@ -172,5 +171,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="shipping-zones.edit-js" location="shipping-zones-edit-js" module_id={$delivery_module_id} }
+    {hook name="shipping-zones.edit-js" location="shipping-zones-edit-js" module_id=$delivery_module_id}
 {/block}

@@ -14,13 +14,13 @@
 
         <div id="wrapper" class="container">
 
-            {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="currency_edit" type="currency" id=$currency_id backend_context="1" lang=$edit_language_id}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                     <li><a href="{url path='/admin/configuration/currencies'}">{intl l="Currencies"}</a></li>
-                    <li>{intl l='Editing currency "%name"' name="{$NAME}"}</li>
+                    <li>{intl l='Editing currency "%name"' name=$NAME}</li>
                 </ul>
 
 			{hook name="currency-edit.top" currency_id=$currency_id}
@@ -30,7 +30,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit currency "%name"' name={$NAME}}
+        					   {intl l='Edit currency "%name"' name=$NAME}
         					</div>
 
                             <div class="form-container">
@@ -123,7 +123,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="alert alert-error">
-                            {intl l="Sorry, currency ID=%id was not found." id={$currency_id}}
+                            {intl l="Sorry, currency ID=%id was not found." id=$currency_id}
                         </div>
                     </div>
                 </div>
@@ -134,5 +134,5 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="currency.edit-js" location="currency-edit-js" currency_id={$currency_id} }
+    {hook name="currency.edit-js" location="currency-edit-js" currency_id=$currency_id}
 {/block}

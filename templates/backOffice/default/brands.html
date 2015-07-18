@@ -47,7 +47,7 @@
                                             order='id'
                                             reverse_order='id-reverse'
                                             path='/admin/brand'
-                                            label="{intl l='ID'}"
+                                            label={intl l='ID'}
                                             }
                                         </th>
 
@@ -59,7 +59,7 @@
                                             order='alpha'
                                             reverse_order='alpha-reverse'
                                             path='/admin/brand'
-                                            label="{intl l='Name'}"
+                                            label={intl l='Name'}
                                             }
                                         </th>
 
@@ -69,7 +69,7 @@
                                             order='manual'
                                             reverse_order='manual-reverse'
                                             path='/admin/brand'
-                                            label="{intl l="Position"}"
+                                            label={intl l="Position"}
                                             }
                                         </th>
 
@@ -79,7 +79,7 @@
                                             order='visible'
                                             reverse_order='visible-reverse'
                                             path={url path='/admin/brand'}
-                                            label="{intl l='Online'}"
+                                            label={intl l='Online'}
                                             }
                                         </th>
 
@@ -95,7 +95,7 @@
                                             <td>{$ID}</td>
 
                                             <td>
-                                                {loop type="image" name="folder_image" source="brand" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                                                {loop type="image" name="folder_image" source="brand" source_id=$ID limit=1 width=50 height=50 resize_mode="crop" backend_context="1"}
                                                     <a href="{url path="admin/brand/update/$OBJECT_ID"}" title="{intl l='Edit this brand'}">
                                                         <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                                     </a>
@@ -118,8 +118,8 @@
                                                     path="/admin/brand/update-position"
                                                     url_parameter="brand_id"
                                                     in_place_edit_class="brandPositionChange"
-                                                    position="$POSITION"
-                                                    id="$ID"
+                                                    position=$POSITION
+                                                    id=$ID
                                                 }
                                             </td>
 
@@ -186,7 +186,7 @@
     {form name="thelia.admin.brand.creation"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "creation_dialog"}
+        {capture name="creation_dialog"}
 			{form_hidden_fields exclude="locale"}
 
             {render_form_field field="success_url" value={url path='/admin/brand/update/_ID_'}}
@@ -200,7 +200,7 @@
 
                     <div class="input-group">
                         <input type="text" {form_field_attributes field="title"}>
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
                 {/loop}
             {/custom_render_form_field}
@@ -231,7 +231,7 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_dialog"}
+    {capture name="delete_dialog"}
         <input type="hidden" name="brand_id" id="brand_delete_id" value="" />
 
         {hook name='brand.delete-form' location='brand_delete_form'}

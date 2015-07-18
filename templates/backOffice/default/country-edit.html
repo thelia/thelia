@@ -14,13 +14,13 @@
 
         <div id="wrapper" class="container">
 
-            {loop name="country_edit" type="country" id="$country_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="country_edit" type="country" id=$country_id backend_context="1" lang=$edit_language_id}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
                     <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
                     <li><a href="{url path='/admin/configuration/countries'}">{intl l="Countries"}</a></li>
-                    <li>{intl l='Editing country "%name"' name="{$TITLE}"}</li>
+                    <li>{intl l='Editing country "%name"' name=$TITLE}</li>
                 </ul>
 
             {hook name="country-edit.top" country_id=$country_id}
@@ -30,7 +30,7 @@
         				<div class="row">
 
         					<div class="col-md-12 title title-without-tabs">
-        					   {intl l='Edit country "%name"' name="{$TITLE}"}
+        					   {intl l='Edit country "%name"' name=$TITLE}
         					</div>
 
                             <div class="form-container">
@@ -115,6 +115,6 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="country.edit-js" location="country-edit-js" country_id=$country_id }
-    {hook name="wysiwyg.js" location="wysiwyg-country-edit-js" }
+    {hook name="country.edit-js" location="country-edit-js" country_id=$country_id}
+    {hook name="wysiwyg.js" location="wysiwyg-country-edit-js"}
 {/block}

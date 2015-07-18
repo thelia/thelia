@@ -16,7 +16,7 @@
             <li><a href="{url path='/admin/hooks'}">{intl l="Hooks"}</a></li>
         </ul>
 
-        {hook name="hooks.top" location="hooks_top" }
+        {hook name="hooks.top" location="hooks_top"}
 
         {loop type="auth" name="can_create" role="ADMIN" resource="admin.hook" access="UPDATE"}
         <div class="row">
@@ -113,7 +113,7 @@
                                             }
                                         </th>
 
-                                        {hook name="hooks.table-header" location="hooks_table_header" }
+                                        {hook name="hooks.table-header" location="hooks_table_header"}
 
                                         <th class="actions">{intl l='Actions'}</th>
                                     </tr>
@@ -138,7 +138,7 @@
                                         </div>
                                     </td>
 
-                                    {hook name="hooks.table-row" location="hooks_table_row" hook_id={$ID} }
+                                    {hook name="hooks.table-row" location="hooks_table_row" hook_id=$ID}
 
                                     <td class="actions">
                                         <div class="btn-toolbar btn toolbar-primary">
@@ -186,7 +186,7 @@
             </div>
         </div>
 
-        {hook name="hooks.bottom" location="hooks_bottom" }
+        {hook name="hooks.bottom" location="hooks_bottom"}
 
     </div>
 </div>
@@ -197,7 +197,7 @@
 {form name="thelia.admin.hook.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "hook_creation_dialog"}
+    {capture name="hook_creation_dialog"}
 
         {form_hidden_fields exclude="locale,native"}
 
@@ -213,7 +213,7 @@
 
                 <div class="input-group">
                     <input type="text" {form_field_attributes field="title"}>
-                    <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                    <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                 </div>
                 <div class="help-block">{intl l="Enter here the value in the default language (%title)" title={$TITLE}}</div>
             {/loop}
@@ -224,31 +224,31 @@
         {render_form_field field='native' value="0"}
         {render_form_field field='active'}
 
-        {hook name="hook.create-form" location="hook_create_form" }
+        {hook name="hook.create-form" location="hook_create_form"}
 
     {/capture}
 
     {include
-    file = "includes/generic-create-dialog.html"
+        file = "includes/generic-create-dialog.html"
 
-    dialog_id    = "add_hook_dialog"
-    dialog_title = {intl l="Create a new Hook"}
-    dialog_body  = {$smarty.capture.hook_creation_dialog nofilter}
+        dialog_id    = "add_hook_dialog"
+        dialog_title = {intl l="Create a new Hook"}
+        dialog_body  = {$smarty.capture.hook_creation_dialog nofilter}
 
-    dialog_ok_label     = {intl l="Create this hook"}
-    dialog_cancel_label = {intl l="Cancel"}
+        dialog_ok_label     = {intl l="Create this hook"}
+        dialog_cancel_label = {intl l="Cancel"}
 
-    form_action        = {url path='/admin/hooks/create'}
-    form_enctype       = {form_enctype}
-    form_error_message = $form_error_message
+        form_action        = {url path='/admin/hooks/create'}
+        form_enctype       = {form_enctype}
+        form_error_message = $form_error_message
     }
 {/form}
 
 
 {* Delete confirmation dialog *}
-{capture "delete_dialog"}
+{capture name="delete_dialog"}
     <input type="hidden" name="hook_id" id="hook_delete_id" value="" />
-    {hook name="hook.delete-form" location="hook_delete_form" }
+    {hook name="hook.delete-form" location="hook_delete_form"}
 {/capture}
 
 {include
@@ -310,7 +310,7 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
             "native": "{url path='/admin/hook/toggle-native'}",
             "activation": "{url path='/admin/hook/toggle-activation'}",
             "discover": "{url path='/admin/hooks/discover'}",
-            "discoverSave": "{url path='/admin/hooks/discover/save'}",
+            "discoverSave": "{url path='/admin/hooks/discover/save'}"
         };
 
         {literal}
@@ -540,5 +540,5 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
 {/block}
 
 {block name="javascript-last-call"}
-{hook name="hooks.js" location="hooks-js" }
+{hook name="hooks.js" location="hooks-js"}
 {/block}

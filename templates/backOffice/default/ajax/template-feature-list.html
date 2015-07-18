@@ -10,7 +10,7 @@
 	    <div class="input-group">
 	        <select required="required" name="feature_id" id="feature_id" class="form-control">
 		        <option value="">{intl l='Select a feature...'}</option>
-		        {loop name="free_features" type="feature" exclude_template="$template_id" backend_context="1" lang="$edit_language_id"}
+		        {loop name="free_features" type="feature" exclude_template=$template_id backend_context=1 lang=$edit_language_id}
 		            <option value="{$ID}">{$TITLE}</option>
 		        {/loop}
 		    </select>
@@ -38,14 +38,14 @@
 
             <th class="text-center">{intl l='Position'}</th>
 
-            {hook name="template.features-table-header" location="template_features_table_header" }
+            {hook name="template.features-table-header" location="template_features_table_header"}
 
             <th class="actions">{intl l="Actions"}</th>
         </tr>
     </thead>
 
     <tbody>
-        {loop name="assigned_features" type="feature" template="$template_id" backend_context="1" lang="$edit_language_id"}
+        {loop name="assigned_features" type="feature" template=$template_id backend_context=1 lang=$edit_language_id}
         <tr>
             <td>{$ID}</td>
 
@@ -65,7 +65,7 @@
              }
             </td>
 
-            {hook name="template.features-table-row" location="template_features_table_row" }
+            {hook name="template.features-table-row" location="template_features_table_row"}
 
             <td class="actions">
                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.template"  access="UPDATE"}
@@ -92,7 +92,7 @@
 
 {* Delete value confirmation dialog *}
 
-{capture "delete_feature_dialog"}
+{capture name="delete_feature_dialog"}
     <input type="hidden" name="template_id" value="{$template_id}" />
     <input type="hidden" name="feature_id" id="feature_delete_id" value="" />
 {/capture}

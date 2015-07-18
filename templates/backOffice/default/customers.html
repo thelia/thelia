@@ -18,12 +18,12 @@
             <li><a href="{url path='/admin/customers'}">{intl l="Customers"}</a></li>
         </ul>
 
-        {hook name="customer.top" location="customer_top" }
+        {hook name="customer.top" location="customer_top"}
 
         <div class="row">
             <div class="col-md-12">
                 <div class="general-block-decorator">
-                    {if $removal_error }
+                    {if $removal_error}
                         <div class="alert alert-danger">
                             {$error_message}
                         </div>
@@ -33,7 +33,7 @@
                             <caption>
                                 {intl l="Customers list"}
 
-                                {hook name="customers.caption" location="customer_list_caption" }
+                                {hook name="customers.caption" location="customer_list_caption"}
 
                                 {loop type="auth" name="can_create" role="ADMIN" resource="admin.customer" access="CREATE"}
                                     <a class="btn btn-primary action-btn" title="{intl l='Add a new Customer'}" href="#add_customer_dialog" data-toggle="modal">
@@ -52,7 +52,7 @@
                                             reverse_order='reference_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='Reference'}"
+                                            label={intl l='Reference'}
                                         }
                                     </th>
 
@@ -63,7 +63,7 @@
                                             reverse_order='lastname_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='Last name'}"
+                                            label={intl l='Last name'}
                                         }
                                     </th>
 
@@ -74,11 +74,11 @@
                                             reverse_order='firstname_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='First name'}"
+                                            label={intl l='First name'}
                                         }
                                     </th>
 
-                                    {hook name="customers.header" location="customer_list_header" }
+                                    {hook name="customers.header" location="customer_list_header"}
 
                                     <th class="object-title">
                                         {admin_sortable_header
@@ -87,7 +87,7 @@
                                             reverse_order='registration_date_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='Registration date'}"
+                                            label={intl l='Registration date'}
                                         }
                                     </th>
 
@@ -102,7 +102,7 @@
                                             reverse_order='last_order_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='Date of last order'}"
+                                            label={intl l='Date of last order'}
                                         }
                                     </th>
 
@@ -113,7 +113,7 @@
                                             reverse_order='order_amount_reverse'
                                             path={url path='/admin/customers'}
                                             request_parameter_name='customer_order'
-                                            label="{intl l='Last order amount'}"
+                                            label={intl l='Last order amount'}
                                         }
                                     </th>
 *}
@@ -127,7 +127,7 @@
                                     {assign "lastOrderAmount" ''}
                                     {assign "lastOrderCurrency" ''}
 
-                                    {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                    {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit=1}
                                         {assign "lastOrderDate" "{format_date date=$CREATE_DATE}"}
                                         {assign "lastOrderAmount" "{format_number number=$TOTAL_TAXED_AMOUNT}"}
                                         {loop type="currency" name="order-currency" id=$CURRENCY}
@@ -147,7 +147,7 @@
                                         </td>
 
 
-                                        {hook name="customers.row" location="customer_list_row" customer_id={$ID}}
+                                        {hook name="customers.row" location="customer_list_row" customer_id=$ID}
 
                                         <td>
                                             {format_date date=$CREATE_DATE}
@@ -212,7 +212,7 @@
         </div>
 
 
-    {hook name="customer.bottom" location="customer_bottom" }
+    {hook name="customer.bottom" location="customer_bottom"}
     </div>
 </div>
 
@@ -222,7 +222,7 @@
     {form name="thelia.admin.customer.create"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-        {capture "customer_creation_dialog"}
+        {capture name="customer_creation_dialog"}
 
             {form_hidden_fields}
 
@@ -338,7 +338,7 @@
                 {/form_field}
             {/if}
 
-            {hook name="customer.create-form" location="customer_create_form" }
+            {hook name="customer.create-form" location="customer_create_form"}
 
         {/capture}
 
@@ -360,11 +360,11 @@
 
     {* Delete confirmation dialog *}
 
-    {capture "delete_customer_dialog"}
+    {capture name="delete_customer_dialog"}
         <input type="hidden" name="page" value="{$page}">
         <input type="hidden" name="customer_id" id="delete_customer_id">
 
-        {hook name="customer.delete-form" location="customer_delete_form" }
+        {hook name="customer.delete-form" location="customer_delete_form"}
     {/capture}
 
     {include
@@ -382,15 +382,13 @@
 {/block}
 
 {block name="javascript-initialization"}
-
-        <script type="text/javascript">
-            $(".customer-delete").click(function(){
-                $("#delete_customer_id").val($(this).attr("data-id"));
-            });
-        </script>
-
+    <script type="text/javascript">
+        $(".customer-delete").click(function(){
+            $("#delete_customer_id").val($(this).attr("data-id"));
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="customers.js" location="customers-js" }
+    {hook name="customers.js" location="customers-js"}
 {/block}

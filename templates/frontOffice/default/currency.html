@@ -6,10 +6,9 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Currency"}, 'url'=>{url path="/currency"}]
+        ['title' => {intl l="Currency"}, 'url' => {url path="/currency"}]
     ]}
 {/block}
-
 
 {block name="main-content"}
     <div class="main">
@@ -18,7 +17,7 @@
             {hook name="currency.top"}
             <ul class="nav nav-tabs nav-justified" style="margin-bottom:60px;">
             {loop type="currency" name="currency_available"}
-              <li{if $ID eq "{currency attr="id"}"} class="active"{/if}><a href="{url path="{navigate to="current"}" currency={$ISOCODE}}">{$SYMBOL} - {$NAME}</a></li>
+              <li{if $ID eq {currency attr="id"}} class="active"{/if}><a href="{url path={navigate to="current"} currency=$ISOCODE}">{$SYMBOL} - {$NAME}</a></li>
             {/loop}
             </ul>
             {hook name="currency.bottom"}

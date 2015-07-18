@@ -1,7 +1,7 @@
 {extends file="layout.tpl"}
 
 {block name="init"}
-    {$errorStock = "FALSE"}
+    {$errorStock = false}
 {/block}
 
 {* Body Class *}
@@ -10,7 +10,7 @@
 {* Breadcrumb *}
 {block name='no-return-functions' append}
     {$breadcrumbs = [
-        ['title' => {intl l="Cart"}, 'url'=>{url path="/cart"}]
+        ['title' => {intl l="Cart"}, 'url' => {url path="/cart"}]
     ]}
 {/block}
 
@@ -19,7 +19,6 @@
         <article id="cart" class="col-main" role="main" aria-labelledby="main-label">
 
             <h1 id="main-label" class="page-header">{intl l="Your Cart"}</h1>
-
 
             {ifloop rel="cartloop"}
             {include file="misc/checkout-progress.tpl" step="cart"}
@@ -63,7 +62,7 @@
                                 {ifloop rel='product-image'}
                                 <a href="{$PRODUCT_URL nofilter}" class="thumbnail">
                                     {assign "cart_count" $LOOP_COUNT}
-                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit="1" width="118" height="85" force_return="true"}
+                                    {loop type="image" name="product-image" product=$PRODUCT_ID limit=1 width=118 height=85 force_return=true}
                                         <img src="{$IMAGE_URL nofilter}" alt="Product #{$cart_count}">
                                     {/loop}
                                 </a>
@@ -77,12 +76,12 @@
                                         {if $STOCK > 0}
                                             <dd>{intl l="In Stock"}</dd>
                                         {else}
-                                            {$errorStock="TRUE"}
+                                            {$errorStock = true}
                                             <dd>{intl l="Out of Stock"}</dd>
                                         {/if}
                                         <dt>{intl l="No."}</dt>
                                         <dd>{$REF}</dd>
-                                        {loop type="attribute_combination" name="product_options" product_sale_elements="$PRODUCT_SALE_ELEMENTS_ID"}
+                                        {loop type="attribute_combination" name="product_options" product_sale_elements=$PRODUCT_SALE_ELEMENTS_ID}
                                             <dt>{$ATTRIBUTE_TITLE}</dt>
                                             <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                         {/loop}
@@ -127,14 +126,14 @@
                         {/loop}
                         {if {cart attr="is_virtual"} != 1}
                         {postage}
-                        {assign var="postageAmount" value=$postage }
+                        {assign var="postageAmount" value=$postage}
                         <tr>
                             <td class="product" colspan="2">
                                 <form action="{url path="/cart/country"}" class="form-inline" method="post">
                                     <h3>
                                         {intl l="Estimated shipping "}
                                         {if $is_customizable == false}
-                                            {loop type="country" name="countryLoop" id="$country_id"}
+                                            {loop type="country" name="countryLoop" id=$country_id}
                                             {intl l="for"} {$TITLE}
                                             {/loop}
                                         {/if}
@@ -143,14 +142,14 @@
                                     <div>
                                         <label for="cart-country">{intl l="Select your country:"}</label>
                                         <select id="cart-country" name="country">
-                                        {loop type="country" name="countryLoop" with_area="true"}
-                                            <option value="{$ID}" {if $ID == $country_id }selected="selected" {/if}>{$TITLE}</option>
+                                        {loop type="country" name="countryLoop" with_area=true}
+                                            <option value="{$ID}" {if $ID == $country_id}selected="selected" {/if}>{$TITLE}</option>
                                         {/loop}
                                         </select>
                                         <a class="btn btn-link btn-change-country" href="#"><i class="fa fa-refresh"></i> {intl l="update"}</a>
                                     </div>
                                     {/if}
-                                    {if $delivery_id != 0 }
+                                    {if $delivery_id != 0}
                                     <div>
                                         {intl l="with:"} {loop type="delivery" name="deliveryLoop" id=$delivery_id}{$TITLE} {/loop}
                                     </div>
@@ -167,7 +166,7 @@
                         </tr>
                         {/postage}
                         {else}
-                        {assign var="postageAmount" value=0 }
+                        {assign var="postageAmount" value=0}
                         {/if}
                     </tbody>
                     <tfoot>
@@ -176,7 +175,7 @@
                         <th class="total">{intl l="Total incl. taxes"}</th>
                         <td class="total">
                             <div class="total-price">
-                                {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount }
+                                {assign var="totalAmount" value={cart attr='total_taxed_price_without_discount'} + $postageAmount}
                                 <span class="price">{format_money number=$totalAmount symbol={currency attr="symbol"}}</span>
                             </div>
                         </td>
@@ -207,8 +206,8 @@
 
                 <div class="products-content">
                     <ul class="products-grid list-unstyled row">
-                        {loop name="product_upsell" type="product" promo="yes" limit="5"}
-                            {include file="includes/single-product.html" colClass="col-md-2" product_id=$ID hasBtn=false hasDescription=true width="218" height="146"}
+                        {loop name="product_upsell" type="product" promo="yes" limit=5}
+                            {include file="includes/single-product.html" colClass="col-md-2" product_id=$ID hasBtn=false hasDescription=true width=218 height=146}
                         {/loop}
                     </ul>
                 </div>
@@ -231,8 +230,8 @@
             e.preventDefault();
             var $form = $(this).parents('form');
             $form.submit();
-        })
-        {if $errorStock=="TRUE"}
+        });
+        {if $errorStock}
           $("#errorStock").show();
         {/if}
     });

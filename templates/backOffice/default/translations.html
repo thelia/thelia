@@ -71,7 +71,7 @@
 					                                </select>
 					                            </div>
 		                                    </div>
-	                                    {else if $item_to_translate == 'fo'}
+	                                    {elseif $item_to_translate == 'fo'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_name">{intl l='Front-office template you want to translate'}</label>
@@ -84,7 +84,7 @@
 	                                                </select>
 	                                            </div>
 	                                        </div>
-	                                    {else if $item_to_translate == 'bo'}
+	                                    {elseif $item_to_translate == 'bo'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_name">{intl l='Back-office template you want to translate'}</label>
@@ -97,7 +97,7 @@
 	                                                </select>
 	                                            </div>
 	                                        </div>
-                                        {else if $item_to_translate == 'ma'}
+                                        {elseif $item_to_translate == 'ma'}
                                             <div class="col-md-4 item-id-selector">
                                                 <div class="form-group">
                                                     <label class="control-label" for="item_name">{intl l='E-mail template you want to translate'}</label>
@@ -110,7 +110,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-	                                    {else if $item_to_translate == 'pf'}
+	                                    {elseif $item_to_translate == 'pf'}
 	                                        <div class="col-md-4 item-id-selector">
 	                                            <div class="form-group">
 	                                                <label class="control-label" for="item_name">{intl l='PDF template you want to translate'}</label>
@@ -174,7 +174,7 @@
 
                                     {if $is_writable === false}
                                         <div class="alert alert-danger">
-                                            {intl l='The directory local/I18n does not exist or is not writable. Please fix this issue before.' }
+                                            {intl l='The directory local/I18n does not exist or is not writable. Please fix this issue before.'}
                                         </div>
                                     {/if}
 
@@ -245,7 +245,7 @@
 
                                     {$not_translated = empty($info.translation)}
 
-                                    {if $view_missing_traductions_only != 1 || $not_translated }
+                                    {if $view_missing_traductions_only != 1 || $not_translated}
 
                                         {* Create a liste of files names *}
 
@@ -347,13 +347,13 @@
                                     {$idx = $idx + 1}
                                 {/foreach}
 
-                                {if isset($all_strings) }
+                                {if isset($all_strings)}
 
-                                    {if empty($all_strings) }
+                                    {if empty($all_strings)}
                                         <div class="alert alert-info">
                                             {intl l='<strong>Did not found any text to translate</strong>. It\'s probably normal. If not, please be sure to use Smarty\'s "intl" function in templates, or the Translator::trans() method in PHP files.'}
                                         </div>
-                                    {else if $view_missing_traductions_only == 1 && $currfile == false }
+                                    {elseif $view_missing_traductions_only == 1 && $currfile == false}
 		                                <div class="alert alert-success">
 		                                    {intl l='<strong>Congratulations</strong>, all text is now translated !'}
 		                                </div>
@@ -524,6 +524,6 @@
         });
     </script>
 
-    {hook name="translations.js" location="translations-js" }
+    {hook name="translations.js" location="translations-js"}
 {/block}
 

@@ -32,7 +32,7 @@
             <div class="col-md-12 general-block-decorator clearfix">
 
                 <div class="row">
-                    <div class="col-md-12 title">{intl l="Editing profile '%name'" name={$TITLE}}</div>
+                    <div class="col-md-12 title">{intl l="Editing profile '%name'" name=$TITLE}</div>
                 </div>
 
                 <ul class="nav nav-tabs clearfix">
@@ -310,6 +310,6 @@
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="profile.edit-js" location="profile-edit-js" profile_id={$profile_id} }
-    {hook name="wysiwyg.js" location="wysiwyg-profile-edit-js" }
+    {hook name="profile.edit-js" location="profile-edit-js" profile_id=$profile_id}
+    {hook name="wysiwyg.js" location="wysiwyg-profile-edit-js"}
 {/block}

@@ -16,7 +16,7 @@
 
         {include file="includes/catalog-breadcrumb.html"}
 
-        {hook name="categories.top" location="categories_top" }
+        {hook name="categories.top" location="categories_top"}
 
         <div class="row">
             <div class="col-md-12">
@@ -26,14 +26,14 @@
                              <caption>
                                  {* display parent category name, and get current cat ID *}
                                  {loop name="category_title" type="category" visible="*" id=$category_id}
-                                     {intl l="Categories in %cat" cat={$TITLE}}
+                                     {intl l="Categories in %cat" cat=$TITLE}
                                      {$cat_id = $ID}
                                  {/loop}
                                  {elseloop rel="category_title"}
                                      {intl l="Top level categories"}
                                  {/elseloop}
 
-                                 {hook name="categories.caption" location="category_list_caption" }
+                                 {hook name="categories.caption" location="category_list_caption"}
 
                                  {loop type="auth" name="can_create" role="ADMIN" resource="admin.category" access="CREATE"}
                                  <a class="btn btn-primary action-btn" title="{intl l='Add a new category'}" href="#category_creation_dialog" data-toggle="modal">
@@ -52,7 +52,7 @@
                                             reverse_order='id_reverse'
                                             path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
-                                            label="{intl l='ID'}"
+                                            label={intl l='ID'}
                                          }
                                          </th>
 
@@ -65,11 +65,11 @@
                                             reverse_order='alpha_reverse'
                                             path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
-                                            label="{intl l='Category title'}"
+                                            label={intl l='Category title'}
                                          }
                                          </th>
 
-                                         {hook name="categories.header" location="category_list_header" }
+                                         {hook name="categories.header" location="category_list_header"}
 
                                          <th>
                                          {admin_sortable_header
@@ -78,7 +78,7 @@
                                             reverse_order='visible_reverse'
                                             path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
-                                            label="{intl l='Online'}"
+                                            label={intl l='Online'}
                                          }
                                          </th>
 
@@ -89,7 +89,7 @@
                                             reverse_order='manual_reverse'
                                             path={url path='/admin/catalog' category_id=$category_id}
                                             request_parameter_name='category_order'
-                                            label="{intl l='Position'}"
+                                            label={intl l='Position'}
                                          }
                                          </th>
 
@@ -103,7 +103,7 @@
                                      <td>{$ID}</td>
 
                                      <td>
-                                     {loop type="image" name="cat_image" source="category" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                                     {loop type="image" name="cat_image" source="category" source_id=$ID limit=1 width=50 height=50 resize_mode="crop" backend_context="1"}
                                        <a href="{url path='admin/catalog' category_id=$OBJECT_ID}" title="{intl l='Browse this category'}"><img class="img-thumbnail" src="{$IMAGE_URL nofilter}" alt="{$TITLE}" /></a>
                                      {/loop}
                                      </td>
@@ -114,7 +114,7 @@
                                           </a>
                                      </td>
 
-                                     {hook name="categories.row" location="category_list_row" category_id={$ID} }
+                                     {hook name="categories.row" location="category_list_row" category_id=$ID}
 
                                      <td>
                                          {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
@@ -203,14 +203,14 @@
                      <caption>
                          {* display parent category name *}
                          {loop name="category_title" type="category" visible="*" id=$category_id}
-                             {intl l="Products in %cat" cat={$TITLE}}
+                             {intl l="Products in %cat" cat=$TITLE}
                          {/loop}
 
                          {elseloop rel="category_title"}
                              {intl l="Top level Products"}
                          {/elseloop}
 
-                         {hook name="products.caption" location="product_list_caption" }
+                         {hook name="products.caption" location="product_list_caption"}
 
                          <a class="btn btn-primary action-btn" title="{intl l='Add a new product'}" href="#product_creation_dialog" data-toggle="modal">
                              <span class="glyphicon glyphicon-plus-sign"></span>
@@ -227,7 +227,7 @@
                                     reverse_order='id_reverse'
                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
                                     request_parameter_name='product_order'
-                                    label="{intl l='ID'}"
+                                    label={intl l='ID'}
                                  }
 
                                  <th>&nbsp;</th>
@@ -239,7 +239,7 @@
                                     reverse_order='ref_reverse'
                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
                                     request_parameter_name='product_order'
-                                    label="{intl l='Reference'}"
+                                    label={intl l='Reference'}
                                  }
                                  </th>
 
@@ -250,10 +250,10 @@
                                     reverse_order='alpha_reverse'
                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
                                     request_parameter_name='product_order'
-                                    label="{intl l='Product title'}"
+                                    label={intl l='Product title'}
                                  }
 
-                                 {hook name="products.header" location="product_list_header" }
+                                 {hook name="products.header" location="product_list_header"}
 
                                  <th class="text-right">
                                      {admin_sortable_header
@@ -262,7 +262,7 @@
                                      reverse_order='max_price'
                                      path={url path='/admin/catalog' category_id=$category_id target='products'}
                                      request_parameter_name='product_order'
-                                     label="{intl l='Price'}"
+                                     label={intl l='Price'}
                                      }
                                  </th>
 
@@ -273,7 +273,7 @@
                                      reverse_order='visible_reverse'
                                      path={url path='/admin/catalog' category_id=$category_id target='products'}
                                      request_parameter_name='product_order'
-                                     label="{intl l='Online'}"
+                                     label={intl l='Online'}
                                      }
                                  </th>
 
@@ -284,7 +284,7 @@
                                     reverse_order='manual_reverse'
                                     path={url path='/admin/catalog' category_id=$category_id target='products'}
                                     request_parameter_name='product_order'
-                                    label="{intl l='Position'}"
+                                    label={intl l='Position'}
                                  }
                                  </th>
 
@@ -298,7 +298,7 @@
                              <td>{$ID}</td>
 
                              <td>
-                             {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                             {loop type="image" name="cat_image" source="product" source_id=$ID limit=1 width=50 height=50 resize_mode="crop" backend_context="1"}
                                <a href="{url path='/admin/products/update' product_id=$OBJECT_ID page=$page}" title="{intl l='Edit this product'}">
                                  <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
                                </a>
@@ -312,7 +312,7 @@
 
                              <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
 
-                             {hook name="products.row" location="product_list_row" product_id={$ID} }
+                             {hook name="products.row" location="product_list_row" product_id=$ID}
 
                              <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
 
@@ -391,11 +391,11 @@
         <div class="alert alert-info">{intl l="To create a new product, select an existing category, or create a new one."}</div>
         {/if}
 
-        {hook name="categories.bottom" location="categories_bottom" }
+        {hook name="categories.bottom" location="categories_bottom"}
 
     </div>
 
-    {hook name="categories.catalog-bottom" location="catalog_bottom" }
+    {hook name="categories.catalog-bottom" location="catalog_bottom"}
 
 </div>
 
@@ -405,7 +405,7 @@
 {form name="thelia.admin.category.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "category_creation_dialog"}
+    {capture name="category_creation_dialog"}
 
         {form_hidden_fields exclude="parent,locale"}
 
@@ -435,7 +435,7 @@
         </label>
         {/form_field}
 
-        {hook name="category.create-form" location="category_create_form" }
+        {hook name="category.create-form" location="category_create_form"}
 
     {/capture}
 
@@ -459,7 +459,7 @@
 {form name="thelia.admin.product.creation"}
 
     {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "product_creation_dialog"}
+    {capture name="product_creation_dialog"}
 
         {form_hidden_fields}
 
@@ -493,10 +493,10 @@
                 {loop type="lang" name="default-lang" default_only="1" backend_context="1"}
                     <div class="input-group">
                         <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Title'}">
-                        <span class="input-group-addon"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /></span>
+                        <span class="input-group-addon"><img src="{image file="assets/img/flags/$CODE.png"}" alt="{$TITLE}" /></span>
                     </div>
 
-                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title="{$TITLE}"}</div>
+                    <div class="help-block">{intl l='Enter here the product name in the default language (%title)' title=$TITLE}</div>
 
                     {* Switch edition to the current locale *}
                     <input type="hidden" name="edit_language_id" value="{$ID}" />
@@ -609,7 +609,7 @@
             </div>
         {/form_field}
 
-        {hook name="product.create-form" location="product_create_form" }
+        {hook name="product.create-form" location="product_create_form"}
 
     {/capture}
 
@@ -633,7 +633,7 @@
 {capture "category_delete_dialog"}
     <input type="hidden" name="category_id" id="category_delete_id" value="" />
 
-    {hook name="category.delete-form" location="category_delete_form" }
+    {hook name="category.delete-form" location="category_delete_form"}
 
 {/capture}
 
@@ -650,12 +650,12 @@
 
 {* -- Delete product confirmation dialog ------------------------------------ *}
 
-{capture "product_delete_dialog"}
+{capture name="product_delete_dialog"}
     <input type="hidden" name="product_id" id="product_delete_id" value="" />
     <input type="hidden" name="category_id" value="{$category_id}" />
     <input type="hidden" name="page" value="{$page}">
 
-    {hook name="product.delete-form" location="product_delete_form" }
+    {hook name="product.delete-form" location="product_delete_form"}
 
 {/capture}
 
@@ -831,12 +831,12 @@
 
             function sanitizeFloat(numVal) {
                 return numVal.replace(",", ".");
-            };
+            }
 
         });
     </script>
 {/block}
 
 {block name="javascript-last-call"}
-    {hook name="categories.js" location="categories-js" }
+    {hook name="categories.js" location="categories-js"}
 {/block}
