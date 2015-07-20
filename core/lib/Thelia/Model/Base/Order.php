@@ -143,20 +143,22 @@ abstract class Order implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
     /**
      * The value for the postage field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $postage;
 
     /**
      * The value for the postage_tax field.
-     * Note: this column has a database default value of: 0
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $postage_tax;
 
@@ -327,7 +329,9 @@ abstract class Order implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->postage_tax = 0;
+        $this->discount = '0.000000';
+        $this->postage = '0.000000';
+        $this->postage_tax = '0.000000';
         $this->version = 0;
     }
 
@@ -724,7 +728,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -735,7 +739,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [postage] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPostage()
     {
@@ -746,7 +750,7 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Get the [postage_tax] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPostageTax()
     {
@@ -1152,13 +1156,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -1173,13 +1177,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [postage] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostage($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->postage !== $v) {
@@ -1194,13 +1198,13 @@ abstract class Order implements ActiveRecordInterface
     /**
      * Set the value of [postage_tax] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Order The current object (for fluent API support)
      */
     public function setPostageTax($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->postage_tax !== $v) {
@@ -1469,7 +1473,15 @@ abstract class Order implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->postage_tax !== 0) {
+            if ($this->discount !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage !== '0.000000') {
+                return false;
+            }
+
+            if ($this->postage_tax !== '0.000000') {
                 return false;
             }
 
@@ -1541,13 +1553,13 @@ abstract class Order implements ActiveRecordInterface
             $this->invoice_ref = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : OrderTableMap::translateFieldName('Postage', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage = (null !== $col) ? (double) $col : null;
+            $this->postage = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : OrderTableMap::translateFieldName('PostageTax', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->postage_tax = (null !== $col) ? (double) $col : null;
+            $this->postage_tax = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : OrderTableMap::translateFieldName('PostageTaxRuleTitle', TableMap::TYPE_PHPNAME, $indexType)];
             $this->postage_tax_rule_title = (null !== $col) ? (string) $col : null;

@@ -87,7 +87,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     ChildCustomerVersion findOneByReseller(int $reseller) Return the first ChildCustomerVersion filtered by the reseller column
  * @method     ChildCustomerVersion findOneByLang(string $lang) Return the first ChildCustomerVersion filtered by the lang column
  * @method     ChildCustomerVersion findOneBySponsor(string $sponsor) Return the first ChildCustomerVersion filtered by the sponsor column
- * @method     ChildCustomerVersion findOneByDiscount(double $discount) Return the first ChildCustomerVersion filtered by the discount column
+ * @method     ChildCustomerVersion findOneByDiscount(string $discount) Return the first ChildCustomerVersion filtered by the discount column
  * @method     ChildCustomerVersion findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomerVersion filtered by the remember_me_token column
  * @method     ChildCustomerVersion findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildCustomerVersion filtered by the remember_me_serial column
  * @method     ChildCustomerVersion findOneByCreatedAt(string $created_at) Return the first ChildCustomerVersion filtered by the created_at column
@@ -109,7 +109,7 @@ use Thelia\Model\Map\CustomerVersionTableMap;
  * @method     array findByReseller(int $reseller) Return ChildCustomerVersion objects filtered by the reseller column
  * @method     array findByLang(string $lang) Return ChildCustomerVersion objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomerVersion objects filtered by the sponsor column
- * @method     array findByDiscount(double $discount) Return ChildCustomerVersion objects filtered by the discount column
+ * @method     array findByDiscount(string $discount) Return ChildCustomerVersion objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomerVersion objects filtered by the remember_me_token column
  * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildCustomerVersion objects filtered by the remember_me_serial column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomerVersion objects filtered by the created_at column

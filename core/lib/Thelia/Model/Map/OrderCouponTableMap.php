@@ -205,7 +205,7 @@ class OrderCouponTableMap extends TableMap
         $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('TYPE', 'Type', 'VARCHAR', true, 255, null);
-        $this->addColumn('AMOUNT', 'Amount', 'FLOAT', true, null, null);
+        $this->addColumn('AMOUNT', 'Amount', 'DECIMAL', true, 16, 0);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
         $this->addColumn('SHORT_DESCRIPTION', 'ShortDescription', 'LONGVARCHAR', true, null, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', true, null, null);

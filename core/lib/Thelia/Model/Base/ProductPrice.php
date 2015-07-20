@@ -72,15 +72,15 @@ abstract class ProductPrice implements ActiveRecordInterface
 
     /**
      * The value for the price field.
-     * Note: this column has a database default value of: 0
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $price;
 
     /**
      * The value for the promo_price field.
-     * Note: this column has a database default value of: 0
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $promo_price;
 
@@ -129,8 +129,8 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->price = 0;
-        $this->promo_price = 0;
+        $this->price = '0.000000';
+        $this->promo_price = '0.000000';
         $this->from_default_currency = true;
     }
 
@@ -419,7 +419,7 @@ abstract class ProductPrice implements ActiveRecordInterface
     /**
      * Get the [price] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPrice()
     {
@@ -430,7 +430,7 @@ abstract class ProductPrice implements ActiveRecordInterface
     /**
      * Get the [promo_price] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPromoPrice()
     {
@@ -542,13 +542,13 @@ abstract class ProductPrice implements ActiveRecordInterface
     /**
      * Set the value of [price] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
      */
     public function setPrice($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->price !== $v) {
@@ -563,13 +563,13 @@ abstract class ProductPrice implements ActiveRecordInterface
     /**
      * Set the value of [promo_price] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
      */
     public function setPromoPrice($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->promo_price !== $v) {
@@ -662,11 +662,11 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->price !== 0) {
+            if ($this->price !== '0.000000') {
                 return false;
             }
 
-            if ($this->promo_price !== 0) {
+            if ($this->promo_price !== '0.000000') {
                 return false;
             }
 
@@ -708,10 +708,10 @@ abstract class ProductPrice implements ActiveRecordInterface
             $this->currency_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPriceTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (double) $col : null;
+            $this->price = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductPriceTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->promo_price = (null !== $col) ? (double) $col : null;
+            $this->promo_price = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('FromDefaultCurrency', TableMap::TYPE_PHPNAME, $indexType)];
             $this->from_default_currency = (null !== $col) ? (boolean) $col : null;

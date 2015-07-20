@@ -135,9 +135,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     ChildOrder findOneByTransactionRef(string $transaction_ref) Return the first ChildOrder filtered by the transaction_ref column
  * @method     ChildOrder findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrder filtered by the delivery_ref column
  * @method     ChildOrder findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrder filtered by the invoice_ref column
- * @method     ChildOrder findOneByDiscount(double $discount) Return the first ChildOrder filtered by the discount column
- * @method     ChildOrder findOneByPostage(double $postage) Return the first ChildOrder filtered by the postage column
- * @method     ChildOrder findOneByPostageTax(double $postage_tax) Return the first ChildOrder filtered by the postage_tax column
+ * @method     ChildOrder findOneByDiscount(string $discount) Return the first ChildOrder filtered by the discount column
+ * @method     ChildOrder findOneByPostage(string $postage) Return the first ChildOrder filtered by the postage column
+ * @method     ChildOrder findOneByPostageTax(string $postage_tax) Return the first ChildOrder filtered by the postage_tax column
  * @method     ChildOrder findOneByPostageTaxRuleTitle(string $postage_tax_rule_title) Return the first ChildOrder filtered by the postage_tax_rule_title column
  * @method     ChildOrder findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrder filtered by the payment_module_id column
  * @method     ChildOrder findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrder filtered by the delivery_module_id column
@@ -161,9 +161,9 @@ use Thelia\Model\Map\OrderTableMap;
  * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrder objects filtered by the transaction_ref column
  * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrder objects filtered by the delivery_ref column
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrder objects filtered by the invoice_ref column
- * @method     array findByDiscount(double $discount) Return ChildOrder objects filtered by the discount column
- * @method     array findByPostage(double $postage) Return ChildOrder objects filtered by the postage column
- * @method     array findByPostageTax(double $postage_tax) Return ChildOrder objects filtered by the postage_tax column
+ * @method     array findByDiscount(string $discount) Return ChildOrder objects filtered by the discount column
+ * @method     array findByPostage(string $postage) Return ChildOrder objects filtered by the postage column
+ * @method     array findByPostageTax(string $postage_tax) Return ChildOrder objects filtered by the postage_tax column
  * @method     array findByPostageTaxRuleTitle(string $postage_tax_rule_title) Return ChildOrder objects filtered by the postage_tax_rule_title column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrder objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrder objects filtered by the delivery_module_id column
