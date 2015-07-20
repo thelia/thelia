@@ -351,7 +351,7 @@
     </route>
 
     <route id="admin.product.calculate-price" path="/admin/product/calculate-price">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCalculator</default>
     </route>
 
     <route id="admin.product.calculate-raw-price" path="/admin/product/calculate-raw-price">
