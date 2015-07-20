@@ -64,9 +64,10 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected function findRelativePath($filePath, $mode)
     {
-        $absolutePath = THELIA_ROOT . $filePath;
-
-        return $this->findAbsolutePath($absolutePath, $mode);
+        return $this->findAbsolutePath(
+            (preg_match('/^[a-z]:\\|^\//i', $filePath) ? '' : THELIA_ROOT) . $filePath,
+            $mode
+        );
     }
 
     protected function findAbsolutePath($filePath, $mode)
