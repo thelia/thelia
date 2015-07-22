@@ -56,7 +56,7 @@ $thelia->getContainer()->get('thelia.translator');
 $faker = Faker\Factory::create('en_US');
 
 // Create localized version for content generation
-$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
+$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
 
 $localizedFaker = [];
 
