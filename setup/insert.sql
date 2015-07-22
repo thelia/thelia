@@ -4,8 +4,8 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`date_format`,`time_format
 (3, 'Castellano', 'es', 'es_ES', '', 'm-d-Y', 'h:i:s', 'm-d-Y h:i:s', ',', '.', '2', '0', NOW(), NOW()),
 (4, 'Italiano', 'it', 'it_IT', '', 'd/m/Y', 'H:i:s', 'd/m/y H:i:s', ',', ' ', '2', '0', NOW(), NOW()),
 (5, 'Russian', 'ru', 'ru_RU', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW()),
-(6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW());
-
+(6, 'Czech', 'cs', 'cs_CZ', '', 'j.n.Y', 'H:i:s', 'j.n.Y H:i:s', ',', ' ', '2', 0, NOW(), NOW()),
+(7, 'Deutsch', 'de', 'de_DE', '', 'd-m-Y', 'H:i:s', 'd-m-Y H:i:s', ',', '.', '2', 0, NOW(), NOW());
 
 INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
 (1, 'check-available-stock', '1', 0, 0, NOW(), NOW()),
