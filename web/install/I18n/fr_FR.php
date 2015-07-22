@@ -19,6 +19,7 @@ return array(
     'Don\'t forget to delete the web/install directory.' => 'N\'oubliez pas de supprimer le répertoire web/install !.',
     'English' => 'Anglais',
     'French' => 'Français',
+    'German' => 'Allemand',
     'General information' => 'Informations générales',
     'Go to back office' => 'Allez dans l\'interface d\'administration',
     'Host :' => 'Hôte :',
@@ -62,5 +63,8 @@ return array(
     'Cache directory has been cleared' => 'Le répertoire du Cache a été nettoyé',
     'Cache directory has not been cleared. Please manually delete content of cache directory.' => 'Le répertoire du Cache n\'a pas été nettoyé. Veuillez supprimer son contenu.',
     'The update wizard directory will be removed' => 'Le répertoire de l\'assistant de mise à jour va être supprimé',
-    "Refresh" => 'Rafraîchir'
+    "Refresh" => 'Rafraîchir',
+    'Published by OpenStudio' => 'Développé par OpenStudio',
+    'Thelia support forum' => 'Forum de Thelia',
+    'Thelia contributions' => 'Contributions de Thelia'
 );
