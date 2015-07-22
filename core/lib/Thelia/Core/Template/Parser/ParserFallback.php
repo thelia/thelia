@@ -101,6 +101,14 @@ class ParserFallback implements ParserInterface
         $this->throwException();
     }
 
+    /**
+     * @return \Thelia\Core\Template\TemplateHelperInterface the parser template helper instance
+     */
+    public function getTemplateHelper()
+    {
+        $this->throwException();
+    }
+
     private function throwException()
     {
         throw new \RuntimeException('if you want to use a parser, please register one');
