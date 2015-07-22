@@ -295,9 +295,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="account-order.after-javascript-include"}
+{hook name="account-order.after-javascript-include" order=$order_id}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="account-order.javascript-initialization"}
+{hook name="account-order.javascript-initialization" order=$order_id}
 {/block}

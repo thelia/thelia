@@ -43,7 +43,7 @@
         {form_hidden_fields}
         {if $form_error}<div class="alert alert-danger">{$form_error_message}</div>{/if}
 
-        {hook name="address-update.form-top"}
+        {hook name="address-update.form-top" address=$address_id}
 
         <fieldset class="panel panel-default">
             <div class="panel-heading">
@@ -257,7 +257,7 @@
             {/if}
         {/form_field}
 
-        {hook name="address-update.form-bottom"}
+        {hook name="address-update.form-bottom" address=$address_id}
 
         <div class="form-group group-btn">
             <div class="control-btn col-sm-5 col-sm-offset-3">
@@ -268,7 +268,7 @@
         </form>
         {/loop}
     {/form}
-    {hook name="address-update.bottom"}
+    {hook name="address-update.bottom" address=$address_id}
     </article>
 
     </div><!-- /.layout -->
@@ -279,9 +279,9 @@
 {/block}
 
 {block name="after-javascript-include"}
-{hook name="address-update.after-javascript-include"}
+{hook name="address-update.after-javascript-include" address=$address_id}
 {/block}
 
 {block name="javascript-initialization"}
-{hook name="address-update.javascript-initialization"}
+{hook name="address-update.javascript-initialization" address=$address_id}
 {/block}
