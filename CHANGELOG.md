@@ -8,6 +8,7 @@
 # 2.2.0-beta2
 
 - Add module image edition in backoffice
+- Fix form serialization in session that contain uploaded files
 - The language change links should now use the locale instead of the language code, e.g. http://www.yourshop/some-page?lang=fr_FR instead if http://www.yourshop/some-page?lang=fr. Backward compatibility is provided.
 - Order status added by modules have their CSS label color handled or have a default color
 - New login page style
