@@ -118,7 +118,7 @@ class FolderImage extends BaseFolderImage implements BreadcrumbInterface, FileMo
      */
     public function getRedirectionUrl()
     {
-        return '/admin/folder/update/' . $this->getFolderId();
+        return '/admin/folders/update/' . $this->getFolderId();
     }
 
     /**

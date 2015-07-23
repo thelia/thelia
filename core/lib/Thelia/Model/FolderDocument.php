@@ -118,7 +118,7 @@ class FolderDocument extends BaseFolderDocument implements BreadcrumbInterface, 
      */
     public function getRedirectionUrl()
     {
-        return '/admin/folder/update/' . $this->getFolderId();
+        return '/admin/folders/update/' . $this->getFolderId();
     }
 
     /**
