@@ -72,6 +72,7 @@ return array(
     'Discount' => 'Discount',
     'Do you have an account?' => 'Do you have an account?',
     'Do you really want to delete this address ?' => 'Do you really want to delete this address ?',
+    'Documents' => 'Documents',
     'Download' => 'Download',
     'Edit' => 'Edit',
     'Edit this address' => 'Edit this address',
