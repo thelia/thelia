@@ -395,7 +395,7 @@
 
             <div class="row">
                 <div class="col-md-12 clearfix">
-                    <div class="version-info pull-left">{intl l='Version %ver' ver="{$THELIA_VERSION}"}</div>
+                    <div class="version-info pull-left"></div>
                     <div class="clearfix pull-right hidden-xs">
                         <div class="button-toolbar pull-right" role="toolbar">
                             <div class="btn-group">

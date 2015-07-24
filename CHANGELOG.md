@@ -1,6 +1,3 @@
-# 2.1.6
-- Check virtualProducts of order before send mail ```mail_virtualproduct```
-
 # 2.1.5
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
@@ -189,6 +186,9 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
+
+# 2.0.9
+- Klik&Pay is no more a submodule
 
 # 2.0.8
 - Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)

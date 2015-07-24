@@ -77,14 +77,7 @@ class UrlGenerator extends AbstractSmartyPlugin
             $mode
         );
 
-        if ($noamp == null) {
-            $url = str_replace('&', '&amp;', $url);
-        }
-
-        if ($target != null) {
-            $url .= '#'.$target;
-        }
-        return $url;
+        return $this->applyNoAmpAndTarget($params, $url);
     }
 
     /**
@@ -221,9 +214,11 @@ class UrlGenerator extends AbstractSmartyPlugin
     {
         $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
         $target = $this->getParam($params, 'target', null);
-        if ($noamp == null) {
+
+        if ($noamp == null && false === strpos($url, '&amp;')) {
             $url = str_replace('&', '&amp;', $url);
         }
+
         if ($target != null) {
             $url .= '#'.$target;
         }

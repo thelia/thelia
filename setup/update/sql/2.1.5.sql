@@ -25,4 +25,6 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (@max_id+2, 'es_ES', NULL, '', '')
 ;
 
+UPDATE `hook` SET `by_module` = 1 WHERE `code` = 'module.config-js';
+
 SET FOREIGN_KEY_CHECKS = 1;
