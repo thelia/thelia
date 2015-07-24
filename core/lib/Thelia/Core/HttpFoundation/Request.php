@@ -27,10 +27,29 @@ use Thelia\Model\ConfigQuery;
  */
 class Request extends BaseRequest
 {
+    /** @var string Path info without trailing slash */
     private $resolvedPathInfo;
 
     /** @var string */
     protected $controllerType = null;
+
+    /**
+     * @
+     * {@inheritdoc} Including Thelia request properties
+     */
+    public function initialize(
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
+        parent::initialize($query, $request, $attributes, $cookies, $files, $server, $content);
+
+        $this->resolvedPathInfo = null;
+    }
 
     /**
      * Filter PathInfo to allow slash ending uri
@@ -43,7 +62,9 @@ class Request extends BaseRequest
         $pathInfo = parent::getPathInfo();
         $pathLength = strlen($pathInfo);
 
-        if ($pathInfo !== "/" && $pathInfo[$pathLength - 1] === "/" && (bool) ConfigQuery::read("allow_slash_ended_uri", false)) {
+        if ($pathInfo !== '/' && $pathInfo[$pathLength - 1] === '/'
+            && (bool) ConfigQuery::read('allow_slash_ended_uri', false)
+        ) {
             if (null === $this->resolvedPathInfo) {
                 $this->resolvedPathInfo = substr($pathInfo, 0, $pathLength - 1); // Remove the slash
             }
@@ -81,22 +102,12 @@ class Request extends BaseRequest
         return $uri . $additionalQs;
     }
 
-    /**
-     * Gets the Session.
-     *
-     * @return \Thelia\Core\HttpFoundation\Session\Session The session
-     * @api
-     */
-    public function getSession()
-    {
-        return parent::getSession();
-    }
-
     public function toString($withContent = true)
     {
         $string =
-            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))."\r\n".
-            $this->headers."\r\n";
+            sprintf('%s %s %s', $this->getMethod(), $this->getRequestUri(), $this->server->get('SERVER_PROTOCOL'))
+            . "\r\n" . $this->headers . "\r\n"
+        ;
 
         if (true === $withContent) {
             $string .= $this->getContent();
