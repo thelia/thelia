@@ -54,7 +54,7 @@ class OrderPayment extends FirewallForm
             // Add terms & conditions
             ->add("agreed", "checkbox", array(
                 "constraints" => array(
-                    new Constraints\True(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
+                    new Constraints\IsTrue(array("message" => Translator::getInstance()->trans("Please accept the Terms and conditions in order to register."))),
                 ),
                 "label" => "Agreed",
                 "label_attr" => array(
