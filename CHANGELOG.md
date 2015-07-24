@@ -1,3 +1,13 @@
+# 2.1.6
+- Check virtualProducts of order before send mail ```mail_virtualproduct```
+
+# 2.1.5
+- Klik&Pay is no more a submodule
+- default category's parent is now 0
+- check specific role in security module instead of checking if a user is logged in
+- add a customer page parameter for the order loop on the customer page 
+- keep break line in ACE editor
+
 # 2.1.4
 
 - Add ```export.top``` and ```export.bottom``` hooks
