@@ -5,6 +5,7 @@
     - ```address_id``` in template ```address-update.html``` for hooks ```address-update.form-top```, ```address-update.bottom```, ```address-update.after-javascript-include```, ```address-update.javascript-initialization```
 - #1587 Fix redirect url for the folder image and folder document
 - #1590 Fix Thelia request initialization
+- #1593 Fix form serialization in session that contain uploaded files
 
 # 2.2.0-beta2
 
