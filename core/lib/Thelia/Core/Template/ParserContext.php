@@ -12,10 +12,11 @@
 
 namespace Thelia\Core\Template;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Thelia\Core\Form\TheliaFormFactoryInterface;
 use Thelia\Core\Form\TheliaFormValidatorInterface;
-use Thelia\Core\Thelia;
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Thelia;
 use Thelia\Form\BaseForm;
 use TheliaSmarty\Template\Exception\SmartyPluginException;
 
@@ -111,9 +112,17 @@ class ParserContext implements \IteratorAggregate
 
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
+        /** Remove unserializable objects \Symfony\Component\HttpFoundation\File\UploadedFile */
+        $formData = $form->getForm()->getData();
+        foreach ($formData as $idx => $value) {
+            if ($value instanceof UploadedFile) {
+                unset($formData[$idx]);
+            }
+        }
+
         // Set form error information
         $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
-            'data'              => $form->getForm()->getData(),
+            'data'              => $formData,
             'hasError'          => $form->hasError(),
             'errorMessage'      => $form->getErrorMessage(),
             'method'            => $this->request->getMethod(),
