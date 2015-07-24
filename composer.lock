@@ -405,7 +405,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/e5d9c677175d147b72a05087b916dfd103e1df74",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/ab12b6f57dd33b1fffa875046fd17c34d88388b9",
                 "reference": "c94b4815280144257b749e1d96db1aad728802df",
                 "shasum": ""
             },
@@ -570,7 +570,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/ce6e728136c4afb7c70b3c866ded8949b922d246",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/edeb1d5b67545fe2ce7f6670362a33f7cfd36247",
                 "reference": "793aea6b762d9a72b083bfc49c74c574f67650c8",
                 "shasum": ""
             },
@@ -2172,28 +2172,30 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v2.3.21",
+            "version": "v2.3.31",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Validator.git",
-                "reference": "8213195cd4b5725e97ed8130c0b8ef498d829917"
+                "reference": "c13b529d5653a9a789116d8c9a3e678c83a86bb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Validator/zipball/8213195cd4b5725e97ed8130c0b8ef498d829917",
-                "reference": "8213195cd4b5725e97ed8130c0b8ef498d829917",
+                "url": "https://api.github.com/repos/symfony/Validator/zipball/c13b529d5653a9a789116d8c9a3e678c83a86bb8",
+                "reference": "c13b529d5653a9a789116d8c9a3e678c83a86bb8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
-                "symfony/translation": "~2.0"
+                "symfony/translation": "~2.0,>=2.0.5"
             },
             "require-dev": {
+                "doctrine/common": "~2.3",
                 "symfony/config": "~2.2",
                 "symfony/http-foundation": "~2.1",
                 "symfony/intl": "~2.3",
-                "symfony/yaml": "~2.0"
+                "symfony/phpunit-bridge": "~2.7",
+                "symfony/yaml": "~2.0,>=2.0.5"
             },
             "suggest": {
                 "doctrine/common": "",
@@ -2219,17 +2221,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Validator Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-10-01 05:39:06"
+            "homepage": "https://symfony.com",
+            "time": "2015-06-27 21:20:18"
         },
         {
             "name": "symfony/yaml",

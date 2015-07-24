@@ -6,6 +6,7 @@
 - #1587 Fix redirect url for the folder image and folder document
 - #1590 Fix Thelia request initialization
 - #1593 Fix form serialization in session that contain uploaded files
+- update symfony/validator version to 2.3.31
 
 # 2.2.0-beta2
 
