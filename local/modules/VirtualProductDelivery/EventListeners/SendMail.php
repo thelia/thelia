@@ -12,6 +12,7 @@
 
 namespace VirtualProductDelivery\EventListeners;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
@@ -22,6 +23,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\MessageQuery;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\OrderProductQuery;
 
 /**
  * Class SendMail
@@ -51,6 +53,13 @@ class SendMail implements EventSubscriberInterface
             ->findOne();
 
         if ($order->hasVirtualProduct() && $event->getStatus() == $paidStatusId) {
+            $virtualProductCount = OrderProductQuery::create()
+                ->filterByOrderId($order->getId())
+                ->filterByVirtual(true)
+                ->filterByVirtualDocument(null, Criteria::NOT_EQUAL)
+                ->count();
+
+            if ($virtualProductCount > 0) {
             $contact_email = ConfigQuery::read('store_email');
 
             $customer = $order->getCustomer();
@@ -91,6 +100,7 @@ class SendMail implements EventSubscriberInterface
                     "Virtual product download: store contact email is not defined. Customer ID:",
                     $customer->getId()
                 );
+                }
             }
         }
     }
