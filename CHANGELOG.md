@@ -7,6 +7,7 @@
 - #1590 Fix Thelia request initialization
 - #1593 Fix form serialization in session that contain uploaded files
 - update symfony/validator version to 2.3.31
+- #1598 composer.json update dependency fzaninotto/faker to stable version 1.5
 
 # 2.2.0-beta2
 
