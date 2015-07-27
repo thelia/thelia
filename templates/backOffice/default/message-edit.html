@@ -93,9 +93,9 @@
 
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            {custom_render_form_field field='html_message'}
-                                                                <textarea {$disable_html} {form_field_attributes field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
-                                                                <div id="{$name}" style="height: 500px;"></div>
+							    {custom_render_form_field form=$form field='html_message'}
+    								<textarea {$disable_html} {form_field_attributes form=$form field='html_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+    								<div id="{$name}" style="height: 500px;"></div>
                                                             {/custom_render_form_field}
                                                         </div>
                                                     </div>
@@ -133,11 +133,11 @@
 
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            {custom_render_form_field field='text_message'}
-                                                            <textarea {$disable_html} {form_field_attributes field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
+                                                            {custom_render_form_field form=$form field='text_message'}
+                                                            <textarea {$disable_html} {form_field_attributes form=$form field='text_message' extra_class="fixedfont"}>{$value nofilter}</textarea>
                                                             <div id="{$name}" style="height: 500px;"></div>
+                                                            {/custom_render_form_field}
                                                         </div>
-                                                        {/custom_render_form_field}
                                                     </div>
                                                 </div>
                                             </div>
