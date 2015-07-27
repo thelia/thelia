@@ -1,3 +1,6 @@
+# 2.1.6
+- Check virtualProducts of order before send mail ```mail_virtualproduct```
+
 # 2.1.5
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
