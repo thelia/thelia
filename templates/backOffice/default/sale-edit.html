@@ -251,9 +251,23 @@
 
         {* data-date-format is a moment.js date format *}
 
-        $('.datetime-picker').datetimepicker({
+        $('#sale-update-form .datetime-picker').datetimepicker({
             locale: "{lang attr="code"}"
+        }).on('dp.change', function (e){
+            if($(this).attr('id')=='start_date'){
+                $('#end_date').data('DateTimePicker').minDate(e.date);
+            }else if($(this).attr('id')=='end_date'){
+                $('#start_date').data('DateTimePicker').maxDate(e.date);
+            }
         });
+
+        if ($('#sale-update-form #start_date').val()!=''){
+            $('#sale-update-form #end_date').data('DateTimePicker').minDate($('#sale-update-form #start_date').val());
+        }
+
+        if ($('#sale-update-form #end_date').val()!=''){
+            $('#sale-update-form #start_date').data('DateTimePicker').maxDate($('#sale-update-form #end_date').val());
+        }
 
         $(document.body).on('change', '.invert-selection', function(ev) {
             var checked = $(this).prop('checked');
