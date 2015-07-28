@@ -1,5 +1,6 @@
 # 2.2.0-beta3
 
+- #1601 Add set error in TheliaFormValidator when form is not valid
 - #1585 Add parameters in frontOffice hooks
     - ```order_id``` in template ```account-order.html``` for hooks ```account-order.after-javascript-include```, ```account-order.javascript-initialization```
     - ```address_id``` in template ```address-update.html``` for hooks ```address-update.form-top```, ```address-update.bottom```, ```address-update.after-javascript-include```, ```address-update.javascript-initialization```
