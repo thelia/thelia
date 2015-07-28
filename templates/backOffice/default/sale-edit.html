@@ -252,8 +252,7 @@
         {* data-date-format is a moment.js date format *}
 
         $('.datetime-picker').datetimepicker({
-            lang: "{lang attr="code"}",
-            useSeconds: false
+            locale: "{lang attr="code"}"
         });
 
         $(document.body).on('change', '.invert-selection', function(ev) {
