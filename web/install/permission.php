@@ -45,12 +45,13 @@ try {
     </div>
     <div class="clearfix">
         <?php if ($isValid) { ?>
-            <a href="connection.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans(
-                    'Continue'
-                ); ?></a>
+            <a href="connection.php" class="pull-right btn btn-default btn-primary"><span class="glyphicon glyphicon-chevron-right"></span>
+                <?php echo $trans->trans('Continue'); ?>
+            </a>
         <?php } else { ?>
             <a href="permission.php" class="pull-right btn btn-default btn-danger"><span class="glyphicon glyphicon-refresh"></span>
-                refresh</a>
+                <?php echo $trans->trans('Refresh'); ?>
+            </a>
         <?php } ?>
     </div>
 <?php

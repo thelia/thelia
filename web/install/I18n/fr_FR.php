@@ -62,4 +62,5 @@ return array(
     'Cache directory has been cleared' => 'Le répertoire du Cache a été nettoyé',
     'Cache directory has not been cleared. Please manually delete content of cache directory.' => 'Le répertoire du Cache n\'a pas été nettoyé. Veuillez supprimer son contenu.',
     'The update wizard directory will be removed' => 'Le répertoire de l\'assistant de mise à jour va être supprimé',
+    "Refresh" => 'Rafraîchir'
 );

@@ -61,4 +61,5 @@ return array(
     'Cache directory has been cleared' => 'Cache directory has been cleared',
     'Cache directory has not been cleared. Please manually delete content of cache directory.' => 'Cache directory has not been cleared. Please manually delete content of cache directory.',
     'The update wizard directory will be removed' => 'The update wizard directory will be removed',
+    "Refresh" => 'Refresh'
 );
