@@ -19,10 +19,10 @@
 <hr />
 <footer class="footer">
     <div class="container">
-        <p>&copy; Thelia 2013
-            - <a href="http://www.openstudio.fr/" target="_blank">Édité par OpenStudio</a>
-            - <a href="http://forum.thelia.net/" target="_blank">Forum Thelia</a>
-            - <a href="http://contrib.thelia.net/" target="_blank">Contributions Thelia</a>
+        <p>&copy; Thelia 2015
+            - <a href="http://www.openstudio.fr/" target="_blank"><?php $trans->trans('Published by OpenStudio'); ?></a>
+            - <a href="http://forum.thelia.net/" target="_blank"><?php $trans->trans('Thelia support forum'); ?></a>
+            - <a href="http://contrib.thelia.net/" target="_blank"><?php $trans->trans('Thelia contributions'); ?></a>
         </p>
     </div>
 </footer>

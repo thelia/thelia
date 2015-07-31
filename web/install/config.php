@@ -111,15 +111,17 @@ try {
             <div class="form-group">
                 <label for="admin_locale"><?php echo $trans->trans('Administrator preferred locale :'); ?></label>
                 <select id="admin_locale" name="admin_locale" class="form-control" required>
-                    <option value="en_US">English</option>
-                    <option value="fr_FR">Français</option>
+                    <option value="en_US"><?php echo $trans->trans('English'); ?></option>
+                    <option value="fr_FR"><?php echo $trans->trans('French'); ?></option>
+                    <option value="de_DE"><?php echo $trans->trans('German'); ?></option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="shop_locale"><?php echo $trans->trans('Shop preferred locale :'); ?></label>
                 <select id="shop_locale" name="shop_locale" class="form-control" required>
-                    <option value="en_US"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "en_US") { echo " selected=\"\""; } ?>>English</option>
-                    <option value="fr_FR"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "fr_FR") { echo " selected=\"\""; } ?>>Français</option>
+                    <option value="en_US"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "en_US") { echo " selected=\"\""; } ?>><?php echo $trans->trans('English'); ?></option>
+                    <option value="fr_FR"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "fr_FR") { echo " selected=\"\""; } ?>><?php echo $trans->trans('French'); ?></option>
+                    <option value="de_DE"<?php if(isset($_GET["admin_locale"]) && $_GET["admin_locale"] === "de_DE") { echo " selected=\"\""; } ?>><?php echo $trans->trans('German'); ?></option>
                 </select>
             </div>
             <div class="form-group">
