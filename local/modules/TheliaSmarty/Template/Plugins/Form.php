@@ -878,7 +878,7 @@ class Form extends AbstractSmartyPlugin
             $this->buildFieldName($formField),
             $formField->getViewData(),
             $formFieldConfig->getType(),
-            $formFieldConfig->getOptions()
+            $formField->createView()->vars
         );
 
         return '';
