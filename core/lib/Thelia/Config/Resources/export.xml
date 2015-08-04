@@ -53,7 +53,7 @@
         <export id="thelia.export.prices" class="Thelia\ImportExport\Export\Type\ProductPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
                 <title>Prix des produits Hors-Taxes</title>
-                <description>Expotez le prix hors taxes de vos produits</description>
+                <description>Exporter le prix hors taxes de vos produits</description>
             </export_descriptive>
             <export_descriptive locale="en_US">
                 <title>Product prices excluding taxes</title>
@@ -64,7 +64,7 @@
         <export id="thelia.export.taxed_prices" class="Thelia\ImportExport\Export\Type\ProductTaxedPricesExport" category_id="thelia.export.products">
             <export_descriptive locale="fr_FR">
                 <title>Prix des produits TTC</title>
-                <description>Expotez le prix TTC de vos produits</description>
+                <description>Exporter le prix TTC de vos produits</description>
             </export_descriptive>
             <export_descriptive locale="en_US">
                 <title>Product prices including taxes</title>
@@ -82,7 +82,7 @@
             <export_descriptive locale="fr_FR">
                 <title>Informations SEO des produits</title>
                 <description>
-                    Exportez les informations SEO de vos produits
+                    Exporter les informations SEO de vos produits
                     ( url réécrites, meta description et mots clés, titre ) de vos produits
                 </description>
             </export_descriptive>
@@ -98,7 +98,7 @@
             <export_descriptive locale="fr_FR">
                 <title>Contenus et dossiers</title>
                 <description>
-                    Exportez vos contenus et les dossiers associés
+                    Exporter vos contenus et les dossiers associés
                 </description>
             </export_descriptive>
         </export>
@@ -107,13 +107,13 @@
             <export_descriptive locale="en_US">
                 <title>Full orders</title>
                 <description>
-                    Export your orders.
+                    Export your orders
                 </description>
             </export_descriptive>
             <export_descriptive locale="fr_FR">
                 <title>Commandes complètes</title>
                 <description>
-                    Exportez vos commandes
+                    Exporter vos commandes
                 </description>
             </export_descriptive>
         </export>
