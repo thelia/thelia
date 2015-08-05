@@ -361,6 +361,11 @@ final class TheliaEvents
     const AFTER_CARTADDITEM = "cart.after.addItem";
 
     /**
+     * sent for searching an item in the cart
+     */
+    const CART_FINDITEM = "cart.findItem";
+
+    /**
      * sent when a cart item is modify
      */
     const AFTER_CARTUPDATEITEM = "cart.updateItem";
