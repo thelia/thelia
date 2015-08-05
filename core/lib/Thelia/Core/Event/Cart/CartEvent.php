@@ -53,12 +53,24 @@ class CartEvent extends ActionEvent
     }
 
     /**
-     * @param  CartItem  $cartItem
+     * @param  CartItem $cartItem
      * @return CartEvent
      */
     public function setCartItem(CartItem $cartItem)
     {
         $this->cartItem = $cartItem;
+
+        return $this;
+    }
+
+    /**
+     * Clear the current cart item
+     *
+     * @return CartEvent
+     */
+    public function clearCartItem()
+    {
+        $this->cartItem = null;
 
         return $this;
     }

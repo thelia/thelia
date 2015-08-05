@@ -278,13 +278,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function findCartItem(CartEvent $event)
     {
-        $foundItem = CartItemQuery::create()
+        if (null !== $foundItem = CartItemQuery::create()
             ->filterByCartId($event->getCart()->getId())
             ->filterByProductId($event->getProduct())
             ->filterByProductSaleElementsId($event->getProductSaleElementsId())
-            ->findOne();
-
-        $event->setCartItem($foundItem);
+            ->findOne()) {
+            $event->setCartItem($foundItem);
+        }
     }
 
     /**
