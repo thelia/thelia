@@ -84,7 +84,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $productSaleElementsId = $event->getProductSaleElementsId();
         $productId = $event->getProduct();
 
-        $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
+        // Search for an identical item in the cart
+        $event->getDispatcher()->dispatch(TheliaEvents::CART_FINDITEM, $event);
+
+        $cartItem = $event->getCartItem();
 
         if ($cartItem === null || $newness) {
             $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId);
@@ -256,6 +259,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @param  int           $productId
      * @param  int           $productSaleElementsId
      * @return CartItem
+     *
+     * @deprecated this method is deprecated. Dispatch a TheliaEvents::CART_FINDITEM instead
      */
     protected function findItem($cartId, $productId, $productSaleElementsId)
     {
@@ -264,6 +269,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
+    }
+
+    /**
+     * Find a specific record in CartItem table using the current CartEvent
+     *
+     * @param CartEvent $event the cart event
+     */
+    public function findCartItem(CartEvent $event)
+    {
+        if (null !== $foundItem = CartItemQuery::create()
+            ->filterByCartId($event->getCart()->getId())
+            ->filterByProductId($event->getProduct())
+            ->filterByProductSaleElementsId($event->getProductSaleElementsId())
+            ->findOne()) {
+            $event->setCartItem($foundItem);
+        }
     }
 
     /**
@@ -462,6 +483,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CART_RESTORE_CURRENT => array("restoreCurrentCart", 128),
             TheliaEvents::CART_CREATE_NEW => array("createEmptyCart", 128),
             TheliaEvents::CART_ADDITEM => array("addItem", 128),
+            TheliaEvents::CART_FINDITEM => array("findCartItem", 128),
             TheliaEvents::CART_DELETEITEM => array("deleteItem", 128),
             TheliaEvents::CART_UPDATEITEM => array("changeItem", 128),
             TheliaEvents::CART_CLEAR => array("clear", 128),

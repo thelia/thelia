@@ -16,6 +16,12 @@ if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
 
+// Set this to true to get "real text" instead of random letters in titles, chapo, descriptions, etc.
+// WARNING : relaTextMode is much more slower than false text mode, and may cause problems with Travis
+// such as  "No output has been received in the last 10 minutes, this potentially indicates a stalled
+// build or something wrong with the build itself."
+$realTextMode = false;
+
 $bootstrapToggle = false;
 $bootstraped = false;
 
@@ -955,13 +961,17 @@ function generate_document($document, $typeobj, $id)
 }
 
 function getRealText($length, $locale = 'en_US') {
-    global $localizedFaker;
-    
-    $text = $localizedFaker[$locale]->realText($length);
+    global $localizedFaker, $realTextMode;
 
-    // Below 20 chars, generate a simple text, without ponctuation nor newlines.
-    if ($length <= 20)
-        $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+    if ($realTextMode) {
+        $text = $localizedFaker[$locale]->realText($length);
+
+        // Below 20 chars, generate a simple text, without ponctuation nor newlines.
+        if ($length <= 20)
+            $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+    } else {
+        $text = $localizedFaker[$locale]->text($length);
+    }
 
     // echo "Generated $locale text ($length) : $locale:$text\n";
 
