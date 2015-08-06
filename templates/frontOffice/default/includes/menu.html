@@ -10,9 +10,7 @@
     <div class="block-content">
         <nav class="nav-categories">
 
-            {loop name="current_cat" type="category" current="yes"}
-                {assign var="parent_cat" value=$PARENT}
-            {/loop}
+            {assign var="parent_cat" value={category attr="parent"}}
 
             {assign var="parent_cat_ids" value=[]}
 
@@ -45,16 +43,20 @@
                     {else}
                         {assign var="collapsed" value="collapsed"}
                     {/if}
+
                     <li>
-                        <a href="{$URL nofilter}#collapse{$ID}" class="accordion-toggle {$collapsed}" data-toggle="collapse" data-parent="#collapse{$ID}">
-                            {$TITLE} ({count type="product" category="{$ID}"})
+                        <a href="{$URL nofilter}">
+                            {$TITLE} ({count type="product" category=$ID})
                         </a>
-                    {menu parent=$ID level=$level+1}
+
+                        <a href="#collapse{$ID}" class="accordion-toggle {$collapsed}" data-toggle="collapse" data-parent="#collapse{$ID}"></a>
+
+                        {menu parent=$ID level=$level+1}
                     </li>
                 {else}
                     <li>
                         <a href="{$URL nofilter}">
-                            {$TITLE} ({count type="product" category="{$ID}"})
+                            {$TITLE} ({count type="product" category=$ID})
                         </a>
                     </li>
                 {/if}
