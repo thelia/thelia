@@ -11,6 +11,8 @@
 - update symfony/validator version to 2.3.31
 - #1598 composer.json update dependency fzaninotto/faker to stable version 1.5
 - #1583 Add German translations
+- #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
+- #1618 Configurable faker
 
 # 2.2.0-beta2
 
