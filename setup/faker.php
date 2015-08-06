@@ -20,25 +20,23 @@ if (php_sapi_name() != 'cli') {
 // WARNING : relaTextMode is much more slower than false text mode, and may cause problems with Travis
 // such as  "No output has been received in the last 10 minutes, this potentially indicates a stalled
 // build or something wrong with the build itself."
-$realTextMode = false;
-
-$bootstrapToggle = false;
 $bootstraped = false;
+$realTextMode = true;
+$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
+$numberCategories = 20;
+$numberProducts = 20;
+
+$options = getopt("b:c:p:r:l:h");
+
+if (false === $options || isset($options['h'])) {
+    usage();
+    exit(0);
+}
 
 // Autoload bootstrap
-
-foreach ($argv as $arg) {
-    if ($arg === '-b') {
-        $bootstrapToggle = true;
-
-        continue;
-    }
-
-    if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
-
-        $bootstraped = true;
-    }
+if (isset($options['b'])) {
+    require __DIR__ . DIRECTORY_SEPARATOR . $options['b'];
+    $bootstraped = true;
 }
 
 if (!$bootstraped) {
@@ -55,6 +53,28 @@ if (!$bootstraped) {
     }
 }
 
+// real text mode
+if (isset($options['r'])) {
+    $realTextMode = filter_var($options['r'], FILTER_VALIDATE_BOOLEAN);
+}
+
+// locales
+if (isset($options['l'])) {
+    $localeList = explode(',', str_replace(' ', '', $options['l']));
+}
+
+if (isset($options['c'])) {
+    if (0 !== intval($options['c'])) {
+        $numberCategories = intval($options['c']);
+    }
+}
+
+if (isset($options['p'])) {
+    if (0 !== intval($options['p'])) {
+        $numberProducts = intval($options['p']);
+    }
+}
+
 $thelia = new Thelia\Core\Thelia("dev", false);
 $thelia->boot();
 $thelia->getContainer()->get('thelia.translator');
@@ -62,8 +82,6 @@ $thelia->getContainer()->get('thelia.translator');
 $faker = Faker\Factory::create('en_US');
 
 // Create localized version for content generation
-$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
-
 $localizedFaker = [];
 
 foreach ($localeList as $locale) {
@@ -392,9 +410,9 @@ try {
         $ft = new Thelia\Model\FeatureTemplate();
 
         $ft
-        ->setTemplate($template)
-        ->setFeatureId($featureId)
-        ->save();
+            ->setTemplate($template)
+            ->setFeatureId($featureId)
+            ->save();
     }
 
     echo "Creating folders and contents\n";
@@ -494,18 +512,18 @@ try {
     $productIdList = array();
     $virtualProductList = array();
     $categoryIdList = array();
-    for ($i=1; $i<20; $i++) {
+    for ($i=1; $i<$numberCategories; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
-        for ($j=1; $j<rand(0, 20); $j++) {
+        for ($j=1; $j<rand(0, $numberCategories); $j++) {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
-            for ($k=0; $k<rand(0, 20); $k++) {
+            for ($k=0; $k<rand(0, $numberProducts); $k++) {
                 createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList, $virtualProductList);
             }
         }
 
-        for ($k=1; $k<rand(1, 50); $k++) {
+        for ($k=1; $k<rand(1, $numberProducts); $k++) {
             createProduct($faker, $category, $k, $template, $brandIdList, $productIdList, $virtualProductList);
         }
     }
@@ -631,7 +649,7 @@ try {
     echo "Creating orders\n";
 
     $colissimo_id = ModuleQuery::create()->
-        filterByCode("Colissimo")
+    filterByCode("Colissimo")
         ->findOne()
         ->getId();
 
@@ -656,7 +674,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         $invoiceOrderAddress = new OrderAddress();
@@ -672,7 +690,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         /**
@@ -737,7 +755,7 @@ try {
                 ->setTaxRuleTitle(getRealText(20))
                 ->setTaxRuleDescription(getRealText(50))
                 ->setEanCode($pse->getEanCode())
-            ->save($con);
+                ->save($con);
         }
 
     }
@@ -764,7 +782,7 @@ try {
         ;
 
         setI18n($sale, [
-                'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
+            'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
         ]);
 
         $sale->save();
@@ -798,7 +816,7 @@ try {
                 ->setAttributeAvId(null)
                 ->save();
             ;
-         }
+        }
     }
 
     $con->commit();
@@ -945,12 +963,12 @@ function generate_document($document, $typeobj, $id)
     global $faker;
 
     $document
-    ->setTitle(getRealText(20))
-    ->setDescription(getRealText(250))
-    ->setChapo(getRealText(40))
-    ->setPostscriptum(getRealText(40))
-    ->setFile(sprintf("sample-document-%s.txt", $id))
-    ->save()
+        ->setTitle(getRealText(20))
+        ->setDescription(getRealText(250))
+        ->setChapo(getRealText(40))
+        ->setPostscriptum(getRealText(40))
+        ->setFile(sprintf("sample-document-%s.txt", $id))
+        ->save()
     ;
 
     $document_file = sprintf("%s/media/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
@@ -983,7 +1001,7 @@ function setI18n(&$object, $fields = array('Title' => 20, 'Chapo' => 30, 'Postsc
     global $localeList, $localizedFaker;
 
     foreach ($localeList as $locale) {
-        
+
         $object->setLocale($locale);
 
         foreach ($fields as $name => $length) {
@@ -1150,4 +1168,47 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon3->setIsAvailableOnSpecialOffers(false);
     $coupon3->setPerCustomerUsageCount(false);
     $coupon3->save();
+}
+
+
+function usage()
+{
+    $usage = <<<USAGE
+Generate fake data for your Thelia website
+
+Usage:
+
+    php faker.php <OPTIONS>
+
+Options:
+
+    -h
+        Display this message and exit
+
+    -b <bootstrap file>
+        Use this bootstrap file
+
+    -c <number of categories>
+        Maximum number of categories and sub categories to create (default: 20)
+
+    -p <number of products>
+        Maximum number of products to create in a category (default: 20)
+
+    -l <locale list>
+        The list of locales (separated with a ,) for which to generate content (default: fr_FR, en_US, es_ES, it_IT, de_DE)
+
+    -r <real text>
+        Use real text or not. real text mode is much more slower than false text mode.
+        0 : false text mode
+        1 : real text mode (default)
+
+Examples:
+
+    Generate content in english and french with false text for 5 categories and 10 products
+
+    php faker.php -r 0 -c 5 -p 10 -l 'fr_FR, en_US'
+
+USAGE;
+
+    echo $usage;
 }
