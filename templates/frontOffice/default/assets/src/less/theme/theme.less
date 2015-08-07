@@ -821,24 +821,37 @@ td.product,
         .amount {
             font-weight: bold;
         }
-        .accordion-toggle {
-            &:after {
-                border: 1px solid @brand-primary;
-                border-radius: 10px;
-                line-height: 19px;
-                text-align: center;
-                width: 19px;
-                height: 19px;
-            }
-            &:hover,
-            &:focus {
+        li {
+            border-top: 1px solid @block-nav-border;
+            position: relative;
+
+            .accordion-toggle {
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding-right: 10px;
+                padding-left: 5px;
+
+                &:hover,
+                &:focus {
+                    background: none;
+
+                    &:after {
+                        border-color: darken(@brand-primary, 15%);
+                        color: darken(@brand-primary, 15%);
+                    }
+                }
+
                 &:after {
-                    border-color: darken(@brand-primary, 15%);
-                    color: darken(@brand-primary, 15%);
+                    border: 1px solid @brand-primary;
+                    border-radius: 10px;
+                    line-height: 17px;
+                    text-align: center;
+                    width: 19px;
+                    height: 19px;
                 }
             }
         }
-
     }
 }
 
