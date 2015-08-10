@@ -11,6 +11,7 @@ use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderAddress;
+use Thelia\Model;
 
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
@@ -106,136 +107,48 @@ try {
 
     echo "Clearing tables\n";
 
-    $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
-        ->find();
-    $productAssociatedContent->delete();
-
-    $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
-        ->find();
-    $categoryAssociatedContent->delete();
-
-    $featureProduct = Thelia\Model\FeatureProductQuery::create()
-        ->find();
-    $featureProduct->delete();
-
-    $attributeCombination = Thelia\Model\AttributeCombinationQuery::create()
-        ->find();
-    $attributeCombination->delete();
-
-    $feature = Thelia\Model\FeatureQuery::create()
-        ->find();
-    $feature->delete();
-
-    $feature = Thelia\Model\FeatureI18nQuery::create()
-        ->find();
-    $feature->delete();
-
-    $featureAv = Thelia\Model\FeatureAvQuery::create()
-        ->find();
-    $featureAv->delete();
-
-    $featureAv = Thelia\Model\FeatureAvI18nQuery::create()
-        ->find();
-    $featureAv->delete();
-
-    $attribute = Thelia\Model\AttributeQuery::create()
-        ->find();
-    $attribute->delete();
-
-    $attribute = Thelia\Model\AttributeI18nQuery::create()
-        ->find();
-    $attribute->delete();
-
-    $attributeAv = Thelia\Model\AttributeAvQuery::create()
-        ->find();
-    $attributeAv->delete();
-
-    $attributeAv = Thelia\Model\AttributeAvI18nQuery::create()
-        ->find();
-    $attributeAv->delete();
-
-    $category = Thelia\Model\CategoryQuery::create()
-        ->find();
-    $category->delete();
-
-    $category = Thelia\Model\CategoryI18nQuery::create()
-        ->find();
-    $category->delete();
-
-    $product = Thelia\Model\ProductQuery::create()
-        ->find();
-    $product->delete();
-
-    $product = Thelia\Model\ProductI18nQuery::create()
-        ->find();
-    $product->delete();
-
-    $customer = Thelia\Model\CustomerQuery::create()
-        ->find();
-    $customer->delete();
-
-    $admin = Thelia\Model\AdminQuery::create()
-        ->find();
-    $admin->delete();
-
-    $folder = Thelia\Model\FolderQuery::create()
-        ->find();
-    $folder->delete();
-
-    $folder = Thelia\Model\FolderI18nQuery::create()
-        ->find();
-    $folder->delete();
-
-    $content = Thelia\Model\ContentQuery::create()
-        ->find();
-    $content->delete();
-
-    $content = Thelia\Model\ContentI18nQuery::create()
-        ->find();
-    $content->delete();
-
-    $accessory = Thelia\Model\AccessoryQuery::create()
-        ->find();
-    $accessory->delete();
-
-    $stock = \Thelia\Model\ProductSaleElementsQuery::create()
-        ->find();
-    $stock->delete();
-
-    $productPrice = \Thelia\Model\ProductPriceQuery::create()
-        ->find();
-    $productPrice->delete();
-
-    $brand = Thelia\Model\BrandQuery::create()
-        ->find();
-    $brand->delete();
-
-    $brand = Thelia\Model\BrandI18nQuery::create()
-        ->find();
-    $brand->delete();
-
-    \Thelia\Model\ProductImageQuery::create()->find()->delete();
-    \Thelia\Model\CategoryImageQuery::create()->find()->delete();
-    \Thelia\Model\FolderImageQuery::create()->find()->delete();
-    \Thelia\Model\ContentImageQuery::create()->find()->delete();
-    \Thelia\Model\BrandImageQuery::create()->find()->delete();
-
-    \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
-    \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
-    \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
-    \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
-    \Thelia\Model\BrandDocumentQuery::create()->find()->delete();
-
-    \Thelia\Model\CouponQuery::create()->find()->delete();
-    \Thelia\Model\OrderQuery::create()->find()->delete();
-
-
-    \Thelia\Model\SaleQuery::create()->find()->delete();
-
-    \Thelia\Model\SaleProductQuery::create()->find()->delete();
-
-
-    \Thelia\Model\MetaDataQuery::create()->find()->delete();
+    Model\ProductAssociatedContentQuery::create()->deleteAll();
+    Model\CategoryAssociatedContentQuery::create()->deleteAll();
+    Model\FeatureProductQuery::create()->deleteAll();
+    Model\AttributeCombinationQuery::create()->deleteAll();
+    Model\FeatureQuery::create()->deleteAll();
+    Model\FeatureI18nQuery::create()->deleteAll();
+    Model\FeatureAvQuery::create()->deleteAll();
+    Model\FeatureAvI18nQuery::create()->deleteAll();
+    Model\AttributeQuery::create()->deleteAll();
+    Model\AttributeI18nQuery::create()->deleteAll();
+    Model\AttributeAvQuery::create()->deleteAll();
+    Model\AttributeAvI18nQuery::create()->deleteAll();
+    Model\CategoryQuery::create()->deleteAll();
+    Model\CategoryI18nQuery::create()->deleteAll();
+    Model\ProductQuery::create()->deleteAll();
+    Model\ProductI18nQuery::create()->deleteAll();
+    Model\CustomerQuery::create()->deleteAll();
+    Model\AdminQuery::create()->deleteAll();
+    Model\FolderQuery::create()->deleteAll();
+    Model\FolderI18nQuery::create()->deleteAll();
+    Model\ContentQuery::create()->deleteAll();
+    Model\ContentI18nQuery::create()->deleteAll();
+    Model\AccessoryQuery::create()->deleteAll();
+    Model\ProductSaleElementsQuery::create()->deleteAll();
+    Model\ProductPriceQuery::create()->deleteAll();
+    Model\BrandQuery::create()->deleteAll();
+    Model\BrandI18nQuery::create()->deleteAll();
+    Model\ProductImageQuery::create()->deleteAll();
+    Model\CategoryImageQuery::create()->deleteAll();
+    Model\FolderImageQuery::create()->deleteAll();
+    Model\ContentImageQuery::create()->deleteAll();
+    Model\BrandImageQuery::create()->deleteAll();
+    Model\ProductDocumentQuery::create()->deleteAll();
+    Model\CategoryDocumentQuery::create()->deleteAll();
+    Model\FolderDocumentQuery::create()->deleteAll();
+    Model\ContentDocumentQuery::create()->deleteAll();
+    Model\BrandDocumentQuery::create()->deleteAll();
+    Model\CouponQuery::create()->deleteAll();
+    Model\OrderQuery::create()->deleteAll();
+    Model\SaleQuery::create()->deleteAll();
+    Model\SaleProductQuery::create()->deleteAll();
+    Model\MetaDataQuery::create()->deleteAll();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
