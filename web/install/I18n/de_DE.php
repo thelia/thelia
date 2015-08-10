@@ -1,6 +1,7 @@
 <?php
 
 return array(
+
     '<p><strong>Sorry, an unexpected error occured</strong>: %err</p><p>Error details:</p><p>%details</p>' => '<p><strong>Es tut uns leid, ein Fehler ist aufgetreten</strong>: %err</p><p>Details:</p><p>%details</p>',
     'Administrator login :' => 'Administratoranmeldung :',
     'Administrator password :' => 'Administratorpasswort :',
@@ -21,8 +22,8 @@ return array(
     'French' => 'Französisch',
     'German' => 'Deutsch',
     'General information' => 'Allgemeine Informationen',
-    'Go to back office' => 'Zum Back Office',    
-    'Host :' => 'Host :',    
+    'Go to back office' => 'Zum Back Office',
+    'Host :' => 'Host : ',
     'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.' => 'Es scheint, dass Thelia bereits auf diesem System installiert ist. Bitte überprüfen Sie die Konfiguration, vornehmen Sie die notwendingen Korrekturen und versuchen Sie es erneut.',
     'or' => 'oder',
     'Password :' => 'Passwort :',
@@ -50,8 +51,6 @@ return array(
     'Thelia has been successfully updated to version %version' => 'Thelia wurde erfolgreich auf die Version %version aktualisiert',
     'Update proccess trace' => 'Update-Prozess-Trace.',
     'update to version %version' => 'Update auf Version %version',
-    'Update Thelia' => "Thelia aktualisieren",
-    'Updating Thelia.' => "Thelia Aktualisierung.",
     'Backup and update Thelia' => 'Backup und Update Thelia',
     'Update Thelia' => 'Thelia aktualisieren',
     'Updating Thelia.' => 'Thelia Aktualisierung.',

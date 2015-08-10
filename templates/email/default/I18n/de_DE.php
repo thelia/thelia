@@ -43,7 +43,7 @@ return array(
     'The %store team.' => 'Die %store Team.',
     'Thelia V2' => 'Thelia V2',
     'To login, please use the email address <span style="font-family: courier, fixed; font-size: 120%">%email</span>' => 'Um sich anzumelden, nutzen Sie bitte die E-Mail-Adresse <span style="font-family: courier, fixed; font-size: 120%">%email</span> ',
-    'Total' => 'Total',
+    'Total' => 'Gesamtsumme',
     'Total due   : %amount' => 'Gesamtsumme : %amount',
     'Unit price : %amount' => 'Einzelpreis : %amount',
     'View it in your browser' => 'In Ihrem Browser ansehen',
