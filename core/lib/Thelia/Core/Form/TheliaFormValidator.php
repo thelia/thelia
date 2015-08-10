@@ -78,7 +78,7 @@ class TheliaFormValidator implements TheliaFormValidatorInterface
                         $this->getErrorMessages($form)
                     );
                 }
-
+                $aBaseForm->setError(true);
                 throw new FormValidationException($errorMessage);
             }
         } else {
