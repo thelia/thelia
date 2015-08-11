@@ -18,6 +18,10 @@ INSERT INTO `config` (`id`, `name`, `value`, `secured`, `hidden`, `created_at`, 
 
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id + 1, 'de_DE', 'Ein dauerhaftes Cookie verwenden, um den Kundes-Warenkorb zu merken', NULL, NULL, NULL),
+(@max_id + 2, 'de_DE', 'Name der Warenkorb-Cookie', NULL, NULL, NULL),
+(@max_id + 3, 'de_DE', 'Dauer der Warenkorb-Cookie in dem Kunden-Browser, in Sekunden', NULL, NULL, NULL),
+(@max_id + 4, 'de_DE', 'URI mit Slash beendet erlauben', NULL, NULL, NULL),
 (@max_id + 1, 'en_US', 'Use a persistent cookie to keep track of customer cart', NULL, NULL, NULL),
 (@max_id + 2, 'en_US', 'Name the cart cookie', NULL, NULL, NULL),
 (@max_id + 3, 'en_US', 'Life time of the cart cookie in the customer browser, in seconds', NULL, NULL, NULL),
@@ -58,6 +62,24 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+  (@max_id+1, 'de_DE', 'Bestellung - Warenkorb oben', '', ''),
+  (@max_id+2, 'de_DE', 'Bestellung - Warenkorb unten', '', ''),
+  (@max_id+3, 'de_DE', 'Bestellung - Rechnung oben', '', ''),
+  (@max_id+4, 'de_DE', 'Bestellung - Rechnung unten', '', ''),
+  (@max_id+5, 'de_DE', 'Bestellung - Vor der Produktliste', '', ''),
+  (@max_id+6, 'de_DE', 'Bestellung - Vor der Öffnung der Produktzeile', '', ''),
+  (@max_id+7, 'de_DE', 'Bestellung - Nach Sperrung der Produkt Zeile', '', ''),
+  (@max_id+8, 'de_DE', 'Bestellung - Nach der Produktliste', '', ''),
+  (@max_id+9, 'de_DE', 'Sonderangebote - oben', '', ''),
+  (@max_id+10, 'de_DE', 'Sonderangebote - Tabellenkopf', '', ''),
+  (@max_id+11, 'de_DE', 'Sonderangebote - Tabellenzeile', '', ''),
+  (@max_id+12, 'de_DE', 'Sonderangebote - unten', '', ''),
+  (@max_id+13, 'de_DE', 'Sonderangebot - Erstellungsformular', '', ''),
+  (@max_id+14, 'de_DE', 'Sonderangebot - Löschungsformular', '', ''),
+  (@max_id+15, 'de_DE', 'Sonderangebote - JavaScript', '', ''),
+  (@max_id+16, 'de_DE', 'Produkt - unten einer Produkt-Kombination', '', ''),
+  (@max_id+17, 'de_DE', 'Layout - vor dem Hauptinhaltsbereich', '', ''),
+  (@max_id+18, 'de_DE', 'Admin layout - Nach dem Hauptinhalt', '', ''),
   (@max_id+1, 'en_US', 'Order - cart top', '', ''),
   (@max_id+2, 'en_US', 'Order - cart bottom', '', ''),
   (@max_id+3, 'en_US', 'Order - bill top', '', ''),
@@ -146,6 +168,8 @@ INSERT INTO `module` (`id`, `code`, `type`, `activate`, `position`, `full_namesp
 ;
 
 INSERT INTO  `module_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max_id+1, 'de_DE', NULL, NULL,  NULL,  NULL),
+(@max_id+2, 'de_DE', NULL, 'Prüfen ob ein Liefermodul für virtuellen Produkte aktiviert ist,  wenn es mindestens ein virtuelles Produkt gibt',  NULL,  NULL),
 (@max_id+1, 'en_US', 'Smarty template engine integration', NULL,  NULL,  NULL),
 (@max_id+2, 'en_US', 'Virtual Product Controller', 'Check if a virtual product delivery module is enabled if at least one product is virtual',  NULL,  NULL),
 (@max_id+1, 'es_ES', NULL, NULL,  NULL,  NULL),

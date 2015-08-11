@@ -24,8 +24,8 @@ return array(
     'Total without tax' => 'Total HT',
     'Unit taxed price' => 'Prix unitaire TTC',
     'Unit. price' => 'Prix unitaire',
-    'delivery.imprint' => 'delivery.imprint',
-    'invoice.imprint' => 'invoice.imprint',
+    'delivery.imprint' => '',
+    'invoice.imprint' => '',
     'page' => 'page',
     'product' => 'Produit',
 );
