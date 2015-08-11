@@ -1,5 +1,9 @@
 {extends file="admin-layout.tpl"}
 
+{block name="after-bootstrap-css"}
+    <link rel="stylesheet" href="{stylesheet file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'}">
+{/block}
+
 {block name="no-return-functions"}
     {$admin_current_location = 'home'}
 {/block}
@@ -65,11 +69,14 @@
 
 				<div class="title title-without-tabs clearfix">
 					{intl l='Dashboard'}
-                    <div class="btn-group pull-right">
-                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="0"><span class="glyphicon glyphicon-refresh"></span></button>
-                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="-1"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                        <button type="button" class="btn btn-default" disabled><span class="glyphicon glyphicon-calendar"></span></button>
-                        <button type="button" class="btn btn-default js-stats-change-month" data-month-offset="+1"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                    <div class="col-sm-2 input-group pull-right">
+                        <span id="span-calendar" class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                        <input type="text" class="form-control" id="date-picker">
+                        <span class="input-group-btn">
+                            <button type="button" class="form-control btn btn-default js-stats-refresh" data-month-offset="0"><span class="glyphicon glyphicon-refresh"></span></button>
+                        </span>
                     </div>
 				</div>
 
@@ -297,15 +304,59 @@
     {javascripts file='assets/js/jqplot/plugins/jqplot.pieRenderer.min.js'}
         <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
+    {javascripts file='assets/js/moment-with-locales.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
 <script>
 
 jQuery(function($){
+    {$langcode = {lang attr="code"}|substr:0:2}
+
+    var jQplotDate = new Date();
+
+    $('#date-picker').val(jQplotDate.getMonth()+1+"/"+jQplotDate.getFullYear());
+
+    $('#date-picker').datetimepicker( {
+        locale: "{$langcode}",
+        viewMode: 'months',
+        format: 'MM/YYYY'
+    }).on('dp.change',function (e) {
+        var month = e.date.format("M");
+        var year = e.date.format("YYYY");
+
+        jQplotDate.setMonth(parseInt(month));
+
+        statInputActive(true);
+
+        {literal}
+
+        retrieveJQPlotJson(
+                month,
+                year,
+                function(){statInputActive(false);},
+                0
+        );
+
+        {/literal}
+    });
+
+    $("#span-calendar").click(function(e){
+        $('#date-picker').focus();
+    });
+
+    function statInputActive(type) {
+        $('#date-picker').attr('readonly', type);
+        $('.js-stats-refresh').attr('disabled', type)
+    }
 
     $(".feed-list").load("{admin_viewurl view='ajax/thelia_news_feed'}");
 
-    var jQplotDate = new Date();
     jQplotDate.setDate(1); // Set day to 1 so we can add month without 30/31 days of month troubles.
+    jQplotDate.setMonth(parseInt(jQplotDate.getMonth())+1); // Init to actual month
     var url = "{url path='/admin/home/stats'}";
     var jQplotData; // json data
     var jQPlotInstance; // global instance
@@ -351,7 +402,7 @@ jQuery(function($){
     {literal}
 
     // Get initial data Json
-    retrieveJQPlotJson(jQplotDate.getMonth()+1, jQplotDate.getFullYear());
+    retrieveJQPlotJson(jQplotDate.getMonth(), jQplotDate.getFullYear());
 
     $('[data-toggle="jqplot"]').click(function(){
 
@@ -360,22 +411,16 @@ jQuery(function($){
 
     });
 
-    $('.js-stats-change-month').click(function(e){
-        $('.js-stats-change-month').attr('disabled', true);
+    $('.js-stats-refresh').click(function(e){
+        statInputActive(true);
 
-        var flush = 0, move = parseInt($(this).data('month-offset'));
-
-        if (move !== 0) {
-            jQplotDate.setMonth(parseInt(jQplotDate.getMonth()) + move);
-        } else {
-            flush = 1;
-        }
+        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()));
 
         retrieveJQPlotJson(
-            jQplotDate.getMonth()+1,
-            jQplotDate.getFullYear(),
-            function(){$('.js-stats-change-month').attr('disabled', false);},
-            flush
+                jQplotDate.getMonth(),
+                jQplotDate.getFullYear(),
+                function(){statInputActive(false);},
+                1
         );
     });
 

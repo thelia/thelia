@@ -1,5 +1,6 @@
 # 2.2.0-beta3
 
+- #1616 Improve statistic on homepage, add datetimepicker and fix first order
 - #1601 Add set error in TheliaFormValidator when form is not valid
 - #1585 Add parameters in frontOffice hooks
     - ```order_id``` in template ```account-order.html``` for hooks ```account-order.after-javascript-include```, ```account-order.javascript-initialization```

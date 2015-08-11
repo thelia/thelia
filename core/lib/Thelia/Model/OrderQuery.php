@@ -63,17 +63,17 @@ class OrderQuery extends BaseOrderQuery
 
         $stats = array();
         for ($day=1; $day<=$numberOfDay; $day++) {
-            $dayOrdersQuery = self::create('matching_order')
+            $dayOrdersQuery = self::create()
                 ->filterByCreatedAt(sprintf("%s-%s-%s 00:00:00", $year, $month, $day), Criteria::GREATER_EQUAL)
                 ->filterByCreatedAt(sprintf("%s-%s-%s 23:59:59", $year, $month, $day), Criteria::LESS_EQUAL);
 
             $otherOrderJoin = new Join();
-            $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'matching_order', OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
+            $otherOrderJoin->addExplicitCondition(OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', null, OrderTableMap::TABLE_NAME, 'CUSTOMER_ID', 'other_order');
             $otherOrderJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $dayOrdersQuery->addJoinObject($otherOrderJoin, 'other_order_join')
-                ->addJoinCondition('other_order_join', '`matching_order`.`ID` <>  `other_order`.`ID`')
-                ->addJoinCondition('other_order_join', '`matching_order`.`CREATED_AT` >  `other_order`.`CREATED_AT`');
+                ->addJoinCondition('other_order_join', '`order`.`ID` <>  `other_order`.`ID`')
+                ->addJoinCondition('other_order_join', '`order`.`CREATED_AT` >  `other_order`.`CREATED_AT`');
 
             $dayOrdersQuery->where('ISNULL(`other_order`.`ID`)');
 
