@@ -18,7 +18,7 @@ before_script:
 - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS
   thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
 - php Thelia thelia:install --db_host=$DB_HOST --db_username=$DB_USER --db_name=thelia
-- php setup/faker.php
+- php setup/faker.php -r 0
 - php Thelia module:refresh
 - php Thelia module:activate Colissimo
 - php Thelia module:activate Cheque
