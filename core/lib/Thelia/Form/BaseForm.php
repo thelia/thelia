@@ -333,7 +333,7 @@ abstract class BaseForm
      * @param string $default a default value for the form parameter. If not defined, the configured base URL is used.
      * @return string an absolute URL
      */
-    public function getFormDefinedUrl($parameterName, $default)
+    public function getFormDefinedUrl($parameterName, $default = null)
     {
         $formDefinedUrl = $this->form->get($parameterName)->getData();
 

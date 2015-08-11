@@ -31,13 +31,19 @@ class ParserContext implements \IteratorAggregate
     // Lifetime, in seconds, of form error data
     const FORM_ERROR_LIFETIME_SECONDS = 60;
 
+    /** @var BaseForm[] */
     private $formStore = array();
+
+    /** @var array */
     private $store = array();
 
-    private $formFactory ;
+    /** @var TheliaFormFactoryInterface */
+    private $formFactory;
+
+    /** @var TheliaFormValidatorInterface */
     private $formValidator;
 
-    /** @var  Request */
+    /** @var Request */
     private $request;
 
     public function __construct(
@@ -72,6 +78,7 @@ class ParserContext implements \IteratorAggregate
     /**
      * Set the current form.
      *
+     * @param null $default
      * @return BaseForm|null
      */
     public function popCurrentForm($default = null)
@@ -85,6 +92,10 @@ class ParserContext implements \IteratorAggregate
         return $form;
     }
 
+    /**
+     * @return BaseForm
+     * @throws SmartyPluginException
+     */
     public function getCurrentForm()
     {
         $form = end($this->formStore);
@@ -108,29 +119,31 @@ class ParserContext implements \IteratorAggregate
      */
     public function addForm(BaseForm $form)
     {
-        $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
-
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
-        /** Remove unserializable objects \Symfony\Component\HttpFoundation\File\UploadedFile */
-        $formData = $form->getForm()->getData();
-        foreach ($formData as $idx => $value) {
-            if ($value instanceof UploadedFile) {
-                unset($formData[$idx]);
+        if ($form->getForm()->get("error_url")->getData() !== null) {
+            $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
+
+            /** Remove unserializable objects \Symfony\Component\HttpFoundation\File\UploadedFile */
+            $formData = $form->getForm()->getData();
+            foreach ($formData as $idx => $value) {
+                if ($value instanceof UploadedFile) {
+                    unset($formData[$idx]);
+                }
             }
+
+            // Set form error information
+            $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
+                'data'              => $formData,
+                'hasError'          => $form->hasError(),
+                'errorMessage'      => $form->getErrorMessage(),
+                'method'            => $this->request->getMethod(),
+                'timestamp'         => time(),
+                'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
+            ];
+
+            $this->request->getSession()->setFormErrorInformation($formErrorInformation);
         }
-
-        // Set form error information
-        $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
-            'data'              => $formData,
-            'hasError'          => $form->hasError(),
-            'errorMessage'      => $form->getErrorMessage(),
-            'method'            => $this->request->getMethod(),
-            'timestamp'         => time(),
-            'validation_groups' => $form->getForm()->getConfig()->getOption('validation_groups')
-        ];
-
-        $this->request->getSession()->setFormErrorInformation($formErrorInformation);
 
         return $this;
     }
