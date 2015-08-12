@@ -128,7 +128,7 @@
                                                 <thead>
                                                     <tr>
                                                        <th class="col-md-6">{intl l="Product"}</th>
-                                                       {hook name="order-edit.table-header" location="order_edit_table_header" }
+                                                       {hook name="order-edit.order-product-table-header" location="order_edit_table_header" }
                                                        <th class="col-md-1 text-right">{intl l="Unit. price"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Tax"}</th>
                                                        <th class="col-md-1 text-right">{intl l="Unit taxed price"}</th>
@@ -172,7 +172,7 @@
                                                             {/ifloop}
                                                             {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
-                                                        {hook name="order-edit.table-row" location="order_edit_table_row" order_product_id={$ID} }
+                                                        {hook name="order-edit.order-product-table-row" location="order_edit_table_row" order_product_id={$ID} }
                                                         <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
