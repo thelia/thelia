@@ -248,6 +248,7 @@ return array(
     'You want to subscribe to the newsletter? Please enter your email address below.' => 'You want to subscribe to the newsletter? Please enter your email address below.',
     'You will receive a link to reset your password.' => 'You will receive a link to reset your password.',
     'Your Cart' => 'Your Cart',
+    'Your phone number' => 'Your phone number',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Your order will be confirmed by us upon receipt of your payment.',
     'deliveries' => 'deliveries',
     'for' => 'for',

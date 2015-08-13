@@ -202,5 +202,6 @@ return array(
     'You will receive a link to reset your password.' => 'Recibirás un enlace para restablecer tu contraseña.',
     'Your Cart' => 'Tu carrito',
     'Your email address' => 'Tu dirección de correo electrónico',
+    'Your phone number' => 'Su número de teléfono',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Tu pedido será confirmado a recepción del pago.',
 );

@@ -244,6 +244,7 @@ return array(
     'You want to subscribe to the newsletter? Please enter your email address below.' => 'Vous voulez vous inscrire à la newsletter ? Veuillez saisir votre adresse e-mail ci-dessous.',
     'You will receive a link to reset your password.' => 'Vous recevrez un lien pour réinitialiser votre mot de passe.',
     'Your Cart' => 'Votre panier',
+    'Your phone number' => 'Votre numéro de téléphone',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Votre commande sera confirmée à réception de votre paiement.',
     'deliveries' => 'Livraisons',
     'for' => 'pour',

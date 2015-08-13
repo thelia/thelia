@@ -244,6 +244,7 @@ return array(
     'You will receive a link to reset your password.' => 'Sie werden einen Link zum Ändern Ihres Passworts erhalten.',
     'Your Cart' => 'Ihr Warenkorb',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Ihre Bestellung wird nach Empfang Ihrer Bezahlung bestätigt.',
+    'Your phone number' => 'Deine Telefonnummer',
     'deliveries' => 'Lieferungen',
     'for' => 'für',
     'instead of' => 'statt',

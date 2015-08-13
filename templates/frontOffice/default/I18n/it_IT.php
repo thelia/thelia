@@ -210,6 +210,7 @@ return array(
     'You will receive a link to reset your password.' => 'Riceverai un link per reimpostare la password.',
     'Your Cart' => 'Tuo carrello',
     'Your email address' => 'Tuo indirizzo email',
+    'Your phone number' => 'Il tuo numero di telefono',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Il tuo ordine sarà confermato da noi al ricevimento del tuo pagamento.',
     'Youtube' => 'Youtube',
     'instead of' => 'Invece di',

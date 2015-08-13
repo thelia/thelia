@@ -223,6 +223,7 @@ return array(
     'You will receive a link to reset your password.' => 'Вы получите ссылку для сброса пароля.',
     'Your Cart' => 'Ваша корзина',
     'Your email address' => 'Ваш адрес электронной почты',
+    'Your phone number' => 'Ваш номер телефона',    
     'Your order will be confirmed by us upon receipt of your payment.' => 'Ваш заказ будет подтвержден после получения платежа.',
     'Youtube' => 'Youtube',
     'deliveries' => 'доставки',

@@ -74,6 +74,12 @@ class ContactForm extends FirewallForm
                     'for' => 'subject_contact',
                 ),
             ))
+            ->add('phone', 'text', array(
+                'label' => Translator::getInstance()->trans('Your phone number'),
+                'label_attr' => array(
+                    'for' => 'phone_contact'
+                )
+            ))              
             ->add('message', 'text', array(
                 'constraints' => array(
                     new NotBlank(),

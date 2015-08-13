@@ -223,6 +223,7 @@ return array(
     'You will receive a link to reset your password.' => 'Obdržíte odkaz pro obnovení hesla.',
     'Your Cart' => 'Váš košík',
     'Your email address' => 'Vaše e-mailová adresa',
+    'Your phone number' => 'Vaše telefonní číslo',
     'Your order will be confirmed by us upon receipt of your payment.' => 'Vaše objednávka bude potvrzena po obdržení platby.',
     'Youtube' => 'Youtube',
     'deliveries' => 'doručení',

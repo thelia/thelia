@@ -51,7 +51,7 @@ class ContactController extends BaseFrontController
                 ->addFrom(ConfigQuery::getStoreEmail(), $form->get('name')->getData())
                 ->addReplyTo($form->get('email')->getData(), $form->get('name')->getData())
                 ->addTo(ConfigQuery::getStoreEmail(), ConfigQuery::getStoreName())
-                ->setBody($form->get('message')->getData())
+                ->setBody($form->get('message')->getData().'<p>'.$form->get('name')->getData().'<br>'.$form->get('phone')->getData().'</p>', 'text/html')
             ;
 
             $this->getMailer()->send($message);
