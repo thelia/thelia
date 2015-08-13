@@ -5,6 +5,7 @@
 - #1634 Remove leftover uncallable routes (admin)
 - #1631 Remove duplicate route (admin)
 - #1629 Fix errors reporting of admin hooks
+- #1632 Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
 - #1616 Improve statistic on homepage, add datetimepicker and fix first order
 - #1601 Add set error in TheliaFormValidator when form is not valid
 - #1585 Add parameters in frontOffice hooks
