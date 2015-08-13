@@ -277,11 +277,6 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
-        <requirement key="_format">xml|json</requirement>
-    </route>
-
     <!--  Product Management -->
 
     <route id="admin.products.default" path="/admin/products">
@@ -318,11 +313,6 @@
 
     <route id="admin.products.update-position" path="/admin/products/update-position">
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
-    </route>
-
-
-    <route id="admin.products.general.tab" path="/admin/products/general/tab">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
     </route>
 
     <!-- Product categories, content and accessories -->
@@ -573,10 +563,6 @@
         <default key="_controller">Thelia\Controller\Admin\CouponController::deleteConditionsAction</default>
         <requirement key="couponId">\d+</requirement>
         <requirement key="conditionIndex">\d+</requirement>
-    </route>
-    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
-        <requirement key="couponCode">.*</requirement>
     </route>
 
     <!-- Routes to the Config (system variables) controller -->
