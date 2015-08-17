@@ -1,4 +1,4 @@
-{hook name="tab-seo.top" id=$parentId type=$seoType}
+{hook name="tab-seo.top" id=$current_id type=$seoType}
 
 {form name="thelia.admin.seo"}
 <div class="form-container">
@@ -35,6 +35,8 @@
         {render_form_field field="meta_description"}
         {render_form_field field="meta_keywords"}
 
+        {hook name="tab-seo.update-form" id=$current_id type=$seoType}
+
         {include
             file = "includes/inner-form-toolbar.html"
             hide_submit_buttons = false
@@ -47,4 +49,4 @@
 </div>
 {/form}
 
-{hook name="tab-seo.bottom" id=$parentId type=$seoType}
+{hook name="tab-seo.bottom" id=$current_id type=$seoType}

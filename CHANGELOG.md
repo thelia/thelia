@@ -1,10 +1,13 @@
 # 2.2.0-beta3
 
+- #1637 Fix admin API edit button
+- #1635 Add unit tests for the routing files (admin, api, front)
+- #1634 Remove leftover uncallable routes (admin)
+- #1631 Remove duplicate route (admin)
+- #1629 Fix errors reporting of admin hooks
 - #1616 Improve statistic on homepage, add datetimepicker and fix first order
 - #1601 Add set error in TheliaFormValidator when form is not valid
 - #1585 Add parameters in frontOffice hooks
-    - ```order_id``` in template ```account-order.html``` for hooks ```account-order.after-javascript-include```, ```account-order.javascript-initialization```
-    - ```address_id``` in template ```address-update.html``` for hooks ```address-update.form-top```, ```address-update.bottom```, ```address-update.after-javascript-include```, ```address-update.javascript-initialization```
 - #1587 Fix redirect url for the folder image and folder document
 - #1590 Fix Thelia request initialization
 - #1593 Fix form serialization in session that contain uploaded files
@@ -347,19 +350,6 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - fix form firewall variable name
 - add more module includes in order-edit.html
 - do not allow failure anymore on travis php5.6
-
-#2.0.4
-- Updating stock when changing order : canceled status
-- order table is versionnable now.
-- product_sale_elements_id is added to order_product table.
-
-#2.0.3
-- Fix js syntax in order-delivery template
-- price are now save without any round.
- /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
-- change Argument type for ref parameter in Product loop
-- Fix export template
-- [Tinymce]fix invisible thumb in file manager
 
 #2.0.4
 - Updating stock when changing order : canceled status
