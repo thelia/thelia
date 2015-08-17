@@ -119,6 +119,47 @@ $ php Thelia thelia:install
 
 You just have to follow all instructions.
 
+### Docker and docker compose
+
+This repo contains all the configuration needed to run Thelia with docker and docker-compose.
+
+It requires obviously [docker](https://docker.com/) and [docker-compose](http://docs.docker.com/compose/)
+
+How to start the configuration : 
+
+```
+docker-compose up -d
+```
+
+tip : create an alias for docker-compose, it's boring to write it all the time
+
+All the script are launched through docker. For examples : 
+
+```
+docker exec -it thelia_web_1 php Thelia cache:clear
+docker exec -it thelia_web_1 php setup/faker.php
+docker exec -it thelia_web_1 unit-tests.sh
+docker exec -it thelia_web_1 php composer.phar install
+```
+
+Database information : 
+
+* host : mariaDB
+* login : root
+* password : toor
+
+Once started, you can access it with your browser at this url : http://127.0.0.1:8080 and phpmyadmin : http://127.0.0.1:8081
+
+What is missing : 
+
+* confguration for export compression (zip, gzip, etc)
+
+Obviously you can modify all the configuration for your own case, for example the php version or add environment variable for the database configuration. Each time you modify the configuration, you have to rebuild it : 
+
+```
+docker-compose build --no-cache
+```
+
 Documentation
 -------------
 
