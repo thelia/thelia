@@ -939,12 +939,13 @@ function generate_document($document, $typeobj, $id)
 
 function getRealText($length, $locale = 'en_US') {
     global $localizedFaker;
-    
+
     $text = $localizedFaker[$locale]->realText($length);
 
     // Below 20 chars, generate a simple text, without ponctuation nor newlines.
-    if ($length <= 20)
-        $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+    if ($length <= 20){
+      $text = ucfirst(mb_strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));      
+    }
 
     // echo "Generated $locale text ($length) : $locale:$text\n";
 
@@ -956,7 +957,7 @@ function setI18n(&$object, $fields = array('Title' => 20, 'Chapo' => 30, 'Postsc
     global $localeList, $localizedFaker;
 
     foreach ($localeList as $locale) {
-        
+
         $object->setLocale($locale);
 
         foreach ($fields as $name => $length) {
