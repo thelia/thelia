@@ -797,4 +797,5 @@ return array(
     'update form' => 'update form',
     'value table header' => 'value table header',
     'value table row' => 'value table row',
+    'Product ref %ref : not enough stock' => 'Product ref %ref : not enough stock',
 );

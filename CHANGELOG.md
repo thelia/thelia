@@ -1,5 +1,6 @@
 # 2.2.0-beta3
 
+- #1643 Fix stock errors when changing order status
 - #1637 Fix admin API edit button
 - #1635 Add unit tests for the routing files (admin, api, front)
 - #1634 Remove leftover uncallable routes (admin)

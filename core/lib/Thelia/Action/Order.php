@@ -24,6 +24,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\Translation\Translator;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\AddressQuery;
@@ -500,28 +501,68 @@ class Order extends BaseAction implements EventSubscriberInterface
     }
 
     /**
-     * @param  ModelOrder                               $order
+     * @param  ModelOrder $order
      * @param $newStatus
-     * @param $canceledStatus
      * @throws \Thelia\Exception\TheliaProcessException
      */
     public function updateQuantity(ModelOrder $order, $newStatus)
     {
-        $canceledStatus = OrderStatusQuery::getCancelledStatus()->getId();
+        $notPaidStatus = OrderStatusQuery::getNotPaidStatus()->getId();
         $paidStatus = OrderStatusQuery::getPaidStatus()->getId();
-        if ($newStatus == $canceledStatus || $order->isCancelled()) {
-            $this->updateQuantityForCanceledOrder($order, $newStatus, $canceledStatus);
-        } elseif ($paidStatus == $newStatus && $order->isNotPaid() && $order->getVersion() == 1) {
-            $this->updateQuantityForPaidOrder($order);
+        $processingStatus = OrderStatusQuery::getProcessingStatus()->getId();
+        $sentStatus = OrderStatusQuery::getSentStatus()->getId();
+        $cancelledStatus = OrderStatusQuery::getCancelledStatus()->getId();
+        $refundedStatus = OrderStatusQuery::getRefundedStatus()->getId();
+
+        switch ($newStatus) {
+            case $notPaidStatus:
+                if (!$order->isCancelled()) {
+                    $this->updateQuantityOnStatusChange($order, true);
+                }
+                break;
+
+            case $cancelledStatus:
+                if (!$order->isNotPaid()) {
+                    $this->updateQuantityOnStatusChange($order, true);
+                }
+                break;
+
+            case $paidStatus:
+                if (!$order->isProcessing() && !$order->isSent() && !$order->isRefunded()) {
+                    $this->updateQuantityOnStatusChange($order, false);
+                }
+                break;
+
+            case $processingStatus:
+                if (!$order->isPaid() && !$order->isSent() && !$order->isRefunded()) {
+                    $this->updateQuantityOnStatusChange($order, false);
+                }
+                break;
+
+            case $sentStatus:
+                if (!$order->isPaid() && !$order->isProcessing() && !$order->isRefunded()) {
+                    $this->updateQuantityOnStatusChange($order, false);
+                }
+                break;
+
+            case $refundedStatus:
+                if ( !$order->isPaid() && !$order->isProcessing() && !$order->isSent()) {
+                    $this->updateQuantityOnStatusChange($order, false);
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
     /**
      * @param ModelOrder $order
+     * @param $increase
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function updateQuantityForPaidOrder(ModelOrder $order)
+    public function updateQuantityOnStatusChange(ModelOrder $order, $increase)
     {
         $paymentModule = ModuleQuery::create()->findPk($order->getPaymentModuleId());
 
@@ -537,50 +578,20 @@ class Order extends BaseAction implements EventSubscriberInterface
 
                 /** @var ProductSaleElements $productSaleElements */
                 if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                    /* check still in stock */
-                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                        throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock");
+                    if ($increase) {
+                        // Increase stock
+                        $productSaleElements->setQuantity($productSaleElements->getQuantity() + $orderProduct->getQuantity());
+                    } elseif (!$increase) {
+                        /* Check if still in stock */
+                        if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
+                            throw new TheliaProcessException(Translator::getInstance()->trans(
+                                "Product ref %ref : not enough stock", ['%ref' => $productSaleElements->getRef()]));
+                        }
+                        // Decrease stock
+                        $productSaleElements->setQuantity($productSaleElements->getQuantity() - $orderProduct->getQuantity());
                     }
-
-                    $productSaleElements->setQuantity($productSaleElements->getQuantity() - $orderProduct->getQuantity());
-
                     $productSaleElements->save();
                 }
-            }
-        }
-    }
-
-    /**
-     * Update product quantity if new status is canceled or if old status is canceled.
-     *
-     * @param ModelOrder $order
-     * @param $newStatus
-     * @param $canceledStatus
-     * @throws \Exception
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    protected function updateQuantityForCanceledOrder(ModelOrder $order, $newStatus, $canceledStatus)
-    {
-        $orderProductList = $order->getOrderProducts();
-
-        /** @var OrderProduct  $orderProduct */
-        foreach ($orderProductList as $orderProduct) {
-            $productSaleElementsId = $orderProduct->getProductSaleElementsId();
-
-            /** @var ProductSaleElements $productSaleElements */
-            if (null !== $productSaleElements = ProductSaleElementsQuery::create()->findPk($productSaleElementsId)) {
-                if ($newStatus == $canceledStatus) {
-                    $productSaleElements->setQuantity($productSaleElements->getQuantity() + $orderProduct->getQuantity());
-                } else {
-                    /* check still in stock */
-                    if ($orderProduct->getQuantity() > $productSaleElements->getQuantity() && true === ConfigQuery::checkAvailableStock()) {
-                        throw new TheliaProcessException($productSaleElements->getRef() . " : Not enough stock");
-                    }
-
-                    $productSaleElements->setQuantity($productSaleElements->getQuantity() - $orderProduct->getQuantity());
-                }
-
-                $productSaleElements->save();
             }
         }
     }
