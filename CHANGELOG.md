@@ -16,6 +16,7 @@
 - #1583 Add German translations
 - #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
 - #1618 Configurable faker
+- Add docker and docker-compose configuration
 
 # 2.2.0-beta2
 
