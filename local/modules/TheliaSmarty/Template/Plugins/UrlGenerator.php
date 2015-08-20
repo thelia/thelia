@@ -208,7 +208,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
         $target = $this->getParam($params, 'target', null);
 
-        if ($noamp == null && false === strpos($url, '&amp;')) {
+        if (!$noamp) {
             $url = str_replace('&', '&amp;', $url);
         }
 
