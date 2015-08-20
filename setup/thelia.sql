@@ -1550,6 +1550,7 @@ CREATE TABLE `rewriting_url`
     PRIMARY KEY (`id`),
     UNIQUE INDEX `url_UNIQUE` (`url`),
     INDEX `idx_rewriting_url_redirected` (`redirected`),
+    INDEX `idx_rewriting_url` (`view_locale`, `view`, `view_id`, `redirected`),
     CONSTRAINT `fk_rewriting_url_redirected`
         FOREIGN KEY (`redirected`)
         REFERENCES `rewriting_url` (`id`)
