@@ -16,7 +16,7 @@ use Thelia\Core\Template\TemplateDefinition;
 
 /**
  * Class ParserFallback
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserFallback implements ParserInterface
 {

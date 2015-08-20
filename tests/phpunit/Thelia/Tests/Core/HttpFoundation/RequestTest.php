@@ -17,7 +17,7 @@ namespace Thelia\Tests\Core\HttpFoundation;
  *
  * Class RequestTest
  * @package Thelia\Tests\Core\HttpFoundation
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class RequestTest extends \PHPUnit_Framework_TestCase
 {

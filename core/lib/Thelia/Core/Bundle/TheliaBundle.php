@@ -38,7 +38,7 @@ use Thelia\Core\DependencyInjection\Compiler\TranslatorPass;
  * @TODO register database configuration.
  *
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 class TheliaBundle extends Bundle

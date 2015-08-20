@@ -18,7 +18,7 @@ use Thelia\Tests\ApiTestCase;
 /**
  * Class CustomerControllerTest
  * @package Thelia\Tests\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Baptiste Cabarrou <bcabarrou@openstudio.fr>
  */
 class CustomerControllerTest extends ApiTestCase

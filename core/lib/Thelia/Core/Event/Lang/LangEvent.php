@@ -18,7 +18,7 @@ use Thelia\Model\Lang;
 /**
  * Class LangEvent
  * @package Thelia\Core\Event\Lang
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangEvent extends ActionEvent
 {

@@ -19,7 +19,7 @@ use Thelia\Model\NewsletterQuery;
 /**
  * Class NewsletterTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterTest extends \PHPUnit_Framework_TestCase
 {

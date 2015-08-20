@@ -14,7 +14,7 @@ namespace Thelia\Core\Template;
 
 /**
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  */
 

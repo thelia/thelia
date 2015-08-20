@@ -35,7 +35,7 @@ use Thelia\Module\ModuleManagement;
 /**
  * Class ModuleController
  * @package Thelia\Controller\Admin
- * @author  Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleController extends AbstractCrudController
 {

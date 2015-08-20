@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Folder;
 /**
  * Class FolderDeleteEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderDeleteEvent extends FolderEvent
 {

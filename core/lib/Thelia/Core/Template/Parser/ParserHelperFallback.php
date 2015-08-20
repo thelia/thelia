@@ -17,7 +17,7 @@ use Thelia\Core\Template\ParserHelperInterface;
 /**
  * Class ParserHelperFallback
  * @package Thelia\Core\Template\Parser
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ParserHelperFallback implements ParserHelperInterface
 {

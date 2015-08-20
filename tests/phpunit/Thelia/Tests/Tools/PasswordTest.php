@@ -17,7 +17,7 @@ use Thelia\Tools\Password;
 /**
  * Class PasswordTest
  * @package Thelia\Tests\Type
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class PasswordTest extends \PHPUnit_Framework_TestCase
 {

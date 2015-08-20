@@ -28,7 +28,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class Export
  * @package Colissimo\Form
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Export extends BaseForm
 {

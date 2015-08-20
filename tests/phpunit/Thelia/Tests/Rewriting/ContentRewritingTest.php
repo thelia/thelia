@@ -17,7 +17,7 @@ use Thelia\Model\Content;
 /**
  * Class ContentRewritingTest
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentRewritingTest extends BaseRewritingObject
 {

@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class CacheEvent
  * @package Thelia\Core\Event\Cache
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CacheEvent extends ActionEvent
 {

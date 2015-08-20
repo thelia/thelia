@@ -26,7 +26,7 @@ use Thelia\Module\Exception\DeliveryException;
 /**
  * Class Delivery
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@gmail.com>
  */
 class Delivery extends BaseSpecificModule

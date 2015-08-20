@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Area;
 /**
  * Class AreaDeleteEvent
  * @package Thelia\Core\Event\Area
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaDeleteEvent extends AreaEvent
 {

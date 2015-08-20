@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\GreaterThan;
 /**
  * Class AreaModificationForm
  * @package Thelia\Form\Shipping
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaModificationForm extends AreaCreateForm
 {

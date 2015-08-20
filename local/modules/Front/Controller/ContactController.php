@@ -33,7 +33,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class ContactController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContactController extends BaseFrontController
 {

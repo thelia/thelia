@@ -26,7 +26,7 @@ use Thelia\Tests\TestCaseWithURLToolSetup;
 /**
  * Class FolderTest
  * @package Thelia\Tests\Action\ImageTest
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderTest extends TestCaseWithURLToolSetup
 {

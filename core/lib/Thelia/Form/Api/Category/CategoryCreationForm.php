@@ -17,7 +17,7 @@ use Thelia\Form\CategoryCreationForm as BaseCategoryCreationForm;
 /**
  * Class CategoryCreationForm
  * @package Thelia\Form\Api\Category
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class CategoryCreationForm extends BaseCategoryCreationForm
 {

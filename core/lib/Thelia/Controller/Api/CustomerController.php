@@ -32,7 +32,7 @@ use Thelia\Form\Definition\ApiForm;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class CustomerController extends AbstractCrudApiController

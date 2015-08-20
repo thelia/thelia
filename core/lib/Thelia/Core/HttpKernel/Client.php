@@ -19,7 +19,7 @@ use Symfony\Component\BrowserKit\Request as DomRequest;
 /**
  * Class Client
  * @package Thelia\Core\HttpKernel
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Client extends BaseClient
 {

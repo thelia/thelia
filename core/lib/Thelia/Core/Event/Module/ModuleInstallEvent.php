@@ -19,7 +19,7 @@ use Thelia\Module\Validator\ModuleDefinition;
 /**
  * Class ModuleEvent
  * @package Thelia\Core\Event\Module
- * @author  Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleInstallEvent extends ActionEvent
 {

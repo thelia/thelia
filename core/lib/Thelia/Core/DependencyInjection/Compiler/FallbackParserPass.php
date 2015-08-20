@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Class FallbackParserPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class FallbackParserPass implements CompilerPassInterface
 {

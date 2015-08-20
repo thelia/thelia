@@ -17,7 +17,7 @@ use Thelia\Model\Content;
 /**
  * Class ContentAddFolderEvent
  * @package Thelia\Core\Event\Content
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ContentAddFolderEvent extends ContentEvent
 {

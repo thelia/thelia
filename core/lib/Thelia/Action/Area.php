@@ -28,7 +28,7 @@ use Thelia\Model\CountryAreaQuery;
 /**
  * Class Area
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Area extends BaseAction implements EventSubscriberInterface
 {

@@ -30,7 +30,7 @@ use Thelia\Model\ContentQuery;
 /**
  * Class ContentController
  * @package Thelia\Controller\Admin
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentController extends AbstractSeoCrudController
 {

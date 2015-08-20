@@ -22,7 +22,7 @@ use Thelia\Command\ModuleGenerateCommand;
  *
  * Class ModuleGenerateCommandTest
  * @package Thelia\Tests\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleGenerateCommandTest extends BaseCommandTest
 {

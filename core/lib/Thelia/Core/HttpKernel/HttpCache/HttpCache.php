@@ -22,7 +22,7 @@ use Thelia\Core\HttpFoundation\Request as TheliaRequest;
 /**
  * Class HttpCache
  * @package Thelia\Core\HttpKernel\HttpCache
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class HttpCache extends BaseHttpCache implements HttpKernelInterface
 {

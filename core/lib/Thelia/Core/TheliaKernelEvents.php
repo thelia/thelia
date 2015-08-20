@@ -15,7 +15,7 @@ namespace Thelia\Core;
 /**
  * Class TheliaKernelEvents
  * @package Thelia\Core
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 final class TheliaKernelEvents
 {

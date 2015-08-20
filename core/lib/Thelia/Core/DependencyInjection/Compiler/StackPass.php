@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * Class StackPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class StackPass implements CompilerPassInterface
 {

@@ -15,7 +15,7 @@ namespace Thelia\Tests\Rewriting;
 /**
  * Class BaseRewritingObject
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseRewritingObject extends \PHPUnit_Framework_TestCase
 {

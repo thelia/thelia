@@ -22,7 +22,7 @@ use Thelia\Model\FeatureQuery;
 /**
  * Class FeatureAvTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FeatureAvTest extends \PHPUnit_Framework_TestCase
 {

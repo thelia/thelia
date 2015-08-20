@@ -17,7 +17,7 @@ use Thelia\Form\CategoryModificationForm as BaseCategoryModificationForm;
 /**
  * Class CategoryModificationForm
  * @package Thelia\Form\Api\Category
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class CategoryModificationForm extends BaseCategoryModificationForm
 {

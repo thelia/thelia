@@ -25,7 +25,7 @@ use Thelia\Log\Tlog;
 /**
  * Class Translation
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Translation extends BaseAction implements EventSubscriberInterface
 {

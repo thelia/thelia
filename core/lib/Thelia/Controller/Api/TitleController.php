@@ -25,7 +25,7 @@ use Thelia\Model\CustomerTitleQuery;
  * Class TitleController
  * @package Thelia\Controller\Api
  * @author Benjamin Perche <bperche@openstudio.fr>
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TitleController extends AbstractCrudApiController
 {
