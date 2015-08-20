@@ -28,7 +28,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class Update
  * @package Thelia\Install
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Update
 {

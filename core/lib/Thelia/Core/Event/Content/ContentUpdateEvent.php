@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Content;
 /**
  * Class ContentUpdateEvent
  * @package Thelia\Core\Event\Content
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class ContentUpdateEvent extends ContentCreateEvent
 {

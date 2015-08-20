@@ -25,7 +25,7 @@ use Thelia\Tools\TokenProvider;
  *
  * Class Install
  * @package Thelia\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Install extends ContainerAwareCommand
 {

@@ -40,7 +40,7 @@ use Thelia\Tools\TokenProvider;
  *
  * Class Cart
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {

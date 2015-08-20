@@ -21,7 +21,7 @@ use Thelia\Model\Newsletter as NewsletterModel;
 /**
  * Class Newsletter
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Newsletter extends BaseAction implements EventSubscriberInterface
 {

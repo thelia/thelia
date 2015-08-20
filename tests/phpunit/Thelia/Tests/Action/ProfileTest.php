@@ -21,7 +21,7 @@ use Thelia\Model\ProfileQuery;
 /**
  * Class ProfileTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProfileTest extends \PHPUnit_Framework_TestCase
 {

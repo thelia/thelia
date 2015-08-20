@@ -34,7 +34,7 @@ use Thelia\Model\Customer;
 /**
  * Class NewsletterController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterController extends BaseFrontController
 {

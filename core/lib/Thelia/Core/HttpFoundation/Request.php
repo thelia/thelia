@@ -23,7 +23,7 @@ use Thelia\Model\ConfigQuery;
  *
  * Class Request
  * @package Thelia\Core\HttpFoundation
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Request extends BaseRequest
 {

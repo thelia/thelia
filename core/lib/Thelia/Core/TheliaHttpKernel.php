@@ -27,7 +27,7 @@ use Thelia\Model;
 
 /**
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 class TheliaHttpKernel extends HttpKernel

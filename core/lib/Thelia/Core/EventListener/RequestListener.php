@@ -38,7 +38,7 @@ use Thelia\Tools\RememberMeTrait;
 /**
  * Class RequestListener
  * @package Thelia\Core\EventListener
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class RequestListener implements EventSubscriberInterface
 {

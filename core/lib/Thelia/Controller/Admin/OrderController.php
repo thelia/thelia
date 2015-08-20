@@ -26,7 +26,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class OrderController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class OrderController extends BaseAdminController
 {

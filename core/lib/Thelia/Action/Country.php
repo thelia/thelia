@@ -24,7 +24,7 @@ use Thelia\Model\CountryQuery;
 /**
  * Class Country
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Country extends BaseAction implements EventSubscriberInterface
 {

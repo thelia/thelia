@@ -23,7 +23,7 @@ use Thelia\Core\TheliaKernelEvents;
 /**
  * Class SessionMiddleware
  * @package Thelia\Core\Stack
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class SessionMiddleware implements HttpKernelInterface
 {

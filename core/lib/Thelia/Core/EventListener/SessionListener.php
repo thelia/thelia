@@ -25,7 +25,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class SessionListener
  * @package Thelia\Core\EventListener
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class SessionListener implements EventSubscriberInterface
 {

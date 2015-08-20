@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Module;
 /**
  * Class ModuleToggleActivationEvent
  * @package Thelia\Core\Event\Module
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleToggleActivationEvent extends ModuleEvent
 {

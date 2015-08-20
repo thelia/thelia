@@ -26,7 +26,7 @@ use Thelia\Model\FolderQuery;
 /**
  * Class FolderController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class FolderController extends AbstractSeoCrudController
 {

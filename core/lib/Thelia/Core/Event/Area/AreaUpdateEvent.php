@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Area;
 /**
  * Class AreaUpdateEvent
  * @package Thelia\Core\Event\Area
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AreaUpdateEvent extends AreaCreateEvent
 {

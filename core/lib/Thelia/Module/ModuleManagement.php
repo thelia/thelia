@@ -27,7 +27,7 @@ use Thelia\Model\ModuleQuery;
 /**
  * Class ModuleManagement
  * @package Thelia\Module
- * @author  Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleManagement
 {

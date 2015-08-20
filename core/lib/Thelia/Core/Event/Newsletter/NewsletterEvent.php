@@ -17,7 +17,7 @@ use Thelia\Core\Event\ActionEvent;
 /**
  * Class NewsletterEvent
  * @package Thelia\Core\Event\Newsletter
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterEvent extends ActionEvent
 {

@@ -30,7 +30,7 @@ use Thelia\Model\AreaQuery;
 /**
  * Class AreaController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class AreaController extends AbstractCrudController

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Class CurrencyConverterProviderPass
  * @package Thelia\Core\DependencyInjection\Compiler
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CurrencyConverterProviderPass implements CompilerPassInterface
 {

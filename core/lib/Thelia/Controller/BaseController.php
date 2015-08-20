@@ -43,7 +43,7 @@ use Thelia\Tools\URL;
  * user is not yet logged in, or back-office home page if the user is logged in.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 

@@ -26,7 +26,7 @@ use Thelia\Model\CountryQuery;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryController extends AbstractCrudController
 {

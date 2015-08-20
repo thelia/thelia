@@ -31,7 +31,7 @@ use Thelia\Model\Map\FolderTableMap;
 /**
  * Class Folder
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Folder extends BaseAction implements EventSubscriberInterface
 {

@@ -30,7 +30,7 @@ use Thelia\Exception\OrderException;
  *
  * @TODO Look if it's possible to block this definition in dependency-injection
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 class ViewListener implements EventSubscriberInterface

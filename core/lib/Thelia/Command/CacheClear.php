@@ -25,7 +25,7 @@ use Thelia\Model\ConfigQuery;
  *
  * Class CacheClear
  * @package Thelia\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  */
 class CacheClear extends ContainerAwareCommand

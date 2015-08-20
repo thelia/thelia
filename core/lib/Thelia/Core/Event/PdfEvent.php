@@ -15,7 +15,7 @@ namespace Thelia\Core\Event;
 /**
  * Class PdfEvent
  * @package Thelia\Core\Event
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class PdfEvent extends ActionEvent
 {

@@ -15,7 +15,7 @@ namespace TheliaSmarty\Template\Exception;
 /**
  * Class SmartyPluginException
  * @package Thelia\Core\Template\Smarty\Exception
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SmartyPluginException extends \SmartyException
 {

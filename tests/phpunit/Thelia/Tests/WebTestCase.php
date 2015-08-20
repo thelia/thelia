@@ -18,7 +18,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class WebTestCase
  * @package Thelia\Tests
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class WebTestCase extends \PHPUnit_Framework_TestCase
 {

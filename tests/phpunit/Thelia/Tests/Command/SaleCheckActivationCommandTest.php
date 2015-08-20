@@ -26,7 +26,7 @@ use Thelia\Model\Sale as SaleModel;
 /**
  * Class SaleCheckActivationCommandTest
  * @package Thelia\Tests\Command
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class SaleCheckActivationCommandTest extends ContainerAwareTestCase
 {

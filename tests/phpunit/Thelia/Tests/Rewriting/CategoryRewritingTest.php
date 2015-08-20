@@ -17,7 +17,7 @@ use Thelia\Model\Category;
 /**
  * Class CategoryRewritingTest
  * @package Thelia\Tests\Rewriting
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CategoryRewritingTest extends BaseRewritingObject
 {

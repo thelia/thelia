@@ -21,7 +21,7 @@ use Thelia\Model\ConfigQuery;
 /**
  * Class ResponseListener
  * @package Thelia\Core\EventListener
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ResponseListener implements EventSubscriberInterface
 {

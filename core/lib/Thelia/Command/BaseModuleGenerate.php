@@ -19,7 +19,7 @@ use Thelia\Model\Module;
  *
  * Class BaseModuleGenerate
  * @package Thelia\Command
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 abstract class BaseModuleGenerate extends ContainerAwareCommand
 {

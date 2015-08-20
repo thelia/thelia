@@ -21,7 +21,7 @@ use Symfony\Component\Translation\Translator;
  * Take care of integration tests (files permissions)
  *
  * @package Thelia\Install
- * @author  Manuel Raynaud <manu@thelia.net>
+ * @author  Manuel Raynaud <manu@raynaud.io>
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  */
 class CheckPermission extends BaseInstall
