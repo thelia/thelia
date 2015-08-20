@@ -115,7 +115,7 @@ class ParserContext implements \IteratorAggregate
         /** Remove unserializable objects \Symfony\Component\HttpFoundation\File\UploadedFile */
         $formData = $form->getForm()->getData();
         foreach ($formData as $idx => $value) {
-            if ($value instanceof UploadedFile) {
+            if (is_object($value)) {
                 unset($formData[$idx]);
             }
         }
