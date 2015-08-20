@@ -86,6 +86,7 @@ abstract class BaseController extends ContainerAware
      * @param $pdf
      * @param $fileName
      * @param $status
+     * @param bool $browser
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function pdfResponse($pdf, $fileName, $status = 200, $browser = false)
@@ -244,6 +245,7 @@ abstract class BaseController extends ContainerAware
      * @param string $fileName
      * @param bool $checkOrderStatus
      * @param bool $checkAdminUser
+     * @param bool $browser
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function generateOrderPdf($order_id, $fileName, $checkOrderStatus = true, $checkAdminUser = true, $browser = false)
@@ -323,7 +325,7 @@ abstract class BaseController extends ContainerAware
         $url = null;
 
         if ($form != null) {
-            $url = $form->getFormDefinedUrl($parameterName, $form);
+            $url = $form->getFormDefinedUrl($parameterName);
         } else {
             $url = $this->getRequest()->get($parameterName);
         }
