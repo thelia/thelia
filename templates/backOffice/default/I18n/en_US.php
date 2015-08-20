@@ -678,7 +678,7 @@ return array(
     'Lastname' => 'Lastname',
     'Latest version available' => 'Latest version available',
     'Leave empty to keep current password' => 'Leave empty to keep current password',
-    'Lire la suite' => 'Lire la suite',
+    'Lire la suite' => 'Read more',
     'Loading Thelia lastest news...' => 'Loading Thelia lastest news...',
     'Loading...' => 'Loading...',
     'Locale' => 'Locale',
