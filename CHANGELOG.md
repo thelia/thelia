@@ -1,5 +1,8 @@
 # 2.2.0-beta3
 
+- #1649 Add index in table rewriting_url
+- #1644 Allow relative path use with Tlog
+- #1640 Add docker and docker-compose configuration
 - #1637 Fix admin API edit button
 - #1635 Add unit tests for the routing files (admin, api, front)
 - #1634 Remove leftover uncallable routes (admin)
@@ -17,7 +20,6 @@
 - #1583 Add German translations
 - #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
 - #1618 Configurable faker
-- Add docker and docker-compose configuration
 
 # 2.2.0-beta2
 

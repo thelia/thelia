@@ -1301,6 +1301,12 @@
     <index name="idx_rewriting_url_redirected">
       <index-column name="redirected" />
     </index>
+    <index name="idx_rewriting_url">
+      <index-column name="view_locale" />
+      <index-column name="view" />
+      <index-column name="view_id" />
+      <index-column name="redirected" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table name="rewriting_argument" namespace="Thelia\Model">
