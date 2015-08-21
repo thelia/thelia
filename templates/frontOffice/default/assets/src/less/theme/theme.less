@@ -379,7 +379,14 @@ td.product,
                     width: 100%;
                     height: 50px;
                     h3 {
-                        padding-right: 10px;
+                        margin-top: 2px;
+                        padding-right: 20px;
+
+                        span {
+                            height: 2em;
+                            overflow: hidden;
+                            display: block;
+                        }
                     }
 
                     &:hover,
@@ -500,6 +507,8 @@ td.product,
                     padding: 3px;
                     .name {
                         margin: 4px;
+                        height: 2em;
+                        overflow: hidden;
                     }
                     .description {
                         margin-left: 4px;
@@ -953,9 +962,6 @@ td.product,
         color: @text-color;
         font-size: @font-size-small;
         font-style: italic;
-        position: relative;
-        top: -22px;
-        left: 20px;
     }
 
     @media (min-width: @screen-tablet) {
