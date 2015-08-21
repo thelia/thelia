@@ -1455,7 +1455,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (59, 'de_DE', 'Dateiname der Fehlerseite', NULL, NULL, NULL),
     (60, 'de_DE', 'Den Kunden erlauben ihre E-Mail-Adresse zu ändern. 1 für Ja, 0 für Nein', NULL, NULL, NULL),
     (61, 'de_DE', 'Den Kunden fragen, ihre E-Mail-Adresse zu bestätigen. 1 für Jan, 0 für Nein', NULL, NULL, NULL),
-    (62, 'de_DE', 'Secret key for form CSRF token', NULL, NULL, NULL),
+    (62, 'de_DE', NULL, NULL, NULL, NULL),
     (1, 'en_US', 'Check available product stock (1) or ignore it (0) when displaying and changing ordered quantity', NULL, NULL, NULL),
     (2, 'en_US', 'Name of the active front-office template', NULL, NULL, NULL),
     (3, 'en_US', 'Name of the active back-office template', NULL, NULL, NULL),
@@ -1908,7 +1908,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (220, 'de_DE', 'Bestellungsdetails - Initialisierung von Javascript', NULL, NULL),
     (221, 'de_DE', 'Kundenkonto - Erweitere Informationen', NULL, NULL),
     (222, 'de_DE', 'Bestelldaten - nach einem Produkt', NULL, NULL),
-    (223, 'de_DE', 'Mini cart', NULL, NULL),
+    (223, 'de_DE', NULL, NULL, NULL),
 
     (1000, 'de_DE', 'Kategorie - Inhalt', NULL, NULL),
     (1001, 'de_DE', 'Inhalt - Inhalt', NULL, NULL),
@@ -2306,6 +2306,7 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1393, 'de_DE', 'Administratoren Tabellenzeile', '', ''),
     (1394, 'de_DE', 'Erweiterte Konfiguration', '', ''),
     (1395, 'de_DE', 'Erweiterte Konfiguration - JavaScript', '', ''),
+
     (2001, 'de_DE', 'Rechnung - CSS', NULL, NULL),
     (2002, 'de_DE', 'Rechnung - im Header', NULL, NULL),
     (2003, 'de_DE', 'Rechnung - oben an dem Footer', NULL, NULL),
