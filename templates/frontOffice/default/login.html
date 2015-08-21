@@ -70,6 +70,9 @@
                                         <span class="help-block">{$message}</span>
                                     {/if}
                                 </div>
+                                <span class="help-block">
+                                    <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
+                                </span>
                             </div>
                             {/form_field}
                             {form_field field='remember_me'}
@@ -84,7 +87,6 @@
                 </fieldset>
                 {hook name="login.form-bottom"}
                 <div class="group-btn">
-                    <a href="{url path="/password"}" data-toggle="confirmation" class="forgot-password">{intl l="Forgot your Password?"}</a>
                     <button type="submit" class="btn btn-primary"><i class="fa fa-chevron-right"></i> {intl l="Next"}</button>
                 </div>
             </form>
