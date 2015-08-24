@@ -101,6 +101,25 @@ class ParserContext implements \IteratorAggregate
     // -- Error form -----------------------------------------------------------
 
     /**
+     * Remove all objects in data, because they are probably not serializable
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function cleanFormData(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[$key] = $this->cleanFormData($value);
+            } elseif (is_object($value)) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Add a new form to the error form context
      *
      * @param BaseForm $form the errored form
@@ -112,17 +131,9 @@ class ParserContext implements \IteratorAggregate
 
         $this->set(get_class($form) . ":" . $form->getType(), $form);
 
-        /** Remove unserializable objects \Symfony\Component\HttpFoundation\File\UploadedFile */
-        $formData = $form->getForm()->getData();
-        foreach ($formData as $idx => $value) {
-            if ($value instanceof UploadedFile) {
-                unset($formData[$idx]);
-            }
-        }
-
         // Set form error information
         $formErrorInformation[get_class($form) . ":" . $form->getType()] = [
-            'data'              => $formData,
+            'data'              => $this->cleanFormData($form->getForm()->getData()),
             'hasError'          => $form->hasError(),
             'errorMessage'      => $form->getErrorMessage(),
             'method'            => $this->request->getMethod(),
