@@ -19,10 +19,20 @@ include("header.php");
 
 ?>
 <div class="well">
-    <div class="clearfix">
-        <a href="?lang=fr_FR"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('French'); ?></a>
-        <a href="?lang=en_US"><span class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('English'); ?></a>
+    <div class="clearfix text-center">
+        <a href="?lang=fr_FR">
+            Français
+        </a>
+        <span>&nbsp;<strong>|</strong>&nbsp;</span>
+        <a href="?lang=en_US">
+            English
+        </a>
+        <span>&nbsp;<strong>|</strong>&nbsp;</span>
+        <a href="?lang=de_DE">
+            Deutsch
+        </a>
     </div>
+    <br />
 
     <p class="lead text-center">
         <?php echo $trans->trans('Welcome in the Thelia updater wizard.'); ?>
@@ -65,10 +75,24 @@ include("header.php");
 
 </div>
 <?php if (!$update->isLatestVersion()) { ?>
+    <script>
+        var token = true;
+
+        function start(elem)
+        {
+            if (token) {
+                elem.innerHTML = '<?php echo $trans->trans('Please wait ...'); ?>';
+                token = false;
+                return true;
+            }
+
+            return false;
+        }
+    </script>
     <div class="clearfix">
-        <a href="updater.php?backup=1" class="pull-right btn btn-default btn-primary"><span
+        <a onclick="return start(this)" href="updater.php?backup=1" class="pull-right btn btn-default btn-primary"><span
                 class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Backup and update Thelia'); ?></a>
-        <a href="updater.php" class="pull-right btn btn-default"><span
+        <a onclick="return start(this)" href="updater.php" class="pull-right btn btn-default"><span
                 class="glyphicon glyphicon-chevron-right"></span> <?php echo $trans->trans('Update Thelia'); ?></a>
     </div>
 <?php

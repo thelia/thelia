@@ -65,5 +65,6 @@ return array(
     "Refresh" => 'Refresh',
     'Published by OpenStudio' => 'Published by OpenStudio',
     'Thelia support forum' => 'Thelia support forum',
-    'Thelia contributions' => 'Thelia contributions'
+    'Thelia contributions' => 'Thelia contributions',
+    'Please wait ...' => 'Please wait ...'
 );

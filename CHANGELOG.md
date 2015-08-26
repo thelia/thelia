@@ -21,7 +21,6 @@
 - #1583 Add German translations
 - #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
 - #1618 Configurable faker
-- Add docker and docker-compose configuration
 - #1581 Fix the prices precision
     - Not round the prices without tax in back office
     - Change the type for the price columns in database. New type : decimal(16,6)

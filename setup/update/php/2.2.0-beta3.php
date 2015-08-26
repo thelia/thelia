@@ -15,7 +15,6 @@ if ($stmtGetFloat->rowCount() !== 0) {
         ['product_price', 'price'],
         ['product_price', 'promo_price'],
         ['order_product', 'price'],
-        ['order_product', 'promo_price'],
         ['order', 'discount'],
         ['order', 'postage'],
         ['order', 'postage_tax'],
@@ -38,18 +37,17 @@ if ($stmtGetFloat->rowCount() !== 0) {
     ];
 
     foreach ($columns as $column) {
-        echo "\n\n[CONVERTING] " . $column[0] . ' ' . $column[1];
-
         $args = [
             ':table:' => $column[0],
             ':column:' => $column[1]
         ];
 
         foreach ($queries as $query) {
-            echo "\n[sql] " . strtr($query, $args);
-
             $stmtConvert = $pdo->prepare(strtr($query, $args));
             $stmtConvert->execute();
         }
     }
+
+    $stmtConvert = $pdo->prepare("ALTER TABLE `order_product` CHANGE `promo_price` `promo_price` DECIMAL( 16, 6 ) NOT NULL DEFAULT '0.00000000'");
+    $stmtConvert->execute();
 }
