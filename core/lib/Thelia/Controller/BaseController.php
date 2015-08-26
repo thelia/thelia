@@ -323,7 +323,7 @@ abstract class BaseController extends ContainerAware
         $url = null;
 
         if ($form != null) {
-            $url = $form->getFormDefinedUrl($parameterName, $form);
+            $url = $form->getFormDefinedUrl($parameterName);
         } else {
             $url = $this->getRequest()->get($parameterName);
         }
