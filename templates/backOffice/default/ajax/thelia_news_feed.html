@@ -4,7 +4,7 @@
 {default_translation_domain domain='bo.default'}
 
 <div class="panel-group" id="accordion">
-	{loop type="feed" name="thelia_feeds" url="http://thelia.net/Flux-rss.html?id_rubrique=8" limit="3"}
+	{loop type="feed" name="thelia_feeds" url="http://thelia.net/feeds/?lang={$lang_code}" limit="3"}
 
 		<div class="panel panel-default">
 			<div class="panel-heading">
