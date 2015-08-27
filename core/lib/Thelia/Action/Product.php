@@ -95,7 +95,7 @@ class Product extends BaseAction implements EventSubscriberInterface
             $con->beginTransaction();
 
             try {
-                $prev_ref = $product->getRef();
+                $prevRef = $product->getRef();
 
                 $product
                     ->setDispatcher($event->getDispatcher())
@@ -113,7 +113,7 @@ class Product extends BaseAction implements EventSubscriberInterface
                 ;
 
                 // Update default PSE (if product has no attributes and the product's ref change)
-                if ($prev_ref != $product->getRef() && $product->countSaleElements() == 1) {
+                if ($prevRef != $product->getRef() && $product->getDefaultSaleElements()->countAttributeCombinations() == 0) {
                     $defaultPse = $product->getDefaultSaleElements();
 
                     $defaultPse->setRef($product->getRef())->save();
