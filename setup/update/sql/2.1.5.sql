@@ -17,6 +17,8 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
+    (@max_id+1, 'de_DE', 'Rechnung - Weitere Produktinformationen', '', ''),
+    (@max_id+2, 'de_DE', 'Lieferung - Weitere Produktinformationen', '', ''),
     (@max_id+1, 'en_US', 'Invoice - additional product information', '', ''),
     (@max_id+2, 'en_US', 'Delivery - additional product information', '', ''),
     (@max_id+1, 'es_ES', NULL, '', ''),

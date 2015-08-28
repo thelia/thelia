@@ -23,7 +23,7 @@ return array(
     'Export' => 'Export',
     'Export expeditor inet file' => 'Exporter le fichier Expeditor INET',
     'Please change the access rights' => 'Merci de modifier les droits d\'accès',
-    'Price (€)' => 'Price (€)',
+    'Price (€)' => 'Prix (€)',
     'Price slices' => 'Prix et poids',
     'Processing' => 'Traitement',
     'REF' => 'REF',

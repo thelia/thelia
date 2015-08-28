@@ -33,6 +33,15 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
+(@max, 'de_DE', 'Shop Informationen'),
+(@max+1, 'de_DE', 'Konfigurations Variablen'),
+(@max+2, 'de_DE', 'Administration Logs ansehen'),
+(@max+3, 'de_DE', 'Logs System Konfiguration'),
+(@max+4, 'de_DE', 'Erweiterte Konfiguration'),
+(@max+5, 'de_DE', 'Übersetzungen'),
+(@max+6, 'de_DE', 'Tools'),
+(@max+7, 'de_DE', 'Exporten-Verwaltung'),
+(@max+8, 'de_DE', 'Export für die Newsletter Angemeldeten'),
 (@max, 'en_US', 'Store information configuration'),
 (@max+1, 'en_US', 'Configuration variables'),
 (@max+2, 'en_US', 'View administration logs'),
