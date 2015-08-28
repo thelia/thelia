@@ -1,5 +1,6 @@
 # 2.2.0-beta3
 
+- #1653 Remove ```AdminIncludes``` folder in the module generation
 - #1649 Add index in table rewriting_url
 - #1644 Allow relative path use with Tlog
 - #1640 Add docker and docker-compose configuration
@@ -20,6 +21,10 @@
 - #1583 Add German translations
 - #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
 - #1618 Configurable faker
+
+##DEPRECATED
+
+- Deprecated AdminIncludes, it's better to use the hooks
 
 # 2.2.0-beta2
 
