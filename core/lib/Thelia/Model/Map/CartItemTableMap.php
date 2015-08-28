@@ -181,8 +181,8 @@ class CartItemTableMap extends TableMap
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', false, null, 1);
         $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', false, null, null);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
+        $this->addColumn('PRICE', 'Price', 'DECIMAL', false, 16, 0);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'DECIMAL', false, 16, 0);
         $this->addColumn('PRICE_END_OF_LIFE', 'PriceEndOfLife', 'TIMESTAMP', false, null, null);
         $this->addColumn('PROMO', 'Promo', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

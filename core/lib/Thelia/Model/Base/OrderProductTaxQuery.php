@@ -54,8 +54,8 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     ChildOrderProductTax findOneByOrderProductId(int $order_product_id) Return the first ChildOrderProductTax filtered by the order_product_id column
  * @method     ChildOrderProductTax findOneByTitle(string $title) Return the first ChildOrderProductTax filtered by the title column
  * @method     ChildOrderProductTax findOneByDescription(string $description) Return the first ChildOrderProductTax filtered by the description column
- * @method     ChildOrderProductTax findOneByAmount(double $amount) Return the first ChildOrderProductTax filtered by the amount column
- * @method     ChildOrderProductTax findOneByPromoAmount(double $promo_amount) Return the first ChildOrderProductTax filtered by the promo_amount column
+ * @method     ChildOrderProductTax findOneByAmount(string $amount) Return the first ChildOrderProductTax filtered by the amount column
+ * @method     ChildOrderProductTax findOneByPromoAmount(string $promo_amount) Return the first ChildOrderProductTax filtered by the promo_amount column
  * @method     ChildOrderProductTax findOneByCreatedAt(string $created_at) Return the first ChildOrderProductTax filtered by the created_at column
  * @method     ChildOrderProductTax findOneByUpdatedAt(string $updated_at) Return the first ChildOrderProductTax filtered by the updated_at column
  *
@@ -63,8 +63,8 @@ use Thelia\Model\Map\OrderProductTaxTableMap;
  * @method     array findByOrderProductId(int $order_product_id) Return ChildOrderProductTax objects filtered by the order_product_id column
  * @method     array findByTitle(string $title) Return ChildOrderProductTax objects filtered by the title column
  * @method     array findByDescription(string $description) Return ChildOrderProductTax objects filtered by the description column
- * @method     array findByAmount(double $amount) Return ChildOrderProductTax objects filtered by the amount column
- * @method     array findByPromoAmount(double $promo_amount) Return ChildOrderProductTax objects filtered by the promo_amount column
+ * @method     array findByAmount(string $amount) Return ChildOrderProductTax objects filtered by the amount column
+ * @method     array findByPromoAmount(string $promo_amount) Return ChildOrderProductTax objects filtered by the promo_amount column
  * @method     array findByCreatedAt(string $created_at) Return ChildOrderProductTax objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildOrderProductTax objects filtered by the updated_at column
  *

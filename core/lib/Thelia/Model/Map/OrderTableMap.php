@@ -257,9 +257,9 @@ class OrderTableMap extends TableMap
         $this->addColumn('TRANSACTION_REF', 'TransactionRef', 'VARCHAR', false, 100, null);
         $this->addColumn('DELIVERY_REF', 'DeliveryRef', 'VARCHAR', false, 100, null);
         $this->addColumn('INVOICE_REF', 'InvoiceRef', 'VARCHAR', false, 100, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
-        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', true, null, null);
-        $this->addColumn('POSTAGE_TAX', 'PostageTax', 'FLOAT', true, null, 0);
+        $this->addColumn('DISCOUNT', 'Discount', 'DECIMAL', false, 16, 0);
+        $this->addColumn('POSTAGE', 'Postage', 'DECIMAL', true, 16, 0);
+        $this->addColumn('POSTAGE_TAX', 'PostageTax', 'DECIMAL', true, 16, 0);
         $this->addColumn('POSTAGE_TAX_RULE_TITLE', 'PostageTaxRuleTitle', 'VARCHAR', false, 255, null);
         $this->addForeignKey('PAYMENT_MODULE_ID', 'PaymentModuleId', 'INTEGER', 'module', 'ID', true, null, null);
         $this->addForeignKey('DELIVERY_MODULE_ID', 'DeliveryModuleId', 'INTEGER', 'module', 'ID', true, null, null);

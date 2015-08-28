@@ -91,7 +91,8 @@ abstract class OrderCoupon implements ActiveRecordInterface
 
     /**
      * The value for the amount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $amount;
 
@@ -221,10 +222,23 @@ abstract class OrderCoupon implements ActiveRecordInterface
     protected $orderCouponModulesScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->amount = '0.000000';
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\OrderCoupon object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -525,7 +539,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
     /**
      * Get the [amount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getAmount()
     {
@@ -772,13 +786,13 @@ abstract class OrderCoupon implements ActiveRecordInterface
     /**
      * Set the value of [amount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\OrderCoupon The current object (for fluent API support)
      */
     public function setAmount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->amount !== $v) {
@@ -1063,6 +1077,10 @@ abstract class OrderCoupon implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->amount !== '0.000000') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -1103,7 +1121,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
             $this->type = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : OrderCouponTableMap::translateFieldName('Amount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->amount = (null !== $col) ? (double) $col : null;
+            $this->amount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : OrderCouponTableMap::translateFieldName('Title', TableMap::TYPE_PHPNAME, $indexType)];
             $this->title = (null !== $col) ? (string) $col : null;
@@ -2988,6 +3006,7 @@ abstract class OrderCoupon implements ActiveRecordInterface
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

@@ -20,9 +20,9 @@
 <footer class="footer">
     <div class="container">
         <p>&copy; Thelia <?php echo date('Y'); ?>
-            - <a href="http://www.openstudio.fr/" target="_blank"><?php $trans->trans('Published by OpenStudio'); ?></a>
-            - <a href="http://forum.thelia.net/" target="_blank"><?php $trans->trans('Thelia support forum'); ?></a>
-            - <a href="http://thelia.net/modules/" target="_blank"><?php $trans->trans('Thelia contributions'); ?></a>
+            - <a href="http://www.openstudio.fr/" target="_blank"><?php echo $trans->trans('Published by OpenStudio'); ?></a>
+            - <a href="http://forum.thelia.net/" target="_blank"><?php echo $trans->trans('Thelia support forum'); ?></a>
+            - <a href="http://thelia.net/modules/" target="_blank"><?php echo $trans->trans('Thelia contributions'); ?></a>
         </p>
     </div>
 </footer>
@@ -30,4 +30,7 @@
 <?php if (isset($scriptHook)) { echo $scriptHook; } ?>
 </body>
 </html>
-<?php echo ob_end_flush(); ?>
+<?php
+if (ob_get_level() < 2) {
+    echo ob_end_flush();
+}

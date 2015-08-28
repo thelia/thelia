@@ -101,8 +101,8 @@ abstract class Cart implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * Note: this column has a database default value of: 0
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
@@ -166,7 +166,7 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->discount = 0;
+        $this->discount = '0.000000';
     }
 
     /**
@@ -498,7 +498,7 @@ abstract class Cart implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -691,13 +691,13 @@ abstract class Cart implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Cart The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -761,7 +761,7 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->discount !== 0) {
+            if ($this->discount !== '0.000000') {
                 return false;
             }
 
@@ -811,7 +811,7 @@ abstract class Cart implements ActiveRecordInterface
             $this->currency_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {

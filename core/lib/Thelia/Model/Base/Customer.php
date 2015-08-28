@@ -140,7 +140,8 @@ abstract class Customer implements ActiveRecordInterface
 
     /**
      * The value for the discount field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $discount;
 
@@ -287,6 +288,7 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->discount = '0.000000';
         $this->version = 0;
     }
 
@@ -674,7 +676,7 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Get the [discount] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getDiscount()
     {
@@ -1024,13 +1026,13 @@ abstract class Customer implements ActiveRecordInterface
     /**
      * Set the value of [discount] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\Customer The current object (for fluent API support)
      */
     public function setDiscount($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->discount !== $v) {
@@ -1199,6 +1201,10 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->discount !== '0.000000') {
+                return false;
+            }
+
             if ($this->version !== 0) {
                 return false;
             }
@@ -1264,7 +1270,7 @@ abstract class Customer implements ActiveRecordInterface
             $this->sponsor = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->discount = (null !== $col) ? (double) $col : null;
+            $this->discount = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('RememberMeToken', TableMap::TYPE_PHPNAME, $indexType)];
             $this->remember_me_token = (null !== $col) ? (string) $col : null;
