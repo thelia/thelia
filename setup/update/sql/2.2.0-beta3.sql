@@ -41,13 +41,13 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
     (@max_id + 5, 'es_ES', NULL, '', ''),
     (@max_id + 6, 'es_ES', NULL, '', ''),
     (@max_id + 7, 'es_ES', NULL, '', ''),
-    (@max_id + 1, 'fr_FR', 'Onglet SEO  - formulaire de modification', '', ''),
-    (@max_id + 2, 'fr_FR', 'Édition d\'une commande - en haut du tableau des produits', '', ''),
-    (@max_id + 3, 'fr_FR', 'Édition d\'une commande - en dessous d\'une ligne d\'un produit', '', ''),
-    (@max_id + 4, 'fr_FR', 'Administrateurs - En haut', '', ''),
-    (@max_id + 5, 'fr_FR', 'Administrateurs - En bas', '', ''),
+    (@max_id + 1, 'fr_FR', 'Onglet SEO - formulaire de mise à jour', '', ''),
+    (@max_id + 2, 'fr_FR', 'Modification commande - en-tête des produits', '', ''),
+    (@max_id + 3, 'fr_FR', 'Modification commande - ligne du tableau des produits', '', ''),
+    (@max_id + 4, 'fr_FR', 'Administrateurs - en-tête', '', ''),
+    (@max_id + 5, 'fr_FR', 'Administrateurs - ligne', '', ''),
     (@max_id + 6, 'fr_FR', 'Configuration avancée', '', ''),
-    (@max_id + 7, 'fr_FR', 'Configuration avancée - appel javascript', '', '')
+    (@max_id + 7, 'fr_FR', 'Configuration avancée - JavaScript', '', '')
 ;
 
 UPDATE `hook` SET  `block` =  '0', `updated_at` =  NOW() WHERE `code` = 'main.topbar-top' AND `type` = 2;

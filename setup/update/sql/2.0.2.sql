@@ -123,7 +123,7 @@ INSERT INTO `country_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `po
 (@max, 'de_DE', NULL, '', '', ''),
 (@max, 'en_US', 'Hong Kong', '', '', ''),
 (@max, 'es_ES', NULL, '', '', ''),
-(@max, 'fr_FR', NULL, '', '', '')
+(@max, 'fr_FR', 'Hong Kong', '', '', '')
 ;
 
 SET FOREIGN_KEY_CHECKS = 1;

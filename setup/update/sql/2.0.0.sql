@@ -42,7 +42,7 @@ INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
 (@max, 'de_DE', 'Konfiguration / Cache'),
 (@max, 'en_US', 'Configuration / Cache'),
 (@max, 'es_ES', NULL),
-(@max, 'fr_FR', NULL)
+(@max, 'fr_FR', 'Configuration / Cache')
 ;
 
 SET @max := @max+1;
