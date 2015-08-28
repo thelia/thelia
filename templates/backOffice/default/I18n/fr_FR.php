@@ -1105,7 +1105,7 @@ return array(
     'To create a new content, select an existing folder, or create a new one.' => 'Pour créer un nouveau contenu, sélectionnez un dossier existant ou créez en un nouveau',
     'To create a new product, select an existing category, or create a new one.' => 'Pour créer un nouveau produit, veuillez sélectionner une rubrique existante ou en créer une nouvelle',
     'To remove a value from the combination, select it and click "remove"' => 'Afin de supprimer une valeur de la combinaison, sélectionnez la et cliquez sur "Enlever"',
-    'To use features or attributes on this product, please select a product template. You can define product templates in the <a href="%tpl_mgmt_url" target="tpl_window">configuration section</a> of the administration.' => 'Pour utiliser les déclinaisons et les caractéristiques sur ce produit, choisissez un tempplate produit. Vous pouvez gérer les gabarits de produit dans <a href="%tpl_mgmt_url" target="tpl_window">la section configuration</a> de l\'administration.',
+    'To use features or attributes on this product, please select a product template. You can define product templates in the <a href="%tpl_mgmt_url" target="tpl_window">configuration section</a> of the administration.' => 'Pour utiliser les déclinaisons et les caractéristiques sur ce produit, choisissez un template produit. Vous pouvez gérer les gabarits de produit dans <a href="%tpl_mgmt_url" target="tpl_window">la section configuration</a> de l\'administration.',
     'Today' => 'Aujourd\'hui',
     'Toggle select all' => 'Tout cocher/décocher',
     'Tools' => 'Outils',
