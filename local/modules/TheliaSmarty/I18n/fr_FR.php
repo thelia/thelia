@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => 'La loop "%type" doit étendre la class Thelia\Core\Template\Element\BaseLoop',
+    '\'%type\' loop class should extends Thelia\Core\Template\Element\BaseLoop' => 'La loop "%type" doit étendre la class Thelia\\Core\\Template\\Element\\BaseLoop',
     'A loop named \'%name\' already exists in the current scope.' => 'une loop avec comme nom \'%name\' existe déjà dans le scope courant',
     'Loop type \'%type\' is not defined.' => 'La loop de type "%type" n\'est pas défini',
     'Missing \'name\' parameter in loop arguments' => 'Le paramètre \'name\' est manquant dans la liste des arguments',

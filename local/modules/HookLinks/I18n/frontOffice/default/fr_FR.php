@@ -6,5 +6,5 @@ return array(
     'Log out!' => 'Déconnexion !',
     'Login' => 'Connexion',
     'My Account' => 'Mon compte',
-    'Register' => 'Créer un compte',
+    'Register' => 'S\'inscrire',
 );

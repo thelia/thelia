@@ -65,5 +65,6 @@ return array(
     "Refresh" => 'Rafraîchir',
     'Published by OpenStudio' => 'Développé par OpenStudio',
     'Thelia support forum' => 'Forum de Thelia',
-    'Thelia contributions' => 'Contributions de Thelia'
+    'Thelia contributions' => 'Contributions de Thelia',
+    'Please wait ...' => 'Veuillez patienter ...'
 );

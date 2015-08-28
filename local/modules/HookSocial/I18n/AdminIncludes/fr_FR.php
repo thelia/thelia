@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'An error occured' => 'Une erreur a été généré',
+    'An error occured' => 'Une erreur est survenue',
     'Edit your social accounts.' => 'Modifier vos paramètres de réseaux sociaux.',
-    'Save' => 'Enregistrer',
+    'Save' => ' Enregistrer',
 );
