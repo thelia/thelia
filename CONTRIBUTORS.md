@@ -34,7 +34,7 @@ please email us (info@thelia.net) or fork this file on GitHub and send a pull-re
  - Vincent Lopes-Vicente (lopes-vincent)
  - (alex63530)
  - Arnault Pachot (apachot)
- - Cédric Sibaut (csibaut)
+ - Cédric Sibaud (csibaud)
  - Stéphane Calisti (csteph85)
  - Alex Rock Ancelet (Pierstoval)
  - Baptiste Cabarrou (bcabarrou)
