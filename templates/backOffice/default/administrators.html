@@ -59,7 +59,7 @@
                                     {$can_update = true}
                                 {/loop}
 
-                                <tr>
+                                <tr class="js-admin-{$ID}">
                                     <td data-field-class="js-login">
                                         {if $can_update}
                                             <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal">{$LOGIN}</a>
@@ -378,9 +378,9 @@ jQuery(function($) {
     });
 
     $(".js-update-administrator").click(function(e){
-        $('#administrator_update_id').val($(this).data('id'))
+        $('#administrator_update_id').val($(this).data('id'));
 
-        $(this).parents('tr').find('td').each(function(k, v) {
+        $('.js-admin-' + $(this).data('id')).find('td').each(function(k, v) {
             if(!$(v).data('field-class')) {
                 return true;
             }

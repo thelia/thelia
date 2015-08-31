@@ -34,7 +34,6 @@
         if ($modal.length > 0) {
             $modal.on('shown.bs.modal', function() {
                 var $firstField = $('input:visible:first', $modal);
-                console.log($firstField);
                 $firstField.focus();
             });
         }
