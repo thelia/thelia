@@ -43,12 +43,16 @@ class ContainerAwareCommand extends Command implements ContainerAwareInterface
 
     /**
      * @see ContainerAwareInterface::setContainer()
+     * @param ContainerInterface $container
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
+    /**
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
+     */
     public function getDispatcher()
     {
         $container = $this->getContainer();

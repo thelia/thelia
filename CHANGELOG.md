@@ -1,3 +1,11 @@
+# 2.2.0
+
+- #1688 Fix the permission messages in Thelia installer
+- #1686 Use createForm method for front forms ```thelia.coupon.code, thelia.order.delivery, thelia.order.payment```
+- #1667 Fix #1666 Display an error when trying to delete a customer which has orders
+- #1665 Fix form field type date in Smarty plugin form, checks if the field type is a BirthdayType for assign a smarty variable [years, month, days]
+- #1659 Fix Administrator edit action in the BackOffice, it was impossible to edit an administrator
+
 # 2.2.0-beta3
 
 - #1653 Remove ```AdminIncludes``` folder in the module generation
