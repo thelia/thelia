@@ -103,7 +103,7 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         {loop type="lang" name="ui-lang"}
-                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
+                                        <li><a href="{url current="1" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                                         {/loop}
                                      </ul>
                                 </div>
