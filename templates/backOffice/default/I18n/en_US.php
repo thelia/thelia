@@ -1013,6 +1013,7 @@ return array(
     'You don\'t have any import' => 'You don\'t have any import',
     'You may also quickly create combinations from products attributes using the  <a href="%url" data-toggle="modal">Combination Builder</a>.' => 'You may also quickly create combinations from products attributes using the  <a href="%url" data-toggle="modal">Combination Builder</a>.',
     'Your current IP address is %ip' => 'Your current IP address is %ip',
+    'Your search is too short' => 'Your search is too short',
     'Zip code' => 'Zip code',
     'Zone name' => 'Zone name',
     'activate' => 'activate',

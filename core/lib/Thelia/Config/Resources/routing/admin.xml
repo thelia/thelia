@@ -650,7 +650,7 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
     </route>
 
-    
+
     <!-- Product templates management -->
 
     <route id="admin.configuration.templates.default" path="/admin/configuration/templates">
