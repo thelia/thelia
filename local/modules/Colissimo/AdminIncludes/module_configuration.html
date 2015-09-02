@@ -166,9 +166,9 @@
                         dialog_body  = "<input type=\"hidden\" name=\"operation\" value=\"add\"/>
                         <input type=\"hidden\" name=\"area\" value=\"{$ID}\" />
                         <label for=\"weight_{$ID}\">{intl d='colissimo.ai' l="Weight up to ... (kg)"}</label></label>
-                        <input type=\"number\" id=\"weight_{$ID}\" name=\"weight\" value=\"1\" class=\"form-control\" pattern=\"\\d+\\.?\\d*\" required/>
+                        <input type=\"number\" step=\"0.01\" id=\"weight_{$ID}\" name=\"weight\" value=\"1\" class=\"form-control\" pattern=\"\\d+\\.?\\d*\" required/>
                         <label for=\"price_{$ID}\">{intl d='colissimo.ai' l="Price (€)"}</label></label>
-                        <input type=\"number\" id=\"price_{$ID}\" name=\"price\" value=\"1\" class=\"form-control\" pattern=\"\\d+\\.?\\d*\" required/>"
+                        <input type=\"number\" step=\"0.01\" id=\"price_{$ID}\" name=\"price\" value=\"1\" class=\"form-control\" pattern=\"\\d+\\.?\\d*\" required/>"
 
                         form_action="{url path="/admin/module/colissimo/prices"}"
 
@@ -204,7 +204,7 @@
                                 <input type=\"hidden\" name=\"area\" value=\"{$ID}\"/>
                                 <input type=\"hidden\" name=\"weight\" value=\"{$MAX_WEIGHT}\"/>
                                 <label for=\"price_edit_{$ID}_{$MAX_WEIGHT}\">{intl d='colissimo.ai' l='Price (€)'}</label>
-                                <input type=\"number\" id=\"price_edit_{$ID}_{$MAX_WEIGHT}\" class=\"form-control\" name=\"price\" value=\"{$PRICE}\" pattern=\"\\d+\\.?\\d*\" required/>"
+                                <input type=\"number\" step=\"0.01\" id=\"price_edit_{$ID}_{$MAX_WEIGHT}\" class=\"form-control\" name=\"price\" value=\"{$PRICE}\" pattern=\"\\d+\\.?\\d*\" required/>"
 
                                 form_action="{url path="/admin/module/colissimo/prices"}"
                                 dialog_ok_label     = {intl d='colissimo.ai' l="Edit"}
