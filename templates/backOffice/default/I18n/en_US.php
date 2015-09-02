@@ -551,6 +551,7 @@ return array(
     'Enter new import category position' => 'Enter new import category position',
     'Enter new import position' => 'Enter new import position',
     'Enter new module position' => 'Enter new module position',
+    'Enter new module hook position' => 'Enter new module hook position',
     'Enter new product position' => 'Enter new product position',
     'Enter new value position' => 'Enter new value position',
     'Enter one or more IP V4 addresses separated by ";". Leave empty to display logs for all IP addresses' => 'Enter one or more IP V4 addresses separated by ";". Leave empty to display logs for all IP addresses',
