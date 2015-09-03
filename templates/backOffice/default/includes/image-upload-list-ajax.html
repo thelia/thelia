@@ -14,7 +14,7 @@ Parameters:
             <li class="col-sm-6 col-md-3 ui-state-default" data-sort-id="{$ID}">
                 <a href="{url path="/admin/image/type/$imageType/$ID/update"}" title="{intl l='Update this image'}" class="thumbnail">
                     {if $PROCESSING_ERROR}
-                        <img src="http://placehold.it/200x100&text={intl l='Image+file+not+found'}" alt="{$TITLE}">
+                        <img src="//placehold.it/200x100&text={intl l='Image+file+not+found'}" alt="{$TITLE}">
                     {else}
                         <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}">
                     {/if}

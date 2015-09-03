@@ -238,7 +238,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 
 <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/jquery.validate.min.js"></script>
 {if {lang attr="code"} != 'en'}
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{lang attr="code"}.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.13.1/localization/messages_{lang attr="code"}.js"></script>
 {/if}
 
 
