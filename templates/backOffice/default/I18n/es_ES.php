@@ -2,7 +2,6 @@
 
 return array(
     ' (default)' => ' (por defecto)',
-    '&copy; Thelia 2013' => '&copy; Thelia 2013',
     '(edit)' => '(editar)',
     '14.50' => '14.50',
     '<span id="number_of_generated_combinations">0</span> combinations' => '<span id="number_of_generated_combinations">0</span> combinaciones',

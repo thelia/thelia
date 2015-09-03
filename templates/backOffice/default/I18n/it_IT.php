@@ -2,7 +2,6 @@
 
 return array(
     ' (default)' => ' (predefinito)',
-    '&copy; Thelia 2013' => '&copy; Thelia 2013',
     '(edit)' => '(modifica)',
     '<a href="http://en.wikipedia.org/wiki/ISO_639-1_language_matrix" target="_other">Check the list</a> of ISO 639-1 codes' => '<a href="http://en.wikipedia.org/wiki/ISO_639-1_language_matrix" target="_other">Controllare l\'elenco</a> dei codici ISO 639-1',
     '<span id="number_of_generated_combinations">0</span> combinations' => '<span id="number_of_generated_combinations">0</span> combinazioni',

@@ -4,7 +4,6 @@ return array(
     ' (default)' => '(défaut)',
     '%count more...' => '%count de plus...',
     '%count shipping zone(s) are attached to this module: %zones. Click here to change' => '%count zone(s) de livraison sont couvertes par ce module: %zones. Cliquez ici pour modifier',
-    '&copy; Thelia 2013' => '&copy; Thelia 2013',
     '(edit)' => '(modification)',
     '<a href="http://en.wikipedia.org/wiki/ISO_639-1_language_matrix" target="_other">Check the list</a> of ISO 639-1 codes' => '<a href="http://en.wikipedia.org/wiki/ISO_639-1_language_matrix" target="_other">Consulter la liste</a> des codes ISO 639-1',
     '<a href="http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes" target="_other">Check the list</a> of ISO 639-1 codes' => '<a href="http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes" target="_other">Liste des codes ISO 639-1</a>',

@@ -422,7 +422,7 @@
     <hr />
     <footer class="footer">
         <div class="container">
-            <p>{intl l='&copy; Thelia 2013'}
+            <p class="text-center">&copy; Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time>
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
             - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
             - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
