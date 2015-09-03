@@ -1149,6 +1149,7 @@ return array(
     'Your current IP address is %ip' => 'Votre adresse IP est %ip',
     'Your email' => 'Votre email',
     'Your module should be packaged in a zip file.' => 'Votre module doit être compressé dans un fichier Zip.',
+    'Your search is too short' => 'Votre recherche est trop courte',
     'Your template define new hooks' => 'Votre template définie de nouveaux hooks',
     'Your template does not support this hooks' => 'Votre template ne supporte pas ces hooks',
     'Your template is clean. No missing hooks and no new hooks.' => 'Votre template est correct. Pas de hook manquant ou de nouveaux hooks.',
