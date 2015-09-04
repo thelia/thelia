@@ -389,7 +389,7 @@ return [
     'Price excl. taxes' => 'Prix HT',
     'Processing cancelation of payment for order ref. %ref' => 'Traitement de l\'annulation du paiement de la commande %ref, ID %id',
     'Processing confirmation of order ref. %ref, ID %id' => 'Traitement de la confirmation de la commande %ref, ID %id',
-    'Prodcut ID *' => 'ID du produit',
+    'Prodcut ID *' => 'ID du produit *',
     'Product' => 'Produit',
     'Product ID' => 'ID produit',
     'Product ID *' => 'ID produit *',
