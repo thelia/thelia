@@ -1075,6 +1075,7 @@ return array(
     'This category has no sub-categories. To create a new one, click the + button above.' => 'This category has no sub-categories. To create a new one, click the + button above.',
     'This country is not included in any shipping zone' => 'This country is not included in any shipping zone',
     'This customer has not defined any delivery address' => 'This customer has not defined any delivery address',
+    'This customer has orders, and can\'t be deleted.' => 'This customer has orders, and can\'t be deleted.',
     'This delivery module handles all shipping zones.' => 'This delivery module handles all shipping zones.',
     'This folder doesn\'t contains any contents. To add a new content, <strong>click the + button</strong> above.' => 'This folder doesn\'t contains any contents. To add a new content, <strong>click the + button</strong> above.',
     'This folder has no sub-folders.' => 'This folder has no sub-folders.',
