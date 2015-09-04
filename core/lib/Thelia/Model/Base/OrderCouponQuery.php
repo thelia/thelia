@@ -78,7 +78,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCoupon findOneByOrderId(int $order_id) Return the first ChildOrderCoupon filtered by the order_id column
  * @method     ChildOrderCoupon findOneByCode(string $code) Return the first ChildOrderCoupon filtered by the code column
  * @method     ChildOrderCoupon findOneByType(string $type) Return the first ChildOrderCoupon filtered by the type column
- * @method     ChildOrderCoupon findOneByAmount(double $amount) Return the first ChildOrderCoupon filtered by the amount column
+ * @method     ChildOrderCoupon findOneByAmount(string $amount) Return the first ChildOrderCoupon filtered by the amount column
  * @method     ChildOrderCoupon findOneByTitle(string $title) Return the first ChildOrderCoupon filtered by the title column
  * @method     ChildOrderCoupon findOneByShortDescription(string $short_description) Return the first ChildOrderCoupon filtered by the short_description column
  * @method     ChildOrderCoupon findOneByDescription(string $description) Return the first ChildOrderCoupon filtered by the description column
@@ -95,7 +95,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     array findByOrderId(int $order_id) Return ChildOrderCoupon objects filtered by the order_id column
  * @method     array findByCode(string $code) Return ChildOrderCoupon objects filtered by the code column
  * @method     array findByType(string $type) Return ChildOrderCoupon objects filtered by the type column
- * @method     array findByAmount(double $amount) Return ChildOrderCoupon objects filtered by the amount column
+ * @method     array findByAmount(string $amount) Return ChildOrderCoupon objects filtered by the amount column
  * @method     array findByTitle(string $title) Return ChildOrderCoupon objects filtered by the title column
  * @method     array findByShortDescription(string $short_description) Return ChildOrderCoupon objects filtered by the short_description column
  * @method     array findByDescription(string $description) Return ChildOrderCoupon objects filtered by the description column

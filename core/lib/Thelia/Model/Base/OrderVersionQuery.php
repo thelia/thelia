@@ -97,9 +97,9 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     ChildOrderVersion findOneByTransactionRef(string $transaction_ref) Return the first ChildOrderVersion filtered by the transaction_ref column
  * @method     ChildOrderVersion findOneByDeliveryRef(string $delivery_ref) Return the first ChildOrderVersion filtered by the delivery_ref column
  * @method     ChildOrderVersion findOneByInvoiceRef(string $invoice_ref) Return the first ChildOrderVersion filtered by the invoice_ref column
- * @method     ChildOrderVersion findOneByDiscount(double $discount) Return the first ChildOrderVersion filtered by the discount column
- * @method     ChildOrderVersion findOneByPostage(double $postage) Return the first ChildOrderVersion filtered by the postage column
- * @method     ChildOrderVersion findOneByPostageTax(double $postage_tax) Return the first ChildOrderVersion filtered by the postage_tax column
+ * @method     ChildOrderVersion findOneByDiscount(string $discount) Return the first ChildOrderVersion filtered by the discount column
+ * @method     ChildOrderVersion findOneByPostage(string $postage) Return the first ChildOrderVersion filtered by the postage column
+ * @method     ChildOrderVersion findOneByPostageTax(string $postage_tax) Return the first ChildOrderVersion filtered by the postage_tax column
  * @method     ChildOrderVersion findOneByPostageTaxRuleTitle(string $postage_tax_rule_title) Return the first ChildOrderVersion filtered by the postage_tax_rule_title column
  * @method     ChildOrderVersion findOneByPaymentModuleId(int $payment_module_id) Return the first ChildOrderVersion filtered by the payment_module_id column
  * @method     ChildOrderVersion findOneByDeliveryModuleId(int $delivery_module_id) Return the first ChildOrderVersion filtered by the delivery_module_id column
@@ -124,9 +124,9 @@ use Thelia\Model\Map\OrderVersionTableMap;
  * @method     array findByTransactionRef(string $transaction_ref) Return ChildOrderVersion objects filtered by the transaction_ref column
  * @method     array findByDeliveryRef(string $delivery_ref) Return ChildOrderVersion objects filtered by the delivery_ref column
  * @method     array findByInvoiceRef(string $invoice_ref) Return ChildOrderVersion objects filtered by the invoice_ref column
- * @method     array findByDiscount(double $discount) Return ChildOrderVersion objects filtered by the discount column
- * @method     array findByPostage(double $postage) Return ChildOrderVersion objects filtered by the postage column
- * @method     array findByPostageTax(double $postage_tax) Return ChildOrderVersion objects filtered by the postage_tax column
+ * @method     array findByDiscount(string $discount) Return ChildOrderVersion objects filtered by the discount column
+ * @method     array findByPostage(string $postage) Return ChildOrderVersion objects filtered by the postage column
+ * @method     array findByPostageTax(string $postage_tax) Return ChildOrderVersion objects filtered by the postage_tax column
  * @method     array findByPostageTaxRuleTitle(string $postage_tax_rule_title) Return ChildOrderVersion objects filtered by the postage_tax_rule_title column
  * @method     array findByPaymentModuleId(int $payment_module_id) Return ChildOrderVersion objects filtered by the payment_module_id column
  * @method     array findByDeliveryModuleId(int $delivery_module_id) Return ChildOrderVersion objects filtered by the delivery_module_id column

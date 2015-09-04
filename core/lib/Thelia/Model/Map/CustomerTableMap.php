@@ -227,7 +227,7 @@ class CustomerTableMap extends TableMap
         $this->addColumn('RESELLER', 'Reseller', 'TINYINT', false, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('SPONSOR', 'Sponsor', 'VARCHAR', false, 50, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
+        $this->addColumn('DISCOUNT', 'Discount', 'DECIMAL', false, 16, 0);
         $this->addColumn('REMEMBER_ME_TOKEN', 'RememberMeToken', 'VARCHAR', false, 255, null);
         $this->addColumn('REMEMBER_ME_SERIAL', 'RememberMeSerial', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

@@ -103,7 +103,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomer findOneByReseller(int $reseller) Return the first ChildCustomer filtered by the reseller column
  * @method     ChildCustomer findOneByLang(string $lang) Return the first ChildCustomer filtered by the lang column
  * @method     ChildCustomer findOneBySponsor(string $sponsor) Return the first ChildCustomer filtered by the sponsor column
- * @method     ChildCustomer findOneByDiscount(double $discount) Return the first ChildCustomer filtered by the discount column
+ * @method     ChildCustomer findOneByDiscount(string $discount) Return the first ChildCustomer filtered by the discount column
  * @method     ChildCustomer findOneByRememberMeToken(string $remember_me_token) Return the first ChildCustomer filtered by the remember_me_token column
  * @method     ChildCustomer findOneByRememberMeSerial(string $remember_me_serial) Return the first ChildCustomer filtered by the remember_me_serial column
  * @method     ChildCustomer findOneByCreatedAt(string $created_at) Return the first ChildCustomer filtered by the created_at column
@@ -123,7 +123,7 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     array findByReseller(int $reseller) Return ChildCustomer objects filtered by the reseller column
  * @method     array findByLang(string $lang) Return ChildCustomer objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomer objects filtered by the sponsor column
- * @method     array findByDiscount(double $discount) Return ChildCustomer objects filtered by the discount column
+ * @method     array findByDiscount(string $discount) Return ChildCustomer objects filtered by the discount column
  * @method     array findByRememberMeToken(string $remember_me_token) Return ChildCustomer objects filtered by the remember_me_token column
  * @method     array findByRememberMeSerial(string $remember_me_serial) Return ChildCustomer objects filtered by the remember_me_serial column
  * @method     array findByCreatedAt(string $created_at) Return ChildCustomer objects filtered by the created_at column
