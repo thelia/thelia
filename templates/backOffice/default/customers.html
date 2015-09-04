@@ -95,27 +95,27 @@
                                         <th class="object-title">{intl l='Last order amount'}</th>
 
                                         {* TODO
-                                                                            <th class="object-title">
-                                                                                {admin_sortable_header
-                                                                                    current_order=$customer_order
-                                                                                    order='last_order'
-                                                                                    reverse_order='last_order_reverse'
-                                                                                    path={url path='/admin/customers'}
-                                                                                    request_parameter_name='customer_order'
-                                                                                    label="{intl l='Date of last order'}"
-                                                                                }
-                                                                            </th>
+                                            <th class="object-title">
+                                                {admin_sortable_header
+                                                    current_order=$customer_order
+                                                    order='last_order'
+                                                    reverse_order='last_order_reverse'
+                                                    path={url path='/admin/customers'}
+                                                    request_parameter_name='customer_order'
+                                                    label="{intl l='Date of last order'}"
+                                                }
+                                            </th>
 
-                                                                            <th class="object-title">
-                                                                                {admin_sortable_header
-                                                                                    current_order=$customer_order
-                                                                                    order='order_amount'
-                                                                                    reverse_order='order_amount_reverse'
-                                                                                    path={url path='/admin/customers'}
-                                                                                    request_parameter_name='customer_order'
-                                                                                    label="{intl l='Last order amount'}"
-                                                                                }
-                                                                            </th>
+                                            <th class="object-title">
+                                                {admin_sortable_header
+                                                    current_order=$customer_order
+                                                    order='order_amount'
+                                                    reverse_order='order_amount_reverse'
+                                                    path={url path='/admin/customers'}
+                                                    request_parameter_name='customer_order'
+                                                    label="{intl l='Last order amount'}"
+                                                }
+                                            </th>
                                         *}
                                         <th class="actions">{intl l='Actions'}</th>
                                     </tr>
@@ -123,20 +123,19 @@
 
                                     <tbody>
                                     {loop name="customer_list" type="customer" current="false" visible="*" order=$customer_order backend_context="1" page=$page limit=#max_displayed_customers# search_term=$search search_in="ref,firstname,lastname,email"}
-                                    {$lastOrderDate = ''}
-                                    {$lastOrderAmount = ''}
-                                    {$lastOrderCurrency = ''}
-                                    {$hasOrders = false}
+                                        {$lastOrderDate = ''}
+                                        {$lastOrderAmount = ''}
+                                        {$lastOrderCurrency = ''}
+                                        {$hasOrders = false}
 
-
-                                    {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
-                                    {$lastOrderDate = {format_date date=$CREATE_DATE}}
-                                    {$lastOrderAmount = {format_number number=$TOTAL_TAXED_AMOUNT}}
-                                    {loop type="currency" name="order-currency" id=$CURRENCY}
-                                    {$lastOrderCurrency = $SYMBOL}
-                                    {$hasOrders = true}
-                                    {/loop}
-                                    {/loop}
+                                        {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                            {$lastOrderDate = {format_date date=$CREATE_DATE}}
+                                            {$lastOrderAmount = {format_number number=$TOTAL_TAXED_AMOUNT}}
+                                            {loop type="currency" name="order-currency" id=$CURRENCY}
+                                                {$lastOrderCurrency = $SYMBOL}
+                                                {$hasOrders = true}
+                                            {/loop}
+                                        {/loop}
 
                                         <tr>
                                             <td><a href="{url path="/admin/customer/update" customer_id=$ID page=$page}">{$REF}</a></td>
@@ -229,140 +228,140 @@
     {form name="thelia.admin.customer.create"}
 
         {* Capture the dialog body, to pass it to the generic dialog *}
-    {capture "customer_creation_dialog"}
+        {capture "customer_creation_dialog"}
 
-        {form_hidden_fields}
+            {form_hidden_fields}
 
-        {form_field field='success_url'}
-            {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
-            <input type="hidden" name="{$name}" value="{url path='/admin/customer/update' customer_id='_ID_'}" />
-        {/form_field}
+            {form_field field='success_url'}
+                {* on success, redirect to the edition page, _ID_ is replaced with the created object ID, see controller  *}
+                <input type="hidden" name="{$name}" value="{url path='/admin/customer/update' customer_id='_ID_'}" />
+            {/form_field}
 
-        {*
-        We use "dummmy-password" here, because the creation form is common to back & front, and that we need a
-        valid password. This is just a workaround.
-        The password will be forced to a more secure value in the CustomerController.
-        *}
+            {*
+            We use "dummmy-password" here, because the creation form is common to back & front, and that we need a
+            valid password. This is just a workaround.
+            The password will be forced to a more secure value in the CustomerController.
+            *}
 
 
-        {form_field field="password"}
-            <input type="hidden" name="{$name}" value="dummmy-password" />
-        {/form_field}
+            {form_field field="password"}
+                <input type="hidden" name="{$name}" value="dummmy-password" />
+            {/form_field}
 
-        {form_field field="password_confirm"}
-            <input type="hidden" name="{$name}" value="dummmy-password" />
-        {/form_field}
+            {form_field field="password_confirm"}
+                <input type="hidden" name="{$name}" value="dummmy-password" />
+            {/form_field}
 
-        {form_field field='company'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
-            </div>
-        {/form_field}
-
-        {form_field field='title'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-                <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                    {loop type="title" name="title1"}
-                        <option value="{$ID}">{$LONG}</option>
-                    {/loop}
-                </select>
-            </div>
-        {/form_field}
-
-        {form_field field='firstname'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
-            </div>
-        {/form_field}
-
-        {form_field field='lastname'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
-            </div>
-        {/form_field}
-
-        {form_field field='address1'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
-            </div>
-
-            <div class="form-group">
-                {form_field field='address2'}
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
-                {/form_field}
-            </div>
-
-            <div class="form-group">
-                {form_field field='address3'}
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
-                {/form_field}
-            </div>
-        {/form_field}
-
-        {form_field field='zipcode'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
-            </div>
-        {/form_field}
-
-        {form_field field='city'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
-            </div>
-        {/form_field}
-
-        {form_field field='country'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <select name="{$name}" id="{$label_attr.for}" class="form-control">
-                    {loop type="country" name="country1"}
-                        <option value="{$ID}" {if $IS_DEFAULT}selected{/if}>{$TITLE}</option>
-                    {/loop}
-                </select>
-            </div>
-        {/form_field}
-
-        {form_field field='email'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email address'}">
-            </div>
-        {/form_field}
-        {if {config key="customer_confirm_email"}}
-            {form_field field='email_confirm'}
+            {form_field field='company'}
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email confirmation address'}">
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Company'}">
                 </div>
             {/form_field}
-        {/if}
 
-        {hook name="customer.create-form" location="customer_create_form" }
+            {form_field field='title'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-    {/capture}
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="title" name="title1"}
+                            <option value="{$ID}">{$LONG}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+            {form_field field='firstname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Firstname'}">
+                </div>
+            {/form_field}
+
+            {form_field field='lastname'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Lastname'}">
+                </div>
+            {/form_field}
+
+            {form_field field='address1'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Address'}">
+                </div>
+
+                <div class="form-group">
+                    {form_field field='address2'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+
+                <div class="form-group">
+                    {form_field field='address3'}
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Additional address'}">
+                    {/form_field}
+                </div>
+            {/form_field}
+
+            {form_field field='zipcode'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Zip code'}">
+                </div>
+            {/form_field}
+
+            {form_field field='city'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='City'}">
+                </div>
+            {/form_field}
+
+            {form_field field='country'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <select name="{$name}" id="{$label_attr.for}" class="form-control">
+                        {loop type="country" name="country1"}
+                            <option value="{$ID}" {if $IS_DEFAULT}selected{/if}>{$TITLE}</option>
+                        {/loop}
+                    </select>
+                </div>
+            {/form_field}
+
+            {form_field field='email'}
+                <div class="form-group {if $error}has-error{/if}">
+                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email address'}">
+                </div>
+            {/form_field}
+            {if {config key="customer_confirm_email"}}
+                {form_field field='email_confirm'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Email confirmation address'}">
+                    </div>
+                {/form_field}
+            {/if}
+
+            {hook name="customer.create-form" location="customer_create_form" }
+
+        {/capture}
 
         {include
-        file = "includes/generic-create-dialog.html"
+            file = "includes/generic-create-dialog.html"
 
-        dialog_id    = "add_customer_dialog"
-        dialog_title = {intl l="Create a new customer"}
-        dialog_body  = {$smarty.capture.customer_creation_dialog nofilter}
+            dialog_id    = "add_customer_dialog"
+            dialog_title = {intl l="Create a new customer"}
+            dialog_body  = {$smarty.capture.customer_creation_dialog nofilter}
 
-    dialog_ok_label     = {intl l="Create this customer"}
-    dialog_cancel_label = {intl l="Cancel"}
+            dialog_ok_label     = {intl l="Create this customer"}
+            dialog_cancel_label = {intl l="Cancel"}
 
-    form_action        = {url path='/admin/customer/create'}
-    form_enctype       = {form_enctype}
-    form_error_message = $form_error_message
-    }
+            form_action        = {url path='/admin/customer/create'}
+            form_enctype       = {form_enctype}
+            form_error_message = $form_error_message
+        }
     {/form}
 
     {* Delete confirmation dialog *}
@@ -375,16 +374,16 @@
     {/capture}
 
     {include
-    file = "includes/generic-confirm-dialog.html"
+        file = "includes/generic-confirm-dialog.html"
 
-    dialog_id       = "delete_customer_dialog"
-    dialog_title    = {intl l="Delete customer"}
-    dialog_message  = {intl l="Do you really want to delete this customer ?"}
+        dialog_id       = "delete_customer_dialog"
+        dialog_title    = {intl l="Delete customer"}
+        dialog_message  = {intl l="Do you really want to delete this customer ?"}
 
-form_action         = {token_url path='/admin/customer/delete'}
-form_content        = {$smarty.capture.delete_customer_dialog nofilter}
-form_id             = "form_delete_customer"
-}
+        form_action         = {token_url path='/admin/customer/delete'}
+        form_content        = {$smarty.capture.delete_customer_dialog nofilter}
+        form_id             = "form_delete_customer"
+    }
 
 {/block}
 
