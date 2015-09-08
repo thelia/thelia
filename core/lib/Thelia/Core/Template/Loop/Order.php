@@ -60,6 +60,15 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     new Type\EnumType(array('*'))
                 )
             ),
+            Argument::createIntListTypeArgument('exclude_status'),
+            new Argument(
+                'status_code',
+                new TypeCollection(
+                    new Type\AnyListType(),
+                    new Type\EnumType(array('*'))
+                )
+            ),
+            Argument::createAnyListTypeArgument('exclude_status_code'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -162,6 +171,28 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
             $search->filterByStatusId($status, Criteria::IN);
         }
 
+        if (null !== $excludeStatus = $this->getExcludeStatus()) {
+            $search->filterByStatusId($status, Criteria::NOT_IN);
+        }
+
+        $statusCode = $this->getStatusCode();
+
+        if (null !== $statusCode && $statusCode != '*') {
+            $search
+                ->useOrderStatusQuery()
+                ->filterByCode($statusCode, Criteria::IN)
+                ->endUse()
+            ;
+        }
+
+        if (null !== $excludeStatusCode = $this->getExcludeStatusCode()) {
+            $search
+                ->useOrderStatusQuery()
+                ->filterByCode($statusCode, Criteria::NOT_IN)
+                ->endUse()
+            ;
+        }
+
         $orderers = $this->getOrder();
 
         foreach ($orderers as $orderer) {
@@ -216,7 +247,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                         ->withColumn(CustomerTableMap::LASTNAME, 'lastname')
                         ->orderBy('lastname', Criteria::ASC)
                         ->orderBy('firstname', Criteria::ASC)
-                        ;
+                    ;
                     break;
                 case 'customer-name-reverse':
                     $search
