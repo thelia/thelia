@@ -293,6 +293,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 ->set('PAYMENT_MODULE', $order->getPaymentModuleId())
                 ->set('DELIVERY_MODULE', $order->getDeliveryModuleId())
                 ->set('STATUS', $order->getStatusId())
+                ->set('STATUS_CODE', $order->getOrderStatus()->getCode())
                 ->set('LANG', $order->getLangId())
                 ->set('DISCOUNT', $order->getDiscount())
                 ->set('TOTAL_TAX', $tax)
