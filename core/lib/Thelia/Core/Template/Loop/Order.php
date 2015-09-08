@@ -172,7 +172,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         }
 
         if (null !== $excludeStatus = $this->getExcludeStatus()) {
-            $search->filterByStatusId($status, Criteria::NOT_IN);
+            $search->filterByStatusId($excludeStatus, Criteria::NOT_IN);
         }
 
         $statusCode = $this->getStatusCode();
@@ -188,7 +188,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
         if (null !== $excludeStatusCode = $this->getExcludeStatusCode()) {
             $search
                 ->useOrderStatusQuery()
-                ->filterByCode($statusCode, Criteria::NOT_IN)
+                ->filterByCode($excludeStatusCode, Criteria::NOT_IN)
                 ->endUse()
             ;
         }
