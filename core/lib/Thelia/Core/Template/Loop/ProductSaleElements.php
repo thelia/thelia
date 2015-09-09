@@ -36,6 +36,17 @@ use Thelia\Type\TypeCollection;
  * Class ProductSaleElements
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getCurrency()
+ * @method int getProduct()
+ * @method bool getPromo()
+ * @method bool getNew()
+ * @method bool getDefault()
+ * @method string getRef()
+ * @method int[] getAttributeAvailability()
+ * @method string[] getOrder()
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {

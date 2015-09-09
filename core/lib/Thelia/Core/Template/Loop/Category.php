@@ -25,6 +25,7 @@ use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\Category as CategoryModel;
 
 /**
  *
@@ -38,17 +39,24 @@ use Thelia\Model\ProductQuery;
  * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual_reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
- * example :
- *
- * <THELIA_cat type="category" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
- *
- *
  * Class Category
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getParent()
+ * @method int getProduct()
+ * @method int getExcludeProduct()
+ * @method bool getCurrent()
+ * @method bool getNotEmpty()
+ * @method bool getWithPrevNextInfo()
+ * @method bool getNeedCountChild()
+ * @method bool getNeedProductCount()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -92,6 +100,12 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         ];
     }
 
+    /**
+     * @param CategoryQuery $search
+     * @param string $searchTerm
+     * @param string $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
@@ -148,10 +162,10 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
             }
         }
 
-        $exclude_product = $this->getExclude_product();
+        $excludeProduct = $this->getExcludeProduct();
 
-        if ($exclude_product != null) {
-            $obj = ProductQuery::create()->findPk($exclude_product);
+        if ($excludeProduct != null) {
+            $obj = ProductQuery::create()->findPk($excludeProduct);
 
             if ($obj != null) {
                 $search->filterByProduct($obj, Criteria::NOT_IN);
@@ -199,6 +213,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var CategoryModel $category */
         foreach ($loopResult->getResultDataCollection() as $category) {
             /*
              * no cause pagination lost :
@@ -235,7 +250,7 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
             }
 
-            if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+            if ($this->getBackendContext() || $this->getWithPrevNextInfo()) {
                 // Find previous and next category
                 $previous = CategoryQuery::create()
                     ->filterByParent($category->getParent())

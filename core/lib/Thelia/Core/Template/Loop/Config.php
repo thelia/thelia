@@ -23,6 +23,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
+use Thelia\Model\Config as ConfigModel;
 
 /**
  * Config loop, to access configuration variables
@@ -35,6 +36,14 @@ use Thelia\Type\EnumListType;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string getVariable()
+ * @method bool|string getHidden()
+ * @method bool|string getSecured()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -138,6 +147,7 @@ class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var ConfigModel $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 

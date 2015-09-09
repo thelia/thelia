@@ -31,6 +31,16 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getParent()
+ * @method int getContent()
+ * @method bool getCurrent()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string getTitle()
+ * @method string[] getOrder()
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -81,6 +91,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         ];
     }
 
+    /**
+     * @param FolderQuery $search
+     * @param string $searchTerm
+     * @param string $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();
@@ -88,6 +104,11 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
         $this->addTitleSearchWhereClause($search, $searchCriteria, $searchTerm);
     }
 
+    /**
+     * @param FolderQuery $search
+     * @param string $criteria
+     * @param string $value
+     */
     protected function addTitleSearchWhereClause($search, $criteria, $value)
     {
         $search->where(

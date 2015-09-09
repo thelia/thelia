@@ -21,6 +21,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AttributeAvQuery;
+use Thelia\Model\AttributeAv as AttributeAvModel;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Type\TypeCollection;
@@ -33,6 +34,13 @@ use Thelia\Type;
  * Class AttributeAvailability
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getAttribute()
+ * @method int getProduct()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -142,6 +150,7 @@ class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInte
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AttributeAvModel $attributeAv */
         foreach ($loopResult->getResultDataCollection() as $attributeAv) {
             $loopResultRow = new LoopResultRow($attributeAv);
             $loopResultRow

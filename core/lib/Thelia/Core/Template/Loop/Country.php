@@ -30,6 +30,13 @@ use Thelia\Model\CountryQuery;
  * Class Country
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getArea()
+ * @method int[] getExcludeArea()
+ * @method int[] getExclude()
+ * @method int[] getWithArea()
  */
 class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -80,7 +87,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->endUse();
         }
 
-        $withArea = $this->getWith_area();
+        $withArea = $this->getWithArea();
 
         if (true === $withArea) {
             $search

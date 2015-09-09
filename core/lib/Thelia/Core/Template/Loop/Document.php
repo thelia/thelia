@@ -12,12 +12,15 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseI18nLoop;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Document\DocumentEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ProductDocument;
+use Thelia\Model\ProductDocumentQuery;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
@@ -31,6 +34,21 @@ use Thelia\Log\Tlog;
  * The document loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method bool|string getVisible()
+ * @method int getLang()
+ * @method int getCategory()
+ * @method int getProduct()
+ * @method int getFolder()
+ * @method int getContent()
+ * @method string getSource()
+ * @method int getSourceId()
+ * @method bool getNewsletter()
+ * @method string getQueryNamespace()
+ * @method string[] getOrder()
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -191,6 +209,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
         // Select the proper query to use, and get the object type
         $this->objectType = $this->objectId = null;
 
+        /** @var ProductDocumentQuery $search */
         $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
@@ -224,6 +243,7 @@ class Document extends BaseI18nLoop implements PropelSearchLoopInterface
             $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
         }
 
+        /** @var ProductDocument $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Create document processing event
             $event = new DocumentEvent($this->request);

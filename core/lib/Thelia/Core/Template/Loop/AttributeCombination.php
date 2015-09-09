@@ -32,6 +32,10 @@ use Thelia\Type\TypeCollection;
  * Class AttributeCombination
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getProductSaleElements()
+ * @method string[] getOrder()
  */
 class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -74,7 +78,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             'ATTRIBUTE_AV_ID'
         );
 
-        $productSaleElements = $this->getProduct_sale_elements();
+        $productSaleElements = $this->getProductSaleElements();
 
         $search->filterByProductSaleElementsId($productSaleElements, Criteria::EQUAL);
 

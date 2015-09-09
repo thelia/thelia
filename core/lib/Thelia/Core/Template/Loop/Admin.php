@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\Admin as AdminModel;
 
 /**
  *
@@ -29,6 +30,10 @@ use Thelia\Model\AdminQuery;
  * Class Admin
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProfile()
  */
 class Admin extends BaseLoop implements PropelSearchLoopInterface
 {
@@ -68,6 +73,7 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AdminModel $admin */
         foreach ($loopResult->getResultDataCollection() as $admin) {
             $loopResultRow = new LoopResultRow($admin);
             $loopResultRow->set("ID", $admin->getId())

@@ -30,6 +30,16 @@ use Thelia\Type\TypeCollection;
  * Class ModuleHook
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getHook()
+ * @method int getModule()
+ * @method int[] getExclude()
+ * @method bool|string getModuleActive()
+ * @method bool|string getHookActive()
+ * @method bool|string getActive()
+ * @method string[] getOrder()
  */
 class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -89,12 +99,12 @@ class ModuleHook extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByActive($active, Criteria::EQUAL);
         }
 
-        $hookActive = $this->getHook_active();
+        $hookActive = $this->getHookActive();
         if ($hookActive !== Type\BooleanOrBothType::ANY) {
             $search->filterByHookActive($hookActive, Criteria::EQUAL);
         }
 
-        $moduleActive = $this->getModule_active();
+        $moduleActive = $this->getModuleActive();
         if ($moduleActive !== Type\BooleanOrBothType::ANY) {
             $search->filterByModuleActive($moduleActive, Criteria::EQUAL);
         }

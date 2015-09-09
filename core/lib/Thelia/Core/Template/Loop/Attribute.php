@@ -20,6 +20,8 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\Attribute as AttributeModel;
+use Thelia\Model\Product as ProductModel;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\ProductQuery;
@@ -35,6 +37,14 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  * Class Attribute
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProduct()
+ * @method int[] getTemplate()
+ * @method int[] getExcludeTemplate()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -84,7 +94,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $product = $this->getProduct();
         $template = $this->getTemplate();
-        $exclude_template = $this->getExcludeTemplate();
+        $excludeTemplate = $this->getExcludeTemplate();
 
         $this->useAttributePosistion = true;
 
@@ -99,11 +109,12 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
                     $template = array();
                 }
 
+                /** @var ProductModel $product */
                 foreach ($products as $product) {
-                    $tpl_id = $product->getTemplateId();
+                    $tplId = $product->getTemplateId();
 
-                    if (! is_null($tpl_id)) {
-                        $template[] = $tpl_id;
+                    if (! is_null($tplId)) {
+                        $template[] = $tplId;
                     }
                 }
             }
@@ -123,12 +134,12 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
             ;
 
             $this->useAttributePosistion = false;
-        } elseif (null !== $exclude_template) {
+        } elseif (null !== $excludeTemplate) {
             // Join with attribute_template table to get position
-            $exclude_attributes = AttributeTemplateQuery::create()->filterByTemplateId($exclude_template)->select('attribute_id')->find();
+            $excludeAttributes = AttributeTemplateQuery::create()->filterByTemplateId($excludeTemplate)->select('attribute_id')->find();
 
             $search
-                ->filterById($exclude_attributes, Criteria::NOT_IN)
+                ->filterById($excludeAttributes, Criteria::NOT_IN)
             ;
         }
 
@@ -170,6 +181,7 @@ class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var AttributeModel $attribute */
         foreach ($loopResult->getResultDataCollection() as $attribute) {
             $loopResultRow = new LoopResultRow($attribute);
             $loopResultRow->set("ID", $attribute->getId())

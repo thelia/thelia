@@ -32,6 +32,15 @@ use Thelia\Type;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getCode()
+ * @method string[] getLocale()
+ * @method int[] getExclude()
+ * @method bool getDefaultOnly()
+ * @method bool getExcludeDefault()
+ * @method string[] getOrder()
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
 {

@@ -26,6 +26,10 @@ use Thelia\Type\TypeCollection;
  * Class Formatter
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getExport()
+ * @method string[] getOrder()
  */
 class Formatter extends BaseLoop implements ArraySearchLoopInterface
 {

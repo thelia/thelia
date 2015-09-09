@@ -18,27 +18,25 @@ use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\CartItem as CartItemModel;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Cart as CartModel;
 use Thelia\Type;
 
+/**
+ *
+ * Cart Loop
+ *
+ *
+ * Class Cart
+ * @package Thelia\Core\Template\Loop
+ *
+ * {@inheritdoc}
+ * @method string[] getOrder()
+ */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
     /**
-     *
-     * define all args used in your loop
-     *
-     * array key is your arg name.
-     *
-     * example :
-     *
-     * return array (
-     *  "ref",
-     *  "id" => "optional",
-     *  "stock" => array(
-     *          "optional",
-     *          "default" => 10
-     *          )
-     * );
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
@@ -57,6 +55,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
+        /** @var CartModel $cart */
         $cart = $this->request->getSession()->getSessionCart($this->getDispatcher());
 
         if (null === $cart) {
@@ -85,6 +84,7 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
         $checkAvailability = ConfigQuery::checkAvailableStock();
         $defaultAvailability = intval(ConfigQuery::read('default-available-stock', 100));
 
+        /** @var CartItemModel $cartItem */
         foreach ($loopResult->getResultDataCollection() as $cartItem) {
             $product = $cartItem->getProduct(null, $locale);
             $productSaleElement = $cartItem->getProductSaleElements();

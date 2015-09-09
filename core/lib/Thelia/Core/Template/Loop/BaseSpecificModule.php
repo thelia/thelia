@@ -24,41 +24,18 @@ use Thelia\Type\TypeCollection;
 /**
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <manu@raynaud.io>
+ *
+ * {@inheritdoc}
+ * @method int getId()
+ * @method int[] getExclude()
+ * @method string getCode()
+ * @method string[] getOrder()
  */
 abstract class BaseSpecificModule extends BaseI18nLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
     /**
-     *
-     * define all args used in your loop
-     *
-     *
-     * example :
-     *
-     * public function getArgDefinitions()
-     * {
-     *  return new ArgumentCollection(
-     *       Argument::createIntListTypeArgument('id'),
-     *           new Argument(
-     *           'ref',
-     *           new TypeCollection(
-     *               new Type\AlphaNumStringListType()
-     *           )
-     *       ),
-     *       Argument::createIntListTypeArgument('category'),
-     *       Argument::createBooleanTypeArgument('new'),
-     *       Argument::createBooleanTypeArgument('promo'),
-     *       Argument::createFloatTypeArgument('min_price'),
-     *       Argument::createFloatTypeArgument('max_price'),
-     *       Argument::createIntTypeArgument('min_stock'),
-     *       Argument::createFloatTypeArgument('min_weight'),
-     *       Argument::createFloatTypeArgument('max_weight'),
-     *       Argument::createBooleanTypeArgument('current'),
-     *
-     *   );
-     * }
-     *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     protected function getArgDefinitions()

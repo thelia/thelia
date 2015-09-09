@@ -19,6 +19,7 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProductQuery;
 use Thelia\Type\TypeCollection;
@@ -31,6 +32,12 @@ use Thelia\Type;
  * Class FeatureAvailability
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getFeature()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -104,6 +111,7 @@ class FeatureAvailability extends BaseI18nLoop implements PropelSearchLoopInterf
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var FeatureAv $featureAv */
         foreach ($loopResult->getResultDataCollection() as $featureAv) {
             $isFreeText = FeatureProductQuery::create()
                 ->filterByFeatureId($featureAv->getFeatureId())

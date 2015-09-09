@@ -29,6 +29,13 @@ use Thelia\Type\TypeCollection;
  *
  * Class BaseLoop
  * @package TThelia\Core\Template\Element
+ *
+ * @method string getType()
+ * @method bool getForceReturn()
+ * @method bool getBackendContext()
+ * @method int getOffset() available if countable is true
+ * @method int getPage() available if countable is true
+ * @method int getLimit() available if countable is true
  */
 abstract class BaseLoop
 {

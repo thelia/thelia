@@ -28,6 +28,14 @@ use Thelia\Type\TypeCollection;
  * Class Hook
  * @package Thelia\Controller\Admin
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method string[] getCode()
+ * @method string[] getHook_type()
+ * @method bool|string getActive()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {

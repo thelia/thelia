@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxRuleQuery;
+use Thelia\Model\TaxRule as TaxRuleModel;
 
 /**
  *
@@ -31,6 +32,11 @@ use Thelia\Model\TaxRuleQuery;
  * Class TaxRule
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -97,6 +103,7 @@ class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TaxRuleModel $taxRule */
         foreach ($loopResult->getResultDataCollection() as $taxRule) {
             $loopResultRow = new LoopResultRow($taxRule);
 
