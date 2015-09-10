@@ -46,6 +46,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntTypeArgument('feature', null, true),
             Argument::createIntTypeArgument('product'),
             Argument::createIntListTypeArgument('feature_availability'),
+            Argument::createAnyListTypeArgument('free_text'),
             Argument::createBooleanTypeArgument('exclude_feature_availability', 0),
             Argument::createBooleanTypeArgument('exclude_free_text', 0),
             new Argument(
@@ -89,8 +90,16 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByFeatureAvId($featureAvailability, Criteria::IN);
         }
 
+        if (null !== $freeText = $this->getFreeText()) {
+            $search->filterByFreeTextValue($featureAvailability, Criteria::IN);
+        }
+
         if (true === $excludeFeatureAvailability = $this->getExclude_feature_availability()) {
             $search->filterByFeatureAvId(null, Criteria::ISNULL);
+        }
+
+        if (true === $excludeFreeText = $this->getExcludeFreeText()) {
+            $search->filterByFreeTextValue(null, Criteria::ISNULL);
         }
 
         $orders  = $this->getOrder();
