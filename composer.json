@@ -15,6 +15,12 @@
     },
     "require": {
         "php": ">=5.4",
+        "ext-pdo_mysql": "*",
+        "ext-mcrypt": "*",
+        "ext-intl": "*",
+        "ext-gd": "*",
+        "ext-curl": "*",
+        "ext-calendar": "*",
         "ircmaxell/password-compat": "1.0.*",
         "propel/propel": "dev-master#793aea6b762d9a72b083bfc49c74c574f67650c8",
         "psr/log": "1.0",
