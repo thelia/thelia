@@ -18,7 +18,7 @@
             </td>
             <td class="col-md-4">
                 <h2>{$TITLE}</h2>
-                {loop type="attribute_combination" name="product_options" product_sale_elements="{$smarty.get.pse_id}"}
+                {loop type="attribute_combination" name="product_options" product_sale_elements="{$smarty.get.pse_id}" order="manual"}
                     <p>{$ATTRIBUTE_TITLE} : {$ATTRIBUTE_AVAILABILITY_TITLE}</p>
                 {/loop}
             </td>
