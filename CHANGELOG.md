@@ -1,3 +1,11 @@
+# 2.0.10
+- Add 'step' to input type number to be able to create and edit weight slices price
+- Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
+- Allow relative path use with Tlog
+- Prevent obscur "[] this value cannot be null" messages.
+- Prevent short research and keep research in input
+- Fix Protocol-relative URL for HTTPS
+
 # 2.0.9
 - Klik&Pay is no more a submodule
 
