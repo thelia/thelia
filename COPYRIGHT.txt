@@ -1,4 +1,4 @@
 THELIA
-Copyright (C) 2005-2014 OpenStudio
+Copyright (C) 2005-2015 OpenStudio
 
-THELIA application uses externals components and libraries which are released under their own GPL compatible license terms.
+THELIA application uses externals components and libraries which are released under their own LGPL compatible license terms.
