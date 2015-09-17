@@ -33,9 +33,8 @@ use Thelia\Core\Event\Product\VirtualProductOrderDownloadResponseEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 use Thelia\Exception\TheliaProcessException;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
-use Thelia\Form\OrderDelivery;
-use Thelia\Form\OrderPayment;
 use Thelia\Log\Tlog;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -133,7 +132,7 @@ class OrderController extends BaseFrontController
 
         $message = false;
 
-        $orderDelivery = new OrderDelivery($this->getRequest());
+        $orderDelivery = $this->createForm(FrontForm::ORDER_DELIVER);
 
         try {
             $form = $this->validateForm($orderDelivery, "post");
@@ -231,7 +230,7 @@ class OrderController extends BaseFrontController
 
         $message = false;
 
-        $orderPayment = new OrderPayment($this->getRequest());
+        $orderPayment = $this->createForm(FrontForm::ORDER_PAYMENT);
 
         try {
             $form = $this->validateForm($orderPayment, "post");
