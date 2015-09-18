@@ -68,7 +68,10 @@ class TheliaHttpKernel extends HttpKernel
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
-        if (false === $this->container->isScopeActive('request')) {
+        if (
+            HttpKernelInterface::MASTER_REQUEST === $type
+            && false === $this->container->isScopeActive('request')
+        ) {
             $this->container->enterScope('request');
             $this->container->set('request', $request, 'request');
         }
@@ -81,7 +84,9 @@ class TheliaHttpKernel extends HttpKernel
             throw $e;
         }
 
-        $this->container->leaveScope('request');
+        if (HttpKernelInterface::MASTER_REQUEST === $type) {
+            $this->container->leaveScope('request');
+        }
 
         return $response;
     }
