@@ -20,14 +20,17 @@ namespace Thelia\Form\Definition;
  */
 final class FrontForm
 {
+    const ADDRESS_CREATE = 'thelia.front.address.create';
+    const ADDRESS_UPDATE = 'thelia.front.address.update';
+    const CART_ADD = 'thelia.cart.add';
+    const CONTACT = 'thelia.front.contact';
+    const COUPON_CONSUME = 'thelia.coupon.code';
     const CUSTOMER_LOGIN = 'thelia.front.customer.login';
     const CUSTOMER_LOST_PASSWORD = 'thelia.front.customer.lostpassword';
     const CUSTOMER_CREATE = 'thelia.front.customer.create';
     const CUSTOMER_PROFILE_UPDATE = 'thelia.front.customer.profile.update';
     const CUSTOMER_PASSWORD_UPDATE = 'thelia.front.customer.password.update';
-    const ADDRESS_CREATE = 'thelia.front.address.create';
-    const ADDRESS_UPDATE = 'thelia.front.address.update';
-    const CONTACT = 'thelia.front.contact';
     const NEWSLETTER = 'thelia.front.newsletter';
-    const CART_ADD = 'thelia.cart.add';
+    const ORDER_DELIVER = 'thelia.order.delivery';
+    const ORDER_PAYMENT = 'thelia.order.payment';
 }
