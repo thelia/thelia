@@ -233,7 +233,7 @@ return array(
     'View product' => 'Voir le produit',
     'Warning' => 'Attention',
     'We apologize but some of the ordered products are not available any more.' => 'Nous sommes désolés, certains des produits que vous avez commandé ne sont plus disponibles.',
-    'We\'re sorry but an error occured. Please try to contact the site <a href=\'mailto:%mail\'>administrator</a>' => 'Nous sommes désolés mais une erreur est survenur. Veuillez contacter l\'<a href=\'mailto:%mail\'>administrateur</a>',
+    'We\'re sorry but an error occured. Please try to contact the site <a href=\'mailto:%mail\'>administrator</a>' => 'Nous sommes désolés mais une erreur est survenue. Veuillez contacter l\'<a href=\'mailto:%mail\'>administrateur</a>',
     'We\'re sorry, a problem occured and your payment was not successful.' => 'Nous sommes désolés, un problème est survenu lors du paiement.',
     'You are here:' => 'Vous êtes ici :',
     'You choose' => 'Vous avez choisi ',
