@@ -131,7 +131,6 @@ class CheckPermission extends BaseInstall
                     $this->isValid = false;
                     $this->validationMessages[$directory]['status'] = false;
                     $this->validationMessages[$directory]['text'] = $this->getI18nDirectoryText($fullDirectory, false);
-                    $this->validationMessages[$directory]['hint'] = $this->getI18nDirectoryHint($fullDirectory);
                 }
             }
         }
@@ -221,31 +220,6 @@ class CheckPermission extends BaseInstall
         return $this->translator->trans($sentence, array(
             '%extension%' => $extension
         ));
-    }
-
-    /**
-     * Get Translated hint about the directory state
-     *
-     * @param string $directory Directory being checked
-     *
-     * @return string
-     */
-    protected function getI18nDirectoryHint($directory)
-    {
-        if ($this->translator !== null) {
-            $sentence = 'chmod 777 %directory% on the server with admin rights may solve the problem';
-            $translatedText = $this->translator->trans(
-                $sentence,
-                array(
-                    '%directory%' => $directory
-                ),
-                'install-wizard'
-            );
-        } else {
-            $translatedText = sprintf('chmod 777 %s on the server with admin rights may solve the problem', $directory);
-        }
-
-        return $translatedText;
     }
 
     /**
