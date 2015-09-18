@@ -56,6 +56,7 @@ class URL
 
     /**
      * @param RequestContext $requestContext
+     * @since Version 2.2
      */
     public function setRequestContext(RequestContext $requestContext)
     {

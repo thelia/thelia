@@ -144,16 +144,16 @@
                         <div class="toolbar-options hidden">
                             {if $EXISTS}
 
-                                {if $CONFIGURABLE == 1}
+                                {if $CONFIGURABLE == 1 && $ACTIVE}
                                     {loop type="auth" name="can_change" role="ADMIN" module=$CODE access="VIEW"}
-                                        <a class="{if ! $ACTIVE}disabled {/if} config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
+                                        <a class="config-btn-{$ID}" title="{intl l='Configure this module'}" href="{url path="/admin/module/%code" code=$CODE}"><span class="glyphicon glyphicon-wrench"></span></a>
                                     {/loop}
                                 {/if}
 
-                                {if $HOOKABLE}
+                                {if $HOOKABLE && $ACTIVE}
                                 {loop type="auth" name="can_change" role="ADMIN" resource="admin.module-hook" access="VIEW"}
-                                <a class="{if ! $ACTIVE}disabled {/if}" id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-sort"></span></a>
-                            {/loop}
+                                    <a id="hook-btn-{$ID}" title="{intl l="Manage its hooks"}" href="{url path="/admin/module-hooks" module="$ID"}" ><span class="glyphicon glyphicon-indent-left"></span></a>
+                                {/loop}
                                 {/if}
 
                                 {*loop type="auth" name="can_change" role="ADMIN" resource="admin.modules" access="VIEW"}
