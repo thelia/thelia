@@ -1,6 +1,6 @@
 <?php
 
 return array(
-    '+ View All' => '+ Alle sehen',
+    '+ View All' => '+ Alle anzeigen',
     'Latest' => 'Neuigkeiten',
 );

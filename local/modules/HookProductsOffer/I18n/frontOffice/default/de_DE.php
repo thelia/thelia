@@ -2,5 +2,5 @@
 
 return array(
     '+ View All' => '+ Alle sehen',
-    'Offers' => 'Sonderangebot',
+    'Offers' => 'Angebote',
 );

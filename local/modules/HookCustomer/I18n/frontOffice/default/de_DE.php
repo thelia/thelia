@@ -1,13 +1,13 @@
 <?php
 
 return array(
-    'Email address' => 'E-Mail Adresse',
-    'Forgot your Password?' => 'Passwort vergessen ?',
-    'Log In!' => 'Anmeldung !',
-    'Log out!' => 'Abmeldung !',
-    'My Account' => 'Mein Konto',
+    'Email address' => 'E-mail Adresse',
+    'Forgot your Password?' => 'Haben sir Ihr Passwort vergessen ?',
+    'Log In!' => 'Log In!',
+    'Log out!' => 'Log out!',
+    'My Account' => 'Mein Kundenkonto',
     'Password' => 'Passwort',
     'Register' => 'Registrieren',
-    'Register!' => 'Registrieren !',
+    'Register!' => 'Registrieren!',
     'Sign In' => 'Registrieren',
 );

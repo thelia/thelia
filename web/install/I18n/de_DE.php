@@ -27,7 +27,7 @@ return array(
     'It seems that Thelia is already installed on this system. Please check configuration, perform some cleanup if required, an try again.' => 'Es scheint, dass Thelia bereits auf diesem System installiert ist. Bitte überprüfen Sie die Konfiguration, vornehmen Sie die notwendingen Korrekturen und versuchen Sie es erneut.',
     'or' => 'oder',
     'Password :' => 'Passwort :',
-    'Port :' => '',
+    'Port :' => 'Port :',
     'Select below the one you want to use.' => 'Wählen Sie unter die Datenbank, die Sie verwenden möchten.',
     'Thanks' => 'Danke',
     'The SQL server contains multiple databases.' => 'Der SQL-Server enthält mehrere Datenbanken.',
@@ -41,7 +41,7 @@ return array(
     'Welcome' => 'Willkommen',
     'Welcome in the Thelia installation wizard.' => 'Willkommen im Thelia Installationsassistenten.',
     'Wrong connection information' => 'Falsche Verbindungsinformationen',
-    'Installation' => '',
+    'Installation' => 'Installation',
     'Update' => 'Aktualisierung',
     'Welcome in the Thelia updater wizard.' => 'Willkommen im Thelia Updater-Assistenten.',
     'It seems that Thelia database is already up to date.' => 'Es scheint, dass Ihre Datenbank bereits auf dem neuesten Stand ist.',
@@ -65,5 +65,6 @@ return array(
     "Refresh" => 'Erfrischen',
     'Published by OpenStudio' => 'Herausgegeben von OpenStudio',
     'Thelia support forum' => 'Thelias Support Forum',
-    'Thelia contributions' => 'Thelia Beiträge'
+    'Thelia contributions' => 'Thelia Beiträge',
+    'Please wait ...' => 'Bitte warten ...'
 );

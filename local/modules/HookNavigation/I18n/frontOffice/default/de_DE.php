@@ -1,8 +1,6 @@
 <?php
 
 return array(
-    'Categories' => 'Kategorien',
-    'Home' => 'Startseite',
-    'No articles currently' => 'Keinen Artikel',
-    'Toggle navigation' => 'Toggle Navigation',
+    'Latest articles' => 'Neueste Artikel',
+    'No articles currently' => 'Zur Zeit keine Artikel',
 );
