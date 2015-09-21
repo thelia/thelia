@@ -1,10 +1,10 @@
 <?php
 
 return array(
-    'Categories' => 'Catégories',
+    'Categories' => 'Rubriques',
     'Home' => 'Accueil',
-    'No articles currently' => 'Encore aucun article',
-    'Toggle navigation' => 'Afficher/Masquer le menu',
+    'No articles currently' => '',
+    'Toggle navigation' => 'Basculer la navigation',
     'HookNavigation configuration' => 'Configuration de HookNavigation',
 
     'Folder in footer body' => 'Dossier du pied de page',
