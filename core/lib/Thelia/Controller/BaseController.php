@@ -188,7 +188,11 @@ abstract class BaseController extends ContainerAware
 
             if (!$child->isValid()) {
 
-                $fieldName = $child->getConfig()->getOption('label', $child->getName());
+                $fieldName = $child->getConfig()->getOption('label', null);
+
+                if (empty($fieldName)) {
+                    $fieldName = $child->getName();
+                }
 
                 $errors .= sprintf("[%s] %s, ", $fieldName, $this->getErrorMessages($child));
             }

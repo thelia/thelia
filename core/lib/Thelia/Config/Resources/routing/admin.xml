@@ -650,10 +650,6 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
     </route>
 
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
-        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
-    </route>
-
 
     <!-- Product templates management -->
 

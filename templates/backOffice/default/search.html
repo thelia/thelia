@@ -21,7 +21,7 @@
 
         <div class="row">
             <div class="col-md-12">
-
+                {if $smarty.get.search_term|trim|strlen > 2}
                 {* customer search *}
                 <div class="general-block-decorator">
                     <div class="table-responsive">
@@ -345,7 +345,11 @@
                     </div>
                 </div>
                 {* end content search *}
-
+                {else}
+                <div class="alert alert-warning">
+                    {intl l="Your search is too short"}
+                </div>
+                {/if}
             </div>
         </div>
 

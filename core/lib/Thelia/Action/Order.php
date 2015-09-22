@@ -373,29 +373,26 @@ class Order extends BaseAction implements EventSubscriberInterface
                 ->filterByName('order_confirmation')
                 ->findOne();
 
-            if (false === $message) {
-                throw new \Exception("Failed to load message 'order_confirmation'.");
+            if (null !== $message) {
+                $order = $event->getOrder();
+                $customer = $order->getCustomer();
+
+                $this->parser->assign('order_id', $order->getId());
+                $this->parser->assign('order_ref', $order->getRef());
+
+                $message
+                    ->setLocale($order->getLang()->getLocale());
+
+                $instance = \Swift_Message::newInstance()
+                    ->addTo($customer->getEmail(), $customer->getFirstname() . " " . $customer->getLastname())
+                    ->addFrom($contact_email, ConfigQuery::read('store_name'));
+
+                // Build subject and body
+
+                $message->buildMessage($this->parser, $instance);
+
+                $this->getMailer()->send($instance);
             }
-
-            $order = $event->getOrder();
-            $customer = $order->getCustomer();
-
-            $this->parser->assign('order_id', $order->getId());
-            $this->parser->assign('order_ref', $order->getRef());
-
-            $message
-                ->setLocale($order->getLang()->getLocale());
-
-            $instance = \Swift_Message::newInstance()
-                ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                ->addFrom($contact_email, ConfigQuery::read('store_name'))
-            ;
-
-            // Build subject and body
-
-            $message->buildMessage($this->parser, $instance);
-
-            $this->getMailer()->send($instance);
         }
     }
 
