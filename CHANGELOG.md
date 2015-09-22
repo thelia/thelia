@@ -1,5 +1,10 @@
 # 2.2.0
 
+- Fix amounts displayed on the PDF invoice when a postage with tax is used (fixes #1693 and #1694)
+- Fix translations for HookNavigation module
+- Update hooktest-template and hooktest-module to prevent thelia-installer conflicts
+- Update French, German, Italian translations
+- Add Turkish translation
 - #1688 Fix the permission messages in Thelia installer
 - #1686 Use createForm method for front forms ```thelia.coupon.code, thelia.order.delivery, thelia.order.payment```
 - #1667 Fix #1666 Display an error when trying to delete a customer which has orders
