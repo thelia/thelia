@@ -1,4 +1,5 @@
 # 2.1.6
+- Fixed amounts displayed on the PDF invoice when a postage with tax is used.
 - Check virtualProducts of order before send mail ```mail_virtualproduct```
 - Add 'step' to input type number to be able to create and edit weight slices price
 - Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
