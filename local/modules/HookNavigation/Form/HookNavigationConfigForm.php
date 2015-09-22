@@ -28,7 +28,7 @@ class HookNavigationConfigForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                    'label' => $this->translator->trans('Folder in footer body', [], HookNavigation::MESSAGE_DOMAIN.'.bo.default'),
+                    'label' => $this->translator->trans('Folder in footer body', [], HookNavigation::MESSAGE_DOMAIN),
                 ]
             )
             ->add(
@@ -38,7 +38,7 @@ class HookNavigationConfigForm extends BaseForm
                     'constraints' => [
                         new NotBlank(),
                     ],
-                    'label' => $this->translator->trans('Folder in footer bottom', [], HookNavigation::MESSAGE_DOMAIN.'.bo.default'),
+                    'label' => $this->translator->trans('Folder in footer bottom', [], HookNavigation::MESSAGE_DOMAIN),
                 ]
             );
     }

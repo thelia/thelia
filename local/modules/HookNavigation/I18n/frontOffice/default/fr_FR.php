@@ -1,6 +1,8 @@
 <?php
 
 return array(
-    'Latest articles' => 'Derniers articles',
+    'Categories' => 'Rubriques',
+    'Home' => 'Accueil',
     'No articles currently' => 'Aucun article pour le moment',
+    'Toggle navigation' => 'Basculer la navigation',
 );

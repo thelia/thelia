@@ -73,7 +73,7 @@ return array(
     'Do you have an account?' => 'Avez-vous un compte ?',
     'Do you really want to delete this address ?' => 'Voulez-vous vraiment supprimer cette adresse ?',
     'Download' => 'Télécharger',
-    'Edit' => '',
+    'Edit' => 'Modifier',
     'Edit this address' => 'Editer cette adresse',
     'Estimated shipping ' => 'Estimation des frais de port',
     'Forgot your Password?' => 'Mot de passe oublié ?',
