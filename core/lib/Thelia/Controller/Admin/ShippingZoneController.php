@@ -24,7 +24,7 @@ use Thelia\Form\ShippingZone\ShippingZoneRemoveArea;
 /**
  * Class ShippingZoneController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ShippingZoneController extends BaseAdminController
 {

@@ -26,7 +26,7 @@ use Thelia\Tools\URL;
 /**
  * Class TranslationsController
  * @package Thelia\Controller\Admin
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TranslationsController extends BaseAdminController
 {

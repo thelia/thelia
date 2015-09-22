@@ -163,17 +163,17 @@
         jQuery(function($) {
 
             $('.from-datetime-picker').datetimepicker({
-                language: "{$langcode}",
-                useSeconds: false,
+                locale: "{$langcode}",
                 format: 'YYYY-MM-DD',
-                defaultDate: moment().subtract(7, 'days')
+                defaultDate: moment().subtract(7, 'days'),
+                ignoreReadonly: true
             });
 
             $('.to-datetime-picker').datetimepicker({
-                language: "{$langcode}",
-                useSeconds: false,
+                locale: "{$langcode}",
                 format: 'YYYY-MM-DD',
-                defaultDate: moment()
+                defaultDate: moment(),
+                ignoreReadonly: true
             });
 
             $('.js-show-logs').click(function(e) {
@@ -196,8 +196,8 @@
                     modules.push($(v).data('id'));
                 });
 
-                var fromDate = $('.from-datetime-picker').data('DateTimePicker').getDate().format('YYYY-MM-DD');
-                var toDate = $('.to-datetime-picker').data('DateTimePicker').getDate().format('YYYY-MM-DD');
+                var fromDate = $('.from-datetime-picker').data('DateTimePicker').date().format('YYYY-MM-DD');
+                var toDate = $('.to-datetime-picker').data('DateTimePicker').date().format('YYYY-MM-DD');
 
                 $.post(
                     "{url path='/admin/configuration/adminLogs/logger'}",

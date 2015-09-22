@@ -246,8 +246,8 @@ class OrderProductTableMap extends TableMap
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
         $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'VARCHAR', false, 45, null);
+        $this->addColumn('PRICE', 'Price', 'DECIMAL', true, 16, 0);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'DECIMAL', false, 16, 0);
         $this->addColumn('WAS_NEW', 'WasNew', 'TINYINT', true, null, null);
         $this->addColumn('WAS_IN_PROMO', 'WasInPromo', 'TINYINT', true, null, null);
         $this->addColumn('WEIGHT', 'Weight', 'VARCHAR', false, 45, null);

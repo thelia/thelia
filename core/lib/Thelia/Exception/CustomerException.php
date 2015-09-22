@@ -15,7 +15,7 @@ namespace Thelia\Exception;
 /**
  * Class CustomerException
  * @package Thelia\Exception
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerException extends \RuntimeException
 {

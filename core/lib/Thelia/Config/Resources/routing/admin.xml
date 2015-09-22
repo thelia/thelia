@@ -277,11 +277,6 @@
         <requirement key="_format">xml|json</requirement>
     </route>
 
-    <route id="admin.category.ajax" path="/admin/catalog/category/parent/{parentId}.{_format}" methods="GET">
-        <default key="_controller">Thelia\Controller\Admin\CategoryController::getByParentIdAction</default>
-        <requirement key="_format">xml|json</requirement>
-    </route>
-
     <!--  Product Management -->
 
     <route id="admin.products.default" path="/admin/products">
@@ -320,11 +315,6 @@
         <default key="_controller">Thelia\Controller\Admin\ProductController::updatePositionAction</default>
     </route>
 
-
-    <route id="admin.products.general.tab" path="/admin/products/general/tab">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::loadGeneralAjaxTabAction</default>
-    </route>
-
     <!-- Product categories, content and accessories -->
 
     <route id="admin.products.related.tab" path="/admin/products/related/tab">
@@ -361,7 +351,7 @@
     </route>
 
     <route id="admin.product.calculate-price" path="/admin/product/calculate-price">
-        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCaclulator</default>
+        <default key="_controller">Thelia\Controller\Admin\ProductController::priceCalculator</default>
     </route>
 
     <route id="admin.product.calculate-raw-price" path="/admin/product/calculate-raw-price">
@@ -574,10 +564,6 @@
         <requirement key="couponId">\d+</requirement>
         <requirement key="conditionIndex">\d+</requirement>
     </route>
-    <route id="admin.coupon.consume" path="/admin/coupon/consume/{couponCode}">
-        <default key="_controller">Thelia\Controller\Admin\CouponController::consumeAction</default>
-        <requirement key="couponCode">.*</requirement>
-    </route>
 
     <!-- Routes to the Config (system variables) controller -->
 
@@ -684,10 +670,6 @@
 
     <route id="admin.configuration.currencies.delete" path="/admin/configuration/currencies/delete">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::deleteAction</default>
-    </route>
-
-    <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
-        <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
 
 

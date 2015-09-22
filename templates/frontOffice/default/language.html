@@ -18,7 +18,7 @@
             {hook name="language.top"}
             <ul class="nav nav-tabs nav-justified" style="margin-bottom:60px;">
             {loop type="lang" name="lang_available"}
-              <li{if $ID eq "{lang attr="id"}"} class="active"{/if}><a href="{url path="{navigate to="current"}" lang={$CODE}}">{$TITLE}</a></li>
+              <li{if $ID eq "{lang attr="id"}"} class="active"{/if}><a href="{url current="1" lang={$CODE}}">{$TITLE}</a></li>
             {/loop}
             </ul>
             {hook name="language.bottom"}

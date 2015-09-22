@@ -28,7 +28,7 @@ use Thelia\Model\ConfigQuery;
  * Class HttpException
  * @package Thelia\Action
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
- * @author Manuel Raynaud  <manu@thelia.net>
+ * @author Manuel Raynaud  <manu@raynaud.io>
  */
 class HttpException extends BaseAction implements EventSubscriberInterface
 {

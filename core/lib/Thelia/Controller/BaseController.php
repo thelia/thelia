@@ -43,7 +43,7 @@ use Thelia\Tools\URL;
  * user is not yet logged in, or back-office home page if the user is logged in.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 
@@ -323,7 +323,7 @@ abstract class BaseController extends ContainerAware
         $url = null;
 
         if ($form != null) {
-            $url = $form->getFormDefinedUrl($parameterName, $form);
+            $url = $form->getFormDefinedUrl($parameterName);
         } else {
             $url = $this->getRequest()->get($parameterName);
         }

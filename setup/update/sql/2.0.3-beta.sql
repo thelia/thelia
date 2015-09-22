@@ -19,6 +19,9 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`,  `created_at`, `upda
 ('terms_conditions_content_id', '', 0, 0, NOW(), NOW());
 
 INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `postscriptum`) VALUES
+(@max + 1, 'de_DE', 'Standart verfügbaren Bestand wenn check-available-stock gleich 0.', NULL, NULL, NULL),
+(@max + 2, 'de_DE', 'Die ID des Ordners mit Ihren Informations-Seiten: AGB, Impressum, ...', NULL, NULL, NULL),
+(@max + 3, 'de_DE', 'Ihr \'Allgemeine Geschäftsbedingungen \' ID.', NULL, NULL, NULL),
 (@max + 1, 'en_US', 'Default available stock when check-available-stock is set to 0.', NULL, NULL, NULL),
 (@max + 2, 'en_US', 'The ID of the folder containing your information pages : terms, imprint, ...', NULL, NULL, NULL),
 (@max + 3, 'en_US', 'The ID of the \'Terms & Conditions\' content.', NULL, NULL, NULL),

@@ -104,12 +104,11 @@
     .block-content {
         li a {
             background-color: @block-nav-bg;
-            border-top: 1px solid @block-nav-border;
             color: @block-nav-color;
             display: block;
             font-size: @font-size-small;
             font-weight: normal;
-            padding: 10px 3px;
+            padding: 10px 60px 10px 3px;
             position: relative;
 
             // Hover state
@@ -121,7 +120,6 @@
             &.accordion-toggle {
                 &:after {
                     color: @brand-primary;
-                    float: right;
                     .fa-icon();
                     content: @fa-var-minus;
                 }

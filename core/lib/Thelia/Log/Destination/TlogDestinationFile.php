@@ -28,7 +28,6 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected $path_defaut = false;
     protected $fh = false;
-    protected $filePath;
 
     public function __construct()
     {
@@ -38,11 +37,13 @@ class TlogDestinationFile extends AbstractTlogDestination
 
     protected function getFilePath()
     {
-        if (null === $this->filePath) {
-            $this->filePath = $this->getConfig(self::VAR_PATH_FILE);
+        $filePath = $this->getConfig(self::VAR_PATH_FILE);
+
+        if (preg_match('/^[a-z]:\\\|^\//i', $filePath) === 0) {
+            $filePath = THELIA_ROOT . $filePath;
         }
 
-        return $this->filePath;
+        return $filePath;
     }
 
     protected function getOpenMode()
@@ -56,20 +57,11 @@ class TlogDestinationFile extends AbstractTlogDestination
         $mode = $this->getOpenMode();
 
         if (!empty($filePath)) {
-            if (!$this->findRelativePath($filePath, $mode)) {
-                $this->findAbsolutePath($filePath, $mode);
-            }
+            $this->resolvePath($filePath, $mode);
         }
     }
 
-    protected function findRelativePath($filePath, $mode)
-    {
-        $absolutePath = THELIA_ROOT . $filePath;
-
-        return $this->findAbsolutePath($absolutePath, $mode);
-    }
-
-    protected function findAbsolutePath($filePath, $mode)
+    protected function resolvePath($filePath, $mode)
     {
         if (! empty($filePath)) {
             if (! is_file($filePath)) {
@@ -80,7 +72,6 @@ class TlogDestinationFile extends AbstractTlogDestination
 
                 touch($filePath);
                 chmod($filePath, 0666);
-                $this->filePath = $filePath;
             }
 
             if ($this->fh) {
@@ -88,7 +79,6 @@ class TlogDestinationFile extends AbstractTlogDestination
             }
 
             $this->fh = fopen($filePath, $mode);
-            $this->filePath = $filePath;
             return true;
         }
 

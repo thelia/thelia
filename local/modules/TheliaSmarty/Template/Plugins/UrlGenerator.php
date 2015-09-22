@@ -50,12 +50,14 @@ class UrlGenerator extends AbstractSmartyPlugin
             $path = $this->request->getPathInfo();
             unset($params["current"]); // Delete the current param, so it isn't included in the url
 
-            // Then build the query variables
+            // build the query variables
             $params = array_merge(
                 $this->request->query->all(),
                 $params
             );
         }
+
+
 
         if ($file !== null) {
             $path = $file;
@@ -208,7 +210,7 @@ class UrlGenerator extends AbstractSmartyPlugin
         $noamp  = $this->getParam($params, 'noamp', null); // Do not change & in &amp;
         $target = $this->getParam($params, 'target', null);
 
-        if ($noamp == null && false === strpos($url, '&amp;')) {
+        if (!$noamp) {
             $url = str_replace('&', '&amp;', $url);
         }
 

@@ -16,7 +16,7 @@ return array(
     'Postage' => 'Frais de livraison',
     'Product' => 'Produit',
     'Quantity' => 'Quantité',
-    'Ref' => 'Ref',
+    'Ref' => 'Réf.',
     'Tax' => 'Taxes',
     'Taxed total' => 'Total TTC',
     'Total' => 'Total',

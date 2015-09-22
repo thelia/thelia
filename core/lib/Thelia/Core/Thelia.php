@@ -18,7 +18,7 @@ namespace Thelia\Core;
  * It extends Symfony\Component\HttpKernel\Kernel for changing some features
  *
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 use Propel\Runtime\Connection\ConnectionManagerSingle;
@@ -50,7 +50,7 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.2.0-beta2';
+    const THELIA_VERSION = '2.2.0-beta3';
 
     public function __construct($environment, $debug)
     {

@@ -56,6 +56,7 @@ class URL
 
     /**
      * @param RequestContext $requestContext
+     * @since Version 2.2
      */
     public function setRequestContext(RequestContext $requestContext)
     {
@@ -164,13 +165,15 @@ class URL
             $base = $path;
         }
 
+        $base = str_replace('&amp;', '&', $base);
+
         $queryString = '';
         $anchor      = '';
 
         if (! is_null($parameters)) {
             foreach ($parameters as $name => $value) {
                 // Remove this parameter from base URL to prevent duplicate parameters
-                $base = preg_replace('/([?&])'.$name.'=([^&])*(&|$)/', '$1', $base);
+                $base = preg_replace('/([?&])'.$name.'=(?:[^&]*)(?:&|$)/', '$1', $base);
 
                 $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
             }

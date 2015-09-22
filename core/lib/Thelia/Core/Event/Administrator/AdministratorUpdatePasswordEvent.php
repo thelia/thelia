@@ -18,7 +18,7 @@ use Thelia\Model\Admin;
 /**
  * Class AdministratorUpdatePasswordEvent
  * @package Thelia\Core\Event\Administrator
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class AdministratorUpdatePasswordEvent extends ActionEvent
 {

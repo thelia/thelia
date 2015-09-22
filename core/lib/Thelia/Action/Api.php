@@ -22,7 +22,7 @@ use Thelia\Model\Api as ApiModel;
 /**
  * Class Api
  * @package Thelia\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Api extends BaseAction implements EventSubscriberInterface
 {

@@ -1,12 +1,41 @@
+# 2.2.0
+
+- #1688 Fix the permission messages in Thelia installer
+- #1686 Use createForm method for front forms ```thelia.coupon.code, thelia.order.delivery, thelia.order.payment```
+- #1667 Fix #1666 Display an error when trying to delete a customer which has orders
+- #1665 Fix form field type date in Smarty plugin form, checks if the field type is a BirthdayType for assign a smarty variable [years, month, days]
+- #1659 Fix Administrator edit action in the BackOffice, it was impossible to edit an administrator
+
 # 2.2.0-beta3
 
+- #1653 Remove ```AdminIncludes``` folder in the module generation
+- #1649 Add index in table rewriting_url
+- #1644 Allow relative path use with Tlog
+- #1640 Add docker and docker-compose configuration
+- #1637 Fix admin API edit button
+- #1635 Add unit tests for the routing files (admin, api, front)
+- #1634 Remove leftover uncallable routes (admin)
+- #1631 Remove duplicate route (admin)
+- #1629 Fix errors reporting of admin hooks
+- #1632 Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
+- #1616 Improve statistic on homepage, add datetimepicker and fix first order
+- #1601 Add set error in TheliaFormValidator when form is not valid
 - #1585 Add parameters in frontOffice hooks
-    - ```order_id``` in template ```account-order.html``` for hooks ```account-order.after-javascript-include```, ```account-order.javascript-initialization```
-    - ```address_id``` in template ```address-update.html``` for hooks ```address-update.form-top```, ```address-update.bottom```, ```address-update.after-javascript-include```, ```address-update.javascript-initialization```
 - #1587 Fix redirect url for the folder image and folder document
 - #1590 Fix Thelia request initialization
 - #1593 Fix form serialization in session that contain uploaded files
-- update symfony/validator version to 2.3.31
+- #1594 update symfony/validator version to 2.3.31
+- #1598 composer.json update dependency fzaninotto/faker to stable version 1.5
+- #1583 Add German translations
+- #1615 New TheliaEvents::CART_FINDITEM event to improve cart management flexibility
+- #1618 Configurable faker
+- #1581 Fix the prices precision
+    - Not round the prices without tax in back office
+    - Change the type for the price columns in database. New type : decimal(16,6)
+
+##DEPRECATED
+
+- Deprecated AdminIncludes, it's better to use the hooks
 
 # 2.2.0-beta2
 
@@ -341,19 +370,6 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - fix form firewall variable name
 - add more module includes in order-edit.html
 - do not allow failure anymore on travis php5.6
-
-#2.0.4
-- Updating stock when changing order : canceled status
-- order table is versionnable now.
-- product_sale_elements_id is added to order_product table.
-
-#2.0.3
-- Fix js syntax in order-delivery template
-- price are now save without any round.
- /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
-- change Argument type for ref parameter in Product loop
-- Fix export template
-- [Tinymce]fix invisible thumb in file manager
 
 #2.0.4
 - Updating stock when changing order : canceled status

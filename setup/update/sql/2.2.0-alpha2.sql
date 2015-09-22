@@ -22,6 +22,12 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Bestellung - Kunde Informationen unten', '', ''),
+(@max_id + 2, 'de_DE', 'Bestellung - Zahlungsmodul unten', '', ''),
+(@max_id + 3, 'de_DE', 'Bestellung - Liefermodul unten', '', ''),
+(@max_id + 4, 'de_DE', 'Rechnung - Nach dem Zahlungsmodul', NULL, NULL),
+(@max_id + 5, 'de_DE', 'Rechnung - Nach dem Liefermodul', NULL, NULL),
+(@max_id + 6, 'de_DE', 'Lieferung - Nach dem Liefermodul', NULL, NULL),
 (@max_id + 1, 'en_US', 'Order - customer information bottom', '', ''),
 (@max_id + 2, 'en_US', 'Order - payment module bottom', '', ''),
 (@max_id + 3, 'en_US', 'Order - delivery module bottom', '', ''),

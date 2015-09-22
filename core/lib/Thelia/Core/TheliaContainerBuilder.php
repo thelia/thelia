@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * Class TheliaContainerBuilder
  * @package Thelia\Core
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class TheliaContainerBuilder extends ContainerBuilder
 {

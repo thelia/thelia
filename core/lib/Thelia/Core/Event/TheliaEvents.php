@@ -16,7 +16,7 @@ namespace Thelia\Core\Event;
  *
  * This class contains all Thelia events identifiers used by Thelia Core
  *
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 
 final class TheliaEvents
@@ -359,6 +359,11 @@ final class TheliaEvents
      * sent when a new item is added to current cart
      */
     const AFTER_CARTADDITEM = "cart.after.addItem";
+
+    /**
+     * sent for searching an item in the cart
+     */
+    const CART_FINDITEM = "cart.findItem";
 
     /**
      * sent when a cart item is modify

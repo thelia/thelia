@@ -165,8 +165,8 @@ class OrderProductTaxTableMap extends TableMap
         $this->addForeignKey('ORDER_PRODUCT_ID', 'OrderProductId', 'INTEGER', 'order_product', 'ID', true, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
-        $this->addColumn('AMOUNT', 'Amount', 'FLOAT', true, null, null);
-        $this->addColumn('PROMO_AMOUNT', 'PromoAmount', 'FLOAT', false, null, null);
+        $this->addColumn('AMOUNT', 'Amount', 'DECIMAL', true, 16, 0);
+        $this->addColumn('PROMO_AMOUNT', 'PromoAmount', 'DECIMAL', false, 16, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()

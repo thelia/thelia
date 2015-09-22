@@ -2,7 +2,7 @@
 
 return array(
     'Email address' => 'Adresse e-mail',
-    'Forgot your Password?' => 'Mot de passe oublié ?',
+    'Forgot your Password?' => 'Mot de passe oublié ?',
     'Log In!' => 'Se connecter',
     'Log out!' => 'Se déconnecter',
     'My Account' => 'Mon compte',

@@ -23,7 +23,7 @@ use Thelia\Model\CountryQuery;
 /**
  * Class CountryTest
  * @package Thelia\Tests\Action
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CountryTest extends \PHPUnit_Framework_TestCase
 {

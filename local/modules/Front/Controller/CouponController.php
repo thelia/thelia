@@ -28,7 +28,7 @@ use Thelia\Controller\Front\BaseFrontController;
 use Thelia\Core\Event\Coupon\CouponConsumeEvent;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\CouponCode;
+use Thelia\Form\Definition\FrontForm;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Log\Tlog;
 use Thelia\Model\AddressQuery;
@@ -60,7 +60,7 @@ class CouponController extends BaseFrontController
         $this->checkCartNotEmpty();
 
         $message = false;
-        $couponCodeForm = new CouponCode($this->getRequest());
+        $couponCodeForm = $this->createForm(FrontForm::COUPON_CONSUME);
 
         try {
             $form = $this->validateForm($couponCodeForm, 'post');

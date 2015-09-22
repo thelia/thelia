@@ -219,6 +219,18 @@
                                     </div>
 
                                     <div class="row">
+                                        {if $edit_language_locale != 'en_US'}
+                                        <div class="col-md-12">
+                                            <div class="translation-mode-developer alert alert-warning hidden">
+                                                {intl l="If you want to translate core components of Thelia : core, install, default modules or templates."} <br>
+                                                {intl l="It's strongly recommended to use our translation platform"}
+                                                ({intl l="on"} <a href="https://crowdin.com/" target="_blank">Crowdin</a>) :
+                                                <a href="http://translate.thelia.net" target="_blank">http://translate.thelia.net</a>
+                                                <br>
+                                                {intl l="That way, Thelia community will benefit of your translations"}.
+                                            </div>
+                                        </div>
+                                        {/if}
                                         <div class="col-md-6">
                                             <div class="form-group">
                                                 <label class="checkbox control-label">
@@ -227,7 +239,6 @@
                                                 </label>
 
                                             </div>
-
                                         </div>
                                     </div>
                                 </fieldset>
@@ -427,16 +438,18 @@
 
                 if (userMode) {
                     $('.translation_field_default').prop('readonly', true);
-                    $('.input-group-custom, .input-group-global').removeClass('hidden');
+                    $('.input-group-custom, .input-group-global, .translation-mode-user').removeClass('hidden');
+                    $('.translation-mode-developer').addClass('hidden');
                     $('#translation-mode-user').addClass('active');
                     $('#translation-mode-developer').removeClass('active');
-                    $('.input-group-custom, .input-group-global').removeClass('hidden');
+                    //$('.input-group-custom, .input-group-global').removeClass('hidden');
                 } else {
                     $('.translation_field_default').prop('readonly', false);
-                    $('.input-group-custom, .input-group-global').addClass('hidden');
+                    $('.input-group-custom, .input-group-global, .translation-mode-user').addClass('hidden');
+                    $('.translation-mode-developer').removeClass('hidden');
                     $('#translation-mode-developer').addClass('active');
                     $('#translation-mode-user').removeClass('active');
-                    $('.toggle-translation-mode').text($('.toggle-translation-mode').data('text-developer'));
+                    //$('.toggle-translation-mode').text($('.toggle-translation-mode').data('text-developer'));
                 }
 
                 docCookies.setItem('translation_userMode', userMode ? '1' : '0');

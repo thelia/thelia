@@ -19,7 +19,7 @@ use Thelia\Model\LangQuery;
 /**
  * Class LangUrlForm
  * @package Thelia\Form\Lang
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class LangUrlForm extends BaseForm
 {

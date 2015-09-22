@@ -1,5 +1,5 @@
 <?php
 
 return array(
-    'Newsletter' => 'Newsletter',
+    'Newsletter' => 'Lettre d\'information',
 );

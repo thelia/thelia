@@ -1,0 +1,34 @@
+#!/bin/bash
+set -e
+
+cd /usr/src/php/ext
+
+usage() {
+  echo "usage: $0 extension-version [extension-version] ...]"
+  echo "   ie: $0 oauth-1.2.3 uploadprogress-1.0.3.1"
+}
+
+while [ $# -gt 0 ]; do
+  ext="$1"
+  shift
+  if [ -d "$ext" ]; then
+    echo >&2 "error: $(pwd -P)/$ext exists already"
+    echo >&2
+    usage >&2
+    exit 1
+  fi
+  exts+=( "$ext" )
+done
+
+if [ "${#exts[@]}" -eq 0 ]; then
+  usage >&2
+  exit 1
+fi
+
+for ext in "${exts[@]}"; do
+  (
+    mkdir -p $ext
+    curl -sSL "http://pecl.php.net/get/$ext" | tar xvz -C "$ext" --strip-components=1
+    docker-php-ext-install $ext
+  )
+done

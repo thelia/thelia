@@ -35,7 +35,7 @@ use Thelia\Model\OrderStatusQuery;
 /**
  * Class Export
  * @package Colissimo\Controller
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Export extends BaseAdminController
 {

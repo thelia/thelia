@@ -109,15 +109,6 @@ try {
         <p class="lead text-center">
             <?php echo $trans->trans('Thelia is now installed. Thank you !'); ?>
         </p>
-        <p class="lead text-center">
-            <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
-        </p>
-
-        <p class="lead text-center">
-            <a href="<?php echo $website_url; ?>/index.php/admin" id="admin_url"><?php echo $trans->trans('Go to back office'); ?></a>
-        </p>
-
-    </div>
 
 <?php
 $scriptHook = <<<SCRIPT
@@ -133,6 +124,39 @@ $scriptHook = <<<SCRIPT
     });
 </script>
 SCRIPT;
+
+ob_start();
+include('footer.php');
+$footerContent = ob_get_clean();
+
+    // Remove the install wizard
+    /*try {
+        $fs = new \Symfony\Component\Filesystem\Filesystem();
+        $fs->remove(THELIA_WEB_DIR . DS . 'install');
+
+        ?>
+        <div class="alert alert-success"><p><?php
+        echo $trans->trans('The install wizard directory will be removed');
+        ?></p></div><?php
+    } catch (\Symfony\Component\Filesystem\Exception\IOException $ex) {
+        ?>
+        <p class="lead text-center">
+            <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
+        </p>
+        <?php
+    }*/
+
+    ?>
+    <p class="lead text-center">
+        <?php echo $trans->trans('Don\'t forget to delete the web/install directory.'); ?>
+    </p>
+
+    <p class="lead text-center">
+        <a href="<?php echo $website_url; ?>/index.php/admin" id="admin_url"><?php echo $trans->trans('Go to back office'); ?></a>
+    </p>
+    <?php
+
+    echo $footerContent;
 }
 catch (\Exception $ex) {
     ?>
@@ -146,6 +170,6 @@ catch (\Exception $ex) {
         ); ?>
     </div>
 <?php
-}
 
-include 'footer.php';
+include('footer.php');
+}

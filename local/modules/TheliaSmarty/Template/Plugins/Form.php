@@ -222,33 +222,32 @@ class Form extends AbstractSmartyPlugin
         }
 
         /* access to date */
-        if ($formFieldType instanceof DateType || $formFieldType instanceof DateTimeType) {
+        if ($formFieldType instanceof DateType || $formFieldType instanceof DateTimeType || $formFieldType instanceof BirthdayType) {
             if ('choice' === $formFieldConfig->getOption('widget')) {
                 /* access to years */
-                if ( $formFieldConfig->getOption('years')) {
+                if ($formFieldConfig->getOption('years')) {
                     $formFieldView->vars['years'] = $formFieldConfig->getOption('years');
                     $template->assign("years", $formFieldView->vars['years']);
                 }
 
                 /* access to month */
-                if ( $formFieldConfig->getOption('months')) {
+                if ($formFieldConfig->getOption('months')) {
                     $formFieldView->vars['months'] = $formFieldConfig->getOption('months');
                     $template->assign("months", $formFieldView->vars['months']);
                 }
 
                 /* access to days */
-                if ( $formFieldConfig->getOption('days')) {
+                if ($formFieldConfig->getOption('days')) {
                     $formFieldView->vars['days'] = $formFieldConfig->getOption('days');
                     $template->assign("days", $formFieldView->vars['days']);
                 }
 
                 /* access to empty_value */
-                if ( $formFieldConfig->getOption('empty_value')) {
+                if ($formFieldConfig->getOption('empty_value')) {
                     $formFieldView->vars['empty_value'] = $formFieldConfig->getOption('empty_value');
                     $template->assign("empty_value", $formFieldView->vars['empty_value']);
                 }
             }
-
         }
 
         /* access to thelia type */
@@ -594,7 +593,7 @@ class Form extends AbstractSmartyPlugin
             $instance->getName()
         );
 
-        if (empty( $fieldData )) {
+        if (empty($fieldData)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     "Field name '%s' not found in form %s children",
@@ -878,7 +877,7 @@ class Form extends AbstractSmartyPlugin
             $this->buildFieldName($formField),
             $formField->getViewData(),
             $formFieldConfig->getType(),
-            $formFieldConfig->getOptions()
+            $formField->createView()->vars
         );
 
         return '';

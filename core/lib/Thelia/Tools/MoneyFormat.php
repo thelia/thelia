@@ -27,6 +27,7 @@ class MoneyFormat extends NumberFormat
      *
      * @param float  $number   the number
      * @param string $decimals number of decimal figures
+     * @return string
      */
     public function formatStandardMoney($number, $decimals = null)
     {

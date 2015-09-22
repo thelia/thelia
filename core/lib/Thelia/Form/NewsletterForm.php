@@ -22,7 +22,7 @@ use Thelia\Model\NewsletterQuery;
 /**
  * Class NewsletterForm
  * @package Thelia\Form
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class NewsletterForm extends BaseForm
 {

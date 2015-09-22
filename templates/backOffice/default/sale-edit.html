@@ -257,8 +257,7 @@
         {$langcode = {lang attr="code"}|substr:0:2}
 
         $('.datetime-picker').datetimepicker({
-            language: "{$langcode}",
-            useSeconds: false
+            locale: "{$langcode}"
         });
 
         $(document.body).on('change', '.invert-selection', function(ev) {

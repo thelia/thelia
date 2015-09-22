@@ -628,6 +628,16 @@ var pseManager = (function($){
             window.location = $(this).val();
         });
 
+        // Login form (login page)
+        $form_login.each(function(){
+            var $emailInput = $('input[type="email"]', $form_login),
+                $passEnable  = $('#account1', $form_login);
+
+            $emailInput.on('keypress', function() {
+                $passEnable.click();
+            });
+        });
+
     });
 
 })(jQuery);

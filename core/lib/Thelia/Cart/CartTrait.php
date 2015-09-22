@@ -27,7 +27,7 @@ use Thelia\Core\Event\Cart\CartEvent;
  *
  * Trait CartTrait
  * @package Thelia\Cart
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  * @deprecated CartTrait is deprecated, please use Session::getSessionCart method instead
  */

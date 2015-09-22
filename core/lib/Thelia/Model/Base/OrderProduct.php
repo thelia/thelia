@@ -123,12 +123,14 @@ abstract class OrderProduct implements ActiveRecordInterface
 
     /**
      * The value for the price field.
-     * @var        double
+     * Note: this column has a database default value of: '0.000000'
+     * @var        string
      */
     protected $price;
 
     /**
      * The value for the promo_price field.
+     * Note: this column has a database default value of: '0.000000'
      * @var        string
      */
     protected $promo_price;
@@ -245,6 +247,8 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
+        $this->price = '0.000000';
+        $this->promo_price = '0.000000';
         $this->virtual = 0;
     }
 
@@ -621,7 +625,7 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Get the [price] column value.
      *
-     * @return   double
+     * @return   string
      */
     public function getPrice()
     {
@@ -996,13 +1000,13 @@ abstract class OrderProduct implements ActiveRecordInterface
     /**
      * Set the value of [price] column.
      *
-     * @param      double $v new value
+     * @param      string $v new value
      * @return   \Thelia\Model\OrderProduct The current object (for fluent API support)
      */
     public function setPrice($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
         if ($this->price !== $v) {
@@ -1276,6 +1280,14 @@ abstract class OrderProduct implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->price !== '0.000000') {
+                return false;
+            }
+
+            if ($this->promo_price !== '0.000000') {
+                return false;
+            }
+
             if ($this->virtual !== 0) {
                 return false;
             }
@@ -1338,7 +1350,7 @@ abstract class OrderProduct implements ActiveRecordInterface
             $this->quantity = (null !== $col) ? (double) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : OrderProductTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (double) $col : null;
+            $this->price = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : OrderProductTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo_price = (null !== $col) ? (string) $col : null;

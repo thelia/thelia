@@ -20,7 +20,7 @@ use Thelia\Core\Event\TheliaEvents;
 /**
  * Class SaleCheckActivationCommand
  * @package Thelia\Command
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class SaleCheckActivationCommand extends ContainerAwareCommand
 {

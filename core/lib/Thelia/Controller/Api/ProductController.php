@@ -31,7 +31,7 @@ use Thelia\Form\Definition\ApiForm;
 /**
  * Class ProductController
  * @package Thelia\Controller\Api
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ProductController extends BaseApiController
 {

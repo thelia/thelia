@@ -69,7 +69,7 @@
                                         </div>
                                         <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="UPDATE"}
-                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}" data-toggle="modal"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a title="{intl l='Change this api access'}" href="{url path="/admin/configuration/api/update/%id" id={$api.Id}}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
 
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.configuration.api" access="DELETE"}

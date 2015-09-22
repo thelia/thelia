@@ -54,16 +54,16 @@ use Thelia\Model\Map\ProductPriceTableMap;
  *
  * @method     ChildProductPrice findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildProductPrice filtered by the product_sale_elements_id column
  * @method     ChildProductPrice findOneByCurrencyId(int $currency_id) Return the first ChildProductPrice filtered by the currency_id column
- * @method     ChildProductPrice findOneByPrice(double $price) Return the first ChildProductPrice filtered by the price column
- * @method     ChildProductPrice findOneByPromoPrice(double $promo_price) Return the first ChildProductPrice filtered by the promo_price column
+ * @method     ChildProductPrice findOneByPrice(string $price) Return the first ChildProductPrice filtered by the price column
+ * @method     ChildProductPrice findOneByPromoPrice(string $promo_price) Return the first ChildProductPrice filtered by the promo_price column
  * @method     ChildProductPrice findOneByFromDefaultCurrency(boolean $from_default_currency) Return the first ChildProductPrice filtered by the from_default_currency column
  * @method     ChildProductPrice findOneByCreatedAt(string $created_at) Return the first ChildProductPrice filtered by the created_at column
  * @method     ChildProductPrice findOneByUpdatedAt(string $updated_at) Return the first ChildProductPrice filtered by the updated_at column
  *
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildProductPrice objects filtered by the product_sale_elements_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildProductPrice objects filtered by the currency_id column
- * @method     array findByPrice(double $price) Return ChildProductPrice objects filtered by the price column
- * @method     array findByPromoPrice(double $promo_price) Return ChildProductPrice objects filtered by the promo_price column
+ * @method     array findByPrice(string $price) Return ChildProductPrice objects filtered by the price column
+ * @method     array findByPromoPrice(string $promo_price) Return ChildProductPrice objects filtered by the promo_price column
  * @method     array findByFromDefaultCurrency(boolean $from_default_currency) Return ChildProductPrice objects filtered by the from_default_currency column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductPrice objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductPrice objects filtered by the updated_at column

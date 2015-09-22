@@ -28,7 +28,7 @@ use Thelia\Module\PaymentModuleInterface;
 /**
  * Class SendMail
  * @package Colissimo\Listener
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class SendMail implements EventSubscriberInterface
 {

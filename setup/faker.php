@@ -11,28 +11,33 @@ use Thelia\Coupon\Type\RemoveXAmount;
 use Thelia\Coupon\Type\RemoveXPercent;
 use Thelia\Model\ModuleQuery;
 use Thelia\Model\OrderAddress;
+use Thelia\Model;
 
 if (php_sapi_name() != 'cli') {
     throw new \Exception('this script can only be launched with cli sapi');
 }
 
-$bootstrapToggle = false;
+// Set this to true to get "real text" instead of random letters in titles, chapo, descriptions, etc.
+// WARNING : relaTextMode is much more slower than false text mode, and may cause problems with Travis
+// such as  "No output has been received in the last 10 minutes, this potentially indicates a stalled
+// build or something wrong with the build itself."
 $bootstraped = false;
+$realTextMode = true;
+$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT', 'de_DE');
+$numberCategories = 20;
+$numberProducts = 20;
+
+$options = getopt("b:c:p:r:l:h");
+
+if (false === $options || isset($options['h'])) {
+    usage();
+    exit(0);
+}
 
 // Autoload bootstrap
-
-foreach ($argv as $arg) {
-    if ($arg === '-b') {
-        $bootstrapToggle = true;
-
-        continue;
-    }
-
-    if ($bootstrapToggle) {
-        require __DIR__ . DIRECTORY_SEPARATOR . $arg;
-
-        $bootstraped = true;
-    }
+if (isset($options['b'])) {
+    require __DIR__ . DIRECTORY_SEPARATOR . $options['b'];
+    $bootstraped = true;
 }
 
 if (!$bootstraped) {
@@ -49,6 +54,28 @@ if (!$bootstraped) {
     }
 }
 
+// real text mode
+if (isset($options['r'])) {
+    $realTextMode = filter_var($options['r'], FILTER_VALIDATE_BOOLEAN);
+}
+
+// locales
+if (isset($options['l'])) {
+    $localeList = explode(',', str_replace(' ', '', $options['l']));
+}
+
+if (isset($options['c'])) {
+    if (0 !== intval($options['c'])) {
+        $numberCategories = intval($options['c']);
+    }
+}
+
+if (isset($options['p'])) {
+    if (0 !== intval($options['p'])) {
+        $numberProducts = intval($options['p']);
+    }
+}
+
 $thelia = new Thelia\Core\Thelia("dev", false);
 $thelia->boot();
 $thelia->getContainer()->get('thelia.translator');
@@ -56,8 +83,6 @@ $thelia->getContainer()->get('thelia.translator');
 $faker = Faker\Factory::create('en_US');
 
 // Create localized version for content generation
-$localeList = array('fr_FR', 'en_US', 'es_ES', 'it_IT');
-
 $localizedFaker = [];
 
 foreach ($localeList as $locale) {
@@ -82,136 +107,48 @@ try {
 
     echo "Clearing tables\n";
 
-    $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
-        ->find();
-    $productAssociatedContent->delete();
-
-    $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
-        ->find();
-    $categoryAssociatedContent->delete();
-
-    $featureProduct = Thelia\Model\FeatureProductQuery::create()
-        ->find();
-    $featureProduct->delete();
-
-    $attributeCombination = Thelia\Model\AttributeCombinationQuery::create()
-        ->find();
-    $attributeCombination->delete();
-
-    $feature = Thelia\Model\FeatureQuery::create()
-        ->find();
-    $feature->delete();
-
-    $feature = Thelia\Model\FeatureI18nQuery::create()
-        ->find();
-    $feature->delete();
-
-    $featureAv = Thelia\Model\FeatureAvQuery::create()
-        ->find();
-    $featureAv->delete();
-
-    $featureAv = Thelia\Model\FeatureAvI18nQuery::create()
-        ->find();
-    $featureAv->delete();
-
-    $attribute = Thelia\Model\AttributeQuery::create()
-        ->find();
-    $attribute->delete();
-
-    $attribute = Thelia\Model\AttributeI18nQuery::create()
-        ->find();
-    $attribute->delete();
-
-    $attributeAv = Thelia\Model\AttributeAvQuery::create()
-        ->find();
-    $attributeAv->delete();
-
-    $attributeAv = Thelia\Model\AttributeAvI18nQuery::create()
-        ->find();
-    $attributeAv->delete();
-
-    $category = Thelia\Model\CategoryQuery::create()
-        ->find();
-    $category->delete();
-
-    $category = Thelia\Model\CategoryI18nQuery::create()
-        ->find();
-    $category->delete();
-
-    $product = Thelia\Model\ProductQuery::create()
-        ->find();
-    $product->delete();
-
-    $product = Thelia\Model\ProductI18nQuery::create()
-        ->find();
-    $product->delete();
-
-    $customer = Thelia\Model\CustomerQuery::create()
-        ->find();
-    $customer->delete();
-
-    $admin = Thelia\Model\AdminQuery::create()
-        ->find();
-    $admin->delete();
-
-    $folder = Thelia\Model\FolderQuery::create()
-        ->find();
-    $folder->delete();
-
-    $folder = Thelia\Model\FolderI18nQuery::create()
-        ->find();
-    $folder->delete();
-
-    $content = Thelia\Model\ContentQuery::create()
-        ->find();
-    $content->delete();
-
-    $content = Thelia\Model\ContentI18nQuery::create()
-        ->find();
-    $content->delete();
-
-    $accessory = Thelia\Model\AccessoryQuery::create()
-        ->find();
-    $accessory->delete();
-
-    $stock = \Thelia\Model\ProductSaleElementsQuery::create()
-        ->find();
-    $stock->delete();
-
-    $productPrice = \Thelia\Model\ProductPriceQuery::create()
-        ->find();
-    $productPrice->delete();
-
-    $brand = Thelia\Model\BrandQuery::create()
-        ->find();
-    $brand->delete();
-
-    $brand = Thelia\Model\BrandI18nQuery::create()
-        ->find();
-    $brand->delete();
-
-    \Thelia\Model\ProductImageQuery::create()->find()->delete();
-    \Thelia\Model\CategoryImageQuery::create()->find()->delete();
-    \Thelia\Model\FolderImageQuery::create()->find()->delete();
-    \Thelia\Model\ContentImageQuery::create()->find()->delete();
-    \Thelia\Model\BrandImageQuery::create()->find()->delete();
-
-    \Thelia\Model\ProductDocumentQuery::create()->find()->delete();
-    \Thelia\Model\CategoryDocumentQuery::create()->find()->delete();
-    \Thelia\Model\FolderDocumentQuery::create()->find()->delete();
-    \Thelia\Model\ContentDocumentQuery::create()->find()->delete();
-    \Thelia\Model\BrandDocumentQuery::create()->find()->delete();
-
-    \Thelia\Model\CouponQuery::create()->find()->delete();
-    \Thelia\Model\OrderQuery::create()->find()->delete();
-
-
-    \Thelia\Model\SaleQuery::create()->find()->delete();
-
-    \Thelia\Model\SaleProductQuery::create()->find()->delete();
-
-
-    \Thelia\Model\MetaDataQuery::create()->find()->delete();
+    Model\ProductAssociatedContentQuery::create()->deleteAll();
+    Model\CategoryAssociatedContentQuery::create()->deleteAll();
+    Model\FeatureProductQuery::create()->deleteAll();
+    Model\AttributeCombinationQuery::create()->deleteAll();
+    Model\FeatureQuery::create()->deleteAll();
+    Model\FeatureI18nQuery::create()->deleteAll();
+    Model\FeatureAvQuery::create()->deleteAll();
+    Model\FeatureAvI18nQuery::create()->deleteAll();
+    Model\AttributeQuery::create()->deleteAll();
+    Model\AttributeI18nQuery::create()->deleteAll();
+    Model\AttributeAvQuery::create()->deleteAll();
+    Model\AttributeAvI18nQuery::create()->deleteAll();
+    Model\CategoryQuery::create()->deleteAll();
+    Model\CategoryI18nQuery::create()->deleteAll();
+    Model\ProductQuery::create()->deleteAll();
+    Model\ProductI18nQuery::create()->deleteAll();
+    Model\CustomerQuery::create()->deleteAll();
+    Model\AdminQuery::create()->deleteAll();
+    Model\FolderQuery::create()->deleteAll();
+    Model\FolderI18nQuery::create()->deleteAll();
+    Model\ContentQuery::create()->deleteAll();
+    Model\ContentI18nQuery::create()->deleteAll();
+    Model\AccessoryQuery::create()->deleteAll();
+    Model\ProductSaleElementsQuery::create()->deleteAll();
+    Model\ProductPriceQuery::create()->deleteAll();
+    Model\BrandQuery::create()->deleteAll();
+    Model\BrandI18nQuery::create()->deleteAll();
+    Model\ProductImageQuery::create()->deleteAll();
+    Model\CategoryImageQuery::create()->deleteAll();
+    Model\FolderImageQuery::create()->deleteAll();
+    Model\ContentImageQuery::create()->deleteAll();
+    Model\BrandImageQuery::create()->deleteAll();
+    Model\ProductDocumentQuery::create()->deleteAll();
+    Model\CategoryDocumentQuery::create()->deleteAll();
+    Model\FolderDocumentQuery::create()->deleteAll();
+    Model\ContentDocumentQuery::create()->deleteAll();
+    Model\BrandDocumentQuery::create()->deleteAll();
+    Model\CouponQuery::create()->deleteAll();
+    Model\OrderQuery::create()->deleteAll();
+    Model\SaleQuery::create()->deleteAll();
+    Model\SaleProductQuery::create()->deleteAll();
+    Model\MetaDataQuery::create()->deleteAll();
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
 
@@ -386,9 +323,9 @@ try {
         $ft = new Thelia\Model\FeatureTemplate();
 
         $ft
-        ->setTemplate($template)
-        ->setFeatureId($featureId)
-        ->save();
+            ->setTemplate($template)
+            ->setFeatureId($featureId)
+            ->save();
     }
 
     echo "Creating folders and contents\n";
@@ -488,18 +425,18 @@ try {
     $productIdList = array();
     $virtualProductList = array();
     $categoryIdList = array();
-    for ($i=1; $i<20; $i++) {
+    for ($i=1; $i<$numberCategories; $i++) {
         $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
-        for ($j=1; $j<rand(0, 20); $j++) {
+        for ($j=1; $j<rand(0, $numberCategories); $j++) {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
-            for ($k=0; $k<rand(0, 20); $k++) {
+            for ($k=0; $k<rand(0, $numberProducts); $k++) {
                 createProduct($faker, $subcategory, $k, $template, $brandIdList, $productIdList, $virtualProductList);
             }
         }
 
-        for ($k=1; $k<rand(1, 50); $k++) {
+        for ($k=1; $k<rand(1, $numberProducts); $k++) {
             createProduct($faker, $category, $k, $template, $brandIdList, $productIdList, $virtualProductList);
         }
     }
@@ -625,7 +562,7 @@ try {
     echo "Creating orders\n";
 
     $colissimo_id = ModuleQuery::create()->
-        filterByCode("Colissimo")
+    filterByCode("Colissimo")
         ->findOne()
         ->getId();
 
@@ -650,7 +587,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         $invoiceOrderAddress = new OrderAddress();
@@ -666,7 +603,7 @@ try {
             ->setZipcode($faker->postcode)
             ->setCity($faker->city)
             ->setCountryId(64)
-        ->save($con)
+            ->save($con)
         ;
 
         /**
@@ -731,7 +668,7 @@ try {
                 ->setTaxRuleTitle(getRealText(20))
                 ->setTaxRuleDescription(getRealText(50))
                 ->setEanCode($pse->getEanCode())
-            ->save($con);
+                ->save($con);
         }
 
     }
@@ -758,7 +695,7 @@ try {
         ;
 
         setI18n($sale, [
-                'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
+            'SaleLabel' => 20, 'Title' => 20, 'Chapo' => 30, 'Postscriptum' => 30, 'Description' => 50
         ]);
 
         $sale->save();
@@ -792,7 +729,7 @@ try {
                 ->setAttributeAvId(null)
                 ->save();
             ;
-         }
+        }
     }
 
     $con->commit();
@@ -939,12 +876,12 @@ function generate_document($document, $typeobj, $id)
     global $faker;
 
     $document
-    ->setTitle(getRealText(20))
-    ->setDescription(getRealText(250))
-    ->setChapo(getRealText(40))
-    ->setPostscriptum(getRealText(40))
-    ->setFile(sprintf("sample-document-%s.txt", $id))
-    ->save()
+        ->setTitle(getRealText(20))
+        ->setDescription(getRealText(250))
+        ->setChapo(getRealText(40))
+        ->setPostscriptum(getRealText(40))
+        ->setFile(sprintf("sample-document-%s.txt", $id))
+        ->save()
     ;
 
     $document_file = sprintf("%s/media/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
@@ -955,13 +892,17 @@ function generate_document($document, $typeobj, $id)
 }
 
 function getRealText($length, $locale = 'en_US') {
-    global $localizedFaker;
-    
-    $text = $localizedFaker[$locale]->realText($length);
+    global $localizedFaker, $realTextMode;
 
-    // Below 20 chars, generate a simple text, without ponctuation nor newlines.
-    if ($length <= 20)
-        $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+    if ($realTextMode) {
+        $text = $localizedFaker[$locale]->realText($length);
+
+        // Below 20 chars, generate a simple text, without ponctuation nor newlines.
+        if ($length <= 20)
+            $text = ucfirst(strtolower(preg_replace("/[^\pL\pM\pN\ ]/", '', $text)));
+    } else {
+        $text = $localizedFaker[$locale]->text($length);
+    }
 
     // echo "Generated $locale text ($length) : $locale:$text\n";
 
@@ -973,7 +914,7 @@ function setI18n(&$object, $fields = array('Title' => 20, 'Chapo' => 30, 'Postsc
     global $localeList, $localizedFaker;
 
     foreach ($localeList as $locale) {
-        
+
         $object->setLocale($locale);
 
         foreach ($fields as $name => $length) {
@@ -1140,4 +1081,47 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
     $coupon3->setIsAvailableOnSpecialOffers(false);
     $coupon3->setPerCustomerUsageCount(false);
     $coupon3->save();
+}
+
+
+function usage()
+{
+    $usage = <<<USAGE
+Generate fake data for your Thelia website
+
+Usage:
+
+    php faker.php <OPTIONS>
+
+Options:
+
+    -h
+        Display this message and exit
+
+    -b <bootstrap file>
+        Use this bootstrap file
+
+    -c <number of categories>
+        Maximum number of categories and sub categories to create (default: 20)
+
+    -p <number of products>
+        Maximum number of products to create in a category (default: 20)
+
+    -l <locale list>
+        The list of locales (separated with a ,) for which to generate content (default: fr_FR, en_US, es_ES, it_IT, de_DE)
+
+    -r <real text>
+        Use real text or not. real text mode is much more slower than false text mode.
+        0 : false text mode
+        1 : real text mode (default)
+
+Examples:
+
+    Generate content in english and french with false text for 5 categories and 10 products
+
+    php faker.php -r 0 -c 5 -p 10 -l 'fr_FR, en_US'
+
+USAGE;
+
+    echo $usage;
 }

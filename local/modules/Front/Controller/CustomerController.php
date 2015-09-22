@@ -46,7 +46,7 @@ use Thelia\Tools\URL;
 /**
  * Class CustomerController
  * @package Thelia\Controller\Front
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class CustomerController extends BaseFrontController
 {

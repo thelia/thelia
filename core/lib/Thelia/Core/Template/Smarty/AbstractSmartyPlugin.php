@@ -17,7 +17,7 @@ use TheliaSmarty\Template\AbstractSmartyPlugin as BaseAbstractSmartyPlugin;
 /**
  * Class AbstractSmartyPlugin
  * @package Thelia\Core\Template\Smarty
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  *
  * @deprecated this class is now present in module TheliaSmarty and will be removed in Thelia 2.3
  */

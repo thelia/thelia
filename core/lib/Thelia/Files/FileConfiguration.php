@@ -15,7 +15,7 @@ namespace Thelia\Files;
 /**
  * Class FileConfiguration
  * @package Thelia\Files
- * @author manuel raynaud <manu@thelia.net>
+ * @author manuel raynaud <manu@raynaud.io>
  */
 class FileConfiguration
 {

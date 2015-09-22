@@ -29,6 +29,11 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+(@max_id + 1, 'de_DE', 'Brand edit Seite - im Formular', '', ''),
+(@max_id + 2, 'de_DE', 'Sonderangebot Änderungsseite - javascript last call block', '', ''),
+(@max_id + 3, 'de_DE', 'API Seite - oben', '', ''),
+(@max_id + 4, 'de_DE', 'API Seite - unten', '', ''),
+(@max_id + 5, 'de_DE', 'API Seite - Löschungsformular', '', ''),
 (@max_id + 1, 'en_US', 'Brand edit page - in the form', '', ''),
 (@max_id + 2, 'en_US', 'Sale edit page - javascript last call block', '', ''),
 (@max_id + 3, 'en_US', 'Api page - at top', '', ''),

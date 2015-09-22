@@ -15,7 +15,7 @@ namespace Thelia\Core\Event\Module;
 /**
  * Class ModuleDeleteEvent
  * @package Thelia\Core\Event\Module
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class ModuleDeleteEvent extends ModuleEvent
 {

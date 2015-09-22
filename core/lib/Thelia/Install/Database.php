@@ -22,7 +22,7 @@ use Thelia\Log\Tlog;
 /**
  * Class Database
  * @package Thelia\Install
- * @author Manuel Raynaud <manu@thelia.net>
+ * @author Manuel Raynaud <manu@raynaud.io>
  */
 class Database
 {
