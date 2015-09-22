@@ -103,7 +103,7 @@
                                     </button>
                                     <ul class="dropdown-menu">
                                         {loop type="lang" name="ui-lang"}
-                                        <li><a href="{url path="{navigate to="current"}" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
+                                        <li><a href="{url current="1" lang={$CODE}}"><img src="{image file="assets/img/flags/{$CODE}.png"}" alt="{$TITLE}" /> {$CODE|ucfirst}</a></li>
                                         {/loop}
                                      </ul>
                                 </div>
@@ -137,7 +137,7 @@
                         {loop name="top-bar-search" type="auth" role="ADMIN" resource="admin.search"  access="VIEW"}
                         <form class="navbar-form-xs col-xs-8 visible-xs" action="{url path='/admin/search'}">
                             <div class="input-group">
-                                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}">
+                                <input type="text" class="form-control" id="search_term" name="search_term" placeholder="{intl l='Search'}" value="{trim($smarty.get.search_term)}">
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
                                 </span>
@@ -422,7 +422,7 @@
     <hr />
     <footer class="footer">
         <div class="container">
-            <p>{intl l='&copy; Thelia 2013'}
+            <p class="text-center">&copy; Thelia <time datetime="{'Y-m-d'|date}">{'Y'|date}</time>
             - <a href="http://www.openstudio.fr/" target="_blank">{intl l='Published by OpenStudio'}</a>
             - <a href="http://thelia.net/forum" target="_blank">{intl l='Thelia support forum'}</a>
             - <a href="http://thelia.net/modules" target="_blank">{intl l='Thelia contributions'}</a>
@@ -439,7 +439,7 @@
 	{* -- Javascript section ------------------------------------------------ *}
 
 	{block name="before-javascript-include"}{/block}
-    <script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.0.3.min.js"></script>
     <script>
         if (typeof jQuery == 'undefined') {
             {javascripts file='assets/js/libs/jquery.js'}

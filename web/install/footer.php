@@ -19,7 +19,7 @@
 <hr />
 <footer class="footer">
     <div class="container">
-        <p>&copy; Thelia 2013
+        <p>&copy; Thelia <?php echo date('Y'); ?>
             - <a href="http://www.openstudio.fr/" target="_blank">Édité par OpenStudio</a>
             - <a href="http://forum.thelia.net/" target="_blank">Forum Thelia</a>
             - <a href="http://contrib.thelia.net/" target="_blank">Contributions Thelia</a>

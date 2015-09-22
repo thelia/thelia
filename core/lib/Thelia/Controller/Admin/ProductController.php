@@ -294,14 +294,14 @@ class ProductController extends AbstractSeoCrudController
                 $defaultPseData = array(
                     "product_sale_element_id" => $saleElement->getId(),
                     "reference"               => $saleElement->getRef(),
-                    "price"                   => $productPrice->getPrice(),
-                    "price_with_tax"          => number_format($this->computePrice($productPrice->getPrice(), 'without_tax', $object), 2, '.', ''),
+                    "price"                   => $this->formatPrice($productPrice->getPrice()),
+                    "price_with_tax"          => $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)),
                     "use_exchange_rate"       => $productPrice->getFromDefaultCurrency() ? 1 : 0,
                     "currency"                => $productPrice->getCurrencyId(),
                     "weight"                  => $saleElement->getWeight(),
                     "quantity"                => $saleElement->getQuantity(),
-                    "sale_price"              => $productPrice->getPromoPrice(),
-                    "sale_price_with_tax"     => number_format($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object), 2, '.', ''),
+                    "sale_price"              => $this->formatPrice($productPrice->getPromoPrice()),
+                    "sale_price_with_tax"     => $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)),
                     "onsale"                  => $saleElement->getPromo() > 0 ? 1 : 0,
                     "isnew"                   => $saleElement->getNewness() > 0 ? 1 : 0,
                     "isdefault"               => $saleElement->getIsDefault() > 0 ? 1 : 0,
@@ -316,12 +316,12 @@ class ProductController extends AbstractSeoCrudController
 
                 $this->appendValue($combinationPseData, "product_sale_element_id", $saleElement->getId());
                 $this->appendValue($combinationPseData, "reference", $saleElement->getRef());
-                $this->appendValue($combinationPseData, "price", $productPrice->getPrice());
-                $this->appendValue($combinationPseData, "price_with_tax", number_format($this->computePrice($productPrice->getPrice(), 'without_tax', $object), 2, '.', ''));
+                $this->appendValue($combinationPseData, "price", $this->formatPrice($productPrice->getPrice()));
+                $this->appendValue($combinationPseData, "price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "weight", $saleElement->getWeight());
                 $this->appendValue($combinationPseData, "quantity", $saleElement->getQuantity());
-                $this->appendValue($combinationPseData, "sale_price", $productPrice->getPromoPrice());
-                $this->appendValue($combinationPseData, "sale_price_with_tax", number_format($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object), 2, '.', ''));
+                $this->appendValue($combinationPseData, "sale_price", $this->formatPrice($productPrice->getPromoPrice()));
+                $this->appendValue($combinationPseData, "sale_price_with_tax", $this->formatPrice($this->computePrice($productPrice->getPromoPrice(), 'without_tax', $object)));
                 $this->appendValue($combinationPseData, "onsale", $saleElement->getPromo() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isnew", $saleElement->getNewness() > 0 ? 1 : 0);
                 $this->appendValue($combinationPseData, "isdefault", $saleElement->getIsDefault() > 0 ? 1 : 0);
@@ -1262,6 +1262,15 @@ class ProductController extends AbstractSeoCrudController
      */
     public function priceCaclulator()
     {
+        return $this->priceCalculator();
+    }
+
+    /**
+     * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
+     * @since version 2.2
+     */
+    public function priceCalculator()
+    {
         $return_price = 0;
 
         $price      = floatval($this->getRequest()->query->get('price', 0));
@@ -1283,7 +1292,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $return_price));
+        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
     }
 
     /**
@@ -1321,7 +1330,7 @@ class ProductController extends AbstractSeoCrudController
             }
         }
 
-        return new JsonResponse(array('result' => $return_price));
+        return new JsonResponse(array('result' => $this->formatPrice($return_price)));
     }
 
     /**
@@ -1363,10 +1372,10 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return new JsonResponse(array(
-            'price_with_tax'         => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_with_tax),
-            'price_without_tax'      => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($price_without_tax),
-            'sale_price_with_tax'    => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_with_tax),
-            'sale_price_without_tax' => NumberFormat::getInstance($this->getRequest())->formatStandardNumber($sale_price_without_tax)
+            'price_with_tax'         => $this->formatPrice($price_with_tax),
+            'price_without_tax'      => $this->formatPrice($price_without_tax),
+            'sale_price_with_tax'    => $this->formatPrice($sale_price_with_tax),
+            'sale_price_without_tax' => $this->formatPrice($sale_price_without_tax)
         ));
     }
 
@@ -1400,8 +1409,7 @@ class ProductController extends AbstractSeoCrudController
             $return_price = $price * Currency::getDefaultCurrency()->getRate();
         }
 
-        // Format the number using '.', to perform further calculation
-        return NumberFormat::getInstance($this->getRequest())->formatStandardNumber($return_price);
+        return floatval($return_price);
     }
 
     /**
@@ -1789,5 +1797,14 @@ class ProductController extends AbstractSeoCrudController
         }
 
         return $status;
+    }
+
+    /**
+     * @param string $price
+     * @return float
+     */
+    protected function formatPrice($price)
+    {
+        return floatval(number_format($price, 6, '.', ''));
     }
 }

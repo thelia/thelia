@@ -517,22 +517,32 @@ class DataAccessFunctions extends AbstractSmartyPlugin
         $out = null;
 
         if (array_key_exists($cacheKey, self::$dataAccessCache)) {
-            return self::$dataAccessCache[$cacheKey];
-        }
-
-        if ($key !== null && $id !== null) {
-            if ($meta === null) {
-                $out = MetaDataQuery::getAllVal($key, (int) $id);
-            } else {
-                $out = MetaDataQuery::getVal($meta, $key, (int) $id);
-            }
+            $out = self::$dataAccessCache[$cacheKey];
         } else {
-            throw new \InvalidArgumentException("key and id attributes are required in meta access function");
+            if ($key !== null && $id !== null) {
+                if ($meta === null) {
+                    $out = MetaDataQuery::getAllVal($key, (int) $id);
+                } else {
+                    $out = MetaDataQuery::getVal($meta, $key, (int) $id);
+                }
+            } else {
+                throw new \InvalidArgumentException("key and id arguments are required in meta access function");
+            }
+
+            self::$dataAccessCache[$cacheKey] = $out;
         }
 
-        self::$dataAccessCache[$cacheKey] = $out;
+        if (!empty($params['out'])) {
+            $smarty->assign($params['out'], $out);
 
-        return $out;
+            return $out !== null ? true : false;
+        } else {
+            if (is_array($out)) {
+                throw new \InvalidArgumentException('The argument "out" is required if the meta value is an array');
+            }
+
+            return $out;
+        }
     }
 
     /**

@@ -172,7 +172,7 @@ class CartTableMap extends TableMap
         $this->addForeignKey('ADDRESS_DELIVERY_ID', 'AddressDeliveryId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('ADDRESS_INVOICE_ID', 'AddressInvoiceId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, 0);
+        $this->addColumn('DISCOUNT', 'Discount', 'DECIMAL', false, 16, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()

@@ -243,7 +243,7 @@
                         {/if}
                         <tr>
                             <td><p>{intl l="Total without tax"}</p></td>
-                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE} symbol=$orderCurrency}</p></td>
+                            <td><p>{format_money number={$TOTAL_AMOUNT - $POSTAGE_UNTAXED} symbol=$orderCurrency}</p></td>
                         </tr>
                         {strip}
                             {capture name="tax"}

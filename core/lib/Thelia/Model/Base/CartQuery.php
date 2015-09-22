@@ -74,7 +74,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     ChildCart findOneByAddressDeliveryId(int $address_delivery_id) Return the first ChildCart filtered by the address_delivery_id column
  * @method     ChildCart findOneByAddressInvoiceId(int $address_invoice_id) Return the first ChildCart filtered by the address_invoice_id column
  * @method     ChildCart findOneByCurrencyId(int $currency_id) Return the first ChildCart filtered by the currency_id column
- * @method     ChildCart findOneByDiscount(double $discount) Return the first ChildCart filtered by the discount column
+ * @method     ChildCart findOneByDiscount(string $discount) Return the first ChildCart filtered by the discount column
  * @method     ChildCart findOneByCreatedAt(string $created_at) Return the first ChildCart filtered by the created_at column
  * @method     ChildCart findOneByUpdatedAt(string $updated_at) Return the first ChildCart filtered by the updated_at column
  *
@@ -84,7 +84,7 @@ use Thelia\Model\Map\CartTableMap;
  * @method     array findByAddressDeliveryId(int $address_delivery_id) Return ChildCart objects filtered by the address_delivery_id column
  * @method     array findByAddressInvoiceId(int $address_invoice_id) Return ChildCart objects filtered by the address_invoice_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildCart objects filtered by the currency_id column
- * @method     array findByDiscount(double $discount) Return ChildCart objects filtered by the discount column
+ * @method     array findByDiscount(string $discount) Return ChildCart objects filtered by the discount column
  * @method     array findByCreatedAt(string $created_at) Return ChildCart objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCart objects filtered by the updated_at column
  *
