@@ -20,6 +20,7 @@ return array(
     'Don\'t forget to delete the web/install directory.' => 'Não esqueça de apagar a pasta web/install.',
     'English' => 'Inglês',
     'French' => 'Francês',
+    'German' => 'Alemão',
     'General information' => 'Informações gerais',
     'Go to back office' => 'Voltar para o painel administrativo',
     'Host :' => 'Host :',
@@ -61,4 +62,9 @@ return array(
     'Cache directory has been cleared' => 'A pasta de cache foi limpa',
     'Cache directory has not been cleared. Please manually delete content of cache directory.' => 'A pasta de cache nãp foi limpa. Por favor apague o conteúdo da pasta de cache manualmente.',
     'The update wizard directory will be removed' => 'A pasta do assistente de atualização foi removida',
+    "Refresh" => 'Atualizar',
+    'Published by OpenStudio' => 'Publicado por OpenStudio',
+    'Thelia support forum' => 'Fórum de suporte do Thelia',
+    'Thelia contributions' => 'Contribuidores do Thelia',
+    'Please wait ...' => 'Por favor aguarde ...'
 );
