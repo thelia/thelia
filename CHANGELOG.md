@@ -1,28 +1,35 @@
 # 2.0.10
+
 - Add 'step' to input type number to be able to create and edit weight slices price
 - Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
 - Allow relative path use with Tlog
 - Prevent obscur "[] this value cannot be null" messages.
 - Prevent short research and keep research in input
 - Fix Protocol-relative URL for HTTPS
+- Fix fatal error that occurs when store does not use the default order_configuration email
 
 # 2.0.9
+
 - Klik&Pay is no more a submodule
 
 # 2.0.8
+
 - Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
 - Force rediction on admin login even when connected to the front
 
 # 2.0.7
+
 - Change TokenProvider behavior to be more flexible
 - More secure csrf token
 - Fix ```templates/backOffice/default/includes/inner-form-toolbar.html``` change currency destination
 - Fix install bug if the admin password doesn't match
 
 # 2.0.6
+
 - Do not register previous url on XmlHttpRequest
 
 # 2.0.5
+
 - add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
 - 'freesans' is now the default font of PDF documents
 - fix bug with cart foreign key constraint #926
@@ -35,11 +42,13 @@
 - do not allow failure anymore on travis php5.6
 
 #2.0.4
+
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
 - product_sale_elements_id is added to order_product table.
 
 #2.0.3
+
 - Fix js syntax in order-delivery template
 - price are now save without any round.
  /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
@@ -47,14 +56,15 @@
 - Fix export template
 - [Tinymce]fix invisible thumb in file manager
 
-
 #2.0.3-beta2
+
 - fix update process
 - fix coupons trait
 - update schema adding new constraints on foreign keys
 - previous url is now saved in session. use ```{navigate to="previous"}``` in your template
 
 #2.0.3-beta
+
 - New coupon type: Free product if selected products are in the cart.
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
@@ -83,6 +93,7 @@
      - Added folders and contents data.
 
 #2.0.2
+
 - Coupon UI has been redesigned.
 - New coupon types:
     - Constant discount on selected products
@@ -113,6 +124,7 @@
 - template exists for managing google sitemap : sitemap.html
 
 #2.0.1
+
 - possibility to apply a permanent discount on a customer
 - display estimated shipping on cart page
 - export newsletter subscribers list
@@ -123,6 +135,7 @@
 - fix bugs : https://github.com/thelia/thelia/issues?milestone=4&page=1&state=closed
 
 #2.0.0
+
 - Coupons values are re-evaluated when a product quantity is changed in the shopping cart
 - You can declare new compilerPass in modules. See Thelia\Module\BaseModule::getCompilers phpDoc
 - Add ability to load assets from another template. See https://gist.github.com/lunika/9365180
@@ -147,6 +160,7 @@
 
 
 #2.0.0-RC1
+
 - Remove container from BaseAction.
 - fix sending mail on order creation
 - less files in default templates are already compiled in css.
@@ -161,6 +175,7 @@
 - we created a new github repo dedicated for modules : https://github.com/thelia-modules
 
 #2.0.0-beta4
+
 - Tinymce is now a dedicated module. You need to activate it.
 - Fix PDF creation. Bug #180
 - Fix many translation issues.
@@ -173,6 +188,7 @@
 - import module from Thelia 1 is available. It works from Thelia 1.4.2 : https://github.com/thelia-modules/importT1
 
 #2.0.0-beta3
+
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
 - when a category is deleted, all subcategories are deleted
 - delete products when categories are removed. Works only when the category is the default one for this product
