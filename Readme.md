@@ -17,7 +17,7 @@ A repository containing all thelia modules is available at this address : https:
 Requirements
 ------------
 
-* php 5.4
+* PHP 5.4
     * Required extensions :
         * PDO_Mysql
         * mcrypt
@@ -26,10 +26,11 @@ Requirements
         * curl
     * safe_mode off
     * memory_limit at least 128M, preferably 256.
-    * post_max_size 20M
-    * upload_max_filesize 2M
-* apache 2
-* mysql 5
+    * post\_max\_size 20M
+    * upload\_max\_filesize 2M
+    * date.timezone must be defined
+* Web Server Apache 2 or Nginx
+* MySQL 5
 
 
 ### MySQL 5.6
@@ -78,7 +79,7 @@ You can get the sources from git and then let composer install dependencies, or 
 ``` bash
 $ git clone --recursive https://github.com/thelia/thelia path
 $ cd path
-$ git checkout 2.1.1 (or 2.0.5)
+$ git checkout 2.2.0 (or 2.1.6)
 $ curl -sS https://getcomposer.org/installer | php
 $ php composer.phar install
 ```
@@ -86,7 +87,7 @@ $ php composer.phar install
 ### Using composer for both download and dependencies
 ``` bash
 $ curl -sS https://getcomposer.org/installer | php
-$ php composer.phar create-project thelia/thelia path/ 2.1.1 (or 2.0.5)
+$ php composer.phar create-project thelia/thelia path/ 2.2.0 (or 2.1.6)
 ```
 
 ## Install it
