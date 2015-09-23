@@ -1,5 +1,10 @@
 # 2.2.0
 
+- #1692 Fix amounts displayed on the PDF invoice when a postage with tax is used (fixes #1693 and #1694)
+- #1692 Fix translations for HookNavigation module
+- #1692 Update hooktest-template and hooktest-module to prevent thelia-installer conflicts
+- #1692 Update French, German, Italian translations
+- #1692 Add Turkish translation
 - #1688 Fix the permission messages in Thelia installer
 - #1686 Use createForm method for front forms ```thelia.coupon.code, thelia.order.delivery, thelia.order.payment```
 - #1667 Fix #1666 Display an error when trying to delete a customer which has orders
@@ -155,7 +160,25 @@
 - Default border color of images resized with resize_mode="border" is now transparent instead of opaque white.
 - The TemplateHelper class is deprecated. You should now use the thelia.template_helper service. TemplateHelperInterface has been introduced, so that modules may implement alternate versions
 
+
+# 2.1.6
+
+- Fix amounts displayed on the PDF invoice when a postage with tax is used (fixes #1693 and #1694).
+- Check virtualProducts of order before send mail ```mail_virtualproduct```
+- Add 'step' to input type number to be able to create and edit weight slices price
+- Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
+- Allow relative path use with Tlog
+- Prevent obscure "[] this value cannot be null" messages.
+- Prevent short research and keep research in input
+- Fix meta return array
+- Fix hook position
+- Fix Protocol-relative URL for HTTPS
+- Update Copyright
+- Fix translations and standardize Import and Export texts
+- Fix the prices precision
+
 # 2.1.5
+
 - Klik&Pay is no more a submodule
 - default category's parent is now 0
 - check specific role in security module instead of checking if a user is logged in
@@ -176,6 +199,9 @@
 # 2.1.3
 
 - Add ```\Thelia\Model\OrderProduct::setCartItemId``` and ```\Thelia\Model\OrderProduct::getCartItemId``` to remove the typo with ```cartIemId```
+- A notice is displayed when the product's template is changed
+- Security fix on authentication
+- Rename cookie related config variables. They were prefixed with "thelia_" on insert, but not in the code
 
 ## DEPRECATED
 
@@ -260,6 +286,7 @@
 - Added a fallback for template to use the default template. it's useful for modules that are used on a website that doesn't use the default template
 
 # 2.1.0-alpha2
+
 - Update Process :
     - update command has been removed and replaced by a php script and a web wizard. Read the UPDATE.md file
 - Templating :
@@ -302,6 +329,7 @@ parser's function and block with theirs arguments.
 - ```\Thelia\Cart\CartTrait``` trait is deprecated. Use ```\Thelia\Core\HttpFoundation\Session\Session::getSessionCart``` for retrieving a valid cart.
 
 #2.1.0-alpha1
+
 - Added sale management feature
 - Added `module_id` parameter to Area loop
 - Added "Shipping configuration" button to the delivery module list, with a warning if no shipping zone is assigned to the module.
@@ -333,33 +361,51 @@ parser's function and block with theirs arguments.
 - Added remember me feature for customer sign in process
 
 ##DEPRECATED
+
 Redirect methods are deprecated. You have now two ways for generating a redirect response :
 - Throwing a Thelia\Core\HttpKernel\Exception\RedirectException with a given URL
 - If you are in a controller, return an instance of \Symfony\Component\HttpFoundation\RedirectResponse
 - Never ever send a response. Only the HttpKernel class is allowed to do that.
 
 ### Deprecated methods :
+
 - Thelia\Controller\BaseController::redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
 
+
+# 2.0.10
+
+- Add 'step' to input type number to be able to create and edit weight slices price
+- Fix pagination infinite URL ; redirect on page 1 when changing products per page limit to avoid having no product on the page
+- Allow relative path use with Tlog
+- Prevent obscur "[] this value cannot be null" messages.
+- Prevent short research and keep research in input
+- Fix Protocol-relative URL for HTTPS
+- Fix fatal error that occurs when store does not use the default order_configuration email
+
 # 2.0.9
+
 - Klik&Pay is no more a submodule
 
 # 2.0.8
+
 - Allow relative path from thelia root for the file logger (by default log/log-thelia.txt)
 - Force rediction on admin login even when connected to the front
 
 # 2.0.7
+
 - Change TokenProvider behavior to be more flexible
 - More secure csrf token
 - Fix ```templates/backOffice/default/includes/inner-form-toolbar.html``` change currency destination
 - Fix install bug if the admin password doesn't match
 
 # 2.0.6
+
 - Do not register previous url on XmlHttpRequest
 
 # 2.0.5
+
 - add new function to smarty ```set_previous_url```. The parameter ```ignore_current``` allows you to ignore the current url and it will not be store as a previous url
 - 'freesans' is now the default font of PDF documents
 - fix bug with cart foreign key constraint #926
@@ -372,11 +418,13 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - do not allow failure anymore on travis php5.6
 
 #2.0.4
+
 - Updating stock when changing order : canceled status
 - order table is versionnable now.
 - product_sale_elements_id is added to order_product table.
 
 #2.0.3
+
 - Fix js syntax in order-delivery template
 - price are now save without any round.
  /!\ Check in your templates if you are using format_money or format_number function. Don't display prices directly.
@@ -385,12 +433,14 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - [Tinymce]fix invisible thumb in file manager
 
 #2.0.3-beta2
+
 - fix update process
 - fix coupons trait
 - update schema adding new constraints on foreign keys
 - previous url is now saved in session. use ```{navigate to="previous"}``` in your template
 
 #2.0.3-beta
+
 - New coupon type: Free product if selected products are in the cart.
 - New feature: Product Brands / Suppliers management
 - New 'brand' loop and substitution. product, image and document loop have been updated.
@@ -419,6 +469,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
      - Added folders and contents data.
 
 #2.0.2
+
 - Coupon UI has been redesigned.
 - New coupon types:
     - Constant discount on selected products
@@ -449,6 +500,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - template exists for managing google sitemap : sitemap.html
 
 #2.0.1
+
 - possibility to apply a permanent discount on a customer
 - display estimated shipping on cart page
 - export newsletter subscribers list
@@ -459,6 +511,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - fix bugs : https://github.com/thelia/thelia/issues?milestone=4&page=1&state=closed
 
 #2.0.0
+
 - Coupons values are re-evaluated when a product quantity is changed in the shopping cart
 - You can declare new compilerPass in modules. See Thelia\Module\BaseModule::getCompilers phpDoc
 - Add ability to load assets from another template. See https://gist.github.com/lunika/9365180
@@ -483,6 +536,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 
 
 #2.0.0-RC1
+
 - Remove container from BaseAction.
 - fix sending mail on order creation
 - less files in default templates are already compiled in css.
@@ -497,6 +551,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - we created a new github repo dedicated for modules : https://github.com/thelia-modules
 
 #2.0.0-beta4
+
 - Tinymce is now a dedicated module. You need to activate it.
 - Fix PDF creation. Bug #180
 - Fix many translation issues.
@@ -509,6 +564,7 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - import module from Thelia 1 is available. It works from Thelia 1.4.2 : https://github.com/thelia-modules/importT1
 
 #2.0.0-beta3
+
 - Coupon effect inputs are now more customisable (input text, select, ajax, etc.. are usable) and unlimited amount of input for coupon effect are now possible too
 - when a category is deleted, all subcategories are deleted
 - delete products when categories are removed. Works only when the category is the default one for this product

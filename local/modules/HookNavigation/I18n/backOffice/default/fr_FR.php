@@ -1,12 +1,10 @@
 <?php
 
 return array(
-    'Categories' => 'Catégories',
+    'Configuration correctly saved' => 'Configuration sauvegardée correctement',
+    'Configure hooknavigation' => 'Configurer Bloc Menu',
     'Home' => 'Accueil',
-    'No articles currently' => 'Encore aucun article',
-    'Toggle navigation' => 'Afficher/Masquer le menu',
-    'HookNavigation configuration' => 'Configuration de HookNavigation',
-
-    'Folder in footer body' => 'Dossier du pied de page',
-    'Folder in footer bottom' => 'Dossier sous le pied de page',
+    'HookNavigation configuration' => 'Configuration de Block Menu',
+    'Modules' => 'Modules',
+    'Select a folder' => 'Sélectionner un dossier',
 );

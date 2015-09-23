@@ -3,8 +3,8 @@
 return array(
     'Cart' => 'Warenkorb',
     'Checkout' => 'Zur Kasse',
-    'Log out!' => 'Abmelden !',
-    'Login' => 'Login',
-    'My Account' => 'Mein Konto',
+    'Log out!' => 'Log out!',
+    'Login' => 'Anmeldung',
+    'My Account' => 'Mein Kundenkonto',
     'Register' => 'Registrieren',
 );

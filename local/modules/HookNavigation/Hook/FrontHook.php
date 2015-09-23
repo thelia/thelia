@@ -41,7 +41,7 @@ class FrontHook extends BaseHook
             $event->add(array(
                 'id' => 'navigation-footer-body',
                 'class' => 'links',
-                'title' => $this->trans('Latest articles', array(), HookNavigation::MESSAGE_DOMAIN.'.fo.default'),
+                'title' => $this->trans('Latest articles', array(), HookNavigation::MESSAGE_DOMAIN),
                 'content' => $content,
             ));
         }

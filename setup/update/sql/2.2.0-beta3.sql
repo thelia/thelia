@@ -20,13 +20,13 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 ;
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
-    (@max_id + 1, 'de_DE', 'SEO Tab - Änderungs-Formular', '', ''),
-    (@max_id + 2, 'de_DE', 'Bestellung Bearbeitung - um Produkt Tabellenkopf', '', ''),
-    (@max_id + 3, 'de_DE', 'Produkt-Tabellenzeile', '', ''),
-    (@max_id + 4, 'de_DE', 'Administratoren Header', '', ''),
-    (@max_id + 5, 'de_DE', 'Administratoren Tabellenzeile', '', ''),
-    (@max_id + 6, 'de_DE', 'Erweiterte Konfiguration', '', ''),
-    (@max_id + 7, 'de_DE', 'Erweiterte Konfiguration - JavaScript', '', ''),
+    (@max_id + 1, 'de_DE', NULL, '', ''),
+    (@max_id + 2, 'de_DE', NULL, '', ''),
+    (@max_id + 3, 'de_DE', NULL, '', ''),
+    (@max_id + 4, 'de_DE', NULL, '', ''),
+    (@max_id + 5, 'de_DE', NULL, '', ''),
+    (@max_id + 6, 'de_DE', NULL, '', ''),
+    (@max_id + 7, 'de_DE', NULL, '', ''),
     (@max_id + 1, 'en_US', 'Tab SEO - update form', '', ''),
     (@max_id + 2, 'en_US', 'Order edit - order product table header', '', ''),
     (@max_id + 3, 'en_US', 'Order edit - order product table row', '', ''),

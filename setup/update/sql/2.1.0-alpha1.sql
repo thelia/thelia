@@ -3147,7 +3147,7 @@ INSERT INTO resource (`id`, `code`, `created_at`, `updated_at`) VALUES
 ;
 
 INSERT INTO resource_i18n (`id`, `locale`, `title`) VALUES
-  (@max_id+1, 'de_DE', NULL),
+  (@max_id+1, 'de_DE', 'Andockpunkte'),
   (@max_id+2, 'de_DE', 'Hooks Position'),
   (@max_id+3, 'de_DE', 'Sonderangebote Verwaltung'),
   (@max_id+4, 'de_DE', 'Administratorenliste'),
