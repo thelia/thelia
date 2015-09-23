@@ -1,3 +1,5 @@
+{config_load file='variables.conf'}
+
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='bo.default'}
 
@@ -178,16 +180,22 @@
 							                               {$selected[] = $FEATURE_AV_ID}
 							                            {/loop}
 
-								                        {capture "select_options"}
+								                        {capture name="select_options"}
 								                        {loop name="product-features-av" type="feature-availability" feature=$ID order="manual" backend_context="1" lang="$edit_language_id"}
 								                            <option value="{$ID}" {if in_array($ID, $selected)}selected="selected"{/if}>{$TITLE}</option>
 
 								                            {$options_count = $LOOP_COUNT} {* LOOP_COUNT is only available inside the loop ! *}
 								                        {/loop}
+
+                                                        {if $options_count > #maximum_product_attribute_select_size#}
+                                                            {$select_size = #maximum_product_attribute_select_size#}
+                                                        {else}
+                                                            {$select_size = $options_count}
+                                                        {/if}
 								                        {/capture}
 
 								                        <div class="input-form">
-								                            <select multiple="multiple" name="feature_value[{$ID}][]" id="feature_value_{$ID}" size="{$options_count}" class="form-control">
+								                            <select multiple="multiple" name="feature_value[{$ID}][]" id="feature_value_{$ID}" size="{$select_size}" class="form-control">
 								                            {$smarty.capture.select_options nofilter}
 								                            </select>
 								                        </div>
