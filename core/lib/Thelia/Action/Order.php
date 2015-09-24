@@ -26,7 +26,6 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\TheliaProcessException;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -34,8 +33,8 @@ use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\Lang as LangModel;
 use Thelia\Model\Map\OrderTableMap;
 use Thelia\Model\ModuleQuery;
-use Thelia\Model\Order as OrderModel;
 use Thelia\Model\Order as ModelOrder;
+use Thelia\Model\Order as OrderModel;
 use Thelia\Model\OrderAddress;
 use Thelia\Model\OrderAddressQuery;
 use Thelia\Model\OrderProduct;
@@ -178,8 +177,14 @@ class Order extends BaseAction implements EventSubscriberInterface
 
         $placedOrder = $sessionOrder->copy();
 
-        // Be sure to create a brand new order
+        // Be sure to create a brand new order, as copy raises the modified flag for all fields
+        // and will also copy order reference and id.
         $placedOrder->setId(null)->setRef(null)->setNew(true);
+
+        // Dates should be marked as not updated so that Propel will update them.
+        $placedOrder->resetModified(OrderTableMap::CREATED_AT);
+        $placedOrder->resetModified(OrderTableMap::UPDATED_AT);
+        $placedOrder->resetModified(OrderTableMap::VERSION_CREATED_AT);
 
         $placedOrder->setDispatcher($dispatcher);
 
