@@ -514,6 +514,34 @@
       <parameter name="log_created_by" value="true" />
     </behavior>
   </table>
+  <table name="image" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="source" required="true" size="50" type="VARCHAR" />
+    <column name="source_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column defaultValue="1" name="visible" required="true" type="TINYINT" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <index name="idx_image_source_source_id">
+      <index-column name="source" />
+      <index-column name="source_id" />
+    </index>
+    <index name="idx_image_source_source_id_position">
+      <index-column name="source" />
+      <index-column name="source_id" />
+      <index-column name="position" />
+    </index>
+    <behavior name="validate">
+      <parameter name="sourceRule" value="{column: source, validator: Regex, options: {pattern: &quot;/[a-z0-9\-]{3,50}/&quot;}}" />
+    </behavior>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
   <table name="product_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
