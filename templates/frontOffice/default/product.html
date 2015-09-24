@@ -284,12 +284,27 @@
                 {/capture}
             {/strip}
 
+            {strip}
+                {capture "document"}
+                    {ifloop rel="document"}
+                    <ul>
+                    {loop name="document" type="document" product=$ID visible="yes"}
+                        <li>
+                            <a href="{$DOCUMENT_URL}" title="{$TITLE}" target="_blank">{$TITLE}</a>
+                        </li>
+                    {/loop}
+                    </ul>
+                    {/ifloop}
+                {/capture}
+            {/strip}
+
             <section id="product-tabs" class="col-sm-12">
                 {hookblock name="product.additional" product="{product attr="id"}" fields="id,class,title,content"}
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="active" role="presentation"><a id="tab1" href="#description" data-toggle="tab" role="tab">{intl l="Description"}</a></li>
                     {if $smarty.capture.additional ne ""}<li role="presentation"><a id="tab2" href="#additional" data-toggle="tab" role="tab">{intl l="Additional Info"}</a></li>{/if}
                     {if $smarty.capture.brand_info ne ""}<li role="presentation"><a id="tab3" href="#brand_info" data-toggle="tab" role="tab">{intl l="Brand information"}</a></li>{/if}
+                    {if $smarty.capture.document ne ""}<li role="presentation"><a id="tab4" href="#document" data-toggle="tab" role="tab">{intl l="Documents"}</a></li>{/if}
                     {forhook rel="product.additional"}
                         <li role="presentation"><a id="tab{$id}" href="#{$id}" data-toggle="tab" role="tab">{$title}</a></li>
                     {/forhook}
@@ -306,6 +321,11 @@
                     {if $smarty.capture.brand_info ne ""}
                         <div class="tab-pane" id="brand_info" role="tabpanel" aria-labelledby="tab3">
                             {$smarty.capture.brand_info nofilter}
+                        </div>
+                    {/if}
+                    {if $smarty.capture.document ne ""}
+                        <div class="tab-pane" id="document" role="tabpanel" aria-labelledby="tab4">
+                            {$smarty.capture.document nofilter}
                         </div>
                     {/if}
                     {forhook rel="product.additional"}
