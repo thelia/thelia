@@ -19,6 +19,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ImageQuery;
 use Thelia\Model\ProductDocumentQuery;
 use Thelia\Model\ProductImage;
 use Thelia\Type\BooleanOrBothType;
@@ -68,7 +69,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * @var array Possible standard image sources
      */
-    protected $possible_sources = array('category', 'product', 'folder', 'content', 'module', 'brand');
+    protected $dedicateTable = array('category', 'product', 'folder', 'content', 'module', 'brand');
 
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
@@ -112,7 +113,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         );
 
         // Add possible image sources
-        foreach ($this->possible_sources as $source) {
+        foreach ($this->dedicateTable as $source) {
             $collection->addArgument(Argument::createIntTypeArgument($source));
         }
 
@@ -128,25 +129,32 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
      */
     protected function createSearchQuery($source, $object_id)
     {
-        $object = ucfirst($source);
+        if (in_array($source, $this->dedicateTable)) {
+            $object = ucfirst($source);
 
-        $ns = $this->getQueryNamespace();
+            $ns = $this->getQueryNamespace();
 
-        if ('\\' !== $ns[0]) {
-            $ns = '\\'.$ns;
-        }
+            if ('\\' !== $ns[0]) {
+                $ns = '\\'.$ns;
+            }
 
-        $queryClass   = sprintf("%s\\%sImageQuery", $ns, $object);
-        $filterMethod = sprintf("filterBy%sId", $object);
+            $queryClass   = sprintf("%s\\%sImageQuery", $ns, $object);
+            $filterMethod = sprintf("filterBy%sId", $object);
 
-        // xxxImageQuery::create()
-        $method = new \ReflectionMethod($queryClass, 'create');
-        $search = $method->invoke(null); // Static !
+            // xxxImageQuery::create()
+            $method = new \ReflectionMethod($queryClass, 'create');
+            $search = $method->invoke(null); // Static !
 
-        // $query->filterByXXX(id)
-        if (! is_null($object_id)) {
-            $method = new \ReflectionMethod($queryClass, $filterMethod);
-            $method->invoke($search, $object_id);
+            // $query->filterByXXX(id)
+            if (! is_null($object_id)) {
+                $method = new \ReflectionMethod($queryClass, $filterMethod);
+                $method->invoke($search, $object_id);
+            }
+
+        } else {
+            $search = ImageQuery::create()
+                ->filterBySource($source)
+                ->filterBySourceId($object_id);
         }
 
         $orders  = $this->getOrder();
@@ -207,7 +215,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $objectId   = $sourceId;
         } else {
             // Check for product="id" folder="id", etc. style arguments
-            foreach ($this->possible_sources as $source) {
+            foreach ($this->dedicateTable as $source) {
                 $argValue = $this->getArgValue($source);
 
                 if (! empty($argValue)) {
@@ -224,9 +232,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         }
 
         if ($search == null) {
-            throw new \InvalidArgumentException(
-                sprintf("Unable to find image source. Valid sources are %s", implode(',', $this->possible_sources))
-            );
+            throw new \InvalidArgumentException("Unable to find image source.");
         }
 
         return $search;
