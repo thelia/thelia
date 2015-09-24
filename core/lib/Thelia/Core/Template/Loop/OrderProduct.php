@@ -32,6 +32,11 @@ use Thelia\Type\BooleanOrBothType;
  * Class OrderProduct
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getOrder()
+ * @method int[] getId()
+ * @method bool|string getVirtual()
  */
 class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 {

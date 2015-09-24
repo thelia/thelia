@@ -19,6 +19,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Event\Image\ImageEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Model\ProductDocumentQuery;
+use Thelia\Model\ProductImage;
 use Thelia\Type\BooleanOrBothType;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
@@ -33,6 +35,28 @@ use Thelia\Log\Tlog;
  * The image loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method int getWidth()
+ * @method int getHeight()
+ * @method int getRotation()
+ * @method string getBackgroundColor()
+ * @method int getQuality()
+ * @method string getEffects()
+ * @method int getCategory()
+ * @method int getProduct()
+ * @method int getFolder()
+ * @method int getContent()
+ * @method string getSource()
+ * @method int getSourceId()
+ * @method string getQueryNamespace()
+ * @method bool getAllowZoom()
+ * @method bool getIgnoreProcessingErrors()
+ * @method string getResizeMode()
+ * @method string[] getOrder()
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -156,11 +180,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
     /**
      * Dynamically create the search query, and set the proper filter and order
      *
-     * @param  string        $object_type (returned) the a valid source identifier (@see $possible_sources)
-     * @param  string        $object_id   (returned) the ID of the source object
+     * @param  string        $objectType (returned) the a valid source identifier (@see $possible_sources)
+     * @param  string        $objectId   (returned) the ID of the source object
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery(&$object_type, &$object_id)
+    protected function getSearchQuery(&$objectType, &$objectId)
     {
         $search = null;
 
@@ -168,19 +192,19 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         $source = $this->getSource();
 
         if (! is_null($source)) {
-            $source_id = $this->getSourceId();
+            $sourceId = $this->getSourceId();
             $id = $this->getId();
 
-            if (is_null($source_id) && is_null($id)) {
+            if (is_null($sourceId) && is_null($id)) {
                 throw new \InvalidArgumentException(
                     "If 'source' argument is specified, 'id' or 'source_id' argument should be specified"
                 );
             }
 
-            $search = $this->createSearchQuery($source, $source_id);
+            $search = $this->createSearchQuery($source, $sourceId);
 
-            $object_type = $source;
-            $object_id   = $source_id;
+            $objectType = $source;
+            $objectId   = $sourceId;
         } else {
             // Check for product="id" folder="id", etc. style arguments
             foreach ($this->possible_sources as $source) {
@@ -191,8 +215,8 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
                     $search = $this->createSearchQuery($source, $argValue);
 
-                    $object_type = $source;
-                    $object_id   = $argValue;
+                    $objectType = $source;
+                    $objectId   = $argValue;
 
                     break;
                 }
@@ -213,6 +237,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
         // Select the proper query to use, and get the object type
         $this->objectType = $this->objectId = null;
 
+        /** @var ProductDocumentQuery $search */
         $search = $this->getSearchQuery($this->objectType, $this->objectId);
 
         /* manage translations */
@@ -258,16 +283,16 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 
         switch ($this->getResizeMode()) {
             case 'crop':
-                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
+                $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
                 break;
 
             case 'borders':
-                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
+                $resizeMode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
                 break;
 
             case 'none':
             default:
-                $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
+                $resizeMode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
 
         }
 
@@ -278,6 +303,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             $baseSourceFilePath = THELIA_ROOT . $baseSourceFilePath;
         }
 
+        /** @var ProductImage $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             // Setup required transformations
             if (! is_null($width)) {
@@ -286,7 +312,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             if (! is_null($height)) {
                 $event->setHeight($height);
             }
-            $event->setResizeMode($resize_mode);
+            $event->setResizeMode($resizeMode);
             if (! is_null($rotation)) {
                 $event->setRotation($rotation);
             }

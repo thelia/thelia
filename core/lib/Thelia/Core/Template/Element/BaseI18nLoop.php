@@ -21,6 +21,9 @@ use Thelia\Model\Tools\ModelCriteriaTools;
  * Class BaseI18nLoop, imlplemented by loops providing internationalized data, such as title, description, etc.
  *
  * @package Thelia\Core\Template\Element
+ *
+ * {@inheritdoc}
+ * @method string getLang()
  */
 abstract class BaseI18nLoop extends BaseLoop
 {
@@ -56,14 +59,14 @@ abstract class BaseI18nLoop extends BaseLoop
         /* manage translations */
 
         $this->locale = ModelCriteriaTools::getI18n(
-            $this->getBackend_context(),
+            $this->getBackendContext(),
             $this->getLang(),
             $search,
             $this->request->getSession()->getLang()->getLocale(),
             $columns,
             $foreignTable,
             $foreignKey,
-            $this->getForce_return()
+            $this->getForceReturn()
         );
     }
 }

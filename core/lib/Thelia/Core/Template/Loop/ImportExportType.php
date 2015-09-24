@@ -29,6 +29,11 @@ use Thelia\Type\TypeCollection;
  * Class ImportExportType
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <bperche@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getCategory()
+ * @method string[] getOrder()
  */
 abstract class ImportExportType extends BaseI18nLoop implements PropelSearchLoopInterface
 {

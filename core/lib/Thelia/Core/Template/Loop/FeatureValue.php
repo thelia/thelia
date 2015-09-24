@@ -32,6 +32,15 @@ use Thelia\Type;
  * Class FeatureValue
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getFeature()
+ * @method int getProduct()
+ * @method string[] getFreeText()
+ * @method int[] getFeatureAvailability()
+ * @method bool getExcludeFeatureAvailability()
+ * @method bool getExcludeFreeText()
+ * @method string[] getOrder()
  */
 class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -86,7 +95,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByProductId($product, Criteria::EQUAL);
         }
 
-        if (null !== $featureAvailability = $this->getFeature_availability()) {
+        if (null !== $featureAvailability = $this->getFeatureAvailability()) {
             $search->filterByFeatureAvId($featureAvailability, Criteria::IN);
         }
 
@@ -94,7 +103,7 @@ class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByFreeTextValue($featureAvailability, Criteria::IN);
         }
 
-        if (true === $excludeFeatureAvailability = $this->getExclude_feature_availability()) {
+        if (true === $excludeFeatureAvailability = $this->getExcludeFeatureAvailability()) {
             $search->filterByFeatureAvId(null, Criteria::ISNULL);
         }
 

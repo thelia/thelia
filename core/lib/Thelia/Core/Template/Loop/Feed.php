@@ -24,6 +24,10 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method string getUrl()
+ * @method int getTimeout()
  */
 class Feed extends BaseLoop implements ArraySearchLoopInterface
 {

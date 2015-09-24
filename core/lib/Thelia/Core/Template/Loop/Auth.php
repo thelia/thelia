@@ -28,6 +28,12 @@ use Thelia\Type\TypeCollection;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method string[] getRole()
+ * @method string[] getResource()
+ * @method int[] getModule()
+ * @method string[] getAccess()
  */
 class Auth extends BaseLoop implements ArraySearchLoopInterface
 {

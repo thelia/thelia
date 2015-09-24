@@ -28,6 +28,8 @@ use Thelia\Type;
  * @package Thelia\Core\Template\Loop
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
  */
 class Template extends BaseLoop implements ArraySearchLoopInterface
 {

@@ -23,6 +23,7 @@ use Thelia\Model\TaxRuleCountryQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Model\TaxQuery;
+use Thelia\Model\Tax as TaxModel;
 
 /**
  *
@@ -32,6 +33,14 @@ use Thelia\Model\TaxQuery;
  * Class Tax
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getExclude()
+ * @method int[] getTaxRule()
+ * @method int[] getExcludeTaxRule()
+ * @method int getCountry()
+ * @method string[] getOrder()
  */
 class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -79,7 +88,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 
         $country = $this->getCountry();
 
-        $taxRule = $this->getTax_rule();
+        $taxRule = $this->getTaxRule();
         if (null !== $taxRule && null !== $country) {
             $search->filterByTaxRuleCountry(
                 TaxRuleCountryQuery::create()
@@ -90,7 +99,7 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
             );
         }
 
-        $excludeTaxRule = $this->getExclude_tax_rule();
+        $excludeTaxRule = $this->getExcludeTaxRule();
         if (null !== $excludeTaxRule && null !== $country) {
             $excludedTaxes = TaxRuleCountryQuery::create()
                 ->filterByCountryId($country, Criteria::EQUAL)
@@ -130,13 +139,14 @@ class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var TaxModel $tax */
         foreach ($loopResult->getResultDataCollection() as $tax) {
             $loopResultRow = new LoopResultRow($tax);
 
             $loopResultRow
                 ->set("ID", $tax->getId())
                 ->set("TYPE", $tax->getType())
-                ->set("ESCAPED_TYPE", \Thelia\Model\Tax::escapeTypeName($tax->getType()))
+                ->set("ESCAPED_TYPE", TaxModel::escapeTypeName($tax->getType()))
                 ->set("REQUIREMENTS", $tax->getRequirements())
                 ->set("IS_TRANSLATED", $tax->getVirtualColumn('IS_TRANSLATED'))
                 ->set("LOCALE", $this->locale)

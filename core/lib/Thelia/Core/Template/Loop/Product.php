@@ -42,6 +42,37 @@ use Thelia\Type\TypeCollection;
  * Class Product
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method bool getComplex()
+ * @method string[] getRef()
+ * @method int[] getCategory()
+ * @method int[] getBrand()
+ * @method int[] getSale()
+ * @method int[] getCategoryDefault()
+ * @method bool getNew()
+ * @method bool getPromo()
+ * @method float getMinPrice()
+ * @method float getMaxPrice()
+ * @method int getMinStock()
+ * @method float getMinWeight()
+ * @method float getMaxWeight()
+ * @method bool getWithPrevNextInfo()
+ * @method bool|string getWithPrevNextVisible()
+ * @method bool getCurrent()
+ * @method bool getCurrentCategory()
+ * @method bool getDepth()
+ * @method bool|string getVirtual()
+ * @method bool|string getVisible()
+ * @method int getCurrency()
+ * @method string getTitle()
+ * @method string[] getOrder()
+ * @method int[] getExclude()
+ * @method int[] getExcludeCategory()
+ * @method int[] getFeatureAvailability()
+ * @method string[] getFeatureValues()
+ * @method string[] getAttributeNonStrictMatch()
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -323,7 +354,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ->set("SHOW_ORIGINAL_PRICE", $display_initial_price)
         ;
 
-        if ($this->getBackend_context() || $this->getWithPrevNextInfo()) {
+        if ($this->getBackendContext() || $this->getWithPrevNextInfo()) {
             $visible = $this->getWithPrevNextVisible();
 
             // Find previous and next category
@@ -569,7 +600,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             ;
         }
 
-        $current_category = $this->getCurrent_category();
+        $current_category = $this->getCurrentCategory();
 
         if ($current_category === true) {
             $search->filterByCategory(
@@ -607,7 +638,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $exclude_category = $this->getExclude_category();
+        $exclude_category = $this->getExcludeCategory();
 
         if (!is_null($exclude_category)) {
             $search
@@ -619,11 +650,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
 
         $new        = $this->getNew();
         $promo      = $this->getPromo();
-        $min_stock  = $this->getMin_stock();
-        $min_weight = $this->getMin_weight();
-        $max_weight = $this->getMax_weight();
-        $min_price  = $this->getMin_price();
-        $max_price  = $this->getMax_price();
+        $min_stock  = $this->getMinStock();
+        $min_weight = $this->getMinWeight();
+        $max_weight = $this->getMaxWeight();
+        $min_price  = $this->getMinPrice();
+        $max_price  = $this->getMaxPrice();
 
         if ($complex) {
             if ($new === true) {
@@ -671,7 +702,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     ->where('NOT ISNULL(`is_max_weight`.ID)');
             }
 
-            $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
+            $attributeNonStrictMatch = $this->getAttributeNonStrictMatch();
 
             if ($attributeNonStrictMatch != '*') {
                 if ($attributeNonStrictMatch == 'none') {
@@ -903,11 +934,11 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         // ... to get the DISPLAY_INITIAL_PRICE column !
         $search->withColumn('`SalePriceDisplay`.DISPLAY_INITIAL_PRICE', 'display_initial_price');
 
-        $feature_availability = $this->getFeature_availability();
+        $feature_availability = $this->getFeatureAvailability();
 
         $this->manageFeatureAv($search, $feature_availability);
 
-        $feature_values = $this->getFeature_values();
+        $feature_values = $this->getFeatureValues();
 
         $this->manageFeatureValue($search, $feature_values);
 

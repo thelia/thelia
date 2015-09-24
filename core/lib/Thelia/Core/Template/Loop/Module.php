@@ -36,6 +36,17 @@ use Thelia\Type\TypeCollection;
  * Class Module
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getProfile()
+ * @method int[] getArea()
+ * @method string[] getCode()
+ * @method string[] getModuleType()
+ * @method string[] getModuleCategory()
+ * @method int[] getExclude()
+ * @method bool|string getActive()
+ * @method string[] getOrder()
  */
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -134,13 +145,13 @@ class Module extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterByCode($code, Criteria::IN);
         }
 
-        $moduleType = $this->getModule_type();
+        $moduleType = $this->getModuleType();
 
         if (null !== $moduleType) {
             $search->filterByType($moduleType, Criteria::IN);
         }
 
-        $moduleCategory = $this->getModule_category();
+        $moduleCategory = $this->getModuleCategory();
 
         if (null !== $moduleCategory) {
             $search->filterByCategory($moduleCategory, Criteria::IN);

@@ -26,6 +26,12 @@ use Thelia\Model\AccessoryQuery;
  * Class Accessory
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getProduct()
+ * @method string[] getOrder()
+ *
+ * @link http://doc.thelia.net/en/documentation/loop/accessory.html
  */
 class Accessory extends Product
 {

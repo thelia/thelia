@@ -25,6 +25,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
  * Class ProductSaleElementsImage
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <benjamin@thelia.net>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProductSaleElementsId()
+ * @method int{] getProductImageId()
+ * @method string[] getOrder()
  */
 class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInterface
 {

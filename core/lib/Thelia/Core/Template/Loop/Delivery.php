@@ -28,6 +28,9 @@ use Thelia\Module\Exception\DeliveryException;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <manu@raynaud.io>
  * @author Etienne Roudeix <eroudeix@gmail.com>
+ *
+ * {@inheritdoc}
+ * @method int getCountry()
  */
 class Delivery extends BaseSpecificModule
 {

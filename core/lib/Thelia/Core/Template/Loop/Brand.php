@@ -33,6 +33,15 @@ use Thelia\Type\TypeCollection;
  * Class Brand
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int getProduct()
+ * @method bool|string getVisible()
+ * @method string getTitle()
+ * @method bool getCurrent()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -84,6 +93,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
         ];
     }
 
+    /**
+     * @param BrandQuery $search
+     * @param string $searchTerm
+     * @param string $searchIn
+     * @param string $searchCriteria
+     */
     public function doSearch(&$search, $searchTerm, $searchIn, $searchCriteria)
     {
         $search->_and();

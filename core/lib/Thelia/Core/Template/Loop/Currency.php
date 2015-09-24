@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\CurrencyQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type\EnumListType;
+use Thelia\Model\Currency as CurrencyModel;
 
 /**
  *
@@ -31,6 +32,12 @@ use Thelia\Type\EnumListType;
  * Class Currency
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[]  getExclude()
+ * @method bool getDefaultOnly()
+ * @method string[] getOrder()
  */
 class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -83,9 +90,9 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $default_only = $this->getDefaultOnly();
+        $defaultOnly = $this->getDefaultOnly();
 
-        if ($default_only === true) {
+        if ($defaultOnly === true) {
             $search->filterByByDefault(true);
         }
 
@@ -144,13 +151,12 @@ class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
             }
         }
 
-        /* perform search */
-
         return $search;
     }
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var CurrencyModel $currency */
         foreach ($loopResult->getResultDataCollection() as $currency) {
             $loopResultRow = new LoopResultRow($currency);
             $loopResultRow

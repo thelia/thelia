@@ -35,6 +35,15 @@ use Thelia\Type;
  * Class Customer
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method bool getCurrent()
+ * @method string getRef()
+ * @method bool getReseller()
+ * @method int getSponsor()
+ * @method bool|string getNewsletter()
+ * @method string[] getOrder()
  */
 class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {

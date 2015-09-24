@@ -20,6 +20,7 @@ use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Model\OrderStatusQuery;
+use Thelia\Model\OrderStatus as OrderStatusModel;
 
 /**
  *
@@ -29,6 +30,9 @@ use Thelia\Model\OrderStatusQuery;
  * Class OrderStatus
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * @method int[] getId()
+ * @method string getCode()
  */
 class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -69,6 +73,7 @@ class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var OrderStatusModel $orderStatus */
         foreach ($loopResult->getResultDataCollection() as $orderStatus) {
             $loopResultRow = new LoopResultRow($orderStatus);
             $loopResultRow->set("ID", $orderStatus->getId())

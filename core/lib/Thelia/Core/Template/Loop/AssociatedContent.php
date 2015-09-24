@@ -27,6 +27,12 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  * Class AssociatedContent
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * {@inheritdoc}
+ * @method int getProduct()
+ * @method int getCategory()
+ * @method int[] getExcludeProduct()
+ * @method int[] getExcludeCategory()
  */
 class AssociatedContent extends Content
 {
@@ -65,33 +71,35 @@ class AssociatedContent extends Content
         }
 
         if ($product !== null) {
+            /** @var ProductAssociatedContentQuery $search */
             $search = ProductAssociatedContentQuery::create();
 
             $search->filterByProductId($product, Criteria::EQUAL);
         } elseif ($category !== null) {
+            /** @var CategoryAssociatedContentQuery $search */
             $search = CategoryAssociatedContentQuery::create();
 
             $search->filterByCategoryId($category, Criteria::EQUAL);
         }
 
-        $exclude_product = $this->getExcludeProduct();
+        $excludeProduct = $this->getExcludeProduct();
 
         // If we have to filter by product, find all products assigned to this product, and filter by found IDs
-        if (null !== $exclude_product) {
+        if (null !== $excludeProduct) {
             // Exclude all contents related to the given product
             $search->filterById(
-                ProductAssociatedContentQuery::create()->filterByProductId($exclude_product)->select('product_id')->find(),
+                ProductAssociatedContentQuery::create()->filterByProductId($excludeProduct)->select('product_id')->find(),
                 Criteria::NOT_IN
             );
         }
 
-        $exclude_category = $this->getExcludeCategory();
+        $excludeCategory = $this->getExcludeCategory();
 
         // If we have to filter by category, find all contents assigned to this category, and filter by found IDs
-        if (null !== $exclude_category) {
+        if (null !== $excludeCategory) {
             // Exclure tous les attribut qui sont attachés aux templates indiqués
             $search->filterById(
-                CategoryAssociatedContentQuery::create()->filterByProductId($exclude_category)->select('category_id')->find(),
+                CategoryAssociatedContentQuery::create()->filterByProductId($excludeCategory)->select('category_id')->find(),
                 Criteria::NOT_IN
             );
         }

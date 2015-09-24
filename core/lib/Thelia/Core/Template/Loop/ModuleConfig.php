@@ -29,6 +29,12 @@ use Thelia\Model\ModuleQuery;
  * Class ModuleConfig
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method string getModule()
+ * @method string getVariable()
+ * @method string getDefaultValue()
+ * @method string getLocale()
  */
 class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
 {

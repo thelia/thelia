@@ -25,6 +25,12 @@ use Propel\Runtime\ActiveQuery\Criteria;
  * Class ProductSaleElementsDocument
  * @package Thelia\Core\Template\Loop
  * @author Benjamin Perche <benjamin@thelia.net>
+ *
+ * {@inheritdoc}
+ * @method int[] getId()
+ * @method int[] getProductSaleElementsId()
+ * @method int{] getProductDocumentId()
+ * @method string[] getOrder()
  */
 class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopInterface
 {

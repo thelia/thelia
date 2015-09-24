@@ -34,6 +34,14 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getCategory()
+ * @method int getDepth()
+ * @method bool getNeedCountChild()
+ * @method bool|string getVisible()
+ * @method int[] getExclude()
+ * @method string[] getOrder()
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
@@ -59,9 +67,9 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $max_level, $exclude, &$resultsList)
+    protected function buildCategoryTree($parent, $visible, $level, $previousLevel, $maxLevel, $exclude, &$resultsList)
     {
-        if ($level > $max_level) {
+        if ($level > $maxLevel) {
             return;
         }
 
@@ -105,7 +113,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
         $results = $search->find();
 
-        $need_count_child = $this->getNeedCountChild();
+        $needCountChild = $this->getNeedCountChild();
 
         foreach ($results as $result) {
             $row = array(
@@ -118,13 +126,13 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
                 'PREV_LEVEL' => $previousLevel,
             );
 
-            if ($need_count_child) {
+            if ($needCountChild) {
                 $row['CHILD_COUNT'] = $result->countChild();
             }
 
             $resultsList[] = $row;
 
-            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $max_level, $exclude, $resultsList);
+            $this->buildCategoryTree($result->getId(), $visible, 1 + $level, $level, $maxLevel, $exclude, $resultsList);
         }
     }
 

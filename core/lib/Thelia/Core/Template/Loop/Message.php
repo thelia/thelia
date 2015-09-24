@@ -21,6 +21,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\MessageQuery;
 use Thelia\Type\BooleanOrBothType;
+use Thelia\Model\Message as MessageModel;
 
 /**
  * Message loop, to access messageuration variables
@@ -33,6 +34,13 @@ use Thelia\Type\BooleanOrBothType;
  *
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ * {@inheritdoc}
+ * @method int getId()
+ * @method int[] getExclude()
+ * @method string getVariable()
+ * @method bool|string getHidden()
+ * @method bool|string getSecured()
  */
 class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 {
@@ -94,6 +102,7 @@ class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
+        /** @var MessageModel $result */
         foreach ($loopResult->getResultDataCollection() as $result) {
             $loopResultRow = new LoopResultRow($result);
 
