@@ -273,6 +273,10 @@ class XmlFileLoader extends FileLoader
 
     protected function parseHook($id, $hook, $file, $type)
     {
+        if (!array_key_exists('scope', $hook)) {
+            $hook['scope'] = 'request';
+        }
+
         $definition = $this->parseService($id, $hook, $file);
         if (null !== $definition) {
             if (null !== $type) {
