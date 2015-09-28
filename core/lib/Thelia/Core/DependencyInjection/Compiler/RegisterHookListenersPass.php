@@ -135,8 +135,9 @@ class RegisterHookListenersPass implements CompilerPassInterface
         }
 
         // test if method exists
+        $validMethod = true;
         if (! $this->isValidHookMethod($class, $event['method'], $hook->getBlock())) {
-            return;
+            $validMethod = false;
         }
 
         // test if hook is already registered in ModuleHook
@@ -147,6 +148,18 @@ class RegisterHookListenersPass implements CompilerPassInterface
             ->findOne();
 
         if (null === $moduleHook) {
+            if (!$validMethod) {
+                Tlog::getInstance()->addAlert(
+                    sprintf(
+                        "Module [%s] could not be registered hook [%s], method [%s] is not reachable.",
+                        $module,
+                        $event['event'],
+                        $event['method']
+                    )
+                );
+                return;
+            }
+
             // Assign the module to the hook only if it has not been "deleted"
             $ignoreCount = IgnoredModuleHookQuery::create()
                 ->filterByHook($hook)
@@ -167,11 +180,26 @@ class RegisterHookListenersPass implements CompilerPassInterface
                     ->save();
             }
         } else {
-            // Update hook if id was changed in the definition
-            if ($moduleHook->getClassname() != $id) {
+            if (!$validMethod) {
+                Tlog::getInstance()->addAlert(
+                    sprintf(
+                        "Module [%s] could not use hook [%s], method [%s] is not reachable anymore.",
+                        $module,
+                        $event['event'],
+                        $event['method']
+                    )
+                );
+
                 $moduleHook
-                    ->setClassname($id)
+                    ->setHookActive(false)
                     ->save();
+            } else {
+                // Update hook if id was changed in the definition
+                if ($moduleHook->getClassname() != $id) {
+                    $moduleHook
+                        ->setClassname($id)
+                        ->save();
+                }
             }
         }
     }
