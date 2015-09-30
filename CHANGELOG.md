@@ -1,5 +1,8 @@
 # 2.3.0-alpha1
 
+- #1706 Fix form coupon not found in frontOffice order invoice
+- #1700 Fix source priority in ```ParserContext::getForm```
+- #1588 Add document tab in frontOffice product page
 - #1668 Add height limit for the select fields in the Attributes and Features tab of the admin product edit page
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
