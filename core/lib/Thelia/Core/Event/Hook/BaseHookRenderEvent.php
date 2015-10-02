@@ -22,22 +22,23 @@ use Symfony\Component\EventDispatcher\Event;
 class BaseHookRenderEvent extends Event
 {
     /** @var  string $code the code of the hook */
-    protected $code = array();
+    protected $code = null;
 
-    /** @var  array $arguments an array of arguments passed to the template engine function  */
+    /** @var  array $arguments an array of arguments passed to the template engine function */
     protected $arguments = array();
+
 
     public function __construct($code, array $arguments = array())
     {
-        $this->setName($code);
-        $this->setArguments($arguments);
+        $this->code = $code;
+        $this->arguments = $arguments;
     }
 
     /**
      * Set the code of the hook
      *
-     * @param  string          $code
-     * @return BaseRenderEvent $this
+     * @param  string $code
+     * @return $this
      */
     public function setCode($code)
     {
@@ -59,8 +60,8 @@ class BaseHookRenderEvent extends Event
     /**
      * Set all arguments
      *
-     * @param  array           $arguments
-     * @return BaseRenderEvent $this
+     * @param  array $arguments
+     * @return $this
      */
     public function setArguments($arguments)
     {
@@ -82,9 +83,9 @@ class BaseHookRenderEvent extends Event
     /**
      * add or replace an argument
      *
-     * @param  string          $key
-     * @param  string          $value
-     * @return HookRenderEvent $this
+     * @param  string $key
+     * @param  string $value
+     * @return $this
      */
     public function setArgument($key, $value)
     {
@@ -95,7 +96,7 @@ class BaseHookRenderEvent extends Event
 
     /**
      * Get an argument
-     * @param  string      $key
+     * @param  string $key
      * @param  string|null $default
      * @return mixed|null  the value of the argument or `$default` if it not exists
      */

@@ -14,6 +14,7 @@ namespace Thelia\Core\Hook;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\Template\Assets\AssetResolverInterface;
@@ -40,10 +41,18 @@ use Thelia\Module\BaseModule;
  */
 abstract class BaseHook
 {
+
+    const INJECT_TEMPLATE_METHOD_NAME = "insertTemplate";
+
     /**
      * @var BaseModule
      */
     public $module = null;
+
+    /**
+     * @var array list of templates automatically injected
+     */
+    protected $templates = [];
 
     /**
      * @var \Thelia\Core\Template\ParserInterface
@@ -79,6 +88,50 @@ abstract class BaseHook
 
     /** @var Currency $currency */
     protected $currency = null;
+
+
+    /**
+     * This function is called when hook uses the automatic insert template.
+     *
+     *@param HookRenderEvent $event
+     */
+    public function insertTemplate(HookRenderEvent $event)
+    {
+        $code = $event->getName();
+
+        if (array_key_exists($code, $this->templates)) {
+            $templates = explode(';', $this->templates[$code]);
+
+            foreach ($templates as $template) {
+                list($type, $filepath) = $this->getTemplateParams($template);
+
+                if ("render" === $type) {
+                    $event->add($this->render($filepath, $event->getArguments()));
+                    continue;
+                }
+
+                if ("dump" === $type) {
+                    $event->add($this->render($filepath));
+                    continue;
+                }
+
+                if ("css" === $type) {
+                    $event->add($this->addCSS($filepath));
+                    continue;
+                }
+
+                if ("js" === $type) {
+                    $event->add($this->addJS($filepath));
+                    continue;
+                }
+
+                if (method_exists($this, $type)) {
+                    $this->{$type}($filepath, $event->getArguments());
+                }
+            }
+        }
+
+    }
 
     /**
      * helper function allowing you to render a template using a template engine
@@ -352,4 +405,49 @@ abstract class BaseHook
 
         return $this->lang;
     }
+
+    /**
+     * Add a new template for automatic render
+     *
+     * @param string $hookCode the code of the hook (the name of the event used to render) : 'hook.{type}.{hook code}'
+     * @param string $value list of the template to render or add.
+     *                      eg: 'render:mytemplate.html;css:assets/css/mycss.css;js:assets/js/myjs.js'
+     */
+    public function addTemplate($hookCode, $value)
+    {
+        if (array_key_exists($hookCode, $this->templates)) {
+            throw new \InvalidArgumentException(sprintf("The hook '%s' is already used in this class.", $hookCode));
+        }
+
+        $this->templates[$hookCode] = $value;
+    }
+
+    /**
+     * @return array templates
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param $template
+     * @return array
+     */
+    protected function getTemplateParams($template)
+    {
+        $templateParams = explode(':', $template);
+
+        if (count($templateParams) > 1) {
+            $type = $templateParams[0];
+            $filepath = $templateParams[1];
+        } else {
+            $type = 'render';
+            $filepath = $templateParams[0];
+        }
+
+        return [$type, $filepath];
+    }
+
+
 }

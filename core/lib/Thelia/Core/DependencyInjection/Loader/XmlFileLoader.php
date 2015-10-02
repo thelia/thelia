@@ -50,6 +50,7 @@ use Thelia\Model\Map\ImportTableMap;
  */
 class XmlFileLoader extends FileLoader
 {
+    const DEFAULT_HOOK_CLASS = "Thelia\\Core\\Hook\\DefaultHook";
     /**
      * Loads an XML file.
      *
@@ -275,6 +276,10 @@ class XmlFileLoader extends FileLoader
     {
         if (!array_key_exists('scope', $hook)) {
             $hook['scope'] = 'request';
+        }
+
+        if (! isset($hook['class'])) {
+            $hook['class'] = self::DEFAULT_HOOK_CLASS;
         }
 
         $definition = $this->parseService($id, $hook, $file);
