@@ -20,6 +20,7 @@ use Thelia\Core\Event\Hook\ModuleHookToggleActivationEvent;
 use Thelia\Core\Event\Hook\ModuleHookUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Core\Hook\BaseHook;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -126,10 +127,11 @@ class ModuleHookController extends AbstractCrudController
         $data = [
             'id'        => $object->getId(),
             'hook_id'   => $object->getHookId(),
-            'module_id'   => $object->getModuleId(),
+            'module_id' => $object->getModuleId(),
             'classname' => $object->getClassname(),
             'method'    => $object->getMethod(),
             'active'    => $object->getActive(),
+            'templates' => $object->getTemplates(),
         ];
 
         return $this->createForm(AdminForm::MODULE_HOOK_MODIFICATION, 'form', $data);
@@ -174,7 +176,9 @@ class ModuleHookController extends AbstractCrudController
                 ->setHookId($formData['hook_id'])
                 ->setClassname($formData['classname'])
                 ->setMethod($formData['method'])
-                ->setActive($formData['active']);
+                ->setActive($formData['active'])
+                ->setTemplates($formData['templates'])
+            ;
         }
 
         return $event;
@@ -360,7 +364,7 @@ class ModuleHookController extends AbstractCrudController
             return $response;
         }
 
-        $result = [];
+        $result = [BaseHook::INJECT_TEMPLATE_METHOD_NAME];
 
         $moduleHooks = ModuleHookQuery::create()
             ->filterByModuleId($moduleId)
