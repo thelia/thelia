@@ -2152,6 +2152,7 @@ CREATE TABLE `module_hook`
     `hook_active` TINYINT(1) NOT NULL,
     `module_active` TINYINT(1) NOT NULL,
     `position` INTEGER NOT NULL,
+    `templates` TEXT,
     PRIMARY KEY (`id`),
     INDEX `idx_module_hook_active` (`active`),
     INDEX `fk_module_hook_module_id_idx` (`module_id`),
