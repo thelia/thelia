@@ -63,6 +63,7 @@
                                 {assign "lastOrderDate" ''}
                                 {assign "lastOrderAmount" ''}
                                 {assign "lastOrderCurrency" ''}
+                                {$hasOrders = false}
 
                                 {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
                                 {assign "lastOrderDate" "{format_date date=$CREATE_DATE}"}
@@ -70,6 +71,7 @@
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
                                 {assign "lastOrderCurrency" $SYMBOL}
                                 {/loop}
+                                {$hasOrders = true}
                                 {/loop}
 
                                 <tr>
@@ -94,17 +96,24 @@
                                     <td>
                                         {$lastOrderCurrency} {$lastOrderAmount}
                                     </td>
-                                    <td>
-                                        <div class="btn-group">
 
+                                    <td class="actions">
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.customer" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID }"><i class="glyphicon glyphicon-edit"></i></a>
+                                                <a title="{intl l='Edit this customer'}" href="{url path='/admin/customer/update' customer_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
                                             {loop type="auth" name="can_send_mail" role="ADMIN" resource="admin.customer" access="VIEW"}
-                                                <a class="btn btn-default btn-xs" title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
+                                                <a title="{intl l="Send a mail to this customer"}" href="mailto:{$EMAIL}"><span class="glyphicon glyphicon-envelope"></span></a>
                                             {/loop}
                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.customer" access="DELETE"}
-                                                <a class="btn btn-default btn-xs customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {if $hasOrders}
+                                                <a class="disabled" title="{intl l='This customer has orders, and can\'t be deleted.'}"  href="#"><span class="glyphicon glyphicon-question-sign"></span></a>
+                                            {else}
+                                                <a class="customer-delete" title="{intl l='Delete this customer and all his orders'}"  href="#delete_customer_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/if}
                                             {/loop}
                                         </div>
                                     </td>
@@ -160,10 +169,12 @@
                                     <td><span class="label label-{#$orderStatusLabel#}">{$orderStatus}</span></td>
 
                                     <td>
-                                        <div class="btn-group">
-
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.order" access="UPDATE"}
-                                                <a class="btn btn-default btn-xs" title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                                <a title="{intl l='Edit this order'}" href="{url path="/admin/order/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
                                             {/loop}
                                         </div>
                                     </td>
@@ -187,7 +198,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Category title"}</th>
-
+                                <th class="text-center">
+                                    {intl l='Online'}
+                                </th>
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -198,11 +211,35 @@
                                 <td>{$ID}</td>
                                 <td></td>
                                 <td class="object-title"><a href="{url path="/admin/categories/update" category_id={$ID}}">{$TITLE}</a></td>
-                                <td class="actions">
+                                <td class="text-center">
                                     {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
-                                        <a class="btn btn-default btn-xs" title="{intl l='Edit this category'}" href="{url path="/admin/categories/update" category_id={$ID}}"><span class="glyphicon glyphicon-edit"></span></a>
+                                        <div class="make-switch switch-small categoryVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                        </div>
                                     {/loop}
+
+                                    {elseloop rel="can_change"}
+                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                            <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                        </div>
+                                    {/elseloop}
                                 </td>
+                                 <td class="actions">
+                                     <div class="btn-toolbar btn toolbar-primary">
+                                         <span class="glyphicon glyphicon-cog"></span>
+                                     </div>
+                                     <div class="toolbar-options hidden">
+                                         <a title="{intl l='Browse this category'}" href="{url path='admin/categories' category_id=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
+
+                                         {loop type="auth" name="can_change" role="ADMIN" resource="admin.category" access="UPDATE"}
+                                            <a title="{intl l='Edit this category'}" href="{url path='/admin/categories/update' category_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                         {/loop}
+
+                                         {loop type="auth" name="can_delete" role="ADMIN" resource="admin.category" access="DELETE"}
+                                            <a class="category-delete" title="{intl l='Delete this category and all its contents'}"  href="#category_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                         {/loop}
+                                     </div>
+                                  </td>
                             </tr>
                             {/loop}
                             </tbody>
@@ -224,7 +261,12 @@
                                 <th></th>
                                 <th>{intl l="Reference"}</th>
                                 <th>{intl l="Product title"}</th>
-
+                                 <th class="text-right">
+                                    {intl l='Price'}
+                                 </th>
+                                 <th class="text-center">
+                                    {intl l='Online'}
+                                 </th>
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -232,27 +274,58 @@
                             <tbody>
                             {loop type="product" name="product-search" visible="*" search_mode="sentence" search_term=trim($smarty.get.search_term) search_in="ref,title"}
                                 {$id_product=$ID}
-                                <tr>
-                                    <td>{$ID}</td>
+                                 <tr>
+                                     <td>{$ID}</td>
 
-                                    <td>
-                                        {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
-                                            <a href="{url path='/admin/products/update' product_id=$id_product}" title="{intl l='Edit this product'}">
-                                                <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
-                                            </a>
-                                        {/loop}
+                                     <td>
+                                     {loop type="image" name="cat_image" source="product" source_id="$ID" limit="1" width="50" height="50" resize_mode="crop" backend_context="1"}
+                                       <a href="{url path='/admin/products/update' product_id=$OBJECT_ID page=$page}" title="{intl l='Edit this product'}">
+                                         <img src="{$IMAGE_URL nofilter}" alt="{$TITLE}" />
+                                       </a>
+                                     {/loop}
+                                     </td>
 
-                                    <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">{$REF}</a></td>
+                                     <td class="object-title">
+                                         <a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$REF}</a>
+                                         {if $VIRTUAL}<span class="glyphicon glyphicon-download text-muted" title="{intl l='Virtual product'}"></span>{/if}
+                                     </td>
 
-                                    <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
+                                     <td class="object-title"><a href="{url path='/admin/products/update' product_id=$ID page=$page}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
+
+                                     {hook name="products.row" location="product_list_row" product_id={$ID} }
+
+                                     <td class="text-right"><a href="{url path='/admin/products/update' product_id=$ID page=$page current_tab='prices'}" title="{intl l='Edit Prices'}">{format_money number=$BEST_PRICE symbol=$currency_symbol}</a></td>
+
+                                     <td class="text-center">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
+                                                <div class="make-switch switch-small productVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="productVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/loop}
+
+                                            {elseloop rel="can_change"}
+                                                <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                </div>
+                                            {/elseloop}
+                                     </td>
 
 
-                                    <td class="actions">
-                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                        {/loop}
-                                    </td>
-                                </tr>
+                                     <td class="actions">
+                                         <div class="btn-toolbar btn toolbar-primary">
+                                             <span class="glyphicon glyphicon-cog"></span>
+                                         </div>
+                                         <div class="toolbar-options hidden">
+                                             {loop type="auth" name="can_change" role="ADMIN" resource="admin.product" access="UPDATE"}
+                                                <a title="{intl l='Edit this product'}" href="{url path='/admin/products/update' product_id=$ID page=$page}"><span class="glyphicon glyphicon-edit"></span></a>
+                                             {/loop}
+
+                                             {loop type="auth" name="can_delete" role="ADMIN" resource="admin.product" access="DELETE"}
+                                                   <a class="product-delete" title="{intl l='Delete this product'}"  href="#product_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                             {/loop}
+                                         </div>
+                                      </td>
+                                 </tr>
 
                             {/loop}
                             </tbody>
@@ -273,7 +346,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Folder title"}</th>
-
+                                <th class="text-center">
+                                    {intl l='Online'}
+                                </th>
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -287,11 +362,35 @@
 
                                     <td class="object-title"><a href="{url path="/admin/folders/update/%id" id=$ID}">{$TITLE}</a></td>
 
+                                    <td class="text-center">
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
+                                            <div class="make-switch switch-small folderVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox" class="folderVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                            </div>
+                                        {/loop}
+
+                                        {elseloop rel="can_change"}
+                                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                            </div>
+                                        {/elseloop}
+                                    </td>
 
                                     <td class="actions">
-                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                        {/loop}
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
+                                            <a title="{intl l='Browse this folder'}" href="{url path='admin/folders' folder_id=$ID}"><span class="glyphicon glyphicon-folder-open"></span></a>
+
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.folder" access="UPDATE"}
+                                                <a title="{intl l='Edit this folder'}" href="{url path="/admin/folders/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.folder" access="DELETE"}
+                                                <a class="folder-delete" title="{intl l='Delete this folder'}"  href="#folder_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
                                     </td>
                                 </tr>
 
@@ -314,7 +413,9 @@
                                 <th>{intl l="ID"}</th>
                                 <th></th>
                                 <th>{intl l="Content title"}</th>
-
+                                <th class="text-center">
+                                    {intl l='Online'}
+                                </th>
                                 <th class="actions">{intl l="Actions"}</th>
                             </tr>
                             </thead>
@@ -328,11 +429,33 @@
 
                                     <td class="object-title"><a href="{url path="/admin/content/update/%id" id=$ID}">{$TITLE}</a></td>
 
+                                    <td class="text-center">
+                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
+                                            <div class="make-switch switch-small contentVisibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox" class="contentVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                            </div>
+                                        {/loop}
+
+                                        {elseloop rel="can_change"}
+                                            <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                            </div>
+                                        {/elseloop}
+                                    </td>
 
                                     <td class="actions">
-                                        {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs" title="{intl l='Edit this content'}" href="{url path="/admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
-                                        {/loop}
+                                        <div class="btn-toolbar btn toolbar-primary">
+                                            <span class="glyphicon glyphicon-cog"></span>
+                                        </div>
+                                        <div class="toolbar-options hidden">
+                                            {loop type="auth" name="can_change" role="ADMIN" resource="admin.content" access="UPDATE"}
+                                                <a title="{intl l='Edit this content'}" href="{url path="/admin/content/update/%id" id=$ID}"><span class="glyphicon glyphicon-edit"></span></a>
+                                            {/loop}
+
+                                            {loop type="auth" name="can_delete" role="ADMIN" resource="admin.content" access="DELETE"}
+                                                <a class="content-delete" title="{intl l='Delete this content'}"  href="#content_delete_dialog" data-id="{$ID}" data-toggle="modal"><span class="glyphicon glyphicon-trash"></span></a>
+                                            {/loop}
+                                        </div>
                                     </td>
                                 </tr>
 
@@ -355,13 +478,88 @@
     </div>
 </div>
 
-{* Delete confirmation dialog *}
+{* -- Delete category confirmation dialog ----------------------------------- *}
 
-{capture "delete_customer_dialog"}
-<input type="hidden" name="page" value="{$page}">
-<input type="hidden" name="customer_id" id="delete_customer_id">
+{capture "category_delete_dialog"}
+    <input type="hidden" name="category_id" id="category_delete_id" value="" />
 
-{hook name="customer.delete-form" location="customer_delete_form" }
+    {hook name="category.delete-form" location="category_delete_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "category_delete_dialog"
+    dialog_title    = {intl l="Delete category"}
+    dialog_message  = {intl l="Do you really want to delete this category and all its content ?"}
+
+    form_action         = {token_url path='/admin/categories/delete'}
+    form_content        = {$smarty.capture.category_delete_dialog nofilter}
+}
+
+{* -- Delete product confirmation dialog ------------------------------------ *}
+
+{capture name="product_delete_dialog"}
+    <input type="hidden" name="product_id" id="product_delete_id" value="" />
+
+    {hook name="product.delete-form" location="product_delete_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "product_delete_dialog"
+    dialog_title    = {intl l="Delete product"}
+    dialog_message  = {intl l="Do you really want to delete this product and all it's components (images, documents)?<br>This can't be canceled."}
+
+    form_action         = {token_url path='/admin/products/delete'}
+    form_content        = {$smarty.capture.product_delete_dialog nofilter}
+}
+
+{* -- Delete category confirmation dialog ----------------------------------- *}
+
+{capture name="folder_delete_dialog"}
+    <input type="hidden" name="folder_id" id="folder_delete_id" value="" />
+
+    {hook name="folder.delete-form" location="folder_delete_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "folder_delete_dialog"
+    dialog_title    = {intl l="Delete folder"}
+    dialog_message  = {intl l="Do you really want to delete this folder and all its content ?"}
+
+form_action         = {token_url path='/admin/folders/delete'}
+form_content        = {$smarty.capture.folder_delete_dialog nofilter}
+}
+
+{* -- Delete category confirmation dialog ----------------------------------- *}
+
+{capture name="content_delete_dialog"}
+    <input type="hidden" name="content_id" id="content_delete_id" value="" />
+
+    {hook name="content.delete-form" location="folder_content_form" }
+{/capture}
+
+{include
+    file = "includes/generic-confirm-dialog.html"
+
+    dialog_id       = "content_delete_dialog"
+    dialog_title    = {intl l="Delete content"}
+    dialog_message  = {intl l="Do you really want to delete this content ?"}
+
+form_action         = {token_url path='/admin/content/delete'}
+form_content        = {$smarty.capture.content_delete_dialog nofilter}
+}
+
+{* -- Delete customer confirmation dialog ----------------------------------- *}
+{capture "customer_delete_dialog"}
+    <input type="hidden" name="page" value="{$page}">
+    <input type="hidden" name="customer_id" id="delete_customer_id">
+
+    {hook name="customer.delete-form" location="customer_delete_form" }
 {/capture}
 
 {include
@@ -373,19 +571,88 @@
 
     form_action         = {token_url path='/admin/customer/delete'}
     form_content        = {$smarty.capture.delete_customer_dialog nofilter}
-    form_id             = "form_delete_customer"
+    form_id             = "customer_delete_dialog"
 }
 
 {/block}
 
 {block name="javascript-initialization"}
+ {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
 
-<script type="text/javascript">
-    $(".customer-delete").click(function(){
-        $("#delete_customer_id").val($(this).attr("data-id"));
-    });
-</script>
+    {javascripts file='assets/js/bootstrap-editable/bootstrap-editable.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    {javascripts file='assets/js/jquery.typewatch.js'}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+    <script>
+        $(function() {
 
+            // Set proper category ID in delete from
+            $('a.category-delete').click(function(ev) {
+                $('#category_delete_id').val($(this).data('id'));
+            });
+
+            // Set proper product ID in delete from
+            $('a.product-delete').click(function(ev) {
+                $('#product_delete_id').val($(this).data('id'));
+            });
+
+            // Set proper folder ID in delete from
+            $('a.folder-delete').click(function(ev) {
+                $('#folder_delete_id').val($(this).data('id'));
+            });
+
+            // Set proper content ID in delete from
+            $('a.content-delete').click(function(ev) {
+                $('#content_delete_id').val($(this).data('id'));
+            });
+
+            {* Toggle object visibility *}
+
+            $(".categoryVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                   url : "{url path='admin/categories/toggle-online'}",
+                   data : {
+                       category_id : $(this).data('id'),
+                       action : 'visibilityToggle'
+                   }
+                });
+            });
+
+            $(".productVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                   url : "{url path='admin/products/toggle-online'}",
+                   data : {
+                       product_id : $(this).data('id'),
+                       action : 'visibilityToggle'
+                   }
+                });
+            });
+
+            $(".folderVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                    url : "{url path='admin/folders/toggle-online'}",
+                    data : {
+                        folder_id : $(this).data('id'),
+                        action : 'visibilityToggle'
+                    }
+                });
+            });
+
+            $(".contentVisibleToggle").on('switch-change', function(event, data) {
+                $.ajax({
+                    url : "{url path='admin/content/toggle-online'}",
+                    data : {
+                        content_id : $(this).data('id'),
+                        action : 'visibilityToggle'
+                    }
+                });
+            });
+        });
+    </script>
 {/block}
 
 {block name="javascript-last-call"}
