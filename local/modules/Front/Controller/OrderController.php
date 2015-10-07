@@ -534,7 +534,8 @@ class OrderController extends BaseFrontController
         $flagQuantity = 0;
         foreach ($cartItems as $cartItem) {
             $pse = $cartItem->getProductSaleElements();
-            if ($pse->getQuantity() <= 0) {
+            $product = $cartItem->getProduct();
+            if ($pse->getQuantity() <= 0 && $product->getVirtual() !== 1) {
                 $flagQuantity = 1;
             }
         }
