@@ -106,15 +106,42 @@ DROP TABLE IF EXISTS `country`;
 CREATE TABLE `country`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
     `isocode` VARCHAR(4) NOT NULL,
     `isoalpha2` VARCHAR(2),
     `isoalpha3` VARCHAR(4),
+    `has_states` TINYINT DEFAULT 0,
+    `need_zip_code` TINYINT DEFAULT 0,
+    `zip_code_format` VARCHAR(20),
     `by_default` TINYINT DEFAULT 0,
     `shop_country` TINYINT(1) DEFAULT 0 NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_country_by_default` (`by_default`)
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- state
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state`;
+
+CREATE TABLE `state`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `visible` TINYINT DEFAULT 0 NOT NULL,
+    `isocode` VARCHAR(4) NOT NULL,
+    `country_id` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `FI_state_country_id` (`country_id`),
+    CONSTRAINT `fk_state_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -497,6 +524,7 @@ CREATE TABLE `address`
     `zipcode` VARCHAR(10) NOT NULL,
     `city` VARCHAR(255) NOT NULL,
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
     `is_default` TINYINT DEFAULT 0,
@@ -506,6 +534,7 @@ CREATE TABLE `address`
     INDEX `idx_address_customer_id` (`customer_id`),
     INDEX `idx_address_customer_title_id` (`title_id`),
     INDEX `idx_address_country_id` (`country_id`),
+    INDEX `FI_address_state_id` (`state_id`),
     CONSTRAINT `fk_address_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
@@ -519,6 +548,11 @@ CREATE TABLE `address`
     CONSTRAINT `fk_address_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_address_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
@@ -786,11 +820,13 @@ CREATE TABLE `order_address`
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_order_address_customer_title_id_idx` (`customer_title_id`),
     INDEX `fk_order_address_country_id_idx` (`country_id`),
+    INDEX `FI_order_address_state_id` (`state_id`),
     CONSTRAINT `fk_order_address_customer_title_id`
         FOREIGN KEY (`customer_title_id`)
         REFERENCES `customer_title` (`id`)
@@ -799,6 +835,11 @@ CREATE TABLE `order_address`
     CONSTRAINT `fk_order_address_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_order_address_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET='utf8';
@@ -2356,6 +2397,24 @@ CREATE TABLE `country_i18n`
     CONSTRAINT `country_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `country` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+-- ---------------------------------------------------------------------
+-- state_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `state_i18n`;
+
+CREATE TABLE `state_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `state_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `state` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

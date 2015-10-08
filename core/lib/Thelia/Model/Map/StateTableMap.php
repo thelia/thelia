@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\OrderAddress;
-use Thelia\Model\OrderAddressQuery;
+use Thelia\Model\State;
+use Thelia\Model\StateQuery;
 
 
 /**
- * This class defines the structure of the 'order_address' table.
+ * This class defines the structure of the 'state' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\OrderAddressQuery;
  * (i.e. if it's a text column type).
  *
  */
-class OrderAddressTableMap extends TableMap
+class StateTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.OrderAddressTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.StateTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class OrderAddressTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'order_address';
+    const TABLE_NAME = 'state';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\OrderAddress';
+    const OM_CLASS = '\\Thelia\\Model\\State';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.OrderAddress';
+    const CLASS_DEFAULT = 'Thelia.Model.State';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 16;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,92 +68,51 @@ class OrderAddressTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 16;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'order_address.ID';
+    const ID = 'state.ID';
 
     /**
-     * the column name for the CUSTOMER_TITLE_ID field
+     * the column name for the VISIBLE field
      */
-    const CUSTOMER_TITLE_ID = 'order_address.CUSTOMER_TITLE_ID';
+    const VISIBLE = 'state.VISIBLE';
 
     /**
-     * the column name for the COMPANY field
+     * the column name for the ISOCODE field
      */
-    const COMPANY = 'order_address.COMPANY';
-
-    /**
-     * the column name for the FIRSTNAME field
-     */
-    const FIRSTNAME = 'order_address.FIRSTNAME';
-
-    /**
-     * the column name for the LASTNAME field
-     */
-    const LASTNAME = 'order_address.LASTNAME';
-
-    /**
-     * the column name for the ADDRESS1 field
-     */
-    const ADDRESS1 = 'order_address.ADDRESS1';
-
-    /**
-     * the column name for the ADDRESS2 field
-     */
-    const ADDRESS2 = 'order_address.ADDRESS2';
-
-    /**
-     * the column name for the ADDRESS3 field
-     */
-    const ADDRESS3 = 'order_address.ADDRESS3';
-
-    /**
-     * the column name for the ZIPCODE field
-     */
-    const ZIPCODE = 'order_address.ZIPCODE';
-
-    /**
-     * the column name for the CITY field
-     */
-    const CITY = 'order_address.CITY';
-
-    /**
-     * the column name for the PHONE field
-     */
-    const PHONE = 'order_address.PHONE';
-
-    /**
-     * the column name for the CELLPHONE field
-     */
-    const CELLPHONE = 'order_address.CELLPHONE';
+    const ISOCODE = 'state.ISOCODE';
 
     /**
      * the column name for the COUNTRY_ID field
      */
-    const COUNTRY_ID = 'order_address.COUNTRY_ID';
-
-    /**
-     * the column name for the STATE_ID field
-     */
-    const STATE_ID = 'order_address.STATE_ID';
+    const COUNTRY_ID = 'state.COUNTRY_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'order_address.CREATED_AT';
+    const CREATED_AT = 'state.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'order_address.UPDATED_AT';
+    const UPDATED_AT = 'state.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
+
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations.
+     *
+     * @var string
+     */
+    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -162,12 +121,12 @@ class OrderAddressTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CustomerTitleId', 'Company', 'Firstname', 'Lastname', 'Address1', 'Address2', 'Address3', 'Zipcode', 'City', 'Phone', 'Cellphone', 'CountryId', 'StateId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'customerTitleId', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'countryId', 'stateId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID, OrderAddressTableMap::CUSTOMER_TITLE_ID, OrderAddressTableMap::COMPANY, OrderAddressTableMap::FIRSTNAME, OrderAddressTableMap::LASTNAME, OrderAddressTableMap::ADDRESS1, OrderAddressTableMap::ADDRESS2, OrderAddressTableMap::ADDRESS3, OrderAddressTableMap::ZIPCODE, OrderAddressTableMap::CITY, OrderAddressTableMap::PHONE, OrderAddressTableMap::CELLPHONE, OrderAddressTableMap::COUNTRY_ID, OrderAddressTableMap::STATE_ID, OrderAddressTableMap::CREATED_AT, OrderAddressTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CUSTOMER_TITLE_ID', 'COMPANY', 'FIRSTNAME', 'LASTNAME', 'ADDRESS1', 'ADDRESS2', 'ADDRESS3', 'ZIPCODE', 'CITY', 'PHONE', 'CELLPHONE', 'COUNTRY_ID', 'STATE_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'customer_title_id', 'company', 'firstname', 'lastname', 'address1', 'address2', 'address3', 'zipcode', 'city', 'phone', 'cellphone', 'country_id', 'state_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        self::TYPE_PHPNAME       => array('Id', 'Visible', 'Isocode', 'CountryId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'visible', 'isocode', 'countryId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(StateTableMap::ID, StateTableMap::VISIBLE, StateTableMap::ISOCODE, StateTableMap::COUNTRY_ID, StateTableMap::CREATED_AT, StateTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'VISIBLE', 'ISOCODE', 'COUNTRY_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'visible', 'isocode', 'country_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -177,12 +136,12 @@ class OrderAddressTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CustomerTitleId' => 1, 'Company' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Address1' => 5, 'Address2' => 6, 'Address3' => 7, 'Zipcode' => 8, 'City' => 9, 'Phone' => 10, 'Cellphone' => 11, 'CountryId' => 12, 'StateId' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'customerTitleId' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'countryId' => 12, 'stateId' => 13, 'createdAt' => 14, 'updatedAt' => 15, ),
-        self::TYPE_COLNAME       => array(OrderAddressTableMap::ID => 0, OrderAddressTableMap::CUSTOMER_TITLE_ID => 1, OrderAddressTableMap::COMPANY => 2, OrderAddressTableMap::FIRSTNAME => 3, OrderAddressTableMap::LASTNAME => 4, OrderAddressTableMap::ADDRESS1 => 5, OrderAddressTableMap::ADDRESS2 => 6, OrderAddressTableMap::ADDRESS3 => 7, OrderAddressTableMap::ZIPCODE => 8, OrderAddressTableMap::CITY => 9, OrderAddressTableMap::PHONE => 10, OrderAddressTableMap::CELLPHONE => 11, OrderAddressTableMap::COUNTRY_ID => 12, OrderAddressTableMap::STATE_ID => 13, OrderAddressTableMap::CREATED_AT => 14, OrderAddressTableMap::UPDATED_AT => 15, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CUSTOMER_TITLE_ID' => 1, 'COMPANY' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'ADDRESS1' => 5, 'ADDRESS2' => 6, 'ADDRESS3' => 7, 'ZIPCODE' => 8, 'CITY' => 9, 'PHONE' => 10, 'CELLPHONE' => 11, 'COUNTRY_ID' => 12, 'STATE_ID' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'customer_title_id' => 1, 'company' => 2, 'firstname' => 3, 'lastname' => 4, 'address1' => 5, 'address2' => 6, 'address3' => 7, 'zipcode' => 8, 'city' => 9, 'phone' => 10, 'cellphone' => 11, 'country_id' => 12, 'state_id' => 13, 'created_at' => 14, 'updated_at' => 15, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Visible' => 1, 'Isocode' => 2, 'CountryId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'visible' => 1, 'isocode' => 2, 'countryId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        self::TYPE_COLNAME       => array(StateTableMap::ID => 0, StateTableMap::VISIBLE => 1, StateTableMap::ISOCODE => 2, StateTableMap::COUNTRY_ID => 3, StateTableMap::CREATED_AT => 4, StateTableMap::UPDATED_AT => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'VISIBLE' => 1, 'ISOCODE' => 2, 'COUNTRY_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'visible' => 1, 'isocode' => 2, 'country_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -195,26 +154,16 @@ class OrderAddressTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('order_address');
-        $this->setPhpName('OrderAddress');
-        $this->setClassName('\\Thelia\\Model\\OrderAddress');
+        $this->setName('state');
+        $this->setPhpName('State');
+        $this->setClassName('\\Thelia\\Model\\State');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
-        $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS1', 'Address1', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS2', 'Address2', 'VARCHAR', false, 255, null);
-        $this->addColumn('ADDRESS3', 'Address3', 'VARCHAR', false, 255, null);
-        $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', true, 10, null);
-        $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
-        $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
-        $this->addColumn('CELLPHONE', 'Cellphone', 'VARCHAR', false, 20, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
+        $this->addColumn('ISOCODE', 'Isocode', 'VARCHAR', true, 4, null);
         $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
-        $this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -224,11 +173,10 @@ class OrderAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('OrderRelatedByInvoiceOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'invoice_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByInvoiceOrderAddressId');
-        $this->addRelation('OrderRelatedByDeliveryOrderAddressId', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'delivery_order_address_id', ), 'RESTRICT', 'RESTRICT', 'OrdersRelatedByDeliveryOrderAddressId');
+        $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'state_id', ), 'RESTRICT', 'RESTRICT', 'Addresses');
+        $this->addRelation('OrderAddress', '\\Thelia\\Model\\OrderAddress', RelationMap::ONE_TO_MANY, array('id' => 'state_id', ), 'RESTRICT', 'RESTRICT', 'OrderAddresses');
+        $this->addRelation('StateI18n', '\\Thelia\\Model\\StateI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'StateI18ns');
     } // buildRelations()
 
     /**
@@ -241,8 +189,18 @@ class OrderAddressTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to state     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                StateI18nTableMap::clearInstancePool();
+            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -300,7 +258,7 @@ class OrderAddressTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? OrderAddressTableMap::CLASS_DEFAULT : OrderAddressTableMap::OM_CLASS;
+        return $withPrefix ? StateTableMap::CLASS_DEFAULT : StateTableMap::OM_CLASS;
     }
 
     /**
@@ -314,21 +272,21 @@ class OrderAddressTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (OrderAddress object, last column rank)
+     * @return array (State object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = OrderAddressTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = OrderAddressTableMap::getInstanceFromPool($key))) {
+        $key = StateTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = StateTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + OrderAddressTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + StateTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = OrderAddressTableMap::OM_CLASS;
+            $cls = StateTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            OrderAddressTableMap::addInstanceToPool($obj, $key);
+            StateTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -351,8 +309,8 @@ class OrderAddressTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = OrderAddressTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = OrderAddressTableMap::getInstanceFromPool($key))) {
+            $key = StateTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = StateTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -361,7 +319,7 @@ class OrderAddressTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                OrderAddressTableMap::addInstanceToPool($obj, $key);
+                StateTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -382,37 +340,17 @@ class OrderAddressTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(OrderAddressTableMap::ID);
-            $criteria->addSelectColumn(OrderAddressTableMap::CUSTOMER_TITLE_ID);
-            $criteria->addSelectColumn(OrderAddressTableMap::COMPANY);
-            $criteria->addSelectColumn(OrderAddressTableMap::FIRSTNAME);
-            $criteria->addSelectColumn(OrderAddressTableMap::LASTNAME);
-            $criteria->addSelectColumn(OrderAddressTableMap::ADDRESS1);
-            $criteria->addSelectColumn(OrderAddressTableMap::ADDRESS2);
-            $criteria->addSelectColumn(OrderAddressTableMap::ADDRESS3);
-            $criteria->addSelectColumn(OrderAddressTableMap::ZIPCODE);
-            $criteria->addSelectColumn(OrderAddressTableMap::CITY);
-            $criteria->addSelectColumn(OrderAddressTableMap::PHONE);
-            $criteria->addSelectColumn(OrderAddressTableMap::CELLPHONE);
-            $criteria->addSelectColumn(OrderAddressTableMap::COUNTRY_ID);
-            $criteria->addSelectColumn(OrderAddressTableMap::STATE_ID);
-            $criteria->addSelectColumn(OrderAddressTableMap::CREATED_AT);
-            $criteria->addSelectColumn(OrderAddressTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(StateTableMap::ID);
+            $criteria->addSelectColumn(StateTableMap::VISIBLE);
+            $criteria->addSelectColumn(StateTableMap::ISOCODE);
+            $criteria->addSelectColumn(StateTableMap::COUNTRY_ID);
+            $criteria->addSelectColumn(StateTableMap::CREATED_AT);
+            $criteria->addSelectColumn(StateTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_TITLE_ID');
-            $criteria->addSelectColumn($alias . '.COMPANY');
-            $criteria->addSelectColumn($alias . '.FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.ADDRESS1');
-            $criteria->addSelectColumn($alias . '.ADDRESS2');
-            $criteria->addSelectColumn($alias . '.ADDRESS3');
-            $criteria->addSelectColumn($alias . '.ZIPCODE');
-            $criteria->addSelectColumn($alias . '.CITY');
-            $criteria->addSelectColumn($alias . '.PHONE');
-            $criteria->addSelectColumn($alias . '.CELLPHONE');
+            $criteria->addSelectColumn($alias . '.VISIBLE');
+            $criteria->addSelectColumn($alias . '.ISOCODE');
             $criteria->addSelectColumn($alias . '.COUNTRY_ID');
-            $criteria->addSelectColumn($alias . '.STATE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -427,7 +365,7 @@ class OrderAddressTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(OrderAddressTableMap::DATABASE_NAME)->getTable(OrderAddressTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(StateTableMap::DATABASE_NAME)->getTable(StateTableMap::TABLE_NAME);
     }
 
     /**
@@ -435,16 +373,16 @@ class OrderAddressTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(OrderAddressTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(OrderAddressTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new OrderAddressTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(StateTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(StateTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new StateTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a OrderAddress or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a State or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or OrderAddress object or primary key or array of primary keys
+     * @param mixed               $values Criteria or State object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -455,25 +393,25 @@ class OrderAddressTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderAddressTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(StateTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\OrderAddress) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\State) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(OrderAddressTableMap::DATABASE_NAME);
-            $criteria->add(OrderAddressTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(StateTableMap::DATABASE_NAME);
+            $criteria->add(StateTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = OrderAddressQuery::create()->mergeWith($criteria);
+        $query = StateQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { OrderAddressTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { StateTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { OrderAddressTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { StateTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -481,20 +419,20 @@ class OrderAddressTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the order_address table.
+     * Deletes all rows from the state table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return OrderAddressQuery::create()->doDeleteAll($con);
+        return StateQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a OrderAddress or Criteria object.
+     * Performs an INSERT on the database, given a State or Criteria object.
      *
-     * @param mixed               $criteria Criteria or OrderAddress object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or State object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -503,22 +441,22 @@ class OrderAddressTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(OrderAddressTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(StateTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from OrderAddress object
+            $criteria = $criteria->buildCriteria(); // build Criteria from State object
         }
 
-        if ($criteria->containsKey(OrderAddressTableMap::ID) && $criteria->keyContainsValue(OrderAddressTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.OrderAddressTableMap::ID.')');
+        if ($criteria->containsKey(StateTableMap::ID) && $criteria->keyContainsValue(StateTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.StateTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = OrderAddressQuery::create()->mergeWith($criteria);
+        $query = StateQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -534,7 +472,7 @@ class OrderAddressTableMap extends TableMap
         return $pk;
     }
 
-} // OrderAddressTableMap
+} // StateTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-OrderAddressTableMap::buildTableMap();
+StateTableMap::buildTableMap();

@@ -19,22 +19,22 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Address as ChildAddress;
 use Thelia\Model\AddressQuery as ChildAddressQuery;
-use Thelia\Model\Customer as ChildCustomer;
-use Thelia\Model\CustomerQuery as ChildCustomerQuery;
-use Thelia\Model\CustomerTitle as ChildCustomerTitle;
-use Thelia\Model\CustomerTitleI18n as ChildCustomerTitleI18n;
-use Thelia\Model\CustomerTitleI18nQuery as ChildCustomerTitleI18nQuery;
-use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
+use Thelia\Model\Country as ChildCountry;
+use Thelia\Model\CountryQuery as ChildCountryQuery;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
-use Thelia\Model\Map\CustomerTitleTableMap;
+use Thelia\Model\State as ChildState;
+use Thelia\Model\StateI18n as ChildStateI18n;
+use Thelia\Model\StateI18nQuery as ChildStateI18nQuery;
+use Thelia\Model\StateQuery as ChildStateQuery;
+use Thelia\Model\Map\StateTableMap;
 
-abstract class CustomerTitle implements ActiveRecordInterface
+abstract class State implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\CustomerTitleTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\StateTableMap';
 
 
     /**
@@ -70,17 +70,23 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the by_default field.
+     * The value for the visible field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $by_default;
+    protected $visible;
 
     /**
-     * The value for the position field.
+     * The value for the isocode field.
      * @var        string
      */
-    protected $position;
+    protected $isocode;
+
+    /**
+     * The value for the country_id field.
+     * @var        int
+     */
+    protected $country_id;
 
     /**
      * The value for the created_at field.
@@ -95,10 +101,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildCustomer[] Collection to store aggregation of ChildCustomer objects.
+     * @var        Country
      */
-    protected $collCustomers;
-    protected $collCustomersPartial;
+    protected $aCountry;
 
     /**
      * @var        ObjectCollection|ChildAddress[] Collection to store aggregation of ChildAddress objects.
@@ -113,10 +118,10 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected $collOrderAddressesPartial;
 
     /**
-     * @var        ObjectCollection|ChildCustomerTitleI18n[] Collection to store aggregation of ChildCustomerTitleI18n objects.
+     * @var        ObjectCollection|ChildStateI18n[] Collection to store aggregation of ChildStateI18n objects.
      */
-    protected $collCustomerTitleI18ns;
-    protected $collCustomerTitleI18nsPartial;
+    protected $collStateI18ns;
+    protected $collStateI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -136,15 +141,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
     /**
      * Current translation objects
-     * @var        array[ChildCustomerTitleI18n]
+     * @var        array[ChildStateI18n]
      */
     protected $currentTranslations;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $customersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -162,7 +161,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $customerTitleI18nsScheduledForDeletion = null;
+    protected $stateI18nsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -172,11 +171,11 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->by_default = 0;
+        $this->visible = 0;
     }
 
     /**
-     * Initializes internal state of Thelia\Model\Base\CustomerTitle object.
+     * Initializes internal state of Thelia\Model\Base\State object.
      * @see applyDefaults()
      */
     public function __construct()
@@ -273,9 +272,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>CustomerTitle</code> instance.  If
-     * <code>obj</code> is an instance of <code>CustomerTitle</code>, delegates to
-     * <code>equals(CustomerTitle)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>State</code> instance.  If
+     * <code>obj</code> is an instance of <code>State</code>, delegates to
+     * <code>equals(State)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param  mixed   $obj The object to compare to.
      * @return boolean Whether equal to the object specified.
@@ -358,7 +357,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return CustomerTitle The current object, for fluid interface
+     * @return State The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -390,7 +389,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return CustomerTitle The current object, for fluid interface
+     * @return State The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -447,25 +446,36 @@ abstract class CustomerTitle implements ActiveRecordInterface
     }
 
     /**
-     * Get the [by_default] column value.
+     * Get the [visible] column value.
      *
      * @return   int
      */
-    public function getByDefault()
+    public function getVisible()
     {
 
-        return $this->by_default;
+        return $this->visible;
     }
 
     /**
-     * Get the [position] column value.
+     * Get the [isocode] column value.
      *
      * @return   string
      */
-    public function getPosition()
+    public function getIsocode()
     {
 
-        return $this->position;
+        return $this->isocode;
+    }
+
+    /**
+     * Get the [country_id] column value.
+     *
+     * @return   int
+     */
+    public function getCountryId()
+    {
+
+        return $this->country_id;
     }
 
     /**
@@ -512,7 +522,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -522,7 +532,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[CustomerTitleTableMap::ID] = true;
+            $this->modifiedColumns[StateTableMap::ID] = true;
         }
 
 
@@ -530,53 +540,78 @@ abstract class CustomerTitle implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [by_default] column.
+     * Set the value of [visible] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
-    public function setByDefault($v)
+    public function setVisible($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->by_default !== $v) {
-            $this->by_default = $v;
-            $this->modifiedColumns[CustomerTitleTableMap::BY_DEFAULT] = true;
+        if ($this->visible !== $v) {
+            $this->visible = $v;
+            $this->modifiedColumns[StateTableMap::VISIBLE] = true;
         }
 
 
         return $this;
-    } // setByDefault()
+    } // setVisible()
 
     /**
-     * Set the value of [position] column.
+     * Set the value of [isocode] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
-    public function setPosition($v)
+    public function setIsocode($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->position !== $v) {
-            $this->position = $v;
-            $this->modifiedColumns[CustomerTitleTableMap::POSITION] = true;
+        if ($this->isocode !== $v) {
+            $this->isocode = $v;
+            $this->modifiedColumns[StateTableMap::ISOCODE] = true;
         }
 
 
         return $this;
-    } // setPosition()
+    } // setIsocode()
+
+    /**
+     * Set the value of [country_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\State The current object (for fluent API support)
+     */
+    public function setCountryId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->country_id !== $v) {
+            $this->country_id = $v;
+            $this->modifiedColumns[StateTableMap::COUNTRY_ID] = true;
+        }
+
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
+        }
+
+
+        return $this;
+    } // setCountryId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -584,7 +619,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[CustomerTitleTableMap::CREATED_AT] = true;
+                $this->modifiedColumns[StateTableMap::CREATED_AT] = true;
             }
         } // if either are not null
 
@@ -597,7 +632,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -605,7 +640,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[CustomerTitleTableMap::UPDATED_AT] = true;
+                $this->modifiedColumns[StateTableMap::UPDATED_AT] = true;
             }
         } // if either are not null
 
@@ -623,7 +658,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->by_default !== 0) {
+            if ($this->visible !== 0) {
                 return false;
             }
 
@@ -654,22 +689,25 @@ abstract class CustomerTitle implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CustomerTitleTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : StateTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerTitleTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->by_default = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : StateTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->visible = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerTitleTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->position = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : StateTableMap::translateFieldName('Isocode', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->isocode = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerTitleTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : StateTableMap::translateFieldName('CountryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->country_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : StateTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerTitleTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : StateTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -682,10 +720,10 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = CustomerTitleTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = StateTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\CustomerTitle object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\State object", 0, $e);
         }
     }
 
@@ -704,6 +742,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
+        }
     } // ensureConsistency
 
     /**
@@ -727,13 +768,13 @@ abstract class CustomerTitle implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CustomerTitleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(StateTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCustomerTitleQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildStateQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -743,13 +784,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collCustomers = null;
-
+            $this->aCountry = null;
             $this->collAddresses = null;
 
             $this->collOrderAddresses = null;
 
-            $this->collCustomerTitleI18ns = null;
+            $this->collStateI18ns = null;
 
         } // if (deep)
     }
@@ -760,8 +800,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see CustomerTitle::setDeleted()
-     * @see CustomerTitle::isDeleted()
+     * @see State::setDeleted()
+     * @see State::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -770,12 +810,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTitleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(StateTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildCustomerTitleQuery::create()
+            $deleteQuery = ChildStateQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -812,7 +852,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CustomerTitleTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(StateTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -822,16 +862,16 @@ abstract class CustomerTitle implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(CustomerTitleTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(StateTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(CustomerTitleTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(StateTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(CustomerTitleTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(StateTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -843,7 +883,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CustomerTitleTableMap::addInstanceToPool($this);
+                StateTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -873,6 +913,18 @@ abstract class CustomerTitle implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
+                }
+                $this->setCountry($this->aCountry);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -884,28 +936,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->customersScheduledForDeletion !== null) {
-                if (!$this->customersScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\CustomerQuery::create()
-                        ->filterByPrimaryKeys($this->customersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->customersScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collCustomers !== null) {
-            foreach ($this->collCustomers as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->addressesScheduledForDeletion !== null) {
                 if (!$this->addressesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\AddressQuery::create()
-                        ->filterByPrimaryKeys($this->addressesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
+                    foreach ($this->addressesScheduledForDeletion as $address) {
+                        // need to save related object because we set the relation to null
+                        $address->save($con);
+                    }
                     $this->addressesScheduledForDeletion = null;
                 }
             }
@@ -936,17 +972,17 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 }
             }
 
-            if ($this->customerTitleI18nsScheduledForDeletion !== null) {
-                if (!$this->customerTitleI18nsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\CustomerTitleI18nQuery::create()
-                        ->filterByPrimaryKeys($this->customerTitleI18nsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->stateI18nsScheduledForDeletion !== null) {
+                if (!$this->stateI18nsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\StateI18nQuery::create()
+                        ->filterByPrimaryKeys($this->stateI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->customerTitleI18nsScheduledForDeletion = null;
+                    $this->stateI18nsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collCustomerTitleI18ns !== null) {
-            foreach ($this->collCustomerTitleI18ns as $referrerFK) {
+                if ($this->collStateI18ns !== null) {
+            foreach ($this->collStateI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -973,30 +1009,33 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[CustomerTitleTableMap::ID] = true;
+        $this->modifiedColumns[StateTableMap::ID] = true;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CustomerTitleTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . StateTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CustomerTitleTableMap::ID)) {
+        if ($this->isColumnModified(StateTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = '`ID`';
         }
-        if ($this->isColumnModified(CustomerTitleTableMap::BY_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
+        if ($this->isColumnModified(StateTableMap::VISIBLE)) {
+            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
         }
-        if ($this->isColumnModified(CustomerTitleTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+        if ($this->isColumnModified(StateTableMap::ISOCODE)) {
+            $modifiedColumns[':p' . $index++]  = '`ISOCODE`';
         }
-        if ($this->isColumnModified(CustomerTitleTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(StateTableMap::COUNTRY_ID)) {
+            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+        }
+        if ($this->isColumnModified(StateTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(CustomerTitleTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(StateTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `customer_title` (%s) VALUES (%s)',
+            'INSERT INTO `state` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1008,11 +1047,14 @@ abstract class CustomerTitle implements ActiveRecordInterface
                     case '`ID`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`BY_DEFAULT`':
-                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
+                    case '`VISIBLE`':
+                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
-                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_STR);
+                    case '`ISOCODE`':
+                        $stmt->bindValue($identifier, $this->isocode, PDO::PARAM_STR);
+                        break;
+                    case '`COUNTRY_ID`':
+                        $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1066,7 +1108,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerTitleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = StateTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1086,15 +1128,18 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getByDefault();
+                return $this->getVisible();
                 break;
             case 2:
-                return $this->getPosition();
+                return $this->getIsocode();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getCountryId();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1120,17 +1165,18 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['CustomerTitle'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['State'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['CustomerTitle'][$this->getPrimaryKey()] = true;
-        $keys = CustomerTitleTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['State'][$this->getPrimaryKey()] = true;
+        $keys = StateTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getByDefault(),
-            $keys[2] => $this->getPosition(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[1] => $this->getVisible(),
+            $keys[2] => $this->getIsocode(),
+            $keys[3] => $this->getCountryId(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1138,8 +1184,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collCustomers) {
-                $result['Customers'] = $this->collCustomers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1147,8 +1193,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
             if (null !== $this->collOrderAddresses) {
                 $result['OrderAddresses'] = $this->collOrderAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collCustomerTitleI18ns) {
-                $result['CustomerTitleI18ns'] = $this->collCustomerTitleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collStateI18ns) {
+                $result['StateI18ns'] = $this->collStateI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1168,7 +1214,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CustomerTitleTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = StateTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1188,15 +1234,18 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setByDefault($value);
+                $this->setVisible($value);
                 break;
             case 2:
-                $this->setPosition($value);
+                $this->setIsocode($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setCountryId($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1221,13 +1270,14 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CustomerTitleTableMap::getFieldNames($keyType);
+        $keys = StateTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setByDefault($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[1], $arr)) $this->setVisible($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setIsocode($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCountryId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1237,13 +1287,14 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CustomerTitleTableMap::DATABASE_NAME);
+        $criteria = new Criteria(StateTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CustomerTitleTableMap::ID)) $criteria->add(CustomerTitleTableMap::ID, $this->id);
-        if ($this->isColumnModified(CustomerTitleTableMap::BY_DEFAULT)) $criteria->add(CustomerTitleTableMap::BY_DEFAULT, $this->by_default);
-        if ($this->isColumnModified(CustomerTitleTableMap::POSITION)) $criteria->add(CustomerTitleTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(CustomerTitleTableMap::CREATED_AT)) $criteria->add(CustomerTitleTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(CustomerTitleTableMap::UPDATED_AT)) $criteria->add(CustomerTitleTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(StateTableMap::ID)) $criteria->add(StateTableMap::ID, $this->id);
+        if ($this->isColumnModified(StateTableMap::VISIBLE)) $criteria->add(StateTableMap::VISIBLE, $this->visible);
+        if ($this->isColumnModified(StateTableMap::ISOCODE)) $criteria->add(StateTableMap::ISOCODE, $this->isocode);
+        if ($this->isColumnModified(StateTableMap::COUNTRY_ID)) $criteria->add(StateTableMap::COUNTRY_ID, $this->country_id);
+        if ($this->isColumnModified(StateTableMap::CREATED_AT)) $criteria->add(StateTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(StateTableMap::UPDATED_AT)) $criteria->add(StateTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1258,8 +1309,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CustomerTitleTableMap::DATABASE_NAME);
-        $criteria->add(CustomerTitleTableMap::ID, $this->id);
+        $criteria = new Criteria(StateTableMap::DATABASE_NAME);
+        $criteria->add(StateTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1300,15 +1351,16 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\CustomerTitle (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\State (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setByDefault($this->getByDefault());
-        $copyObj->setPosition($this->getPosition());
+        $copyObj->setVisible($this->getVisible());
+        $copyObj->setIsocode($this->getIsocode());
+        $copyObj->setCountryId($this->getCountryId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1316,12 +1368,6 @@ abstract class CustomerTitle implements ActiveRecordInterface
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
-
-            foreach ($this->getCustomers() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCustomer($relObj->copy($deepCopy));
-                }
-            }
 
             foreach ($this->getAddresses() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1335,9 +1381,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getCustomerTitleI18ns() as $relObj) {
+            foreach ($this->getStateI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCustomerTitleI18n($relObj->copy($deepCopy));
+                    $copyObj->addStateI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1358,7 +1404,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\CustomerTitle Clone of current object.
+     * @return                 \Thelia\Model\State Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1369,6 +1415,57 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCountry object.
+     *
+     * @param                  ChildCountry $v
+     * @return                 \Thelia\Model\State The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCountry(ChildCountry $v = null)
+    {
+        if ($v === null) {
+            $this->setCountryId(NULL);
+        } else {
+            $this->setCountryId($v->getId());
+        }
+
+        $this->aCountry = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCountry object, it will not be re-added.
+        if ($v !== null) {
+            $v->addState($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCountry object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCountry The associated ChildCountry object.
+     * @throws PropelException
+     */
+    public function getCountry(ConnectionInterface $con = null)
+    {
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = ChildCountryQuery::create()->findPk($this->country_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCountry->addStates($this);
+             */
+        }
+
+        return $this->aCountry;
     }
 
 
@@ -1382,236 +1479,15 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Customer' == $relationName) {
-            return $this->initCustomers();
-        }
         if ('Address' == $relationName) {
             return $this->initAddresses();
         }
         if ('OrderAddress' == $relationName) {
             return $this->initOrderAddresses();
         }
-        if ('CustomerTitleI18n' == $relationName) {
-            return $this->initCustomerTitleI18ns();
+        if ('StateI18n' == $relationName) {
+            return $this->initStateI18ns();
         }
-    }
-
-    /**
-     * Clears out the collCustomers collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCustomers()
-     */
-    public function clearCustomers()
-    {
-        $this->collCustomers = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collCustomers collection loaded partially.
-     */
-    public function resetPartialCustomers($v = true)
-    {
-        $this->collCustomersPartial = $v;
-    }
-
-    /**
-     * Initializes the collCustomers collection.
-     *
-     * By default this just sets the collCustomers collection to an empty array (like clearcollCustomers());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCustomers($overrideExisting = true)
-    {
-        if (null !== $this->collCustomers && !$overrideExisting) {
-            return;
-        }
-        $this->collCustomers = new ObjectCollection();
-        $this->collCustomers->setModel('\Thelia\Model\Customer');
-    }
-
-    /**
-     * Gets an array of ChildCustomer objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCustomerTitle is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCustomer[] List of ChildCustomer objects
-     * @throws PropelException
-     */
-    public function getCustomers($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCustomersPartial && !$this->isNew();
-        if (null === $this->collCustomers || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCustomers) {
-                // return empty collection
-                $this->initCustomers();
-            } else {
-                $collCustomers = ChildCustomerQuery::create(null, $criteria)
-                    ->filterByCustomerTitle($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collCustomersPartial && count($collCustomers)) {
-                        $this->initCustomers(false);
-
-                        foreach ($collCustomers as $obj) {
-                            if (false == $this->collCustomers->contains($obj)) {
-                                $this->collCustomers->append($obj);
-                            }
-                        }
-
-                        $this->collCustomersPartial = true;
-                    }
-
-                    reset($collCustomers);
-
-                    return $collCustomers;
-                }
-
-                if ($partial && $this->collCustomers) {
-                    foreach ($this->collCustomers as $obj) {
-                        if ($obj->isNew()) {
-                            $collCustomers[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCustomers = $collCustomers;
-                $this->collCustomersPartial = false;
-            }
-        }
-
-        return $this->collCustomers;
-    }
-
-    /**
-     * Sets a collection of Customer objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $customers A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomerTitle The current object (for fluent API support)
-     */
-    public function setCustomers(Collection $customers, ConnectionInterface $con = null)
-    {
-        $customersToDelete = $this->getCustomers(new Criteria(), $con)->diff($customers);
-
-
-        $this->customersScheduledForDeletion = $customersToDelete;
-
-        foreach ($customersToDelete as $customerRemoved) {
-            $customerRemoved->setCustomerTitle(null);
-        }
-
-        $this->collCustomers = null;
-        foreach ($customers as $customer) {
-            $this->addCustomer($customer);
-        }
-
-        $this->collCustomers = $customers;
-        $this->collCustomersPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Customer objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Customer objects.
-     * @throws PropelException
-     */
-    public function countCustomers(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCustomersPartial && !$this->isNew();
-        if (null === $this->collCustomers || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCustomers) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getCustomers());
-            }
-
-            $query = ChildCustomerQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCustomerTitle($this)
-                ->count($con);
-        }
-
-        return count($this->collCustomers);
-    }
-
-    /**
-     * Method called to associate a ChildCustomer object to this object
-     * through the ChildCustomer foreign key attribute.
-     *
-     * @param    ChildCustomer $l ChildCustomer
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
-     */
-    public function addCustomer(ChildCustomer $l)
-    {
-        if ($this->collCustomers === null) {
-            $this->initCustomers();
-            $this->collCustomersPartial = true;
-        }
-
-        if (!in_array($l, $this->collCustomers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCustomer($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Customer $customer The customer object to add.
-     */
-    protected function doAddCustomer($customer)
-    {
-        $this->collCustomers[]= $customer;
-        $customer->setCustomerTitle($this);
-    }
-
-    /**
-     * @param  Customer $customer The customer object to remove.
-     * @return ChildCustomerTitle The current object (for fluent API support)
-     */
-    public function removeCustomer($customer)
-    {
-        if ($this->getCustomers()->contains($customer)) {
-            $this->collCustomers->remove($this->collCustomers->search($customer));
-            if (null === $this->customersScheduledForDeletion) {
-                $this->customersScheduledForDeletion = clone $this->collCustomers;
-                $this->customersScheduledForDeletion->clear();
-            }
-            $this->customersScheduledForDeletion[]= clone $customer;
-            $customer->setCustomerTitle(null);
-        }
-
-        return $this;
     }
 
     /**
@@ -1663,7 +1539,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCustomerTitle is new, it will return
+     * If this ChildState is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
@@ -1680,7 +1556,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->initAddresses();
             } else {
                 $collAddresses = ChildAddressQuery::create(null, $criteria)
-                    ->filterByCustomerTitle($this)
+                    ->filterByState($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -1725,7 +1601,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @param      Collection $addresses A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomerTitle The current object (for fluent API support)
+     * @return   ChildState The current object (for fluent API support)
      */
     public function setAddresses(Collection $addresses, ConnectionInterface $con = null)
     {
@@ -1735,7 +1611,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $this->addressesScheduledForDeletion = $addressesToDelete;
 
         foreach ($addressesToDelete as $addressRemoved) {
-            $addressRemoved->setCustomerTitle(null);
+            $addressRemoved->setState(null);
         }
 
         $this->collAddresses = null;
@@ -1776,7 +1652,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
             }
 
             return $query
-                ->filterByCustomerTitle($this)
+                ->filterByState($this)
                 ->count($con);
         }
 
@@ -1788,7 +1664,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * through the ChildAddress foreign key attribute.
      *
      * @param    ChildAddress $l ChildAddress
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
     public function addAddress(ChildAddress $l)
     {
@@ -1810,12 +1686,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected function doAddAddress($address)
     {
         $this->collAddresses[]= $address;
-        $address->setCustomerTitle($this);
+        $address->setState($this);
     }
 
     /**
      * @param  Address $address The address object to remove.
-     * @return ChildCustomerTitle The current object (for fluent API support)
+     * @return ChildState The current object (for fluent API support)
      */
     public function removeAddress($address)
     {
@@ -1825,8 +1701,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->addressesScheduledForDeletion = clone $this->collAddresses;
                 $this->addressesScheduledForDeletion->clear();
             }
-            $this->addressesScheduledForDeletion[]= clone $address;
-            $address->setCustomerTitle(null);
+            $this->addressesScheduledForDeletion[]= $address;
+            $address->setState(null);
         }
 
         return $this;
@@ -1836,13 +1712,13 @@ abstract class CustomerTitle implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this CustomerTitle is new, it will return
-     * an empty collection; or if this CustomerTitle has previously
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
      * been saved, it will retrieve related Addresses from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in CustomerTitle.
+     * actually need in State.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -1861,13 +1737,38 @@ abstract class CustomerTitle implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this CustomerTitle is new, it will return
-     * an empty collection; or if this CustomerTitle has previously
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
      * been saved, it will retrieve related Addresses from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in CustomerTitle.
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAddress[] List of ChildAddress objects
+     */
+    public function getAddressesJoinCustomerTitle($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAddressQuery::create(null, $criteria);
+        $query->joinWith('CustomerTitle', $joinBehavior);
+
+        return $this->getAddresses($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related Addresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -1878,31 +1779,6 @@ abstract class CustomerTitle implements ActiveRecordInterface
     {
         $query = ChildAddressQuery::create(null, $criteria);
         $query->joinWith('Country', $joinBehavior);
-
-        return $this->getAddresses($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this CustomerTitle is new, it will return
-     * an empty collection; or if this CustomerTitle has previously
-     * been saved, it will retrieve related Addresses from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in CustomerTitle.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildAddress[] List of ChildAddress objects
-     */
-    public function getAddressesJoinState($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildAddressQuery::create(null, $criteria);
-        $query->joinWith('State', $joinBehavior);
 
         return $this->getAddresses($query, $con);
     }
@@ -1956,7 +1832,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCustomerTitle is new, it will return
+     * If this ChildState is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
@@ -1973,7 +1849,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->initOrderAddresses();
             } else {
                 $collOrderAddresses = ChildOrderAddressQuery::create(null, $criteria)
-                    ->filterByCustomerTitle($this)
+                    ->filterByState($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -2018,7 +1894,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @param      Collection $orderAddresses A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomerTitle The current object (for fluent API support)
+     * @return   ChildState The current object (for fluent API support)
      */
     public function setOrderAddresses(Collection $orderAddresses, ConnectionInterface $con = null)
     {
@@ -2028,7 +1904,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $this->orderAddressesScheduledForDeletion = $orderAddressesToDelete;
 
         foreach ($orderAddressesToDelete as $orderAddressRemoved) {
-            $orderAddressRemoved->setCustomerTitle(null);
+            $orderAddressRemoved->setState(null);
         }
 
         $this->collOrderAddresses = null;
@@ -2069,7 +1945,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
             }
 
             return $query
-                ->filterByCustomerTitle($this)
+                ->filterByState($this)
                 ->count($con);
         }
 
@@ -2081,7 +1957,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * through the ChildOrderAddress foreign key attribute.
      *
      * @param    ChildOrderAddress $l ChildOrderAddress
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
     public function addOrderAddress(ChildOrderAddress $l)
     {
@@ -2103,12 +1979,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
     protected function doAddOrderAddress($orderAddress)
     {
         $this->collOrderAddresses[]= $orderAddress;
-        $orderAddress->setCustomerTitle($this);
+        $orderAddress->setState($this);
     }
 
     /**
      * @param  OrderAddress $orderAddress The orderAddress object to remove.
-     * @return ChildCustomerTitle The current object (for fluent API support)
+     * @return ChildState The current object (for fluent API support)
      */
     public function removeOrderAddress($orderAddress)
     {
@@ -2119,7 +1995,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 $this->orderAddressesScheduledForDeletion->clear();
             }
             $this->orderAddressesScheduledForDeletion[]= $orderAddress;
-            $orderAddress->setCustomerTitle(null);
+            $orderAddress->setState(null);
         }
 
         return $this;
@@ -2129,13 +2005,38 @@ abstract class CustomerTitle implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this CustomerTitle is new, it will return
-     * an empty collection; or if this CustomerTitle has previously
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
      * been saved, it will retrieve related OrderAddresses from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in CustomerTitle.
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildOrderAddress[] List of ChildOrderAddress objects
+     */
+    public function getOrderAddressesJoinCustomerTitle($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildOrderAddressQuery::create(null, $criteria);
+        $query->joinWith('CustomerTitle', $joinBehavior);
+
+        return $this->getOrderAddresses($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related OrderAddresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -2150,57 +2051,32 @@ abstract class CustomerTitle implements ActiveRecordInterface
         return $this->getOrderAddresses($query, $con);
     }
 
-
     /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this CustomerTitle is new, it will return
-     * an empty collection; or if this CustomerTitle has previously
-     * been saved, it will retrieve related OrderAddresses from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in CustomerTitle.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildOrderAddress[] List of ChildOrderAddress objects
-     */
-    public function getOrderAddressesJoinState($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildOrderAddressQuery::create(null, $criteria);
-        $query->joinWith('State', $joinBehavior);
-
-        return $this->getOrderAddresses($query, $con);
-    }
-
-    /**
-     * Clears out the collCustomerTitleI18ns collection
+     * Clears out the collStateI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCustomerTitleI18ns()
+     * @see        addStateI18ns()
      */
-    public function clearCustomerTitleI18ns()
+    public function clearStateI18ns()
     {
-        $this->collCustomerTitleI18ns = null; // important to set this to NULL since that means it is uninitialized
+        $this->collStateI18ns = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collCustomerTitleI18ns collection loaded partially.
+     * Reset is the collStateI18ns collection loaded partially.
      */
-    public function resetPartialCustomerTitleI18ns($v = true)
+    public function resetPartialStateI18ns($v = true)
     {
-        $this->collCustomerTitleI18nsPartial = $v;
+        $this->collStateI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collCustomerTitleI18ns collection.
+     * Initializes the collStateI18ns collection.
      *
-     * By default this just sets the collCustomerTitleI18ns collection to an empty array (like clearcollCustomerTitleI18ns());
+     * By default this just sets the collStateI18ns collection to an empty array (like clearcollStateI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2209,192 +2085,192 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initCustomerTitleI18ns($overrideExisting = true)
+    public function initStateI18ns($overrideExisting = true)
     {
-        if (null !== $this->collCustomerTitleI18ns && !$overrideExisting) {
+        if (null !== $this->collStateI18ns && !$overrideExisting) {
             return;
         }
-        $this->collCustomerTitleI18ns = new ObjectCollection();
-        $this->collCustomerTitleI18ns->setModel('\Thelia\Model\CustomerTitleI18n');
+        $this->collStateI18ns = new ObjectCollection();
+        $this->collStateI18ns->setModel('\Thelia\Model\StateI18n');
     }
 
     /**
-     * Gets an array of ChildCustomerTitleI18n objects which contain a foreign key that references this object.
+     * Gets an array of ChildStateI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCustomerTitle is new, it will return
+     * If this ChildState is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCustomerTitleI18n[] List of ChildCustomerTitleI18n objects
+     * @return Collection|ChildStateI18n[] List of ChildStateI18n objects
      * @throws PropelException
      */
-    public function getCustomerTitleI18ns($criteria = null, ConnectionInterface $con = null)
+    public function getStateI18ns($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collCustomerTitleI18nsPartial && !$this->isNew();
-        if (null === $this->collCustomerTitleI18ns || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCustomerTitleI18ns) {
+        $partial = $this->collStateI18nsPartial && !$this->isNew();
+        if (null === $this->collStateI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collStateI18ns) {
                 // return empty collection
-                $this->initCustomerTitleI18ns();
+                $this->initStateI18ns();
             } else {
-                $collCustomerTitleI18ns = ChildCustomerTitleI18nQuery::create(null, $criteria)
-                    ->filterByCustomerTitle($this)
+                $collStateI18ns = ChildStateI18nQuery::create(null, $criteria)
+                    ->filterByState($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collCustomerTitleI18nsPartial && count($collCustomerTitleI18ns)) {
-                        $this->initCustomerTitleI18ns(false);
+                    if (false !== $this->collStateI18nsPartial && count($collStateI18ns)) {
+                        $this->initStateI18ns(false);
 
-                        foreach ($collCustomerTitleI18ns as $obj) {
-                            if (false == $this->collCustomerTitleI18ns->contains($obj)) {
-                                $this->collCustomerTitleI18ns->append($obj);
+                        foreach ($collStateI18ns as $obj) {
+                            if (false == $this->collStateI18ns->contains($obj)) {
+                                $this->collStateI18ns->append($obj);
                             }
                         }
 
-                        $this->collCustomerTitleI18nsPartial = true;
+                        $this->collStateI18nsPartial = true;
                     }
 
-                    reset($collCustomerTitleI18ns);
+                    reset($collStateI18ns);
 
-                    return $collCustomerTitleI18ns;
+                    return $collStateI18ns;
                 }
 
-                if ($partial && $this->collCustomerTitleI18ns) {
-                    foreach ($this->collCustomerTitleI18ns as $obj) {
+                if ($partial && $this->collStateI18ns) {
+                    foreach ($this->collStateI18ns as $obj) {
                         if ($obj->isNew()) {
-                            $collCustomerTitleI18ns[] = $obj;
+                            $collStateI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collCustomerTitleI18ns = $collCustomerTitleI18ns;
-                $this->collCustomerTitleI18nsPartial = false;
+                $this->collStateI18ns = $collStateI18ns;
+                $this->collStateI18nsPartial = false;
             }
         }
 
-        return $this->collCustomerTitleI18ns;
+        return $this->collStateI18ns;
     }
 
     /**
-     * Sets a collection of CustomerTitleI18n objects related by a one-to-many relationship
+     * Sets a collection of StateI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $customerTitleI18ns A Propel collection.
+     * @param      Collection $stateI18ns A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCustomerTitle The current object (for fluent API support)
+     * @return   ChildState The current object (for fluent API support)
      */
-    public function setCustomerTitleI18ns(Collection $customerTitleI18ns, ConnectionInterface $con = null)
+    public function setStateI18ns(Collection $stateI18ns, ConnectionInterface $con = null)
     {
-        $customerTitleI18nsToDelete = $this->getCustomerTitleI18ns(new Criteria(), $con)->diff($customerTitleI18ns);
+        $stateI18nsToDelete = $this->getStateI18ns(new Criteria(), $con)->diff($stateI18ns);
 
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->customerTitleI18nsScheduledForDeletion = clone $customerTitleI18nsToDelete;
+        $this->stateI18nsScheduledForDeletion = clone $stateI18nsToDelete;
 
-        foreach ($customerTitleI18nsToDelete as $customerTitleI18nRemoved) {
-            $customerTitleI18nRemoved->setCustomerTitle(null);
+        foreach ($stateI18nsToDelete as $stateI18nRemoved) {
+            $stateI18nRemoved->setState(null);
         }
 
-        $this->collCustomerTitleI18ns = null;
-        foreach ($customerTitleI18ns as $customerTitleI18n) {
-            $this->addCustomerTitleI18n($customerTitleI18n);
+        $this->collStateI18ns = null;
+        foreach ($stateI18ns as $stateI18n) {
+            $this->addStateI18n($stateI18n);
         }
 
-        $this->collCustomerTitleI18ns = $customerTitleI18ns;
-        $this->collCustomerTitleI18nsPartial = false;
+        $this->collStateI18ns = $stateI18ns;
+        $this->collStateI18nsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related CustomerTitleI18n objects.
+     * Returns the number of related StateI18n objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related CustomerTitleI18n objects.
+     * @return int             Count of related StateI18n objects.
      * @throws PropelException
      */
-    public function countCustomerTitleI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countStateI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collCustomerTitleI18nsPartial && !$this->isNew();
-        if (null === $this->collCustomerTitleI18ns || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCustomerTitleI18ns) {
+        $partial = $this->collStateI18nsPartial && !$this->isNew();
+        if (null === $this->collStateI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collStateI18ns) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getCustomerTitleI18ns());
+                return count($this->getStateI18ns());
             }
 
-            $query = ChildCustomerTitleI18nQuery::create(null, $criteria);
+            $query = ChildStateI18nQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByCustomerTitle($this)
+                ->filterByState($this)
                 ->count($con);
         }
 
-        return count($this->collCustomerTitleI18ns);
+        return count($this->collStateI18ns);
     }
 
     /**
-     * Method called to associate a ChildCustomerTitleI18n object to this object
-     * through the ChildCustomerTitleI18n foreign key attribute.
+     * Method called to associate a ChildStateI18n object to this object
+     * through the ChildStateI18n foreign key attribute.
      *
-     * @param    ChildCustomerTitleI18n $l ChildCustomerTitleI18n
-     * @return   \Thelia\Model\CustomerTitle The current object (for fluent API support)
+     * @param    ChildStateI18n $l ChildStateI18n
+     * @return   \Thelia\Model\State The current object (for fluent API support)
      */
-    public function addCustomerTitleI18n(ChildCustomerTitleI18n $l)
+    public function addStateI18n(ChildStateI18n $l)
     {
         if ($l && $locale = $l->getLocale()) {
             $this->setLocale($locale);
             $this->currentTranslations[$locale] = $l;
         }
-        if ($this->collCustomerTitleI18ns === null) {
-            $this->initCustomerTitleI18ns();
-            $this->collCustomerTitleI18nsPartial = true;
+        if ($this->collStateI18ns === null) {
+            $this->initStateI18ns();
+            $this->collStateI18nsPartial = true;
         }
 
-        if (!in_array($l, $this->collCustomerTitleI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCustomerTitleI18n($l);
+        if (!in_array($l, $this->collStateI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddStateI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param CustomerTitleI18n $customerTitleI18n The customerTitleI18n object to add.
+     * @param StateI18n $stateI18n The stateI18n object to add.
      */
-    protected function doAddCustomerTitleI18n($customerTitleI18n)
+    protected function doAddStateI18n($stateI18n)
     {
-        $this->collCustomerTitleI18ns[]= $customerTitleI18n;
-        $customerTitleI18n->setCustomerTitle($this);
+        $this->collStateI18ns[]= $stateI18n;
+        $stateI18n->setState($this);
     }
 
     /**
-     * @param  CustomerTitleI18n $customerTitleI18n The customerTitleI18n object to remove.
-     * @return ChildCustomerTitle The current object (for fluent API support)
+     * @param  StateI18n $stateI18n The stateI18n object to remove.
+     * @return ChildState The current object (for fluent API support)
      */
-    public function removeCustomerTitleI18n($customerTitleI18n)
+    public function removeStateI18n($stateI18n)
     {
-        if ($this->getCustomerTitleI18ns()->contains($customerTitleI18n)) {
-            $this->collCustomerTitleI18ns->remove($this->collCustomerTitleI18ns->search($customerTitleI18n));
-            if (null === $this->customerTitleI18nsScheduledForDeletion) {
-                $this->customerTitleI18nsScheduledForDeletion = clone $this->collCustomerTitleI18ns;
-                $this->customerTitleI18nsScheduledForDeletion->clear();
+        if ($this->getStateI18ns()->contains($stateI18n)) {
+            $this->collStateI18ns->remove($this->collStateI18ns->search($stateI18n));
+            if (null === $this->stateI18nsScheduledForDeletion) {
+                $this->stateI18nsScheduledForDeletion = clone $this->collStateI18ns;
+                $this->stateI18nsScheduledForDeletion->clear();
             }
-            $this->customerTitleI18nsScheduledForDeletion[]= clone $customerTitleI18n;
-            $customerTitleI18n->setCustomerTitle(null);
+            $this->stateI18nsScheduledForDeletion[]= clone $stateI18n;
+            $stateI18n->setState(null);
         }
 
         return $this;
@@ -2406,8 +2282,9 @@ abstract class CustomerTitle implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->by_default = null;
-        $this->position = null;
+        $this->visible = null;
+        $this->isocode = null;
+        $this->country_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2430,11 +2307,6 @@ abstract class CustomerTitle implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCustomers) {
-                foreach ($this->collCustomers as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collAddresses) {
                 foreach ($this->collAddresses as $o) {
                     $o->clearAllReferences($deep);
@@ -2445,8 +2317,8 @@ abstract class CustomerTitle implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCustomerTitleI18ns) {
-                foreach ($this->collCustomerTitleI18ns as $o) {
+            if ($this->collStateI18ns) {
+                foreach ($this->collStateI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2456,10 +2328,10 @@ abstract class CustomerTitle implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        $this->collCustomers = null;
         $this->collAddresses = null;
         $this->collOrderAddresses = null;
-        $this->collCustomerTitleI18ns = null;
+        $this->collStateI18ns = null;
+        $this->aCountry = null;
     }
 
     /**
@@ -2469,7 +2341,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CustomerTitleTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(StateTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -2477,11 +2349,11 @@ abstract class CustomerTitle implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCustomerTitle The current object (for fluent API support)
+     * @return     ChildState The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[CustomerTitleTableMap::UPDATED_AT] = true;
+        $this->modifiedColumns[StateTableMap::UPDATED_AT] = true;
 
         return $this;
     }
@@ -2493,7 +2365,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildCustomerTitle The current object (for fluent API support)
+     * @return    ChildState The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -2518,12 +2390,12 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildCustomerTitleI18n */
+     * @return ChildStateI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
-            if (null !== $this->collCustomerTitleI18ns) {
-                foreach ($this->collCustomerTitleI18ns as $translation) {
+            if (null !== $this->collStateI18ns) {
+                foreach ($this->collStateI18ns as $translation) {
                     if ($translation->getLocale() == $locale) {
                         $this->currentTranslations[$locale] = $translation;
 
@@ -2532,15 +2404,15 @@ abstract class CustomerTitle implements ActiveRecordInterface
                 }
             }
             if ($this->isNew()) {
-                $translation = new ChildCustomerTitleI18n();
+                $translation = new ChildStateI18n();
                 $translation->setLocale($locale);
             } else {
-                $translation = ChildCustomerTitleI18nQuery::create()
+                $translation = ChildStateI18nQuery::create()
                     ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                     ->findOneOrCreate($con);
                 $this->currentTranslations[$locale] = $translation;
             }
-            $this->addCustomerTitleI18n($translation);
+            $this->addStateI18n($translation);
         }
 
         return $this->currentTranslations[$locale];
@@ -2552,21 +2424,21 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return    ChildCustomerTitle The current object (for fluent API support)
+     * @return    ChildState The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
-            ChildCustomerTitleI18nQuery::create()
+            ChildStateI18nQuery::create()
                 ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                 ->delete($con);
         }
         if (isset($this->currentTranslations[$locale])) {
             unset($this->currentTranslations[$locale]);
         }
-        foreach ($this->collCustomerTitleI18ns as $key => $translation) {
+        foreach ($this->collStateI18ns as $key => $translation) {
             if ($translation->getLocale() == $locale) {
-                unset($this->collCustomerTitleI18ns[$key]);
+                unset($this->collStateI18ns[$key]);
                 break;
             }
         }
@@ -2579,7 +2451,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildCustomerTitleI18n */
+     * @return ChildStateI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
@@ -2587,48 +2459,24 @@ abstract class CustomerTitle implements ActiveRecordInterface
 
 
         /**
-         * Get the [short] column value.
+         * Get the [title] column value.
          *
          * @return   string
          */
-        public function getShort()
+        public function getTitle()
         {
-        return $this->getCurrentTranslation()->getShort();
+        return $this->getCurrentTranslation()->getTitle();
     }
 
 
         /**
-         * Set the value of [short] column.
+         * Set the value of [title] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\CustomerTitleI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\StateI18n The current object (for fluent API support)
          */
-        public function setShort($v)
-        {    $this->getCurrentTranslation()->setShort($v);
-
-        return $this;
-    }
-
-
-        /**
-         * Get the [long] column value.
-         *
-         * @return   string
-         */
-        public function getLong()
-        {
-        return $this->getCurrentTranslation()->getLong();
-    }
-
-
-        /**
-         * Set the value of [long] column.
-         *
-         * @param      string $v new value
-         * @return   \Thelia\Model\CustomerTitleI18n The current object (for fluent API support)
-         */
-        public function setLong($v)
-        {    $this->getCurrentTranslation()->setLong($v);
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
 
         return $this;
     }
