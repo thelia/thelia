@@ -134,10 +134,16 @@ class ParamInitMiddleware implements HttpKernelInterface
     protected function detectLang(TheliaRequest $request)
     {
         // first priority => lang parameter present in request (get or post)
-        if ($request->query->has("lang")) {
-            // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
-            // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
-            $requestedLangCodeOrLocale = $request->query->get("lang");
+        $requestedLangCodeOrLocale = $request->query->get("lang");
+
+        // add a fallback on locale parameter
+        if (null === $requestedLangCodeOrLocale) {
+            $requestedLangCodeOrLocale = $request->query->get("locale");
+        }
+
+        // The lang parameter may contains a lang code (fr, en, ru) for Thelia < 2.2,
+        // or a locale (fr_FR, en_US, etc.) for Thelia > 2.2.beta1
+        if (null !== $requestedLangCodeOrLocale) {
 
             if (strlen($requestedLangCodeOrLocale) > 2) {
                 $lang = LangQuery::create()->findOneByLocale($requestedLangCodeOrLocale);

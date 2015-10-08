@@ -57,7 +57,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->where('ISNULL(`ra`.REWRITING_URL_ID)')
             ->filterByView($view)
-            ->filterByViewLocale($viewLocale)
+            ->filterByViewLocale($this->retrieveLocale($viewLocale))
             ->filterByViewId($viewId)
             ->filterByRedirected(null)
             ->orderById(Criteria::DESC)
@@ -78,7 +78,7 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
             ->joinRewritingArgument('ra', Criteria::LEFT_JOIN)
             ->withColumn('`ra`.REWRITING_URL_ID', 'ra_REWRITING_URL_ID')
             ->filterByView($view)
-            ->filterByViewLocale($viewLocale)
+            ->filterByViewLocale($this->retrieveLocale($viewLocale))
             ->filterByViewId($viewId)
             ->filterByRedirected(null)
             ->orderById(Criteria::DESC);
@@ -109,5 +109,17 @@ class RewritingUrlQuery extends BaseRewritingUrlQuery
 
         return $urlQuery->findOne();
     }
+
+    protected function retrieveLocale($viewLocale)
+    {
+        if (strlen($viewLocale) == 2) {
+            if (null !== $lang = LangQuery::create()->findOneByCode($viewLocale)) {
+                $viewLocale = $lang->getLocale();
+            }
+        }
+
+        return $viewLocale;
+    }
+
 }
 // RewritingUrlQuery

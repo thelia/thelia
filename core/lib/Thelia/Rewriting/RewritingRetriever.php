@@ -50,7 +50,7 @@ class RewritingRetriever
 
         $allParametersWithoutView = array();
         if (null !== $viewLocale) {
-            $allParametersWithoutView['locale'] = $viewLocale;
+            $allParametersWithoutView['lang'] = $viewLocale;
         }
         if (null !== $viewId) {
             $allParametersWithoutView[$view . '_id'] = $viewId;
@@ -82,7 +82,7 @@ class RewritingRetriever
         $this->search = $this->rewritingUrlQuery->getSpecificUrlQuery($view, $viewLocale, $viewId, $viewOtherParameters);
 
         $allParametersWithoutView = $viewOtherParameters;
-        $allParametersWithoutView['locale'] = $viewLocale;
+        $allParametersWithoutView['lang'] = $viewLocale;
         if (null !== $viewId) {
             $allParametersWithoutView[$view . '_id'] = $viewId;
         }
