@@ -1,5 +1,6 @@
 # 2.3.0-alpha1
 
+- #1718 Autocomplete combination generation form with default pse values
 - #1706 Fix form coupon not found in frontOffice order invoice
 - #1700 Fix source priority in ```ParserContext::getForm```
 - #1588 Add document tab in frontOffice product page
