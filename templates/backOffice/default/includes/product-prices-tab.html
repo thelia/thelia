@@ -699,14 +699,14 @@
 		        </ul>
 		    </div>
 		</div>
-
+        {loop type="product_sale_elements" name="product_sale_elements_combination_form" product="{$product_id}" default="yes"}
 		<div class="col-md-6">
          {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">
                  <label for="price_without_tax" class="control-label">{$label} : </label>
 
                     <div class="input-group">
-                        <input type="text" id="price_without_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
+                        <input type="text" id="price_without_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{if $value}{$value}{else}{$PRICE}{/if}" title="{$label}" placeholder="{intl l='Price excl. taxes'}">
                         <span class="input-group-addon">{$currency_symbol}</span>
                     </div>
              </div>
@@ -717,7 +717,7 @@
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
                 <div class="form-group">
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Combination reference'}">
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$REF}{/if}" title="{$label}" placeholder="{intl l='Combination reference'}">
                 </div>
             </div>
          {/form_field}
@@ -727,7 +727,7 @@
                 <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
                 <div class="form-group">
-                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Combination EAN Code'}">
+                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$EAN_CODE}{/if}" title="{$label}" placeholder="{intl l='Combination EAN Code'}">
                 </div>
             </div>
          {/form_field}
@@ -739,7 +739,7 @@
 	                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
 	                <div class="input-group">
-	                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
+	                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$WEIGHT}{/if}" title="{$label}" placeholder="{intl l='Product weight'}">
 	                    <span class="input-group-addon">{intl l="Kg"}</span>
 	                </div>
 	            </div>
@@ -752,7 +752,7 @@
 	                 <label for="{$label_attr.for}" class="control-label">{intl l='Stock'} : </label>
 
 	                 <div class="form-group">
-	                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Current quantity'}">
+	                     <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{if $value}{$value}{else}{$QUANTITY}{/if}" title="{$label}" placeholder="{intl l='Current quantity'}">
 	                 </div>
 	             </div>
 	          {/form_field}
@@ -763,7 +763,7 @@
              <div class="form-group {if $error}has-error{/if}">
                  <label for="sale_price_without_tax" class="control-label">{$label} : </label>
                  <div class="input-group">
-                     <input type="text" id="sale_price_without_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}">
+                     <input type="text" id="sale_price_without_tax" name="{$name}" class="price_field automatic_price_field form-control" value="{if $value}{$value}{else}{$PROMO_PRICE}{/if}" title="{$label}" placeholder="{intl l='Product price'}">
                      <span class="input-group-addon">{$currency_symbol}</span>
                  </div>
             </div>
@@ -773,7 +773,7 @@
 	     <div class="form-group {if $error}has-error{/if}">
 	        <div class="checkbox">
 	            <label>
-	                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1">
+	                <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $IS_PROMO}checked{/if}>
 	                {$label}
 	            </label>
 	        </div>
@@ -784,12 +784,14 @@
          <div class="form-group {if $error}has-error{/if}">
              <div class="checkbox">
                  <label>
-                     <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1">
+                     <input type="checkbox" id="{$label_attr.for}" name="{$name}" value="1" {if $IS_NEW}checked{/if}>
                      {$label}
                  </label>
              </div>
          </div>
          {/form_field}
+         {/loop}
+
 
          <div class="well well-sm" style="margin-bottom: 0"><b>{intl l='<span id="number_of_generated_combinations">0</span> combinations'}</b></div>
     </div>
