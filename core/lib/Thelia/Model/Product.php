@@ -152,10 +152,11 @@ class Product extends BaseProduct implements FileModelParentInterface
      * @param  int        $priceCurrencyId   the price currency Id
      * @param  int        $taxRuleId         the product tax rule ID
      * @param  float      $baseWeight        base weight in Kg
+     * @param  int        $baseQuantity     the product quantity (default: 0)
      * @throws \Exception
      */
 
-    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight)
+    public function create($defaultCategoryId, $basePrice, $priceCurrencyId, $taxRuleId, $baseWeight, $baseQuantity = 0)
     {
         $con = Propel::getWriteConnection(ProductTableMap::DATABASE_NAME);
 
@@ -175,7 +176,7 @@ class Product extends BaseProduct implements FileModelParentInterface
             $this->setTaxRuleId($taxRuleId);
 
             // Create the default product sale element of this product
-            $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true);
+            $this->createProductSaleElement($con, $baseWeight, $basePrice, $basePrice, $priceCurrencyId, true, false, false, $baseQuantity);
 
             // Store all the stuff !
             $con->commit();
