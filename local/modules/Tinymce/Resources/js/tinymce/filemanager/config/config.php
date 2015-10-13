@@ -108,11 +108,11 @@ if ($env !== "prod") {
     $thumbs_dir = '/media/'.$env.'/thumbs/';
 
     // path to file manager folder to upload folder for current env (with final /)
-    $current_path = THELIA_WEB_DIR.DS.'media'.DS.$env.DS.'upload'.DS;
+    $current_path = THELIA_WEB_DIR.'media'.DS.$env.DS.'upload'.DS;
 
     // path to file manager folder to thumbs folder for current env (with final /)
     // WARNING: thumbs folder should not be inside the upload folder
-    $thumbs_base_path = THELIA_WEB_DIR.DS.'media'.DS.$env.DS.'thumbs'.DS;
+    $thumbs_base_path = THELIA_WEB_DIR.'media'.DS.$env.DS.'thumbs'.DS;
 } else {
     // path from base_url to base of upload folder (with start and final /)
     $upload_dir = '/media/upload/';
@@ -121,11 +121,11 @@ if ($env !== "prod") {
     $thumbs_dir = '/media/thumbs/';
 
     // path to file manager folder to upload folder (with final /)
-    $current_path = THELIA_WEB_DIR.DS.'media'.DS.'upload'.DS;
+    $current_path = THELIA_WEB_DIR.'media'.DS.'upload'.DS;
 
     // path to file manager folder to thumbs folder (with final /)
     // WARNING: thumbs folder should not be inside the upload folder
-    $thumbs_base_path = THELIA_WEB_DIR.DS.'media'.DS.'thumbs'.DS;
+    $thumbs_base_path = THELIA_WEB_DIR.'media'.DS.'thumbs'.DS;
 }
 
 generateFolder($env);

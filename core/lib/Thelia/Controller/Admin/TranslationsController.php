@@ -189,7 +189,7 @@ class TranslationsController extends BaseAdminController
                 case 'in':
                     $directory = THELIA_SETUP_DIRECTORY;
                     $domain = 'install';
-                    $i18nDirectory = THELIA_SETUP_DIRECTORY . '/I18n';
+                    $i18nDirectory = THELIA_SETUP_DIRECTORY . 'I18n';
                     $walkMode = TranslationEvent::WALK_MODE_TEMPLATE;
                     // resources not loaded by default
                     $this->loadTranslation($i18nDirectory, $domain);
