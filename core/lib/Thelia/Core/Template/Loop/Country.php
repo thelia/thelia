@@ -133,6 +133,9 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
                 ->set("ISOALPHA3", $country->getIsoalpha3())
                 ->set("IS_DEFAULT", $country->getByDefault() ? "1" : "0")
                 ->set("IS_SHOP_COUNTRY", $country->getShopCountry() ? "1" : "0")
+                ->set("HAS_STATES", $country->getHasStates() ? "1" : "0")
+                ->set("NEED_ZIP_CODE", $country->getNeedZipCode() ? "1" : "0")
+                ->set("ZIP_CODE_FORMAT", $country->getZipCodeFormat())
             ;
 
             $this->addOutputFields($loopResultRow, $country);
