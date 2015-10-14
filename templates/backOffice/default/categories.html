@@ -507,133 +507,135 @@
             </div>
         {/form_field}
 
-        {form_field field='tax_rule'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='tax_rule'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-                <div class="form-group">
-                    <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
-                        <option value="">{intl l="Select a tax tule"}</option>
-                        {loop name="tax" type="tax-rule" backend_context="1"}
-                            <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
-                        {/loop}
-                    </select>
-                </div>
+                        <div class="form-group">
+                            <select id="{$label_attr.for}" required="required" name="{$name}" class="form-control">
+                                <option value="">{intl l="Select a tax tule"}</option>
+                                {loop name="tax" type="tax-rule" backend_context="1"}
+                                    <option value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}>{$TITLE}</option>
+                                {/loop}
+                            </select>
+                        </div>
 
-                <div class="help-block">{intl l='Select here the tax applicable to this product'}</div>
+                        <div class="help-block">{intl l='Select here the tax applicable to this product'}</div>
+                    </div>
+                {/form_field}
             </div>
-        {/form_field}
 
-        {* If there are some templates, display select template field *}
-        {ifloop rel="product_template"}
+            <div class="col-sm-6">
+                {* If there are some templates, display select template field *}
+                {ifloop rel="product_template"}
 
-            {* Get category template *}
-            {loop type="category" name="new_product_category" visible="*" id=$category_id}
-                {assign var="product_template" value=$TEMPLATE}
-                {assign var="parent_category" value=$PARENT}
-            {/loop}
-
-            {* If current category has no template, get a parent's one *}
-            {if !$product_template}
-                {while $parent_category != 0 && !$product_template}
-                    {loop type="category" name="parent_category" visible="*" id=$parent_category}
-                        {assign var="parent_category" value=$PARENT}
+                    {* Get category template *}
+                    {loop type="category" name="new_product_category" visible="*" id=$category_id}
                         {assign var="product_template" value=$TEMPLATE}
+                        {assign var="parent_category" value=$PARENT}
                     {/loop}
-                {/while}
-            {/if}
 
-            {form_field field='template_id'}
-                <div class="form-group {if $error}has-error{/if}">
-                    <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-
-                    <div class="form-group">
-                        <select id="{$label_attr.for}" name="{$name}" class="form-control">
-                            <option value="">{intl l="Select a template"}</option>
-                            {loop name="product_template" type="product-template"}
-                                <option value="{$ID}" {if $product_template == $ID}selected{/if}>{$NAME}</option>
+                    {* If current category has no template, get a parent's one *}
+                    {if !$product_template}
+                        {while $parent_category != 0 && !$product_template}
+                            {loop type="category" name="parent_category" visible="*" id=$parent_category}
+                                {assign var="parent_category" value=$PARENT}
+                                {assign var="product_template" value=$TEMPLATE}
                             {/loop}
-                        </select>
+                        {/while}
+                    {/if}
+
+                    {form_field field='template_id'}
+                        <div class="form-group {if $error}has-error{/if}">
+                            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+
+                            <div class="form-group">
+                                <select id="{$label_attr.for}" name="{$name}" class="form-control">
+                                    <option value="">{intl l="Select a template"}</option>
+                                    {loop name="product_template" type="product-template"}
+                                        <option value="{$ID}" {if $product_template == $ID}selected{/if}>{$NAME}</option>
+                                    {/loop}
+                                </select>
+                            </div>
+
+                            <div class="help-block">{intl l='Select here a template for this product'}</div>
+                        </div>
+                    {/form_field}
+                {/ifloop}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='price'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        {loop type="currency" name="default-currency" default_only="1" backend_context="1"}
+
+                            <div class="input-group">
+                                <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}" data-price-type="price-without-tax" data-rel-price="price_with_tax">
+                                <span class="input-group-addon">{$SYMBOL}</span>
+                            </div>
+
+                            <div class="help-block">{intl l='Enter here the product price in %title' title={$NAME}}</div>
+
+                            {form_field field='currency'}
+                                <input type="hidden" name="{$name}" value="{$ID}" />
+                            {/form_field}
+
+                        {/loop}
                     </div>
+                {/form_field}
+            </div>
 
-                    <div class="help-block">{intl l='Select here a template for this product'}</div>
+            <div class="col-sm-6">
+                {form_field field='tax_price'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+                        {loop type="currency" name="default-currency" default_only="1" backend_context="1"}
+
+                            <div class="input-group">
+                                <input type="text" id="{$label_attr.for}" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product tax price'}" data-price-type="price-with-tax" data-rel-price="price_without_tax">
+                                <span class="input-group-addon">{$SYMBOL}</span>
+                            </div>
+
+                            <div class="help-block">{intl l='Enter here the product tax price in %title' title={$NAME}}</div>
+                        {/loop}
+                    </div>
+                {/form_field}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-6">
+                {form_field field='weight'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label}: </label>
+
+                        <div class="input-group">
+                            <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
+                            <span class="input-group-addon">{intl l="Kg"}</span>
+                        </div>
+
+                        <div class="help-block">{intl l='Enter here the product weight, in Kilogrammes'}</div>
+                    </div>
+                {/form_field}
                 </div>
-            {/form_field}
-        {/ifloop}
 
-        {form_field field='price'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-				{loop type="currency" name="default-currency" default_only="1" backend_context="1"}
+                <div class="col-sm-6">
+                {form_field field='quantity'}
+                    <div class="form-group {if $error}has-error{/if}">
+                        <label for="{$label_attr.for}" class="control-label">{$label}: </label>
 
-					<div class="row">
-	                    <div class="col-lg-4">
-						    <div class="input-group">
-						        <input type="text" id="{$label_attr.for}" required="required" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product price'}" data-price-type="price-without-tax" data-rel-price="price_with_tax">
-						        <span class="input-group-addon">{$SYMBOL}</span>
-						    </div>
-					    </div>
-					</div>
-
-					<div class="help-block">{intl l='Enter here the product price in %title' title={$NAME}}</div>
-
-			        {form_field field='currency'}
-			            <input type="hidden" name="{$name}" value="{$ID}" />
-			        {/form_field}
-
-				{/loop}
-            </div>
-        {/form_field}
-
-        {form_field field='tax_price'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label} : </label>
-				{loop type="currency" name="default-currency" default_only="1" backend_context="1"}
-
-					<div class="row">
-	                    <div class="col-lg-4">
-						    <div class="input-group">
-						        <input type="text" id="{$label_attr.for}" name="{$name}" class="col-lg-2 form-control automatic_price_field" value="{$value}" title="{$label}" placeholder="{intl l='Product tax price'}" data-price-type="price-with-tax" data-rel-price="price_without_tax">
-						        <span class="input-group-addon">{$SYMBOL}</span>
-						    </div>
-					    </div>
-					</div>
-
-					<div class="help-block">{intl l='Enter here the product tax price in %title' title={$NAME}}</div>
-				{/loop}
-            </div>
-        {/form_field}
-
-        {form_field field='weight'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label}: </label>
-
-                <div class="row">
-                    <div class="col-lg-4">
-		                <div class="input-group">
-		                    <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product weight'}">
-		                    <span class="input-group-addon">{intl l="Kg"}</span>
-		                </div>
-		            </div>
-		        </div>
-
-                <div class="help-block">{intl l='Enter here the product weight, in Kilogrammes'}</div>
-            </div>
-        {/form_field}
-
-        {form_field field='quantity'}
-            <div class="form-group {if $error}has-error{/if}">
-                <label for="{$label_attr.for}" class="control-label">{$label}: </label>
-
-                <div class="row">
-                    <div class="col-lg-4">
                         <input type="text" id="{$label_attr.for}" name="{$name}" class="form-control" value="{$value}" title="{$label}" placeholder="{intl l='Product stock'}">
-                    </div>
-                </div>
 
-                <div class="help-block">{intl l='Enter here the product stock'}</div>
+                        <div class="help-block">{intl l='Enter here the product stock'}</div>
+                    </div>
+                {/form_field}
             </div>
-        {/form_field}
+        </div>
 
         {form_field field='virtual'}
         <div class="form-group {if $error}has-error{/if}">
