@@ -198,10 +198,10 @@ class ProductSaleElementsTableMap extends TableMap
         $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
         $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', 'RESTRICT', 'CartItems');
         $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', null, 'ProductPrices');
-        $this->addRelation('ProductSaleElementsProductImage', '\\Thelia\\Model\\ProductSaleElementsProductImage', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'ProductSaleElementsProductImages');
-        $this->addRelation('ProductSaleElementsProductDocument', '\\Thelia\\Model\\ProductSaleElementsProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'ProductSaleElementsProductDocuments');
-        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::MANY_TO_MANY, array(), null, null, 'ProductImages');
-        $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::MANY_TO_MANY, array(), null, null, 'ProductDocuments');
+        $this->addRelation('ProductSaleElementsProductImage', '\\Thelia\\Model\\ProductSaleElementsProductImage', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', 'RESTRICT', 'ProductSaleElementsProductImages');
+        $this->addRelation('ProductSaleElementsProductDocument', '\\Thelia\\Model\\ProductSaleElementsProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', 'RESTRICT', 'ProductSaleElementsProductDocuments');
+        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'ProductImages');
+        $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'ProductDocuments');
     } // buildRelations()
 
     /**
@@ -226,6 +226,8 @@ class ProductSaleElementsTableMap extends TableMap
                 AttributeCombinationTableMap::clearInstancePool();
                 CartItemTableMap::clearInstancePool();
                 ProductPriceTableMap::clearInstancePool();
+                ProductSaleElementsProductImageTableMap::clearInstancePool();
+                ProductSaleElementsProductDocumentTableMap::clearInstancePool();
             }
 
     /**

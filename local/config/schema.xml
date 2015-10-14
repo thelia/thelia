@@ -1688,10 +1688,10 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="product_image_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_image_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_image_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_image" name="fk_pse_product_image_product_image_id">
+    <foreign-key foreignTable="product_image" name="fk_pse_product_image_product_image_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_image_id" />
     </foreign-key>
     <index name="fk_pse_product_image_product_image_id_idx">
@@ -1705,10 +1705,10 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="product_document_id" required="true" type="INTEGER" />
-    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_document_product_sale_elements_id">
+    <foreign-key foreignTable="product_sale_elements" name="fk_pse_product_document_product_sale_elements_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
-    <foreign-key foreignTable="product_document" name="fk_pse_product_document_product_document_id">
+    <foreign-key foreignTable="product_document" name="fk_pse_product_document_product_document_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_document_id" />
     </foreign-key>
     <index name="fk_pse_product_document_product_document__idx">
