@@ -3353,6 +3353,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (312, '{$locale}', {intl l='Yamanashi' locale=$locale}){if ! $locale@last},{/if}
 
 {/foreach}
+;
 
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`, `description`) VALUES

@@ -7310,6 +7310,7 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (310, 'fr_FR', NULL),
     (311, 'fr_FR', NULL),
     (312, 'fr_FR', NULL)
+;
 
 
 INSERT INTO `tax_i18n` (`id`, `locale`, `title`, `description`) VALUES
