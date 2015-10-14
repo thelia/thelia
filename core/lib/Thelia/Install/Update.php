@@ -130,7 +130,7 @@ class Update
      */
     protected function getDatabaseConfig()
     {
-        $configPath = THELIA_CONF_DIR . "/database.yml";
+        $configPath = THELIA_CONF_DIR . "database.yml";
 
         if (!file_exists($configPath)) {
             throw new UpdateException("Thelia is not installed yet");

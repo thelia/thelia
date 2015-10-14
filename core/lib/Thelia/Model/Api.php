@@ -33,7 +33,7 @@ class Api extends BaseApi implements UserInterface
 
     private function getKeyDir()
     {
-        return THELIA_CONF_DIR . DS . 'key';
+        return THELIA_CONF_DIR . 'key';
     }
 
     private function generateSecureKey()
