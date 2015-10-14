@@ -14,7 +14,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop name="country_edit" type="country" id="$country_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="country_edit" type="country" id="$country_id" backend_context="1" lang="$edit_language_id" visible="*"}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -58,6 +58,8 @@
 
                                             <div class="row">
             	                                <div class="col-md-6">
+                                                    {render_form_field field="visible"}
+
                                                     {include file="includes/standard-description-form-fields.html"}
                                                 </div>
 
@@ -65,6 +67,10 @@
                                                     {render_form_field field="isocode"}
                                                     {render_form_field field="isoalpha2"}
                                                     {render_form_field field="isoalpha3"}
+
+                                                    {render_form_field field="has_states"}
+                                                    {render_form_field field="need_zip_code"}
+                                                    {render_form_field field="zip_code_format"}
 
                                                     <div class="panel panel-default">
                                                         <div class="panel-heading">
@@ -88,6 +94,20 @@
                                         </form>
         							{/form}
 
+                                    {ifloop rel="states"}
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <h3 class="panel-title">{intl l="States/provinces for this country"}</h3>
+                                        </div>
+                                        <div class="panel-body">
+                                            <ul class="list-unstyled">
+                                                {loop name="states" type="state" country=$country_id visible="*" backend_context="1"}
+                                                    <li><a href="">{$NAME}</a></li>
+                                                {/loop}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    {/ifloop}
         						</div>
         					</div>
 

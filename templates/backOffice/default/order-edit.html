@@ -409,7 +409,7 @@
                                                             </tr>
                                                             <tr data-field-class="js-country" data-value="{$COUNTRY}">
                                                                 <th>{intl l="Country"}</th>
-                                                                <td>{loop type="country" name="order-invoice-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
+                                                                <td>{loop type="country" name="order-invoice-address-country" id=$COUNTRY visible="*"}{$TITLE}{/loop}</td>
                                                             </tr>
                                                             <tr data-field-class="js-phone">
                                                                 <th>{intl l="Phone"}</th>
@@ -489,7 +489,7 @@
                                                                 </tr>
                                                                 <tr data-field-class="js-country" data-value="{$COUNTRY}">
                                                                     <th>{intl l="Country"}</th>
-                                                                    <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY}{$TITLE}{/loop}</td>
+                                                                    <td>{loop type="country" name="order-delivery-address-country" id=$COUNTRY visible="*"}{$TITLE}{/loop}</td>
                                                                 </tr>
                                                                 <tr data-field-class="js-phone">
                                                                     <th>{intl l="Phone"}</th>
@@ -620,7 +620,7 @@
                 <div class="form-group {if $error}has-error{/if}">
                     <label for="{$label_attr.for}" class="control-label">{$label} : </label>
                     <select name="{$name}" id="{$label_attr.for}" class="form-control js-country">
-                        {loop type="country" name="country1"}
+                        {loop type="country" name="country1" visible="*"}
                             <option value="{$ID}">{$TITLE}</option>
                         {/loop}
                     </select>

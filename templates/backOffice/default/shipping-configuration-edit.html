@@ -80,7 +80,7 @@
 
                                         {custom_render_form_field field='country_id'}
                                             <select multiple {form_field_attributes field="country_id"}>
-                                                {loop name="country-not-in-this-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id}
+                                                {loop name="country-not-in-this-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id visible="*"}
                                                     <option value="{$ID}">{$TITLE}</option>
                                                 {/loop}
                                             </select>
@@ -107,14 +107,14 @@
                                                 <tr>
                                                     <th>{intl l="Countries assigned to this zone"}</th>
                                                     <th class="text-center">
-                                                        {if {count type="country" area=$area_id backend_context=1} > 0}
+                                                        {if {count type="country" area=$area_id backend_context=1 visible="*"} > 0}
                                                             {intl l='Select'} <a id="select-all" href="#">{intl l='all'}</a> - <a id="select-none" href="#">{intl l='none'}</a> - <a id="select-reverse" href="#">{intl l='reverse'}</a>
                                                         {/if}
                                                     </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {loop name="country-area" type="country" area=$area_id backend_context="1"}
+                                                {loop name="country-area" type="country" area=$area_id backend_context="1" visible="*"}
                                                     <tr>
                                                         <td>{$TITLE}</td>
                                                         <td class="text-center">

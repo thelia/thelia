@@ -115,7 +115,7 @@
                             <form id="country-selector-form" action="{url path="/admin/configuration/taxes_rules/update/%id" id=$tax_rule_id}" method="GET">
                                 <input type="hidden" name="tab" value="taxes">
                                 <select id="country-selector" name="country" data-toggle="selectpicker">
-                                    {loop type="country" name="country-list"}
+                                    {loop type="country" name="country-list" visible="*"}
                                         <option value="{$ID}" {if $ID == $asked_country}selected="selected"{/if}>{$TITLE}</option>
                                     {/loop}
                                 </select>
@@ -246,7 +246,7 @@
             <div class="form-group">
                 <div class="input-group">
                     <select id="countries-select" class="" name="{$name}" data-toggle="selectpicker" multiple>
-                        {loop type="country" name="country-list"}
+                        {loop type="country" name="country-list" visible="*"}
                             <option value='{$ID}' {if (!$value AND in_array($ID, $matchedCountries)) OR ($value AND in_array($ID, $value))}selected="selected"{/if}>{$TITLE}</option>
                         {/loop}
                     </select>

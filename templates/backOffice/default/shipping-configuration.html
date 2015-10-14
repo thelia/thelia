@@ -52,13 +52,13 @@
                                 <tr>
                                     <td nowrap><a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}">{$NAME}</a></td>
                                     <td>
-                                        {loop name="country-area" type="country" area=$ID backend_context="1" limit="6"}
+                                        {loop name="country-area" type="country" area=$ID backend_context="1" limit="6" visible="*"}
                                             {$TITLE}{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
                                         {/loop}
 
                                         {ifloop rel="country-area-more"}
                                             {$countries = ''}
-                                            {loop name="country-area-more" type="country" area=$ID backend_context="1" offset="6"}
+                                            {loop name="country-area-more" type="country" area=$ID backend_context="1" offset="6" visible="*"}
                                                 {$countries = "$countries, $TITLE"}
                                                 {$ctry_count=$LOOP_COUNT}
                                             {/loop}

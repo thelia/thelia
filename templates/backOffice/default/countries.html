@@ -44,7 +44,7 @@
 
                             <div class="table-responsive">
                                 <table class="table table-striped table-condensed">
-                                   <caption class="clearfix">
+                                    <caption class="clearfix">
                                         {intl l='Countries'}
                                         {loop type="auth" name="can_create" role="ADMIN" resource="admin.configuration.country" access="CREATE"}
                                             <a class="btn btn-primary action-btn" title="{intl l='Add a new country'}" href="#add_country_dialog" data-toggle="modal">
@@ -60,6 +60,7 @@
                                             <th>{intl l="N° ISO"}</th>
                                             <th>{intl l="ISO Code"}</th>
                                             <th>{intl l="Shipping zone"}</th>
+                                            <th>{intl l="Visible"}</th>
 
                                             {hook name="countries.table-header" location="countries_table_header" }
 
@@ -68,7 +69,7 @@
                                     </thead>
 
                                     <tbody>
-                                        {loop name="countries" type="country" backend_context="1" lang=$lang_id order=$order}
+                                        {loop name="countries" type="country" backend_context="1" lang=$lang_id order=$order visible="*"}
                                             <tr>
                                                 <td>{$ID}</td>
                                                 <td><a href="{url path="/admin/configuration/country/update/%id" id=$ID}">{$TITLE}</a></td>
@@ -77,16 +78,8 @@
                                                         <input class="change-default-toggle" type="radio" name="by_default" value="{$ID}" {if $IS_DEFAULT}checked="checked"{/if}/>
                                                     </div>
                                                 </td>
-                                                {*
-                                                <td>
-                                                    <div class="make-switch switch-small switch-radio" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
-                                                        <input class="change-default" type="radio" name="" value="{$ID}" {if $IS_DEFAULT}selected="selected"{/if}/>
-                                                    </div>                                                
-                                                </td>
-                                                *}
                                                 <td>{$ISOCODE}</td>
                                                 <td>{$ISOALPHA3}</td>
-
                                                 <td>
                                                     {loop type="area" name="country-area" country={$ID}}
                                                         <a href="{url path="/admin/configuration/shipping_configuration/update/%id" id=$ID}">{$NAME}</a>{if $LOOP_COUNT < $LOOP_TOTAL},{/if}
@@ -95,6 +88,20 @@
                                                         <span class="text-warning"><i class="glyphicon glyphicon-warning-sign"></i> {intl l='None'}</span>
                                                     {/elseloop}
                                                 </td>
+                                                <td class="text-center">
+                                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.country" access="UPDATE"}
+                                                        <div class="make-switch switch-small visibleToggle" data-id="{$ID}"  data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                            <input type="checkbox" class="visibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                        </div>
+                                                    {/loop}
+
+                                                    {elseloop rel="can_change"}
+                                                        <div class="make-switch switch-small" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                            <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                                        </div>
+                                                    {/elseloop}
+                                                </td>
+
 
                                                 {hook name="countries.table-row" location="countries_table_row" country_id={$ID} }
 
@@ -172,6 +179,14 @@
             {render_form_field field="isocode"}
             {render_form_field field="isoalpha2"}
             {render_form_field field="isoalpha3"}
+
+            {custom_render_form_field field="visible"}
+                <input type="checkbox" checked {form_field_attributes field="visible"}> {$label}
+            {/custom_render_form_field}
+
+            {custom_render_form_field field="has_states"}
+                <input type="checkbox" {form_field_attributes field="has_states"}> {$label}
+            {/custom_render_form_field}
 
             {hook name="country.create-form" location="country_create_form" }
 
@@ -260,6 +275,18 @@
                             $('#toggle-default-failed').modal('show');
                         });
                     }
+                });
+
+                {* Visibility toggle *}
+
+                $(".visibleToggle").on('switch-change', function(event, data) {
+                    $.ajax({
+                        url : "{url path='admin/configuration/country/toggle-online'}",
+                        data : {
+                            country_id : $(this).data('id'),
+                            action : 'visibilityToggle'
+                        }
+                    });
                 });
             });
 

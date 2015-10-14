@@ -15,6 +15,7 @@ namespace Thelia\Controller\Admin;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
+use Thelia\Core\Event\Country\CountryToggleVisibilityEvent;
 use Thelia\Core\Event\Country\CountryUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\AccessManager;
@@ -39,7 +40,8 @@ class CountryController extends AbstractCrudController
             AdminResources::COUNTRY,
             TheliaEvents::COUNTRY_CREATE,
             TheliaEvents::COUNTRY_UPDATE,
-            TheliaEvents::COUNTRY_DELETE
+            TheliaEvents::COUNTRY_DELETE,
+            TheliaEvents::COUNTRY_TOGGLE_VISIBILITY
         );
     }
 
@@ -69,10 +71,17 @@ class CountryController extends AbstractCrudController
         $data = array(
             'id' => $object->getId(),
             'locale' => $object->getLocale(),
+            'visible' => $object->getVisible() ? true : false,
             'title' => $object->getTitle(),
+            'chapo' => $object->getChapo(),
+            'description' => $object->getDescription(),
+            'postscriptum' => $object->getPostscriptum(),
             'isocode' => $object->getIsocode(),
             'isoalpha2' => $object->getIsoalpha2(),
             'isoalpha3' => $object->getIsoalpha3(),
+            'has_states' => $object->getHasStates() ? true : false,
+            'need_zip_code' => $object->getNeedZipCode() ? true : false,
+            'zip_code_format' => $object->getZipCodeFormat(),
         );
 
         return $this->createForm(AdminForm::COUNTRY_MODIFICATION, 'form', $data);
@@ -99,17 +108,30 @@ class CountryController extends AbstractCrudController
     {
         $event = new CountryUpdateEvent($formData['id']);
 
-        return $this->hydrateEvent($event, $formData);
+        $event = $this->hydrateEvent($event, $formData);
+
+        $event
+            ->setChapo($formData['chapo'])
+            ->setDescription($formData['description'])
+            ->setPostscriptum($formData['postscriptum'])
+            ->setNeedZipCode($formData['need_zip_code'])
+            ->setZipCodeFormat($formData['zip_code_format'])
+        ;
+
+        return $event;
+
     }
 
     protected function hydrateEvent($event, $formData)
     {
         $event
             ->setLocale($formData['locale'])
+            ->setVisible($formData['visible'])
             ->setTitle($formData['title'])
             ->setIsocode($formData['isocode'])
             ->setIsoAlpha2($formData['isoalpha2'])
             ->setIsoAlpha3($formData['isoalpha3'])
+            ->setHasStates($formData['has_states'])
         ;
 
         return $event;
@@ -246,4 +268,13 @@ class CountryController extends AbstractCrudController
 
         return $this->nullResponse(500);
     }
+
+    /**
+     * @return CountryToggleVisibilityEvent|void
+     */
+    protected function createToggleVisibilityEvent()
+    {
+        return new CountryToggleVisibilityEvent($this->getExistingObject());
+    }
+
 }

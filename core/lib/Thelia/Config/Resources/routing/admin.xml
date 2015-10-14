@@ -885,6 +885,10 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::toggleDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.countries.toggle-online" path="/admin/configuration/country/toggle-online">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::setToggleVisibilityAction</default>
+    </route>
+
     <!-- end countries routes management -->
 
     <!-- profiles management -->

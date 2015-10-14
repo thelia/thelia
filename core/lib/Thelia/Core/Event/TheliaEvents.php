@@ -151,6 +151,7 @@ final class TheliaEvents
     const AFTER_DELETECOUNTRY    = "action.after_deleteCountry";
 
     const COUNTRY_TOGGLE_DEFAULT = "action.toggleCountryDefault";
+    const COUNTRY_TOGGLE_VISIBILITY = "action.toggleCountryVisibility";
     // -- END COUNTRY EVENTS ---------------------------------------------------------
 
 
