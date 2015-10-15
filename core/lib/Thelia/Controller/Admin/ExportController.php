@@ -29,6 +29,7 @@ use Thelia\Form\Exception\FormValidationException;
 use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\ImportExport\Export\ImagesExportInterface;
+use Thelia\Model\Export;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
@@ -53,6 +54,67 @@ class ExportController extends BaseAdminController
         $this->setOrders();
 
         return $this->render('export');
+    }
+
+    /**
+     * @param  integer  $id
+     * @return Response
+     *
+     * This method is called when the route /admin/export/{id}
+     * is called with a GET request.
+     *
+     * It returns a modal view if the request is an AJAX one,
+     * otherwise it generates a "normal" back-office page
+     */
+    public function exportView($id)
+    {
+        if (null === $export = $this->getExport($id)) {
+            return $this->pageNotFound();
+        }
+
+        /**
+         * Use the loop to inject the same vars in the Template engine
+         */
+        $loop = new ExportLoop($this->container);
+
+        $loop->initializeArgs([
+            "id" => $export->getId()
+        ]);
+
+        $query = $loop->buildModelCriteria();
+        $result= $query->find();
+
+        $results = $loop->parseResults(
+            new LoopResult($result)
+        );
+
+        $parserContext = $this->getParserContext();
+
+        /** @var \Thelia\Core\Template\Element\LoopResultRow $row */
+        foreach ($results as $row) {
+            foreach ($row->getVarVal() as $name => $value) {
+                $parserContext->set($name, $value);
+            }
+        }
+
+        /**
+         * Inject conditions in template engine,
+         * It is used to display or not the checkboxes "Include images"
+         * and "Include documents"
+         */
+        $this->getParserContext()
+            ->set("HAS_IMAGES", $export->hasImages($this->container))
+            ->set("HAS_DOCUMENTS", $export->hasDocuments($this->container))
+            ->set("IS_RANGE_EXPORT", $this->isRangeExport($export))
+            ->set("CURRENT_LANG_ID", $this->getSession()->getLang()->getId())
+        ;
+
+        /** Then render the form */
+        if ($this->getRequest()->isXmlHttpRequest()) {
+            return $this->render("ajax/export-modal");
+        } else {
+            return $this->render("export-page");
+        }
     }
 
     /**
@@ -275,67 +337,6 @@ class ExportController extends BaseAdminController
         }
     }
 
-    /**
-     * @param  integer  $id
-     * @return Response
-     *
-     * This method is called when the route /admin/export/{id}
-     * is called with a GET request.
-     *
-     * It returns a modal view if the request is an AJAX one,
-     * otherwise it generates a "normal" back-office page
-     */
-    public function exportView($id)
-    {
-        if (null === $export = $this->getExport($id)) {
-            return $this->pageNotFound();
-        }
-
-        /**
-         * Use the loop to inject the same vars in the Template engine
-         */
-        $loop = new ExportLoop($this->container);
-
-        $loop->initializeArgs([
-            "id" => $export->getId()
-        ]);
-
-        $query = $loop->buildModelCriteria();
-        $result= $query->find();
-
-        $results = $loop->parseResults(
-            new LoopResult($result)
-        );
-
-        $parserContext = $this->getParserContext();
-
-        /** @var \Thelia\Core\Template\Element\LoopResultRow $row */
-        foreach ($results as $row) {
-            foreach ($row->getVarVal() as $name => $value) {
-                $parserContext->set($name, $value);
-            }
-        }
-
-        /**
-         * Inject conditions in template engine,
-         * It is used to display or not the checkboxes "Include images"
-         * and "Include documents"
-         */
-        $this->getParserContext()
-            ->set("HAS_IMAGES", $export->hasImages($this->container))
-            ->set("HAS_DOCUMENTS", $export->hasDocuments($this->container))
-            ->set("CURRENT_LANG_ID", $this->getSession()->getLang()->getId())
-        ;
-
-        /** Then render the form */
-        if ($this->getRequest()->isXmlHttpRequest()) {
-            return $this->render("ajax/export-modal");
-        } else {
-            return $this->render("export-page");
-        }
-    }
-
-
     public function changePosition()
     {
         if (null !== $response = $this->checkAuth([AdminResources::EXPORT], [], [AccessManager::UPDATE])) {
@@ -446,5 +447,22 @@ class ExportController extends BaseAdminController
         }
 
         return $category;
+    }
+
+    /**
+     * @param Export $export
+     * @return bool
+     */
+    protected function isRangeExport(Export $export)
+    {
+        $handleClassName = $export->getHandleClass();
+
+        if (! class_exists($handleClassName)) {
+            throw new \LogicException('Class : ' . $handleClassName . ' not found');
+        }
+
+        /** @var ExportHandler $handle */
+        $handle = new $handleClassName($this->getContainer());
+        return $handle->isRangeExport();
     }
 }

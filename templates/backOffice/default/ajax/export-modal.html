@@ -27,73 +27,66 @@
                             </div>
                         {/if}
 
-                        {$showRange  = false}
-                        {loop name="export-category" type="export-category" id=$CATEGORY_ID limit=1}
-                            {if $TITLE == {intl l="Orders"} }
-                                {$showRange  = true}
-                            {/if}
-                        {/loop}
-
-                        {if $showRange}
-                        <div class="row">
-                            <div class="col-md-4">
-                                {form_field field="range_date_start"}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
+                        {if $IS_RANGE_EXPORT}
+                            <div class="row">
+                                <div class="col-md-4">
+                                    {form_field field="range_date_start"}
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="{$label_attr.for}">
+                                                    {$label}
+                                                </label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <select name="{$name}[year]" id="{$label_attr.for}_year">
+                                                    {foreach from=$years item=m}
+                                                        <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                                <select name="{$name}[month]" id="{$label_attr.for}_month">
+                                                    {foreach from=$months item=m}
+                                                        <option value="{$m}" {if {$smarty.now|date_format:'%m'} == $m} selected {/if}>{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                                <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
+                                                    {foreach from=$days item=m}
+                                                        <option value="{$m}">{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                            </div>
                                         </div>
-                                        <div class="col-md-12">
-                                            <select name="{$name}[year]" id="{$label_attr.for}_year">
-                                                {foreach from=$years item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[month]" id="{$label_attr.for}_month">
-                                                {foreach from=$months item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%m'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
-                                                {foreach from=$days item=m}
-                                                    <option value="{$m}">{$m}</option>
-                                                {/foreach}
-                                            </select>
+                                    {/form_field}
+                                </div>
+                                <div class="col-md-4">
+                                    {form_field field="range_date_end"}
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label for="{$label_attr.for}">
+                                                    {$label}
+                                                </label>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <select name="{$name}[year]" id="{$label_attr.for}_year">
+                                                    {foreach from=$years item=m}
+                                                        <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                                <select name="{$name}[month]" id="{$label_attr.for}_month">
+                                                    {foreach from=$months item=m}
+                                                        <option value="{$m}" {if {$smarty.now|date_format:'%m'}+1 == $m} selected {/if}>{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                                <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
+                                                    {foreach from=$days item=m}
+                                                        <option value="{$m}">{$m}</option>
+                                                    {/foreach}
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                {/form_field}
+                                    {/form_field}
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                {form_field field="range_date_end"}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <select name="{$name}[year]" id="{$label_attr.for}_year">
-                                                {foreach from=$years item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[month]" id="{$label_attr.for}_month">
-                                                {foreach from=$months item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%m'}+1 == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
-                                                {foreach from=$days item=m}
-                                                    <option value="{$m}">{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                        </div>
-                                    </div>
-                                {/form_field}
-                            </div>
-                        </div>
-                        <br>
+                            <br>
                         {/if}
                         <div class="row">
                             <div class="col-md-12">
