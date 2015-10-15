@@ -40,6 +40,7 @@ use Thelia\Type\TypeCollection;
  * @method int[] getExcludeArea()
  * @method int[] getExclude()
  * @method int[] getWithArea()
+ * @method bool|string getHasStates()
  * @method bool|string getVisible()
  * @method string[] getOrder()
  */
@@ -58,6 +59,7 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('exclude_area'),
             Argument::createBooleanTypeArgument('with_area'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanOrBothTypeArgument('has_states', BooleanOrBothType::ANY),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
@@ -128,6 +130,11 @@ class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $hasStates = $this->getHasStates();
+        if ($hasStates !== BooleanOrBothType::ANY) {
+            $search->filterByHasStates($hasStates ? 1 : 0);
         }
 
         $visible = $this->getVisible();

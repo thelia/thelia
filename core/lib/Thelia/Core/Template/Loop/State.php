@@ -42,7 +42,8 @@ use Thelia\Type\TypeCollection;
  */
 class State extends BaseI18nLoop implements PropelSearchLoopInterface
 {
-    protected $timestampable = true;
+    protected $countable = true;
+    protected $timestampable = false;
 
     /**
      * @return ArgumentCollection

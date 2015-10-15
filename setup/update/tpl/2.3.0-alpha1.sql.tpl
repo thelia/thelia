@@ -37,16 +37,48 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 
 INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
 {foreach $locales as $locale}
-    (@max_id+1,  '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
-    (@max_id+2,  '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
-    (@max_id+3,  '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
-    (@max_id+4,  '{$locale}', {intl l='Category edit - right column bottom' locale=$locale}, NULL, NULL),
-    (@max_id+5,  '{$locale}', {intl l='Content edit - right column top' locale=$locale}, NULL, NULL),
-    (@max_id+6,  '{$locale}', {intl l='Content edit - right column bottom' locale=$locale}, NULL, NULL),
-    (@max_id+7,  '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
-    (@max_id+8,  '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
-    (@max_id+9,  '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
-    (@max_id+10, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+(@max_id+1,  '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
+(@max_id+2,  '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
+(@max_id+3,  '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
+(@max_id+4,  '{$locale}', {intl l='Category edit - right column bottom' locale=$locale}, NULL, NULL),
+(@max_id+5,  '{$locale}', {intl l='Content edit - right column top' locale=$locale}, NULL, NULL),
+(@max_id+6,  '{$locale}', {intl l='Content edit - right column bottom' locale=$locale}, NULL, NULL),
+(@max_id+7,  '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
+(@max_id+8,  '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
+(@max_id+9,  '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
+(@max_id+10, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+
+{/foreach}
+;
+
+/* States */
+SELECT @max_id := IFNULL(MAX(`id`),0) FROM `hook`;
+
+INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
+(@max_id + 1, 'state-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 2, 'state-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 3, 'state.edit-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 4, 'states.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 5, 'states.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 6, 'states.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 7, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 8, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 9, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(@max_id + 10, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+;
+
+INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUES
+{foreach $locales as $locale}
+(@max_id + 1, '{$locale}', {intl l='state-edit - at the top' locale=$locale}, '', ''),
+(@max_id + 2, '{$locale}', {intl l='state-edit - bottom' locale=$locale}, '', ''),
+(@max_id + 3, '{$locale}', {intl l='state - Edit JavaScript' locale=$locale}, '', ''),
+(@max_id + 4, '{$locale}', {intl l='states - at the top' locale=$locale}, '', ''),
+(@max_id + 5, '{$locale}', {intl l='states - table header' locale=$locale}, '',    ''),
+(@max_id + 6, '{$locale}', {intl l='states - table row' locale=$locale}, '', ''),
+(@max_id + 7, '{$locale}', {intl l='states - bottom' locale=$locale}, '', ''),
+(@max_id + 8, '{$locale}', {intl l='state - creation form' locale=$locale}, '',  ''),
+(@max_id + 9, '{$locale}', {intl l='state - delete form' locale=$locale}, '', ''),
+(@max_id + 10, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;

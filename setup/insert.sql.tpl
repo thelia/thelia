@@ -729,8 +729,17 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (1402, 'folder.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1403, 'folder.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (1404, 'product.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(1405, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
-;
+(1405, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1406, 'state-edit.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1407, 'state-edit.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1408, 'state.edit-js', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1409, 'states.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1410, 'states.table-header', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1411, 'states.table-row', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1412, 'states.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1413, 'state.create-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1414, 'state.delete-form', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(1415, 'states.js', 2, 0, 0, 1, 1, 1, NOW(), NOW());
 
 -- Insert pdf hooks
 INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activate`, `position`, `created_at`, `updated_at`) VALUES
@@ -2680,7 +2689,17 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (1402, '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
     (1403, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
     (1404, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
-    (1405, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (1405, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL),
+    (1406, '{$locale}', {intl l='state-edit - at the top' locale=$locale}, '', ''),
+    (1407, '{$locale}', {intl l='state-edit - bottom' locale=$locale}, '', ''),
+    (1408, '{$locale}', {intl l='state - Edit JavaScript' locale=$locale}, '', ''),
+    (1409, '{$locale}', {intl l='states - at the top' locale=$locale}, '', ''),
+    (1410, '{$locale}', {intl l='states - table header' locale=$locale}, '',    ''),
+    (1411, '{$locale}', {intl l='states - table row' locale=$locale}, '', ''),
+    (1412, '{$locale}', {intl l='states - bottom' locale=$locale}, '', ''),
+    (1413, '{$locale}', {intl l='state - creation form' locale=$locale}, '',  ''),
+    (1414, '{$locale}', {intl l='state - delete form' locale=$locale}, '', ''),
+    (1415, '{$locale}', {intl l='states - JavaScript' locale=$locale}, '', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;
