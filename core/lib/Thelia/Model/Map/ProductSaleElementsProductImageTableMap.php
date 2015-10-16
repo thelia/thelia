@@ -147,8 +147,8 @@ class ProductSaleElementsProductImageTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
-        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::MANY_TO_ONE, array('product_image_id' => 'id', ), null, null);
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::MANY_TO_ONE, array('product_image_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
