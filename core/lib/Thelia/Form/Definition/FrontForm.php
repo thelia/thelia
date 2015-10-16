@@ -24,7 +24,7 @@ final class FrontForm
     const ADDRESS_UPDATE = 'thelia.front.address.update';
     const CART_ADD = 'thelia.cart.add';
     const CONTACT = 'thelia.front.contact';
-    const COUPON_CONSUME = 'thelia.coupon.code';
+    const COUPON_CONSUME = 'thelia.order.coupon';
     const CUSTOMER_LOGIN = 'thelia.front.customer.login';
     const CUSTOMER_LOST_PASSWORD = 'thelia.front.customer.lostpassword';
     const CUSTOMER_CREATE = 'thelia.front.customer.create';
