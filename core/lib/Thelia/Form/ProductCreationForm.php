@@ -54,7 +54,7 @@ class ProductCreationForm extends BaseForm
                 "label"      => Translator::getInstance()->trans("This product does not have a physical presence"),
                 "label_attr" => array("for" => "virtual_field"),
             ))
-            ;
+        ;
 
         if (! $change_mode) {
             $this->formBuilder
@@ -63,10 +63,10 @@ class ProductCreationForm extends BaseForm
                     "label"      => Translator::getInstance()->trans("Product base price excluding taxes *"),
                     "label_attr" => array("for" => "price_without_tax"),
                 ))
-               ->add("tax_price", "number", array(
-                       "label"      => Translator::getInstance()->trans("Product base price with taxes"),
-                       "label_attr" => array("for" => "price_with_tax"),
-                   ))
+                ->add("tax_price", "number", array(
+                    "label"      => Translator::getInstance()->trans("Product base price with taxes"),
+                    "label_attr" => array("for" => "price_with_tax"),
+                ))
                 ->add("currency", "integer", array(
                     "constraints" => array(new NotBlank()),
                     "label"      => Translator::getInstance()->trans("Price currency *"),
@@ -80,6 +80,16 @@ class ProductCreationForm extends BaseForm
                 ->add("weight", "number", array(
                     "label"      => Translator::getInstance()->trans("Weight"),
                     "label_attr" => array("for" => "weight_field"),
+                ))
+                ->add("quantity", "number", array(
+                    "label"      => Translator::getInstance()->trans("Stock"),
+                    "label_attr" => array("for" => "quantity_field"),
+                    "required"   => false
+                ))
+                ->add("template_id", "integer", array(
+                    "label"      => Translator::getInstance()->trans("Template"),
+                    "label_attr" => array("for" => "template_field"),
+                    "required"   => false
                 ))
             ;
         }
