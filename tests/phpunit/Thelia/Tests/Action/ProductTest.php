@@ -124,6 +124,69 @@ class ProductTest extends TestCaseWithURLToolSetup
         return $createdProduct;
     }
 
+    public function testCreateWithOptionalParametersAction()
+    {
+        $event = new ProductCreateEvent();
+        $defaultCategory = CategoryQuery::create()->addAscendingOrderByColumn('RAND()')->findOne();
+        $taxRuleId = TaxRuleQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
+        $currencyId = CurrencyQuery::create()->select('id')->addAscendingOrderByColumn('RAND()')->findOne();
+        $templateId = $defaultCategory->getDefaultTemplateId();
+
+        if (null === $templateId) {
+            $templateId = TemplateQuery::create()->addAscendingOrderByColumn('RAND()')->findOne()->getId();
+        }
+
+        $event
+            ->setRef('testCreateWithOptionalParameters')
+            ->setLocale('fr_FR')
+            ->setTitle('test create new product with optional parameters')
+            ->setVisible(1)
+            ->setDefaultCategory($defaultCategory->getId())
+            ->setBasePrice(10)
+            ->setTaxRuleId($taxRuleId)
+            ->setBaseWeight(10)
+            ->setCurrencyId($currencyId)
+            ->setBaseQuantity(10)
+            ->setTemplateId($templateId)
+            ->setDispatcher($this->getDispatcher());
+
+        $action = new Product();
+        $action->create($event);
+
+        $createdProduct = $event->getProduct();
+
+        $this->assertInstanceOf('Thelia\Model\Product', $createdProduct);
+
+        $this->assertFalse($createdProduct->isNew());
+
+        $createdProduct->setLocale('fr_FR');
+
+        $this->assertEquals('test create new product with optional parameters', $createdProduct->getTitle());
+        $this->assertEquals('testCreateWithOptionalParameters', $createdProduct->getRef());
+        $this->assertEquals(1, $createdProduct->getVisible());
+        $this->assertEquals($defaultCategory->getId(), $createdProduct->getDefaultCategoryId());
+        $this->assertGreaterThan(0, $createdProduct->getPosition());
+        $this->assertEquals($templateId, $createdProduct->getTemplateId());
+
+        $productSaleElements = $createdProduct->getProductSaleElementss();
+
+        $this->assertEquals(1, count($productSaleElements));
+
+        $defaultProductSaleElement = $productSaleElements->getFirst();
+
+        $this->assertTrue($defaultProductSaleElement->getIsDefault());
+        $this->assertEquals(0, $defaultProductSaleElement->getPromo());
+        $this->assertEquals(0, $defaultProductSaleElement->getNewness());
+        $this->assertEquals($createdProduct->getRef(), $defaultProductSaleElement->getRef());
+        $this->assertEquals(10, $defaultProductSaleElement->getWeight());
+        $this->assertEquals(10, $defaultProductSaleElement->getQuantity());
+
+        $productPrice = $defaultProductSaleElement->getProductPrices()->getFirst();
+
+        $this->assertEquals(10, $productPrice->getPrice());
+        $this->assertEquals($currencyId, $productPrice->getCurrencyId());
+    }
+
     /**
      * @depends testCreate
      */
