@@ -1022,7 +1022,7 @@ return array(
     'Test your configuration' => 'Tester la configuration',
     'Text version of this message' => 'Version texte du message',
     'That way, Thelia community will benefit of your translations' => 'De cette façon, la communauté de Thelia bénéficiera de vos traductions',
-    'The default pricing is used when no combination is defined.' => 'Le prix pas défaut est utilisez lorsqu\'aucune combinaison n\'est utilisé',
+    'The default pricing is used when no combination is defined.' => 'Le prix par défaut est utilisé lorsqu\'aucune combinaison n\'est utilisée.',
     'The destinations processes logs to display, store or send them. You can select and configure zero, one or more destinations below.' => 'Les destinations permettent d\'afficher, stocker ou bien envoyer les logs. Vous pouvez en sélectionner zéro, un ou plusieurs dans la liste ci-dessous',
     'The detailed description.' => 'La description détaillée.',
     'The directory local/I18n does not exist or is not writable. Please fix this issue before.' => 'Le dossier local/I18n n\'existe pas ou n\'est pas accessible en écriture. Veuillez corriger le problème.',
