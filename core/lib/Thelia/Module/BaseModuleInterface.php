@@ -26,5 +26,7 @@ interface BaseModuleInterface
 
     public function postDeactivation(ConnectionInterface $con = null);
 
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null);
+
     public function destroy(ConnectionInterface $con = null, $deleteModuleData = false);
 }

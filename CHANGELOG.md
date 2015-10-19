@@ -1,6 +1,16 @@
 # 2.3.0-alpha1
 
+- #1727 Add template & stock inputs on product creation
+- #1722 Replaced parameter "locale" with "lang" in generated URL
+- #1732 Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document
+- #1730 Change layout to only cache assets/dist
+- #1734 Fix critical performance issue on ProductController HydrateObjectForm
+- #1733 Fix order attribute in BaseHook
+- #1729 Fix all useless DIRECTORY_SEPARATOR
+- #1726 Fix method setRangeDate variable
 - #1718 Autocomplete combination generation form with default pse values
+- #1699 Fix missing use for BirthdayType
+- #1713 Add more options for content, folder and order in search results
 - #1706 Fix form coupon not found in frontOffice order invoice
 - #1700 Fix source priority in ```ParserContext::getForm```
 - #1588 Add document tab in frontOffice product page
