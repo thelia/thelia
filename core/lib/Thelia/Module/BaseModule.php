@@ -521,7 +521,7 @@ class BaseModule extends ContainerAware implements BaseModuleInterface
      * @param string $newVersion the new module version, as defined in the module.xml file
      * @param ConnectionInterface $con
      */
-    public function update($currentVersion, $newVersion, ConnectionInterface $con)
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
     {
         // Override this method to do something useful.
     }
