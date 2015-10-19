@@ -49,7 +49,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DIRECTORY_SEPARATOR . $this->module;
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
         try {
             $this->verifyExistingModule();

@@ -910,7 +910,7 @@ function generate_image($image, $typeobj, $id)
         ->line(new Imagine\Image\Point(0, 239), new Imagine\Image\Point(0, 0), $white)
     ;
 
-    $image_file = sprintf("%s/media/images/%s/sample-image-%s.png", THELIA_LOCAL_DIR, $typeobj, $id);
+    $image_file = sprintf("%smedia/images/%s/sample-image-%s.png", THELIA_LOCAL_DIR, $typeobj, $id);
 
     if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
 
@@ -930,7 +930,7 @@ function generate_document($document, $typeobj, $id)
     ->save()
     ;
 
-    $document_file = sprintf("%s/media/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
+    $document_file = sprintf("%smedia/documents/%s/sample-document-%s.txt", THELIA_LOCAL_DIR, $typeobj, $id);
 
     if (! is_dir(dirname($document_file))) mkdir(dirname($document_file), 0777, true);
 
