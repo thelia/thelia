@@ -39,7 +39,7 @@ class HookTest extends WebTestCase
 
         $client->request(
             'GET',
-            '/',
+            '/?lang=en_US',
             [],
             [],
             []
@@ -120,7 +120,7 @@ class HookTest extends WebTestCase
     public function testBaseHookGlobal($content)
     {
         $this->assertStringContains($content, ":: main.content-top ::");
-        $this->assertStringContains($content, ":: request : GET / HTTP/1.1");
+        $this->assertStringContains($content, ":: request : GET /?lang=en_US HTTP/1.1");
         $this->assertRegExp('/:: session : [a-f0-9]{40} ::/', $content);
         $this->assertStringContains($content, ":: cart : not null ::");
         $this->assertStringContains($content, ":: order : not null ::");
