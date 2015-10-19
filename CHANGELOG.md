@@ -1,3 +1,11 @@
+# 2.1.7
+
+- Fix all useless DIRECTORY_SEPARATOR (related to #1729)
+- Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document (related to #1732)
+- Fix order attribute in BaseHook (related to #1733)
+- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
+- Replaced parameter "locale" with "lang" in URL generated (related to #1722)
+
 # 2.1.6
 
 - Fix amounts displayed on the PDF invoice when a postage with tax is used (fixes #1693 and #1694).
@@ -210,6 +218,10 @@ Redirect methods are deprecated. You have now two ways for generating a redirect
 - Thelia\Controller\BaseController::redirectSuccess
 - Thelia\Controller\BaseController::redirectToRoute
 
+
+# 2.0.11
+
+- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
 
 # 2.0.10
 
