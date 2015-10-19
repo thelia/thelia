@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHa
 use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 use Thelia\Core\Event\SessionEvent;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Core\TheliaKernelEvents;
@@ -55,6 +57,12 @@ class SessionListener implements EventSubscriberInterface
     {
         return new Session($storage);
     }
+
+    public function saveSession(PostResponseEvent $event)
+    {
+        $event->getRequest()->getSession()->save();
+    }
+
     /**
      * Returns an array of event names this subscriber wants to listen to.
      *
@@ -81,6 +89,9 @@ class SessionListener implements EventSubscriberInterface
             TheliaKernelEvents::SESSION =>[
                 ['prodSession', 0],
                 ['testSession', 128]
+            ],
+            KernelEvents::TERMINATE => [
+                ['saveSession', 0]
             ]
         ];
     }
