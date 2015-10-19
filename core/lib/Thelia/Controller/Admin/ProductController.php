@@ -328,12 +328,13 @@ class ProductController extends AbstractSeoCrudController
                 $this->appendValue($combinationPseData, "ean_code", $saleElement->getEanCode());
             }
 
-            $defaultPseForm = new ProductDefaultSaleElementUpdateForm($this->getRequest(), "form", $defaultPseData);
-            $this->getParserContext()->addForm($defaultPseForm);
-
-            $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
-            $this->getParserContext()->addForm($combinationPseForm);
         }
+
+        $defaultPseForm = new ProductDefaultSaleElementUpdateForm($this->getRequest(), "form", $defaultPseData);
+        $this->getParserContext()->addForm($defaultPseForm);
+
+        $combinationPseForm = new ProductSaleElementUpdateForm($this->getRequest(), "form", $combinationPseData);
+        $this->getParserContext()->addForm($combinationPseForm);
 
         // Hydrate the "SEO" tab form
         $this->hydrateSeoForm($object);
