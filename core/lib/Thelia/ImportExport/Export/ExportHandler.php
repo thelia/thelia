@@ -101,7 +101,13 @@ abstract class ExportHandler extends AbstractHandler
         return $this->rangeDate;
     }
 
-    public function setRangeDate(array $range_date)
+    /**
+     * Use this method to set the range date
+     *
+     * @param array $rangeDate
+     * @return $this
+     */
+    public function setRangeDate(array $rangeDate)
     {
         if (isset($rangeDate["start"]) && isset($rangeDate["end"])) {
             $this->rangeDate = $rangeDate;

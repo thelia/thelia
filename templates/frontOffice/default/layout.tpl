@@ -18,7 +18,7 @@ GNU General Public License : http://www.gnu.org/licenses/
 -->
 
 {* Declare assets directory, relative to template base directory *}
-{declare_assets directory='assets'}
+{declare_assets directory='assets/dist'}
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='fo.default'}
 

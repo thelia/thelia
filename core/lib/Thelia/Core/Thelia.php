@@ -50,7 +50,7 @@ use Thelia\Model\ModuleQuery;
 
 class Thelia extends Kernel
 {
-    const THELIA_VERSION = '2.2.0';
+    const THELIA_VERSION = '2.2.1';
 
     public function __construct($environment, $debug)
     {
@@ -440,7 +440,7 @@ class Thelia extends Kernel
     public function getCacheDir()
     {
         if (defined('THELIA_ROOT')) {
-            return THELIA_CACHE_DIR.DS.$this->environment;
+            return THELIA_CACHE_DIR . $this->environment;
         } else {
             return parent::getCacheDir();
         }

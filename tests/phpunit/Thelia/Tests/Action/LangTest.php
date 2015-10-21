@@ -208,8 +208,8 @@ class LangTest extends ContainerAwareTestCase
 
     protected function tearDown()
     {
-        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TEST.png");
-        @unlink(THELIA_TEMPLATE_DIR . "/backOffice/default/assets/img/flags/TES.png");
+        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TEST.png");
+        @unlink(THELIA_TEMPLATE_DIR . "backOffice/default/assets/img/flags/TES.png");
     }
 
     /**

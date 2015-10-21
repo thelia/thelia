@@ -156,6 +156,10 @@ class ParserContext implements \IteratorAggregate
      */
     public function getForm($formId, $formClass, $formType)
     {
+        if (isset($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
+            return $this->store[$formClass . ":" . $formType];
+        }
+
         $formErrorInformation = $this->request->getSession()->getFormErrorInformation();
 
         if (isset($formErrorInformation[$formClass.":".$formType])) {
@@ -192,8 +196,6 @@ class ParserContext implements \IteratorAggregate
 
                 return $form;
             }
-        } elseif (isset($this->store[$formClass . ":" . $formType]) && $this->store[$formClass . ":" . $formType] instanceof BaseForm) {
-            return $this->store[$formClass . ":" . $formType];
         }
 
         return null;

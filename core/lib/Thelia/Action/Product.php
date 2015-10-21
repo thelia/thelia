@@ -20,7 +20,6 @@ use Thelia\Core\Event\Feature\FeatureAvDeleteEvent;
 use Thelia\Core\Event\File\FileDeleteEvent;
 use Thelia\Core\Event\Product\ProductCloneEvent;
 use Thelia\Model\AttributeCombinationQuery;
-use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureAvI18n;
 use Thelia\Model\FeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery;
@@ -84,30 +83,17 @@ class Product extends BaseAction implements EventSubscriberInterface
             // Set the default tax rule to this product
             ->setTaxRule(TaxRuleQuery::create()->findOneByIsDefault(true))
 
+            ->setTemplateId($event->getTemplateId())
+
             ->create(
                 $event->getDefaultCategory(),
                 $event->getBasePrice(),
                 $event->getCurrencyId(),
                 $event->getTaxRuleId(),
-                $event->getBaseWeight()
+                $event->getBaseWeight(),
+                $event->getBaseQuantity()
             )
         ;
-
-        // Set the product template, if one is defined in the category tree
-        $parentCatId = $event->getDefaultCategory();
-
-        while ($parentCatId > 0) {
-            if (null === $cat = CategoryQuery::create()->findPk($parentCatId)) {
-                break;
-            }
-
-            if ($cat->getDefaultTemplateId()) {
-                $product->setTemplateId($cat->getDefaultTemplateId())->save();
-                break;
-            }
-
-            $parentCatId = $cat->getParent();
-        }
 
         $event->setProduct($product);
     }

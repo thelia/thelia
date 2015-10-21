@@ -97,7 +97,7 @@ class CustomerUpdateForm extends BaseForm
             ->add("password", "text", array(
                 "label" => Translator::getInstance()->trans("Password"),
                 "label_attr" => array(
-                    "for" => "email",
+                    "for" => "password",
                 ),
             ))
             ->add("address1", "text", array(
