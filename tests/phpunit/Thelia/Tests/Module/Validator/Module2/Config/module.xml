@@ -16,10 +16,9 @@
     </author>
     <type>classic</type>
     <required>
-        <module version="&gt;=0.1">Front</module>
-        <module version="&gt;=0.1">HookCart</module>
-        <module version="&gt;=0.2">HookSearch</module>
-
+        <module version="&gt;=2.1.0">Front</module>
+        <module version="&gt;=2.1.6">HookCart</module>
+        <module version="&gt;=2.4.0">HookSearch</module>
     </required>
     <thelia>2.1.0</thelia>
     <stability>other</stability>

@@ -51,7 +51,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->module = $this->formatModuleName($input->getArgument("name"));
-        $this->moduleDirectory = THELIA_MODULE_DIR . DS . $this->module;
+        $this->moduleDirectory = THELIA_MODULE_DIR . $this->module;
 
         $fs = new Filesystem();
 
@@ -106,7 +106,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate
         );
 
         $verifyDirectories = array(
-            THELIA_MODULE_DIR . DS . "Thelia",
+            THELIA_MODULE_DIR . "Thelia",
             $this->moduleDirectory . DS . "Model" . DS . "Thelia"
         );
 

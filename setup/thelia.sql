@@ -2098,10 +2098,14 @@ CREATE TABLE `product_sale_elements_product_image`
     INDEX `fk_pse_product_image_product_sale_element_idx` (`product_sale_elements_id`),
     CONSTRAINT `fk_pse_product_image_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
-        REFERENCES `product_sale_elements` (`id`),
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_pse_product_image_product_image_id`
         FOREIGN KEY (`product_image_id`)
         REFERENCES `product_image` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------
@@ -2120,10 +2124,14 @@ CREATE TABLE `product_sale_elements_product_document`
     INDEX `fk_pse_product_document_product_sale_elem_idx` (`product_sale_elements_id`),
     CONSTRAINT `fk_pse_product_document_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
-        REFERENCES `product_sale_elements` (`id`),
+        REFERENCES `product_sale_elements` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
     CONSTRAINT `fk_pse_product_document_product_document_id`
         FOREIGN KEY (`product_document_id`)
         REFERENCES `product_document` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 -- ---------------------------------------------------------------------

@@ -305,10 +305,10 @@ abstract class BaseHook
     protected function getOrder()
     {
         if (null === $this->order) {
-            $this->cart = $this->getSession() ? $this->getSession()->getOrder() : null;
+            $this->order = $this->getSession() ? $this->getSession()->getOrder() : null;
         }
 
-        return $this->cart;
+        return $this->order;
     }
 
     /**

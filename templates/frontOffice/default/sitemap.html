@@ -21,7 +21,7 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
         {if $_lang_ == "" || $_lang_ == $CODE }
             {loop type="category" name="category" lang="$ID"}
             <url>
-                <loc>{$URL nofilter}</loc>
+                <loc>{$URL}</loc>
                 <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
             </url>
             {/loop}
@@ -33,7 +33,7 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
         {if $_lang_ == "" || $_lang_ == $CODE }
             {loop type="product" name="product" lang="$ID"}
                 <url>
-                    <loc>{$URL nofilter}</loc>
+                    <loc>{$URL}</loc>
                     <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
                 </url>
             {/loop}
@@ -48,7 +48,7 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
         {if $_lang_ == "" || $_lang_ == $CODE }
             {loop type="folder" name="folder" lang="$ID"}
                 <url>
-                    <loc>{$URL nofilter}</loc>
+                    <loc>{$URL}</loc>
                     <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
                 </url>
             {/loop}
@@ -60,7 +60,7 @@ generated on : {$smarty.now|date_format:'%Y-%m-%d %H:%M:%S'}
         {if $_lang_ == "" || $_lang_ == $CODE }
             {loop type="content" name="content" lang="$ID"}
             <url>
-                <loc>{$URL nofilter}</loc>
+                <loc>{$URL}</loc>
                 <lastmod>{format_date date=$UPDATE_DATE format="c"}</lastmod>
             </url>
             {/loop}

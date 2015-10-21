@@ -82,11 +82,11 @@ $thumbs_dir = '/media/thumbs/';
 $filemanager_dir = '/tinymce/filemanager/';
 
 // path to file manager folder to upload folder (with final /)
-$current_path = THELIA_WEB_DIR . DS . 'media'. DS .'upload'. DS;
+$current_path = THELIA_WEB_DIR . 'media'. DS .'upload'. DS;
 
 // path to file manager folder to thumbs folder (with final /)
 // WARNING: thumbs folder should not be inside the upload folder
-$thumbs_base_path = THELIA_WEB_DIR . DS . 'media'. DS .'thumbs'. DS;
+$thumbs_base_path = THELIA_WEB_DIR . 'media'. DS .'thumbs'. DS;
 
 // Set the language to the back-office current language, if it is available
 $current_locale = $request->getSession()->getLang()->getLocale();
