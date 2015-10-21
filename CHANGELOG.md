@@ -1,3 +1,7 @@
+# 2.0.11
+
+- Fix critical performance issue on ProductController HydrateObjectForm (related to #1734)
+
 # 2.0.10
 
 - Add 'step' to input type number to be able to create and edit weight slices price
