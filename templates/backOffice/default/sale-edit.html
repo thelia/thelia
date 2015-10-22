@@ -142,7 +142,7 @@
                                     {form_field field="categories"}
                                     <div class="form-group ">
                                         <label for="cat_source" class="control-label">{intl l='Selected categories'}</label>
-                                        <select {form_field_attributes field='categories'}'>
+                                        <select {form_field_attributes field='categories'}>
                                         {* protect ourselves against empty $value, which causes all categories to be displayed *}
                                         {if empty($value)}{$value = [ 0 ]}{/if}
                                         {loop type="category" category=0 name="selected-of-categories" id={$value|default:0|implode:','} backend_context=1}
@@ -258,7 +258,21 @@
 
         $('.datetime-picker').datetimepicker({
             locale: "{$langcode}"
+        }).on('dp.change', function(e) {
+            if ($(this).attr('id')=='start_date') {
+                $('#end_date').data('DateTimePicker').minDate(e.date);
+            } else if ($(this).attr('id')=='end_date') {
+                $('#start_date').data('DateTimePicker').maxDate(e.date);
+            }
         });
+
+        if ($('#sale-update-form #start_date').val()!='') {
+            $('#sale-update-form #end_date').data('DateTimePicker').minDate($('#sale-update-form #start_date').val());
+        }
+
+        if ($('#sale-update-form #end_date').val()!='') {
+            $('#sale-update-form #start_date').data('DateTimePicker').maxDate($('#sale-update-form #end_date').val());
+        }
 
         $(document.body).on('change', '.invert-selection', function(ev) {
             var checked = $(this).prop('checked');
