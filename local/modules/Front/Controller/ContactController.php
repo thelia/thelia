@@ -56,8 +56,8 @@ class ContactController extends BaseFrontController
 
             $this->getMailer()->send($message);
 
-            if (null !== $successUrl = $this->retrieveSuccessUrl($contactForm)) {
-                return $this->generateRedirect($successUrl);
+            if ($contactForm->hasSuccessUrl()) {
+                return $this->generateSuccessRedirect($contactForm);
             }
 
             return $this->generateRedirectFromRoute('contact.success');
