@@ -26,6 +26,7 @@ use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CurrencyQuery;
+use Thelia\Model\Map\AttributeCombinationTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
@@ -160,6 +161,12 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     new Type\EnumType(['*', 'none'])
                 ),
                 'none'
+            ),
+            new Argument(
+                'attribute_availability',
+                new TypeCollection(
+                    new Type\IntToCombinedIntsListType()
+                )
             )
         );
     }
@@ -456,6 +463,57 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
             }
         }
     }
+
+    protected function manageAttributeAv(ProductQuery &$search, $attributeAvailability)
+    {
+        $search->innerJoinProductSaleElements('pse_attribute');
+
+        if (null !== $attributeAvailability) {
+            foreach ($attributeAvailability as $attribute => $attributeChoice) {
+                foreach ($attributeChoice['values'] as $attributeAv) {
+                    $attributeAlias = 'aa_' . $attribute;
+                    if ($attributeAv != '*') {
+                        $attributeAlias .= '_' .$attributeAv;
+                    }
+                    $attributeAvJoin =  new Join();
+                    $attributeAvJoin->addExplicitCondition(
+                        ProductSaleElementsTableMap::TABLE_NAME,
+                        'ID',
+                        'pse_attribute',
+                        AttributeCombinationTableMap::TABLE_NAME,
+                        'PRODUCT_SALE_ELEMENTS_ID',
+                        $attributeAlias
+                    );
+                    $attributeAvJoin->setJoinType(Criteria::LEFT_JOIN);
+
+                    $search->addJoinObject($attributeAvJoin, $attributeAlias);
+
+                    if ($attributeAv != '*') {
+                        $search->addJoinCondition(
+                            $attributeAlias,
+                            "`$attributeAlias`.ATTRIBUTE_AV_ID = ?",
+                            $attributeAv,
+                            null,
+                            \PDO::PARAM_INT
+                        );
+                    }
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $attributeChoice['expression'];
+                if ($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`aa_' . $attribute . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`aa_' . $attribute . '_' . '\1`.ATTRIBUTE_ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
+            }
+        }
+    }
+
 
     public function buildModelCriteria()
     {
@@ -941,6 +999,8 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
         $feature_values = $this->getFeatureValues();
 
         $this->manageFeatureValue($search, $feature_values);
+
+        $this->manageAttributeAv($search, $this->getAttributeAvailability());
 
         $search->groupBy(ProductTableMap::ID);
 
