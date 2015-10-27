@@ -36,6 +36,21 @@ class EnumListType extends BaseType
         }
     }
 
+    /**
+     * @param array|\Traversable $values
+     * @since 2.3.0
+     */
+    public function addValues($values)
+    {
+        if (!is_array($values) && !$values instanceof \Traversable) {
+            throw new \InvalidArgumentException('$values must be an array or an instance of \Traversable');
+        }
+
+        foreach ($values as $value) {
+            $this->addValue($value);
+        }
+    }
+
     public function getType()
     {
         return 'Enum list type';
