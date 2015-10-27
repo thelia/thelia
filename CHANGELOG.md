@@ -1,5 +1,6 @@
 # 2.3.0-alpha1
 
+- #1750 Add EQUAL to product loop filter by min or max
 - #1727 Add template & stock inputs on product creation
 - #1722 Replaced parameter "locale" with "lang" in generated URL
 - #1732 Update sql constraint for table product_sale_elements_product_image and product_sale_elements_product_document
