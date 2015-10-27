@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\Exception\AuthenticationException;
@@ -30,10 +31,10 @@ class SessionController extends BaseAdminController
 
     public function showLoginAction()
     {
-        // Check if user is already authanticate
+        // Check if user is already authenticate
         if ($this->getSecurityContext()->hasAdminUser()) {
-            // Render the home page
-            return $this->render("home");
+            // Redirect to the homepage
+            return new RedirectResponse($this->retrieveUrlFromRouteId('admin.home.view'));
         }
 
         return $this->render("login");
