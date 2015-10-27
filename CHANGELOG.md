@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1753) Fix the rounding of prices in the order product loop
 - (related to #1751) Fix for undefined currency exchange rate, add error message in the currency configuration page when an
 - (related to #1750) Add EQUAL to product loop filter by min or max
 - (related to #1747) Fixed success_url check for contact form
