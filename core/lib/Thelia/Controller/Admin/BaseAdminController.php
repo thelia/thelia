@@ -105,7 +105,7 @@ class BaseAdminController extends BaseController
     /**
      * Return a general error page
      *
-     * @param string $message a message string, or an exception instance
+     * @param \Exception|string $message a message string, or an exception instance
      * @param int    $status  the HTTP status (default is 500)
      *
      * @return \Thelia\Core\HttpFoundation\Response
@@ -113,7 +113,16 @@ class BaseAdminController extends BaseController
     protected function errorPage($message, $status = 500)
     {
         if ($message instanceof \Exception) {
-            $message = $this->getTranslator()->trans("Sorry, an error occured: %msg", array('%msg' => $message->getMessage()));
+            $strMessage = $this->getTranslator()->trans(
+                "Sorry, an error occured: %msg",
+                [ '%msg' => $message->getMessage() ]
+            );
+
+            Tlog::getInstance()->addError($strMessage.": ".$message->getTraceAsString());
+
+            $message = $strMessage;
+        } else {
+            Tlog::getInstance()->addError($message);
         }
 
         return $this->render(
