@@ -12,17 +12,18 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Currency\CurrencyCreateEvent;
 use Thelia\Core\Event\Currency\CurrencyDeleteEvent;
 use Thelia\Core\Event\Currency\CurrencyUpdateEvent;
+use Thelia\Core\Event\Currency\CurrencyUpdateRateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Translation\Translator;
 use Thelia\CurrencyConverter\CurrencyConverter;
+use Thelia\CurrencyConverter\Exception\CurrencyNotFoundException;
+use Thelia\Log\Tlog;
 use Thelia\Math\Number;
-use Thelia\Model\ConfigQuery;
 use Thelia\Model\Currency as CurrencyModel;
 use Thelia\Model\CurrencyQuery;
 
@@ -104,7 +105,9 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
             // Update rates when setting a new default currency
             if ($event->getIsDefault()) {
-                $event->getDispatcher()->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES);
+                $updateRateEvent = new CurrencyUpdateRateEvent();
+
+                $event->getDispatcher()->dispatch(TheliaEvents::CURRENCY_UPDATE_RATES, $updateRateEvent);
             }
 
             $event->setCurrency($currency);
@@ -134,7 +137,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
         }
     }
 
-    public function updateRates(Event $event)
+    public function updateRates(CurrencyUpdateRateEvent $event)
     {
         if (null === $defaultCurrency = CurrencyQuery::create()->findOneByByDefault(true)) {
             throw new \RuntimeException('Unable to find a default currency, please define a default currency.');
@@ -147,19 +150,26 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
         /** @var \Thelia\Model\Currency $currency */
         foreach ($currencies as $currency) {
-            $rate = $this->currencyConverter
-                ->from($defaultCurrency->getCode())
-                ->to($currency->getCode())
-                ->convert($baseValue);
+            try {
+                $rate = $this->currencyConverter
+                    ->from($defaultCurrency->getCode())
+                    ->to($currency->getCode())
+                    ->convert($baseValue);
 
-            $currency->setRate($rate->getNumber(-1))->save();
+                $currency->setRate($rate->getNumber(-1))->save();
+            } catch (CurrencyNotFoundException $ex) {
+                Tlog::getInstance()->addError(
+                    sprintf("Unable to find exchange rate for currency %s, ID %d", $currency->getCode(), $currency->getId())
+                );
+                $event->addUndefinedRate($currency->getId());
+            }
         }
     }
 
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
