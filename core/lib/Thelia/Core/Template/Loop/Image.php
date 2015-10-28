@@ -361,11 +361,19 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                 // Dispatch image processing event
                 $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
+                $originalImageSize = getimagesize($sourceFilePath);
+
+                $imageSize = getimagesize($event->getCacheFilepath());
+
                 $loopResultRow
                     ->set("IMAGE_URL", $event->getFileUrl())
                     ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
                     ->set("IMAGE_PATH", $event->getCacheFilepath())
                     ->set("PROCESSING_ERROR", false)
+                    ->set("IMAGE_WIDH", $imageSize[0])
+                    ->set("IMAGE_HEIGHT", $imageSize[1])
+                    ->set("ORIGINAL_IMAGE_WIDH", $originalImageSize[0])
+                    ->set("ORIGINAL_IMAGE_HEIGHT", $originalImageSize[1])
                 ;
             } catch (\Exception $ex) {
                 // Ignore the result and log an error
@@ -377,6 +385,10 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                         ->set("ORIGINAL_IMAGE_URL", '')
                         ->set("IMAGE_PATH", '')
                         ->set("PROCESSING_ERROR", true)
+                        ->set("IMAGE_WIDH", '')
+                        ->set("IMAGE_HEIGHT", '')
+                        ->set("ORIGINAL_IMAGE_WIDH", '')
+                        ->set("ORIGINAL_IMAGE_HEIGHT", '')
                     ;
                 } else {
                     $addRow = false;
