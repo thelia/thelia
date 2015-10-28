@@ -12,7 +12,8 @@ module.exports = function (grunt) {
         uglify: {
             all: {
                 files: {
-                    'assets/dist/js/thelia.min.js': 'assets/src/js/thelia.js'
+                    'assets/dist/js/thelia.min.js': 'assets/src/js/thelia.js',
+                    'assets/dist/js/vendors/pse-manager.min.js': 'assets/src/js/pseManager.js'
                 }
             }
         },

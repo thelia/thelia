@@ -263,6 +263,10 @@ GNU General Public License : http://www.gnu.org/licenses/
         <script src="{$asset_url}"></script>
     {/javascripts}
 
+    {javascripts file="assets/dist/js/vendors/pse-manager.min.js"}
+        <script src="{$asset_url}"></script>
+    {/javascripts}
+
     {hook name="main.after-javascript-include"}
 
     {block name="after-javascript-include"}{/block}
