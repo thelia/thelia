@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1760) Set order status as paid when the FreeOrder module is used to "pay" an order
 - (related to #1753) Fix the rounding of prices in the order product loop
 - (related to #1751) Fix for undefined currency exchange rate, add error message in the currency configuration page when an
 - (related to #1750) Add EQUAL to product loop filter by min or max
