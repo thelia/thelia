@@ -12,7 +12,10 @@
 
 namespace FreeOrder;
 
+use Thelia\Core\Event\Order\OrderEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Order;
+use Thelia\Model\OrderStatusQuery;
 use Thelia\Module\BaseModule;
 use Thelia\Module\PaymentModuleInterface;
 
@@ -25,7 +28,9 @@ class FreeOrder extends BaseModule implements PaymentModuleInterface
 
     public function pay(Order $order)
     {
-        // We have nothing to do here.
+        $event = new OrderEvent($order);
+        $event->setStatus(OrderStatusQuery::getPaidStatus()->getId());
+        $this->getDispatcher()->dispatch(TheliaEvents::ORDER_UPDATE_STATUS, $event);
     }
 
     public function manageStockOnCreation()
