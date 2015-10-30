@@ -3,16 +3,36 @@ module.exports = function (grunt) {
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
-        jshint: {
-            all: [
-                'assets/src/js/*.js',
+        clean: {
+          js:  ["assets/dist/js/transpiled"]
+        },
+        eslint: {                   
+            target: [
+                'assets/dist/js/transpiled/*.transpiled.js',
                 '!assets/src/js/vendors/*.js'
             ]
-        },
+        },    
+        babel: {
+            options: {
+                presets: ['babel-preset-es2015']
+            },
+            all: {
+                files: [
+                    {
+                      expand: true,
+                      cwd: 'assets/src/js',
+                      src: ['*.js','!*.transpiled.js'],
+                      dest: 'assets/dist/js/transpiled/',
+                      ext: '.transpiled.js',
+                      extDot: 'first'
+                    },
+                ]
+            }
+        },    
         uglify: {
             all: {
                 files: {
-                    'assets/dist/js/thelia.min.js': 'assets/src/js/thelia.js'
+                    'assets/dist/js/thelia.min.js': 'assets/dist/js/transpiled/*.transpiled.js'
                 }
             }
         },
@@ -207,7 +227,7 @@ module.exports = function (grunt) {
             },
             js: {
                 files: ['assets/src/js/*.js'],
-                tasks: ['jshint', 'uglify'],
+                tasks: ['clean:js','babel','eslint', 'uglify'],
                 options: {
                     spawn: false,
                     livereload: true
@@ -224,6 +244,6 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('default', ['copy', 'jshint', 'uglify', 'less', 'autoprefixer', 'cssmin', 'imagemin']);
+    grunt.registerTask('default', ['clean','copy','babel','eslint', 'uglify', 'less', 'autoprefixer', 'cssmin', 'imagemin']);
 
 }
