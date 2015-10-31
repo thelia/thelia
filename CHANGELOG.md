@@ -19,6 +19,10 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 
+# 2.2.1
+
+- Add save session on terminate event for other handler's that native file storage.
+
 # 2.2.0
 
 - #1692 Fix amounts displayed on the PDF invoice when a postage with tax is used (fixes #1693 and #1694)
