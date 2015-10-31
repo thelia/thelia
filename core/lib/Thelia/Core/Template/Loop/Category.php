@@ -47,6 +47,7 @@ use Thelia\Model\Category as CategoryModel;
  * {@inheritdoc}
  * @method int[] getId()
  * @method int getParent()
+ * @method int getExcludeParent()
  * @method int getProduct()
  * @method int getExcludeProduct()
  * @method bool getCurrent()
@@ -70,7 +71,8 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntTypeArgument('parent'),
+            Argument::createIntListTypeArgument('parent'),
+            Argument::createIntListTypeArgument('exclude_parent'),
             Argument::createIntTypeArgument('product'),
             Argument::createIntTypeArgument('exclude_product'),
             Argument::createBooleanTypeArgument('current'),
@@ -129,7 +131,13 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
         $parent = $this->getParent();
 
         if (!is_null($parent)) {
-            $search->filterByParent($parent);
+            $search->filterByParent($parent, Criteria::IN);
+        }
+
+        $excludeParent = $this->getExcludeParent();
+
+        if (!is_null($excludeParent)) {
+            $search->filterByParent($excludeParent, Criteria::NOT_IN);
         }
 
         $current = $this->getCurrent();
