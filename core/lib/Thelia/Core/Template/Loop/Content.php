@@ -307,20 +307,36 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
      */
     private function findNextPrev(LoopResultRow $loopResultRow, \Thelia\Model\Content $content, $defaultFolderId)
     {
-        if ($this->getBackendContext() || $this->getWithPrevNextInfo()) {
+        $isBackendContext = $this->getBackendContext();
+
+        if ($isBackendContext || $this->getWithPrevNextInfo()) {
             // Find previous and next category
-            $previous = ContentQuery::create()
+            $previousQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                 ->filterByPosition($content->getPosition(), Criteria::LESS_THAN)
+            ;
+
+            if (! $isBackendContext) {
+                $previousQuery->filterByVisible(true);
+            }
+
+            $previous = $previousQuery
                 ->orderByPosition(Criteria::DESC)
                 ->findOne()
             ;
 
-            $next = ContentQuery::create()
+            $nextQuery = ContentQuery::create()
                 ->joinContentFolder()
                 ->where('ContentFolder.folder_id = ?', $defaultFolderId)
                 ->filterByPosition($content->getPosition(), Criteria::GREATER_THAN)
+            ;
+
+            if (! $isBackendContext) {
+                $nextQuery->filterByVisible(true);
+            }
+
+            $next = $nextQuery
                 ->orderByPosition(Criteria::ASC)
                 ->findOne()
             ;

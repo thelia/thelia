@@ -258,18 +258,34 @@ class Category extends BaseI18nLoop implements PropelSearchLoopInterface, Search
                 $loopResultRow->set("PRODUCT_COUNT", $category->countAllProducts());
             }
 
-            if ($this->getBackendContext() || $this->getWithPrevNextInfo()) {
+            $isBackendContext = $this->getBackendContext();
+
+            if ($isBackendContext || $this->getWithPrevNextInfo()) {
                 // Find previous and next category
-                $previous = CategoryQuery::create()
+                $previousQuery = CategoryQuery::create()
                     ->filterByParent($category->getParent())
                     ->filterByPosition($category->getPosition(), Criteria::LESS_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $previousQuery->filterByVisible(true);
+                }
+
+                $previous = $previousQuery
                     ->orderByPosition(Criteria::DESC)
                     ->findOne()
                 ;
 
-                $next = CategoryQuery::create()
+                $nextQuery = CategoryQuery::create()
                     ->filterByParent($category->getParent())
                     ->filterByPosition($category->getPosition(), Criteria::GREATER_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $nextQuery->filterByVisible(true);
+                }
+
+                $next = $nextQuery
                     ->orderByPosition(Criteria::ASC)
                     ->findOne()
                 ;
