@@ -42,6 +42,7 @@ use Thelia\Type\TypeCollection;
  * @method bool getCurrent()
  * @method int[] getExclude()
  * @method string[] getOrder()
+ * @method bool getWithPrevNextInfo()
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -58,6 +59,7 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('title'),
             Argument::createBooleanTypeArgument('current'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -216,6 +218,45 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 ->set("VISIBLE", $brand->getVisible())
                 ->set("LOGO_IMAGE_ID", $brand->getLogoImageId() ?: 0)
             ;
+
+            $isBackendContext = $this->getBackendContext();
+
+            if ($isBackendContext || $this->getWithPrevNextInfo()) {
+                // Find previous and next category
+                $previousQuery = BrandQuery::create()
+                    ->filterByPosition($brand->getPosition(), Criteria::LESS_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $previousQuery->filterByVisible(true);
+                }
+
+                $previous = $previousQuery
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $nextQuery = BrandQuery::create()
+                    ->filterByPosition($brand->getPosition(), Criteria::GREATER_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $nextQuery->filterByVisible(true);
+                }
+
+                $next = $nextQuery
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1)
+                ;
+            }
+
             $this->addOutputFields($loopResultRow, $brand);
 
             $loopResult->addRow($loopResultRow);

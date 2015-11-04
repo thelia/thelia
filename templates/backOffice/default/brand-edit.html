@@ -35,6 +35,24 @@
                         <div class="col-md-7 title">
                             {intl l='Edit brand %title' title={$TITLE}}
                         </div>
+
+                        <div class="col-md-5 actions">
+
+                            {if $HAS_PREVIOUS != 0}
+                                <a href="{url path="/admin/brand/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous brand'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            {/if}
+
+                            <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview brand page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
+
+                            {if $HAS_NEXT != 0}
+                                <a href="{url path="/admin/brand/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next brand'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                            {else}
+                                <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                            {/if}
+                        </div>
+
                     </div>
 
                     <div class="row">
