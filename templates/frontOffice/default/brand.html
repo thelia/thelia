@@ -128,7 +128,7 @@
 
                     <div id="category-products">
                         <div class="products-content">
-                            <ul class="list-unstyled">
+                            <ul class="list-unstyled row">
                                 {loop type="product" name="product_list" brand=$ID limit=$limit page=$product_page order=$product_order}
                                     {include file="includes/single-product.html" product_id=$ID hasBtn=true hasDescription=true hasQuickView=true width="218" height="146"}
                                 {/loop}
