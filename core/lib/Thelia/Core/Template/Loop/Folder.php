@@ -41,6 +41,7 @@ use Thelia\Type\BooleanOrBothType;
  * @method int[] getExclude()
  * @method string getTitle()
  * @method string[] getOrder()
+ * @method bool getWithPrevNextInfo()
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
@@ -73,11 +74,12 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                         'created_reverse',
                         'updated',
                         'updated_reverse'
-                        ])
+                    ])
                 ),
                 'manual'
             ),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanTypeArgument('with_prev_next_info', false)
         );
     }
 
@@ -240,6 +242,47 @@ class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLo
                 ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
                 ->set("POSITION", $folder->getPosition())
             ;
+
+            $isBackendContext = $this->getBackendContext();
+
+            if ($isBackendContext || $this->getWithPrevNextInfo()) {
+                // Find previous and next folder
+                $previousQuery = FolderQuery::create()
+                    ->filterByParent($folder->getParent())
+                    ->filterByPosition($folder->getPosition(), Criteria::LESS_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $previousQuery->filterByVisible(true);
+                }
+
+                $previous = $previousQuery
+                    ->orderByPosition(Criteria::DESC)
+                    ->findOne()
+                ;
+
+                $nextQUery = FolderQuery::create()
+                    ->filterByParent($folder->getParent())
+                    ->filterByPosition($folder->getPosition(), Criteria::GREATER_THAN)
+                ;
+
+                if (! $isBackendContext) {
+                    $nextQUery->filterByVisible(true);
+                }
+
+                $next = $nextQUery
+                    ->orderByPosition(Criteria::ASC)
+                    ->findOne()
+                ;
+
+                $loopResultRow
+                    ->set("HAS_PREVIOUS", $previous != null ? 1 : 0)
+                    ->set("HAS_NEXT", $next != null ? 1 : 0)
+                    ->set("PREVIOUS", $previous != null ? $previous->getId() : -1)
+                    ->set("NEXT", $next != null ? $next->getId() : -1)
+                ;
+            }
+
             $this->addOutputFields($loopResultRow, $folder);
 
             $loopResult->addRow($loopResultRow);
