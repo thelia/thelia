@@ -76,6 +76,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
+                            'id', 'id_reverse',
                             'quantity', 'quantity_reverse',
                             'min_price', 'max_price',
                             'promo', 'new',
@@ -136,6 +137,12 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
 
         foreach ($orders as $order) {
             switch ($order) {
+                case "id":
+                    $search->orderById(Criteria::ASC);
+                    break;
+                case "id_reverse":
+                    $search->orderById(Criteria::DESC);
+                    break;
                 case "quantity":
                     $search->orderByQuantity(Criteria::ASC);
                     break;
