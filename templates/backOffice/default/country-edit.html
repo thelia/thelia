@@ -95,16 +95,32 @@
         							{/form}
 
                                     {ifloop rel="states"}
+
+                                    {loop type="auth" name="can_change" role="ADMIN" resource="admin.configuration.state" access="UPDATE"}
+                                        {$canEditState=true}
+                                    {/loop}
+
                                     <div class="panel panel-default">
                                         <div class="panel-heading">
-                                            <h3 class="panel-title">{intl l="States/provinces for this country"}</h3>
+                                            <h3 class="panel-title">{intl l="States/provinces assigned to this country"}</h3>
                                         </div>
                                         <div class="panel-body">
-                                            <ul class="list-unstyled">
-                                                {loop name="states" type="state" country=$country_id visible="*" backend_context="1"}
-                                                    <li><a href="">{$NAME}</a></li>
-                                                {/loop}
-                                            </ul>
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-condensed">
+                                                    <tbody>
+                                                    {loop name="states" type="state" country=$country_id visible="*" backend_context="1"}
+                                                    <tr>
+                                                        <td>{$ID}. {$TITLE}</td>
+                                                        {if $canEditState}
+                                                            <td class="text-center">
+                                                                <a title="{intl l='Change this state'}" href="{url path="/admin/configuration/state/update/%id" id=$ID}">{intl l="Edit"}</a>
+                                                            </td>
+                                                        {/if}
+                                                    </tr>
+                                                    {/loop}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                     {/ifloop}
