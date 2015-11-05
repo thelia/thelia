@@ -21,12 +21,6 @@ use Thelia\Model\ConfigQuery;
 
 class TheliaTemplateHelper implements TemplateHelperInterface
 {
-    public function __construct()
-    {
-        // Initialize the deprecated TemplateHelper class to ensure backward compatibility
-        TemplateHelper::init($this);
-    }
-
     /**
      * @return TemplateDefinition
      */

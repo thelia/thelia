@@ -1284,15 +1284,6 @@ class ProductController extends AbstractSeoCrudController
 
     /**
      * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
-     * @deprecated since version 2.2 and will be removed in 2.3, please use priceCalculator
-     */
-    public function priceCaclulator()
-    {
-        return $this->priceCalculator();
-    }
-
-    /**
-     * Invoked through Ajax; this method calculates the taxed price from the untaxed price, and vice versa.
      * @since version 2.2
      */
     public function priceCalculator()
