@@ -1,5 +1,10 @@
 # 2.3.0-alpha1
 
+- #1746 Removes deprecated classes and methods for the version 2.3
+- #1745 Fix output value IS_DEFAULT in the product_sale_elements loop
+- #1754 Add homepage redirection on /admin/login if the admin is already authenticate. Before this change, there was a render
+- #1765 Fix for prev/next queries in Category and Content loops, and add prev/next in Product and Folder loop
+- #1759 Fix for parent attribute and new exclude_parent attribute of Category loop
 - #1750 Add EQUAL to product loop filter by min or max
 - #1727 Add template & stock inputs on product creation
 - #1722 Replaced parameter "locale" with "lang" in generated URL

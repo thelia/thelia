@@ -242,7 +242,7 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
                 ->set("QUANTITY", $PSEValue->getQuantity())
                 ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
                 ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("IS_DEFAULT", $PSEValue->getIsDefault() === 1 ? 1 : 0)
+                ->set("IS_DEFAULT", $PSEValue->getIsDefault() ? 1 : 0)
                 ->set("WEIGHT", $PSEValue->getWeight())
                 ->set("REF", $PSEValue->getRef())
                 ->set("EAN_CODE", $PSEValue->getEanCode())
