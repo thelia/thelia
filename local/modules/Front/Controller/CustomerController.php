@@ -524,6 +524,25 @@ class CustomerController extends BaseFrontController
      */
     private function createEventInstance($data)
     {
+        $other = $data;
+        unset($other['title']);
+        unset($other['firstname']);
+        unset($other['lastname']);
+        unset($other['address1']);
+        unset($other['address2']);
+        unset($other['address3']);
+        unset($other['phone']);
+        unset($other['cellphone']);
+        unset($other['zipcode']);
+        unset($other['city']);
+        unset($other['country']);
+        unset($other['email']);
+        unset($other['password']);
+        unset($other['reseller']);
+        unset($other['sponsor']);
+        unset($other['discount']);
+        unset($other['company']);
+
         $customerCreateEvent = new CustomerCreateOrUpdateEvent(
             isset($data["title"])?$data["title"]:null,
             isset($data["firstname"])?$data["firstname"]:null,
@@ -543,7 +562,8 @@ class CustomerController extends BaseFrontController
             isset($data["sponsor"])?$data["sponsor"]:null,
             isset($data["discount"])?$data["discount"]:null,
             isset($data["company"])?$data["company"]:null,
-            null
+            null,
+            $other
         );
 
         return $customerCreateEvent;
