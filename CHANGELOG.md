@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1769) Increase API key size to 48
 - (related to #1768) Update composer.lock file, update of the dependency thelia/currency-converter to version 1.0.1
 - (related to #1760) Set order status as paid when the FreeOrder module is used to "pay" an order
 - (related to #1753) Fix the rounding of prices in the order product loop
