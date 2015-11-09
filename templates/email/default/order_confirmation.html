@@ -42,7 +42,9 @@
                         {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
                         {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
                         {$CITY}<br />
-                        {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                        {$ZIPCODE},
+                        {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                        {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}<br />
                         {/loop}
                     {/elsehook}
                 </td>
@@ -55,7 +57,9 @@
                     {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
                     {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
                     {$CITY}<br />
-                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                    {$ZIPCODE},
+                    {loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}<br />
                     {/loop}
                 </td>
             </tr>

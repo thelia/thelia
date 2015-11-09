@@ -91,7 +91,9 @@
                                                     <br><span class="street-address">{$ADDRESS3}</span>
                                                 {/if}
                                                 <br><span class="postal-code">{$ZIPCODE}</span>
-                                                <span class="locality">{$CITY}, <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                <span class="locality">{$CITY},
+                                                <span class="country-name">{loop type="country" name="customer.country.info" id=$COUNTRY}{$TITLE}{/loop}</span></span>
+                                                {if $STATE}, <span class="state-name">{loop type="state" name="customer.state.info" id=$STATE}{$TITLE}{/loop}</span></span>{/if}
                                             </address>
                                         </li>
                                         <li class="col-sm-4">
