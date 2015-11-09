@@ -214,6 +214,7 @@
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
                     {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_delivery" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
                 {/elsehook}
@@ -226,7 +227,8 @@
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
-                    {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+                    {loop type="country" name="country_invoice" id=$COUNTRY}{$TITLE}{/loop}
+                    {if $STATE}{loop type="state" name="state_invoice" id=$STATE}{$TITLE}{/loop}{/if}
                     {/loop}
                 </p>
             </td>
