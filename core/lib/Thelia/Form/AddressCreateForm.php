@@ -27,6 +27,8 @@ use Thelia\Model\StateQuery;
  */
 class AddressCreateForm extends FirewallForm
 {
+    use AddressCountryValidationTrait;
+
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -185,53 +187,6 @@ class AddressCreateForm extends FirewallForm
                     "required" => false,
                 ))
         ;
-    }
-
-    public function verifyZipCode($value, ExecutionContextInterface $context)
-    {
-        $data = $context->getRoot()->getData();
-
-        if (null !== $country = CountryQuery::create()->findPk($data['country'])) {
-            if ($country->getNeedZipCode()) {
-                $zipCodeRegExp = $country->getZipCodeRE();
-                if (null !== $zipCodeRegExp) {
-                    if (!preg_match($zipCodeRegExp, $data['zipcode'])) {
-                        $context->addViolation(
-                            Translator::getInstance()->trans(
-                                "This zip code should respect the following format : %format.",
-                                ['%format' => $country->getZipCodeFormat()]
-                            )
-                        );
-                    }
-                }
-            }
-        }
-
-    }
-
-    public function verifyState($value, ExecutionContextInterface $context)
-    {
-        $data = $context->getRoot()->getData();
-
-        if (null !== $country = CountryQuery::create()->findPk($data['country'])) {
-            if ($country->getHasStates()) {
-                if (null !== $state = StateQuery::create()->findPk($data['state'])) {
-                    if ($state->getCountryId() !== $country->getId()) {
-                        $context->addViolation(
-                            Translator::getInstance()->trans(
-                                "This state doesn't belong to this country."
-                            )
-                        );
-                    }
-                } else {
-                    $context->addViolation(
-                        Translator::getInstance()->trans(
-                            "You should select a state for this country."
-                        )
-                    );
-                }
-            }
-        }
     }
 
 

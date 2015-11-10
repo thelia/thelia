@@ -74,7 +74,8 @@ class Customer extends BaseCustomer implements UserInterface
         $discount = 0,
         $company = null,
         $ref = null,
-        $forceEmailUpdate = false
+        $forceEmailUpdate = false,
+        $stateId
     ) {
         $this
             ->setTitleId($titleId)
@@ -112,6 +113,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->setIsDefault(1)
                     ;
 
@@ -132,6 +134,7 @@ class Customer extends BaseCustomer implements UserInterface
                     ->setZipcode($zipcode)
                     ->setCity($city)
                     ->setCountryId($countryId)
+                    ->setStateId($stateId)
                     ->save($con)
                 ;
             }

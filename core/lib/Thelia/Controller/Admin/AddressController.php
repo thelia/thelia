@@ -112,6 +112,7 @@ class AddressController extends AbstractCrudController
             "zipcode" => $object->getZipcode(),
             "city" => $object->getCity(),
             "country" => $object->getCountryId(),
+            "state" => $object->getStateId(),
             "cellphone" => $object->getCellphone(),
             "phone" => $object->getPhone(),
             "company" => $object->getCompany()
@@ -174,7 +175,8 @@ class AddressController extends AbstractCrudController
             $formData["cellphone"],
             $formData["phone"],
             $formData["company"],
-            $formData["is_default"]
+            $formData["is_default"],
+            $formData["state"]
         );
 
         return $event;
