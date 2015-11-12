@@ -302,7 +302,7 @@
                                                     <div class="input-group">
                                                         <input class="form-control" type="text" name="delivery_ref" value="{$DELIVERY_REF}" placeholder="{intl l="tracking reference"}"/>
                                                         <span class="input-group-btn">
-                                                            <button class="btn btn-success">{intl l="Save"} <span class="glyphicon glyphicon glyphicon glyphicon-ok"></span></button>
+                                                            <button class="btn btn-success">{intl l="Save"} <span class="glyphicon glyphicon-ok"></span></button>
                                                         </span>
                                                     </div>
                                                 </form>
@@ -317,7 +317,7 @@
                                         </dl>
                                         <dl class="dl-horizontal">
                                             <dt>{intl l="Description"}</dt>
-                                            <dd>{$DESCRIPTION}</dd>
+                                            <dd>{$DESCRIPTION nofilter}</dd>
                                         </dl>
 
                                         {hook name="order-edit.delivery-module-bottom" order_id=$order_id module_id=$DELIVERY_MODULE}
