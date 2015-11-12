@@ -63,6 +63,7 @@ class CurrencyController extends AbstractCrudController
         ->setCurrencyName($formData['name'])
         ->setLocale($formData["locale"])
         ->setSymbol($formData['symbol'])
+        ->setFormat($formData['format'])
         ->setCode($formData['code'])
         ->setRate($formData['rate'])
         ;
@@ -79,6 +80,7 @@ class CurrencyController extends AbstractCrudController
         ->setCurrencyName($formData['name'])
         ->setLocale($formData["locale"])
         ->setSymbol($formData['symbol'])
+        ->setFormat($formData['format'])
         ->setCode($formData['code'])
         ->setRate($formData['rate'])
         ;
@@ -114,6 +116,7 @@ class CurrencyController extends AbstractCrudController
                 'locale' => $object->getLocale(),
                 'code'   => $object->getCode(),
                 'symbol' => $object->getSymbol(),
+                'format' => $object->getFormat(),
                 'rate'   => $object->getRate()
         );
 

@@ -646,6 +646,7 @@
     <column name="name" size="45" type="VARCHAR" />
     <column name="code" size="45" type="VARCHAR" />
     <column name="symbol" size="45" type="VARCHAR" />
+    <column name="format" size="10" type="CHAR" />
     <column name="rate" type="FLOAT" />
     <column name="position" type="INTEGER" />
     <column name="by_default" type="TINYINT" />

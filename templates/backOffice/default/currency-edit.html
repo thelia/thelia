@@ -92,6 +92,16 @@
             	                                    </div>
                                                 {/form_field}
 
+												{form_field field='format'}
+													<div class="form-group {if $error}has-error{/if}">
+														<label for="{$label_attr.for}" class="control-label">
+															{$label} :
+														</label>
+														<input type="text" id="{$label_attr.for}" required="required" name="{$name}" value="{$value}" title="{intl l='Format'}" placeholder="{intl l='n c'}" class="form-control">
+														<span class="help-block">{intl l='n for number, c for currency'}</span>
+													</div>
+												{/form_field}
+
                                                 {form_field field='rate'}
             	                                    <div class="form-group {if $error}has-error{/if}">
             	                                        <label for="{$label_attr.for}" class="control-label">

@@ -46,6 +46,15 @@ class CurrencyCreationForm extends BaseForm
                     "for" => "symbol",
                 ]
             ])
+            ->add("format", "text", [
+                "constraints" => [
+                    new NotBlank(),
+                ],
+                "label"       => Translator::getInstance()->trans('Format *'),
+                "label_attr"  => [
+                    "for" => "format",
+                ]
+            ])
             ->add("rate", "text", [
                 "constraints" => [
                     new NotBlank(),

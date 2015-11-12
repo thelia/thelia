@@ -57,6 +57,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
+            ->setFormat($event->getFormat())
             ->setRate($event->getRate())
             ->setCode(strtoupper($event->getCode()))
             ->setByDefault($isDefault)
@@ -80,6 +81,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
                 ->setSymbol($event->getSymbol())
+                ->setFormat($event->getFormat())
                 ->setRate($event->getRate())
                 ->setCode(strtoupper($event->getCode()))
 
@@ -172,7 +174,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {

@@ -751,6 +751,7 @@ CREATE TABLE `currency`
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45),
     `symbol` VARCHAR(45),
+    `format` CHAR(10),
     `rate` FLOAT,
     `position` INTEGER,
     `by_default` TINYINT,
