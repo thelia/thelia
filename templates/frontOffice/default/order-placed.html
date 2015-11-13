@@ -26,9 +26,6 @@
             {include file="misc/checkout-progress.tpl" step="last"}
 
             {loop type="order" name="placed-order" id=$placed_order_id}
-                {loop type="currency" name="order-currency" id=$CURRENCY}
-                    {$orderCurrency=$SYMBOL}
-                {/loop}
             {ifhook rel="order-placed.body"}
                 {hook name="order-placed.body" module="$PAYMENT_MODULE"}
             {/ifhook}
@@ -47,7 +44,7 @@
                             <dt>{intl l="Date"} : </dt>
                             <dd>{format_date date=$CREATE_DATE output="date"}</dd>
                             <dt>{intl l="Total"} : </dt>
-                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} symbol={$orderCurrency}}</dd>
+                            <dd>{format_money number={$TOTAL_TAXED_AMOUNT} currency_id=$CURRENCY}</dd>
                         </dl>
 
                         {block name='additional-payment-info'}{/block}

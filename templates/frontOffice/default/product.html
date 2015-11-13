@@ -158,9 +158,9 @@
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
 
                         <span id="pse-promo">
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
+                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE}</span></span>
                             {if $SHOW_ORIGINAL_PRICE}
-                                <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
+                                <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE}</span></span>
                             {/if}
                         </span>
                     </div>
@@ -343,7 +343,7 @@
 {$combination_label=[]}
 {$combination_values=[]}
 {loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
-    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}", "promo" => "{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}" ]}
+    {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_money number=$TAXED_PRICE}", "promo" => "{format_money number=$TAXED_PROMO_PRICE}" ]}
     {$pse_combination=[]}
     {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
         {if ! $combination_label[$ATTRIBUTE_ID]}
