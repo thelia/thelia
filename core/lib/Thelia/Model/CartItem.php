@@ -125,4 +125,23 @@ class CartItem extends BaseCartItem
 
         return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
     }
+
+    public function getTotalRealTaxedPrice(Country $country)
+    {
+        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country) : $this->getTotalTaxedPrice($country);
+    }
+
+    public function getTotalTaxedPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()*$this->getQuantity()), 2);
+    }
+
+    public function getTotalTaxedPromoPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+
+        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity()), 2);
+    }
 }

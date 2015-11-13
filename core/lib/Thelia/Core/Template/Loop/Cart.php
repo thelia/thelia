@@ -107,6 +107,10 @@ class Cart extends BaseLoop implements ArraySearchLoopInterface
                 ->set("TAXED_PRICE", $cartItem->getTaxedPrice($taxCountry))
                 ->set("PROMO_TAXED_PRICE", $cartItem->getTaxedPromoPrice($taxCountry))
                 ->set("IS_PROMO", $cartItem->getPromo() === 1 ? 1 : 0);
+            $loopResultRow->set("TOTAL_PRICE", $cartItem->getPrice()*$cartItem->getQuantity())
+                ->set("TOTAL_PROMO_PRICE", $cartItem->getPromoPrice()*$cartItem->getQuantity())
+                ->set("TOTAL_TAXED_PRICE", $cartItem->getTotalTaxedPrice($taxCountry))
+                ->set("TOTAL_PROMO_TAXED_PRICE", $cartItem->getTotalTaxedPromoPrice($taxCountry));
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_ID", $productSaleElement->getId());
             $loopResultRow->set("PRODUCT_SALE_ELEMENTS_REF", $productSaleElement->getRef());
             $this->addOutputFields($loopResultRow, $cartItem);
