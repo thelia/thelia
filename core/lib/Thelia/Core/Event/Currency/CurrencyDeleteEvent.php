@@ -14,6 +14,9 @@ namespace Thelia\Core\Event\Currency;
 
 class CurrencyDeleteEvent extends CurrencyEvent
 {
+    /**
+     * @param int $currencyId
+     */
     public function __construct($currencyId)
     {
         $this->setCurrencyId($currencyId);

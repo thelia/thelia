@@ -71,7 +71,9 @@ class CurrencyTest extends ContainerAwareTestCase
     }
 
     /**
+     * @param CurrencyModel $currency
      * @depends testCreate
+     * @return CurrencyModel
      */
     public function testUpdate(CurrencyModel $currency)
     {
@@ -106,6 +108,7 @@ class CurrencyTest extends ContainerAwareTestCase
     /**
      * @param CurrencyModel $currency
      * @depends testUpdate
+     * @return CurrencyModel
      */
     public function testSetDefault(CurrencyModel $currency)
     {
