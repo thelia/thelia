@@ -168,9 +168,6 @@
     </page_footer>
 
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-    {loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrency" $SYMBOL}
-    {/loop}
 
     <table class="table-info">
         <col style="width: 100%; padding: 0mm;" />
