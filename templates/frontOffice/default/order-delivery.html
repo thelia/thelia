@@ -155,8 +155,6 @@
 
     <script type="text/javascript">
         jQuery(function($) {
-            $('#delivery-module-list-block').load('{url path="/order/deliveryModuleList"}');
-
             $('.js-change-delivery-address').change(function(e) {
                 if (this.checked) {
                     $('#delivery-module-list-block').load(
@@ -167,7 +165,7 @@
                             address_id: $(this).attr('value')
                         }
     {/literal}
-                    );
+                    ).filter(':checked').change();
                 }
             });
         });
