@@ -1,8 +1,5 @@
 {default_translation_domain domain='email.default'}
 {loop name="order.invoice" type="order" id=$order_id customer="*"}
-{loop name="currency.order" type="currency" id=$CURRENCY}
-    {assign "orderCurrencySymbol" $SYMBOL}
-{/loop}
 {intl l="Hello,"}
 
 {intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
@@ -45,12 +42,12 @@
     {/loop}
 {/ifloop}
     {intl l="Quantity : %qty" qty=$QUANTITY}
-    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice} symbol=$orderCurrencySymbol}
+    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice} currency_id=$CURRENCY}
 {/loop}
 -----------------------------------------
-{intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} symbol=$orderCurrencySymbol}}
-{intl l="Shipping    : %amount" amount={format_money number=$POSTAGE symbol=$orderCurrencySymbol}}
-{intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrencySymbol}}
+{intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}}
+{intl l="Shipping    : %amount" amount={format_money number=$POSTAGE currency_id=$CURRENCY}}
+{intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}}
 ==================================
 
 {intl l="Your invoice is available in your customer account at %url" url={config key="url_site"}}
