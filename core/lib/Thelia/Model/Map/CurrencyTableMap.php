@@ -58,7 +58,7 @@ class CurrencyTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class CurrencyTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -94,6 +94,11 @@ class CurrencyTableMap extends TableMap
      * the column name for the RATE field
      */
     const RATE = 'currency.RATE';
+
+    /**
+     * the column name for the VISIBLE field
+     */
+    const VISIBLE = 'currency.VISIBLE';
 
     /**
      * the column name for the POSITION field
@@ -136,12 +141,12 @@ class CurrencyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Symbol', 'Format', 'Rate', 'Position', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'symbol', 'format', 'rate', 'position', 'byDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CurrencyTableMap::ID, CurrencyTableMap::CODE, CurrencyTableMap::SYMBOL, CurrencyTableMap::FORMAT, CurrencyTableMap::RATE, CurrencyTableMap::POSITION, CurrencyTableMap::BY_DEFAULT, CurrencyTableMap::CREATED_AT, CurrencyTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'SYMBOL', 'FORMAT', 'RATE', 'POSITION', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'symbol', 'format', 'rate', 'position', 'by_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Symbol', 'Format', 'Rate', 'Visible', 'Position', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'symbol', 'format', 'rate', 'visible', 'position', 'byDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CurrencyTableMap::ID, CurrencyTableMap::CODE, CurrencyTableMap::SYMBOL, CurrencyTableMap::FORMAT, CurrencyTableMap::RATE, CurrencyTableMap::VISIBLE, CurrencyTableMap::POSITION, CurrencyTableMap::BY_DEFAULT, CurrencyTableMap::CREATED_AT, CurrencyTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'SYMBOL', 'FORMAT', 'RATE', 'VISIBLE', 'POSITION', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'symbol', 'format', 'rate', 'visible', 'position', 'by_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -151,12 +156,12 @@ class CurrencyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Symbol' => 2, 'Format' => 3, 'Rate' => 4, 'Position' => 5, 'ByDefault' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'symbol' => 2, 'format' => 3, 'rate' => 4, 'position' => 5, 'byDefault' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(CurrencyTableMap::ID => 0, CurrencyTableMap::CODE => 1, CurrencyTableMap::SYMBOL => 2, CurrencyTableMap::FORMAT => 3, CurrencyTableMap::RATE => 4, CurrencyTableMap::POSITION => 5, CurrencyTableMap::BY_DEFAULT => 6, CurrencyTableMap::CREATED_AT => 7, CurrencyTableMap::UPDATED_AT => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'SYMBOL' => 2, 'FORMAT' => 3, 'RATE' => 4, 'POSITION' => 5, 'BY_DEFAULT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'symbol' => 2, 'format' => 3, 'rate' => 4, 'position' => 5, 'by_default' => 6, 'created_at' => 7, 'updated_at' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Symbol' => 2, 'Format' => 3, 'Rate' => 4, 'Visible' => 5, 'Position' => 6, 'ByDefault' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'symbol' => 2, 'format' => 3, 'rate' => 4, 'visible' => 5, 'position' => 6, 'byDefault' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
+        self::TYPE_COLNAME       => array(CurrencyTableMap::ID => 0, CurrencyTableMap::CODE => 1, CurrencyTableMap::SYMBOL => 2, CurrencyTableMap::FORMAT => 3, CurrencyTableMap::RATE => 4, CurrencyTableMap::VISIBLE => 5, CurrencyTableMap::POSITION => 6, CurrencyTableMap::BY_DEFAULT => 7, CurrencyTableMap::CREATED_AT => 8, CurrencyTableMap::UPDATED_AT => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'SYMBOL' => 2, 'FORMAT' => 3, 'RATE' => 4, 'VISIBLE' => 5, 'POSITION' => 6, 'BY_DEFAULT' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'symbol' => 2, 'format' => 3, 'rate' => 4, 'visible' => 5, 'position' => 6, 'by_default' => 7, 'created_at' => 8, 'updated_at' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -180,8 +185,9 @@ class CurrencyTableMap extends TableMap
         $this->addColumn('SYMBOL', 'Symbol', 'VARCHAR', false, 45, null);
         $this->addColumn('FORMAT', 'Format', 'CHAR', false, 10, null);
         $this->addColumn('RATE', 'Rate', 'FLOAT', false, null, null);
+        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, 0);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
+        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -367,6 +373,7 @@ class CurrencyTableMap extends TableMap
             $criteria->addSelectColumn(CurrencyTableMap::SYMBOL);
             $criteria->addSelectColumn(CurrencyTableMap::FORMAT);
             $criteria->addSelectColumn(CurrencyTableMap::RATE);
+            $criteria->addSelectColumn(CurrencyTableMap::VISIBLE);
             $criteria->addSelectColumn(CurrencyTableMap::POSITION);
             $criteria->addSelectColumn(CurrencyTableMap::BY_DEFAULT);
             $criteria->addSelectColumn(CurrencyTableMap::CREATED_AT);
@@ -377,6 +384,7 @@ class CurrencyTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.SYMBOL');
             $criteria->addSelectColumn($alias . '.FORMAT');
             $criteria->addSelectColumn($alias . '.RATE');
+            $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.BY_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
