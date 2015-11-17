@@ -215,13 +215,38 @@ class CurrencyController extends AbstractCrudController
             return $response;
         }
 
-        $changeEvent = new CurrencyUpdateEvent($this->getRequest()->get('currency_id', 0));
+        $changeEvent = new CurrencyUpdateEvent((int) $this->getRequest()->get('currency_id', 0));
 
         // Create and dispatch the change event
-        $changeEvent->setIsDefault(true);
+        $changeEvent->setIsDefault(true)->setVisible(1);
 
         try {
             $this->dispatch(TheliaEvents::CURRENCY_SET_DEFAULT, $changeEvent);
+        } catch (\Exception $ex) {
+            // Any error
+            return $this->errorPage($ex);
+        }
+
+        return $this->redirectToListTemplate();
+    }
+
+    /**
+     * Sets if the currency is visible for Front
+     */
+    public function setVisibleAction()
+    {
+        // Check current user authorization
+        if (null !== $response = $this->checkAuth($this->resourceCode, array(), AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $changeEvent = new CurrencyUpdateEvent((int) $this->getRequest()->get('currency_id', 0));
+
+        // Create and dispatch the change event
+        $changeEvent->setVisible((int) $this->getRequest()->get('visible', 0));
+
+        try {
+            $this->dispatch(TheliaEvents::CURRENCY_SET_VISIBLE, $changeEvent);
         } catch (\Exception $ex) {
             // Any error
             return $this->errorPage($ex);

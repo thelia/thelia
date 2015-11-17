@@ -17,6 +17,10 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     /** @var int */
     protected $is_default;
 
+
+    /** @var int */
+    protected $visible;
+
     /**
      * @param int $currencyId
      */
@@ -40,6 +44,25 @@ class CurrencyUpdateEvent extends CurrencyCreateEvent
     public function setIsDefault($is_default)
     {
         $this->is_default = $is_default;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param $visible
+     * @return $this
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
 
         return $this;
     }

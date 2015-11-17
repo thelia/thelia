@@ -14,7 +14,7 @@
 
         <div id="wrapper" class="container">
 
-            {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" lang="$edit_language_id"}
+            {loop name="currency_edit" type="currency" id="$currency_id" backend_context="1" visible="*" lang="$edit_language_id"}
 
                 <ul class="breadcrumb">
         			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
