@@ -188,8 +188,6 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn('i18n_TITLE');
-                    break;
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
