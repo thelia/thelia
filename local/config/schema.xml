@@ -648,8 +648,9 @@
     <column name="symbol" size="45" type="VARCHAR" />
     <column name="format" size="10" type="CHAR" />
     <column name="rate" type="FLOAT" />
+    <column defaultValue="0" name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
-    <column name="by_default" type="TINYINT" />
+    <column defaultValue="0" name="by_default" type="TINYINT" />
     <index name="idx_currency_by_default">
       <index-column name="by_default" />
     </index>
