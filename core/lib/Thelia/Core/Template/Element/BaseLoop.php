@@ -21,9 +21,9 @@ use Thelia\Core\Event\LoopOverridesEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
-use Thelia\Core\Template\Element\Overrides\ArgDefinitionOverrideInterface;
-use Thelia\Core\Template\Element\Overrides\ArgInitializationOverrideInterface;
-use Thelia\Core\Template\Element\Overrides\ParseOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ArgDefinitionsOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\InitializeArgsOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ParseResultsOverrideInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Translation\Translator;
@@ -45,6 +45,11 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop
 {
+    const OVERRIDES_ARG_DEFINITIONS = 'ArgDefinitions';
+    const OVERRIDES_ARG_INITIALIZE_ARGS = 'InitializeArgs';
+    const OVERRIDES_BUILDER = 'Builder';
+    const OVERRIDES_PARSE_RESULTS = 'ParseResults';
+
     /**
      * @var \Thelia\Core\HttpFoundation\Request
      */
@@ -76,12 +81,10 @@ abstract class BaseLoop
     private static $cacheLoopResult = [];
     private static $cacheCount = [];
 
-    private static $cacheOverride = false;
+    protected static $overrides = [];
 
-    private static $overrideArgDefinition = [];
-    private static $overrideArgInitialization = [];
-    private static $overrideBuilder = [];
-    private static $overrideParse = [];
+    protected $loopName = null;
+
     /**
      * Create a new Loop
      *
@@ -99,20 +102,12 @@ abstract class BaseLoop
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
 
-        if (false === self::$cacheOverride) {
-
-            $event = new LoopOverridesEvent($this);
-            $this->dispatcher->dispatch(TheliaEvents::LOOP_OVERRIDES, $event);
-
-            self::$overrideArgDefinition = $event->getArgDefinition();
-            self::$overrideArgInitialization = $event->getArgInitialization();
-            self::$overrideBuilder = $event->getBuilder();
-            self::$overrideParse = $event->getParser();
-
-            self::$cacheOverride = true;
+        if (null !== $this->getLoopName()) {
+            $this->initializeOverrides();
         }
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+
         $this->overrideArgDefinitions();
     }
 
@@ -170,6 +165,19 @@ abstract class BaseLoop
         }
 
         return $defaultArgs;
+    }
+
+    /**
+     * Return the name of the loop
+     *
+     * The name is used in overriding system to dispatch the proper event.
+     * You should define it in your Loop.
+     *
+     * @return string|null The Loop name
+     */
+    public function getLoopName()
+    {
+        return $this->loopName;
     }
 
     /**
@@ -234,7 +242,8 @@ abstract class BaseLoop
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
 
-        $nameValuePairs = $this->overrideArgInitialization($nameValuePairs);
+        $this->overrideInitializeArgs($nameValuePairs);
+
         $this->args->rewind();
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
@@ -638,51 +647,83 @@ abstract class BaseLoop
         $this->overrideParseResults($loopResultRow, $item);
     }
 
+    /**
+     * Override arguments definitions
+     */
     protected function overrideArgDefinitions()
     {
-        /** @var ArgDefinitionOverrideInterface $override */
-        foreach (self::$overrideArgDefinition as $override) {
-            if (null !== $args = $override->getDefinitions($this)) {
-                $this->args->addArguments($args, true);
-            }
+        /** @var ArgDefinitionsOverrideInterface $override */
+        foreach ($this->getOverrides(self::OVERRIDES_ARG_DEFINITIONS) as $override) {
+            $override->getArgDefinitions($this);
         }
     }
 
-    protected function overrideArgInitialization(array $nameValuePairs)
+    /**
+     * Override initiliaze arguments
+     */
+    protected function overrideInitializeArgs(array $nameValuePairs)
     {
         $args = [];
 
-        /** @var ArgInitializationOverrideInterface $override */
-        foreach (self::$overrideArgInitialization as $override) {
-            $args = array_merge(
-                $args,
-                $override->initialize($this, $nameValuePairs)
-            );
-        }
-
-        if (!empty($args)) {
-            $nameValuePairs = array_merge($nameValuePairs, $args);
+        /** @var InitializeArgsOverrideInterface $override */
+        foreach ($this->getOverrides(self::OVERRIDES_ARG_INITIALIZE_ARGS) as $override) {
+            $override->initializeArgs($this, $nameValuePairs);
         }
 
         return $nameValuePairs;
     }
 
+    /**
+     * Override buildModelCriteria or buildArray
+     */
     protected function overrideBuilder($search)
     {
-        foreach (self::$overrideBuilder as $override) {
-            $search = $override->build($this, $search);
+        foreach ($this->getOverrides(self::OVERRIDES_BUILDER) as $override) {
+            $override->build($this, $search);
         }
 
         return $search;
     }
 
+    /**
+     * Override parse results
+     */
     protected function overrideParseResults(LoopResultRow $loopResultRow, $item)
     {
-        /** @var ParseOverrideInterface $override */
-        foreach (self::$overrideParse as $override) {
-            $loopResultRow = $override->parse($this, $loopResultRow, $item);
+        /** @var ParseResultsOverrideInterface $override */
+        foreach ($this->getOverrides(self::OVERRIDES_PARSE_RESULTS) as $override) {
+            $override->parseResults($this, $loopResultRow, $item);
         }
 
         return $loopResultRow;
+    }
+
+    protected function getOverrides($key)
+    {
+        if (null !== $this->getLoopName()) {
+            return static::$overrides[$this->getLoopName()][$key];
+        }
+
+        return [];
+    }
+
+    protected function initializeOverrides()
+    {
+        if (!array_key_exists($this->getLoopName(), static::$overrides)) {
+            $event = new LoopOverridesEvent($this);
+
+            // for all loops
+            $this->dispatcher->dispatch(TheliaEvents::LOOP_OVERRIDES_LOOPS, $event);
+
+            // for specific loop
+            $this->dispatcher->dispatch(TheliaEvents::getLoopOverridesEvent($this->getLoopName()), $event);
+
+            static::$overrides[$this->getLoopName()] = [
+                self::OVERRIDES_ARG_DEFINITIONS => $event->getArgDefinitions(),
+                self::OVERRIDES_ARG_INITIALIZE_ARGS => $event->getInitializeArgs(),
+                self::OVERRIDES_BUILDER => $event->getBuilder(),
+                self::OVERRIDES_PARSE_RESULTS => $event->getParserResults()
+            ];
+        }
     }
 }

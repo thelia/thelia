@@ -16,8 +16,11 @@ namespace Thelia\Core\Event;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\Overrides\ArgDefinitionOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ArgDefinitionsOverrideInterface;
 use Thelia\Core\Template\Element\Overrides\ArrayBuilderOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\InitializeArgsOverrideInterface;
 use Thelia\Core\Template\Element\Overrides\ParseOverrideInterface;
+use Thelia\Core\Template\Element\Overrides\ParseResultsOverrideInterface;
 use Thelia\Core\Template\Element\Overrides\PropelBuilderOverrideInterface;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 
@@ -31,13 +34,13 @@ class LoopOverridesEvent extends ActionEvent
     /** @var BaseLoop|null  */
     protected $loop = null;
 
-    protected $argDefinition = [];
+    protected $argDefinitions = [];
 
-    protected $argInitialization = [];
+    protected $initializeArgs = [];
 
     protected $builder = [];
 
-    protected $parser = [];
+    protected $parserResults = [];
 
     public function __construct(BaseLoop $loop)
     {
@@ -61,6 +64,15 @@ class LoopOverridesEvent extends ActionEvent
     }
 
     /**
+     * @return null|string
+     */
+    public function getLoopName()
+    {
+        return $this->loop->getLoopName();
+    }
+
+
+    /**
      * @return array
      */
     public function getBuilder()
@@ -71,25 +83,41 @@ class LoopOverridesEvent extends ActionEvent
     /**
      * @return array
      */
-    public function getArgDefinition()
+    public function getArgDefinitions()
     {
-        return $this->argDefinition;
+        return $this->argDefinitions;
     }
 
     /**
      * @return array
      */
-    public function getArgInitialization()
+    public function getInitializeArgs()
     {
-        return $this->argInitialization;
+        return $this->initializeArgs;
     }
 
     /**
      * @return $this
      */
-    public function getParser()
+    public function getParserResults()
     {
-        return $this->parser;
+        return $this->parserResults;
+    }
+
+    public function addClass($class)
+    {
+        if ($class instanceof ArgDefinitionsOverrideInterface) {
+            $this->addArgDefinitions($class);
+        }
+        if ($class instanceof InitializeArgsOverrideInterface) {
+            $this->addInitializeArgs($class);
+        }
+        if ($class instanceof PropelSearchLoopInterface || $class instanceof ArrayBuilderOverrideInterface) {
+            $this->addBuilder($class);
+        }
+        if ($class instanceof ParseResultsOverrideInterface) {
+            $this->addParserResults($class);
+        }
     }
 
     /**
@@ -107,7 +135,7 @@ class LoopOverridesEvent extends ActionEvent
             if ($builder instanceof ArrayBuilderOverrideInterface) {
                 $this->builder[] = $builder;
             } else {
-                throw new \InvalidArgumentException('builder should implements PropelBuilderOverrideInterface');
+                throw new \InvalidArgumentException('builder should implements ArraySearchLoopInterface');
             }
         }
 
@@ -117,9 +145,9 @@ class LoopOverridesEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function addArgDefinition(ArgDefinitionOverrideInterface $argDefinition)
+    public function addArgDefinitions(ArgDefinitionsOverrideInterface $argDefinitions)
     {
-        $this->argDefinition[] = $argDefinition;
+        $this->argDefinitions[] = $argDefinitions;
 
         return $this;
     }
@@ -127,18 +155,19 @@ class LoopOverridesEvent extends ActionEvent
     /**
      * @return $this
      */
-    public function addArgInitialization(ArgInitializationOverrideInterface $argInitialization)
+    public function addInitializeArgs(InitializeArgsOverrideInterface $initializeArgs)
     {
-        $this->argInitialization[] = $argInitialization;
+        $this->initializeArgs[] = $initializeArgs;
 
         return $this;
     }
+
     /**
      * @return $this
      */
-    public function addParser(ParseOverrideInterface $parser)
+    public function addParserResults(ParseResultsOverrideInterface $parserResults)
     {
-        $this->argParser[] = $parser;
+        $this->parserResults[] = $parserResults;
 
         return $this;
     }

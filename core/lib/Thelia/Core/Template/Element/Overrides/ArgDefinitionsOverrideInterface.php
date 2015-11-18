@@ -9,29 +9,33 @@
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
-
-
 namespace Thelia\Core\Template\Element\Overrides;
 
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+
 
 /**
- * Class ParseOverrideInterface
- * @package Thelia\Core\Template\Element\Overrides
+ * Class ArgDefinitionsOverride
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-interface ParseOverrideInterface
+interface ArgDefinitionsOverrideInterface
 {
     /**
+     * Manipulate argument definitions
      *
+     * For instance:
      *
-     * @param BaseLoop        $loop    the current loop
-     * @param LoopResultRow   $result  the current loop result row of the loop
-     * @param object|array    $item
+     * $loop->getArgs()->addArgument(
+     *     Argument::createEnumListTypeArgument(
+     *         'export',
+     *         ['JSON', 'json', 'csv', 'xml'],
+     *     )
+     * );
      *
-     * @return LoopResult             the modified LoopResult
+     * @param BaseLoop  $loop      the current loop
+     *
      */
-    public function parse(BaseLoop $loop, LoopResultRow $result, $item);
+    public function getArgDefinitions(BaseLoop $loop);
 }

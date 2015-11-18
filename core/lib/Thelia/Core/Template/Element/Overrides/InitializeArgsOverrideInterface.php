@@ -16,16 +16,21 @@ namespace Thelia\Core\Template\Element\Overrides;
 use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class ArgInitializationOverrideInterface
+ * Class InitializeArgsOverrideInterface
  * @package Thelia\Core\Template\Element\Overrides
  * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-interface ArgInitializationOverrideInterface
+interface InitializeArgsOverrideInterface
 {
     /**
+     * Manipulate arguments of a loop
+     *
+     * For instance:
+     *
+     * $nameValuePairs['export'] = 'json';
+     *
      * @param BaseLoop $loop
      * @param array $nameValuePairs
-     * @return array
      */
-    public function initialize(BaseLoop $loop, array $nameValuePairs);
+    public function initializeArgs(BaseLoop $loop, array $nameValuePairs);
 }

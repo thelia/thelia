@@ -26,12 +26,15 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 interface PropelBuilderOverrideInterface
 {
     /**
+     * Manipulate the ModelCriteria
      *
+     * For instance:
+     *
+     * $search->orderBy('id', Criteria::DESC);
      *
      * @param BaseLoop        $loop      the current loop
      * @param ModelCriteria   $search    the search ModelCriteria of the loop
      *
-     * @return ModelCriteria             the modified ModelCriteria
      */
     public function build(BaseLoop $loop, ModelCriteria $search);
 }
