@@ -13,9 +13,7 @@
 namespace Thelia\Controller\Admin;
 
 use Doctrine\Common\Cache\FilesystemCache;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
-use Thelia\Core\Thelia;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\OrderQuery;
@@ -54,8 +52,11 @@ class HomeController extends BaseAdminController
 
         $cacheContent = false;
 
+        $month = (int) $this->getRequest()->query->get('month', date('m'));
+        $year = (int) $this->getRequest()->query->get('year', date('Y'));
+
         if ($cacheExpire) {
-            $context = "_" . $this->getRequest()->query->get('month', date('m')) . "_" . $this->getRequest()->query->get('year', date('Y'));
+            $context = "_" . $month . "_" . $year;
 
             $cacheKey = self::STATS_CACHE_KEY . $context;
 
@@ -71,48 +72,35 @@ class HomeController extends BaseAdminController
         if ($cacheContent === false) {
             $data = new \stdClass();
 
-            $data->title = $this->getTranslator()->trans("Stats on %month/%year", array('%month' => $this->getRequest()->query->get('month', date('m')), '%year' => $this->getRequest()->query->get('year', date('Y'))));
+            $data->title = $this->getTranslator()->trans(
+                "Stats on %month/%year",
+                ['%month' => $month, '%year' => $year]
+            );
 
             /* sales */
             $saleSeries = new \stdClass();
-            $saleSeries->color = $this->getRequest()->query->get('sales_color', '#adadad');
-            $saleSeries->data = OrderQuery::getMonthlySaleStats(
-                $this->getRequest()->query->get('month', date('m')),
-                $this->getRequest()->query->get('year', date('Y'))
-            );
+            $saleSeries->color = self::testHexColor('sales_color', '#adadad');
+            $saleSeries->data = OrderQuery::getMonthlySaleStats($month, $year);
 
             /* new customers */
             $newCustomerSeries = new \stdClass();
-            $newCustomerSeries->color = $this->getRequest()->query->get('customers_color', '#f39922');
-            $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats(
-                $this->getRequest()->query->get('month', date('m')),
-                $this->getRequest()->query->get('year', date('Y'))
-            );
+            $newCustomerSeries->color = self::testHexColor('customers_color', '#f39922');
+            $newCustomerSeries->data = CustomerQuery::getMonthlyNewCustomersStats($month, $year);
 
             /* orders */
             $orderSeries = new \stdClass();
-            $orderSeries->color = $this->getRequest()->query->get('orders_color', '#5cb85c');
-            $orderSeries->data = OrderQuery::getMonthlyOrdersStats(
-                $this->getRequest()->query->get('month', date('m')),
-                $this->getRequest()->query->get('year', date('Y'))
-            );
+            $orderSeries->color = self::testHexColor('orders_color', '#5cb85c');
+            $orderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year);
 
             /* first order */
             $firstOrderSeries = new \stdClass();
-            $firstOrderSeries->color = $this->getRequest()->query->get('first_orders_color', '#5bc0de');
-            $firstOrderSeries->data = OrderQuery::getFirstOrdersStats(
-                $this->getRequest()->query->get('month', date('m')),
-                $this->getRequest()->query->get('year', date('Y'))
-            );
+            $firstOrderSeries->color = self::testHexColor('first_orders_color', '#5bc0de');
+            $firstOrderSeries->data = OrderQuery::getFirstOrdersStats($month, $year);
 
             /* cancelled orders */
             $cancelledOrderSeries = new \stdClass();
-            $cancelledOrderSeries->color = $this->getRequest()->query->get('cancelled_orders_color', '#d9534f');
-            $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats(
-                $this->getRequest()->query->get('month', date('m')),
-                $this->getRequest()->query->get('year', date('Y')),
-                array(5)
-            );
+            $cancelledOrderSeries->color = self::testHexColor('cancelled_orders_color', '#d9534f');
+            $cancelledOrderSeries->data = OrderQuery::getMonthlyOrdersStats($month, $year, array(5));
 
             $data->series = array(
                 $saleSeries,
@@ -144,5 +132,17 @@ class HomeController extends BaseAdminController
         $cacheDir .= DIRECTORY_SEPARATOR . self::STATS_CACHE_DIR . DIRECTORY_SEPARATOR;
 
         return $cacheDir;
+    }
+
+    /**
+     * @param string $key
+     * @param string $default
+     * @return string hexadecimal color or default argument
+     */
+    protected function testHexColor($key, $default)
+    {
+        $hexColor = $this->getRequest()->query->get($key, $default);
+
+        return preg_match('/^#[a-f0-9]{6}$/i', $hexColor) ? $hexColor : $default;
     }
 }
