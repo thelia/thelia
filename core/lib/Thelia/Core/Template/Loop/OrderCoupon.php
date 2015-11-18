@@ -38,6 +38,8 @@ use Thelia\Model\OrderQuery;
  */
 class OrderCoupon extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-coupon';
+
     /**
      * Define all args used in your loop
      *

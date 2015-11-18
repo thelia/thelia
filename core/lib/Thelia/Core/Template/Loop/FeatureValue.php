@@ -44,6 +44,8 @@ use Thelia\Type;
  */
 class FeatureValue extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'feature-value';
+
     protected $timestampable = true;
 
     /**

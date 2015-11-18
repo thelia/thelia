@@ -37,6 +37,8 @@ use Thelia\Model\Admin as AdminModel;
  */
 class Admin extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'admin';
+
     protected $timestampable = true;
 
     /**

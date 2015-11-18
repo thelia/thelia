@@ -35,6 +35,8 @@ use Thelia\Model\AccessoryQuery;
  */
 class Accessory extends Product
 {
+    protected $loopName = 'accessory';
+
     protected $accessoryId;
     protected $accessoryPosition;
 

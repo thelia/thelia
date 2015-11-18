@@ -41,6 +41,8 @@ use Thelia\Model\Currency as CurrencyModel;
  */
 class Currency extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'currency';
+
     protected $timestampable = true;
 
     /**

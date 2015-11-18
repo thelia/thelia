@@ -44,6 +44,8 @@ use Thelia\Type\TypeCollection;
  */
 class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'coupon';
+
     /**
      * Define all args used in your loop
      *

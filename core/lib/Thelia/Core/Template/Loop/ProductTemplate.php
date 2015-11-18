@@ -37,6 +37,8 @@ use Thelia\Model\Template as TemplateModel;
  */
 class ProductTemplate extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'product-template';
+
     protected $timestampable = true;
 
     /**

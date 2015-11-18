@@ -41,6 +41,8 @@ use Thelia\Type;
  */
 class Address extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'address';
+
     protected $timestampable = true;
 
     /**

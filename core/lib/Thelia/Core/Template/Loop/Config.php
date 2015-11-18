@@ -47,6 +47,8 @@ use Thelia\Model\Config as ConfigModel;
  */
 class Config extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'config';
+
     protected $timestampable = true;
 
     /**

@@ -32,6 +32,8 @@ use Thelia\Type\TypeCollection;
  */
 class ArchiveBuilder extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'archive-builder';
+
     /**
      * this method returns an array
      *

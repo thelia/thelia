@@ -33,6 +33,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class FolderPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'folder-path';
+
     /**
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */

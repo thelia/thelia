@@ -42,6 +42,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class CategoryPath extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'category-path';
+
     /**
      * @return ArgumentCollection
      */

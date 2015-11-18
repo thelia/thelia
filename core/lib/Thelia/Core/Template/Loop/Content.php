@@ -53,6 +53,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'content';
+
     protected $timestampable = true;
     protected $versionable = true;
 

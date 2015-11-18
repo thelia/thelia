@@ -37,6 +37,8 @@ use Thelia\Type\TypeCollection;
  */
 class Auth extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'auth';
+
     public function getArgDefinitions()
     {
         return new ArgumentCollection(

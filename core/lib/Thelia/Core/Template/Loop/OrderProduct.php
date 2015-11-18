@@ -40,6 +40,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-product';
+
     protected $timestampable = true;
 
     /**

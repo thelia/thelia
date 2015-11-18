@@ -21,6 +21,8 @@ use Thelia\Model\ExportQuery;
  */
 class Export extends ImportExportType
 {
+    protected $loopName = 'export';
+
     protected function getBaseUrl()
     {
         return $this->container->getParameter("export.base_url");

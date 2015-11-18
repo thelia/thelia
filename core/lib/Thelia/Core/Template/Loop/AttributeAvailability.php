@@ -44,6 +44,8 @@ use Thelia\Type;
  */
 class AttributeAvailability extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'attribute-availability';
+
     protected $timestampable = true;
 
     /**

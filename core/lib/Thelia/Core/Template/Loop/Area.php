@@ -40,6 +40,8 @@ use Thelia\Type\TypeCollection;
  */
 class Area extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'area';
+
     protected $timestampable = true;
 
     /**

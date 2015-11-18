@@ -39,6 +39,8 @@ use Thelia\Type\TypeCollection;
  */
 class Hook extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'hook';
+
     protected $timestampable = true;
 
     /**

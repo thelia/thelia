@@ -40,6 +40,8 @@ use Thelia\Model\CountryQuery;
  */
 class Country extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'country';
+
     protected $timestampable = true;
 
     /**
