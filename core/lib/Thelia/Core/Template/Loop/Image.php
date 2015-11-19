@@ -82,7 +82,7 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new EnumListType(array('alpha', 'alpha-reverse', 'alpha_reverse', 'manual', 'manual-reverse', 'manual_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -158,9 +158,11 @@ class Image extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual-reverse":
+                case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "manual":
