@@ -90,8 +90,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
             Argument::createEnumListTypeArgument(
                 "order",
                 [
-                    "position",
-                    "position-reverse"
+                    "position", "position-reverse", "position_reverse"
                 ],
                 "position"
             )
@@ -130,6 +129,7 @@ class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInter
                     break;
 
                 case "position-reverse":
+                case "position_reverse":
                     $query
                         ->useProductImageQuery()
                             ->orderByPosition(Criteria::DESC)
