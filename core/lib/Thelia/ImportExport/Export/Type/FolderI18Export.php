@@ -16,18 +16,18 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\Model\Map\ProductI18nTableMap;
-use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Map\FolderI18nTableMap;
+use Thelia\Model\Map\FolderTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
-use Thelia\Model\Product;
+use Thelia\Model\Folder;
 use Thelia\Model\Lang;
-use Thelia\Model\ProductQuery;
+use Thelia\Model\FolderQuery;
 
 /**
- * Class ProductI18Export
+ * Class FolderI18Export
  * @package Thelia\ImportExport\Export\Type
  */
-class ProductI18Export extends ExportHandler
+class FolderI18Export extends ExportHandler
 {
     /**
      * @return string|array
@@ -60,10 +60,10 @@ class ProductI18Export extends ExportHandler
     {
         $locale = $this->locale = $lang->getLocale();
 
-        $query = ProductQuery::create();
+        $query = FolderQuery::create();
 
-        $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $urlJoin = new Join(FolderTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
+        $folderJoin = new Join(FolderTableMap::ID, FolderI18nTableMap::ID, Criteria::LEFT_JOIN);
 
         $query
             ->addJoinObject($urlJoin, "rewriting_url_join")
@@ -72,38 +72,36 @@ class ProductI18Export extends ExportHandler
             ->addJoinCondition(
                 "rewriting_url_join",
                 RewritingUrlTableMap::VIEW . " = ?",
-                (new Product())->getRewrittenUrlViewName(),
+                (new Folder())->getRewrittenUrlViewName(),
                 null,
                 \PDO::PARAM_STR
             )
             ->addJoinCondition("rewriting_url_join", "ISNULL(" . RewritingUrlTableMap::REDIRECTED . ")")
-            ->addJoinObject($productJoin, "product_join")
-            ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR);
+            ->addJoinObject($folderJoin, "folder_join")
+            ->addJoinCondition("folder_join", FolderI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR);
 
         $query
-            ->addAsColumn("product_ID", ProductTableMap::ID)
-            ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
-            ->addAsColumn("product_i18n_DESCRIPTION", ProductI18nTableMap::DESCRIPTION)
-            ->addAsColumn("product_i18n_CHAPO", ProductI18nTableMap::CHAPO)
-            ->addAsColumn("product_i18n_POSTSCRIPTUM", ProductI18nTableMap::POSTSCRIPTUM)
-            ->addAsColumn("product_REF", ProductTableMap::REF)
-            ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
-            ->addAsColumn("product_seo_TITLE", ProductI18nTableMap::META_TITLE)
-            ->addAsColumn("product_seo_META_DESCRIPTION", ProductI18nTableMap::META_DESCRIPTION)
-            ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
-            ->addAsColumn("product_URL", RewritingUrlTableMap::URL)
+            ->addAsColumn("folder_ID", FolderTableMap::ID)
+            ->addAsColumn("folder_i18n_TITLE", FolderI18nTableMap::TITLE)
+            ->addAsColumn("folder_i18n_DESCRIPTION", FolderI18nTableMap::DESCRIPTION)
+            ->addAsColumn("folder_i18n_CHAPO", FolderI18nTableMap::CHAPO)
+            ->addAsColumn("folder_i18n_POSTSCRIPTUM", FolderI18nTableMap::POSTSCRIPTUM)
+            ->addAsColumn("folder_VISIBLE", FolderTableMap::VISIBLE)
+            ->addAsColumn("folder_seo_TITLE", FolderI18nTableMap::META_TITLE)
+            ->addAsColumn("folder_seo_META_DESCRIPTION", FolderI18nTableMap::META_DESCRIPTION)
+            ->addAsColumn("folder_seo_META_KEYWORDS", FolderI18nTableMap::META_KEYWORDS)
+            ->addAsColumn("folder_URL", RewritingUrlTableMap::URL)
             ->select([
-                "product_ID",
-                "product_REF",
-                "product_VISIBLE",
-                "product_i18n_TITLE",
-                "product_i18n_DESCRIPTION",
-                "product_i18n_CHAPO",
-                "product_i18n_POSTSCRIPTUM",
-                "product_URL",
-                "product_seo_TITLE",
-                "product_seo_META_DESCRIPTION",
-                "product_seo_META_KEYWORDS",
+                "folder_ID",
+                "folder_VISIBLE",
+                "folder_i18n_TITLE",
+                "folder_i18n_DESCRIPTION",
+                "folder_i18n_CHAPO",
+                "folder_i18n_POSTSCRIPTUM",
+                "folder_URL",
+                "folder_seo_TITLE",
+                "folder_seo_META_DESCRIPTION",
+                "folder_seo_META_KEYWORDS",
             ]);
 
         return $query;
@@ -113,12 +111,11 @@ class ProductI18Export extends ExportHandler
     {
         return  [
             "id",
-            "ref",
             "visible",
-            "product_title",
-            "product_description",
-            "product_chapo",
-            "product_postscriptum",
+            "folder_title",
+            "folder_description",
+            "folder_chapo",
+            "folder_postscriptum",
             "url",
             "page_title",
             "meta_description",
@@ -129,17 +126,16 @@ class ProductI18Export extends ExportHandler
     protected function getAliases()
     {
         return [
-            "product_ID" => "id",
-            "product_REF" => "ref",
-            "product_VISIBLE" => "visible",
-            "product_i18n_TITLE" => "product_title",
-            "product_i18n_DESCRIPTION" => "product_description",
-            "product_i18n_CHAPO" => "product_chapo",
-            "product_i18n_POSTSCRIPTUM" => "product_postscriptum",
-            "product_URL" => "url",
-            "product_seo_TITLE" => "page_title",
-            "product_seo_META_DESCRIPTION" => "meta_description",
-            "product_seo_META_KEYWORDS" => "meta_keywords",
+            "folder_ID" => "id",
+            "folder_VISIBLE" => "visible",
+            "folder_i18n_TITLE" => "folder_title",
+            "folder_i18n_DESCRIPTION" => "folder_description",
+            "folder_i18n_CHAPO" => "folder_chapo",
+            "folder_i18n_POSTSCRIPTUM" => "folder_postscriptum",
+            "folder_URL" => "url",
+            "folder_seo_TITLE" => "page_title",
+            "folder_seo_META_DESCRIPTION" => "meta_description",
+            "folder_seo_META_KEYWORDS" => "meta_keywords",
         ];
     }
 }

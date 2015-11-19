@@ -16,18 +16,18 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\Model\Map\ProductI18nTableMap;
-use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\Map\ContentI18nTableMap;
+use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\Map\RewritingUrlTableMap;
-use Thelia\Model\Product;
+use Thelia\Model\Content;
 use Thelia\Model\Lang;
-use Thelia\Model\ProductQuery;
+use Thelia\Model\ContentQuery;
 
 /**
- * Class ProductI18Export
+ * Class ContentI18Export
  * @package Thelia\ImportExport\Export\Type
  */
-class ProductI18Export extends ExportHandler
+class ContentI18Export extends ExportHandler
 {
     /**
      * @return string|array
@@ -60,10 +60,10 @@ class ProductI18Export extends ExportHandler
     {
         $locale = $this->locale = $lang->getLocale();
 
-        $query = ProductQuery::create();
+        $query = ContentQuery::create();
 
-        $urlJoin = new Join(ProductTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
-        $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $urlJoin = new Join(ContentTableMap::ID, RewritingUrlTableMap::VIEW_ID, Criteria::LEFT_JOIN);
+        $contentJoin = new Join(ContentTableMap::ID, ContentI18nTableMap::ID, Criteria::LEFT_JOIN);
 
         $query
             ->addJoinObject($urlJoin, "rewriting_url_join")
@@ -72,38 +72,36 @@ class ProductI18Export extends ExportHandler
             ->addJoinCondition(
                 "rewriting_url_join",
                 RewritingUrlTableMap::VIEW . " = ?",
-                (new Product())->getRewrittenUrlViewName(),
+                (new Content())->getRewrittenUrlViewName(),
                 null,
                 \PDO::PARAM_STR
             )
             ->addJoinCondition("rewriting_url_join", "ISNULL(" . RewritingUrlTableMap::REDIRECTED . ")")
-            ->addJoinObject($productJoin, "product_join")
-            ->addJoinCondition("product_join", ProductI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR);
+            ->addJoinObject($contentJoin, "content_join")
+            ->addJoinCondition("content_join", ContentI18nTableMap::LOCALE . " = ?", $locale, null, \PDO::PARAM_STR);
 
         $query
-            ->addAsColumn("product_ID", ProductTableMap::ID)
-            ->addAsColumn("product_i18n_TITLE", ProductI18nTableMap::TITLE)
-            ->addAsColumn("product_i18n_DESCRIPTION", ProductI18nTableMap::DESCRIPTION)
-            ->addAsColumn("product_i18n_CHAPO", ProductI18nTableMap::CHAPO)
-            ->addAsColumn("product_i18n_POSTSCRIPTUM", ProductI18nTableMap::POSTSCRIPTUM)
-            ->addAsColumn("product_REF", ProductTableMap::REF)
-            ->addAsColumn("product_VISIBLE", ProductTableMap::VISIBLE)
-            ->addAsColumn("product_seo_TITLE", ProductI18nTableMap::META_TITLE)
-            ->addAsColumn("product_seo_META_DESCRIPTION", ProductI18nTableMap::META_DESCRIPTION)
-            ->addAsColumn("product_seo_META_KEYWORDS", ProductI18nTableMap::META_KEYWORDS)
-            ->addAsColumn("product_URL", RewritingUrlTableMap::URL)
+            ->addAsColumn("content_ID", ContentTableMap::ID)
+            ->addAsColumn("content_i18n_TITLE", ContentI18nTableMap::TITLE)
+            ->addAsColumn("content_i18n_DESCRIPTION", ContentI18nTableMap::DESCRIPTION)
+            ->addAsColumn("content_i18n_CHAPO", ContentI18nTableMap::CHAPO)
+            ->addAsColumn("content_i18n_POSTSCRIPTUM", ContentI18nTableMap::POSTSCRIPTUM)
+            ->addAsColumn("content_VISIBLE", ContentTableMap::VISIBLE)
+            ->addAsColumn("content_seo_TITLE", ContentI18nTableMap::META_TITLE)
+            ->addAsColumn("content_seo_META_DESCRIPTION", ContentI18nTableMap::META_DESCRIPTION)
+            ->addAsColumn("content_seo_META_KEYWORDS", ContentI18nTableMap::META_KEYWORDS)
+            ->addAsColumn("content_URL", RewritingUrlTableMap::URL)
             ->select([
-                "product_ID",
-                "product_REF",
-                "product_VISIBLE",
-                "product_i18n_TITLE",
-                "product_i18n_DESCRIPTION",
-                "product_i18n_CHAPO",
-                "product_i18n_POSTSCRIPTUM",
-                "product_URL",
-                "product_seo_TITLE",
-                "product_seo_META_DESCRIPTION",
-                "product_seo_META_KEYWORDS",
+                "content_ID",
+                "content_VISIBLE",
+                "content_i18n_TITLE",
+                "content_i18n_DESCRIPTION",
+                "content_i18n_CHAPO",
+                "content_i18n_POSTSCRIPTUM",
+                "content_URL",
+                "content_seo_TITLE",
+                "content_seo_META_DESCRIPTION",
+                "content_seo_META_KEYWORDS",
             ]);
 
         return $query;
@@ -113,12 +111,11 @@ class ProductI18Export extends ExportHandler
     {
         return  [
             "id",
-            "ref",
             "visible",
-            "product_title",
-            "product_description",
-            "product_chapo",
-            "product_postscriptum",
+            "content_title",
+            "content_description",
+            "content_chapo",
+            "content_postscriptum",
             "url",
             "page_title",
             "meta_description",
@@ -129,17 +126,16 @@ class ProductI18Export extends ExportHandler
     protected function getAliases()
     {
         return [
-            "product_ID" => "id",
-            "product_REF" => "ref",
-            "product_VISIBLE" => "visible",
-            "product_i18n_TITLE" => "product_title",
-            "product_i18n_DESCRIPTION" => "product_description",
-            "product_i18n_CHAPO" => "product_chapo",
-            "product_i18n_POSTSCRIPTUM" => "product_postscriptum",
-            "product_URL" => "url",
-            "product_seo_TITLE" => "page_title",
-            "product_seo_META_DESCRIPTION" => "meta_description",
-            "product_seo_META_KEYWORDS" => "meta_keywords",
+            "content_ID" => "id",
+            "content_VISIBLE" => "visible",
+            "content_i18n_TITLE" => "content_title",
+            "content_i18n_DESCRIPTION" => "content_description",
+            "content_i18n_CHAPO" => "content_chapo",
+            "content_i18n_POSTSCRIPTUM" => "content_postscriptum",
+            "content_URL" => "url",
+            "content_seo_TITLE" => "page_title",
+            "content_seo_META_DESCRIPTION" => "meta_description",
+            "content_seo_META_KEYWORDS" => "meta_keywords",
         ];
     }
 }
