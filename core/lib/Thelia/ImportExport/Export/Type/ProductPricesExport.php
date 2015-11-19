@@ -16,7 +16,6 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\ImportExport\Export\ExportHandler;
-use Thelia\Model\Base\AttributeCombinationQuery;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\AttributeAvI18nTableMap;
 use Thelia\Model\Map\AttributeAvTableMap;
@@ -25,6 +24,7 @@ use Thelia\Model\Map\ProductI18nTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
+use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Class ProductPricesExport
@@ -65,47 +65,49 @@ class ProductPricesExport extends ExportHandler
         $locale = $lang->getLocale();
 
         $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
+
         $attributeAvJoin = new Join(AttributeAvTableMap::ID, AttributeAvI18nTableMap::ID, Criteria::LEFT_JOIN);
 
-        $query = AttributeCombinationQuery::create()
-            ->useProductSaleElementsQuery()
-                ->useProductPriceQuery()
-                    ->useCurrencyQuery()
-                        ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
-                    ->endUse()
-                    ->addAsColumn("price_PRICE", ProductPriceTableMap::PRICE)
-                    ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
+        $query = ProductSaleElementsQuery::create()
+            ->useProductPriceQuery()
+                ->useCurrencyQuery()
+                    ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
                 ->endUse()
-                ->useProductQuery()
-                    ->addJoinObject($productJoin, "product_join")
-                    ->addJoinCondition(
-                        "product_join",
-                        ProductI18nTableMap::LOCALE . " = ?",
-                        $locale,
-                        null,
-                        \PDO::PARAM_STR
-                    )
-                    ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
-                    ->addAsColumn("product_ID", ProductTableMap::ID)
-                ->endUse()
-                ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
-                ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
-                ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
+                ->addAsColumn("price_PRICE", ProductPriceTableMap::PRICE)
+                ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
             ->endUse()
-            ->useAttributeAvQuery()
-                ->addJoinObject($attributeAvJoin, "attribute_av_join")
+            ->useProductQuery()
+                ->addJoinObject($productJoin, "product_join")
                 ->addJoinCondition(
-                    "attribute_av_join",
-                    AttributeAvI18nTableMap::LOCALE . " = ?",
+                    "product_join",
+                    ProductI18nTableMap::LOCALE . " = ?",
                     $locale,
                     null,
                     \PDO::PARAM_STR
                 )
-                ->addAsColumn(
-                    "attribute_av_i18n_ATTRIBUTES",
-                    "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
-                )
+                ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
+                ->addAsColumn("product_ID", ProductTableMap::ID)
             ->endUse()
+            ->useAttributeCombinationQuery()
+                ->useAttributeAvQuery()
+                    ->addJoinObject($attributeAvJoin, "attribute_av_join")
+                    ->addJoinCondition(
+                        "attribute_av_join",
+                        AttributeAvI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
+                    ->addAsColumn(
+                        "attribute_av_i18n_ATTRIBUTES",
+                        "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
+                    )
+                ->endUse()
+                ->groupByAttributeAvId()
+            ->endUse()
+            ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
+            ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
+            ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
             ->select([
                 "product_sale_elements_ID",
                 "product_sale_elements_EAN_CODE",
@@ -114,8 +116,9 @@ class ProductPricesExport extends ExportHandler
                 "price_PROMO_PRICE",
                 "currency_CODE",
                 "product_TITLE",
-                "attribute_av_i18n_ATTRIBUTES",
+                "attribute_av_i18n_ATTRIBUTES"
             ])
+            ->orderBy("product_sale_elements_ID")
             ->groupBy("product_sale_elements_ID")
         ;
 
@@ -128,12 +131,12 @@ class ProductPricesExport extends ExportHandler
             "id",
             "product_id",
             "title",
-            "attributes",
             "ean",
             "price",
             "promo_price",
             "currency",
             "promo",
+            "attribute_av_i18n_ATTRIBUTES"
         ];
     }
 
@@ -146,8 +149,8 @@ class ProductPricesExport extends ExportHandler
             "price_PROMO_PRICE" => "promo_price",
             "currency_CODE" => "currency",
             "product_TITLE" => "title",
-            "attribute_av_i18n_ATTRIBUTES" => "attributes",
             "product_sale_elements_PROMO" => "promo",
+            "attribute_av_i18n_ATTRIBUTES" => "attribute_title"
         ];
     }
 }
