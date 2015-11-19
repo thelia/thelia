@@ -16,15 +16,15 @@ use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Import\ImportHandler;
-use Thelia\Model\Product;
-use Thelia\Model\ProductQuery;
+use Thelia\Model\Brand;
+use Thelia\Model\BrandQuery;
 use Thelia\Model\RewritingUrlQuery;
 
 /**
- * Class ProductPricesImport
+ * Class BrandI18Import
  * @package Thelia\ImportExport\Import\Type
  */
-class ProductI18Import extends ImportHandler
+class BrandI18Import extends ImportHandler
 {
     /**
      * @return string|array
@@ -61,19 +61,19 @@ class ProductI18Import extends ImportHandler
         $translator = Translator::getInstance();
 
         $locale = $this->translator->getLocale();
-        $viewName = (new Product())->getRewrittenUrlViewName();
+        $viewName = (new Brand())->getRewrittenUrlViewName();
 
         while (null !== $row = $data->popRow())
         {
 
             $this->checkMandatoryColumns($row);
 
-            $obj = ProductQuery::create()->findPk($row["id"]);
+            $obj = BrandQuery::create()->findPk($row["id"]);
 
             if ($obj === null)
             {
                 $errorMessage = $translator->trans(
-                    "The product id %id doesn't exist",
+                    "The brand id %id doesn't exist",
                     [
                         "%id" => $row["id"]
                     ]
@@ -84,17 +84,17 @@ class ProductI18Import extends ImportHandler
 
                 $obj->setLocale($locale);
 
-                if(isset($row["product_title"]))
-                    $obj->setTitle($row["product_title"]);
+                if(isset($row["brand_title"]))
+                    $obj->setTitle($row["brand_title"]);
 
-                if(isset($row["product_description"]))
-                    $obj->setDescription($row["product_description"]);
+                if(isset($row["brand_description"]))
+                    $obj->setDescription($row["brand_description"]);
 
-                if(isset($row["product_chapo"]))
-                    $obj->setChapo($row["product_chapo"]);
+                if(isset($row["brand_chapo"]))
+                    $obj->setChapo($row["brand_chapo"]);
 
-                if(isset($row["product_postscriptum"]))
-                    $obj->setPostscriptum($row["product_postscriptum"]);
+                if(isset($row["brand_postscriptum"]))
+                    $obj->setPostscriptum($row["brand_postscriptum"]);
 
                 if(isset($row["page_title"]))
                     $obj->setMetaTitle($row["page_title"]);
@@ -107,7 +107,7 @@ class ProductI18Import extends ImportHandler
 
                 $obj->save();
 
-                $objProductUrl = RewritingUrlQuery::create()
+                $objBrandUrl = RewritingUrlQuery::create()
                     ->filterByView($viewName)
                     ->filterByViewId($obj->getId())
                     ->filterByViewLocale($locale)
@@ -115,18 +115,18 @@ class ProductI18Import extends ImportHandler
                     ->findOne();
 
 
-                if(null !== $objProductUrl)
+                if(null !== $objBrandUrl)
                 {
                     $isUrlExist = RewritingUrlQuery::create()
                         ->filterByUrl($row["url"])
                         ->findOne();
                     if ( (null !== $isUrlExist && $isUrlExist->getView() === $viewName &&  $isUrlExist->getViewId() == $obj->getId() ) || (null === $isUrlExist)){
-                        $objProductUrl->setUrl($row["url"])
+                        $objBrandUrl->setUrl($row["url"])
                             ->save();
                     }
                     else{
                         $errorMessage = $translator->trans(
-                            "The product url \"%url\" already exist for product id %id",
+                            "The brand url \"%url\" already exist for brand id %id",
                             [
                                 "%url" => $row["url"],
                                 "%id" => $row["id"]
@@ -148,7 +148,7 @@ class ProductI18Import extends ImportHandler
      */
     protected function getMandatoryColumns()
     {
-        //return ["id", "product_title", "product_description","product_chapo","product_postscriptum","page_title", "meta_description", "meta_keywords", "url"];
-        return ["id"];
+        //return ["id", "brand_title", "brand_description","brand_chapo","brand_postscriptum","page_title", "meta_description", "meta_keywords", "url"];
+        return(["id"]);
     }
 }

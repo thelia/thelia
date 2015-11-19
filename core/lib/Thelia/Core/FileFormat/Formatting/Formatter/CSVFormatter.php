@@ -141,11 +141,12 @@ class CSVFormatter extends AbstractFormatter
 
         $value = str_replace($this->stringDelimiter, "\\" . $this->stringDelimiter, $value);
 
-        /*
-         * On supprime les retours de ligne qui vont faire bugger l'export
+        /**
+         * Remove all carriage returns
          */
         $value = nl2br($value);
         $value = str_replace(array("\r\n", "\r", "\n"), "", $value);
+        $value = utf8_decode($value);
 
         return $this->stringDelimiter . $value . $this->stringDelimiter . $this->delimiter;
     }
@@ -170,9 +171,8 @@ class CSVFormatter extends AbstractFormatter
             unset($raw[0]);
             foreach ($raw as $line) {
                 /**
-                 * Dans certain cas on peut trouver des ; (délimiteur) dans la ligne sans que ce soit un délimiteur
-                 * Dans ce cas on recherche toutes les instances qui respecte la regle suivante :
-                 **/
+                 * Remove all delimiters in cells
+                 */
                 $pattern = '#([^'.$this->stringDelimiter.']'.$this->delimiter.')#';
                 $line = preg_replace($pattern, "", $line);
                 $result[] = array_combine($keys, str_getcsv($line, $this->delimiter, $this->stringDelimiter));
