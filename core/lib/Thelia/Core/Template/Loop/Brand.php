@@ -65,17 +65,12 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'id',
-                            'id-reverse',
-                            'alpha',
-                            'alpha-reverse',
-                            'manual',
-                            'manual-reverse',
+                            'id', 'id-reverse', 'id_reverse',
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'manual', 'manual-reverse', 'manual_reverse',
                             'random',
-                            'created',
-                            'created-reverse',
-                            'updated',
-                            'updated-reverse'
+                            'created', 'created-reverse', 'created_reverse',
+                            'updated', 'updated-reverse', 'updated_reverse'
                         )
                     )
                 ),
@@ -155,18 +150,21 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                     $search->orderById(Criteria::ASC);
                     break;
                 case 'id-reverse':
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual-reverse":
+                case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "random":
@@ -177,12 +175,14 @@ class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoo
                     $search->addAscendingOrderByColumn('created_at');
                     break;
                 case "created-reverse":
+                case "created_reverse":
                     $search->addDescendingOrderByColumn('created_at');
                     break;
                 case "updated":
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
                 case "updated-reverse":
+                case "updated_reverse":
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
             }
