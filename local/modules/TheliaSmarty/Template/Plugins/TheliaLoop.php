@@ -373,7 +373,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     protected function createLoopInstance($smartyParams)
     {
-        $type = strtolower($smartyParams['type']);
+        $type = strtolower(strtr($smartyParams['type'], '._', '--'));
 
         if (! isset($this->loopDefinition[$type])) {
             throw new ElementNotFoundException(
@@ -419,6 +419,7 @@ class TheliaLoop extends AbstractSmartyPlugin
     public function setLoopList(array $loopDefinition)
     {
         foreach ($loopDefinition as $name => $className) {
+            $name = strtr($name, '._', '--');
             if (array_key_exists($name, $this->loopDefinition)) {
                 throw new \InvalidArgumentException(
                     $this->translator->trans("The loop name '%name' is already defined in %className class", [
