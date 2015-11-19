@@ -44,7 +44,7 @@
             <language>{$locale|replace:'_':'-'|lower}</language>
             <lastBuildDate>{$smarty.now|date_format:'r'}</lastBuildDate>
             <generator>Thelia 2.0</generator>
-            {loop type="brand" name="brand-list" lang=$_lang_ order="id-reverse" }
+            {loop type="brand" name="brand-list" lang=$_lang_ order="id_reverse" }
                 <item>
                     <title>{$TITLE}</title>
                     <link>{$URL nofilter}</link>
