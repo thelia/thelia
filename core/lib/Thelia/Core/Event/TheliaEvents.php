@@ -342,6 +342,9 @@ final class TheliaEvents
     const BEFORE_UPDATEFEATURE_PRODUCT = "action.before_updateFeatureProduct";
     const AFTER_UPDATEFEATURE_PRODUCT  = "action.after_updateFeatureProduct";
 
+    /** Persist a cart */
+    const CART_PERSIST = "cart.persist";
+
     /** Restore a current cart in the session, either by reloading it from the database, or creating a new one */
     const CART_RESTORE_CURRENT = "cart.restore.current";
 

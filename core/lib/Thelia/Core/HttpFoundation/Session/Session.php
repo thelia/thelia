@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
@@ -40,6 +41,9 @@ use Thelia\Tools\URL;
  */
 class Session extends BaseSession
 {
+    /** @var Cart|null $transientCart */
+    protected static $transientCart = null;
+
     /**
      * @param bool $forceDefault if true, the default language will be returned if no current language is defined.
      *
@@ -192,11 +196,31 @@ class Session extends BaseSession
     // -- Cart ------------------------------------------------------------------
 
     /**
+     * Set the cart to store in the current session.
+     *
+     * @param Cart|null The cart to store in session
+     *
+     * @return $this
+     */
+    public function setSessionCart(Cart $cart = null)
+    {
+        if (null === $cart || $cart->isNew()) {
+            self::$transientCart = $cart;
+        } else {
+            self::$transientCart = null;
+            $this->set("thelia.cart_id", $cart->getId());
+        }
+
+        return $this;
+    }
+
+
+    /**
      * Return the cart stored in the current session
      *
      * @param EventDispatcherInterface $dispatcher the event dispatcher, required if no cart is currently stored in the session
      *
-     * @return Cart The cart in the current session .
+     * @return Cart The cart in the current session.
      */
     public function getSessionCart(EventDispatcherInterface $dispatcher = null)
     {
@@ -204,7 +228,7 @@ class Session extends BaseSession
         if (null !== $cart_id) {
             $cart = CartQuery::create()->findPk($cart_id);
         } else {
-            $cart = null;
+            $cart = self::$transientCart;
         }
 
         // If we do not have a cart, or if the current cart is nor valid
@@ -235,8 +259,8 @@ class Session extends BaseSession
                 );
             }
 
-            // Store the cart ID.
-            $this->set("thelia.cart_id", $cart->getId());
+            // Store the cart.
+            $this->setSessionCart($cart);
         }
 
         return $cart;
@@ -259,8 +283,8 @@ class Session extends BaseSession
             );
         }
 
-        // Store the cart ID.
-        $this->set("thelia.cart_id", $cart->getId());
+        // Store the cart
+        $this->setSessionCart($cart);
     }
 
     /**

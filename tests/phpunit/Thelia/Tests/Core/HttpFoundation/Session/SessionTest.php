@@ -51,6 +51,8 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 
         $this->session = new Session(new MockArraySessionStorage());
 
+        $this->session->setSessionCart(null);
+
         $this->request->setSession($this->session);
 
         $translator = new Translator($this->getMock('\Symfony\Component\DependencyInjection\ContainerInterface'));

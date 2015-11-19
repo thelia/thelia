@@ -78,7 +78,12 @@ class Cart extends BaseCart
                 $dispatcher->dispatch(TheliaEvents::CART_ITEM_DUPLICATE, new CartItemDuplicationItem($item, $cartItem));
             }
         }
-        $this->delete();
+
+        try {
+            $this->delete();
+        } catch (\Exception $e) {
+            // just fail silently in some cases
+        }
 
         return $cart;
     }
