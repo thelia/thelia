@@ -50,7 +50,7 @@
                 <link itemprop="availability" href="{$current_stock_href}" content="{$current_stock_content}" />
                 {if $IS_PROMO }
 
-                    {assign var="combination_count" value={count type="product_sale_elements" promo="1" product=$ID}}
+                    {assign var="combination_count" value={count type="product-sale-elements" promo="1" product=$ID}}
                     <span class="special-price col-xs-6"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span class="price">
                         {if $combination_count > 1}
                             {intl l="From %price" price={format_money number=$BEST_TAXED_PRICE symbol={currency attr="symbol"}}}

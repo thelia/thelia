@@ -51,7 +51,7 @@
 
             {* Add custom feature if needed
             {loop name="isbn.feature" type="feature" product="{$ID}" title="isbn"}
-                {loop name="isbn.value" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                {loop name="isbn.value" type="feature-value" feature="{$ID}" product="{product attr="id"}"}
                     <meta itemprop="productID" content="isbn:{$TITLE}">
                 {/loop}
             {/loop}
@@ -244,7 +244,7 @@
                             {ifloop rel="feature_value_info"}
                                 <li>
                                     <strong>{$TITLE}</strong> :
-                                    {loop name="feature_value_info" type="feature_value" feature="{$ID}" product="{product attr="id"}"}
+                                    {loop name="feature_value_info" type="feature-value" feature="{$ID}" product="{product attr="id"}"}
                                         {if $LOOP_COUNT > 1}, {else} {/if}
                                         <span>{if $IS_FREE_TEXT == 1}{$FREE_TEXT_VALUE}{else}{$TITLE}{/if}</span>
                                     {/loop}
@@ -342,7 +342,7 @@
 {$pse=[]}
 {$combination_label=[]}
 {$combination_values=[]}
-{loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
+{loop name="pse" type="product-sale-elements" product="{product attr="id"}"}
     {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}", "promo" => "{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}" ]}
     {$pse_combination=[]}
     {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
