@@ -60,13 +60,13 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                 new TypeCollection(
                     new EnumListType(
                         array(
-                        'id', 'id-reverse',
-                        'code', 'code-reverse',
-                        'title', 'title-reverse',
-                        'enabled', 'enabled-reverse',
-                        'expiration-date', 'expiration-date-reverse',
-                        'days-left', 'days-left-reverse',
-                        'usages-left', 'usages-left-reverse'
+                        'id', 'id-reverse', 'id_reverse',
+                        'code', 'code-reverse', 'code_reverse',
+                        'title', 'title-reverse', 'title_reverse',
+                        'enabled', 'enabled-reverse', 'enabled_reverse',
+                        'expiration-date', 'expiration-date-reverse', 'expiration_date', 'expiration_date_reverse',
+                        'days-left', 'days-left-reverse', 'days_left', 'days-left_reverse',
+                        'usages-left', 'usages-left-reverse', 'usages_left', 'usages_left_reverse'
                         )
                     )
                 ),
@@ -115,48 +115,52 @@ class Coupon extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->orderById(Criteria::ASC);
                     break;
                 case 'id-reverse':
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'code':
                     $search->orderByCode(Criteria::ASC);
                     break;
                 case 'code-reverse':
+                case 'code_reverse':
                     $search->orderByCode(Criteria::DESC);
                     break;
-
                 case 'title':
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case 'title-reverse':
+                case 'title_reverse':
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-
                 case 'enabled':
                     $search->orderByIsEnabled(Criteria::ASC);
                     break;
                 case 'enabled-reverse':
+                case 'enabled_reverse':
                     $search->orderByIsEnabled(Criteria::DESC);
                     break;
-
                 case 'expiration-date':
+                case 'expiration_date':
                     $search->orderByExpirationDate(Criteria::ASC);
                     break;
                 case 'expiration-date-reverse':
+                case 'expiration_date_reverse':
                     $search->orderByExpirationDate(Criteria::DESC);
                     break;
-
                 case 'usages-left':
+                case 'usages_left':
                     $search->orderByMaxUsage(Criteria::ASC);
                     break;
                 case 'usages-left-reverse':
+                case 'usages_left_reverse':
                     $search->orderByMaxUsage(Criteria::DESC);
                     break;
-
                 case 'days-left':
+                case 'days_left':
                     $search->addAscendingOrderByColumn('days_left');
                     break;
                 case 'days-left-reverse':
+                case 'days_left_reverse':
                     $search->addDescendingOrderByColumn('days_left');
                     break;
             }
