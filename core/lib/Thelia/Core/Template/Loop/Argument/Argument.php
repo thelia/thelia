@@ -143,7 +143,7 @@ class Argument
     }
 
     /**
-     * This method is available from Thelia 2.2 version
+     * @since 2.2
      *
      * @param $name
      * @param null $default
@@ -170,6 +170,29 @@ class Argument
             $name,
             new TypeCollection(
                 new Type\EnumListType($entries)
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
+    /**
+     * @since 2.3
+     *
+     * @param string $name
+     * @param array $entries
+     * @param null $default
+     * @param bool $mandatory
+     * @param bool $empty
+     * @return Argument
+     */
+    public static function createEnumTypeArgument($name, array $entries, $default = null, $mandatory = false, $empty = true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\EnumType($entries)
             ),
             $default,
             $mandatory,
