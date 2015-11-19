@@ -90,8 +90,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
             Argument::createEnumListTypeArgument(
                 "order",
                 [
-                    "position",
-                    "position-reverse"
+                    "position", "position-reverse", "position_reverse"
                 ],
                 "position"
             )
@@ -130,6 +129,7 @@ class ProductSaleElementsDocument extends BaseLoop implements PropelSearchLoopIn
                     break;
 
                 case "position-reverse":
+                case "position_reverse":
                     $query
                         ->useProductDocumentQuery()
                             ->orderByPosition(Criteria::DESC)
