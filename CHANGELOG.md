@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1783) Fix product price exports. Resolve #1078 #1610
 - (related to #1771) Add argument customer_id for hook customer.edit-js
 - (related to #1769) Increase API key size to 48
 - (related to #1768) Update composer.lock file, update of the dependency thelia/currency-converter to version 1.0.1

@@ -14,85 +14,135 @@ namespace Thelia\ImportExport\Export\Type;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Model\CurrencyQuery;
 use Thelia\Model\Lang;
-use Thelia\Model\Map\AttributeCombinationTableMap;
+use Thelia\Model\Map\AttributeAvI18nTableMap;
+use Thelia\Model\Map\AttributeAvTableMap;
+use Thelia\Model\Map\CurrencyTableMap;
+use Thelia\Model\Map\ProductI18nTableMap;
+use Thelia\Model\Map\ProductPriceTableMap;
 use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\Map\TaxRuleI18nTableMap;
 use Thelia\Model\Map\TaxRuleTableMap;
 use Thelia\Model\ProductSaleElementsQuery;
-use Thelia\Tools\I18n;
 
 /**
  * Class ProductTaxedPricesExport
  * @package Thelia\ImportExport\Export\Type
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
 class ProductTaxedPricesExport extends ProductPricesExport
 {
     public function buildDataSet(Lang $lang)
     {
-        /** @var \Thelia\Model\AttributeCombinationQuery $query */
-        $query = parent::buildDataSet($lang);
+        $locale = $lang->getLocale();
 
-        $pseJoin = new Join(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductSaleElementsTableMap::ID);
-        $pseJoin->setRightTableAlias("pse_tax_join");
+        $productI18nJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
 
-        $productJoin = new Join(ProductSaleElementsTableMap::ID, ProductTableMap::ID);
-        $productJoin->setRightTableAlias("product_tax_join");
+        $attributeAvI18nJoin = new Join(AttributeAvTableMap::ID, AttributeAvI18nTableMap::ID, Criteria::LEFT_JOIN);
 
-        $taxJoin = new Join("`product_tax_join`.TAX_RULE_ID", TaxRuleTableMap::ID, Criteria::LEFT_JOIN);
-        $taxI18nJoin = new Join(TaxRuleTableMap::ID, TaxRuleI18nTableMap::ID, Criteria::LEFT_JOIN);
+        $taxRuleI18nJoin = new Join(TaxRuleTableMap::ID, TaxRuleI18nTableMap::ID, Criteria::LEFT_JOIN);
 
-        $query
-            ->addJoinObject($pseJoin, "pse_tax_join")
-            ->addJoinObject($productJoin, "product_tax_join")
-            ->addJoinObject($productJoin)
-            ->addJoinObject($taxJoin)
-            ->addJoinObject($taxI18nJoin)
-            ->addAsColumn("product_TAX_TITLE", TaxRuleI18nTableMap::TITLE)
-            ->addAsColumn("tax_ID", TaxRuleTableMap::ID)
-            ->select($query->getSelect() + [
-                "product_TAX_TITLE",
-                "tax_ID",
+        $query = ProductSaleElementsQuery::create()
+            ->useProductPriceQuery()
+                ->useCurrencyQuery()
+                    ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
+                ->endUse()
+                ->addAsColumn("price_PRICE", ProductPriceTableMap::PRICE)
+                ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
+            ->endUse()
+            ->useProductQuery()
+                ->useTaxRuleQuery()
+                    ->addJoinObject($taxRuleI18nJoin, "tax_rule_i18n_join")
+                    ->addJoinCondition(
+                        "tax_rule_i18n_join",
+                        TaxRuleI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
+                    ->addAsColumn("tax_TITLE", TaxRuleI18nTableMap::TITLE)
+                    ->addAsColumn("tax_ID", TaxRuleTableMap::ID)
+                ->endUse()
+                ->addJoinObject($productI18nJoin, "product_i18n_join")
+                ->addJoinCondition(
+                    "product_i18n_join",
+                    ProductI18nTableMap::LOCALE . " = ?",
+                    $locale,
+                    null,
+                    \PDO::PARAM_STR
+                )
+                ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
+                ->addAsColumn("product_ID", ProductTableMap::ID)
+            ->endUse()
+            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                ->useAttributeAvQuery(null, Criteria::LEFT_JOIN)
+                    ->addJoinObject($attributeAvI18nJoin, "attribute_av_i18n_join")
+                    ->addJoinCondition(
+                        "attribute_av_i18n_join",
+                        AttributeAvI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
+                    ->addAsColumn(
+                        "attribute_av_i18n_ATTRIBUTES",
+                        "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
+                    )
+                ->endUse()
+            ->endUse()
+            ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
+            ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
+            ->addAsColumn("product_sale_elements_PROMO", ProductSaleElementsTableMap::PROMO)
+            ->select([
+                "product_sale_elements_ID",
+                "product_sale_elements_EAN_CODE",
+                "product_sale_elements_PROMO",
+                "price_PRICE",
+                "price_PROMO_PRICE",
+                "currency_CODE",
+                "product_TITLE",
+                "attribute_av_i18n_ATTRIBUTES",
+                "tax_TITLE",
+                "tax_ID"
             ])
+            ->orderBy("product_sale_elements_ID")
+            ->groupBy("product_sale_elements_ID")
         ;
 
-        I18n::addI18nCondition(
-            $query,
-            TaxRuleI18nTableMap::TABLE_NAME,
-            TaxRuleTableMap::ID,
-            TaxRuleI18nTableMap::ID,
-            TaxRuleI18nTableMap::LOCALE,
-            $lang->getLocale()
-        );
+        return $query;
+    }
 
-        $dataSet = $query
-            ->keepQuery(true)
-            ->find()
-            ->toArray()
-        ;
+    protected function getAliases()
+    {
+        return [
+            "product_sale_elements_ID" => "id",
+            "product_sale_elements_EAN_CODE" => "ean",
+            "price_PRICE" => "price",
+            "price_PROMO_PRICE" => "promo_price",
+            "currency_CODE" => "currency",
+            "product_TITLE" => "title",
+            "product_sale_elements_PROMO" => "promo",
+            "attribute_av_i18n_ATTRIBUTES" => "attributes",
+            "tax_TITLE" => "tax_title",
+            "tax_id" => "tax_id",
+        ];
+    }
 
-        $productSaleElements = ProductSaleElementsQuery::create()
-            ->find()
-            ->toKeyIndex("Id")
-        ;
-
-        $currencies = CurrencyQuery::create()
-            ->find()
-            ->toKeyIndex("Code")
-        ;
-
-        foreach ($dataSet as &$line) {
-            /** @var \Thelia\Model\ProductSaleElements $pse */
-            $pse = $productSaleElements[$line["product_sale_elements_ID"]];
-
-            $pricesTools = $pse->getPricesByCurrency($currencies[$line["currency_CODE"]]);
-            $line["price_PRICE"] = $pricesTools->getPrice();
-            $line["price_PROMO_PRICE"] = $pricesTools->getPromoPrice();
-        }
-
-        return $dataSet;
+    public function getOrder()
+    {
+        return [
+            "id",
+            "product_id",
+            "title",
+            "attributes",
+            "ean",
+            "price",
+            "promo_price",
+            "currency",
+            "promo",
+            "tax_id",
+            "tax_title",
+        ];
     }
 }
