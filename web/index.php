@@ -28,8 +28,6 @@ $loader = require __DIR__ . '/../core/vendor/autoload.php';
 $cacheLoader = new ApcClassLoader(sha1(__FILE__), $loader);
 $loader->unregister();
 $cacheLoader->register(true);
-
-//Test
 */
 
 
