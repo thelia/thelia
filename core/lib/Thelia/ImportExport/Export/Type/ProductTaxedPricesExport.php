@@ -45,52 +45,49 @@ class ProductTaxedPricesExport extends ProductPricesExport
 
         $query = ProductSaleElementsQuery::create()
             ->useProductPriceQuery()
-            ->useCurrencyQuery()
-            ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
-            ->endUse()
-            ->addAsColumn("price_PRICE", ProductPriceTableMap::PRICE)
-            ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
+                ->useCurrencyQuery()
+                    ->addAsColumn("currency_CODE", CurrencyTableMap::CODE)
+                ->endUse()
+                ->addAsColumn("price_PRICE", ProductPriceTableMap::PRICE)
+                ->addAsColumn("price_PROMO_PRICE", ProductPriceTableMap::PROMO_PRICE)
             ->endUse()
             ->useProductQuery()
-            ->useTaxRuleQuery()
-            ->addJoinObject($taxRuleI18nJoin, "tax_rule_i18n_join")
-            ->addJoinCondition(
-                "tax_rule_i18n_join",
-                TaxRuleI18nTableMap::LOCALE . " = ?",
-                $locale,
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addAsColumn("tax_TITLE", TaxRuleI18nTableMap::TITLE)
-            ->addAsColumn("tax_ID", TaxRuleTableMap::ID)
-            ->endUse()
-            ->addJoinObject($productI18nJoin, "product_i18n_join")
-            ->addJoinCondition(
-                "product_i18n_join",
-                ProductI18nTableMap::LOCALE . " = ?",
-                $locale,
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
-            ->addAsColumn("product_ID", ProductTableMap::ID)
+                ->useTaxRuleQuery()
+                    ->addJoinObject($taxRuleI18nJoin, "tax_rule_i18n_join")
+                    ->addJoinCondition(
+                        "tax_rule_i18n_join",
+                        TaxRuleI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
+                    ->addAsColumn("tax_TITLE", TaxRuleI18nTableMap::TITLE)
+                    ->addAsColumn("tax_ID", TaxRuleTableMap::ID)
+                ->endUse()
+                ->addJoinObject($productI18nJoin, "product_i18n_join")
+                ->addJoinCondition(
+                    "product_i18n_join",
+                    ProductI18nTableMap::LOCALE . " = ?",
+                    $locale,
+                    null,
+                    \PDO::PARAM_STR
+                )
+                ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
+                ->addAsColumn("product_ID", ProductTableMap::ID)
             ->endUse()
             ->useAttributeCombinationQuery()
-            ->useAttributeAvQuery()
-            ->addJoinObject($attributeAvI18nJoin, "attribute_av_i18n_join")
-            ->addJoinCondition(
-                "attribute_av_i18n_join",
-                AttributeAvI18nTableMap::LOCALE . " = ?",
-                $locale,
-                null,
-                \PDO::PARAM_STR
-            )
-            ->addAsColumn(
-                "attribute_av_i18n_TITLE",
-                "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
-            )
-            ->endUse()
-            ->groupByAttributeAvId()
+                ->useAttributeAvQuery()
+                    ->addJoinObject($attributeAvI18nJoin, "attribute_av_i18n_join")
+                    ->addJoinCondition(
+                        "attribute_av_i18n_join",
+                        AttributeAvI18nTableMap::LOCALE . " = ?",
+                        $locale,
+                        null,
+                        \PDO::PARAM_STR
+                    )
+                    ->addAsColumn("attribute_av_i18n_TITLE", AttributeAvI18nTableMap::TITLE)
+                ->endUse()
+                ->groupByAttributeAvId()
             ->endUse()
             ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
             ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
@@ -124,13 +121,13 @@ class ProductTaxedPricesExport extends ProductPricesExport
             "currency_CODE" => "currency",
             "product_TITLE" => "title",
             "product_sale_elements_PROMO" => "promo",
-            "attribute_av_i18n_ATTRIBUTES" => "attribute_title",
+            "attribute_av_i18n_TITLE" => "attribute_title",
             "tax_TITLE" => "tax_title",
             "tax_id" => "tax_id",
         ];
     }
 
-    public function getOrder()
+    public function getDefaultOrder()
     {
         return [
             "id",
@@ -141,7 +138,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
             "promo_price",
             "currency",
             "promo",
-            "attribute_av_i18n_ATTRIBUTES",
+            "attribute_title",
             "tax_id",
             "tax_title",
         ];
