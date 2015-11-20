@@ -10,6 +10,7 @@
 
     <hooks>
         <hook id="cheque.hook" class="Cheque\Hook\HookManager" scope="request">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
             <tag name="hook.event_listener" event="order-placed.additional-payment-info" type="front" method="onAdditionalPaymentInfo" />
         </hook>
     </hooks>
