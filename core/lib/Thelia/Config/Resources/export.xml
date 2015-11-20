@@ -25,6 +25,10 @@
             <title locale="en_US">Modules</title>
             <title locale="fr_FR">Modules</title>
         </export_category>
+        <export_category id="thelia.export.brands">
+            <title locale="en_US">Brands</title>
+            <title locale="fr_FR">Marques</title>
+        </export_category>
     </export_categories>
 
     <exports>
@@ -88,6 +92,35 @@
             </export_descriptive>
         </export>
 
+        <export id="thelia.export.product_i18" class="Thelia\ImportExport\Export\Type\ProductI18Export" category_id="thelia.export.products">
+            <export_descriptive locale="en_US">
+                <title>Product i18 information</title>
+                <description>
+                    Export the i18 information ( rewritten url, meta description and keywords, page title ) of your products
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations i18 des produits</title>
+                <description>
+                    Exporter les informations i18 ( url réécrites, meta description et mots clés, titre ) de vos produits
+                </description>
+            </export_descriptive>
+        </export>
+        <export id="thelia.export.category_i18" class="Thelia\ImportExport\Export\Type\CategoryI18Export" category_id="thelia.export.products">
+            <export_descriptive locale="en_US">
+                <title>Category i18 information</title>
+                <description>
+                    Export the i18 information ( rewritten url, meta description and keywords, page title ) of your categories
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations i18 des catégories</title>
+                <description>
+                    Exporter les informations i18 ( url réécrites, meta description et mots clés, titre ) de vos catégories
+                </description>
+            </export_descriptive>
+        </export>
+
         <export id="thelia.export.content" class="Thelia\ImportExport\Export\Type\ContentExport" category_id="thelia.export.content">
             <export_descriptive locale="en_US">
                 <title>Contents and folder</title>
@@ -99,6 +132,34 @@
                 <title>Contenus et dossiers</title>
                 <description>
                     Exporter vos contenus et les dossiers associés
+                </description>
+            </export_descriptive>
+        </export>
+        <export id="thelia.export.content_i18" class="Thelia\ImportExport\Export\Type\ContentI18Export" category_id="thelia.export.content">
+            <export_descriptive locale="en_US">
+                <title>Contents i18 information</title>
+                <description>
+                    Export the i18 information ( rewritten url, meta description and keywords, page title ) of your contents
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations i18 des contenus</title>
+                <description>
+                    Exporter les informations i18 ( url réécrites, meta description et mots clés, titre ) de vos contenus
+                </description>
+            </export_descriptive>
+        </export>
+        <export id="thelia.export.folder_i18" class="Thelia\ImportExport\Export\Type\FolderI18Export" category_id="thelia.export.content">
+            <export_descriptive locale="en_US">
+                <title>Folder i18 information</title>
+                <description>
+                    Export the i18 information ( rewritten url, meta description and keywords, page title ) of your folder
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations i18 des dossiers</title>
+                <description>
+                    Exporter les informations i18 ( url réécrites, meta description et mots clés, titre ) de vos dossiers
                 </description>
             </export_descriptive>
         </export>
@@ -114,6 +175,21 @@
                 <title>Commandes complètes</title>
                 <description>
                     Exporter vos commandes
+                </description>
+            </export_descriptive>
+        </export>
+
+        <export id="thelia.export.brands_i18" class="Thelia\ImportExport\Export\Type\BrandI18Export" category_id="thelia.export.brands">
+            <export_descriptive locale="en_US">
+                <title>Brands i18 information</title>
+                <description>
+                    Export the i18 information ( rewritten url, meta description and keywords, page title ) of your brands
+                </description>
+            </export_descriptive>
+            <export_descriptive locale="fr_FR">
+                <title>Informations i18 des marques</title>
+                <description>
+                    Exporter les informations i18 ( url réécrites, meta description et mots clés, titre ) de vos marques
                 </description>
             </export_descriptive>
         </export>
