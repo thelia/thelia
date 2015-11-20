@@ -146,7 +146,6 @@ class CSVFormatter extends AbstractFormatter
          */
         $value = nl2br($value);
         $value = str_replace(array("\r\n", "\r", "\n"), "", $value);
-        $value = utf8_decode($value);
 
         return $this->stringDelimiter . $value . $this->stringDelimiter . $this->delimiter;
     }
@@ -173,10 +172,25 @@ class CSVFormatter extends AbstractFormatter
                 /**
                  * Remove all delimiters in cells
                  */
-                $pattern = '#([^'.$this->stringDelimiter.']'.$this->delimiter.')#';
-                $line = preg_replace($pattern, "", $line);
+                $pattern = '#([^'.$this->stringDelimiter.'])('.$this->delimiter.')([^'.$this->stringDelimiter.'])#';
+                $line = preg_replace($pattern, "$1___DELIMITER___$3", $line);
                 $result[] = array_combine($keys, str_getcsv($line, $this->delimiter, $this->stringDelimiter));
+
             }
+            /**
+             * Add all removed delimiters in cells
+             */
+            foreach($result as &$aTabTmp)
+            {
+                foreach($aTabTmp as $key=>$elm)
+                {
+                    $elm = str_replace("___DELIMITER___", $this->delimiter, $elm);
+                    $elm = str_replace("\\" . $this->stringDelimiter, $this->stringDelimiter, $elm);
+                    $elm = html_entity_decode($elm,ENT_COMPAT,"UTF-8");
+                    $aTabTmp[$key] = $elm;
+                }
+            }
+
         }
 
         return (new FormatterData())->setData($result);
