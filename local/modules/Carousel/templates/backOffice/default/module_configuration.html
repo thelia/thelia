@@ -1,7 +1,7 @@
 <div class="general-block-decorator">
     <div class="row">
         <div class="col-md-12 title title-without-tabs">
-            {intl l='Edit your carousel.' d='carousel.ai'}
+            {intl l='Edit your carousel.' d='carousel.bo.default'}
         </div>
     </div>
 
@@ -15,11 +15,11 @@
 
                         {form_field field='file'}
                             <div class="form-group {if $error}has-error{/if}">
-                                <label for="{$label_attr.for}" class="control-label">{intl d='carousel.ai' l='Add an image to the carousel'}</label>
+                                <label for="{$label_attr.for}" class="control-label">{intl d='carousel.bo.default' l='Add an image to the carousel'}</label>
                                 <div class="input-group">
-                                    <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Carousel image' d='carousel.ai'}" placeholder="{intl l='Carousel image' d='carousel.ai'}" class="form-control">
+                                    <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Carousel image' d='carousel.bo.default'}" placeholder="{intl l='Carousel image' d='carousel.bo.default'}" class="form-control">
                                     <span class="input-group-btn">
-                                        <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl d='carousel.ai' l='Add this image to the carousel'}" >
+                                        <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl d='carousel.bo.default' l='Add this image to the carousel'}" >
                                     </span>
                                 </div>
                             </div>
@@ -32,7 +32,7 @@
 
     <div class="row">
         <div class="col-md-12 title title-without-tabs">
-            {intl l='Carousel images' d='carousel.ai'}
+            {intl l='Carousel images' d='carousel.bo.default'}
         </div>
     </div>
 
@@ -69,7 +69,7 @@
 
                                     <div class="btn-group">
                                         <a class="btn btn-default btn-sm image-delete" href="#delete_carousel_dialog" data-toggle="modal" data-id="{$ID}">
-                                            <i class="glyphicon glyphicon-trash"></i> {intl d='carousel.ai' l='Remove this image'}
+                                            <i class="glyphicon glyphicon-trash"></i> {intl d='carousel.bo.default' l='Remove this image'}
                                         </a>
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@
 
                 {elseloop rel="carousel.image"}
                     <div class="alert alert-info">
-                        {intl d='carousel.ai' l="Your carousel contains no image. Please add one using the form above."}
+                        {intl d='carousel.bo.default' l="Your carousel contains no image. Please add one using the form above."}
                     </div>
                 {/elseloop}
             </div>
@@ -118,8 +118,8 @@
 file = "includes/generic-confirm-dialog.html"
 
 dialog_id       = "delete_carousel_dialog"
-dialog_title    = {intl l="Delete a carousel image" d="carousel.ai"}
-dialog_message  = {intl l="Do you really want to remove this image from the carousel ?" d="carousel.ai"}
+dialog_title    = {intl l="Delete a carousel image" d="carousel.bo.default"}
+dialog_message  = {intl l="Do you really want to remove this image from the carousel ?" d="carousel.bo.default"}
 
 form_action         = {url path='/admin/module/carousel/delete'}
 form_content        = {$smarty.capture.delete_dialog nofilter}

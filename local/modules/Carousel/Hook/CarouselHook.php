@@ -11,6 +11,7 @@
 /*************************************************************************************/
 
 namespace Carousel\Hook;
+
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
@@ -28,5 +29,15 @@ class CarouselHook extends BaseHook
         $event->add(
             $this->render('carousel.html')
         );
+    }
+
+    public function onModuleConfiguration(HookRenderEvent $event)
+    {
+        $event->add($this->render("module_configuration.html"));
+    }
+
+    public function onModuleConfigurationJS(HookRenderEvent $event)
+    {
+        $event->add($this->addJS('assets/js/module-configuration.js'));
     }
 } 
