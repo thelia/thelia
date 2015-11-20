@@ -14,20 +14,25 @@ namespace HookAnalytics\Hook;
 
 use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
-use Thelia\Model\ConfigQuery;
 
 /**
- * Class FrontHook
- * @package HookCurrency\Hook
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class BackHook
+ * @package HookAnalytics\Hook
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
-class FrontHook extends BaseHook {
+class BackHook extends BaseHook {
 
-    public function onMainHeadBottom(HookRenderEvent $event)
+    public function onModuleConfiguration(HookRenderEvent $event)
     {
-        $value = trim(ConfigQuery::read("hookanalytics_trackingcode", ""));
-        if ("" != $value){
-            $event->add($value);
-        }
+        $event->add(
+            $this->render("module_configuration.html")
+        );
     }
-} 
+
+    public function onModuleConfigurationJS(HookRenderEvent $event)
+    {
+        $event->add(
+            $this->addJS('assets/js/module-configuration.js')
+        );
+    }
+}
