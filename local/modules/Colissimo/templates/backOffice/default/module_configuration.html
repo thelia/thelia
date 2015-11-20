@@ -2,7 +2,7 @@
     <!-- Errors -->
     {loop name="checkrights.colissimo" type="colissimo.check.rights"}
     <div class="alert alert-danger">
-        <p>{$ERRMES} {$ERRFILE} | {intl d='colissimo.ai' l="Please change the access rights"}.</p>
+        <p>{$ERRMES} {$ERRFILE} | {intl d='colissimo.bo.default' l="Please change the access rights"}.</p>
     </div>
     {/loop}
 </div>
@@ -10,7 +10,7 @@
 {elseloop rel="checkrights.colissimo"}
 
 <div class="alert alert-info">
-    <p>{intl d='colissimo.ai' l="Colissimo Module allows to send your products all around the world with La Poste."}</p>
+    <p>{intl d='colissimo.bo.default' l="Colissimo Module allows to send your products all around the world with La Poste."}</p>
 </div>
 
 <div class="modal fade" id="freeshipping-failed" tabindex="-1" role="dialog" aria-hidden="true">
@@ -19,7 +19,7 @@
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h3>{intl d='colissimo.ai' l="An error occured"}</h3>
+                <h3>{intl d='colissimo.bo.default' l="An error occured"}</h3>
             </div>
             <div class="modal-body" id="freeshipping-failed-body">
 
@@ -33,8 +33,8 @@
     <div class="row">
         <div class="col-md-12">
             <ul id="tabbed-menu" class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#export">{intl d='colissimo.ai' l="Export expeditor inet file"}</a> </li>
-                <li class="{if $tab eq "1"}active{/if}"><a data-toggle="tab" href="#prices_slices_tab">{intl d='colissimo.ai' l="Price slices"}</a></li>
+                <li class="active"><a data-toggle="tab" href="#export">{intl d='colissimo.bo.default' l="Export expeditor inet file"}</a> </li>
+                <li class="{if $tab eq "1"}active{/if}"><a data-toggle="tab" href="#prices_slices_tab">{intl d='colissimo.bo.default' l="Price slices"}</a></li>
             </ul>
             <div class="tab-content">
                 <div id="export" class="tab-pane active form-container">
@@ -45,7 +45,7 @@
                             <div class="panel panel-default">
                                 {form_field field="status_id"}
                                 <div class="panel-heading clearfix">
-                                    {intl d='colissimo.ai' l="Change orders status after export"}
+                                    {intl d='colissimo.bo.default' l="Change orders status after export"}
                                 </div>
                                 <div class="panel-body">
 
@@ -53,7 +53,7 @@
 
                                             <tr>
                                                 <td>
-                                                    <label for="nochange">{intl d='colissimo.ai' l="Do not change"}</label>&nbsp;
+                                                    <label for="nochange">{intl d='colissimo.bo.default' l="Do not change"}</label>&nbsp;
                                                 </td>
                                                 <td>
                                                     <input type="radio"  id="nochange" name="{$name}" value="nochange"/>
@@ -61,7 +61,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <label for="processing">{intl d='colissimo.ai' l="Processing"}</label>&nbsp;
+                                                    <label for="processing">{intl d='colissimo.bo.default' l="Processing"}</label>&nbsp;
                                                 </td>
                                                 <td>
                                                     <input type="radio"  id="processing" name="{$name}" value="processing"/>
@@ -69,7 +69,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <label for="sent">{intl d='colissimo.ai' l="Sent"}*</label>&nbsp;
+                                                    <label for="sent">{intl d='colissimo.bo.default' l="Sent"}*</label>&nbsp;
                                                 </td>
                                                 <td>
                                                     <input type="radio"  id="sent" name="{$name}" value="sent"/>
@@ -77,22 +77,22 @@
                                             </tr>
                                         </table>
                                     {/form_field}
-                                    <span class="p">{intl d='colissimo.ai' l="*If you choose this option, the exported orders would not be available on this page anymore"}</span>
+                                    <span class="p">{intl d='colissimo.bo.default' l="*If you choose this option, the exported orders would not be available on this page anymore"}</span>
                                 </div>
                             </div>
                             <table class="table table-striped table-condensed">
                                 <thead>
                                 <th class="object-title">
-                                    {intl d='colissimo.ai' l="REF"}
+                                    {intl d='colissimo.bo.default' l="REF"}
                                 </th>
                                 <th class="object-title">
-                                    {intl d='colissimo.ai' l="Date"}
+                                    {intl d='colissimo.bo.default' l="Date"}
                                 </th>
                                 <th class="object-title">
-                                    {intl d='colissimo.ai' l="Total taxed amount"}
+                                    {intl d='colissimo.bo.default' l="Total taxed amount"}
                                 </th>
                                 <th class="object-title">
-                                    {intl d='colissimo.ai' l="Export"}
+                                    {intl d='colissimo.bo.default' l="Export"}
                                 </th>
                                 </thead>
 
@@ -121,7 +121,7 @@
                                     <tr>
                                         <td colspan="4">
                                             <br />
-                                            <div class="alert alert-info">{intl d='colissimo.ai' l="There is currently not orders to export"}</div>
+                                            <div class="alert alert-info">{intl d='colissimo.bo.default' l="There is currently not orders to export"}</div>
                                         </td>
                                     </tr>
                                 {/elseloop}
@@ -129,7 +129,7 @@
                             </table>
 
                             {ifloop rel="colissimo.notsend.loop"}
-                                <button type="submit" name="export_socolissimo_form" value="stay" class="form-submit-button btn btn-sm btn-default" title="{intl d='colissimo.ai' l='Export'}">{intl d='colissimo.ai' l='Export'}</button>
+                                <button type="submit" name="export_socolissimo_form" value="stay" class="form-submit-button btn btn-sm btn-default" title="{intl d='colissimo.bo.default' l='Export'}">{intl d='colissimo.bo.default' l='Export'}</button>
                             {/ifloop}
                         </form>
                     {/form}
@@ -162,34 +162,34 @@
                         file = "includes/generic-create-dialog.html"
 
                         dialog_id    = "price_slice_create_dialog_{$ID}"
-                        dialog_title = {intl d='colissimo.ai' l="Create a price slice"}
+                        dialog_title = {intl d='colissimo.bo.default' l="Create a price slice"}
                         dialog_body  = "<input type=\"hidden\" name=\"operation\" value=\"add\"/>
                         <input type=\"hidden\" name=\"area\" value=\"{$ID}\" />
-                        <label for=\"weight_{$ID}\">{intl d='colissimo.ai' l="Weight up to ... (kg)"}</label></label>
+                        <label for=\"weight_{$ID}\">{intl d='colissimo.bo.default' l="Weight up to ... (kg)"}</label></label>
                         <input type=\"number\" step=\"0.01\" id=\"weight_{$ID}\" name=\"weight\" value=\"1\" class=\"form-control\" pattern=\"\d+\.?\d*\" required/>
-                        <label for=\"price_{$ID}\">{intl d='colissimo.ai' l="Price (€)"}</label></label>
+                        <label for=\"price_{$ID}\">{intl d='colissimo.bo.default' l="Price (€)"}</label></label>
                         <input type=\"number\" step=\"0.01\" id=\"price_{$ID}\" name=\"price\" value=\"1\" class=\"form-control\" pattern=\"\d+\.?\d*\" required/>"
 
                         form_action="{url path="/admin/module/colissimo/prices"}"
 
-                        dialog_ok_label     = {intl d='colissimo.ai' l="Create"}
-                        dialog_cancel_label = {intl d='colissimo.ai' l="Cancel"}
+                        dialog_ok_label     = {intl d='colissimo.bo.default' l="Create"}
+                        dialog_cancel_label = {intl d='colissimo.bo.default' l="Cancel"}
                         }
                         <div class="table-responsive">
                             <table class="table table-striped table-condensed table-left-aligned">
                                 <caption class="clearfix">
-                                    {intl d='colissimo.ai' l="Area : "}{$NAME}
+                                    {intl d='colissimo.bo.default' l="Area : "}{$NAME}
                                     {loop type="auth" name="can_create" role="ADMIN" module="colissimo" access="CREATE"}
-                                    <a class="btn btn-default btn-primary pull-right" title="{intl d='colissimo.ai' l='Create a new price slice'}" href="#price_slice_create_dialog_{$ID}" data-toggle="modal">
+                                    <a class="btn btn-default btn-primary pull-right" title="{intl d='colissimo.bo.default' l='Create a new price slice'}" href="#price_slice_create_dialog_{$ID}" data-toggle="modal">
                                         <span class="glyphicon glyphicon-plus"></span>
                                     </a>
                                     {/loop}
                                 </caption>
                                 <thead>
                                 <tr>
-                                    <th class="col-md-3">{intl d='colissimo.ai' l="Weight up to ... (kg)"}</th>
-                                    <th class="col-md-5">{intl d='colissimo.ai' l="Price (€)"}</th>
-                                    <th class="col-md-1">{intl d='colissimo.ai' l="Actions"}</th>
+                                    <th class="col-md-3">{intl d='colissimo.bo.default' l="Weight up to ... (kg)"}</th>
+                                    <th class="col-md-5">{intl d='colissimo.bo.default' l="Price (€)"}</th>
+                                    <th class="col-md-1">{intl d='colissimo.bo.default' l="Actions"}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -199,31 +199,31 @@
                                 file = "includes/generic-confirm-dialog.html"
 
                                 dialog_id    = "price_slice_edit_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}"
-                                dialog_title = {intl d='colissimo.ai' l="Edit a price slice"}
+                                dialog_title = {intl d='colissimo.bo.default' l="Edit a price slice"}
                                 dialog_message  = "<input type=\"hidden\" name=\"operation\" value=\"add\"/>
                                 <input type=\"hidden\" name=\"area\" value=\"{$ID}\"/>
                                 <input type=\"hidden\" name=\"weight\" value=\"{$MAX_WEIGHT}\"/>
-                                <label for=\"price_edit_{$ID}_{$MAX_WEIGHT}\">{intl d='colissimo.ai' l='Price (€)'}</label>
+                                <label for=\"price_edit_{$ID}_{$MAX_WEIGHT}\">{intl d='colissimo.bo.default' l='Price (€)'}</label>
                                 <input type=\"number\" step=\"0.01\" id=\"price_edit_{$ID}_{$MAX_WEIGHT}\" class=\"form-control\" name=\"price\" value=\"{$PRICE}\" pattern=\"\d+\.?\d*\" required/>"
 
                                 form_action="{url path="/admin/module/colissimo/prices"}"
-                                dialog_ok_label     = {intl d='colissimo.ai' l="Edit"}
-                                dialog_cancel_label = {intl d='colissimo.ai' l="Cancel"}
+                                dialog_ok_label     = {intl d='colissimo.bo.default' l="Edit"}
+                                dialog_cancel_label = {intl d='colissimo.bo.default' l="Cancel"}
                                 }
                                 {* -- Delete price slice confirmation dialog ----------------------------------- *}
                                 {include
                                 file = "includes/generic-confirm-dialog.html"
 
                                 dialog_id    = "price_slice_delete_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}"
-                                dialog_title = {intl d='colissimo.ai' l="Delete a price slice"}
+                                dialog_title = {intl d='colissimo.bo.default' l="Delete a price slice"}
                                 dialog_message  = "<input type=\"hidden\" name=\"operation\" value=\"delete\"/>
                                 <input type=\"hidden\" name=\"area\" value=\"{$ID}\"/>
                                 <input type=\"hidden\" name=\"weight\" value=\"{$MAX_WEIGHT}\"/>
-                                {intl d='colissimo.ai' l="Do you really want to delete this slice ?"}"
+                                {intl d='colissimo.bo.default' l="Do you really want to delete this slice ?"}"
 
                                 form_action="{url path="/admin/module/colissimo/prices"}"
-                                dialog_ok_label     = {intl d='colissimo.ai' l="Delete"}
-                                dialog_cancel_label = {intl d='colissimo.ai' l="Cancel"}
+                                dialog_ok_label     = {intl d='colissimo.bo.default' l="Delete"}
+                                dialog_cancel_label = {intl d='colissimo.bo.default' l="Cancel"}
                                 }
 
                                 <tr>
@@ -232,10 +232,10 @@
                                     <td>
                                         <div class="btn-group">
                                             {loop type="auth" name="can_change" role="ADMIN" module="colissimo" access="UPDATE"}
-                                            <a class="btn btn-default btn-xs" title="{intl d='colissimo.ai' l='Edit this price slice'}" href="#price_slice_edit_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}" data-toggle="modal">
+                                            <a class="btn btn-default btn-xs" title="{intl d='colissimo.bo.default' l='Edit this price slice'}" href="#price_slice_edit_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}" data-toggle="modal">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                             </a>
-                                            <a class="btn btn-default btn-xs" title="{intl d='colissimo.ai' l='Delete this price slice'}" href="#price_slice_delete_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}" data-toggle="modal">
+                                            <a class="btn btn-default btn-xs" title="{intl d='colissimo.bo.default' l='Delete this price slice'}" href="#price_slice_delete_dialog_{$ID}_{$MAX_WEIGHT|replace:'.':'-'}" data-toggle="modal">
                                                 <span class="glyphicon glyphicon-trash"></span>
                                             </a>
                                             {/loop}
@@ -254,5 +254,6 @@
     </div>
 </div>
 
+<script src="{javascript file='assets/js/bootstrap-switch/bootstrap-switch.js'}"></script>
 
 {/elseloop}
