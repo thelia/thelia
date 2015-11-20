@@ -85,9 +85,11 @@ class ProductTaxedPricesExport extends ProductPricesExport
                         null,
                         \PDO::PARAM_STR
                     )
-                    ->addAsColumn("attribute_av_i18n_TITLE", AttributeAvI18nTableMap::TITLE)
+                    ->addAsColumn(
+                        "attribute_av_i18n_ATTRIBUTES",
+                        "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
+                    )
                 ->endUse()
-                ->groupByAttributeAvId()
             ->endUse()
             ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
             ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
@@ -100,7 +102,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
                 "price_PROMO_PRICE",
                 "currency_CODE",
                 "product_TITLE",
-                "attribute_av_i18n_TITLE",
+                "attribute_av_i18n_ATTRIBUTES",
                 "tax_TITLE",
                 "tax_ID"
             ])
@@ -121,7 +123,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
             "currency_CODE" => "currency",
             "product_TITLE" => "title",
             "product_sale_elements_PROMO" => "promo",
-            "attribute_av_i18n_TITLE" => "attribute_title",
+            "attribute_av_i18n_ATTRIBUTES" => "attributes",
             "tax_TITLE" => "tax_title",
             "tax_id" => "tax_id",
         ];
@@ -138,7 +140,7 @@ class ProductTaxedPricesExport extends ProductPricesExport
             "promo_price",
             "currency",
             "promo",
-            "attribute_title",
+            "attributes",
             "tax_id",
             "tax_title",
         ];

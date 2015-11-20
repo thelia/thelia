@@ -98,9 +98,11 @@ class ProductPricesExport extends ExportHandler
                         null,
                         \PDO::PARAM_STR
                     )
-                    ->addAsColumn("attribute_av_i18n_TITLE", AttributeAvI18nTableMap::TITLE)
+                    ->addAsColumn(
+                        "attribute_av_i18n_ATTRIBUTES",
+                        "GROUP_CONCAT(DISTINCT ".AttributeAvI18nTableMap::TITLE.")"
+                    )
                 ->endUse()
-                ->groupByAttributeAvId()
             ->endUse()
             ->addAsColumn("product_sale_elements_ID", ProductSaleElementsTableMap::ID)
             ->addAsColumn("product_sale_elements_EAN_CODE", ProductSaleElementsTableMap::EAN_CODE)
@@ -113,7 +115,7 @@ class ProductPricesExport extends ExportHandler
                 "price_PROMO_PRICE",
                 "currency_CODE",
                 "product_TITLE",
-                "attribute_av_i18n_TITLE"
+                "attribute_av_i18n_ATTRIBUTES"
             ])
             ->orderBy("product_sale_elements_ID")
             ->groupBy("product_sale_elements_ID")
@@ -133,7 +135,7 @@ class ProductPricesExport extends ExportHandler
             "promo_price",
             "currency",
             "promo",
-            "attribute_title"
+            "attributes"
         ];
     }
 
@@ -147,7 +149,7 @@ class ProductPricesExport extends ExportHandler
             "currency_CODE" => "currency",
             "product_TITLE" => "title",
             "product_sale_elements_PROMO" => "promo",
-            "attribute_av_i18n_TITLE" => "attribute_title"
+            "attribute_av_i18n_ATTRIBUTES" => "attributes"
         ];
     }
 }
