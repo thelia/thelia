@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Translation\Translator;
 use Thelia\Type\EnumListType;
 use Thelia\Type\EnumType;
@@ -39,6 +40,12 @@ use Thelia\Type\TypeCollection;
  */
 abstract class BaseLoop
 {
+    /** @var String|null The loop name  */
+    protected $loopName = null;
+
+    /** @var String|null The loop name  */
+    protected static $loopDefinitions = [];
+
     /**
      * @var \Thelia\Core\HttpFoundation\Request
      */
@@ -57,6 +64,7 @@ abstract class BaseLoop
     /** @var ContainerInterface Service Container */
     protected $container = null;
 
+    /** @var ArgumentCollection */
     protected $args;
 
     protected $countable = true;
@@ -86,6 +94,25 @@ abstract class BaseLoop
         $this->dispatcher = $container->get('event_dispatcher');
         $this->securityContext = $container->get('thelia.securityContext');
 
+        $this->initialize();
+    }
+
+    /**
+     * Initialize the loop
+     *
+     * First it will get the loop name according to the loop class.
+     * Then argument definitions is initialized
+     *
+     */
+    protected function initialize()
+    {
+        if (0 === count(self::$loopDefinitions)) {
+            self::$loopDefinitions = array_flip($this->container->getParameter('thelia.parser.loops'));
+        }
+
+        if (array_key_exists(get_class($this), self::$loopDefinitions)) {
+            $this->loopName = self::$loopDefinitions[get_class($this)];
+        }
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
@@ -105,15 +132,20 @@ abstract class BaseLoop
         ];
 
         if (true === $this->countable) {
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createIntTypeArgument('offset', 0),
                     Argument::createIntTypeArgument('page'),
                     Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-                ]);
+                ]
+            );
         }
 
         if ($this instanceof SearchLoopInterface) {
-            $defaultArgs = array_merge($defaultArgs, [
+            $defaultArgs = array_merge(
+                $defaultArgs,
+                [
                     Argument::createAnyTypeArgument('search_term'),
                     new Argument(
                         'search_in',
@@ -124,15 +156,18 @@ abstract class BaseLoop
                     new Argument(
                         'search_mode',
                         new TypeCollection(
-                            new EnumType([
-                                SearchLoopInterface::MODE_ANY_WORD,
-                                SearchLoopInterface::MODE_SENTENCE,
-                                SearchLoopInterface::MODE_STRICT_SENTENCE,
-                            ])
+                            new EnumType(
+                                [
+                                    SearchLoopInterface::MODE_ANY_WORD,
+                                    SearchLoopInterface::MODE_SENTENCE,
+                                    SearchLoopInterface::MODE_STRICT_SENTENCE,
+                                ]
+                            )
                         ),
                         SearchLoopInterface::MODE_STRICT_SENTENCE
                     )
-                ]);
+                ]
+            );
         }
 
         return $defaultArgs;
@@ -572,5 +607,22 @@ abstract class BaseLoop
      */
     protected function addOutputFields(LoopResultRow $loopResultRow, $item)
     {
+    }
+
+    /**
+     * @return null|String
+     */
+    public function getLoopName()
+    {
+        return $this->loopName;
+    }
+
+    /**
+     * @param null|String $loopName
+     */
+    public function setLoopName($loopName)
+    {
+        $this->loopName = $loopName;
+        return $this;
     }
 }
