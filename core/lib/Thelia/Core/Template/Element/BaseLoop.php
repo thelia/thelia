@@ -17,6 +17,12 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Util\PropelModelPager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Event\Loop\LoopExtendsArgDefinitionsEvent;
+use Thelia\Core\Event\Loop\LoopExtendsBuildArrayEvent;
+use Thelia\Core\Event\Loop\LoopExtendsBuildModelCriteriaEvent;
+use Thelia\Core\Event\Loop\LoopExtendsInitializeArgsEvent;
+use Thelia\Core\Event\Loop\LoopExtendsParseResultsEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Template\Element\Exception\LoopException;
 use Thelia\Core\Template\Loop\Argument\Argument;
@@ -115,6 +121,11 @@ abstract class BaseLoop
         }
 
         $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
+
+        $this->dispatcher->dispatch(
+            TheliaEvents::LOOP_EXTENDS_ARG_DEFINITIONS,
+            new LoopExtendsArgDefinitionsEvent($this)
+        );
     }
 
     /**
@@ -207,6 +218,10 @@ abstract class BaseLoop
     {
         $faultActor = [];
         $faultDetails = [];
+
+        $event = new LoopExtendsInitializeArgsEvent($this, $nameValuePairs);
+        $this->dispatcher->dispatch(TheliaEvents::LOOP_EXTENDS_INITIALIZE_ARGS, $event);
+        $nameValuePairs = $event->getLoopParameters();
 
         $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
         $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
@@ -427,14 +442,15 @@ abstract class BaseLoop
 
         $count = 0;
         if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->buildModelCriteria();
+            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
+
             if (null === $searchModelCriteria) {
                 $count = 0;
             } else {
                 $count = $searchModelCriteria->count();
             }
         } elseif ($this instanceof ArraySearchLoopInterface) {
-            $searchArray = $this->buildArray();
+            $searchArray = $this->extendsBuildArray($this->buildArray());
             if (null === $searchArray) {
                 $count = 0;
             } else {
@@ -465,7 +481,7 @@ abstract class BaseLoop
         $results = [];
 
         if ($this instanceof PropelSearchLoopInterface) {
-            $searchModelCriteria = $this->buildModelCriteria();
+            $searchModelCriteria = $this->extendsBuildModelCriteria($this->buildModelCriteria());
 
             if (null !== $searchModelCriteria) {
                 $results = $this->search(
@@ -474,7 +490,7 @@ abstract class BaseLoop
                 );
             }
         } elseif ($this instanceof ArraySearchLoopInterface) {
-            $searchArray = $this->buildArray();
+            $searchArray = $this->extendsBuildArray($this->buildArray());
 
             if (null !== $searchArray) {
                 $results = $this->searchArray($searchArray);
@@ -493,7 +509,7 @@ abstract class BaseLoop
             $loopResult->setVersioned();
         }
 
-        $parsedResults = $this->parseResults($loopResult);
+        $parsedResults = $this->extendsParseResults($this->parseResults($loopResult));
 
         if ($isCaching) {
             self::$cacheLoopResult[$hash] = $parsedResults;
@@ -607,6 +623,70 @@ abstract class BaseLoop
      */
     protected function addOutputFields(LoopResultRow $loopResultRow, $item)
     {
+    }
+
+    /**
+     * Dispatch an event to extend the BuildModelCriteria
+     *
+     * @param ModelCriteria $search
+     * @return ModelCriteria
+     */
+    protected function extendsBuildModelCriteria(ModelCriteria $search = null)
+    {
+        if (null === $search) {
+            return null;
+        }
+
+        $this->dispatcher->dispatch(
+            TheliaEvents::LOOP_EXTENDS_BUILD_MODEL_CRITERIA,
+            new LoopExtendsBuildModelCriteriaEvent($this, $search)
+        );
+
+        return $search;
+    }
+
+    /**
+     * Dispatch an event to extend the BuildArray
+     *
+     * @param array $search
+     * @return array
+     */
+    protected function extendsBuildArray(array $search = null)
+    {
+        if (null === $search) {
+            return null;
+        }
+
+        $this->dispatcher->dispatch(
+            TheliaEvents::LOOP_EXTENDS_BUILD_ARRAY,
+            new LoopExtendsBuildArrayEvent($this, $search)
+        );
+
+        return $search;
+    }
+
+    /**
+     * Dispatch an event to extend the ParseResults
+     *
+     * @param LoopResult $loopResult
+     * @return LoopResult
+     */
+    protected function extendsParseResults(LoopResult $loopResult)
+    {
+        $this->dispatcher->dispatch(
+            TheliaEvents::LOOP_EXTENDS_PARSE_RESULTS,
+            new LoopExtendsParseResultsEvent($this, $loopResult)
+        );
+
+        return $loopResult;
+    }
+
+    /**
+     * @return ArgumentCollection
+     */
+    public function getArgumentCollection()
+    {
+        return $this->args;
     }
 
     /**
