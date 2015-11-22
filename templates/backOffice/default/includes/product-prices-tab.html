@@ -377,7 +377,7 @@
                                         {$current_pse_id = $value}
 
                                         {capture assign="combination_label"}
-                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1"}
+                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
                                             {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
                                             {/loop}
                                         {/capture}

@@ -22,6 +22,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Model\AttributeCombinationQuery;
 use Thelia\Model\Map\AttributeAvTableMap;
 use Thelia\Model\Map\AttributeTableMap;
+use Thelia\Model\Map\AttributeTemplateTableMap;
 use Thelia\Type;
 use Thelia\Type\TypeCollection;
 
@@ -51,7 +52,7 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'alpha'
             )
@@ -91,6 +92,20 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
                     break;
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
+                    break;
+                case "manual":
+                    $search
+                        ->useAttributeQuery()
+                            ->joinAttributeTemplate()
+                        ->endUse()
+                        ->addAscendingOrderByColumn(AttributeTemplateTableMap::POSITION);
+                    break;
+                case "manual_reverse":
+                    $search
+                        ->useAttributeQuery()
+                            ->joinAttributeTemplate()
+                        ->endUse()
+                        ->addDescendingOrderByColumn(AttributeTemplateTableMap::POSITION);
                     break;
             }
         }

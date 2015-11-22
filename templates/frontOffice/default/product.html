@@ -345,7 +345,7 @@
 {loop name="pse" type="product_sale_elements" product="{product attr="id"}"}
     {$pse[$ID]=["id" => $ID, "isDefault" => $IS_DEFAULT, "isPromo" => $IS_PROMO, "isNew" => $IS_NEW, "ref" => "{$REF}", "ean" => "{$EAN}", "quantity" => {$QUANTITY}, "price" => "{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}", "promo" => "{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}" ]}
     {$pse_combination=[]}
-    {loop name="combi" type="attribute_combination" product_sale_elements="$ID"}
+    {loop name="combi" type="attribute_combination" product_sale_elements="$ID" order="manual"}
         {if ! $combination_label[$ATTRIBUTE_ID]}
             {$combination_label[$ATTRIBUTE_ID]=["name" => "{$ATTRIBUTE_TITLE}", "values" => []]}
         {/if}
