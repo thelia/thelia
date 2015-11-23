@@ -18,6 +18,10 @@
         <hook id="hooksocial.hook.front" class="HookSocial\Hook\FrontHook" scope="request">
             <tag name="hook.event_listener" event="main.footer-body" />
         </hook>
+        <hook id="hooksocial.hook.back" class="HookSocial\Hook\BackHook" scope="request">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfiguration" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" method="onModuleConfigurationJS" />
+        </hook>
     </hooks>
 
 </config>

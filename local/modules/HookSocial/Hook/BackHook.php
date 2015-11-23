@@ -12,29 +12,27 @@
 
 namespace HookSocial\Hook;
 
-use Thelia\Core\Event\Hook\HookRenderBlockEvent;
+use Thelia\Core\Event\Hook\HookRenderEvent;
 use Thelia\Core\Hook\BaseHook;
 
-
 /**
- * Class FrontHook
- * @package HookCurrency\Hook
- * @author Julien Chanséaume <jchanseaume@openstudio.fr>
+ * Class BackHook
+ * @package HookSocial\Hook
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
-class FrontHook extends BaseHook {
+class BackHook extends BaseHook {
 
-    public function onMainFooterBody(HookRenderBlockEvent $event)
+    public function onModuleConfiguration(HookRenderEvent $event)
     {
-        $content = trim($this->render("main-footer-body.html"));
-        if ("" != $content){
-            $event->add(array(
-                "id" => "social-footer-body",
-                "class" => "social",
-                "title" => $this->trans("Follow us", array(), "hooksocial"),
-                "content" => $content
-            ));
-        }
+        $event->add(
+            $this->render("module_configuration.html")
+        );
     }
 
-
-} 
+    public function onModuleConfigurationJS(HookRenderEvent $event)
+    {
+        $event->add(
+            $this->addJS('assets/js/module-configuration.js')
+        );
+    }
+}
