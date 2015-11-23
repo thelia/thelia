@@ -1,5 +1,6 @@
 # 2.1.8
 
+- Update the default PSE ref when the product ref is updated (related to #1790)
 - Sanitize the get arguments for admin stats (related to #1782)
 - Add argument customer_id for hook customer.edit-js (related #1771)
 - Increase API key size to 48 (related #1769)
