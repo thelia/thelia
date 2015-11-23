@@ -17,7 +17,6 @@ use Symfony\Component\Validator\Constraints\Image;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 
-
 /**
  * Class CarouselImageForm
  * @package Carousel\Form

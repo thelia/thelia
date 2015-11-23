@@ -13,9 +13,18 @@
 namespace Carousel;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Thelia\Install\Database;
+use Thelia\Model\ConfigQuery;
 use Thelia\Module\BaseModule;
 
+/**
+ * Class Carousel
+ * @package Carousel
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
 class Carousel extends BaseModule
 {
     const DOMAIN_NAME = 'carousel';
@@ -25,7 +34,7 @@ class Carousel extends BaseModule
         if (! $this->getConfigValue('is_initialized', false)) {
             $database = new Database($con);
 
-            $database->insertSql(null, array(__DIR__ . '/Config/sql/thelia.sql'));
+            $database->insertSql(null, array(__DIR__ . '/Config/thelia.sql'));
 
             $this->setConfigValue('is_initialized', true);
         }
@@ -42,6 +51,39 @@ class Carousel extends BaseModule
 
     public function getUploadDir()
     {
-        return __DIR__ . DS . 'media' . DS . 'carousel';
+        $uploadDir = ConfigQuery::read('images_library_path');
+
+        if ($uploadDir === null) {
+            $uploadDir = THELIA_LOCAL_DIR . 'media' . DS . 'images';
+        } else {
+            $uploadDir = THELIA_ROOT . $uploadDir;
+        }
+
+        return $uploadDir . DS . Carousel::DOMAIN_NAME;
+    }
+
+    /**
+     * @param string $currentVersion
+     * @param string $newVersion
+     * @param ConnectionInterface $con
+     * @author Thomas Arnaud <tarnaud@openstudio.fr>
+     */
+    public function update($currentVersion, $newVersion, ConnectionInterface $con = null)
+    {
+        $uploadDir = $this->getUploadDir();
+        $fileSystem = new Filesystem();
+
+        if (!file_exists($uploadDir)) {
+            $finder = new Finder();
+            $finder->files()->in(__DIR__ . DS . 'media' . DS . 'carousel');
+
+            $fileSystem->mkdir($uploadDir);
+
+            /** @var SplFileInfo $file */
+            foreach ($finder as $file) {
+                copy($file, $uploadDir . DS . $file->getRelativePathname());
+            }
+            $fileSystem->remove(__DIR__ . DS . 'media');
+        }
     }
 }
