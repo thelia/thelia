@@ -502,7 +502,7 @@ class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 /* format for mysql */
                 $sqlWhereString = $attributeChoice['expression'];
                 if ($sqlWhereString == '*') {
-                    $sqlWhereString = 'NOT ISNULL(`aa_' . $attribute . '`.ID)';
+                    $sqlWhereString = 'NOT ISNULL(`aa_' . $attribute . '`.ATTRIBUTE_AV_ID)';
                 } else {
                     $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`aa_' . $attribute . '_' . '\1`.ATTRIBUTE_ID)', $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
