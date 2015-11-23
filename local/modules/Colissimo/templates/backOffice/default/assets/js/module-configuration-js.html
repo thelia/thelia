@@ -1,4 +1,9 @@
-$(document).ready(function() {
+{javascripts file="assets/js/bootstrap-switch/bootstrap-switch.js"}
+<script src="{$asset_url}"></script>
+{/javascripts}
+
+<script>
+    $(document).ready(function() {
     $(".freeshipping-activation-Colissimo").bootstrapSwitch();
 
     $(".freeshipping-activation-Colissimo").on("switch-change", function(e, data){
@@ -26,6 +31,6 @@ $(document).ready(function() {
                 $('#freeshipping-failed-body').html(jqXHR.responseJSON.error);
                 $("#freeshipping-failed").modal("show");
             });
-
+        });
     });
-});
+</script>

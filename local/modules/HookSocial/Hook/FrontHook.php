@@ -15,7 +15,6 @@ namespace HookSocial\Hook;
 use Thelia\Core\Event\Hook\HookRenderBlockEvent;
 use Thelia\Core\Hook\BaseHook;
 
-
 /**
  * Class FrontHook
  * @package HookCurrency\Hook
@@ -35,6 +34,4 @@ class FrontHook extends BaseHook {
             ));
         }
     }
-
-
 } 

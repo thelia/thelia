@@ -31,11 +31,4 @@ class HookManager extends BaseHook {
 
         $event->add($content);
     }
-
-    public function onModuleConfiguration(HookRenderEvent $event)
-    {
-        $event->add(
-            $this->render("module_configuration.html")
-        );
-    }
 } 
