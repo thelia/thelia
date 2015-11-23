@@ -158,7 +158,7 @@
                         <meta itemprop="priceCurrency" content="{currency attr="symbol"}">
 
                         <span id="pse-promo">
-                            <span class="special-price"><span itemprop="price" class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
+                            <span class="special-price"><span class="price-label">{intl l="Special Price:"} </span><span id="pse-price" class="price" itemprop="price">{format_money number=$TAXED_PROMO_PRICE symbol={currency attr="symbol"}}</span></span>
                             {if $SHOW_ORIGINAL_PRICE}
                                 <span class="old-price"><span class="price-label">{intl l="Regular Price:"} </span><span id="pse-price-old" class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></span>
                             {/if}
