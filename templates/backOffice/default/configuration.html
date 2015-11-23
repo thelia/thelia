@@ -161,10 +161,17 @@
                                 {/loop}
 
                                 {loop type="auth" name="pcc5.1" role="ADMIN" resource="admin.configuration.translations" access="VIEW"}
-                                    <tr>
-                                        <td><a href="{url path='/admin/configuration/translations'}">{intl l='Translations'}</a></td>
-                                        <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/translations'}"><i class="glyphicon glyphicon-edit"></i></a></td>
-                                    </tr>
+                                <tr>
+                                    <td><a href="{url path='/admin/configuration/translations'}">{intl l='Translations'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/translations'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+
+                                {loop type="auth" name="pcc5.2" role="ADMIN" resource="admin.configuration.translations" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/configuration/translations-db'}">{intl l='Translations-db'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/translations-db'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
                                 {/loop}
 
                                 {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.mailing-system" access="VIEW"}
