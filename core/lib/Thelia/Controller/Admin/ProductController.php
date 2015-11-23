@@ -81,6 +81,7 @@ use Thelia\Model\ProductSaleElementsProductImageQuery;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\TaxEngine\Calculator;
+use Thelia\Tools\NumberFormat;
 use Thelia\Type\BooleanOrBothType;
 
 /**
