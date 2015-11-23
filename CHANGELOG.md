@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1790) Update the default PSE ref when the product ref is updated
 - (related to #1783) Fix product price exports. Resolve #1078 #1610
 - (related to #1771) Add argument customer_id for hook customer.edit-js
 - (related to #1769) Increase API key size to 48
