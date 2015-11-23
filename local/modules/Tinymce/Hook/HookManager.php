@@ -28,4 +28,11 @@ class HookManager extends BaseHook {
         $content = $this->render("tinymce_init.tpl");
         $event->add($content);
     }
+
+    public function onModuleConfiguration(HookRenderEvent $event)
+    {
+        $event->add(
+            $this->render("module_configuration.html")
+        );
+    }
 } 
