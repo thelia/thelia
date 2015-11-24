@@ -59,6 +59,19 @@ GNU General Public License : http://www.gnu.org/licenses/
     {stylesheets file='assets/dist/css/thelia.min.css'}
         <link rel="stylesheet" href="{$asset_url}">
     {/stylesheets}
+    {*
+     If you want to generate the CSS assets on the fly, just replace the stylesheet inclusion above by the following.
+     Then, in your back-office, go to Configuration -> System Variables and set process_assets to 1.
+     Now, when you're accessing the front office in developpement mode (index_dev.php)  the CSS is recompiled when a
+     change in the source files is detected.
+
+     See http://doc.thelia.net/en/documentation/templates/assets.html#activate-automatic-assets-generation for details.
+
+    {stylesheets file='assets/src/less/thelia.less' filters='less'}
+        <link rel="stylesheet" href="{$asset_url}">
+    {/stylesheets}
+
+    *}
 
     {hook name="main.stylesheet"}
 
