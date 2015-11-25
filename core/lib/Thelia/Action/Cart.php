@@ -15,6 +15,7 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\Cart\CartCreateEvent;
+use Thelia\Core\Event\Cart\CartPersistEvent;
 use Thelia\Core\Event\Cart\CartRestoreEvent;
 use Thelia\Core\Event\Cart\CartEvent;
 use Thelia\Core\Event\Currency\CurrencyChangeEvent;
@@ -62,6 +63,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $this->tokenProvider = $tokenProvider;
     }
 
+    public function persistCart(CartPersistEvent $event)
+    {
+        $cart = $event->getCart();
+
+        if ($cart->isNew()) {
+            $cart
+                ->setToken($this->generateCartCookieIdentifier())
+                ->save();
+            $this->session->setSessionCart($cart);
+        }
+    }
+
     /**
      *
      * add an article in the current cart
@@ -76,6 +89,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $currency = $cart->getCurrency();
         $customer = $cart->getCustomer();
         $discount = 0;
+
+        if ($cart->isNew()) {
+            $persistEvent = new CartPersistEvent($cart);
+            $event->getDispatcher()->dispatch(TheliaEvents::CART_PERSIST, $persistEvent);
+        }
 
         if (null !== $customer && $customer->getDiscount() > 0) {
             $discount = $customer->getDiscount();
@@ -417,16 +435,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $cart = new CartModel();
 
-        $cart
-            ->setToken($this->generateCartCookieIdentifier())
-            ->setCurrency($this->session->getCurrency(true))
-        ;
+        $cart->setCurrency($this->session->getCurrency(true));
 
         if (null !== $customer = $this->session->getCustomerUser()) {
             $cart->setCustomer(CustomerQuery::create()->findPk($customer->getId()));
         }
-
-        $cart->save();
 
         $cartCreateEvent->setCart($cart);
     }
@@ -480,6 +493,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
+            TheliaEvents::CART_PERSIST => array("persistCart", 128),
             TheliaEvents::CART_RESTORE_CURRENT => array("restoreCurrentCart", 128),
             TheliaEvents::CART_CREATE_NEW => array("createEmptyCart", 128),
             TheliaEvents::CART_ADDITEM => array("addItem", 128),
