@@ -42,6 +42,8 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  */
 class FolderTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'folder-tree';
+
     /**
      * @return ArgumentCollection
      */

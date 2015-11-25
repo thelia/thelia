@@ -52,6 +52,8 @@ use Thelia\Log\Tlog;
  */
 class Document extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'document';
+
     protected $objectType;
     protected $objectId;
 

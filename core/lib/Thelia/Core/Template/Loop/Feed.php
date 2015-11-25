@@ -31,6 +31,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
  */
 class Feed extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'feed';
+
     public function getArgDefinitions()
     {
         return new ArgumentCollection(

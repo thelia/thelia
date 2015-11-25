@@ -45,6 +45,8 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  */
 class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'category-tree';
+
     /**
      * @return ArgumentCollection
      */

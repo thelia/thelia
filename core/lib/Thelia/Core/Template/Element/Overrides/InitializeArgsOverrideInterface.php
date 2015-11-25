@@ -10,31 +10,27 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
 
-use Thelia\Model\ExportQuery;
+namespace Thelia\Core\Template\Element\Overrides;
+
+use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class InitializeArgsOverrideInterface
+ * @package Thelia\Core\Template\Element\Overrides
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Export extends ImportExportType
+interface InitializeArgsOverrideInterface
 {
-    protected $loopName = 'export';
-
-    protected function getBaseUrl()
-    {
-        return $this->container->getParameter("export.base_url");
-    }
-
-    protected function getQueryModel()
-    {
-        return ExportQuery::create();
-    }
-
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
+    /**
+     * Manipulate arguments of a loop
+     *
+     * For instance:
+     *
+     * $nameValuePairs['export'] = 'json';
+     *
+     * @param BaseLoop $loop
+     * @param array $nameValuePairs
+     */
+    public function initializeArgs(BaseLoop $loop, array $nameValuePairs);
 }

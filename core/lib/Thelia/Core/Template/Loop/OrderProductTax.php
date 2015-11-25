@@ -36,6 +36,8 @@ use Thelia\Model\OrderProductTax as OrderProductTaxModel;
  */
 class OrderProductTax extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-product-tax';
+
     protected $timestampable = true;
 
     /**

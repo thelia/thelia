@@ -33,6 +33,8 @@ use Thelia\Type\TypeCollection;
  */
 class Formatter extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'formatter';
+
     /**
      * this method returns an array
      *

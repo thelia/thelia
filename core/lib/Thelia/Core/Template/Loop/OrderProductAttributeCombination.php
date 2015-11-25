@@ -39,6 +39,8 @@ use Thelia\Model\OrderProductAttributeCombination as OrderProductAttributeCombin
  */
 class OrderProductAttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-product-attribute-combination';
+
     protected $timestampable = true;
 
     /**

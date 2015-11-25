@@ -34,6 +34,8 @@ use Thelia\Module\Exception\DeliveryException;
  */
 class Delivery extends BaseSpecificModule
 {
+    protected $loopName = 'delivery';
+
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();

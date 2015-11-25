@@ -36,6 +36,8 @@ use Thelia\Model\Profile as ProfileModel;
  */
 class Profile extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'profile';
+
     protected $timestampable = true;
 
     /**

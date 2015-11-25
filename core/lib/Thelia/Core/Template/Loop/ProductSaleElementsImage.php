@@ -34,6 +34,8 @@ use Propel\Runtime\ActiveQuery\Criteria;
  */
 class ProductSaleElementsImage extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'product-sale-elements-image';
+
     /**
      * @param LoopResult $loopResult
      *

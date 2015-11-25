@@ -44,6 +44,8 @@ use Thelia\Model\Message as MessageModel;
  */
 class Message extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'message';
+
     protected $timestampable = true;
 
     /**

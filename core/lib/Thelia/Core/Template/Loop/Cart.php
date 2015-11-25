@@ -36,6 +36,8 @@ use Thelia\Type;
  */
 class Cart extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'cart';
+
     /**
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection

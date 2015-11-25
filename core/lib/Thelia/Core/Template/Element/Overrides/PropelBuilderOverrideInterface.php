@@ -10,31 +10,31 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
 
-use Thelia\Model\ExportQuery;
+namespace Thelia\Core\Template\Element\Overrides;
+
+use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class PropelBuilderOverrideInterface
+ * @package Thelia\Core\Template\Element\Overrides
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Export extends ImportExportType
+interface PropelBuilderOverrideInterface
 {
-    protected $loopName = 'export';
-
-    protected function getBaseUrl()
-    {
-        return $this->container->getParameter("export.base_url");
-    }
-
-    protected function getQueryModel()
-    {
-        return ExportQuery::create();
-    }
-
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
+    /**
+     * Manipulate the ModelCriteria
+     *
+     * For instance:
+     *
+     * $search->orderBy('id', Criteria::DESC);
+     *
+     * @param BaseLoop        $loop      the current loop
+     * @param ModelCriteria   $search    the search ModelCriteria of the loop
+     *
+     */
+    public function build(BaseLoop $loop, ModelCriteria $search);
 }

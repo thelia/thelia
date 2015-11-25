@@ -21,6 +21,8 @@ use Thelia\Model\ImportQuery;
  */
 class Import extends ImportExportType
 {
+    protected $loopName = 'import';
+
     protected function getBaseUrl()
     {
         return $this->container->getParameter("import.base_url");

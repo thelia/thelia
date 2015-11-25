@@ -39,6 +39,8 @@ use Thelia\Model\Resource as ResourceModel;
  */
 class Resource extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'resource';
+
     protected $timestampable = true;
 
     /**

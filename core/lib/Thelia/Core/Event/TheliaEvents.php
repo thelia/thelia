@@ -759,8 +759,24 @@ final class TheliaEvents
     const MODULE_INSTALL = 'thelia.module.install';
 
     /* Invoke payment module */
-
     const MODULE_PAY = 'thelia.module.pay';
+
+    /* Loop */
+    const LOOP_OVERRIDES_LOOPS = 'thelia.loop.overrides';
+    const LOOP_OVERRIDES_LOOP = 'thelia.loop.overrides.%s';
+
+    /**
+     * Generate the name of the event for a specific loop
+     *
+     * @param string $loopName the loop name
+     * @return string the event name
+     */
+    public static function getLoopOverridesEvent($loopName)
+    {
+        $loopName = preg_replace("[^A-Za-z0-9]", "-", $loopName);
+
+        return sprintf(self::LOOP_OVERRIDES_LOOP, $loopName);
+    }
 
     /**
      * Hook

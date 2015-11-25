@@ -40,6 +40,8 @@ use Thelia\Type\TypeCollection;
  */
 class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'attribute-combination';
+
     protected $timestampable = true;
 
     /**

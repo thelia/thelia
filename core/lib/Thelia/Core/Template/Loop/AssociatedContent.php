@@ -36,6 +36,8 @@ use Thelia\Model\CategoryAssociatedContentQuery;
  */
 class AssociatedContent extends Content
 {
+    protected $loopName = 'associated-content';
+
     protected $contentId;
     protected $contentPosition;
 

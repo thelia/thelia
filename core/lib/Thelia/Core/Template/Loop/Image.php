@@ -60,6 +60,8 @@ use Thelia\Log\Tlog;
  */
 class Image extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'image';
+
     protected $objectType;
     protected $objectId;
 

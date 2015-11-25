@@ -47,6 +47,8 @@ use Thelia\Type;
  */
 class Customer extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
+    protected $loopName = 'customer';
+
     protected $timestampable = true;
 
     /**

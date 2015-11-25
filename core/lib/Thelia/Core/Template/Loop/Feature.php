@@ -52,6 +52,8 @@ use Thelia\Model\Feature as FeatureModel;
  */
 class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'feature';
+
     protected $useFeaturePosition;
 
     protected $timestampable = true;

@@ -44,6 +44,8 @@ use Thelia\Model\Tax as TaxModel;
  */
 class Tax extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'tax';
+
     protected $timestampable = true;
 
     /**

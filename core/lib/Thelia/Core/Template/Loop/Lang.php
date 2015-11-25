@@ -44,6 +44,8 @@ use Thelia\Type;
  */
 class Lang extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'lang';
+
     protected $timestampable = true;
 
     /**

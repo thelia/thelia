@@ -46,6 +46,8 @@ use Thelia\Type\TypeCollection;
  */
 class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInterface
 {
+    protected $loopName = 'order';
+
     protected $countable = true;
     protected $timestampable = true;
     protected $versionable = false;

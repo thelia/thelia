@@ -36,6 +36,8 @@ use Thelia\Model\CustomerTitle as CustomerTitleModel;
  */
 class Title extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'title';
+
     protected $timestampable = true;
 
     /**

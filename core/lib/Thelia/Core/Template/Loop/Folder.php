@@ -45,6 +45,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Folder extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'folder';
+
     protected $timestampable = true;
     protected $versionable = true;
 

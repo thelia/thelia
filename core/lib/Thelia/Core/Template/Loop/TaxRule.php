@@ -40,6 +40,8 @@ use Thelia\Model\TaxRule as TaxRuleModel;
  */
 class TaxRule extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'tax-rule';
+
     protected $timestampable = true;
 
     /**

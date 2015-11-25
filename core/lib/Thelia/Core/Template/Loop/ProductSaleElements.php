@@ -50,6 +50,8 @@ use Thelia\Type\TypeCollection;
  */
 class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'product-sale-elements';
+
     protected $timestampable = true;
 
     /**

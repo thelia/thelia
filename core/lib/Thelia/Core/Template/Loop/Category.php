@@ -61,6 +61,8 @@ use Thelia\Model\Category as CategoryModel;
  */
 class Category extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'category';
+
     protected $timestampable = true;
     protected $versionable = true;
 

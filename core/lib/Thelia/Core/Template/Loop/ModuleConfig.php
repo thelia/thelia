@@ -38,6 +38,8 @@ use Thelia\Model\ModuleQuery;
  */
 class ModuleConfig extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'module-config';
+
     /**
      * @return ArgumentCollection
      */

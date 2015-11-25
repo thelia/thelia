@@ -45,6 +45,8 @@ use Thelia\Model\TaxRuleCountry as TaxRuleCountryModel;
  */
 class TaxRuleCountry extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'tax-rule-country';
+
     protected $taxCountForOriginCountry;
 
     protected $timestampable = true;

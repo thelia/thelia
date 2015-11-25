@@ -21,6 +21,8 @@ use Thelia\Model\ExportCategoryQuery;
  */
 class ExportCategory extends ImportExportCategory
 {
+    protected $loopName = 'export-category';
+
     protected function getQueryModel()
     {
         return ExportCategoryQuery::create();

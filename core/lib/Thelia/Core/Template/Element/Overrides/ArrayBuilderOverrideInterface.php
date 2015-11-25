@@ -10,31 +10,17 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Loop;
 
-use Thelia\Model\ExportQuery;
+namespace Thelia\Core\Template\Element\Overrides;
+
+use Thelia\Core\Template\Element\BaseLoop;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class ArrayBuilderOverrideInterface
+ * @package Thelia\Core\Template\Element\Overrides
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Export extends ImportExportType
+interface ArrayBuilderOverrideInterface
 {
-    protected $loopName = 'export';
-
-    protected function getBaseUrl()
-    {
-        return $this->container->getParameter("export.base_url");
-    }
-
-    protected function getQueryModel()
-    {
-        return ExportQuery::create();
-    }
-
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
+    public function build(BaseLoop $loop, array $search);
 }

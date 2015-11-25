@@ -48,6 +48,8 @@ use Thelia\Model\Map\AttributeTemplateTableMap;
  */
 class Attribute extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'attribute';
+
     protected $useAttributePosistion;
 
     protected $timestampable = true;

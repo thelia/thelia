@@ -9,32 +9,33 @@
 /*      For the full copyright and license information, please view the LICENSE.txt  */
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
+namespace Thelia\Core\Template\Element\Overrides;
 
-namespace Thelia\Core\Template\Loop;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
-use Thelia\Model\ExportQuery;
 
 /**
- * Class Export
- * @package Thelia\Core\Template\Loop
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class ArgDefinitionsOverride
+ * @author Julien Chanséaume <jchanseaume@openstudio.fr>
  */
-class Export extends ImportExportType
+interface ArgDefinitionsOverrideInterface
 {
-    protected $loopName = 'export';
-
-    protected function getBaseUrl()
-    {
-        return $this->container->getParameter("export.base_url");
-    }
-
-    protected function getQueryModel()
-    {
-        return ExportQuery::create();
-    }
-
-    protected function getCategoryName()
-    {
-        return "ExportCategoryId";
-    }
+    /**
+     * Manipulate argument definitions
+     *
+     * For instance:
+     *
+     * $loop->getArgs()->addArgument(
+     *     Argument::createEnumListTypeArgument(
+     *         'export',
+     *         ['JSON', 'json', 'csv', 'xml'],
+     *     )
+     * );
+     *
+     * @param BaseLoop  $loop      the current loop
+     *
+     */
+    public function getArgDefinitions(BaseLoop $loop);
 }

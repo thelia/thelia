@@ -42,6 +42,8 @@ use Thelia\Type\BooleanOrBothType;
  */
 class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'sale';
+
     protected $timestampable = true;
 
     /**

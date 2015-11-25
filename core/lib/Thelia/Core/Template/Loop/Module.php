@@ -50,6 +50,8 @@ use Thelia\Type\TypeCollection;
  */
 class Module extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'module';
+
     protected $timestampable = true;
 
     /**

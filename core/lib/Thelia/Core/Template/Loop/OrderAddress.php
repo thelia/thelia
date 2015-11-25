@@ -36,6 +36,8 @@ use Thelia\Model\OrderAddress as OrderAddressModel;
  */
 class OrderAddress extends BaseLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-address';
+
     protected $timestampable = true;
 
     /**

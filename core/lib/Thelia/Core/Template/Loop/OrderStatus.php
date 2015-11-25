@@ -36,6 +36,8 @@ use Thelia\Model\OrderStatus as OrderStatusModel;
  */
 class OrderStatus extends BaseI18nLoop implements PropelSearchLoopInterface
 {
+    protected $loopName = 'order-status';
+
     protected $timestampable = true;
 
     /**

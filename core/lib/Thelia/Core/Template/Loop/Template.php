@@ -33,6 +33,8 @@ use Thelia\Type;
  */
 class Template extends BaseLoop implements ArraySearchLoopInterface
 {
+    protected $loopName = 'template';
+
     /**
      * @return ArgumentCollection
      */

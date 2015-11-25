@@ -76,6 +76,8 @@ use Thelia\Type\TypeCollection;
  */
 class Product extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'product';
+
     protected $timestampable = true;
     protected $versionable = true;
 

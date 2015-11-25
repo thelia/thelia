@@ -46,6 +46,8 @@ use Thelia\Type\TypeCollection;
  */
 class Brand extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoopInterface
 {
+    protected $loopName = 'brand';
+
     protected $timestampable = true;
 
     /**

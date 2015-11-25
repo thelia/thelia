@@ -25,6 +25,8 @@ use Thelia\Module\PaymentModuleInterface;
  */
 class Payment extends BaseSpecificModule implements PropelSearchLoopInterface
 {
+    protected $loopName = 'payment';
+
     public function getArgDefinitions()
     {
         $collection = parent::getArgDefinitions();
