@@ -400,6 +400,11 @@ class DataAccessFunctions extends AbstractSmartyPlugin
     {
         $key = $this->getParam($params, 'key', false);
         $moduleCode = $this->getParam($params, 'module', false);
+        $locale = $this->getParam($params, 'locale');
+
+        if (null === $locale) {
+            $locale = $this->request->getSession()->getLang()->getLocale();
+        }
 
         if ($key === false || $moduleCode === false) {
             return null;
@@ -413,7 +418,7 @@ class DataAccessFunctions extends AbstractSmartyPlugin
                     $module->getId(),
                     $key,
                     $default,
-                    $this->request->getSession()->getLang()->getLocale()
+                    $locale
                 );
         } else {
             Tlog::getInstance()->addWarning(
