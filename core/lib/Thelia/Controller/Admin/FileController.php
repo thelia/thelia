@@ -190,16 +190,10 @@ class FileController extends BaseAdminController
             throw new ProcessFileException('', 404);
         }
 
-        $defaultTitle = $parentModel->getTitle();
-
-        if (empty($defaultTitle)) {
-            $defaultTitle = $fileBeingUploaded->getClientOriginalName();
-        }
-
         $fileModel
             ->setParentId($parentId)
             ->setLocale(Lang::getDefaultLanguage()->getLocale())
-            ->setTitle($defaultTitle)
+            ->setTitle($parentModel->getTitle())
         ;
 
         $fileCreateOrUpdateEvent = new FileCreateOrUpdateEvent($parentId);
