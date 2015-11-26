@@ -30,6 +30,7 @@ use Thelia\Model\ProductSaleElementsQuery;
  * Class ProductPricesExport
  * @package Thelia\ImportExport\Export\Type
  * @author Benjamin Perche <bperche@openstudio.fr>
+ * @contributor Thomas Arnaud <tarnaud@openstudio.fr>
  */
 class ProductPricesExport extends ExportHandler
 {
@@ -65,7 +66,6 @@ class ProductPricesExport extends ExportHandler
         $locale = $lang->getLocale();
 
         $productJoin = new Join(ProductTableMap::ID, ProductI18nTableMap::ID, Criteria::LEFT_JOIN);
-
         $attributeAvJoin = new Join(AttributeAvTableMap::ID, AttributeAvI18nTableMap::ID, Criteria::LEFT_JOIN);
 
         $query = ProductSaleElementsQuery::create()
@@ -88,8 +88,8 @@ class ProductPricesExport extends ExportHandler
                 ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
                 ->addAsColumn("product_ID", ProductTableMap::ID)
             ->endUse()
-            ->useAttributeCombinationQuery()
-                ->useAttributeAvQuery()
+            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                ->useAttributeAvQuery(null, Criteria::LEFT_JOIN)
                     ->addJoinObject($attributeAvJoin, "attribute_av_join")
                     ->addJoinCondition(
                         "attribute_av_join",
@@ -124,21 +124,6 @@ class ProductPricesExport extends ExportHandler
         return $query;
     }
 
-    public function getOrder()
-    {
-        return [
-            "id",
-            "product_id",
-            "title",
-            "ean",
-            "price",
-            "promo_price",
-            "currency",
-            "promo",
-            "attributes"
-        ];
-    }
-
     protected function getAliases()
     {
         return [
@@ -150,6 +135,21 @@ class ProductPricesExport extends ExportHandler
             "product_TITLE" => "title",
             "product_sale_elements_PROMO" => "promo",
             "attribute_av_i18n_ATTRIBUTES" => "attributes"
+        ];
+    }
+
+    public function getOrder()
+    {
+        return [
+            "id",
+            "product_id",
+            "title",
+            "attributes",
+            "ean",
+            "price",
+            "promo_price",
+            "currency",
+            "promo",
         ];
     }
 }

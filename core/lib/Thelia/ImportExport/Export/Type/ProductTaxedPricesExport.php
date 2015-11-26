@@ -29,7 +29,7 @@ use Thelia\Model\ProductSaleElementsQuery;
 /**
  * Class ProductTaxedPricesExport
  * @package Thelia\ImportExport\Export\Type
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Thomas Arnaud <tarnaud@openstudio.fr>
  */
 class ProductTaxedPricesExport extends ProductPricesExport
 {
@@ -75,8 +75,8 @@ class ProductTaxedPricesExport extends ProductPricesExport
                 ->addAsColumn("product_TITLE", ProductI18nTableMap::TITLE)
                 ->addAsColumn("product_ID", ProductTableMap::ID)
             ->endUse()
-            ->useAttributeCombinationQuery()
-                ->useAttributeAvQuery()
+            ->useAttributeCombinationQuery(null, Criteria::LEFT_JOIN)
+                ->useAttributeAvQuery(null, Criteria::LEFT_JOIN)
                     ->addJoinObject($attributeAvI18nJoin, "attribute_av_i18n_join")
                     ->addJoinCondition(
                         "attribute_av_i18n_join",
@@ -129,18 +129,18 @@ class ProductTaxedPricesExport extends ProductPricesExport
         ];
     }
 
-    public function getDefaultOrder()
+    public function getOrder()
     {
         return [
             "id",
             "product_id",
             "title",
+            "attributes",
             "ean",
             "price",
             "promo_price",
             "currency",
             "promo",
-            "attributes",
             "tax_id",
             "tax_title",
         ];
