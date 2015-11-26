@@ -166,7 +166,7 @@ function createProduct($faker, $categories, $brands, $contents, $template, $attr
                     ->setChapo($data[2])
                     ->setDescription($data[4])
                     ->setPostscriptum($data[6])
-                ->setLocale('fr_Fr')
+                ->setLocale('fr_FR')
                     ->setTitle($data[1])
                     ->setChapo($data[3])
                     ->setDescription($data[5])
