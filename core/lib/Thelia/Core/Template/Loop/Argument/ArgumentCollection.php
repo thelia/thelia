@@ -27,16 +27,27 @@ class ArgumentCollection implements \Iterator
         $this->addArguments(func_get_args(), true);
     }
 
+    /**
+     * @param $key
+     * @return bool
+     */
     public function hasKey($key)
     {
         return isset($this->arguments[$key]);
     }
 
+    /**
+     * @param $key
+     * @return Argument|null
+     */
     public function get($key)
     {
         return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
+    /**
+     * @return bool
+     */
     public function isEmpty()
     {
         return count($this->arguments) == 0;

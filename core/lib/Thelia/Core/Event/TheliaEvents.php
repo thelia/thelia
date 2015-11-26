@@ -547,6 +547,27 @@ final class TheliaEvents
      */
     const AFTER_COUPON_CONDITION_UPDATE    = "action.after_update_coupon_condition";
 
+    // -- Loop ---------------------------------------------
+
+    const LOOP_EXTENDS_ARG_DEFINITIONS = "loop.extends.arg_definitions";
+    const LOOP_EXTENDS_INITIALIZE_ARGS = "loop.extends.initialize_args";
+    const LOOP_EXTENDS_BUILD_MODEL_CRITERIA = "loop.extends.build_model_criteria";
+    const LOOP_EXTENDS_BUILD_ARRAY = "loop.extends.build_array";
+    const LOOP_EXTENDS_PARSE_RESULTS = "loop.extends.parse_results";
+
+    /**
+     * Generate the event name for a specific loop
+     *
+     * @param string $eventName the event name
+     * @param string $loopName the loop name
+     *
+     * @return string the event name for the loop
+     */
+    public static function getLoopExtendsEvent($eventName, $loopName)
+    {
+        return sprintf("%s.%s", $eventName, $loopName);
+    }
+
     // -- Configuration management ---------------------------------------------
 
     const CONFIG_CREATE   = "action.createConfig";
