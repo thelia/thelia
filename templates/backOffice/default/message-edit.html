@@ -281,8 +281,10 @@
             var aceEditor = editor[$(this).data('toggle-textarea')];
             if ($(this).val() != '') {
                 aceEditor.setReadOnly(true);
+                $(this).parents(".row").next().slideUp()
             } else {
                 aceEditor.setReadOnly(false);
+                $(this).parents(".row").next().slideDown()
             }
         });
 
