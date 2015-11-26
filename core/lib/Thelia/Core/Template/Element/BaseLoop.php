@@ -50,7 +50,7 @@ abstract class BaseLoop
     protected $loopName = null;
 
     /** @var array|null array of loop definitions (class => id) */
-    protected static $loopDefinitions = [];
+    protected static $loopDefinitions = null;
 
     /**
      * @var \Thelia\Core\HttpFoundation\Request
