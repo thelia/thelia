@@ -348,7 +348,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    private function manageNonPersistentCookie(CartRestoreEvent $cartRestoreEvent)
+    protected function manageNonPersistentCookie(CartRestoreEvent $cartRestoreEvent)
     {
         $cart = $cartRestoreEvent->getCart();
 
@@ -371,7 +371,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    private function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName)
+    protected function managePersistentCart(CartRestoreEvent $cartRestoreEvent, $cookieName)
     {
         // The cart cookie exists -> get the cart token
         $token = $this->request->cookies->get($cookieName);
@@ -384,7 +384,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return $cart;
     }
 
-    private function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher)
+    protected function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher)
     {
         /** @var CustomerModel $customer */
         if (null !== $customer = $this->session->getCustomerUser()) {
