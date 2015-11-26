@@ -251,8 +251,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @return CartItem
      */
-    protected function doAddItem(EventDispatcherInterface $dispatcher, CartModel $cart, $productId, ProductSaleElements $productSaleElements, $quantity, ProductPriceTools $productPrices)
-    {
+    protected function doAddItem(
+        EventDispatcherInterface $dispatcher,
+        CartModel $cart,
+        $productId,
+        ProductSaleElements $productSaleElements,
+        $quantity,
+        ProductPriceTools $productPrices
+    ) {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($dispatcher);
         $cartItem
@@ -349,24 +355,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if (null === $cart) {
             $cart = $cart = $this->dispatchNewCart($cartRestoreEvent->getDispatcher());
         } else {
-            if (null !== $customer = $this->session->getCustomerUser()) {
-                // A customer is logged in.
-                if (null === $cart->getCustomerId()) {
-                    // The cart created by the customer when it was not yet logged in
-                    // is assigned to it after login.
-                    $cart->setCustomerId($customer->getId())->save();
-                } elseif ($cart->getCustomerId() != $customer->getId()) {
-                    // The cart does not belongs to the current customer
-                    // -> clone it to create a new cart.
-                    $cart = $this->duplicateCart(
-                        $cartRestoreEvent->getDispatcher(),
-                        $cart,
-                        CustomerQuery::create()->findPk($customer->getId())
-                    );
-                }
-            } else {
-                $cart->setCustomerId(null)->save();
-            }
+            $cart = $this->manageCartDuplicationAtCustomerLogin($cart, $cartRestoreEvent->getDispatcher());
         }
 
         return $cart;
@@ -389,24 +378,46 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
         // Check if a cart exists for this token
         if (null !== $cart = CartQuery::create()->findOneByToken($token)) {
-            if (null !== $customer = $this->session->getCustomerUser()) {
-                // A customer is logged in.
-                if (null === $cart->getCustomerId()) {
-                    // The cart created by the customer when it was not yet logged in
-                    // is assigned to it after login.
-                    $cart->setCustomerId($customer->getId())->save();
-                } elseif ($cart->getCustomerId() != $customer->getId()) {
-                    // The cart does not belongs to the current customer
-                    // -> clone it to create a new cart.
-                    $cart = $this->duplicateCart(
-                        $cartRestoreEvent->getDispatcher(),
-                        $cart,
-                        CustomerQuery::create()->findPk($customer->getId())
-                    );
+            $cart = $this->manageCartDuplicationAtCustomerLogin($cart, $cartRestoreEvent->getDispatcher());
+        }
+
+        return $cart;
+    }
+
+    private function manageCartDuplicationAtCustomerLogin(CartModel $cart, EventDispatcherInterface $dispatcher)
+    {
+        /** @var CustomerModel $customer */
+        if (null !== $customer = $this->session->getCustomerUser()) {
+            // Check if we have to duplicate the existing cart.
+
+            $duplicateCart = true;
+
+            // A customer is logged in.
+            if (null === $cart->getCustomerId()) {
+                // If the customer has a discount, whe have to duplicate the cart,
+                // so that the discount will be applied to the products in cart.
+
+                if (0 === $customer->getDiscount() || 0 === $cart->countCartItems()) {
+                    // If no discount, or an empty cart, there's no need to duplicate.
+                    $duplicateCart = false;
                 }
-            } elseif ($cart->getCustomerId() != null) {
-                // Just duplicate the current cart, without assigning a customer ID.
-                $cart = $this->duplicateCart($cartRestoreEvent->getDispatcher(), $cart);
+            }
+
+            if ($duplicateCart) {
+                // Duplicate the cart
+                $cart = $this->duplicateCart($dispatcher, $cart, $customer);
+            } else {
+                // No duplication required, just assign the cart to the customer
+                $cart->setCustomerId($customer->getId())->save();
+            }
+        } elseif ($cart->getCustomerId() != null) {
+            // The cart belongs to another user
+            if (0 === $cart->countCartItems()) {
+                // No items in cart, assign it to nobody.
+                $cart->setCustomerId(null)->save();
+            } else {
+                // Some itemls in cart, duplicate it without assigning a customer ID.
+                $cart = $this->duplicateCart($dispatcher, $cart);
             }
         }
 
