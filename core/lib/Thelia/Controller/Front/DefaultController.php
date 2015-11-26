@@ -12,14 +12,14 @@
 
 namespace Thelia\Controller\Front;
 
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\HttpKernel\Exception\RedirectException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 /**
- *
- * Must be the last controller call. It fixes default values
+ * This is the defualt Thelia controller, which is called when no controller was found to process the request.
  *
  * @author Manuel Raynaud <mraynadu@openstudio.fr>
  */
@@ -27,12 +27,17 @@ use Thelia\Tools\URL;
 class DefaultController extends BaseFrontController
 {
     /**
+     * This is the default Thelia behaviour if no action is defined.
      *
-     * set the default value for thelia
+     * If the request contains a 'view' parameter, this view will be displayed.
+     * If the request contains a '_view' attribute (set in the route definition, for example), this view will be displayed.
+     * Otherwise, we will use the "index" view.
      *
-     * In this case there is no action so we have to verify if some needed params are not missing
+     * Additionaly, if the URL rewriting is enabled, the method will check if a redirect to the pâge rewritten URL should
+     * be done.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Thelia\Core\HttpFoundation\Request $request
+     * @throw RedirectException if a redirection to the rewritted URL shoud be done.
      */
     public function noAction(Request $request)
     {
@@ -55,10 +60,10 @@ class DefaultController extends BaseFrontController
             if ($request->attributes->get('_rewritten', false) === false) {
                 /* Does the query GET parameters match a rewritten URL ? */
                 $rewrittenUrl = URL::getInstance()->retrieveCurrent($request);
+
                 if ($rewrittenUrl->rewrittenUrl !== null) {
                     /* 301 redirection to rewritten URL */
-
-                    return $this->generateRedirect($rewrittenUrl, 301);
+                    throw new RedirectException($rewrittenUrl->rewrittenUrl, 301);
                 }
             }
         }

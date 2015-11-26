@@ -1,5 +1,6 @@
 # 2.2.3
 
+- (related to #1799) Fixed the redirection to rewritten URL
 - (related to #1797) Fix order manual and manual_reverse in AttributeCombination loop
 - #1901 Update Colissimo export, add link to order and to customer, add package weight
 
