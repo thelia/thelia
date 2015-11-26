@@ -353,7 +353,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cart = $cartRestoreEvent->getCart();
 
         if (null === $cart) {
-            $cart = $cart = $this->dispatchNewCart($cartRestoreEvent->getDispatcher());
+            $cart = $this->dispatchNewCart($cartRestoreEvent->getDispatcher());
         } else {
             $cart = $this->manageCartDuplicationAtCustomerLogin($cart, $cartRestoreEvent->getDispatcher());
         }
