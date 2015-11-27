@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1806) Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE
 - (related to #1796) Fix regression in OrderAddressEvent cell phone can not be required in the constructor
 - (related to #1790) Update the default PSE ref when the product ref is updated
 - (related to #1783) Fix product price exports. Resolve #1078 #1610
