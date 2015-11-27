@@ -215,6 +215,7 @@ return array(
     'Free product when buying one or more selected products' => 'Un produit offert pour l\'achat d\'un ou plusieurs produits',
     'Front Office' => 'Front Office',
     'Full Name' => 'Nom complet',
+    'Further submissions will be ignored during %time' => 'Les prochains envois seront ignorés pendant %time',
     'Greater than' => 'Supérieur à',
     'Greater than or equals' => 'Supérieur ou égal à',
     'HTML Message' => 'Message au format HTML',
