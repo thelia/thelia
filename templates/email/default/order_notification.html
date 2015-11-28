@@ -34,6 +34,7 @@
                 <td valign="top" width="55%">
                     <strong>{intl l="Customer delivery address:"}</strong><br>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
                     {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
@@ -45,6 +46,7 @@
                 <td valign="top">
                     <strong>{intl l="Customer billing address:"}</strong><br />
                     {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
                     {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
