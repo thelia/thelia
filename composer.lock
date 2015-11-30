@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c6a3020a6a5dfd77bd17f47132847948",
-    "content-hash": "029ab1f6e34a9ed225db9abff2649ffa",
+    "hash": "8b7697b7c5694a7f3027afa86573b1f9",
+    "content-hash": "c15de7c512187c734169b1a153bb3ef6",
     "packages": [
         {
             "name": "doctrine/cache",
@@ -406,7 +406,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/30e53e8a28284b69dd223c9f5ee8957befd72636",
+                "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/621384bbddce8645c143425f83e048217b0ca921",
                 "reference": "c94b4815280144257b749e1d96db1aad728802df",
                 "shasum": ""
             },
@@ -571,7 +571,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/27bb4ec5dbe608ed9e8ff3f2f99c2ef43f03cc06",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/bab00213c535142f699e17cd75df185580491552",
                 "reference": "793aea6b762d9a72b083bfc49c74c574f67650c8",
                 "shasum": ""
             },
@@ -2069,32 +2069,48 @@
         },
         {
             "name": "symfony/serializer",
-            "version": "v2.3.21",
-            "target-dir": "Symfony/Component/Serializer",
+            "version": "v2.7.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "8711b73e39ff4c89ac1966283973bb66318d83fc"
+                "reference": "6954ed98a22799ed4746895d88d03022aa5a8cef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/8711b73e39ff4c89ac1966283973bb66318d83fc",
-                "reference": "8711b73e39ff4c89ac1966283973bb66318d83fc",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/6954ed98a22799ed4746895d88d03022aa5a8cef",
+                "reference": "6954ed98a22799ed4746895d88d03022aa5a8cef",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "doctrine/annotations": "~1.0",
+                "doctrine/cache": "~1.0",
+                "symfony/config": "~2.2",
+                "symfony/property-access": "~2.3",
+                "symfony/yaml": "~2.0,>=2.0.5"
+            },
+            "suggest": {
+                "doctrine/annotations": "For using the annotation mapping. You will also need doctrine/cache.",
+                "doctrine/cache": "For using the default cached annotation reader and metadata cache.",
+                "symfony/config": "For using the XML mapping loader.",
+                "symfony/property-access": "For using the ObjectNormalizer.",
+                "symfony/yaml": "For using the default YAML mapping loader."
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.3-dev"
+                    "dev-master": "2.7-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
+                "psr-4": {
                     "Symfony\\Component\\Serializer\\": ""
-                }
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2102,17 +2118,17 @@
             ],
             "authors": [
                 {
-                    "name": "Symfony Community",
-                    "homepage": "http://symfony.com/contributors"
-                },
-                {
                     "name": "Fabien Potencier",
                     "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Serializer Component",
-            "homepage": "http://symfony.com",
-            "time": "2014-09-22 08:32:35"
+            "homepage": "https://symfony.com",
+            "time": "2015-11-18 13:41:01"
         },
         {
             "name": "symfony/translation",

@@ -37,7 +37,7 @@
         "imagine/imagine": "v0.6.2",
         "symfony/icu": "1.0",
         "swiftmailer/swiftmailer": "5.2.*",
-        "symfony/serializer": "2.3.*",
+        "symfony/serializer": "^2.7",
         "ensepar/html2pdf": "1.0.1",
         "symfony/finder": "2.3.*",
         "symfony/browser-kit": "2.3.*",
