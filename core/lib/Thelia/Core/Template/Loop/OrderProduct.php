@@ -112,6 +112,9 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
             $taxedPrice = $orderProduct->getPrice() + $orderProduct->getVirtualColumn('TOTAL_TAX');
             $taxedPromoPrice = $orderProduct->getPromoPrice() + $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX');
 
+            $totalPrice = $orderProduct->getPrice()*$orderProduct->getQuantity();
+            $totalPromoPrice = $orderProduct->getPromoPrice()*$orderProduct->getQuantity();
+
             $loopResultRow->set("ID", $orderProduct->getId())
                 ->set("REF", $orderProduct->getProductRef())
                 ->set("PRODUCT_ID", $orderProduct->getVirtualColumn('product_id'))
@@ -133,6 +136,10 @@ class OrderProduct extends BaseLoop implements PropelSearchLoopInterface
                 ->set("PROMO_PRICE", $orderProduct->getPromoPrice())
                 ->set("PROMO_PRICE_TAX", $orderProduct->getVirtualColumn('TOTAL_PROMO_TAX'))
                 ->set("TAXED_PROMO_PRICE", $taxedPromoPrice)
+                ->set("TOTAL_PRICE", $totalPrice)
+                ->set("TOTAL_TAXED_PRICE", $totalPrice + ($orderProduct->getVirtualColumn('TOTAL_TAX')*$orderProduct->getQuantity()))
+                ->set("TOTAL_PROMO_PRICE", $totalPromoPrice)
+                ->set("TOTAL_TAXED_PROMO_PRICE", $totalPromoPrice + ($orderProduct->getVirtualColumn('TOTAL_PROMO_TAX')*$orderProduct->getQuantity()))
                 ->set("TAX_RULE_TITLE", $orderProduct->getTaxRuleTitle())
                 ->set("TAX_RULE_DESCRIPTION", $orderProduct->getTaxRuledescription())
                 ->set("PARENT", $orderProduct->getParent())
