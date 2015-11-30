@@ -116,14 +116,14 @@ class CartItem extends BaseCartItem
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice());
     }
 
     public function getTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice());
     }
 
     public function getTotalRealTaxedPrice(Country $country)
@@ -135,13 +135,13 @@ class CartItem extends BaseCartItem
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()*$this->getQuantity()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()*$this->getQuantity());
     }
 
     public function getTotalTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
     }
 }
