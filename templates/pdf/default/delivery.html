@@ -212,6 +212,7 @@
                 {elsehook rel="delivery.delivery-address"}                
 				<p>
                     {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>
@@ -224,6 +225,7 @@
                 <h3>{intl l="Invoice address"}</h3>
                 <p>
                     {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                     {$ZIPCODE} {$CITY}<br/>

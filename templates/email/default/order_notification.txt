@@ -9,7 +9,8 @@
 
 {intl l="* Billing address"}
 {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
-{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{if $COMPANY != ""}{$COMPANY}
+{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
@@ -17,7 +18,8 @@
 
 {intl l="* Delivery address"}
 {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{if $COMPANY != ""}{$COMPANY}
+{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}

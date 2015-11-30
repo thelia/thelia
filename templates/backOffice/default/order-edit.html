@@ -355,13 +355,13 @@
                                                         </tr>
 
                                                         {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
-                                                            <tr data-field-class="js-title" data-value="{$TITLE}">
-                                                                <th>{intl l="Title"}</th>
-                                                                <td>{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}</td>
-                                                            </tr>
                                                             <tr data-field-class="js-company">
                                                                 <th>{intl l="Company"}</th>
                                                                 <td>{$COMPANY}</td>
+                                                            </tr>
+                                                            <tr data-field-class="js-title" data-value="{$TITLE}">
+                                                                <th>{intl l="Title"}</th>
+                                                                <td>{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop}</td>
                                                             </tr>
                                                             <tr data-field-class="js-firstname">
                                                                 <th>{intl l="Firstname"}</th>
@@ -435,13 +435,13 @@
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
                                                             {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
-                                                                <tr data-field-class="js-title" data-value="{$TITLE}">
-                                                                    <th>{intl l="Title"}</th>
-                                                                    <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
-                                                                </tr>
                                                                 <tr data-field-class="js-company">
                                                                     <th>{intl l="Company"}</th>
                                                                     <td>{$COMPANY}</td>
+                                                                </tr>
+                                                                <tr data-field-class="js-title" data-value="{$TITLE}">
+                                                                    <th>{intl l="Title"}</th>
+                                                                    <td>{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop}</td>
                                                                 </tr>
                                                                 <tr data-field-class="js-firstname">
                                                                     <th>{intl l="Firstname"}</th>
