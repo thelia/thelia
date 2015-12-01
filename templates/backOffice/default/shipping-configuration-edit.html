@@ -80,7 +80,7 @@
 
                                         {custom_render_form_field field='country_id'}
                                             <select multiple {form_field_attributes field="country_id"}>
-                                                {loop name="country-without-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id}
+                                                {loop name="country-not-in-this-area" type="country" exclude_area=$area_id backend_context="1" lang=$lang_id}
                                                     <option value="{$ID}">{$TITLE}</option>
                                                 {/loop}
                                             </select>
