@@ -12,6 +12,14 @@
             <title locale="en_US">Modules</title>
             <title locale="fr_FR">Modules</title>
         </import_category>
+        <import_category id="thelia.import.contents">
+            <title locale="fr_FR">Contenus</title>
+            <title locale="en_US">Contents</title>
+        </import_category>
+        <import_category id="thelia.import.brands">
+            <title locale="en_US">Brands</title>
+            <title locale="fr_FR">Marques</title>
+        </import_category>
     </import_categories>
 
     <imports>
@@ -76,6 +84,239 @@
                        <li>currency: the currency code (example: EUR, USD)</li>
                        <li>promo_price: the promo price excluding taxes of the product attribute combinations</li>
                        <li>promo: If this value is 0, set the product not in promo, if 1, it sets the product in promo</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+
+        <import id="thelia.import.product_i18" class="Thelia\ImportExport\Import\Type\ProductI18Import" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les informations des produits</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id : L'id du produit</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                    <ul>
+                        <li>product_title : le titre de votre produit</li>
+                        <li>product_description : la description de votre produit</li>
+                        <li>product_chapo : le résumé de votre produit</li>
+                        <li>product_postscriptum : la conclusion de votre produit</li>
+                        <li>page_title : le titre de la page de votre produit</li>
+                        <li>meta_description : la description SEO de votre produit</li>
+                        <li>meta_keywords : les mots clés de votre produit</li>
+                        <li>url : url de votre produit</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import product information</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your product</li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                        <li>product_title : title of your product</li>
+                        <li>product_description : the description of your product</li>
+                        <li>product_chapo : the summary of your product</li>
+                        <li>product_postscriptum : the postcriptum of your product</li>
+                        <li>page_title : the title page of your product</li>
+                        <li>meta_description : SEO description of your product</li>
+                        <li>meta_keywords : keywords of your product</li>
+                        <li>url : url of your product</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+        <import id="thelia.import.category_i18" class="Thelia\ImportExport\Import\Type\CategoryI18Import" category_id="thelia.import.products">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les informations des catégories</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id : L'id de la catégorie</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                    <ul>
+                        <li>category_title : le titre de votre catégorie</li>
+                        <li>category_description : la description de votre catégorie</li>
+                        <li>category_chapo : le résumé de votre catégorie</li>
+                        <li>category_postscriptum : la conclusion de votre catégorie</li>
+                        <li>page_title : le titre de la page de votre catégorie</li>
+                        <li>meta_description : la description SEO de votre catégorie</li>
+                        <li>meta_keywords : les mots clés de votre catégorie</li>
+                        <li>url : url de votre catégorie</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import category information</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your category</li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                        <li>category_title : title of your category</li>
+                        <li>category_description : the description of your category</li>
+                        <li>category_chapo : the summary of your category</li>
+                        <li>category_postscriptum : the postcriptum of your category</li>
+                        <li>page_title : the title page of your category</li>
+                        <li>meta_description : SEO description of your category</li>
+                        <li>meta_keywords : keywords of your category</li>
+                        <li>url : url of your category</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+
+        <import id="thelia.import.content_i18" class="Thelia\ImportExport\Import\Type\ContentI18Import" category_id="thelia.import.contents">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les informations des contenus</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id: L'id du contenu</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                   <ul>
+                        <li>product_title : le titre de votre contenu</li>
+                        <li>product_description : la description de votre contenu</li>
+                        <li>product_chapo : le résumé de votre contenu</li>
+                        <li>product_postscriptum : la conclusion de votre contenu</li>
+                        <li>page_title : le titre de la page de votre contenu</li>
+                        <li>meta_description : la description SEO de votre contenu</li>
+                        <li>meta_keywords : les mots clés de votre contenu</li>
+                        <li>url : url de votre contenu</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import content information</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your content </li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                        <li>content_title : title of your content</li>
+                        <li>content_description : the description of your content</li>
+                        <li>content_chapo : the summary of your content</li>
+                        <li>content_postscriptum : the postcriptum of your content</li>
+                        <li>page_title : the title page of your content</li>
+                        <li>meta_description : SEO description of your content</li>
+                        <li>meta_keywords : keywords of your content</li>
+                        <li>url : url of your content</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+        <import id="thelia.import.folder_i18" class="Thelia\ImportExport\Import\Type\FolderI18Import" category_id="thelia.import.contents">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les informations des dossiers</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id: L'id du dossier</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                   <ul>
+                        <li>folder_title : le titre de votre dossier</li>
+                        <li>folder_description : la description de votre dossier</li>
+                        <li>folder_chapo : le résumé de votre dossier</li>
+                        <li>folder_postscriptum : la conclusion de votre dossier</li>
+                        <li>page_title : le titre de la page de votre dossier</li>
+                        <li>meta_description : la description SEO de votre dossier</li>
+                        <li>meta_keywords : les mots clés de votre dossier</li>
+                        <li>url : url de votre dossier</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import folder information</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your folder </li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                        <li>folder_title : title of your folder</li>
+                        <li>folder_description : the description of your folder</li>
+                        <li>folder_chapo : the summary of your folder</li>
+                        <li>folder_postscriptum : the postcriptum of your folder</li>
+                        <li>page_title : the title page of your folder</li>
+                        <li>meta_description : SEO description of your folder</li>
+                        <li>meta_keywords : keywords of your folder</li>
+                        <li>url : url of your folder</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+        </import>
+
+        <import id="thelia.import.brand_i18" class="Thelia\ImportExport\Import\Type\BrandI18Import" category_id="thelia.import.brands">
+            <import_descriptive locale="fr_FR">
+                <title>Importer les informations des marques</title>
+                <description>
+                    <![CDATA[
+                    Votre fichier doit avoir les colonnes suivantes:
+                    <ul>
+                        <li>id: L'id de la marque</li>
+                    </ul>
+                    Il peut aussi optionnellement avoir ces colonnes:
+                   <ul>
+                        <li>folder_title : le titre de votre marque</li>
+                        <li>folder_description : la description de votre marque</li>
+                        <li>folder_chapo : le résumé de votre marque</li>
+                        <li>folder_postscriptum : la conclusion de votre marque</li>
+                        <li>page_title : le titre de la page de votre marque</li>
+                        <li>meta_description : la description SEO de votre marque</li>
+                        <li>meta_keywords : les mots clés de votre marque</li>
+                        <li>url : url de votre marque</li>
+                    </ul>
+                    ]]>
+                </description>
+            </import_descriptive>
+            <import_descriptive locale="en_US">
+                <title>Import brand information</title>
+                <description>
+                    <![CDATA[
+                    Your file must have the following columns:
+                    <ul>
+                        <li>id: The id of your brand </li>
+                    </ul>
+                    It may also optionally have those columns:
+                    <ul>
+                        <li>brand_title : title of your brand</li>
+                        <li>brand_description : the description of your brand</li>
+                        <li>brand_chapo : the summary of your brand</li>
+                        <li>brand_postscriptum : the postcriptum of your brand</li>
+                        <li>page_title : the title page of your brand</li>
+                        <li>meta_description : SEO description of your brand</li>
+                        <li>meta_keywords : keywords of your brand</li>
+                        <li>url : url of your brand</li>
                     </ul>
                     ]]>
                 </description>

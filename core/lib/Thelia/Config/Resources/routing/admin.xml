@@ -1310,6 +1310,13 @@
         <default key="_controller">Thelia\Controller\Admin\TranslationsController::updateAction</default>
     </route>
 
+    <route id="admin.configuration.translations-db" path="/admin/configuration/translations-db">
+        <default key="_controller">Thelia\Controller\Admin\TranslationsControllerDb::defaultAction</default>
+    </route>
+    <route id="admin.configuration.translations-db.update" path="/admin/configuration/translations-db/update">
+        <default key="_controller">Thelia\Controller\Admin\TranslationsControllerDb::updateAction</default>
+    </route>
+
     <!-- Routes to the Brands controller -->
 
     <route id="admin.brand.default" path="/admin/brand">
