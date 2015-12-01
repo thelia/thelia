@@ -107,22 +107,68 @@ class CartItem extends BaseCartItem
         return $product;
     }
 
+    /**
+     * @param Country $country
+     * @return float
+     */
     public function getRealTaxedPrice(Country $country)
     {
         return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country) : $this->getTaxedPrice($country);
     }
 
+    /**
+     * @param Country $country
+     * @return float
+     */
     public function getTaxedPrice(Country $country)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice());
     }
 
+    /**
+     * @param Country $country
+     * @return float
+     */
     public function getTaxedPromoPrice(Country $country)
     {
         $taxCalculator = new Calculator();
 
-        return round($taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()), 2);
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice());
+    }
+
+    /**
+     * @since Version 2.3
+     * @param Country $country
+     * @return float
+     */
+    public function getTotalRealTaxedPrice(Country $country)
+    {
+        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country) : $this->getTotalTaxedPrice($country);
+    }
+
+    /**
+     * @since Version 2.3
+     * @param Country $country
+     * @return float
+     */
+    public function getTotalTaxedPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()*$this->getQuantity());
+    }
+
+    /**
+     * @since Version 2.3
+     * @param Country $country
+     * @return float
+     */
+    public function getTotalTaxedPromoPrice(Country $country)
+    {
+        $taxCalculator = new Calculator();
+
+        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
     }
 }
