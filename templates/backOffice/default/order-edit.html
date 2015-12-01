@@ -143,10 +143,12 @@
                                                         {assign "realPrice" $PROMO_PRICE}
                                                         {assign "realTax" $PROMO_PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                                                        {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
                                                     {else}
                                                         {assign "realPrice" $PRICE}
                                                         {assign "realTax" $PRICE_TAX}
                                                         {assign "realTaxedPrice" $TAXED_PRICE}
+                                                        {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
                                                     {/if}
                                                     {hook name="order-edit.before-order-product-row" location="before-order-product-row" order_id=$order_id order_product_id=$ID}
                                                     <tr>
@@ -177,7 +179,7 @@
                                                         <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
                                                         <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
                                                         <td class="text-right">{$QUANTITY}</td>
-                                                        <td class="text-right">{format_money number=$realTaxedPrice * $QUANTITY symbol=$orderCurrency}</td>
+                                                        <td class="text-right">{format_money number=$realTotalPrice symbol=$orderCurrency}</td>
                                                     </tr>
                                                     {hook name="order-edit.after-order-product-row" location="after-order-product-row" order_id=$order_id order_product_id=$ID}
                                                 {/loop}

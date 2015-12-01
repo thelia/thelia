@@ -185,10 +185,12 @@
                     {assign "realPrice" $PROMO_PRICE}
                     {assign "realTax" $PROMO_PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PROMO_PRICE}
                 {else}
                     {assign "realPrice" $PRICE}
                     {assign "realTax" $PRICE_TAX}
                     {assign "realTaxedPrice" $TAXED_PRICE}
+                    {assign "realTotalPrice" $TOTAL_TAXED_PRICE}
                 {/if}
 
                 {$taxes[{$TAX_RULE_TITLE}][] = $realTax * $QUANTITY}
@@ -207,7 +209,7 @@
                     <td class="unitprice"><p>{format_money number=$realPrice symbol=$orderCurrency}</p></td>
                     <td class="unitprice"><p>{format_money number=$realTaxedPrice symbol=$orderCurrency}</p></td>
                     <td class="qty"><p>{$QUANTITY}</p></td>
-                    <td class="subprice"><p>{format_money number={$realTaxedPrice * $QUANTITY} symbol=$orderCurrency}</p></td>
+                    <td class="subprice"><p>{format_money number={$realTotalPrice} symbol=$orderCurrency}</p></td>
                 </tr>
                 {ifhook rel="account-order.product-extra"}
                 <tr>
