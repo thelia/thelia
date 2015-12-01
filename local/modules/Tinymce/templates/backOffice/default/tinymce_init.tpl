@@ -41,6 +41,15 @@
             "fullscreen code youtube importcss"
         ],
 
+        setup: function(editor) {
+            editor.on('FullscreenStateChanged', function(e) {
+                if (e.state) {
+                    $('#wrapper > nav').hide();
+                } else {
+                    $('#wrapper > nav').show();
+                }
+            });
+        },
         // See available controls at http://www.tinymce.com/wiki.php/Controls
         toolbar1: "undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | hr | styleselect | filemanager | code | fullscreen",
         toolbar2: "link unlink anchor | image responsivefilemanager media youtube | forecolor backcolor | charmap | print preview ",
