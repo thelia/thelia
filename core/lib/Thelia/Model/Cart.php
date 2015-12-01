@@ -119,7 +119,7 @@ class Cart extends BaseCart
         $total = 0;
 
         foreach ($this->getCartItems() as $cartItem) {
-            $total += $cartItem->getRealTaxedPrice($country) * $cartItem->getQuantity();
+            $total += $cartItem->getTotalRealTaxedPrice($country);
         }
 
         if ($discount) {

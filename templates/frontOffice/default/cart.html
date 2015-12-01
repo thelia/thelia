@@ -92,11 +92,11 @@
                             </td>
                             <td class="unitprice">
                                 {if $IS_PROMO == 1}
-                                    {assign "real_price" $PROMO_TAXED_PRICE}
+                                    {assign "real_total_price" $TOTAL_PROMO_TAXED_PRICE}
                                     <div class="special-price"><span class="price">{format_money number=$PROMO_TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
                                     <small class="old-price">{intl l="instead of"} <span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></small>
                                 {else}
-                                    {assign "real_price" $TAXED_PRICE}
+                                    {assign "real_total_price" $TOTAL_TAXED_PRICE}
                                     <div class="special-price"><span class="price">{format_money number=$TAXED_PRICE symbol={currency attr="symbol"}}</span></div>
                                 {/if}
                             </td>
@@ -121,7 +121,7 @@
                                 </div>
                             </td>
                             <td class="subprice">
-                                <span class="price">{format_money number={$real_price * $QUANTITY} symbol={currency attr="symbol"}}</span>
+                                <span class="price">{format_money number={$real_total_price} symbol={currency attr="symbol"}}</span>
                             </td>
                         </tr>
                         {/loop}
