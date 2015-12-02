@@ -111,64 +111,69 @@ class CartItem extends BaseCartItem
      * @param Country $country
      * @return float
      */
-    public function getRealTaxedPrice(Country $country)
+    public function getRealTaxedPrice(Country $country, State $state = null)
     {
-        return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country) : $this->getTaxedPrice($country);
+        return $this->getPromo() == 1 ? $this->getTaxedPromoPrice($country, $state) : $this->getTaxedPrice($country, $state);
     }
 
     /**
      * @param Country $country
+     * @param State|null $state
      * @return float
      */
-    public function getTaxedPrice(Country $country)
+    public function getTaxedPrice(Country $country, State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice());
     }
 
     /**
      * @param Country $country
+     * @param State|null $state
      * @return float
      */
-    public function getTaxedPromoPrice(Country $country)
+    public function getTaxedPromoPrice(Country $country, State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice());
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
+     * @param State|null $state
      * @return float
      */
-    public function getTotalRealTaxedPrice(Country $country)
+    public function getTotalRealTaxedPrice(Country $country, State $state = null)
     {
-        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country) : $this->getTotalTaxedPrice($country);
+        return $this->getPromo() == 1 ? $this->getTotalTaxedPromoPrice($country, $state) : $this->getTotalTaxedPrice($country, $state);
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
+     * @param State|null $state
      * @return float
      */
-    public function getTotalTaxedPrice(Country $country)
+    public function getTotalTaxedPrice(Country $country, State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPrice()*$this->getQuantity());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPrice()*$this->getQuantity());
     }
 
     /**
      * @since Version 2.3
      * @param Country $country
+     * @param State|null $state
      * @return float
      */
-    public function getTotalTaxedPromoPrice(Country $country)
+    public function getTotalTaxedPromoPrice(Country $country, State $state = null)
     {
         $taxCalculator = new Calculator();
 
-        return $taxCalculator->load($this->getProduct(), $country)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
+        return $taxCalculator->load($this->getProduct(), $country, $state)->getTaxedPrice($this->getPromoPrice()*$this->getQuantity());
     }
 }
