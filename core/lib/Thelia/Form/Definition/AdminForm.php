@@ -126,7 +126,7 @@ final class AdminForm
 
     const LANG_UPDATE = 'thelia.lang.update';
     const LANG_CREATE = 'thelia.lang.create';
-    const LANG_DEFAULT_BEHAVIOR = 'thelia.lang.default_BEHAVIOR';
+    const LANG_DEFAULT_BEHAVIOR = 'thelia.lang.defaultBehavior';
     const LANG_URL = 'thelia.lang.url';
 
     const CONFIG_STORE = 'thelia.configuration.store';
