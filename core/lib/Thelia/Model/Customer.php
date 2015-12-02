@@ -51,6 +51,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param  null                                      $company
      * @param  null                                      $ref
      * @param  bool                                      $forceEmailUpdate true if the email address could be updated.
+     * @param  int                                       $stateId          customer state id (from State table)
      * @throws \Exception
      * @throws \Propel\Runtime\Exception\PropelException
      */
@@ -75,7 +76,7 @@ class Customer extends BaseCustomer implements UserInterface
         $company = null,
         $ref = null,
         $forceEmailUpdate = false,
-        $stateId
+        $stateId = null
     ) {
         $this
             ->setTitleId($titleId)
