@@ -183,16 +183,19 @@ DROP TABLE IF EXISTS `tax_rule_country`;
 
 CREATE TABLE `tax_rule_country`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `tax_rule_id` INTEGER NOT NULL,
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `tax_id` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`tax_rule_id`,`country_id`,`tax_id`),
+    PRIMARY KEY (`id`),
     INDEX `idx_tax_rule_country_tax_id` (`tax_id`),
     INDEX `idx_tax_rule_country_tax_rule_id` (`tax_rule_id`),
     INDEX `idx_tax_rule_country_country_id` (`country_id`),
+    INDEX `idx_tax_rule_country_state_id` (`state_id`),
     INDEX `idx_tax_rule_country_tax_rule_id_country_id_position` (`tax_rule_id`, `country_id`, `position`),
     CONSTRAINT `fk_tax_rule_country_tax_id`
         FOREIGN KEY (`tax_id`)
@@ -207,6 +210,11 @@ CREATE TABLE `tax_rule_country`
     CONSTRAINT `fk_tax_rule_country_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_tax_rule_country_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';

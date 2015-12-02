@@ -173,23 +173,33 @@ CREATE TABLE `state`
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
 ALTER TABLE `address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
-ALTER TABLE product_sale_elements_product_document
+ALTER TABLE `address`
     ADD CONSTRAINT `fk_address_state_id`
     FOREIGN KEY (`state_id`)
     REFERENCES `state` (`id`)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
-ALTER TABLE `address` ADD INDEX INDEX `FI_address_state_id` (`state_id`);
+ALTER TABLE `address` ADD INDEX `FI_address_state_id` (`state_id`);
 
 ALTER TABLE `order_address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
-ALTER TABLE product_sale_elements_product_document
+ALTER TABLE `order_address`
     ADD CONSTRAINT `fk_order_address_state_id`
     FOREIGN KEY (`state_id`)
     REFERENCES `state` (`id`)
     ON UPDATE RESTRICT
     ON DELETE RESTRICT;
-ALTER TABLE `order_address` ADD INDEX INDEX `FI_order_address_state_id` (`state_id`);
+ALTER TABLE `order_address` ADD INDEX `FI_order_address_state_id` (`state_id`);
 
+ALTER TABLE `tax_rule_country` DROP PRIMARY KEY;
+ALTER TABLE `tax_rule_country` ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
+ALTER TABLE `tax_rule_country` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
+ALTER TABLE `tax_rule_country`
+    ADD CONSTRAINT `fk_tax_rule_country_state_id`
+    FOREIGN KEY (`state_id`)
+    REFERENCES `state` (`id`)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE;
+ALTER TABLE `tax_rule_country` INDEX `idx_tax_rule_country_state_id` (`state_id`);
 
 /*
 for United States and Canada we create new country (not visible) and link them to states
