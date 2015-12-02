@@ -219,7 +219,6 @@
 
                 {form_field field="state"}
                     {assign var="customer_state_id" value={$value|default:$STATE}}
-                    State : {$customer_state_id}
                     <div class="form-group group-state {if $error}has-error{/if}">
                         <label class="control-label col-sm-3" for="{$label_attr.for}">{$label}:{if $required} <span class="required">*</span>{/if}</label>
                         <div class="control-input col-sm-5">
