@@ -50,7 +50,7 @@ class TokenProvider
     protected $tokenName;
 
     /**
-     * @param SessionInterface    $session
+     * @param Request $request
      * @param TranslatorInterface $translator
      * @param $tokenName
      */
@@ -82,7 +82,7 @@ class TokenProvider
     }
 
     /**
-     * @param $entryValue
+     * @param string $entryValue
      * @return bool
      * @throws \Thelia\Core\Security\Exception\TokenAuthenticationException
      */
@@ -92,14 +92,10 @@ class TokenProvider
             throw new TokenAuthenticationException(
                 "Tried to check a token without assigning it before"
             );
-        } else {
-            if ($this->token !== $entryValue) {
-                throw new TokenAuthenticationException(
-                    "Tried to validate an invalid token"
-                );
-            } else {
-                $this->refreshToken();
-            }
+        } elseif ($this->token !== $entryValue) {
+            throw new TokenAuthenticationException(
+                "Tried to validate an invalid token"
+            );
         }
 
         return true;
@@ -118,6 +114,7 @@ class TokenProvider
     {
         return self::generateToken();
     }
+
     /**
      * Same method as getToken but can be called statically
      *
@@ -134,6 +131,7 @@ class TokenProvider
     }
 
     /**
+     * @param int $length
      * @return string
      */
     protected static function getOpenSSLRandom($length = 40)
