@@ -12,6 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Event\Country\CountryCreateEvent;
 use Thelia\Core\Event\Country\CountryDeleteEvent;
 use Thelia\Core\Event\Country\CountryToggleDefaultEvent;
@@ -22,7 +23,13 @@ use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Form\Definition\AdminForm;
 use Thelia\Log\Tlog;
+use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
+use Thelia\Model\Map\CountryTableMap;
+use Thelia\Model\Map\StateTableMap;
+use Thelia\Model\State;
+use Thelia\Model\StateQuery;
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 /**
  * Class CustomerController
@@ -277,4 +284,43 @@ class CountryController extends AbstractCrudController
         return new CountryToggleVisibilityEvent($this->getExistingObject());
     }
 
+    public function getDataAction()
+    {
+        $responseData = [];
+
+        /** @var CountryQuery $search */
+        $countries = CountryQuery::create()
+            ->filterByVisible(true)
+            ->joinWithI18n($this->getCurrentEditionLocale())
+        ;
+
+        /** @var Country $country */
+        foreach ($countries as $country) {
+            $currentCountry = [
+                'id' => $country->getId(),
+                'title' => $country->getTitle(),
+                'hasStates' => $country->getHasStates(),
+                'states' => []
+            ];
+
+            if ($country->getHasStates()) {
+                $states = StateQuery::create()
+                    ->filterByVisible(true)
+                    ->joinWithI18n($this->getCurrentEditionLocale())
+                ;
+
+                /** @var State $state */
+                foreach ($states as $state) {
+                    $currentCountry['states'][] = [
+                        'id' => $state->getId(),
+                        'title' => $state->getTitle(),
+                    ];
+                }
+            }
+
+            $responseData[] = $currentCountry;
+        }
+
+        return $this->jsonResponse(json_encode($responseData));
+    }
 }

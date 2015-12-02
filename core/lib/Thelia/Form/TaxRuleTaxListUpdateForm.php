@@ -14,7 +14,8 @@ namespace Thelia\Form;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Core\Translation\Translator;
-use Thelia\Model\CountryQuery;
+use Thelia\Model\Base\CountryQuery;
+use Thelia\Model\StateQuery;
 use Thelia\Model\TaxQuery;
 use Thelia\Model\TaxRuleQuery;
 use Thelia\Type\JsonType;
@@ -23,48 +24,81 @@ class TaxRuleTaxListUpdateForm extends BaseForm
 {
     protected function buildForm()
     {
-        $countryList = array();
-        foreach (CountryQuery::create()->find() as $country) {
-            $countryList[$country->getId()] = $country->getId();
-        }
-
         $this->formBuilder
-            ->add("id", "hidden", array(
+            ->add(
+                "id",
+                "hidden",
+                [
                     "required" => true,
-                    "constraints" => array(
+                    "constraints" => [
                         new Constraints\NotBlank(),
                         new Constraints\Callback(
-                            array(
-                                "methods" => array(
-                                    array($this, "verifyTaxRuleId"),
-                                ),
-                            )
+                            [
+                                "methods" => [
+                                    [$this, "verifyTaxRuleId"],
+                                ],
+                            ]
                         ),
-                    ),
-            ))
-            ->add("tax_list", "hidden", array(
-                "required" => true,
-                "attr" => array(
-                    "id" => 'tax_list',
-                ),
-                "constraints" => array(
-                    new Constraints\Callback(
-                        array(
-                            "methods" => array(
-                                array($this, "verifyTaxList"),
-                            ),
-                        )
-                    ),
-                ),
-            ))
-            ->add("country_list", "choice", array(
-                "choices" => $countryList,
-                "required" => true,
-                "multiple" => true,
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                ),
-            ))
+                    ],
+                ]
+            )
+            ->add(
+                "tax_list",
+                "hidden",
+                [
+                    "required" => true,
+                    "attr" => [
+                        "id" => 'tax_list',
+                    ],
+                    "constraints" => [
+                        new Constraints\Callback(
+                            [
+                                "methods" => [
+                                    [$this, "verifyTaxList"],
+                                ],
+                            ]
+                        ),
+                    ],
+                ]
+            )
+            ->add(
+                "country_list",
+                "hidden",
+                [
+                    "required" => true,
+                    "attr" => [
+                        "id" => 'country_list',
+                    ],
+                    "constraints" => [
+                        new Constraints\Callback(
+                            [
+                                "methods" => [
+                                    [$this, "verifyCountryList"],
+                                ],
+                            ]
+                        ),
+                    ],
+                ]
+            )
+            ->add(
+                "country_deleted_list",
+                "hidden",
+                [
+                    "required" => true,
+                    "attr" => [
+                        "id" => 'country_deleted_list',
+                    ],
+                    "constraints" => [
+                        new Constraints\Callback(
+                            [
+                                "methods" => [
+                                    [$this, "verifyCountryList"],
+                                ],
+                            ]
+                        ),
+                    ],
+                ]
+            )
         ;
     }
 
@@ -76,7 +110,8 @@ class TaxRuleTaxListUpdateForm extends BaseForm
     public function verifyTaxRuleId($value, ExecutionContextInterface $context)
     {
         $taxRule = TaxRuleQuery::create()
-            ->findPk($value);
+            ->findPk($value)
+        ;
 
         if (null === $taxRule) {
             $context->addViolation(Translator::getInstance()->trans("Tax rule ID not found"));
@@ -102,7 +137,8 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                     } else {
                         $taxModel = TaxQuery::create()->findPk($taxLevel2);
                         if (null === $taxModel) {
-                            $context->addViolation(Translator::getInstance()->trans("Tax ID not found in tax list JSON"));
+                            $context->addViolation(Translator::getInstance()
+                                ->trans("Tax ID not found in tax list JSON"));
                         }
                     }
                 }
@@ -111,6 +147,46 @@ class TaxRuleTaxListUpdateForm extends BaseForm
                 if (null === $taxModel) {
                     $context->addViolation(Translator::getInstance()->trans("Tax ID not found in tax list JSON"));
                 }
+            }
+        }
+    }
+
+    public function verifyCountryList($value, ExecutionContextInterface $context)
+    {
+        $jsonType = new JsonType();
+        if (!$jsonType->isValid($value)) {
+            $context->addViolation(Translator::getInstance()->trans("Country list is not valid JSON"));
+        }
+
+        $countryList = json_decode($value, true);
+
+        foreach ($countryList as $countryItem) {
+            if (is_array($countryItem)) {
+                $country = CountryQuery::create()->findPk($countryItem[0]);
+                if (null === $country) {
+                    $context->addViolation(
+                        Translator::getInstance()->trans(
+                            "Country ID %id not found",
+                            ['%id' => $countryItem[0]]
+                        )
+                    );
+                }
+
+                if ($countryItem[1] == "0") {
+                    continue;
+                }
+
+                $state = StateQuery::create()->findPk($countryItem[1]);
+                if (null === $state) {
+                    $context->addViolation(
+                        Translator::getInstance()->trans(
+                            "State ID %id not found",
+                            ['%id' => $countryItem[1]]
+                        )
+                    );
+                }
+            } else {
+                $context->addViolation(Translator::getInstance()->trans("Wrong country definition"));
             }
         }
     }

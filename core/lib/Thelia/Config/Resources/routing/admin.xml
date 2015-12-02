@@ -889,6 +889,10 @@
         <default key="_controller">Thelia\Controller\Admin\CountryController::setToggleVisibilityAction</default>
     </route>
 
+    <route id="admin.configuration.countries.data" path="/admin/configuration/countries/data">
+        <default key="_controller">Thelia\Controller\Admin\CountryController::getDataAction</default>
+    </route>
+
     <!-- end countries routes management -->
 
     <!-- States routes management -->
@@ -1288,6 +1292,11 @@
 
     <route id="admin.configuration.taxes-rules.set-default" path="/admin/configuration/taxes_rules/update/set_default/{tax_rule_id}">
         <default key="_controller">Thelia\Controller\Admin\TaxRuleController::setDefaultAction</default>
+        <requirement key="tax_rule_id">\d+</requirement>
+    </route>
+
+    <route id="admin.configuration.taxes-rules.get" path="/admin/configuration/taxes_rules/specs/{tax_rule_id}">
+        <default key="_controller">Thelia\Controller\Admin\TaxRuleController::specsAction</default>
         <requirement key="tax_rule_id">\d+</requirement>
     </route>
 
