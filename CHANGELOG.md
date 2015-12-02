@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1821) Fix the value for constant AdminForm::LANG_DEFAULT_BEHAVIOR, Resolve ##1820
 - (related to #1818) Fix menu hook block to integrate main link if it's used #1818
 - (related to #1806) Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE
 - (related to #1796) Fix regression in OrderAddressEvent cell phone can not be required in the constructor
