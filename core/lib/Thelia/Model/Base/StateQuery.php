@@ -44,6 +44,10 @@ use Thelia\Model\Map\StateTableMap;
  * @method     ChildStateQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
  * @method     ChildStateQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
  *
+ * @method     ChildStateQuery leftJoinTaxRuleCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleCountry relation
+ * @method     ChildStateQuery rightJoinTaxRuleCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleCountry relation
+ * @method     ChildStateQuery innerJoinTaxRuleCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleCountry relation
+ *
  * @method     ChildStateQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
  * @method     ChildStateQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method     ChildStateQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
@@ -562,6 +566,79 @@ abstract class StateQuery extends ModelCriteria
         return $this
             ->joinCountry($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\TaxRuleCountry object
+     *
+     * @param \Thelia\Model\TaxRuleCountry|ObjectCollection $taxRuleCountry  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStateQuery The current query, for fluid interface
+     */
+    public function filterByTaxRuleCountry($taxRuleCountry, $comparison = null)
+    {
+        if ($taxRuleCountry instanceof \Thelia\Model\TaxRuleCountry) {
+            return $this
+                ->addUsingAlias(StateTableMap::ID, $taxRuleCountry->getStateId(), $comparison);
+        } elseif ($taxRuleCountry instanceof ObjectCollection) {
+            return $this
+                ->useTaxRuleCountryQuery()
+                ->filterByPrimaryKeys($taxRuleCountry->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTaxRuleCountry() only accepts arguments of type \Thelia\Model\TaxRuleCountry or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TaxRuleCountry relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildStateQuery The current query, for fluid interface
+     */
+    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TaxRuleCountry');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TaxRuleCountry');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TaxRuleCountry relation TaxRuleCountry object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
+     */
+    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTaxRuleCountry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TaxRuleCountry', '\Thelia\Model\TaxRuleCountryQuery');
     }
 
     /**

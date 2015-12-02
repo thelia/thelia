@@ -2465,10 +2465,7 @@ abstract class Country implements ActiveRecordInterface
         $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
 
 
-        //since at least one column in the foreign key is at the same time a PK
-        //we can not just set a PK to NULL in the lines below. We have to store
-        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->taxRuleCountriesScheduledForDeletion = clone $taxRuleCountriesToDelete;
+        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
 
         foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setCountry(null);
@@ -2614,6 +2611,31 @@ abstract class Country implements ActiveRecordInterface
     {
         $query = ChildTaxRuleCountryQuery::create(null, $criteria);
         $query->joinWith('TaxRule', $joinBehavior);
+
+        return $this->getTaxRuleCountries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Country is new, it will return
+     * an empty collection; or if this Country has previously
+     * been saved, it will retrieve related TaxRuleCountries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Country.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildTaxRuleCountry[] List of ChildTaxRuleCountry objects
+     */
+    public function getTaxRuleCountriesJoinState($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('State', $joinBehavior);
 
         return $this->getTaxRuleCountries($query, $con);
     }

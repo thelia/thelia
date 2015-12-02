@@ -27,6 +27,8 @@ use Thelia\Model\State as ChildState;
 use Thelia\Model\StateI18n as ChildStateI18n;
 use Thelia\Model\StateI18nQuery as ChildStateI18nQuery;
 use Thelia\Model\StateQuery as ChildStateQuery;
+use Thelia\Model\TaxRuleCountry as ChildTaxRuleCountry;
+use Thelia\Model\TaxRuleCountryQuery as ChildTaxRuleCountryQuery;
 use Thelia\Model\Map\StateTableMap;
 
 abstract class State implements ActiveRecordInterface
@@ -106,6 +108,12 @@ abstract class State implements ActiveRecordInterface
     protected $aCountry;
 
     /**
+     * @var        ObjectCollection|ChildTaxRuleCountry[] Collection to store aggregation of ChildTaxRuleCountry objects.
+     */
+    protected $collTaxRuleCountries;
+    protected $collTaxRuleCountriesPartial;
+
+    /**
      * @var        ObjectCollection|ChildAddress[] Collection to store aggregation of ChildAddress objects.
      */
     protected $collAddresses;
@@ -144,6 +152,12 @@ abstract class State implements ActiveRecordInterface
      * @var        array[ChildStateI18n]
      */
     protected $currentTranslations;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $taxRuleCountriesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -785,6 +799,8 @@ abstract class State implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCountry = null;
+            $this->collTaxRuleCountries = null;
+
             $this->collAddresses = null;
 
             $this->collOrderAddresses = null;
@@ -934,6 +950,23 @@ abstract class State implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->taxRuleCountriesScheduledForDeletion !== null) {
+                if (!$this->taxRuleCountriesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\TaxRuleCountryQuery::create()
+                        ->filterByPrimaryKeys($this->taxRuleCountriesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->taxRuleCountriesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collTaxRuleCountries !== null) {
+            foreach ($this->collTaxRuleCountries as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             if ($this->addressesScheduledForDeletion !== null) {
@@ -1187,6 +1220,9 @@ abstract class State implements ActiveRecordInterface
             if (null !== $this->aCountry) {
                 $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
+            if (null !== $this->collTaxRuleCountries) {
+                $result['TaxRuleCountries'] = $this->collTaxRuleCountries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1369,6 +1405,12 @@ abstract class State implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
+            foreach ($this->getTaxRuleCountries() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTaxRuleCountry($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getAddresses() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAddress($relObj->copy($deepCopy));
@@ -1479,6 +1521,9 @@ abstract class State implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('TaxRuleCountry' == $relationName) {
+            return $this->initTaxRuleCountries();
+        }
         if ('Address' == $relationName) {
             return $this->initAddresses();
         }
@@ -1488,6 +1533,299 @@ abstract class State implements ActiveRecordInterface
         if ('StateI18n' == $relationName) {
             return $this->initStateI18ns();
         }
+    }
+
+    /**
+     * Clears out the collTaxRuleCountries collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTaxRuleCountries()
+     */
+    public function clearTaxRuleCountries()
+    {
+        $this->collTaxRuleCountries = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collTaxRuleCountries collection loaded partially.
+     */
+    public function resetPartialTaxRuleCountries($v = true)
+    {
+        $this->collTaxRuleCountriesPartial = $v;
+    }
+
+    /**
+     * Initializes the collTaxRuleCountries collection.
+     *
+     * By default this just sets the collTaxRuleCountries collection to an empty array (like clearcollTaxRuleCountries());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTaxRuleCountries($overrideExisting = true)
+    {
+        if (null !== $this->collTaxRuleCountries && !$overrideExisting) {
+            return;
+        }
+        $this->collTaxRuleCountries = new ObjectCollection();
+        $this->collTaxRuleCountries->setModel('\Thelia\Model\TaxRuleCountry');
+    }
+
+    /**
+     * Gets an array of ChildTaxRuleCountry objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildState is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildTaxRuleCountry[] List of ChildTaxRuleCountry objects
+     * @throws PropelException
+     */
+    public function getTaxRuleCountries($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTaxRuleCountriesPartial && !$this->isNew();
+        if (null === $this->collTaxRuleCountries || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTaxRuleCountries) {
+                // return empty collection
+                $this->initTaxRuleCountries();
+            } else {
+                $collTaxRuleCountries = ChildTaxRuleCountryQuery::create(null, $criteria)
+                    ->filterByState($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collTaxRuleCountriesPartial && count($collTaxRuleCountries)) {
+                        $this->initTaxRuleCountries(false);
+
+                        foreach ($collTaxRuleCountries as $obj) {
+                            if (false == $this->collTaxRuleCountries->contains($obj)) {
+                                $this->collTaxRuleCountries->append($obj);
+                            }
+                        }
+
+                        $this->collTaxRuleCountriesPartial = true;
+                    }
+
+                    reset($collTaxRuleCountries);
+
+                    return $collTaxRuleCountries;
+                }
+
+                if ($partial && $this->collTaxRuleCountries) {
+                    foreach ($this->collTaxRuleCountries as $obj) {
+                        if ($obj->isNew()) {
+                            $collTaxRuleCountries[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTaxRuleCountries = $collTaxRuleCountries;
+                $this->collTaxRuleCountriesPartial = false;
+            }
+        }
+
+        return $this->collTaxRuleCountries;
+    }
+
+    /**
+     * Sets a collection of TaxRuleCountry objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $taxRuleCountries A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildState The current object (for fluent API support)
+     */
+    public function setTaxRuleCountries(Collection $taxRuleCountries, ConnectionInterface $con = null)
+    {
+        $taxRuleCountriesToDelete = $this->getTaxRuleCountries(new Criteria(), $con)->diff($taxRuleCountries);
+
+
+        $this->taxRuleCountriesScheduledForDeletion = $taxRuleCountriesToDelete;
+
+        foreach ($taxRuleCountriesToDelete as $taxRuleCountryRemoved) {
+            $taxRuleCountryRemoved->setState(null);
+        }
+
+        $this->collTaxRuleCountries = null;
+        foreach ($taxRuleCountries as $taxRuleCountry) {
+            $this->addTaxRuleCountry($taxRuleCountry);
+        }
+
+        $this->collTaxRuleCountries = $taxRuleCountries;
+        $this->collTaxRuleCountriesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related TaxRuleCountry objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related TaxRuleCountry objects.
+     * @throws PropelException
+     */
+    public function countTaxRuleCountries(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collTaxRuleCountriesPartial && !$this->isNew();
+        if (null === $this->collTaxRuleCountries || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTaxRuleCountries) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getTaxRuleCountries());
+            }
+
+            $query = ChildTaxRuleCountryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByState($this)
+                ->count($con);
+        }
+
+        return count($this->collTaxRuleCountries);
+    }
+
+    /**
+     * Method called to associate a ChildTaxRuleCountry object to this object
+     * through the ChildTaxRuleCountry foreign key attribute.
+     *
+     * @param    ChildTaxRuleCountry $l ChildTaxRuleCountry
+     * @return   \Thelia\Model\State The current object (for fluent API support)
+     */
+    public function addTaxRuleCountry(ChildTaxRuleCountry $l)
+    {
+        if ($this->collTaxRuleCountries === null) {
+            $this->initTaxRuleCountries();
+            $this->collTaxRuleCountriesPartial = true;
+        }
+
+        if (!in_array($l, $this->collTaxRuleCountries->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddTaxRuleCountry($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param TaxRuleCountry $taxRuleCountry The taxRuleCountry object to add.
+     */
+    protected function doAddTaxRuleCountry($taxRuleCountry)
+    {
+        $this->collTaxRuleCountries[]= $taxRuleCountry;
+        $taxRuleCountry->setState($this);
+    }
+
+    /**
+     * @param  TaxRuleCountry $taxRuleCountry The taxRuleCountry object to remove.
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function removeTaxRuleCountry($taxRuleCountry)
+    {
+        if ($this->getTaxRuleCountries()->contains($taxRuleCountry)) {
+            $this->collTaxRuleCountries->remove($this->collTaxRuleCountries->search($taxRuleCountry));
+            if (null === $this->taxRuleCountriesScheduledForDeletion) {
+                $this->taxRuleCountriesScheduledForDeletion = clone $this->collTaxRuleCountries;
+                $this->taxRuleCountriesScheduledForDeletion->clear();
+            }
+            $this->taxRuleCountriesScheduledForDeletion[]= $taxRuleCountry;
+            $taxRuleCountry->setState(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related TaxRuleCountries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildTaxRuleCountry[] List of ChildTaxRuleCountry objects
+     */
+    public function getTaxRuleCountriesJoinTax($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('Tax', $joinBehavior);
+
+        return $this->getTaxRuleCountries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related TaxRuleCountries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildTaxRuleCountry[] List of ChildTaxRuleCountry objects
+     */
+    public function getTaxRuleCountriesJoinTaxRule($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('TaxRule', $joinBehavior);
+
+        return $this->getTaxRuleCountries($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related TaxRuleCountries from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildTaxRuleCountry[] List of ChildTaxRuleCountry objects
+     */
+    public function getTaxRuleCountriesJoinCountry($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildTaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('Country', $joinBehavior);
+
+        return $this->getTaxRuleCountries($query, $con);
     }
 
     /**
@@ -2307,6 +2645,11 @@ abstract class State implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTaxRuleCountries) {
+                foreach ($this->collTaxRuleCountries as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collAddresses) {
                 foreach ($this->collAddresses as $o) {
                     $o->clearAllReferences($deep);
@@ -2328,6 +2671,7 @@ abstract class State implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
+        $this->collTaxRuleCountries = null;
         $this->collAddresses = null;
         $this->collOrderAddresses = null;
         $this->collStateI18ns = null;
