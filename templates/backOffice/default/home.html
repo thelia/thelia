@@ -325,10 +325,11 @@ jQuery(function($){
         viewMode: 'months',
         format: 'MM/YYYY'
     }).on('dp.change',function (e) {
-        var month = e.date.format("M");
-        var year = e.date.format("YYYY");
+        var month = parseInt(e.date.format("M")) - 1;
+        var year = parseInt(e.date.format("YYYY"));
 
-        jQplotDate.setMonth(parseInt(month));
+        jQplotDate.setMonth(month);
+        jQplotDate.setFullYear(year);
 
         statInputActive(true);
 
@@ -355,8 +356,6 @@ jQuery(function($){
 
     $(".feed-list").load("{admin_viewurl view='ajax/thelia_news_feed'}");
 
-    jQplotDate.setDate(1); // Set day to 1 so we can add month without 30/31 days of month troubles.
-    jQplotDate.setMonth(parseInt(jQplotDate.getMonth())+1); // Init to actual month
     var url = "{url path='/admin/home/stats'}";
     var jQplotData; // json data
     var jQPlotInstance; // global instance
@@ -424,13 +423,22 @@ jQuery(function($){
         );
     });
 
+    /**
+     * @param {number} month Note: January is 0, February is 1, and so on.
+     * @param {number} year Example : 2015
+     * @param {function=} callback
+     * @param {number=} flush
+     */
     function retrieveJQPlotJson(month, year, callback, flush) {
+
+        month = parseInt(month);
+        year = parseInt(year);
 
         if (typeof flush === "undefined") {
             flush = 0;
         }
 
-        $.getJSON(url, {month: month, year: year, flush: flush})
+        $.getJSON(url, {month: month + 1, year: year, flush: flush})
             .done(function(data) {
                 jQplotData = data;
                 jsonSuccessLoad();
