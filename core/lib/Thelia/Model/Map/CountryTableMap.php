@@ -220,6 +220,7 @@ class CountryTableMap extends TableMap
         $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_MANY, array(), 'CASCADE', null, 'Coupons');
         $this->addRelation('OrderCoupon', '\\Thelia\\Model\\OrderCoupon', RelationMap::MANY_TO_MANY, array(), null, null, 'OrderCoupons');
         $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Areas');
+        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'States');
     } // buildRelations()
 
     /**

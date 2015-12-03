@@ -19,7 +19,11 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Address as ChildAddress;
 use Thelia\Model\AddressQuery as ChildAddressQuery;
+use Thelia\Model\Area as ChildArea;
+use Thelia\Model\AreaQuery as ChildAreaQuery;
 use Thelia\Model\Country as ChildCountry;
+use Thelia\Model\CountryArea as ChildCountryArea;
+use Thelia\Model\CountryAreaQuery as ChildCountryAreaQuery;
 use Thelia\Model\CountryQuery as ChildCountryQuery;
 use Thelia\Model\OrderAddress as ChildOrderAddress;
 use Thelia\Model\OrderAddressQuery as ChildOrderAddressQuery;
@@ -126,10 +130,26 @@ abstract class State implements ActiveRecordInterface
     protected $collOrderAddressesPartial;
 
     /**
+     * @var        ObjectCollection|ChildCountryArea[] Collection to store aggregation of ChildCountryArea objects.
+     */
+    protected $collCountryAreas;
+    protected $collCountryAreasPartial;
+
+    /**
      * @var        ObjectCollection|ChildStateI18n[] Collection to store aggregation of ChildStateI18n objects.
      */
     protected $collStateI18ns;
     protected $collStateI18nsPartial;
+
+    /**
+     * @var        ChildArea[] Collection to store aggregation of ChildArea objects.
+     */
+    protected $collAreas;
+
+    /**
+     * @var        ChildCountry[] Collection to store aggregation of ChildCountry objects.
+     */
+    protected $collCountries;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -157,6 +177,18 @@ abstract class State implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
+    protected $areasScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $countriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
     protected $taxRuleCountriesScheduledForDeletion = null;
 
     /**
@@ -170,6 +202,12 @@ abstract class State implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $orderAddressesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $countryAreasScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -805,8 +843,12 @@ abstract class State implements ActiveRecordInterface
 
             $this->collOrderAddresses = null;
 
+            $this->collCountryAreas = null;
+
             $this->collStateI18ns = null;
 
+            $this->collAreas = null;
+            $this->collCountries = null;
         } // if (deep)
     }
 
@@ -952,6 +994,60 @@ abstract class State implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->areasScheduledForDeletion !== null) {
+                if (!$this->areasScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->areasScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+
+                    CountryAreaQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->areasScheduledForDeletion = null;
+                }
+
+                foreach ($this->getAreas() as $area) {
+                    if ($area->isModified()) {
+                        $area->save($con);
+                    }
+                }
+            } elseif ($this->collAreas) {
+                foreach ($this->collAreas as $area) {
+                    if ($area->isModified()) {
+                        $area->save($con);
+                    }
+                }
+            }
+
+            if ($this->countriesScheduledForDeletion !== null) {
+                if (!$this->countriesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk  = $this->getPrimaryKey();
+                    foreach ($this->countriesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+
+                    CountryAreaQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->countriesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCountries() as $country) {
+                    if ($country->isModified()) {
+                        $country->save($con);
+                    }
+                }
+            } elseif ($this->collCountries) {
+                foreach ($this->collCountries as $country) {
+                    if ($country->isModified()) {
+                        $country->save($con);
+                    }
+                }
+            }
+
             if ($this->taxRuleCountriesScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountriesScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\TaxRuleCountryQuery::create()
@@ -999,6 +1095,23 @@ abstract class State implements ActiveRecordInterface
 
                 if ($this->collOrderAddresses !== null) {
             foreach ($this->collOrderAddresses as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->countryAreasScheduledForDeletion !== null) {
+                if (!$this->countryAreasScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CountryAreaQuery::create()
+                        ->filterByPrimaryKeys($this->countryAreasScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->countryAreasScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCountryAreas !== null) {
+            foreach ($this->collCountryAreas as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1229,6 +1342,9 @@ abstract class State implements ActiveRecordInterface
             if (null !== $this->collOrderAddresses) {
                 $result['OrderAddresses'] = $this->collOrderAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collCountryAreas) {
+                $result['CountryAreas'] = $this->collCountryAreas->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collStateI18ns) {
                 $result['StateI18ns'] = $this->collStateI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1423,6 +1539,12 @@ abstract class State implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getCountryAreas() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCountryArea($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getStateI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addStateI18n($relObj->copy($deepCopy));
@@ -1529,6 +1651,9 @@ abstract class State implements ActiveRecordInterface
         }
         if ('OrderAddress' == $relationName) {
             return $this->initOrderAddresses();
+        }
+        if ('CountryArea' == $relationName) {
+            return $this->initCountryAreas();
         }
         if ('StateI18n' == $relationName) {
             return $this->initStateI18ns();
@@ -2390,6 +2515,274 @@ abstract class State implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCountryAreas collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCountryAreas()
+     */
+    public function clearCountryAreas()
+    {
+        $this->collCountryAreas = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCountryAreas collection loaded partially.
+     */
+    public function resetPartialCountryAreas($v = true)
+    {
+        $this->collCountryAreasPartial = $v;
+    }
+
+    /**
+     * Initializes the collCountryAreas collection.
+     *
+     * By default this just sets the collCountryAreas collection to an empty array (like clearcollCountryAreas());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCountryAreas($overrideExisting = true)
+    {
+        if (null !== $this->collCountryAreas && !$overrideExisting) {
+            return;
+        }
+        $this->collCountryAreas = new ObjectCollection();
+        $this->collCountryAreas->setModel('\Thelia\Model\CountryArea');
+    }
+
+    /**
+     * Gets an array of ChildCountryArea objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildState is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCountryArea[] List of ChildCountryArea objects
+     * @throws PropelException
+     */
+    public function getCountryAreas($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCountryAreasPartial && !$this->isNew();
+        if (null === $this->collCountryAreas || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCountryAreas) {
+                // return empty collection
+                $this->initCountryAreas();
+            } else {
+                $collCountryAreas = ChildCountryAreaQuery::create(null, $criteria)
+                    ->filterByState($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCountryAreasPartial && count($collCountryAreas)) {
+                        $this->initCountryAreas(false);
+
+                        foreach ($collCountryAreas as $obj) {
+                            if (false == $this->collCountryAreas->contains($obj)) {
+                                $this->collCountryAreas->append($obj);
+                            }
+                        }
+
+                        $this->collCountryAreasPartial = true;
+                    }
+
+                    reset($collCountryAreas);
+
+                    return $collCountryAreas;
+                }
+
+                if ($partial && $this->collCountryAreas) {
+                    foreach ($this->collCountryAreas as $obj) {
+                        if ($obj->isNew()) {
+                            $collCountryAreas[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCountryAreas = $collCountryAreas;
+                $this->collCountryAreasPartial = false;
+            }
+        }
+
+        return $this->collCountryAreas;
+    }
+
+    /**
+     * Sets a collection of CountryArea objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $countryAreas A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildState The current object (for fluent API support)
+     */
+    public function setCountryAreas(Collection $countryAreas, ConnectionInterface $con = null)
+    {
+        $countryAreasToDelete = $this->getCountryAreas(new Criteria(), $con)->diff($countryAreas);
+
+
+        $this->countryAreasScheduledForDeletion = $countryAreasToDelete;
+
+        foreach ($countryAreasToDelete as $countryAreaRemoved) {
+            $countryAreaRemoved->setState(null);
+        }
+
+        $this->collCountryAreas = null;
+        foreach ($countryAreas as $countryArea) {
+            $this->addCountryArea($countryArea);
+        }
+
+        $this->collCountryAreas = $countryAreas;
+        $this->collCountryAreasPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CountryArea objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CountryArea objects.
+     * @throws PropelException
+     */
+    public function countCountryAreas(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCountryAreasPartial && !$this->isNew();
+        if (null === $this->collCountryAreas || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCountryAreas) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCountryAreas());
+            }
+
+            $query = ChildCountryAreaQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByState($this)
+                ->count($con);
+        }
+
+        return count($this->collCountryAreas);
+    }
+
+    /**
+     * Method called to associate a ChildCountryArea object to this object
+     * through the ChildCountryArea foreign key attribute.
+     *
+     * @param    ChildCountryArea $l ChildCountryArea
+     * @return   \Thelia\Model\State The current object (for fluent API support)
+     */
+    public function addCountryArea(ChildCountryArea $l)
+    {
+        if ($this->collCountryAreas === null) {
+            $this->initCountryAreas();
+            $this->collCountryAreasPartial = true;
+        }
+
+        if (!in_array($l, $this->collCountryAreas->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCountryArea($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CountryArea $countryArea The countryArea object to add.
+     */
+    protected function doAddCountryArea($countryArea)
+    {
+        $this->collCountryAreas[]= $countryArea;
+        $countryArea->setState($this);
+    }
+
+    /**
+     * @param  CountryArea $countryArea The countryArea object to remove.
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function removeCountryArea($countryArea)
+    {
+        if ($this->getCountryAreas()->contains($countryArea)) {
+            $this->collCountryAreas->remove($this->collCountryAreas->search($countryArea));
+            if (null === $this->countryAreasScheduledForDeletion) {
+                $this->countryAreasScheduledForDeletion = clone $this->collCountryAreas;
+                $this->countryAreasScheduledForDeletion->clear();
+            }
+            $this->countryAreasScheduledForDeletion[]= $countryArea;
+            $countryArea->setState(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related CountryAreas from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCountryArea[] List of ChildCountryArea objects
+     */
+    public function getCountryAreasJoinArea($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCountryAreaQuery::create(null, $criteria);
+        $query->joinWith('Area', $joinBehavior);
+
+        return $this->getCountryAreas($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this State is new, it will return
+     * an empty collection; or if this State has previously
+     * been saved, it will retrieve related CountryAreas from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in State.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCountryArea[] List of ChildCountryArea objects
+     */
+    public function getCountryAreasJoinCountry($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCountryAreaQuery::create(null, $criteria);
+        $query->joinWith('Country', $joinBehavior);
+
+        return $this->getCountryAreas($query, $con);
+    }
+
+    /**
      * Clears out the collStateI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2615,6 +3008,372 @@ abstract class State implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collAreas collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAreas()
+     */
+    public function clearAreas()
+    {
+        $this->collAreas = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAreasPartial = null;
+    }
+
+    /**
+     * Initializes the collAreas collection.
+     *
+     * By default this just sets the collAreas collection to an empty collection (like clearAreas());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initAreas()
+    {
+        $this->collAreas = new ObjectCollection();
+        $this->collAreas->setModel('\Thelia\Model\Area');
+    }
+
+    /**
+     * Gets a collection of ChildArea objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildState is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildArea[] List of ChildArea objects
+     */
+    public function getAreas($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collAreas || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAreas) {
+                // return empty collection
+                $this->initAreas();
+            } else {
+                $collAreas = ChildAreaQuery::create(null, $criteria)
+                    ->filterByState($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collAreas;
+                }
+                $this->collAreas = $collAreas;
+            }
+        }
+
+        return $this->collAreas;
+    }
+
+    /**
+     * Sets a collection of Area objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $areas A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function setAreas(Collection $areas, ConnectionInterface $con = null)
+    {
+        $this->clearAreas();
+        $currentAreas = $this->getAreas();
+
+        $this->areasScheduledForDeletion = $currentAreas->diff($areas);
+
+        foreach ($areas as $area) {
+            if (!$currentAreas->contains($area)) {
+                $this->doAddArea($area);
+            }
+        }
+
+        $this->collAreas = $areas;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildArea objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildArea objects
+     */
+    public function countAreas($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collAreas || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAreas) {
+                return 0;
+            } else {
+                $query = ChildAreaQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByState($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAreas);
+        }
+    }
+
+    /**
+     * Associate a ChildArea object to this object
+     * through the country_area cross reference table.
+     *
+     * @param  ChildArea $area The ChildCountryArea object to relate
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function addArea(ChildArea $area)
+    {
+        if ($this->collAreas === null) {
+            $this->initAreas();
+        }
+
+        if (!$this->collAreas->contains($area)) { // only add it if the **same** object is not already associated
+            $this->doAddArea($area);
+            $this->collAreas[] = $area;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    Area $area The area object to add.
+     */
+    protected function doAddArea($area)
+    {
+        $countryArea = new ChildCountryArea();
+        $countryArea->setArea($area);
+        $this->addCountryArea($countryArea);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$area->getStates()->contains($this)) {
+            $foreignCollection   = $area->getStates();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildArea object to this object
+     * through the country_area cross reference table.
+     *
+     * @param ChildArea $area The ChildCountryArea object to relate
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function removeArea(ChildArea $area)
+    {
+        if ($this->getAreas()->contains($area)) {
+            $this->collAreas->remove($this->collAreas->search($area));
+
+            if (null === $this->areasScheduledForDeletion) {
+                $this->areasScheduledForDeletion = clone $this->collAreas;
+                $this->areasScheduledForDeletion->clear();
+            }
+
+            $this->areasScheduledForDeletion[] = $area;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collCountries collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCountries()
+     */
+    public function clearCountries()
+    {
+        $this->collCountries = null; // important to set this to NULL since that means it is uninitialized
+        $this->collCountriesPartial = null;
+    }
+
+    /**
+     * Initializes the collCountries collection.
+     *
+     * By default this just sets the collCountries collection to an empty collection (like clearCountries());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCountries()
+    {
+        $this->collCountries = new ObjectCollection();
+        $this->collCountries->setModel('\Thelia\Model\Country');
+    }
+
+    /**
+     * Gets a collection of ChildCountry objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildState is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildCountry[] List of ChildCountry objects
+     */
+    public function getCountries($criteria = null, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCountries || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCountries) {
+                // return empty collection
+                $this->initCountries();
+            } else {
+                $collCountries = ChildCountryQuery::create(null, $criteria)
+                    ->filterByState($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCountries;
+                }
+                $this->collCountries = $collCountries;
+            }
+        }
+
+        return $this->collCountries;
+    }
+
+    /**
+     * Sets a collection of Country objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $countries A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function setCountries(Collection $countries, ConnectionInterface $con = null)
+    {
+        $this->clearCountries();
+        $currentCountries = $this->getCountries();
+
+        $this->countriesScheduledForDeletion = $currentCountries->diff($countries);
+
+        foreach ($countries as $country) {
+            if (!$currentCountries->contains($country)) {
+                $this->doAddCountry($country);
+            }
+        }
+
+        $this->collCountries = $countries;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of ChildCountry objects related by a many-to-many relationship
+     * to the current object by way of the country_area cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related ChildCountry objects
+     */
+    public function countCountries($criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        if (null === $this->collCountries || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCountries) {
+                return 0;
+            } else {
+                $query = ChildCountryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByState($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCountries);
+        }
+    }
+
+    /**
+     * Associate a ChildCountry object to this object
+     * through the country_area cross reference table.
+     *
+     * @param  ChildCountry $country The ChildCountryArea object to relate
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function addCountry(ChildCountry $country)
+    {
+        if ($this->collCountries === null) {
+            $this->initCountries();
+        }
+
+        if (!$this->collCountries->contains($country)) { // only add it if the **same** object is not already associated
+            $this->doAddCountry($country);
+            $this->collCountries[] = $country;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param    Country $country The country object to add.
+     */
+    protected function doAddCountry($country)
+    {
+        $countryArea = new ChildCountryArea();
+        $countryArea->setCountry($country);
+        $this->addCountryArea($countryArea);
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$country->getStates()->contains($this)) {
+            $foreignCollection   = $country->getStates();
+            $foreignCollection[] = $this;
+        }
+    }
+
+    /**
+     * Remove a ChildCountry object to this object
+     * through the country_area cross reference table.
+     *
+     * @param ChildCountry $country The ChildCountryArea object to relate
+     * @return ChildState The current object (for fluent API support)
+     */
+    public function removeCountry(ChildCountry $country)
+    {
+        if ($this->getCountries()->contains($country)) {
+            $this->collCountries->remove($this->collCountries->search($country));
+
+            if (null === $this->countriesScheduledForDeletion) {
+                $this->countriesScheduledForDeletion = clone $this->collCountries;
+                $this->countriesScheduledForDeletion->clear();
+            }
+
+            $this->countriesScheduledForDeletion[] = $country;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2660,8 +3419,23 @@ abstract class State implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCountryAreas) {
+                foreach ($this->collCountryAreas as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collStateI18ns) {
                 foreach ($this->collStateI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collAreas) {
+                foreach ($this->collAreas as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCountries) {
+                foreach ($this->collCountries as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2674,7 +3448,10 @@ abstract class State implements ActiveRecordInterface
         $this->collTaxRuleCountries = null;
         $this->collAddresses = null;
         $this->collOrderAddresses = null;
+        $this->collCountryAreas = null;
         $this->collStateI18ns = null;
+        $this->collAreas = null;
+        $this->collCountries = null;
         $this->aCountry = null;
     }
 
