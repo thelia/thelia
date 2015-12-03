@@ -1852,7 +1852,9 @@
     <behavior name="timestampable" />
   </table>
   <table isCrossRef="true" name="country_area" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="country_id" required="true" type="INTEGER" />
+    <column name="state_id" type="INTEGER" />
     <column name="area_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="area" name="fk_country_area_area_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="area_id" />
@@ -1860,11 +1862,17 @@
     <foreign-key foreignTable="country" name="fk_country_area_country_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="country_id" />
     </foreign-key>
+    <foreign-key foreignTable="state" name="fk_country_area_state_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="state_id" />
+    </foreign-key>
     <index name="country_area_area_id_idx">
       <index-column name="area_id" />
     </index>
     <index name="fk_country_area_country_id_idx">
       <index-column name="country_id" />
+    </index>
+    <index name="fk_country_area_state_id_idx">
+      <index-column name="state_id" />
     </index>
     <behavior name="timestampable" />
   </table>
