@@ -863,9 +863,9 @@ final class TheliaEvents
 
     // -- Export ----------------------------------------------
 
+    const EXPORT_CHANGE_POSITION = 'export.change.position';
+    const EXPORT_CATEGORY_CHANGE_POSITION = 'export.category.change.position';
 
-    const EXPORT_CATEGORY_CHANGE_POSITION = "Thelia.export.change_category_position";
-    const EXPORT_CHANGE_POSITION = "Thelia.export.change_position";
     const EXPORT_BEFORE_ENCODE = 'export.encode.before';
     const EXPORT_AFTER_ENCODE = 'export.encode.after';
 

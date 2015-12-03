@@ -1348,25 +1348,27 @@
 
     <!-- export management -->
 
-    <route id="export.list" path="/admin/export">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::indexAction</default>
+    <route id="export.list" path="/admin/export" methods="get">
+        <default key="_controller">Thelia:Admin\Export:index</default>
     </route>
 
-    <route id="export.position" path="/admin/export/position">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changePosition</default>
+    <route id="export.position" path="/admin/export/position" methods="get">
+        <default key="_controller">Thelia:Admin\Export:changeExportPosition</default>
     </route>
 
-    <route id="export.category.position" path="/admin/export/position/category">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::changeCategoryPosition</default>
-    </route>
-
-    <route id="export.mode" path="/admin/export/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::export</default>
-        <requirement key="id">\d+</requirement>
+    <route id="export.category.position" path="/admin/export/position/category" methods="get">
+        <default key="_controller">Thelia:Admin\Export:changeCategoryPosition</default>
     </route>
 
     <route id="export.view" path="/admin/export/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ExportController::exportView</default>
+        <default key="_controller">Thelia:Admin\Export:configure</default>
+
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="export.process" path="/admin/export/{id}" methods="post">
+        <default key="_controller">Thelia:Admin\Export:export</default>
+
         <requirement key="id">\d+</requirement>
     </route>
 

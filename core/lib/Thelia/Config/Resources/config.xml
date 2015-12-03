@@ -237,8 +237,7 @@
         </service>
 
         <!-- Formatters -->
-
-        <service id="thelia.manager.formatter_manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
+        <service id="thelia.formatter.manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
 
         <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
             <tag name="thelia.formatter" />

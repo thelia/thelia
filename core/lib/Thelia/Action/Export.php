@@ -12,76 +12,63 @@
 
 namespace Thelia\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\Cache\CacheEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
+use Thelia\Handler\ExportHandler;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 
 /**
  * Class Export
- * @package Thelia\Action
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class Export extends BaseAction implements EventSubscriberInterface
 {
-    protected $environment;
+    /**
+     * @var \Thelia\Handler\ExportHandler  An export handler instance
+     */
+    protected $handler;
 
-    public function __construct($environment)
+    /**
+     * @param \Thelia\Handler\ExportHandler $exportHandler  An export handler instance
+     */
+    public function __construct(ExportHandler $exportHandler)
     {
-        $this->environment = $environment;
+        $this->handler = $exportHandler;
     }
 
-    public function changeCategoryPosition(UpdatePositionEvent $event)
+    public static function getSubscribedEvents()
     {
-        $this->genericUpdatePosition(new ExportCategoryQuery(), $event);
-
-        $this->cacheClear($event->getDispatcher());
-    }
-
-    public function changeExportPosition(UpdatePositionEvent $event)
-    {
-        $this->genericUpdatePosition(new ExportQuery(), $event);
-
-        $this->cacheClear($event->getDispatcher());
-    }
-
-    protected function cacheClear(EventDispatcherInterface $dispatcher)
-    {
-        $cacheEvent = new CacheEvent(
-            $this->environment
-        );
-
-        $dispatcher->dispatch(TheliaEvents::CACHE_CLEAR, $cacheEvent);
+        return [
+            TheliaEvents::EXPORT_CHANGE_POSITION => [
+                ['exportChangePosition', 128]
+            ],
+            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION => [
+                ['exportCategoryChangePosition', 128]
+            ]
+        ];
     }
 
     /**
-     * Returns an array of event names this subscriber wants to listen to.
+     * Handle export change position event
      *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
+     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
      */
-    public static function getSubscribedEvents()
+    public function exportChangePosition(UpdatePositionEvent $updatePositionEvent)
     {
-        return array(
-            TheliaEvents::EXPORT_CATEGORY_CHANGE_POSITION => array("changeCategoryPosition", 128),
-            TheliaEvents::EXPORT_CHANGE_POSITION => array("changeExportPosition", 128),
-        );
+        $this->handler->getExport($updatePositionEvent->getObjectId(), true);
+        $this->genericUpdatePosition(new ExportQuery, $updatePositionEvent);
+    }
+
+    /**
+     * Handle export category change position event
+     *
+     * @param \Thelia\Core\Event\UpdatePositionEvent $updatePositionEvent
+     */
+    public function exportCategoryChangePosition(UpdatePositionEvent $updatePositionEvent)
+    {
+        $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
+        $this->genericUpdatePosition(new ExportCategoryQuery, $updatePositionEvent);
     }
 }

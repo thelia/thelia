@@ -186,8 +186,9 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="thelia.export.change_position" class="Thelia\Action\Export">
-            <argument>%kernel.cache_dir%</argument>
+        <service id="thelia.action.export" class="Thelia\Action\Export">
+            <argument type="service" id="thelia.export.handler" />
+
             <tag name="kernel.event_subscriber" />
         </service>
 

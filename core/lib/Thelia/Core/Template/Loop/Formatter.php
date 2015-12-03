@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -41,7 +42,7 @@ class Formatter extends BaseLoop implements ArraySearchLoopInterface
     public function buildArray()
     {
         /** @var \Thelia\Core\FileFormat\Formatting\FormatterManager $service */
-        $service = $this->container->get("thelia.manager.formatter_manager");
+        $service = $this->container->get(RegisterFormatterPass::MANAGER_SERVICE_ID);
 
         $rawFormatters = array_change_key_case($service->getAll());
 
