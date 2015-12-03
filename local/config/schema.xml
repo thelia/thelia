@@ -1752,6 +1752,7 @@
     <column name="hook_active" required="true" type="BOOLEAN" />
     <column name="module_active" required="true" type="BOOLEAN" />
     <column name="position" required="true" type="INTEGER" />
+    <column name="templates" type="LONGVARCHAR" />
     <foreign-key foreignTable="module" name="fk_module_hook_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="module_id" />
     </foreign-key>

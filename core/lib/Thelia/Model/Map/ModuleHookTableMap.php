@@ -58,7 +58,7 @@ class ModuleHookTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 9;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class ModuleHookTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 9;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -116,6 +116,11 @@ class ModuleHookTableMap extends TableMap
     const POSITION = 'module_hook.POSITION';
 
     /**
+     * the column name for the TEMPLATES field
+     */
+    const TEMPLATES = 'module_hook.TEMPLATES';
+
+    /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -127,12 +132,12 @@ class ModuleHookTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ModuleId', 'HookId', 'Classname', 'Method', 'Active', 'HookActive', 'ModuleActive', 'Position', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'moduleId', 'hookId', 'classname', 'method', 'active', 'hookActive', 'moduleActive', 'position', ),
-        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID, ModuleHookTableMap::MODULE_ID, ModuleHookTableMap::HOOK_ID, ModuleHookTableMap::CLASSNAME, ModuleHookTableMap::METHOD, ModuleHookTableMap::ACTIVE, ModuleHookTableMap::HOOK_ACTIVE, ModuleHookTableMap::MODULE_ACTIVE, ModuleHookTableMap::POSITION, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'MODULE_ID', 'HOOK_ID', 'CLASSNAME', 'METHOD', 'ACTIVE', 'HOOK_ACTIVE', 'MODULE_ACTIVE', 'POSITION', ),
-        self::TYPE_FIELDNAME     => array('id', 'module_id', 'hook_id', 'classname', 'method', 'active', 'hook_active', 'module_active', 'position', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id', 'ModuleId', 'HookId', 'Classname', 'Method', 'Active', 'HookActive', 'ModuleActive', 'Position', 'Templates', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'moduleId', 'hookId', 'classname', 'method', 'active', 'hookActive', 'moduleActive', 'position', 'templates', ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID, ModuleHookTableMap::MODULE_ID, ModuleHookTableMap::HOOK_ID, ModuleHookTableMap::CLASSNAME, ModuleHookTableMap::METHOD, ModuleHookTableMap::ACTIVE, ModuleHookTableMap::HOOK_ACTIVE, ModuleHookTableMap::MODULE_ACTIVE, ModuleHookTableMap::POSITION, ModuleHookTableMap::TEMPLATES, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'MODULE_ID', 'HOOK_ID', 'CLASSNAME', 'METHOD', 'ACTIVE', 'HOOK_ACTIVE', 'MODULE_ACTIVE', 'POSITION', 'TEMPLATES', ),
+        self::TYPE_FIELDNAME     => array('id', 'module_id', 'hook_id', 'classname', 'method', 'active', 'hook_active', 'module_active', 'position', 'templates', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -142,12 +147,12 @@ class ModuleHookTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ModuleId' => 1, 'HookId' => 2, 'Classname' => 3, 'Method' => 4, 'Active' => 5, 'HookActive' => 6, 'ModuleActive' => 7, 'Position' => 8, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'moduleId' => 1, 'hookId' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'hookActive' => 6, 'moduleActive' => 7, 'position' => 8, ),
-        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID => 0, ModuleHookTableMap::MODULE_ID => 1, ModuleHookTableMap::HOOK_ID => 2, ModuleHookTableMap::CLASSNAME => 3, ModuleHookTableMap::METHOD => 4, ModuleHookTableMap::ACTIVE => 5, ModuleHookTableMap::HOOK_ACTIVE => 6, ModuleHookTableMap::MODULE_ACTIVE => 7, ModuleHookTableMap::POSITION => 8, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'MODULE_ID' => 1, 'HOOK_ID' => 2, 'CLASSNAME' => 3, 'METHOD' => 4, 'ACTIVE' => 5, 'HOOK_ACTIVE' => 6, 'MODULE_ACTIVE' => 7, 'POSITION' => 8, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'module_id' => 1, 'hook_id' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'hook_active' => 6, 'module_active' => 7, 'position' => 8, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ModuleId' => 1, 'HookId' => 2, 'Classname' => 3, 'Method' => 4, 'Active' => 5, 'HookActive' => 6, 'ModuleActive' => 7, 'Position' => 8, 'Templates' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'moduleId' => 1, 'hookId' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'hookActive' => 6, 'moduleActive' => 7, 'position' => 8, 'templates' => 9, ),
+        self::TYPE_COLNAME       => array(ModuleHookTableMap::ID => 0, ModuleHookTableMap::MODULE_ID => 1, ModuleHookTableMap::HOOK_ID => 2, ModuleHookTableMap::CLASSNAME => 3, ModuleHookTableMap::METHOD => 4, ModuleHookTableMap::ACTIVE => 5, ModuleHookTableMap::HOOK_ACTIVE => 6, ModuleHookTableMap::MODULE_ACTIVE => 7, ModuleHookTableMap::POSITION => 8, ModuleHookTableMap::TEMPLATES => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'MODULE_ID' => 1, 'HOOK_ID' => 2, 'CLASSNAME' => 3, 'METHOD' => 4, 'ACTIVE' => 5, 'HOOK_ACTIVE' => 6, 'MODULE_ACTIVE' => 7, 'POSITION' => 8, 'TEMPLATES' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'module_id' => 1, 'hook_id' => 2, 'classname' => 3, 'method' => 4, 'active' => 5, 'hook_active' => 6, 'module_active' => 7, 'position' => 8, 'templates' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -175,6 +180,7 @@ class ModuleHookTableMap extends TableMap
         $this->addColumn('HOOK_ACTIVE', 'HookActive', 'BOOLEAN', true, 1, null);
         $this->addColumn('MODULE_ACTIVE', 'ModuleActive', 'BOOLEAN', true, 1, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('TEMPLATES', 'Templates', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -333,6 +339,7 @@ class ModuleHookTableMap extends TableMap
             $criteria->addSelectColumn(ModuleHookTableMap::HOOK_ACTIVE);
             $criteria->addSelectColumn(ModuleHookTableMap::MODULE_ACTIVE);
             $criteria->addSelectColumn(ModuleHookTableMap::POSITION);
+            $criteria->addSelectColumn(ModuleHookTableMap::TEMPLATES);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.MODULE_ID');
@@ -343,6 +350,7 @@ class ModuleHookTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.HOOK_ACTIVE');
             $criteria->addSelectColumn($alias . '.MODULE_ACTIVE');
             $criteria->addSelectColumn($alias . '.POSITION');
+            $criteria->addSelectColumn($alias . '.TEMPLATES');
         }
     }
 

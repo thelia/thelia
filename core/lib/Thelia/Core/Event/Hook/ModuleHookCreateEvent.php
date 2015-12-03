@@ -19,10 +19,20 @@ namespace Thelia\Core\Event\Hook;
  */
 class ModuleHookCreateEvent extends ModuleHookEvent
 {
+    /** @var int */
     protected $module_id;
+
+    /** @var int */
     protected $hook_id;
-    protected $classname;
+
+    /** @var string */
     protected $method;
+
+    /** @var string */
+    protected $classname;
+
+    /** @var string */
+    protected $templates;
 
     /**
      * @param int $hook_id
@@ -99,4 +109,25 @@ class ModuleHookCreateEvent extends ModuleHookEvent
     {
         return $this->method;
     }
+
+    /**
+     * @return string
+     */
+    public function getTemplates()
+    {
+        return $this->templates;
+    }
+
+    /**
+     * @param string $templates
+     * @return $this
+     */
+    public function setTemplates($templates)
+    {
+        $this->templates = $templates;
+
+        return $this;
+    }
+
+
 }
