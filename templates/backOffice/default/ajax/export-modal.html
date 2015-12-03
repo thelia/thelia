@@ -1,253 +1,40 @@
 {* Set the default translation domain, that will be used by {intl} when the 'd' parameter is not set *}
 {default_translation_domain domain='bo.default'}
 
-{form name="thelia.export"}
-    <form action="{$URL nofilter}" method="post" {form_enctype}>
-        {form_hidden_fields}
-        <div class="modal fade" id="real-export-modal" tabindex="-1" role="dialog" aria-labelledby="export-modal-label"
-             aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
-                                    class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="export-modal-label">Export: {$TITLE}</h4>
-                    </div>
-                    <div class="modal-body">
+{loop type="export" name="export" id=$exportId}
+    {form name="thelia.export"}
+        <form action="{$URL nofilter}" method="post" {form_enctype}>
+            {form_hidden_fields}
 
-                        {hook name="export.top" type="modal" id=$ID}
-
-                        {if $DESCRIPTION}
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="alert alert-info">
-                                        {$DESCRIPTION nofilter}
-                                    </div>
-                                </div>
-                            </div>
-                        {/if}
-
-                        {$showRange  = false}
-                        {loop name="export-category" type="export-category" id=$CATEGORY_ID limit=1}
-                            {if $TITLE == {intl l="Orders"} }
-                                {$showRange  = true}
-                            {/if}
-                        {/loop}
-
-                        {if $showRange}
-                        <div class="row">
-                            <div class="col-md-4">
-                                {form_field field="range_date_start"}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <select name="{$name}[year]" id="{$label_attr.for}_year">
-                                                {foreach from=$years item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[month]" id="{$label_attr.for}_month">
-                                                {foreach from=$months item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%m'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
-                                                {foreach from=$days item=m}
-                                                    <option value="{$m}">{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                        </div>
-                                    </div>
-                                {/form_field}
-                            </div>
-                            <div class="col-md-4">
-                                {form_field field="range_date_end"}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label for="{$label_attr.for}">
-                                                {$label}
-                                            </label>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <select name="{$name}[year]" id="{$label_attr.for}_year">
-                                                {foreach from=$years item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%Y'} == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[month]" id="{$label_attr.for}_month">
-                                                {foreach from=$months item=m}
-                                                    <option value="{$m}" {if {$smarty.now|date_format:'%m'}+1 == $m} selected {/if}>{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                            <select name="{$name}[day]" class="hidden" id="{$label_attr.for}_day">
-                                                {foreach from=$days item=m}
-                                                    <option value="{$m}">{$m}</option>
-                                                {/foreach}
-                                            </select>
-                                        </div>
-                                    </div>
-                                {/form_field}
-                            </div>
-                        </div>
-                        <br>
-                        {/if}
-                        <div class="row">
-                            <div class="col-md-12">
-                                {ifloop rel="export-formatters"}
-                                    <div class="row">
-                                    <div class="col-md-4">
-                                        {form_field field="formatter"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <select name="{$name}" id="{$label_attr.for}">
-                                                        {loop name="export-formatters" type="formatter" export=$ID}
-                                                            <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                                {$NAME} (.{$EXTENSION})
-                                                            </option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                    <div class="col-md-3">
-                                        {form_field field="language"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <select id="{$label_attr.for}" name="{$name}" required>
-                                                        {loop name="export-lang" type="lang"}
-                                                            <option value="{$ID}"
-                                                                    {if $ID == $CURRENT_LANG_ID}selected{/if}>{$TITLE}</option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {ifloop rel="export-archive-builder"}
-                                    <div class="col-md-1"></div>
-                                    <div class="col-md-4">
-                                        {form_field field="do_compress"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;"
-                                                         data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;"
-                                                         data-on="success" class="make-switch switch-small"
-                                                         id="export-compression-switch">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                    </div>
-                                    <div class="row export-compression-selection-row">
-                                    <div class="col-md-4">
-                                        {form_field field="archive_builder"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <select name="{$name}" id="{$label_attr.for}">
-                                                        {loop name="export-archive-builder" type="archive-builder"}
-                                                            <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                                {$NAME} (.{$EXTENSION})
-                                                            </option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {if $HAS_IMAGES}
-                                    <div class="col-md-4">
-                                        {form_field field="images"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;"
-                                                         data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;"
-                                                         data-on="success" class="make-switch switch-small">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {/if}
-                                {if $HAS_DOCUMENTS}
-                                    <div class="col-md-4">
-                                        {form_field field="documents"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;"
-                                                         data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;"
-                                                         data-on="success" class="make-switch switch-small">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {/if}
-
-                                {/ifloop}
-                                    </div>
-                                {/ifloop}
-                                {elseloop rel="export-formatters"}
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="alert alert-warning">
-                                                {intl l="You can't do exports, you don't have any formatter that handles this."}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {/elseloop}
-                            </div>
+            <div id="real-export-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="export-modal-label" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button class="close" type="button" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                            </button>
+                            <h4 id="export-modal-label" class="modal-title">
+                                {intl l="Export"}&nbsp;: {$TITLE}
+                            </h4>
                         </div>
 
-                        {hook name="export.bottom" type="modal" id=$ID}
+                        <div class="modal-body">
+                            {hook name="export.top" type="modal" id=$ID}
 
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">{intl l="Close"}</button>
-                        <button type="submit" class="btn btn-primary">{intl l="Export"}</button>
+                            {include 'includes/export-form-body.html'}
+
+                            {hook name="export.bottom" type="modal" id=$ID}
+                        </div>
+
+                        {ifloop rel="export-formatters"}
+                            <div class="modal-footer">
+                                <button class="btn btn-default" type="button" data-dismiss="modal">{intl l="Close"}</button>
+                                <button class="btn btn-primary" type="submit">{intl l="Do this export"}</button>
+                            </div>
+                        {/ifloop}
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-{/form}
+        </form>
+    {/form}
+{/loop}

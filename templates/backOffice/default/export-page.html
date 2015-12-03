@@ -10,204 +10,81 @@
 {block name="check-access"}view{/block}
 
 {block name="main-content"}
-    <div class="container" id="wrapper">
+    {loop type="export" name="export" id=$exportId}
+        <div id="wrapper" class="container">
+            <nav>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{url path='admin/home'}">{intl l='Home'}</a>
+                    </li>
+                    <li>
+                        <a href="{url path='admin/tools'}">{intl l='Tools'}</a>
+                    </li>
+                    <li>
+                        <a href="{url path='admin/export'}">{intl l="Exports"}</a>
+                    </li>
+                    <li>
+                        {intl l="Export"}&nbsp;: {$TITLE}
+                    </li>
+                </ul>
+            </nav>
 
-        <nav>
-            <ul class="breadcrumb">
-                <li><a href="{url path='admin/home'}">{intl l='Home'}</a></li>
-                <li><a href="{url path='admin/tools'}">{intl l='Tools'}</a></li>
-                <li><a href="{url path='admin/export'}">{intl l="Exports"}</a></li>
-                <li>{intl l="Export"}: {$TITLE}</li>
-            </ul>
-        </nav>
-
-        {form name="thelia.export"}
-
-        {if $form_error}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="alert alert-danger">{$form_error_message}</div>
-                </div>
-            </div>
-        {/if}
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="general-block-decorator">
-
-                    <div class="title title-without-tabs">
-                        {intl l='Export'}: {$TITLE}
+            {if $general_error}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-danger">{$general_error}</div>
                     </div>
+                </div>
+            {/if}
 
-                    {hook name="export.top" type="page" id=$ID}
+            {form name="thelia.export"}
+                <form action="{$URL nofilter}" method="post" {form_enctype}>
+                    {form_hidden_fields}
 
-                    {if $DESCRIPTION}
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="alert alert-info">
-                                    {$DESCRIPTION nofilter}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="general-block-decorator">
+                                <div class="title title-without-tabs">
+                                    {intl l='Export'}: {$TITLE}
                                 </div>
-                            </div>
-                        </div>
-                    {/if}
 
-                    <form action="{$URL nofilter}" method="post" {form_enctype}>
-                        {form_hidden_fields}
-                        <div class="row">
-                            <div class="col-md-12">
-                                {ifloop rel="export-formatters"}
-                                    <div class="row">
-                                    <div class="col-md-4">
-                                        {form_field field="formatter"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <select name="{$name}" id="{$label_attr.for}">
-                                                        {loop name="export-formatters" type="formatter" export=$ID}
-                                                            <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                                {$NAME} (.{$EXTENSION})
-                                                            </option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                    <div class="col-md-3">
-                                        {form_field field="language"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-
-                                                <div class="col-md-12">
-                                                    <select id="{$label_attr.for}" name="{$name}" required>
-                                                        {loop name="export-lang" type="lang"}
-                                                            <option value="{$ID}" {if $ID == $CURRENT_LANG_ID}selected{/if}>{$TITLE}</option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {ifloop rel="export-archive-builder"}
-                                    <div class="col-md-1"></div>
-                                    <div class="col-md-4">
-                                        {form_field field="do_compress"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small" id="export-compression-switch">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}"/>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                    </div>
-                                    <div class="row export-compression-selection-row">
-                                    <div class="col-md-4">
-                                        {form_field field="archive_builder"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <select name="{$name}" id="{$label_attr.for}">
-                                                        {loop name="export-archive-builder" type="archive-builder"}
-                                                            <option value="{$NAME}" {if $value == $NAME}selected{/if}>
-                                                                {$NAME} (.{$EXTENSION})
-                                                            </option>
-                                                        {/loop}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {if $HAS_IMAGES}
-                                    <div class="col-md-4">
-                                        {form_field field="images"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {/if}
-                                {if $HAS_DOCUMENTS}
-                                    <div class="col-md-4">
-                                        {form_field field="documents"}
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label for="{$label_attr.for}">
-                                                        {$label}
-                                                    </label>
-                                                </div>
-                                                <div class="col-md-12">
-                                                    <div data-off-label="&lt;i class='glyphicon glyphicon-remove-circle'&gt;&lt;/i&gt;" data-on-label="&lt;i class='glyphicon glyphicon-ok-circle'&gt;&lt;/i&gt;" data-on="success" class="make-switch switch-small">
-                                                        <input type="checkbox" name="{$name}" id="{$label_attr.for}" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {/form_field}
-                                    </div>
-                                {/if}
-                                {/ifloop}
-                                    </div>
-                                {/ifloop}
-                                {elseloop rel="export-formatters"}
+                                {if $form_error}
                                     <div class="row">
                                         <div class="col-md-12">
-                                            <div class="alert alert-warning">
-                                                {intl l="You can't do exports, you don't have any formatter that handles this."}
-                                            </div>
+                                            <div class="alert alert-danger">{$form_error_message}</div>
                                         </div>
                                     </div>
-                                {/elseloop}
-                            </div>
+                                {/if}
+
+                                {hook name="export.top" type="page" id=$ID}
+
+                                {include 'includes/export-form-body.html'}
+
+                                {hook name="export.bottom" type="page" id=$ID}
+
+                                {ifloop rel="export-formatters"}
+                                    <div>
+                                        <button class="btn btn-primary" type="submit">{intl l="Do this export"}</button>
+                                    </div>
+                                {/ifloop}
+                            </form>
                         </div>
-
-                        {hook name="export.bottom" type="page" id=$ID}
-
-                        <button type="submit" class="btn btn-primary">{intl l="Export"}</button>
-                    </form>
+                    </div>
                 </div>
-            </div>
+            {/form}
         </div>
-    </div>
-
-    {/form}
+    {/loop}
 {/block}
 
 {block name="javascript-initialization"}
     {javascripts file='assets/js/bootstrap-switch/bootstrap-switch.js'}
-        <script src="{$asset_url}"></script>
+        <script type="text/javascript" src="{$asset_url}"></script>
     {/javascripts}
 {/block}
 
 {block name="javascript-last-call"}
-    <script>
+    {literal}
+    <script type="text/javascript">
         $(document).ready(function() {
 
             var compression_switch = $("#export-compression-switch");
@@ -234,5 +111,7 @@
 
         });
     </script>
+
     {hook name="export.js" location="export-js" }
+    {/literal}
 {/block}
