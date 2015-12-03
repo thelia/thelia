@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1824 #1829) Fix the admin home stats, On page load, the month sent to Thelia was bad
 - (related to #1821) Fix the value for constant AdminForm::LANG_DEFAULT_BEHAVIOR, Resolve ##1820
 - (related to #1818) Fix menu hook block to integrate main link if it's used #1818
 - (related to #1806) Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE
