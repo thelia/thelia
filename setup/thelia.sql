@@ -2293,12 +2293,16 @@ DROP TABLE IF EXISTS `country_area`;
 
 CREATE TABLE `country_area`
 (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `country_id` INTEGER NOT NULL,
+    `state_id` INTEGER,
     `area_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
     INDEX `country_area_area_id_idx` (`area_id`),
     INDEX `fk_country_area_country_id_idx` (`country_id`),
+    INDEX `fk_country_area_state_id_idx` (`state_id`),
     CONSTRAINT `fk_country_area_area_id`
         FOREIGN KEY (`area_id`)
         REFERENCES `area` (`id`)
@@ -2307,6 +2311,11 @@ CREATE TABLE `country_area`
     CONSTRAINT `fk_country_area_country_id`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_country_area_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
