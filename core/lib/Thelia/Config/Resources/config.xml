@@ -209,6 +209,7 @@
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
+            <argument type="service" id="request_stack" />
         </service>
 
         <service id="stack_factory" class="Stack\Builder" />
@@ -224,6 +225,8 @@
 
 
         <service id="request" scope="request" synthetic="true" />
+
+        <service id="request_stack" class="Symfony\Component\HttpFoundation\RequestStack" />
 
         <service id="service_container" synthetic="true" />
 

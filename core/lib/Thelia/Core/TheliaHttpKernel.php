@@ -12,17 +12,14 @@
 
 namespace Thelia\Core;
 
-use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\Currency\CurrencyChangeEvent;
-use Thelia\Core\Event\SessionEvent;
-use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Model;
 
 /**
@@ -36,9 +33,13 @@ class TheliaHttpKernel extends HttpKernel
 
     protected $container;
 
-    public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
-    {
-        parent::__construct($dispatcher, $controllerResolver);
+    public function __construct(
+        EventDispatcherInterface $dispatcher,
+        ContainerInterface $container,
+        ControllerResolverInterface $controllerResolver,
+        RequestStack $requestStack
+    ) {
+        parent::__construct($dispatcher, $controllerResolver, $requestStack);
 
         $this->container = $container;
     }
