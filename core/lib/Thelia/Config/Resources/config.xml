@@ -298,5 +298,11 @@
 
         <!-- Thelia logger -->
         <service factory-class="%thelia.logger.class%" factory-method="getInstance" id="thelia.logger" class="%thelia.logger.class%" />
+
+        <!-- Handlers -->
+        <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
+            <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="thelia.translator" />
+        </service>
     </services>
 </config>
