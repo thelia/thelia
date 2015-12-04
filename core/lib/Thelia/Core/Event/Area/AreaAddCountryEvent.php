@@ -19,23 +19,25 @@ namespace Thelia\Core\Event\Area;
  */
 class AreaAddCountryEvent extends AreaEvent
 {
-    protected $area_id;
-    protected $country_id;
+    protected $areaId;
+    protected $countryId;
 
-    public function __construct($area_id, $country_id)
+    public function __construct($areaId, $countryId)
     {
-        $this->area_id = $area_id;
-        $this->country_id = $country_id;
+        parent::__construct();
+
+        $this->areaId = $areaId;
+        $this->countryId = $countryId;
     }
 
     /**
-     * @param mixed $area_id
+     * @param mixed $areaId
      *
      * @return $this
      */
-    public function setAreaId($area_id)
+    public function setAreaId($areaId)
     {
-        $this->area_id = $area_id;
+        $this->areaId = $areaId;
 
         return $this;
     }
@@ -45,17 +47,17 @@ class AreaAddCountryEvent extends AreaEvent
      */
     public function getAreaId()
     {
-        return $this->area_id;
+        return $this->areaId;
     }
 
     /**
-     * @param mixed $country_id
+     * @param mixed $countryId
      *
      * @return $this
      */
-    public function setCountryId($country_id)
+    public function setCountryId($countryId)
     {
-        $this->country_id = $country_id;
+        $this->countryId = $countryId;
 
         return $this;
     }
@@ -65,6 +67,6 @@ class AreaAddCountryEvent extends AreaEvent
      */
     public function getCountryId()
     {
-        return $this->country_id;
+        return $this->countryId;
     }
 }

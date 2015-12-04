@@ -314,7 +314,8 @@ class AreaController extends AbstractCrudController
             $data = $form->getData();
 
             foreach ($data['country_id'] as $countryId) {
-                $this->removeOneCountryFromArea($data['area_id'], $countryId);
+                $country = explode('-', $countryId);
+                $this->removeOneCountryFromArea($data['area_id'], $country[0], $country[1]);
             }
             // Redirect to the success URL
             return $this->generateSuccessRedirect($areaDeleteCountriesForm);
@@ -336,9 +337,13 @@ class AreaController extends AbstractCrudController
         return $this->renderEditionTemplate();
     }
 
-    protected function removeOneCountryFromArea($areaId, $countryId)
+    protected function removeOneCountryFromArea($areaId, $countryId, $stateId)
     {
-        $removeCountryEvent = new AreaRemoveCountryEvent($areaId, $countryId);
+        if (intval($stateId) === 0) {
+            $stateId = null;
+        }
+
+        $removeCountryEvent = new AreaRemoveCountryEvent($areaId, $countryId, $stateId);
 
         $this->dispatch(TheliaEvents::AREA_REMOVE_COUNTRY, $removeCountryEvent);
 
@@ -368,7 +373,8 @@ class AreaController extends AbstractCrudController
 
         $this->removeOneCountryFromArea(
             $this->getRequest()->get('area_id', 0),
-            $this->getRequest()->get('country_id', 0)
+            $this->getRequest()->get('country_id', 0),
+            $this->getRequest()->get('state_id', null)
         );
 
         return $this->redirectToEditionTemplate();

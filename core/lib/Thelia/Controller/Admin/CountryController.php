@@ -305,6 +305,7 @@ class CountryController extends AbstractCrudController
 
             if ($country->getHasStates()) {
                 $states = StateQuery::create()
+                    ->filterByCountryId($country->getId())
                     ->filterByVisible(true)
                     ->joinWithI18n($this->getCurrentEditionLocale())
                 ;
