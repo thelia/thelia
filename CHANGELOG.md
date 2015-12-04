@@ -1,5 +1,6 @@
 # 2.1.8
 
+- Add message if thelia project is not installed (related to #1825)
 - Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE (related to #1806)
 - Update the default PSE ref when the product ref is updated (related to #1790)
 - Sanitize the get arguments for admin stats (related to #1782)
