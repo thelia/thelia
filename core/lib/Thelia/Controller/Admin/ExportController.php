@@ -12,7 +12,7 @@
 
 namespace Thelia\Controller\Admin;
 
-use Thelia\Core\DependencyInjection\Compiler\RegisterFormatterPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\Security\AccessManager;
@@ -148,8 +148,8 @@ class ExportController extends BaseAdminController
             $templateName,
             [
                 'exportId' => $id,
-                'HAS_IMAGES' => $export->hasImages($this->container),
-                'HAS_DOCUMENTS' => $export->hasDocuments($this->container)
+                'HAS_IMAGES' => /*$export->hasImages($this->container)*/false,
+                'HAS_DOCUMENTS' => /*$export->hasDocuments($this->container)*/false
             ]
         );
     }
@@ -171,12 +171,6 @@ class ExportController extends BaseAdminController
             return $this->pageNotFound();
         }
 
-        /**
-         * Get needed services
-         */
-        $archiveBuilderManager = $this->container->get("thelia.manager.archive_builder_manager");
-        $formatterManager = $this->container->get(RegisterFormatterPass::MANAGER_SERVICE_ID);
-
         $form = $this->createForm(AdminForm::EXPORT);
 
         try {
@@ -184,18 +178,18 @@ class ExportController extends BaseAdminController
 
             $lang = (new LangQuery)->findPk($validatedForm->get('language')->getData());
 
-            /**
-             * Get the formatter and the archive builder if we have to compress the file(s)
-             */
+            /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
+            $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
 
-            /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
-            $formatter = $formatterManager->get($validatedForm->get('formatter')->getData());
+            /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
+            $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiveBuilder = null;
-            if ($validatedForm->get('do_compress')->getData()) {
-                /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
-                $archiveBuilder = $archiveBuilderManager->get($validatedForm->get("archive_builder")->getData());
-            }
+//            if ($validatedForm->get('do_compress')->getData()) {
+//                $archiveBuilderManager = $this->container->get("thelia.manager.archive_builder_manager");
+//                /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
+//                $archiveBuilder = $archiveBuilderManager->get($validatedForm->get("archive_builder")->getData());
+//            }
 
             $rangeDate = null;
             if ($validatedForm->get('range_date_start')->getData()
@@ -207,9 +201,12 @@ class ExportController extends BaseAdminController
                 ];
             }
 
+            $class = $export->getHandleClass();
+
             return $exportHandler->export(
-                $export->getHandleClassInstance($this->container),
-                $formatter,
+//                $export->getHandleClassInstance($this->container),
+                new $class,
+                $serializer,
                 $archiveBuilder,
                 $lang,
                 $validatedForm->get('images')->getData(),

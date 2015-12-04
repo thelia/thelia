@@ -10,20 +10,20 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting\Formatter;
+namespace Thelia\Core\FileFormat\Formatting\Serializer;
 
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Thelia\Core\FileFormat\Formatting\Exception\BadFormattedStringException;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\AbstractSerializer;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 
 /**
- * Class XMLFormatter
- * @package Thelia\Core\FileFormat\Formatting\Formatter
+ * Class XMLSerializer
+ * @package Thelia\Core\FileFormat\Formatting\Serializer
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class XMLFormatter extends AbstractFormatter
+class XMLSerializer extends AbstractSerializer
 {
     public $root = "data";
     public $rowName = "row";

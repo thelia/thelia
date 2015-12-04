@@ -13,12 +13,15 @@
 namespace Thelia\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\ImportExport;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
 use Thelia\Core\HttpFoundation\Response;
+use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Translation\Translator;
+use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\ExportCategoryQuery;
@@ -37,20 +40,12 @@ class ExportHandler
     protected $eventDispatcher;
 
     /**
-     * @var \Symfony\Component\Translation\TranslatorInterface A translator interface instance
-     */
-    protected $translator;
-
-    /**
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
      *  An event dispatcher interface instance
-     * @param \Symfony\Component\Translation\TranslatorInterface          $translator
-     *  A translator interface instance
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher, TranslatorInterface $translator)
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
-        $this->translator = $translator;
     }
 
     /**
@@ -69,7 +64,7 @@ class ExportHandler
 
         if ($export === null && $dispatchException) {
             throw new \ErrorException(
-                $this->translator->trans(
+                Translator::getInstance()->trans(
                     'There is no id "%id" in the exports',
                     [
                         '%id' => $exportId
@@ -97,7 +92,7 @@ class ExportHandler
 
         if ($category === null && $dispatchException) {
             throw new \ErrorException(
-                $this->translator->trans(
+                Translator::getInstance()->trans(
                     'There is no id "%id" in the export categories',
                     [
                         '%id' => $exportCategoryId
@@ -112,26 +107,30 @@ class ExportHandler
     /*---------- Copied code from old controller - NOT YET REWORKED ----------*/
 
     public function export(
-        \Thelia\ImportExport\Export\ExportHandler $handler,
-        AbstractFormatter $formatter,
+        AbstractExport $handler,
+        SerializerInterface $serializer,
         AbstractArchiveBuilder $archiveBuilder = null,
         Lang $lang = null,
         $includeImages = false,
         $includeDocuments = false,
         $rangeDate = null
     ) {
-        /**
-         * Build an event containing the formatter and the handler.
-         * Used for specific configuration (e.g: XML node names)
-         */
+//        if ($rangeDate !== null) {
+//            $handler->setRangeDate($rangeDate);
+//        }
 
-        $event = new ImportExport($formatter, $handler);
+        $event = new ExportEvent($handler, $serializer);
 
-        $filename = $handler->getFilename() . '.' . $formatter->getExtension();
+        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEGIN, $event);
 
-        if ($rangeDate !== null) {
-            $handler->setRangeDate($rangeDate);
-        }
+        $this->processExport($handler, $serializer);
+
+        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);
+
+
+        /*$event = new ImportExport($serializer, $handler);
+
+        $filename = $handler->getFilename() . '.' . $serializer->getExtension();
 
         if ($archiveBuilder === null) {
             $data = $handler->buildData($lang);
@@ -139,20 +138,19 @@ class ExportHandler
             $event->setData($data);
             $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
 
-            $formattedContent = $formatter
+            $serializedContent = $serializer
                 ->setOrder($handler->getOrder())
                 ->encode($data)
             ;
 
-            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
+            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($serializedContent));
 
             return new Response(
                 $event->getContent(),
                 200,
                 [
-                    "Content-Type" => $formatter->getMimeType(),
-                    "Content-Disposition" =>
-                        "attachment; filename=\"" . $filename . "\"",
+                    'Content-Type' => $serializer->getMimeType(),
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
                 ]
             );
         } else {
@@ -191,7 +189,26 @@ class ExportHandler
             );
 
             return $archiveBuilder->buildArchiveResponse($handler->getFilename());
+        }*/
+    }
+
+    protected function processExport($handler, SerializerInterface $serializer)
+    {
+//        $filename = sprintf(
+//            '%s-%s-%s.%s',
+//            (new \DateTime)->format('Ymd'),
+//            uniqid(),
+//            $handler->getFilename(),
+//            $serializer->getExtension()
+//        );
+        echo $serializer->wrapOpening();
+
+        foreach ($handler as $test) {
+            echo $serializer->serialize($test);
         }
+
+        echo $serializer->wrapClosing();
+        exit;
     }
 
     /**

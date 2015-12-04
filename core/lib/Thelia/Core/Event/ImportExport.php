@@ -13,7 +13,7 @@
 namespace Thelia\Core\Event;
 
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\AbstractSerializer;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\ImportExport\AbstractHandler;
 use Thelia\ImportExport\Export\ExportHandler;
@@ -28,7 +28,7 @@ class ImportExport extends ActionEvent
     /** @var  \Thelia\ImportExport\AbstractHandler */
     protected $handler;
 
-    /** @var  \Thelia\Core\FileFormat\Formatting\AbstractFormatter */
+    /** @var  \Thelia\Core\FileFormat\Formatting\AbstractSerializer */
     protected $formatter;
 
     /** @var  FormatterData */
@@ -41,7 +41,7 @@ class ImportExport extends ActionEvent
     protected $content;
 
     public function __construct(
-        AbstractFormatter $formatter = null,
+        AbstractSerializer $formatter = null,
         AbstractHandler $handler = null,
         FormatterData $data = null,
         AbstractArchiveBuilder $archiveBuilder = null
@@ -72,10 +72,10 @@ class ImportExport extends ActionEvent
     }
 
     /**
-     * @param  AbstractFormatter $formatter
+     * @param  AbstractSerializer $formatter
      * @return $this
      */
-    public function setFormatter(AbstractFormatter $formatter)
+    public function setFormatter(AbstractSerializer $formatter)
     {
         $this->formatter = $formatter;
 
@@ -83,7 +83,7 @@ class ImportExport extends ActionEvent
     }
 
     /**
-     * @return \Thelia\Core\FileFormat\Formatting\AbstractFormatter
+     * @return \Thelia\Core\FileFormat\Formatting\AbstractSerializer
      */
     public function getFormatter()
     {

@@ -13,6 +13,7 @@
 namespace Thelia\ImportExport\Export\Type;
 
 use Thelia\Core\FileFormat\FormatType;
+use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\ImportExport\Export\ExportHandler;
 use Thelia\Model\Lang;
 use Thelia\Model\Map\NewsletterTableMap;
@@ -23,8 +24,23 @@ use Thelia\Model\NewsletterQuery;
  * @package Thelia\ImportExport\Export
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class MailingExport extends ExportHandler
+class MailingExport extends AbstractExport
 {
+    protected function getRawData()
+    {
+        $newsletter = NewsletterQuery::create()
+            ->select([
+                NewsletterTableMap::EMAIL,
+                NewsletterTableMap::LASTNAME,
+                NewsletterTableMap::FIRSTNAME,
+            ])
+//            ->find()
+//            ->toArray()
+        ;
+
+        return $newsletter;
+    }
+
     /**
      * @param  Lang                                            $lang
      * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria

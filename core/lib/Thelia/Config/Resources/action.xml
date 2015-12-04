@@ -192,8 +192,9 @@
             <tag name="kernel.event_subscriber" />
         </service>
 
-        <service id="thelia.import.change_position" class="Thelia\Action\Import">
-            <argument>%kernel.cache_dir%</argument>
+        <service id="thelia.action.import" class="Thelia\Action\Import">
+            <argument type="service" id="thelia.import.handler" />
+
             <tag name="kernel.event_subscriber" />
         </service>
 

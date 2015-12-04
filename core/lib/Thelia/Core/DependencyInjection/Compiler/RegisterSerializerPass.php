@@ -18,21 +18,21 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class RegisterFormatterPass
+ * Class RegisterSerializerPass
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class RegisterFormatterPass implements CompilerPassInterface
+class RegisterSerializerPass implements CompilerPassInterface
 {
     /**
-     * @var string Formatter manager service ID
+     * @var string Serializer manager service ID
      */
-    const MANAGER_SERVICE_ID = 'thelia.formatter.manager';
+    const MANAGER_SERVICE_ID = 'thelia.serializer.manager';
 
     /**
-     * @var string Formatter tag name
+     * @var string Serializer tag name
      */
-    const FORMATTER_SERVICE_TAG = 'thelia.formatter';
+    const SERIALIZER_SERVICE_TAG = 'thelia.serializer';
 
     public function process(ContainerBuilder $container)
     {
@@ -42,7 +42,7 @@ class RegisterFormatterPass implements CompilerPassInterface
             return;
         }
 
-        foreach (array_keys($container->findTaggedServiceIds(self::FORMATTER_SERVICE_TAG)) as $serviceId) {
+        foreach (array_keys($container->findTaggedServiceIds(self::SERIALIZER_SERVICE_TAG)) as $serviceId) {
             $manager->addMethodCall(
                 'add',
                 [

@@ -14,7 +14,7 @@ namespace Thelia\Core\FileFormat\Formatting\Exception;
 
 /**
  * Class BadFormattedStringException
- * @package Thelia\Core\FileFormat\Formatter\Exception
+ * @package Thelia\Core\FileFormat\Serializer\Exception
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
 class BadFormattedStringException extends \ErrorException

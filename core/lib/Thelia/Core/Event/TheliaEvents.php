@@ -866,8 +866,10 @@ final class TheliaEvents
     const EXPORT_CHANGE_POSITION = 'export.change.position';
     const EXPORT_CATEGORY_CHANGE_POSITION = 'export.category.change.position';
 
+    const EXPORT_BEGIN = 'export.begin';
     const EXPORT_BEFORE_ENCODE = 'export.encode.before';
     const EXPORT_AFTER_ENCODE = 'export.encode.after';
+    const EXPORT_SUCCESS = 'export.success';
 
     const IMPORT_BEFORE_DECODE = "Thelia.import.decode.before";
     const IMPORT_AFTER_DECODE = "Thelia.import.decode.after";

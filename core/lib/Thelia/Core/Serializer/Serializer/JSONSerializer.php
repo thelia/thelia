@@ -10,23 +10,53 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting;
+namespace Thelia\Core\Serializer\Serializer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Serializer\SerializerInterface;
 
 /**
- * Trait FormatterManagerTrait
- * @package Thelia\Core\FileFormat\Serializer
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class JSONSerializer
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-trait FormatterManagerTrait
+class JSONSerializer implements SerializerInterface
 {
-    /**
-     * @param  ContainerInterface                                  $container
-     * @return \Thelia\Core\FileFormat\Formatting\SerializerManager
-     */
-    public function getFormatterManager(ContainerInterface $container)
+    public function getId()
     {
-        return $container->get("thelia.manager.serializer");
+        return 'thelia.json';
+    }
+
+    public function getName()
+    {
+        return 'JSON';
+    }
+
+    public function getExtension()
+    {
+        return 'json';
+    }
+
+    public function getMimeType()
+    {
+        return 'application/json';
+    }
+
+    public function wrapOpening()
+    {
+        return '[';
+    }
+
+    public function serialize($data)
+    {
+        return json_encode($data);
+    }
+
+    public function wrapClosing()
+    {
+        return ']';
+    }
+
+    public function unserialize()
+    {
+        // TODO: Implement decode() method.
     }
 }

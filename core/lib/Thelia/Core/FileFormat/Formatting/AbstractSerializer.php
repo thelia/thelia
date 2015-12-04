@@ -17,11 +17,11 @@ use Thelia\Core\Translation\Translator;
 use Thelia\Log\Tlog;
 
 /**
- * Class AbstractFormatter
+ * Class AbstractSerializer
  * @package Thelia\Core\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-abstract class AbstractFormatter implements FormatInterface, FormatterInterface
+abstract class AbstractSerializer implements FormatInterface, SerializerInterface
 {
     const FILENAME = "data";
 

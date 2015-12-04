@@ -10,23 +10,53 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting;
+namespace Thelia\Core\Serializer\Serializer;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Serializer\SerializerInterface;
 
 /**
- * Trait FormatterManagerTrait
- * @package Thelia\Core\FileFormat\Serializer
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * Class XMLSerializer
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-trait FormatterManagerTrait
+class XMLSerializer implements SerializerInterface
 {
-    /**
-     * @param  ContainerInterface                                  $container
-     * @return \Thelia\Core\FileFormat\Formatting\SerializerManager
-     */
-    public function getFormatterManager(ContainerInterface $container)
+    public function getId()
     {
-        return $container->get("thelia.manager.serializer");
+        return 'thelia.xml';
+    }
+
+    public function getName()
+    {
+        return 'XML';
+    }
+
+    public function getExtension()
+    {
+        return 'xml';
+    }
+
+    public function getMimeType()
+    {
+        return 'application/xml';
+    }
+
+    public function wrapOpening()
+    {
+        // TODO: Implement wrapOpening() method.
+    }
+
+    public function serialize($data)
+    {
+        // TODO: Implement serialize() method.
+    }
+
+    public function wrapClosing()
+    {
+        // TODO: Implement wrapClosing() method.
+    }
+
+    public function unserialize()
+    {
+        // TODO: Implement unserialize() method.
     }
 }

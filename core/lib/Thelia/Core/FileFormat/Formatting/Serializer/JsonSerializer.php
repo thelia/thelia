@@ -10,18 +10,18 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting\Formatter;
+namespace Thelia\Core\FileFormat\Formatting\Serializer;
 
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\AbstractSerializer;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 
 /**
- * Class JsonFormatter
- * @package Thelia\Core\FileFormat\Formatting\Formatter
+ * Class JsonSerializer
+ * @package Thelia\Core\FileFormat\Formatting\Serializer
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class JsonFormatter extends AbstractFormatter
+class JsonSerializer extends AbstractSerializer
 {
     /**
      * @return string

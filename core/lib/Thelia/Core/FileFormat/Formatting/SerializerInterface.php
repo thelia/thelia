@@ -13,11 +13,11 @@
 namespace Thelia\Core\FileFormat\Formatting;
 
 /**
- * Interface FormatterInterface
- * @package Thelia\Core\FileFormat\Formatter
+ * Interface SerializerInterface
+ * @package Thelia\Core\FileFormat\Serializer
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-interface FormatterInterface
+interface SerializerInterface
 {
     /**
      * @param  FormatterData $data

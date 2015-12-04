@@ -16,21 +16,27 @@ use Thelia\Core\Translation\Translator;
 
 /**
  * Class FormatterManager
- * @package Thelia\Core\FileFormat\Formatting
  * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class FormatterManager
+class SerializerManager
 {
-    protected $formatters = array();
+    /**
+     * @var array List of handled serializers
+     */
+    protected $serializers = [];
 
     /**
-     * @param $archiveCreator
-     * @return $this
+     * Add
+     *
+     * @param AbstractSerializer $formatter
+     *
+     * @return $this Return $this, allow chaining
      */
-    public function add(AbstractFormatter $formatter)
+    public function add(AbstractSerializer $formatter)
     {
         if (null !== $formatter) {
-            $this->formatters[$formatter->getName()] = $formatter;
+            $this->serializers[$formatter->getName()] = $formatter;
         }
 
         return $this;
@@ -43,30 +49,30 @@ class FormatterManager
      */
     public function delete($name)
     {
-        if (!array_key_exists($name, $this->formatters)) {
+        if (!array_key_exists($name, $this->serializers)) {
             $this->throwOutOfBounds($name);
         }
 
-        unset($this->formatters[$name]);
+        unset($this->serializers[$name]);
 
         return $this;
     }
 
     public function get($name)
     {
-        if (!array_key_exists($name, $this->formatters)) {
+        if (!array_key_exists($name, $this->serializers)) {
             $this->throwOutOfBounds($name);
         }
 
-        return $this->formatters[$name];
+        return $this->serializers[$name];
     }
 
     /**
-     * @return array[AbstractFormatter]
+     * @return array[AbstractSerializer]
      */
     public function getAll()
     {
-        return $this->formatters;
+        return $this->serializers;
     }
 
     /**
@@ -76,8 +82,8 @@ class FormatterManager
     {
         $names = [];
 
-        /** @var AbstractFormatter $formatter */
-        foreach ($this->formatters as $formatter) {
+        /** @var AbstractSerializer $formatter */
+        foreach ($this->serializers as $formatter) {
             $names[] = $formatter->getName();
         }
 
@@ -109,8 +115,8 @@ class FormatterManager
     {
         $extensions = [];
 
-        /** @var AbstractFormatter $formatter */
-        foreach ($this->formatters as $formatter) {
+        /** @var AbstractSerializer $formatter */
+        foreach ($this->serializers as $formatter) {
             $extensionName = $withDot ? ".": "";
             $extensionName .= $formatter->getExtension();
             $extensions[$formatter->getName()] = $extensionName;
@@ -123,7 +129,7 @@ class FormatterManager
     {
         $extensions = [];
 
-        /** @var AbstractFormatter $formatter */
+        /** @var AbstractSerializer $formatter */
         foreach ($this->getFormattersByTypes($types) as $formatter) {
             $extensionName = $withDot ? ".": "";
             $extensionName .= $formatter->getExtension();
@@ -135,7 +141,7 @@ class FormatterManager
 
     /**
      * @param $extension
-     * @return bool|AbstractFormatter
+     * @return bool|AbstractSerializer
      */
     public function getFormatterByExtension($extension)
     {
@@ -151,7 +157,7 @@ class FormatterManager
             $flip = array_flip($extensions);
             $formatterName = $flip[$extension];
 
-            return $this->formatters[$formatterName];
+            return $this->serializers[$formatterName];
         }
     }
 
@@ -163,8 +169,8 @@ class FormatterManager
 
         $selectedFormatters = [];
 
-        /** @var AbstractFormatter $formatter */
-        foreach ($this->formatters as $formatter) {
+        /** @var AbstractSerializer $formatter */
+        foreach ($this->serializers as $formatter) {
             $handledType = $formatter->getHandledType();
 
             if (in_array($handledType, $types)) {
@@ -183,7 +189,7 @@ class FormatterManager
 
         $mimeTypes = [];
 
-        /** @var AbstractFormatter $formatter */
+        /** @var AbstractSerializer $formatter */
         foreach ($this->getFormattersByTypes($types) as $formatter) {
             $mimeTypes[$formatter->getName()] = $formatter->getMimeType();
         }

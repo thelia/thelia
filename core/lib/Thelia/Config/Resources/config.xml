@@ -236,19 +236,23 @@
             <tag name="thelia.archive_builder" />
         </service>
 
-        <!-- Formatters -->
-        <service id="thelia.formatter.manager" class="Thelia\Core\FileFormat\Formatting\FormatterManager" />
+        <!-- Serializers -->
+        <service id="thelia.serializer.manager" class="Thelia\Core\Serializer\SerializerManager" />
 
-        <service id="thelia.formatter.xml_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\XMLFormatter">
-            <tag name="thelia.formatter" />
+        <service id="thelia.serializer.csv" class="Thelia\Core\Serializer\Serializer\CSVSerializer">
+            <tag name="thelia.serializer" />
         </service>
 
-        <service id="thelia.formatter.json_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\JsonFormatter">
-            <tag name="thelia.formatter" />
+        <service id="thelia.serializer.xml" class="Thelia\Core\Serializer\Serializer\XMLSerializer">
+            <tag name="thelia.serializer" />
         </service>
 
-        <service id="thelia.formatter.csv_formatter" class="Thelia\Core\FileFormat\Formatting\Formatter\CSVFormatter">
-            <tag name="thelia.formatter" />
+        <service id="thelia.serializer.json" class="Thelia\Core\Serializer\Serializer\JSONSerializer">
+            <tag name="thelia.serializer" />
+        </service>
+
+        <service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">
+            <tag name="thelia.serializer" />
         </service>
 
         <!-- Thelia simple token provider -->
@@ -301,6 +305,9 @@
         <!-- Handlers -->
         <service id="thelia.export.handler" class="Thelia\Handler\ExportHandler">
             <argument type="service" id="event_dispatcher" />
+        </service>
+
+        <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
             <argument type="service" id="thelia.translator" />
         </service>
     </services>

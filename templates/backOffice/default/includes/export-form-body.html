@@ -78,10 +78,10 @@
 
 <div class="row">
     <div class="col-md-12">
-        {ifloop rel="export-formatters"}
+        {ifloop rel="export-serializers"}
             <div class="row vertical-row-space">
                 <div class="col-xs-4">
-                    {form_field field="formatter"}
+                    {form_field field="serializer"}
                         <div>
                             <label for="{$label_attr.for}">
                                 {$label}
@@ -90,8 +90,8 @@
 
                         <div>
                             <select id="{$label_attr.for}" name="{$name}" required>
-                                {loop type="formatter" name="export-formatters" export=$ID}
-                                    <option value="{$NAME}"{if $value == $NAME} selected{/if}>{$NAME} (.{$EXTENSION})</option>
+                                {loop type="serializer" name="export-serializers" export=$ID}
+                                    <option value="{$ID}"{if $value == $ID} selected{/if}>{$NAME} (.{$EXTENSION})</option>
                                 {/loop}
                             </select>
                         </div>
@@ -194,7 +194,7 @@
                 </div>
             {/ifloop}
         {/ifloop}
-        {elseloop rel="export-formatters"}
+        {elseloop rel="export-serializers"}
             <div class="alert alert-warning">
                 {intl l="You can't do exports, you don't have any formatter that handles this."}
             </div>

@@ -10,18 +10,18 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\FileFormat\Formatting\Formatter;
+namespace Thelia\Core\FileFormat\Formatting\Serializer;
 
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
+use Thelia\Core\FileFormat\Formatting\AbstractSerializer;
 use Thelia\Core\FileFormat\Formatting\FormatterData;
 use Thelia\Core\FileFormat\FormatType;
 
 /**
- * Class CSVFormatter
- * @package Thelia\Core\FileFormat\Formatting\Formatter
+ * Class CSVSerializer
+ * @package Thelia\Core\FileFormat\Formatting\Serializer
  * @author Benjamin Perche <bperche@openstudio.fr>
  */
-class CSVFormatter extends AbstractFormatter
+class CSVSerializer extends AbstractSerializer
 {
     public $delimiter = ";";
     public $lineReturn = "\n";

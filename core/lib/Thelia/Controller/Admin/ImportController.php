@@ -18,8 +18,8 @@ use Thelia\Core\Event\UpdatePositionEvent;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManager;
 use Thelia\Core\FileFormat\Archive\ArchiveBuilderManagerTrait;
-use Thelia\Core\FileFormat\Formatting\AbstractFormatter;
-use Thelia\Core\FileFormat\Formatting\FormatterManager;
+use Thelia\Core\FileFormat\Formatting\AbstractSerializer;
+use Thelia\Core\FileFormat\Formatting\SerializerManager;
 use Thelia\Core\FileFormat\Formatting\FormatterManagerTrait;
 use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
@@ -105,7 +105,7 @@ class ImportController extends BaseAdminController
             /** @var AbstractArchiveBuilder $archiveBuilder */
             $archiveBuilder = $tools["archive_builder"];
 
-            /** @var AbstractFormatter $formatter */
+            /** @var AbstractSerializer $formatter */
             $formatter = $tools["formatter"];
 
             if ($archiveBuilder !== null) {
@@ -172,7 +172,7 @@ class ImportController extends BaseAdminController
 
     public function getFileContentInArchive(
         AbstractArchiveBuilder $archiveBuilder,
-        FormatterManager $formatterManager,
+        SerializerManager $formatterManager,
         array $types
     ) {
         $content = null;
@@ -182,7 +182,7 @@ class ImportController extends BaseAdminController
          */
 
         $fileNames = [];
-        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+        /** @var \Thelia\Core\FileFormat\Formatting\AbstractSerializer $formatter */
         foreach ($formatterManager->getFormattersByTypes($types) as $formatter) {
             $fileName = $formatter::FILENAME . "." . $formatter->getExtension();
             $fileNames[] = $fileName;
@@ -227,7 +227,7 @@ class ImportController extends BaseAdminController
 
         $uploadFormat = null;
 
-        /** @var \Thelia\Core\FileFormat\Formatting\AbstractFormatter $formatter */
+        /** @var \Thelia\Core\FileFormat\Formatting\AbstractSerializer $formatter */
         $formatter = null;
 
         /** @var \Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder $archiveBuilder */
@@ -289,7 +289,7 @@ class ImportController extends BaseAdminController
     public function processImport(
         $content,
         ImportHandler $handler,
-        AbstractFormatter $formatter = null,
+        AbstractSerializer $formatter = null,
         AbstractArchiveBuilder $archiveBuilder = null,
         Lang $lang = null
     ) {
