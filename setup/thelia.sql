@@ -2312,11 +2312,6 @@ CREATE TABLE `country_area`
         FOREIGN KEY (`country_id`)
         REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_country_area_state_id`
-        FOREIGN KEY (`state_id`)
-        REFERENCES `state` (`id`)
-        ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 

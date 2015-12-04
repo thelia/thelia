@@ -204,12 +204,14 @@ ALTER TABLE `tax_rule_country` INDEX `idx_tax_rule_country_state_id` (`state_id`
 ALTER TABLE `country_area` DROP PRIMARY KEY;
 ALTER TABLE `country_area` ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
 ALTER TABLE `country_area` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
+/*
 ALTER TABLE `country_area`
     ADD CONSTRAINT `fk_country_area_state_id`
     FOREIGN KEY (`state_id`)
     REFERENCES `state` (`id`)
     ON UPDATE RESTRICT
     ON DELETE CASCADE;
+*/
 ALTER TABLE `country_area` INDEX `fk_country_area_state_id_idx` (`state_id`);
 
 /*
