@@ -16,7 +16,7 @@
             </tr>
             <tr>
                 <td>
-                {loop name="product-attributes-av" type="attribute_availability" attribute="{$ID}" product="{$product_id}"}
+                {loop name="product-attributes-av" type="attribute-availability" attribute="{$ID}" product="{$product_id}"}
                     {$selected = in_array($ID, $selected_attributes_av_id)}
                     <div class="checkbox">
                         <label>

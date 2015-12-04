@@ -138,7 +138,7 @@
                                                 </thead>
 
                                                 <tbody>
-                                                {loop type="order_product" name="order-products" order=$ID}
+                                                {loop type="order-product" name="order-products" order=$ID}
                                                     {if $WAS_IN_PROMO == 1}
                                                         {assign "realPrice" $PROMO_PRICE}
                                                         {assign "realTax" $PROMO_PRICE_TAX}
@@ -166,7 +166,7 @@
                                                             {/elseloop}
                                                             {ifloop rel="combinations"}
                                                             <dl class="dl-horizontal">
-                                                                {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                                                                {loop type="order_product-attribute-combination" name="combinations" order_product=$ID}
                                                                 <dt>{$ATTRIBUTE_TITLE}</dt>
                                                                 <dd>{$ATTRIBUTE_AVAILABILITY_TITLE}</dd>
                                                                 {/loop}
@@ -199,7 +199,7 @@
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Coupon code"}</strong></td>
                                                         <td colspan="100" class="text-right">
-                                                            {loop type="order_coupon" name="couponcode" order=$ID}
+                                                            {loop type="order-coupon" name="couponcode" order=$ID}
                                                                 {$CODE}{if $LOOP_COUNT != $LOOP_TOTAL}, {/if}
                                                             {/loop}
                                                             {elseloop rel="couponcode"}
@@ -239,7 +239,7 @@
                                         </div>
 
 
-                                        {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                        {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                             {assign "orderInvoiceFirstName" $FIRSTNAME}
                                             {assign "orderInvoiceLastName" $LASTNAME}
                                             {assign "orderInvoiceCompany" $COMPANY}
@@ -356,7 +356,7 @@
                                                             <td>{format_date date=$INVOICE_DATE output="date"}</td>
                                                         </tr>
 
-                                                        {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                                        {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                                             <tr data-field-class="js-company">
                                                                 <th>{intl l="Company"}</th>
                                                                 <td>{$COMPANY}</td>
@@ -436,7 +436,7 @@
                                                             {hook name="order-edit.bill-delivery-address" module="$DELIVERY_MODULE" order_id={$order_id}}
                                                         {/ifhook}
                                                         {elsehook rel="order-edit.bill-delivery-address"}
-                                                            {loop type="order_address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
+                                                            {loop type="order-address" name="order-delivery-address" id=$DELIVERY_ADDRESS}
                                                                 <tr data-field-class="js-company">
                                                                     <th>{intl l="Company"}</th>
                                                                     <td>{$COMPANY}</td>

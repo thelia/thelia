@@ -3,8 +3,8 @@
     {$has_at_least_one_combination = false}
     {$default_product_sale_element_id = 0}
 
-    {loop name="product.sales.elements.test" type="product_sale_elements" product=$product_id currency=$edit_currency_id backend_context="1"}
-        {loop name="product.combinations" type="attribute_combination" product_sale_elements="$ID"}
+    {loop name="product.sales.elements.test" type="product-sale-elements" product=$product_id currency=$edit_currency_id backend_context="1"}
+        {loop name="product.combinations" type="attribute-combination" product_sale_elements="$ID"}
             {$has_at_least_one_combination = true}
         {/loop}
 
@@ -377,7 +377,7 @@
                                         {$current_pse_id = $value}
 
                                         {capture assign="combination_label"}
-                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
+                                            {loop name="product.sales.elements.combinations" type="attribute-combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
                                             {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
                                             {/loop}
                                         {/capture}
@@ -699,7 +699,7 @@
 		        </ul>
 		    </div>
 		</div>
-        {loop type="product_sale_elements" name="product_sale_elements_combination_form" product="{$product_id}" default="yes"}
+        {loop type="product_sale_elements" name="product-sale-elements_combination_form" product="{$product_id}" default="yes"}
 		<div class="col-md-6">
          {form_field field='price'}
              <div class="form-group {if $error}has-error{/if}">

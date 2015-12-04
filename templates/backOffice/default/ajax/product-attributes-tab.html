@@ -176,7 +176,7 @@
 
 		                                                {$selected = array()}
 
-							                            {loop name="free-text-value" exclude_free_text="true" type="feature_value" product=$product_id feature=$ID  backend_context="1" lang="$edit_language_id"}
+							                            {loop name="free-text-value" exclude_free_text="true" type="feature-value" product=$product_id feature=$ID  backend_context="1" lang="$edit_language_id"}
 							                               {$selected[] = $FEATURE_AV_ID}
 							                            {/loop}
 
@@ -211,7 +211,7 @@
 								                        {* Get the free text value *}
                                                         {$feature_value=''}
 
-								                        {loop name="free-text-value" type="feature_value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id"}
+								                        {loop name="free-text-value" type="feature-value" product=$product_id feature=$ID backend_context="1" lang="$edit_language_id"}
                                                             {if $IS_FREE_TEXT && $FREE_TEXT_VALUE != 1}
                                                                 {$feature_value=$FREE_TEXT_VALUE}
                                                             {else}

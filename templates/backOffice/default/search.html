@@ -148,7 +148,7 @@
 
                             <tbody>
                             {loop type="order" name="order-search" backend_context=1 customer="*" search_term=trim($smarty.get.search_term) search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email"}
-                                {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
                                 {assign "orderInvoiceCompany" $COMPANY}

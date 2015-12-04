@@ -10,7 +10,7 @@
 
     <div id="wrapper" class="container">
 
-        {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+        {loop name="module_hook_edit" type="module-hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
 
         <ul class="breadcrumb">
             <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
@@ -86,7 +86,7 @@
 
         {/loop}
 
-        {elseloop rel="module_hook_edit"}
+        {elseloop rel="module-hook-edit"}
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-error">
@@ -103,7 +103,7 @@
 <script>
 (function($) {
     // Declare current values for classname and method selects
-    {loop name="module_hook_edit" type="module_hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
+    {loop name="module_hook_edit" type="module-hook" id="$module_hook_id" backend_context="1" lang="$edit_language_id"}
         var currentClassname = "{$CLASSNAME}";
         var currentMethod = "{$METHOD}";
     {/loop}

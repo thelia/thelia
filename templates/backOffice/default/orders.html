@@ -113,7 +113,7 @@
                                         {$orderCurrency=$SYMBOL}
                                     {/loop}
 
-                                    {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                    {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
                                         {assign "orderInvoiceLastName" $LASTNAME}
                                         {assign "orderInvoiceCompany" $COMPANY}
