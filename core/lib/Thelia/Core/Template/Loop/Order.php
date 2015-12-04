@@ -82,12 +82,12 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                 'order',
                 new TypeCollection(
                     new Type\EnumListType(array(
-                        'id', 'id-reverse',
-                        'reference', 'reference-reverse',
-                        'create-date', 'create-date-reverse',
-                        'company', 'company-reverse',
-                        'customer-name', 'customer-name-reverse',
-                        'status', 'status-reverse'
+                        'id', 'id-reverse', 'id_reverse',
+                        'reference', 'reference-reverse', 'reference_reverse',
+                        'create-date', 'create-date-reverse', 'create_date', 'create_date_reverse',
+                        'company', 'company-reverse', 'company', 'company_reverse',
+                        'customer-name', 'customer-name-reverse', 'customer_name', 'customer_name_reverse',
+                        'status', 'status-reverse', 'status_reverse'
                     ))
                 ),
                 'create-date-reverse'
@@ -210,30 +210,31 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     $search->orderById(Criteria::ASC);
                     break;
                 case 'id-reverse':
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
-
                 case 'reference':
                     $search->orderByRef(Criteria::ASC);
                     break;
                 case 'reference-reverse':
+                case 'reference_reverse':
                     $search->orderByRef(Criteria::DESC);
                     break;
-
                 case 'create-date':
+                case 'create_date':
                     $search->orderByCreatedAt(Criteria::ASC);
                     break;
                 case 'create-date-reverse':
+                case 'create_date_reverse':
                     $search->orderByCreatedAt(Criteria::DESC);
                     break;
-
                 case 'status':
                     $search->orderByStatusId(Criteria::ASC);
                     break;
                 case 'status-reverse':
+                case 'status_reverse':
                     $search->orderByStatusId(Criteria::DESC);
                     break;
-
                 case 'company':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
@@ -242,14 +243,15 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     ;
                     break;
                 case 'company-reverse':
+                case 'company_reverse':
                     $search
                         ->joinOrderAddressRelatedByDeliveryOrderAddressId()
                         ->withColumn(OrderAddressTableMap::COMPANY, 'company')
                         ->orderBy('company', Criteria::DESC)
                     ;
                     break;
-
                 case 'customer-name':
+                case 'customer_name':
                     $search
                         ->joinCustomer()
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')
@@ -259,6 +261,7 @@ class Order extends BaseLoop implements SearchLoopInterface, PropelSearchLoopInt
                     ;
                     break;
                 case 'customer-name-reverse':
+                case 'customer_name_reverse':
                     $search
                         ->joinCustomer()
                         ->withColumn(CustomerTableMap::FIRSTNAME, 'firstname')

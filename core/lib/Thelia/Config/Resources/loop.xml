@@ -9,10 +9,10 @@
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
         <loop class="Thelia\Core\Template\Loop\Admin" name="admin"/>
         <loop class="Thelia\Core\Template\Loop\Area" name="area"/>
-        <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
+        <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated-content"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
-        <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
-        <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute-availability"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute-combination"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
         <loop class="Thelia\Core\Template\Loop\Brand" name="brand"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
@@ -22,23 +22,23 @@
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
         <loop class="Thelia\Core\Template\Loop\FeatureAvailability" name="feature-availability"/>
-        <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature-value"/>
         <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
         <loop class="Thelia\Core\Template\Loop\FolderPath" name="folder-path"/>
         <loop class="Thelia\Core\Template\Loop\Module" name="module"/>
         <loop class="Thelia\Core\Template\Loop\Hook" name="hook"/>
-        <loop class="Thelia\Core\Template\Loop\ModuleHook" name="module_hook"/>
+        <loop class="Thelia\Core\Template\Loop\ModuleHook" name="module-hook"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
-        <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order_address"/>
-        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order_product"/>
-        <loop class="Thelia\Core\Template\Loop\OrderProductTax" name="order_product_tax"/>
-        <loop class="Thelia\Core\Template\Loop\OrderCoupon" name="order_coupon"/>
-        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order_product_attribute_combination"/>
+        <loop class="Thelia\Core\Template\Loop\OrderAddress" name="order-address"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProduct" name="order-product"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductTax" name="order-product-tax"/>
+        <loop class="Thelia\Core\Template\Loop\OrderCoupon" name="order-coupon"/>
+        <loop class="Thelia\Core\Template\Loop\OrderProductAttributeCombination" name="order-product-attribute-combination"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Payment" name="payment"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
-        <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product-sale-elements"/>
         <loop class="Thelia\Core\Template\Loop\Profile" name="profile"/>
         <loop class="Thelia\Core\Template\Loop\Resource" name="resource"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>

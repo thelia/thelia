@@ -44,8 +44,8 @@
 
                 <td class="text-center">
                     {$has_combinations = false}
-                    {loop name="product.sales.elements.test" type="product_sale_elements" product=$ID currency=$edit_currency_id backend_context="1"}
-                        {loop name="product.combinations" type="attribute_combination" product_sale_elements=$ID backend_context="1"}
+                    {loop name="product.sales.elements.test" type="product-sale-elements" product=$ID currency=$edit_currency_id backend_context="1"}
+                        {loop name="product.combinations" type="attribute-combination" product_sale_elements=$ID backend_context="1"}
                             {$has_combinations = true}
                         {/loop}
                     {/loop}

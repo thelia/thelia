@@ -29,7 +29,7 @@
             <tr>
                 <td valign="top" width="55%">
                     <strong>{intl l="Delivery address:"}</strong><br>
-                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {loop type="order-address" name="delivery_address" id=$DELIVERY_ADDRESS}
                     {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
@@ -41,7 +41,7 @@
                 </td>
                 <td valign="top">
                     <strong>{intl l="Billing address:"}</strong><br />
-                    {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                    {loop type="order-address" name="invoice_address" id=$INVOICE_ADDRESS}
                     {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1}<br>
@@ -69,7 +69,7 @@
                 <td style="color:#999;border-bottom:1px solid #000">{intl l="What You Purchased"}</td>
                 <td align="right" style="color:#999;border-bottom:1px solid #000">{intl l="Price in"} {$orderCurrencyIsoCode}</td>
             </tr>
-            {loop type="order_product" name="order-products" order=$ID}
+            {loop type="order-product" name="order-products" order=$ID}
             {if $WAS_IN_PROMO == 1}
                 {assign "realPrice" $PROMO_PRICE}
                 {assign "realTax" $PROMO_PRICE_TAX}
@@ -83,7 +83,7 @@
                     <td style="border-bottom:1px solid #000">
                         <b>{$TITLE}</b> <i>({$REF})</i>
                         {ifloop rel="combinations"}<br />
-                        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                        {loop type="order-product-attribute-combination" name="combinations" order_product=$ID}
                             <span style="color:#999;display:block;font-size:11px;line-height:1.2">* {$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}</span>
                         {/loop}
                         {/ifloop}

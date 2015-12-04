@@ -41,7 +41,7 @@
                                         {admin_sortable_header
                                         current_order=$orders_order
                                         order='id'
-                                        reverse_order='id-reverse'
+                                        reverse_order='id_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='ID'}"
@@ -51,7 +51,7 @@
                                     {admin_sortable_header
                                         current_order=$orders_order
                                         order='reference'
-                                        reverse_order='reference-reverse'
+                                        reverse_order='reference_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Reference'}"
@@ -60,8 +60,8 @@
                                     <th class="object-title">
                                     {admin_sortable_header
                                         current_order=$orders_order
-                                        order='create-date'
-                                        reverse_order='create-date-reverse'
+                                        order='create_date'
+                                        reverse_order='create_date_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Date & Hour'}"
@@ -71,7 +71,7 @@
                                     {admin_sortable_header
                                         current_order=$orders_order
                                         order='company'
-                                        reverse_order='company-reverse'
+                                        reverse_order='company_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Company'}"
@@ -80,8 +80,8 @@
                                     <th class="object-title">
                                     {admin_sortable_header
                                         current_order=$orders_order
-                                        order='customer-name'
-                                        reverse_order='customer-name-reverse'
+                                        order='customer_name'
+                                        reverse_order='customer_name_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Cutomer Name'}"
@@ -93,7 +93,7 @@
                                     {admin_sortable_header
                                         current_order=$orders_order
                                         order='status'
-                                        reverse_order='status-reverse'
+                                        reverse_order='status_reverse'
                                         path={url path='/admin/orders'}
                                         request_parameter_name='orders_order'
                                         label="{intl l='Status'}"
@@ -113,7 +113,7 @@
                                         {$orderCurrency=$SYMBOL}
                                     {/loop}
 
-                                    {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                    {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                         {assign "orderInvoiceFirstName" $FIRSTNAME}
                                         {assign "orderInvoiceLastName" $LASTNAME}
                                         {assign "orderInvoiceCompany" $COMPANY}

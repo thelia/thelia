@@ -128,7 +128,7 @@
                                         {$lastOrderCurrency = ''}
                                         {$hasOrders = false}
 
-                                        {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                        {loop type="order" name="last-order" customer=$ID order="create_date_reverse" limit="1"}
                                             {$lastOrderDate = {format_date date=$CREATE_DATE}}
                                             {$lastOrderAmount = {format_number number=$TOTAL_TAXED_AMOUNT}}
                                             {loop type="currency" name="order-currency" id=$CURRENCY}

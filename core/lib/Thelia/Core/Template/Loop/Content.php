@@ -76,18 +76,12 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'alpha',
-                            'alpha-reverse',
-                            'manual',
-                            'manual_reverse',
-                            'random',
-                            'given_id',
-                            'created',
-                            'created_reverse',
-                            'updated',
-                            'updated_reverse',
-                            'position',
-                            'position_reverse'
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'manual', 'manual_reverse',
+                            'random', 'given_id',
+                            'created', 'created_reverse',
+                            'updated', 'updated_reverse',
+                            'position', 'position_reverse'
                         )
                     )
                 ),
@@ -203,6 +197,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":

@@ -71,7 +71,11 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('id', 'id_reverse', 'alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array(
+                        'id', 'id_reverse',
+                        'alpha', 'alpha-reverse', 'alpha_reverse',
+                        'manual', 'manual_reverse'
+                    ))
                 ),
                 'manual'
             ),
@@ -188,6 +192,7 @@ class Feature extends BaseI18nLoop implements PropelSearchLoopInterface
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":

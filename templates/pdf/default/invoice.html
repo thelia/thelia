@@ -213,7 +213,7 @@
                 {/ifhook}
                 {elsehook rel="invoice.delivery-address"}                
 				<p>
-                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                    {loop type="order-address" name="delivery_address" id=$DELIVERY_ADDRESS}
                     {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop} {$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
@@ -226,7 +226,7 @@
             <td style="border-left: solid 1mm #f6993c;">
                 <h3>{intl l="Invoice address"}</h3>
                 <p>
-                    {loop type="order_address" name="delivery_address" id=$INVOICE_ADDRESS}
+                    {loop type="order-address" name="delivery_address" id=$INVOICE_ADDRESS}
                     {if $COMPANY != ""}{$COMPANY}<br />{/if}
                     {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                     {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
@@ -256,7 +256,7 @@
             <td><h4 class="align-center">{intl l="Quantity"}</h4></td>
             <td style="background:#f6993c"><h4 style="color:white;" class="align-center">{intl l="Taxed total"}</h4></td>
         </tr>
-        {loop type="order_product" name="order-products" order=$ID}
+        {loop type="order-product" name="order-products" order=$ID}
             {if $WAS_IN_PROMO == 1}
                 {assign "realPrice" $PROMO_PRICE}
                 {assign "realTax" $PROMO_PRICE_TAX}
@@ -275,7 +275,7 @@
                 <td>
                     <p>{$TITLE}</p>
                     {ifloop rel="combinations"}
-                    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                    {loop type="order-product-attribute-combination" name="combinations" order_product=$ID}
                         {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                     {/loop}
                     {/ifloop}
@@ -287,7 +287,7 @@
                 <td><p class="align-right">{format_money number={$realTotalPrice} symbol=$orderCurrency}</p></td>
             </tr>
 
-            {hook name="invoice.order-product" order="{$order_id}" order_product="{$ID}"}
+            {hook name="invoice.order-product" order=$order_id order_product=$ID}
         {/loop}
     </table>
 

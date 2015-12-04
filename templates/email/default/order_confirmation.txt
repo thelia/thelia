@@ -8,7 +8,7 @@
 {intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
 
 {intl l="Your delivery address"}
-{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+{loop type="order-address" name="delivery_address" id=$DELIVERY_ADDRESS}
 {if $COMPANY != ""}{$COMPANY}
 {/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
@@ -17,7 +17,7 @@
 {/loop}
 
 {intl l="Your billing address"}
-{loop type="order_address" name="billing_address" id=$INVOICE_ADDRESS}
+{loop type="order-address" name="billing_address" id=$INVOICE_ADDRESS}
 {if $COMPANY != ""}{$COMPANY}
 {/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
@@ -27,7 +27,7 @@
 
 {intl l="Items ordered:"}
 
-{loop type="order_product" name="order-products" order=$ID}
+{loop type="order-product" name="order-products" order=$ID}
 {if $WAS_IN_PROMO == 1}
     {assign "realPrice" $PROMO_PRICE}
     {assign "realTax" $PROMO_PRICE_TAX}
@@ -40,7 +40,7 @@
     
     {intl l="Item : %item" item=$TITLE}
 {ifloop rel="combinations"}
-    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+    {loop type="order-product-attribute_combination" name="combinations" order_product=$ID}
       - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
     {/loop}
 {/ifloop}

@@ -60,26 +60,18 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                 new TypeCollection(
                     new Type\EnumListType(
                         array(
-                            'id',
-                            'id-reverse',
-                            'alpha',
-                            'alpha-reverse',
-                            'label',
-                            'label-reverse',
-                            'active',
-                            'active-reverse',
-                            'start-date',
-                            'start-date-reverse',
-                            'end-date',
-                            'end-date-reverse',
-                            'created',
-                            'created-reverse',
-                            'updated',
-                            'updated-reverse'
+                            'id', 'id-reverse', 'id_reverse',
+                            'alpha', 'alpha-reverse', 'alpha_reverse',
+                            'label', 'label-reverse', 'label_reverse',
+                            'active', 'active-reverse', 'active_reverse',
+                            'start-date', 'start-date-reverse', 'start_date', 'start_date_reverse',
+                            'end-date', 'end-date-reverse', 'end_date', 'end_date_reverse',
+                            'created', 'created-reverse',
+                            'updated', 'updated-reverse'
                         )
                     )
                 ),
-                'start-date'
+                'start_date'
             )
         );
     }
@@ -153,48 +145,58 @@ class Sale extends BaseI18nLoop implements PropelSearchLoopInterface, SearchLoop
                     $search->orderById(Criteria::ASC);
                     break;
                 case 'id-reverse':
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
                 case "alpha":
                     $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
+                case "alpha_reverse":
                     $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "label":
                     $search->addAscendingOrderByColumn('i18n_SALE_LABEL');
                     break;
                 case "label-reverse":
+                case "label_reverse":
                     $search->addDescendingOrderByColumn('i18n_SALE_LABEL');
                     break;
                 case "active":
                     $search->orderByActive(Criteria::ASC);
                     break;
                 case "active-reverse":
+                case "active_reverse":
                     $search->orderByActive(Criteria::DESC);
                     break;
                 case "start-date":
+                case "start_date":
                     $search->orderByStartDate(Criteria::ASC);
                     break;
                 case "start-date-reverse":
+                case "start_date_reverse":
                     $search->orderByStartDate(Criteria::DESC);
                     break;
                 case "end-date":
+                case "end_date":
                     $search->orderByEndDate(Criteria::ASC);
                     break;
                 case "end-date-reverse":
+                case "end_date_reverse":
                     $search->orderByEndDate(Criteria::DESC);
                     break;
                 case "created":
                     $search->addAscendingOrderByColumn('created_at');
                     break;
                 case "created-reverse":
+                case "created_reverse":
                     $search->addDescendingOrderByColumn('created_at');
                     break;
                 case "updated":
                     $search->addAscendingOrderByColumn('updated_at');
                     break;
                 case "updated-reverse":
+                case "updated_reverse":
                     $search->addDescendingOrderByColumn('updated_at');
                     break;
             }

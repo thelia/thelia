@@ -65,7 +65,7 @@
                                 {assign "lastOrderCurrency" ''}
                                 {$hasOrders = false}
 
-                                {loop type="order" name="last-order" customer=$ID order="create-date-reverse" limit="1"}
+                                {loop type="order" name="last-order" customer=$ID order="create_date_reverse" limit="1"}
                                 {assign "lastOrderDate" "{format_date date=$CREATE_DATE}"}
                                 {assign "lastOrderAmount" "{format_number number=$TOTAL_TAXED_AMOUNT}"}
                                 {loop type="currency" name="order-currency" id=$CURRENCY}
@@ -148,7 +148,7 @@
 
                             <tbody>
                             {loop type="order" name="order-search" backend_context=1 customer="*" search_term=trim($smarty.get.search_term) search_in="ref,customer_ref,customer_firstname,customer_lastname,customer_email"}
-                                {loop type="order_address" name="order-invoice-address" id=$INVOICE_ADDRESS}
+                                {loop type="order-address" name="order-invoice-address" id=$INVOICE_ADDRESS}
                                 {assign "orderInvoiceFirstName" $FIRSTNAME}
                                 {assign "orderInvoiceLastName" $LASTNAME}
                                 {assign "orderInvoiceCompany" $COMPANY}

@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            {loop type="module_hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1 lang=$lang_id}
+            {loop type="module-hook" name="hook.{$hook_id}" hook="{$hook_id}" backend_context=1 lang=$lang_id}
             {assign var="visible" value="{if $MODULE_ACTIVE && $HOOK_ACTIVE}{if $ACTIVE}1{else}0{/if}{else}0{/if}" }
             <tr class="hook-module {if ! $MODULE_ACTIVE}inactive{/if}"
                 data-visible="{$visible}"

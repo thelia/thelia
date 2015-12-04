@@ -21,7 +21,7 @@
     <label for="coupon-products-id">{intl l="Applies to attribute values :"}</label>
 
     <select required multiple size="10" class="form-control" id="coupon-attributeAvs-id" name="{$attribute_av_field_name}[]">
-        {loop type="attribute_availability" attribute=$attribute_value|default:0 name="list-of-attribute_avs" backend_context="1"}
+        {loop type="attribute-availability" attribute=$attribute_value|default:0 name="list-of-attribute_avs" backend_context="1"}
             <option value="{$ID}" {if in_array($ID, $attribute_av_values)}selected="selected"{/if}>{$TITLE}</option>
         {/loop}
     </select>

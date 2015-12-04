@@ -125,13 +125,13 @@ class Area extends BaseLoop implements PropelSearchLoopInterface
                 case 'id':
                     $search->orderById(Criteria::ASC);
                     break;
-                case 'id-reverse':
+                case 'id_reverse':
                     $search->orderById(Criteria::DESC);
                     break;
                 case "alpha":
                     $search->orderByName(Criteria::ASC);
                     break;
-                case "alpha-reverse":
+                case "alpha_reverse":
                     $search->orderByName(Criteria::DESC);
                     break;
             }

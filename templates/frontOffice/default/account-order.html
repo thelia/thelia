@@ -94,7 +94,7 @@
                             {hook name="account-order.delivery-address" module="{$delivery_id}" order="{$order_id}"}
                         {/ifhook}
                         {elsehook rel="account-order.delivery-address"}
-                            {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                            {loop type="order-address" name="delivery_address" id=$DELIVERY_ADDRESS}
                                 {loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                                 {$ZIPCODE} {$CITY}<br/>
@@ -128,7 +128,7 @@
                             {hook name="account-order.invoice-address" module="{$payment_id}" order="{$order_id}"}
                         {/ifhook}
                         {elsehook rel="account-order.invoice-address"}
-                            {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
+                            {loop type="order-address" name="invoice_address" id=$INVOICE_ADDRESS}
                                 {loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG} {/loop}{$FIRSTNAME} {$LASTNAME}<br />
                                 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}<br />
                                 {$ZIPCODE} {$CITY}<br/>
@@ -180,7 +180,7 @@
             </tr>
             {/ifhook}
 
-            {loop type="order_product" name="order-products" order=$ID}
+            {loop type="order-product" name="order-products" order=$ID}
                 {if $WAS_IN_PROMO == 1}
                     {assign "realPrice" $PROMO_PRICE}
                     {assign "realTax" $PROMO_PRICE_TAX}
@@ -200,7 +200,7 @@
                         <p>{$TITLE}</p>
                         {ifloop rel="combinations"}
                         <p>
-                        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+                        {loop type="order-product_attribute_combination" name="combinations" order_product=$ID}
                             {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}<br>
                         {/loop}
                         </p>
