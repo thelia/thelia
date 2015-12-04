@@ -154,7 +154,7 @@ class CountryAreaTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
-        $this->addForeignKey('STATE_ID', 'StateId', 'INTEGER', 'state', 'ID', false, null, null);
+        $this->addColumn('STATE_ID', 'StateId', 'INTEGER', false, null, null);
         $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -167,7 +167,6 @@ class CountryAreaTableMap extends TableMap
     {
         $this->addRelation('Area', '\\Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_ONE, array('state_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**

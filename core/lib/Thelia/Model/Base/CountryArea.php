@@ -22,8 +22,6 @@ use Thelia\Model\Country as ChildCountry;
 use Thelia\Model\CountryArea as ChildCountryArea;
 use Thelia\Model\CountryAreaQuery as ChildCountryAreaQuery;
 use Thelia\Model\CountryQuery as ChildCountryQuery;
-use Thelia\Model\State as ChildState;
-use Thelia\Model\StateQuery as ChildStateQuery;
 use Thelia\Model\Map\CountryAreaTableMap;
 
 abstract class CountryArea implements ActiveRecordInterface
@@ -105,11 +103,6 @@ abstract class CountryArea implements ActiveRecordInterface
      * @var        Country
      */
     protected $aCountry;
-
-    /**
-     * @var        State
-     */
-    protected $aState;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -524,10 +517,6 @@ abstract class CountryArea implements ActiveRecordInterface
             $this->modifiedColumns[CountryAreaTableMap::STATE_ID] = true;
         }
 
-        if ($this->aState !== null && $this->aState->getId() !== $v) {
-            $this->aState = null;
-        }
-
 
         return $this;
     } // setStateId()
@@ -692,9 +681,6 @@ abstract class CountryArea implements ActiveRecordInterface
         if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
             $this->aCountry = null;
         }
-        if ($this->aState !== null && $this->state_id !== $this->aState->getId()) {
-            $this->aState = null;
-        }
         if ($this->aArea !== null && $this->area_id !== $this->aArea->getId()) {
             $this->aArea = null;
         }
@@ -739,7 +725,6 @@ abstract class CountryArea implements ActiveRecordInterface
 
             $this->aArea = null;
             $this->aCountry = null;
-            $this->aState = null;
         } // if (deep)
     }
 
@@ -879,13 +864,6 @@ abstract class CountryArea implements ActiveRecordInterface
                     $affectedRows += $this->aCountry->save($con);
                 }
                 $this->setCountry($this->aCountry);
-            }
-
-            if ($this->aState !== null) {
-                if ($this->aState->isModified() || $this->aState->isNew()) {
-                    $affectedRows += $this->aState->save($con);
-                }
-                $this->setState($this->aState);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1099,9 +1077,6 @@ abstract class CountryArea implements ActiveRecordInterface
             }
             if (null !== $this->aCountry) {
                 $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aState) {
-                $result['State'] = $this->aState->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1401,57 +1376,6 @@ abstract class CountryArea implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildState object.
-     *
-     * @param                  ChildState $v
-     * @return                 \Thelia\Model\CountryArea The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setState(ChildState $v = null)
-    {
-        if ($v === null) {
-            $this->setStateId(NULL);
-        } else {
-            $this->setStateId($v->getId());
-        }
-
-        $this->aState = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildState object, it will not be re-added.
-        if ($v !== null) {
-            $v->addCountryArea($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildState object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildState The associated ChildState object.
-     * @throws PropelException
-     */
-    public function getState(ConnectionInterface $con = null)
-    {
-        if ($this->aState === null && ($this->state_id !== null)) {
-            $this->aState = ChildStateQuery::create()->findPk($this->state_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aState->addCountryAreas($this);
-             */
-        }
-
-        return $this->aState;
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1485,7 +1409,6 @@ abstract class CountryArea implements ActiveRecordInterface
 
         $this->aArea = null;
         $this->aCountry = null;
-        $this->aState = null;
     }
 
     /**

@@ -1359,23 +1359,6 @@ abstract class CountryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related State object
-     * using the country_area table as cross reference
-     *
-     * @param State $state the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCountryQuery The current query, for fluid interface
-     */
-    public function filterByState($state, $comparison = Criteria::EQUAL)
-    {
-        return $this
-            ->useCountryAreaQuery()
-            ->filterByState($state, $comparison)
-            ->endUse();
-    }
-
-    /**
      * Exclude object from result
      *
      * @param   ChildCountry $country Object to remove from the list of results

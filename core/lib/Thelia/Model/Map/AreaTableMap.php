@@ -161,7 +161,6 @@ class AreaTableMap extends TableMap
         $this->addRelation('AreaDeliveryModule', '\\Thelia\\Model\\AreaDeliveryModule', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'CASCADE', 'RESTRICT', 'AreaDeliveryModules');
         $this->addRelation('CountryArea', '\\Thelia\\Model\\CountryArea', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'CASCADE', 'RESTRICT', 'CountryAreas');
         $this->addRelation('Country', '\\Thelia\\Model\\Country', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Countries');
-        $this->addRelation('State', '\\Thelia\\Model\\State', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'States');
     } // buildRelations()
 
     /**
