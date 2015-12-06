@@ -26,38 +26,9 @@ use Thelia\Model\NewsletterQuery;
  */
 class MailingExport extends AbstractExport
 {
-    protected function getRawData()
+    protected function getData()
     {
-        $newsletter = NewsletterQuery::create()
-            ->select([
-                NewsletterTableMap::EMAIL,
-                NewsletterTableMap::LASTNAME,
-                NewsletterTableMap::FIRSTNAME,
-            ])
-//            ->find()
-//            ->toArray()
-        ;
-
-        return $newsletter;
-    }
-
-    /**
-     * @param  Lang                                            $lang
-     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
-     */
-    public function buildDataSet(Lang $lang)
-    {
-        $newsletter = NewsletterQuery::create()
-            ->select([
-                NewsletterTableMap::EMAIL,
-                NewsletterTableMap::LASTNAME,
-                NewsletterTableMap::FIRSTNAME,
-            ])
-            ->find()
-            ->toArray()
-        ;
-
-        return $newsletter;
+        return new NewsletterQuery;
     }
 
     protected function getAliases()

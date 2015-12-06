@@ -201,14 +201,25 @@ class ExportHandler
 //            $handler->getFilename(),
 //            $serializer->getExtension()
 //        );
-        echo $serializer->wrapOpening();
+        $fd = fopen('/dev/null', 'w');
 
-        foreach ($handler as $test) {
-            echo $serializer->serialize($test);
+        fwrite($fd, $serializer->wrapOpening());
+
+        foreach ($handler as $idx => $test) {
+            if ($idx > 0) {
+                fwrite($fd, $serializer->separator());
+            }
+            fwrite($fd, $serializer->serialize($test));
         }
 
-        echo $serializer->wrapClosing();
-        exit;
+        fwrite($fd, $serializer->wrapClosing());
+
+        fclose($fd);
+
+        var_dump(memory_get_usage() / 1024 / 1024 . 'Mb', memory_get_peak_usage() / 1024 / 1024 . 'Mb');
+        var_dump(memory_get_usage(true) / 1024 / 1024 . 'Mb', memory_get_peak_usage(true) / 1024 / 1024 . 'Mb');
+
+        exit('sweeeeeeeeeeet');
     }
 
     /**

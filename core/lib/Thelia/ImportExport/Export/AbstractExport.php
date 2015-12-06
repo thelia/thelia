@@ -13,7 +13,6 @@
 namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
-use Propel\Runtime\Util\PropelModelPager;
 
 /**
  * Class AbstractExport
@@ -21,11 +20,6 @@ use Propel\Runtime\Util\PropelModelPager;
  */
 abstract class AbstractExport implements \Iterator
 {
-    /**
-     * @var array|\Propel\Runtime\ActiveQuery\ModelCriteria Raw data
-     */
-    private $rawData;
-
     /**
      * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
      */
@@ -42,7 +36,7 @@ abstract class AbstractExport implements \Iterator
             return current($this->data);
         }
 
-        return $this->data->getIterator()->current();
+        return $this->data->getIterator()->current()->toArray();
     }
 
     public function key()
@@ -65,7 +59,8 @@ abstract class AbstractExport implements \Iterator
         } else {
             $this->data->getIterator()->next();
             if (!$this->valid() && !$this->data->isLastPage()) {
-                $this->data = $this->rawData->paginate($this->data->getNextPage(), 1000);
+                $this->data = $this->data->getQuery()->paginate($this->data->getNextPage(), 1000);
+                $this->data->getIterator()->rewind();
             }
         }
     }
@@ -75,19 +70,19 @@ abstract class AbstractExport implements \Iterator
         // Since it's first method call on traversable, we get raw data here
         // but we do not permit to go back
 
-        if ($this->rawData === null) {
-            $this->rawData = $this->getRawData();
+        if ($this->data === null) {
+            $data = $this->getData();
 
-            if (is_array($this->rawData)) {
+            if (is_array($data)) {
+                $this->data = $data;
                 $this->dataIsArray = true;
-                $this->data = &$this->rawData;
 
                 return;
             }
 
-            if ($this->rawData instanceof ModelCriteria) {
-                $this->rawData->setFormatter(ModelCriteria::FORMAT_ON_DEMAND);
-                $this->data = $this->rawData->paginate(1, 1000);
+            if ($data instanceof ModelCriteria) {
+                $this->data = $data->setFormatter(ModelCriteria::FORMAT_ON_DEMAND)->keepQuery(false)->paginate(1, 1000);
+                $this->data->getIterator()->rewind();
 
                 return;
             }
@@ -110,5 +105,5 @@ abstract class AbstractExport implements \Iterator
     /**
      * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    abstract protected function getRawData();
+    abstract protected function getData();
 }

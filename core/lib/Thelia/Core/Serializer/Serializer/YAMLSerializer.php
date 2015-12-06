@@ -50,6 +50,11 @@ class YAMLSerializer implements SerializerInterface
         // TODO: Implement serialize() method.
     }
 
+    public function separator()
+    {
+        // TODO: Implement separator() method.
+    }
+
     public function wrapClosing()
     {
         // TODO: Implement wrapClosing() method.

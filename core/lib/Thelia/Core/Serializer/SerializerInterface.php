@@ -63,6 +63,13 @@ interface SerializerInterface
     public function serialize($data);
 
     /**
+     * Get string that separate serialized data
+     *
+     * @return string Wrap separator string
+     */
+    public function separator();
+
+    /**
      * Get close string that must wrap serialized data
      *
      * @return string Wrap closing string

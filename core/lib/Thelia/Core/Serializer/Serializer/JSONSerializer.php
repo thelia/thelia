@@ -50,6 +50,11 @@ class JSONSerializer implements SerializerInterface
         return json_encode($data);
     }
 
+    public function separator()
+    {
+        return ',';
+    }
+
     public function wrapClosing()
     {
         return ']';
