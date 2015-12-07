@@ -204,6 +204,16 @@ class Format extends AbstractSmartyPlugin
             return "";
         }
 
+        if ($this->getParam($params, "symbol", null) === null) {
+            return MoneyFormat::getInstance($this->request)->formatByCurrency(
+                $number,
+                $this->getParam($params, "decimals", null),
+                $this->getParam($params, "dec_point", null),
+                $this->getParam($params, "thousands_sep", null),
+                $this->getParam($params, "currency_id", null)
+            );
+        }
+
         return MoneyFormat::getInstance($this->request)->format(
             $number,
             $this->getParam($params, "decimals", null),

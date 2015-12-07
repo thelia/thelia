@@ -1,5 +1,33 @@
 # 2.3.0-alpha1
 
+- #1780 Adds the ability to disable a currency and change the position of the currency symbol
+- #1806 Fix the event dispatched before decoding of the import, ```TheliaEvents::IMPORT_AFTER_DECODE``` to ```TheliaEvents::IMPORT_BEFORE_DECODE```
+- #1799 Fixed the redirection to rewritten URL
+- #1725 Added new attributes and some aliases to the {cart} substitution
+    - A new `weight` attribute is added, to get the cart total weight.
+    - A new `total_price_without_discount` attribute is added, to get the cart total amount without taxes, excluding discount.
+    - The following aliases of existing attributes are added, to provide a better english syntax, or a more accurate name :
+        - `product_count`, alias of `count_product`
+        - `item_count`, alias of `count_item`
+        - `total_price_with_discount` alias of `total_price`
+        - `total_taxed_price_with_discount` alias of `total_taxed_price`
+        - `contains_virtual_product` alias of `is_virtual`
+        - `total_tax_amount` alias of `total_vat`
+- #1802 After upload, The image file name is no longer the default image title
+- #1805 Add a new parameter ```locale``` for the module_config smarty plugin
+- #1796 Fix regression in OrderAddressEvent cell phone can not be required in the constructor
+- #1787 Add loop Overriding, Documentation ```http://doc.thelia.net/en/documentation/loop/extend.html```
+- #1785 Fix undesirable carts, persist only non empty carts
+- #1790 Update the default PSE ref when the product ref is updated
+- #1778 #1797 Add ```manual``` and ```manuel_reverse``` order in attributeCombination loop
+- #1766 Add order by ```id``` and ```id_reverse``` in product_sale_element loop
+- #1760 Set order status as paid when the FreeOrder module is used to "pay" an order
+- #1751 Fix for undefined currency exchange rate, add error message in the currency configuration page when an exchange rate could not be found
+- #1769 Increase API key size to 48
+- #1771 Add argument ```customer_id``` for hook customer.edit-js
+- #1753 Fix the rounding of prices in the order product loop
+- #1768 Update composer.lock file, update of the dependency thelia/currency-converter to version 1.0.1
+- #1752 Add addValues method in EnumListType
 - #1746 Removes deprecated classes and methods for the version 2.3
 - #1745 Fix output value IS_DEFAULT in the product_sale_elements loop
 - #1754 Add homepage redirection on /admin/login if the admin is already authenticate. Before this change, there was a render

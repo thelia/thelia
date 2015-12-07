@@ -605,6 +605,7 @@ final class TheliaEvents
     const CURRENCY_UPDATE          = "action.updateCurrency";
     const CURRENCY_DELETE          = "action.deleteCurrency";
     const CURRENCY_SET_DEFAULT     = "action.setDefaultCurrency";
+    const CURRENCY_SET_VISIBLE     = "action.setVisibleCurrency";
     const CURRENCY_UPDATE_RATES    = "action.updateCurrencyRates";
     const CURRENCY_UPDATE_POSITION = "action.updateCurrencyPosition";
 

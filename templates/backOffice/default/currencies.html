@@ -109,6 +109,16 @@
                                         <th class="text-center">
                                             {admin_sortable_header
                                             current_order=$order
+                                            order='visible'
+                                            reverse_order='visible_reverse'
+                                            path='/admin/configuration/currencies'
+                                            label="{intl l="Visible"}"
+                                            }
+                                        </th>
+
+                                        <th class="text-center">
+                                            {admin_sortable_header
+                                            current_order=$order
                                             order='manual'
                                             reverse_order='manual_reverse'
                                             path='/admin/configuration/currencies'
@@ -133,7 +143,7 @@
                                     </thead>
 
                                     <tbody>
-                                    {loop name="currencies" type="currency" backend_context="1" lang=$lang_id order=$order}
+                                    {loop name="currencies" type="currency" backend_context="1" visible="*" lang=$lang_id order=$order}
                                         <tr>
                                             <td>{$ID}</td>
 
@@ -151,6 +161,12 @@
                                             <td class="text-center">{$SYMBOL}</td>
 
                                             <td class="text-center">{format_number number="$RATE" decimals="4"}</td>
+
+                                            <td class="text-center">
+                                                <div class="make-switch switch-small change-visible" data-on="success" data-off="danger" data-on-label="<i class='glyphicon glyphicon-ok'></i>" data-off-label="<i class='glyphicon glyphicon-remove'></i>">
+                                                    <input type="checkbox" name="visible" value="{$ID}" {if $VISIBLE}checked="checked"{/if}/>
+                                                </div>
+                                            </td>
 
                                             <td class="text-center">
                                                 {admin_position_block
@@ -195,7 +211,7 @@
                                     {/loop}
                                     {elseloop rel="currencies"}
                                         <tr>
-                                            <td colspan="8">
+                                            <td colspan="9">
                                                 <div class="alert alert-info">
                                                     {intl l="No currency has been created yet. Click the + button to create one."}
                                                 </div>
@@ -367,13 +383,21 @@ form_content        = {$smarty.capture.delete_dialog nofilter}
             {* Change default status *}
 
             $('.change-default').on("switch-change", function(event, data) {
-                var $loader = $('<div class="loader"></div>');
-                $('body').append($loader);
-                $loader.show();
-                var url = "{url path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
+                var url = "{url noamp='1' path='/admin/configuration/currencies/set-default' currency_id='__ID__'}";
 
                 // Perform ID subtitutions
                 url = url.replace('__ID__', $("input", this).val());
+
+                // Reload the page
+                location.href = url;
+            });
+
+            $('.change-visible').on("switch-change", function(event, data) {
+                var url = "{url noamp='1' path='/admin/configuration/currencies/set-visible' currency_id='__ID__' visible='__VISIBLE__'}";
+
+                url = url.replace('__ID__', $("input", this).val());
+
+                url = url.replace('__VISIBLE__', $("input", this).is(':checked') ? 1 : 0);
 
                 // Reload the page
                 location.href = url;

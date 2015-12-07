@@ -57,6 +57,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             ->setLocale($event->getLocale())
             ->setName($event->getCurrencyName())
             ->setSymbol($event->getSymbol())
+            ->setFormat($event->getFormat())
             ->setRate($event->getRate())
             ->setCode(strtoupper($event->getCode()))
             ->setByDefault($isDefault)
@@ -80,6 +81,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
                 ->setLocale($event->getLocale())
                 ->setName($event->getCurrencyName())
                 ->setSymbol($event->getSymbol())
+                ->setFormat($event->getFormat())
                 ->setRate($event->getRate())
                 ->setCode(strtoupper($event->getCode()))
 
@@ -102,6 +104,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
 
             $currency
                 ->setDispatcher($event->getDispatcher())
+                ->setVisible($event->getVisible())
                 ->setByDefault($event->getIsDefault())
                 ->save()
             ;
@@ -114,6 +117,18 @@ class Currency extends BaseAction implements EventSubscriberInterface
             }
 
             $event->setCurrency($currency);
+        }
+    }
+
+    /**
+     * @param CurrencyUpdateEvent $event
+     */
+    public function setVisible(CurrencyUpdateEvent $event)
+    {
+        if (null !== $currency = CurrencyQuery::create()->findPk($event->getCurrencyId())) {
+            if (!$currency->getByDefault()) {
+                $currency->setVisible($event->getVisible())->save();
+            }
         }
     }
 
@@ -172,7 +187,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
     /**
      * Changes position, selecting absolute ou relative change.
      *
-     * @param CategoryChangePositionEvent $event
+     * @param UpdatePositionEvent $event
      */
     public function updatePosition(UpdatePositionEvent $event)
     {
@@ -189,6 +204,7 @@ class Currency extends BaseAction implements EventSubscriberInterface
             TheliaEvents::CURRENCY_UPDATE          => array("update", 128),
             TheliaEvents::CURRENCY_DELETE          => array("delete", 128),
             TheliaEvents::CURRENCY_SET_DEFAULT     => array("setDefault", 128),
+            TheliaEvents::CURRENCY_SET_VISIBLE     => array("setVisible", 128),
             TheliaEvents::CURRENCY_UPDATE_RATES    => array("updateRates", 128),
             TheliaEvents::CURRENCY_UPDATE_POSITION => array("updatePosition", 128)
         );

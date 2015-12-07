@@ -109,7 +109,7 @@
                                             {$CREATE_DATE|date_format}
                                         </td>
                                         <td>
-                                            {$TOTAL_TAXED_AMOUNT} {loop name="list.socolissimo.getcurrency" type="currency" id=$CURRENCY}{$SYMBOL}{/loop}
+                                            {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}
                                         </td>
                                         <td>
                                             <input type="checkbox" name="{$name}" id="{$label_attr.for}" value="true" class="form-control"/>

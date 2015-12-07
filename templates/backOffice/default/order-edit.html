@@ -175,11 +175,11 @@
                                                             {hook name="order-edit.product-list" location="order-product-list" order_id=$order_id order_product_id=$ID}
                                                         </td>
                                                         {hook name="order-edit.order-product-table-row" location="order_edit_table_row" order_product_id={$ID} }
-                                                        <td class="text-right">{format_money number=$realPrice symbol=$orderCurrency}</td>
-                                                        <td class="text-right">{format_money number=$realTax symbol=$orderCurrency}</td>
-                                                        <td class="text-right">{format_money number=$realTaxedPrice symbol=$orderCurrency}</td>
+                                                        <td class="text-right">{format_money number=$realPrice currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$realTax currency_id=$CURRENCY}</td>
+                                                        <td class="text-right">{format_money number=$realTaxedPrice currency_id=$CURRENCY}</td>
                                                         <td class="text-right">{$QUANTITY}</td>
-                                                        <td class="text-right">{format_money number=$realTotalPrice symbol=$orderCurrency}</td>
+                                                        <td class="text-right">{format_money number=$realTotalPrice currency_id=$CURRENCY}</td>
                                                     </tr>
                                                     {hook name="order-edit.after-order-product-row" location="after-order-product-row" order_id=$order_id order_product_id=$ID}
                                                 {/loop}
@@ -188,12 +188,12 @@
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total without discount"}</strong></td>
-                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE+$DISCOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Discount"}</strong></td>
-                                                        <td colspan="100" class="text-right"><strong>{format_money number=$DISCOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$DISCOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
@@ -210,14 +210,14 @@
                                                     <tr>
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Total including discount"}</strong></td>
-                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT-$POSTAGE currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3"><strong>{intl l="Postage"}</strong></td>
                                                         <td colspan="100" class="text-right">
-                                                            <strong>{format_money number=$POSTAGE symbol=$orderCurrency}</strong>
-                                                            <em title="{intl l='Taxes'}">({format_money number=$POSTAGE_TAX symbol=$orderCurrency})</em>
+                                                            <strong>{format_money number=$POSTAGE currency_id=$CURRENCY}</strong>
+                                                            <em title="{intl l='Taxes'}">({format_money number=$POSTAGE_TAX currency_id=$CURRENCY})</em>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -230,7 +230,7 @@
                                                     <tr class="active">
                                                         <td colspan="2" class="td-unstyled"></td>
                                                         <td colspan="3" class="last"><strong>{intl l="Total"}</strong></td>
-                                                        <td colspan="100" class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT symbol=$orderCurrency}</strong></td>
+                                                        <td colspan="100" class="last text-right"><strong>{format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}</strong></td>
                                                     </tr>
                                                 </tbody>
                                             </table>

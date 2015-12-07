@@ -25,7 +25,9 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCurrencyQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCurrencyQuery orderBySymbol($order = Criteria::ASC) Order by the symbol column
+ * @method     ChildCurrencyQuery orderByFormat($order = Criteria::ASC) Order by the format column
  * @method     ChildCurrencyQuery orderByRate($order = Criteria::ASC) Order by the rate column
+ * @method     ChildCurrencyQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCurrencyQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildCurrencyQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method     ChildCurrencyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -34,7 +36,9 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery groupById() Group by the id column
  * @method     ChildCurrencyQuery groupByCode() Group by the code column
  * @method     ChildCurrencyQuery groupBySymbol() Group by the symbol column
+ * @method     ChildCurrencyQuery groupByFormat() Group by the format column
  * @method     ChildCurrencyQuery groupByRate() Group by the rate column
+ * @method     ChildCurrencyQuery groupByVisible() Group by the visible column
  * @method     ChildCurrencyQuery groupByPosition() Group by the position column
  * @method     ChildCurrencyQuery groupByByDefault() Group by the by_default column
  * @method     ChildCurrencyQuery groupByCreatedAt() Group by the created_at column
@@ -70,7 +74,9 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrency findOneById(int $id) Return the first ChildCurrency filtered by the id column
  * @method     ChildCurrency findOneByCode(string $code) Return the first ChildCurrency filtered by the code column
  * @method     ChildCurrency findOneBySymbol(string $symbol) Return the first ChildCurrency filtered by the symbol column
+ * @method     ChildCurrency findOneByFormat(string $format) Return the first ChildCurrency filtered by the format column
  * @method     ChildCurrency findOneByRate(double $rate) Return the first ChildCurrency filtered by the rate column
+ * @method     ChildCurrency findOneByVisible(int $visible) Return the first ChildCurrency filtered by the visible column
  * @method     ChildCurrency findOneByPosition(int $position) Return the first ChildCurrency filtered by the position column
  * @method     ChildCurrency findOneByByDefault(int $by_default) Return the first ChildCurrency filtered by the by_default column
  * @method     ChildCurrency findOneByCreatedAt(string $created_at) Return the first ChildCurrency filtered by the created_at column
@@ -79,7 +85,9 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     array findById(int $id) Return ChildCurrency objects filtered by the id column
  * @method     array findByCode(string $code) Return ChildCurrency objects filtered by the code column
  * @method     array findBySymbol(string $symbol) Return ChildCurrency objects filtered by the symbol column
+ * @method     array findByFormat(string $format) Return ChildCurrency objects filtered by the format column
  * @method     array findByRate(double $rate) Return ChildCurrency objects filtered by the rate column
+ * @method     array findByVisible(int $visible) Return ChildCurrency objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildCurrency objects filtered by the position column
  * @method     array findByByDefault(int $by_default) Return ChildCurrency objects filtered by the by_default column
  * @method     array findByCreatedAt(string $created_at) Return ChildCurrency objects filtered by the created_at column
@@ -172,7 +180,7 @@ abstract class CurrencyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SYMBOL`, `RATE`, `POSITION`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `currency` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `SYMBOL`, `FORMAT`, `RATE`, `VISIBLE`, `POSITION`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `currency` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -361,6 +369,35 @@ abstract class CurrencyQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the format column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByFormat('fooValue');   // WHERE format = 'fooValue'
+     * $query->filterByFormat('%fooValue%'); // WHERE format LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $format The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByFormat($format = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($format)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $format)) {
+                $format = str_replace('*', '%', $format);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CurrencyTableMap::FORMAT, $format, $comparison);
+    }
+
+    /**
      * Filter the query on the rate column
      *
      * Example usage:
@@ -399,6 +436,47 @@ abstract class CurrencyQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CurrencyTableMap::RATE, $rate, $comparison);
+    }
+
+    /**
+     * Filter the query on the visible column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVisible(1234); // WHERE visible = 1234
+     * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * </code>
+     *
+     * @param     mixed $visible The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByVisible($visible = null, $comparison = null)
+    {
+        if (is_array($visible)) {
+            $useMinMax = false;
+            if (isset($visible['min'])) {
+                $this->addUsingAlias(CurrencyTableMap::VISIBLE, $visible['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($visible['max'])) {
+                $this->addUsingAlias(CurrencyTableMap::VISIBLE, $visible['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CurrencyTableMap::VISIBLE, $visible, $comparison);
     }
 
     /**

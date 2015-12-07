@@ -62,7 +62,7 @@ class CurrencyEvent extends ActionEvent
     }
 
     /**
-     * @param mixed $currencyId
+     * @param int $currencyId
      * @return $this
      */
     public function setCurrencyId($currencyId)

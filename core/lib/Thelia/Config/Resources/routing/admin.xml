@@ -660,6 +660,10 @@
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::setDefaultAction</default>
     </route>
 
+    <route id="admin.configuration.currencies.set-visible" path="/admin/configuration/currencies/set-visible">
+        <default key="_controller">Thelia\Controller\Admin\CurrencyController::setVisibleAction</default>
+    </route>
+
     <route id="admin.configuration.currencies.update-position" path="/admin/configuration/currencies/update-position">
         <default key="_controller">Thelia\Controller\Admin\CurrencyController::updatePositionAction</default>
     </route>
