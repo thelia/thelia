@@ -124,6 +124,20 @@ abstract class Lang implements ActiveRecordInterface
     protected $decimals;
 
     /**
+     * The value for the active field.
+     * Note: this column has a database default value of: false
+     * @var        boolean
+     */
+    protected $active;
+
+    /**
+     * The value for the visible field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $visible;
+
+    /**
      * The value for the by_default field.
      * @var        int
      */
@@ -168,10 +182,24 @@ abstract class Lang implements ActiveRecordInterface
     protected $ordersScheduledForDeletion = null;
 
     /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->active = false;
+        $this->visible = 0;
+    }
+
+    /**
      * Initializes internal state of Thelia\Model\Base\Lang object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -547,6 +575,28 @@ abstract class Lang implements ActiveRecordInterface
     }
 
     /**
+     * Get the [active] column value.
+     *
+     * @return   boolean
+     */
+    public function getActive()
+    {
+
+        return $this->active;
+    }
+
+    /**
+     * Get the [visible] column value.
+     *
+     * @return   int
+     */
+    public function getVisible()
+    {
+
+        return $this->visible;
+    }
+
+    /**
      * Get the [by_default] column value.
      *
      * @return   int
@@ -840,6 +890,56 @@ abstract class Lang implements ActiveRecordInterface
     } // setDecimals()
 
     /**
+     * Sets the value of the [active] column.
+     * Non-boolean arguments are converted using the following rules:
+     *   * 1, '1', 'true',  'on',  and 'yes' are converted to boolean true
+     *   * 0, '0', 'false', 'off', and 'no'  are converted to boolean false
+     * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
+     *
+     * @param      boolean|integer|string $v The new value
+     * @return   \Thelia\Model\Lang The current object (for fluent API support)
+     */
+    public function setActive($v)
+    {
+        if ($v !== null) {
+            if (is_string($v)) {
+                $v = in_array(strtolower($v), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
+            } else {
+                $v = (boolean) $v;
+            }
+        }
+
+        if ($this->active !== $v) {
+            $this->active = $v;
+            $this->modifiedColumns[LangTableMap::ACTIVE] = true;
+        }
+
+
+        return $this;
+    } // setActive()
+
+    /**
+     * Set the value of [visible] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Lang The current object (for fluent API support)
+     */
+    public function setVisible($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->visible !== $v) {
+            $this->visible = $v;
+            $this->modifiedColumns[LangTableMap::VISIBLE] = true;
+        }
+
+
+        return $this;
+    } // setVisible()
+
+    /**
      * Set the value of [by_default] column.
      *
      * @param      int $v new value
@@ -933,6 +1033,14 @@ abstract class Lang implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->active !== false) {
+                return false;
+            }
+
+            if ($this->visible !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -993,19 +1101,25 @@ abstract class Lang implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : LangTableMap::translateFieldName('Decimals', TableMap::TYPE_PHPNAME, $indexType)];
             $this->decimals = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : LangTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : LangTableMap::translateFieldName('Active', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->active = (null !== $col) ? (boolean) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : LangTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->visible = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : LangTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : LangTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : LangTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -1018,7 +1132,7 @@ abstract class Lang implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 15; // 15 = LangTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 17; // 17 = LangTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Lang object", 0, $e);
@@ -1290,6 +1404,12 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::DECIMALS)) {
             $modifiedColumns[':p' . $index++]  = '`DECIMALS`';
         }
+        if ($this->isColumnModified(LangTableMap::ACTIVE)) {
+            $modifiedColumns[':p' . $index++]  = '`ACTIVE`';
+        }
+        if ($this->isColumnModified(LangTableMap::VISIBLE)) {
+            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+        }
         if ($this->isColumnModified(LangTableMap::BY_DEFAULT)) {
             $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
         }
@@ -1345,6 +1465,12 @@ abstract class Lang implements ActiveRecordInterface
                         break;
                     case '`DECIMALS`':
                         $stmt->bindValue($identifier, $this->decimals, PDO::PARAM_STR);
+                        break;
+                    case '`ACTIVE`':
+                        $stmt->bindValue($identifier, (int) $this->active, PDO::PARAM_INT);
+                        break;
+                    case '`VISIBLE`':
+                        $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
                     case '`BY_DEFAULT`':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
@@ -1454,15 +1580,21 @@ abstract class Lang implements ActiveRecordInterface
                 return $this->getDecimals();
                 break;
             case 11:
-                return $this->getByDefault();
+                return $this->getActive();
                 break;
             case 12:
-                return $this->getPosition();
+                return $this->getVisible();
                 break;
             case 13:
-                return $this->getCreatedAt();
+                return $this->getByDefault();
                 break;
             case 14:
+                return $this->getPosition();
+                break;
+            case 15:
+                return $this->getCreatedAt();
+                break;
+            case 16:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1505,10 +1637,12 @@ abstract class Lang implements ActiveRecordInterface
             $keys[8] => $this->getDecimalSeparator(),
             $keys[9] => $this->getThousandsSeparator(),
             $keys[10] => $this->getDecimals(),
-            $keys[11] => $this->getByDefault(),
-            $keys[12] => $this->getPosition(),
-            $keys[13] => $this->getCreatedAt(),
-            $keys[14] => $this->getUpdatedAt(),
+            $keys[11] => $this->getActive(),
+            $keys[12] => $this->getVisible(),
+            $keys[13] => $this->getByDefault(),
+            $keys[14] => $this->getPosition(),
+            $keys[15] => $this->getCreatedAt(),
+            $keys[16] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1587,15 +1721,21 @@ abstract class Lang implements ActiveRecordInterface
                 $this->setDecimals($value);
                 break;
             case 11:
-                $this->setByDefault($value);
+                $this->setActive($value);
                 break;
             case 12:
-                $this->setPosition($value);
+                $this->setVisible($value);
                 break;
             case 13:
-                $this->setCreatedAt($value);
+                $this->setByDefault($value);
                 break;
             case 14:
+                $this->setPosition($value);
+                break;
+            case 15:
+                $this->setCreatedAt($value);
+                break;
+            case 16:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1633,10 +1773,12 @@ abstract class Lang implements ActiveRecordInterface
         if (array_key_exists($keys[8], $arr)) $this->setDecimalSeparator($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setThousandsSeparator($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setDecimals($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setByDefault($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setPosition($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setCreatedAt($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setUpdatedAt($arr[$keys[14]]);
+        if (array_key_exists($keys[11], $arr)) $this->setActive($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setVisible($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setByDefault($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setPosition($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setCreatedAt($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setUpdatedAt($arr[$keys[16]]);
     }
 
     /**
@@ -1659,6 +1801,8 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::DECIMAL_SEPARATOR)) $criteria->add(LangTableMap::DECIMAL_SEPARATOR, $this->decimal_separator);
         if ($this->isColumnModified(LangTableMap::THOUSANDS_SEPARATOR)) $criteria->add(LangTableMap::THOUSANDS_SEPARATOR, $this->thousands_separator);
         if ($this->isColumnModified(LangTableMap::DECIMALS)) $criteria->add(LangTableMap::DECIMALS, $this->decimals);
+        if ($this->isColumnModified(LangTableMap::ACTIVE)) $criteria->add(LangTableMap::ACTIVE, $this->active);
+        if ($this->isColumnModified(LangTableMap::VISIBLE)) $criteria->add(LangTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(LangTableMap::BY_DEFAULT)) $criteria->add(LangTableMap::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(LangTableMap::POSITION)) $criteria->add(LangTableMap::POSITION, $this->position);
         if ($this->isColumnModified(LangTableMap::CREATED_AT)) $criteria->add(LangTableMap::CREATED_AT, $this->created_at);
@@ -1736,6 +1880,8 @@ abstract class Lang implements ActiveRecordInterface
         $copyObj->setDecimalSeparator($this->getDecimalSeparator());
         $copyObj->setThousandsSeparator($this->getThousandsSeparator());
         $copyObj->setDecimals($this->getDecimals());
+        $copyObj->setActive($this->getActive());
+        $copyObj->setVisible($this->getVisible());
         $copyObj->setByDefault($this->getByDefault());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -2207,12 +2353,15 @@ abstract class Lang implements ActiveRecordInterface
         $this->decimal_separator = null;
         $this->thousands_separator = null;
         $this->decimals = null;
+        $this->active = null;
+        $this->visible = null;
         $this->by_default = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
