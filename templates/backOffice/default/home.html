@@ -316,33 +316,27 @@
 jQuery(function($){
     {$langcode = {lang attr="code"}|substr:0:2}
 
-    var jQplotDate = new Date();
+    var jQplotDate = moment();
 
-    $('#date-picker').val(jQplotDate.getMonth()+1+"/"+jQplotDate.getFullYear());
+    $('#date-picker').val(moment().format('MM/YYYY'));
 
     $('#date-picker').datetimepicker( {
         locale: "{$langcode}",
         viewMode: 'months',
         format: 'MM/YYYY'
     }).on('dp.change',function (e) {
-        var month = parseInt(e.date.format("M")) - 1;
-        var year = parseInt(e.date.format("YYYY"));
-
-        jQplotDate.setMonth(month);
-        jQplotDate.setFullYear(year);
+        // e.date is a moment.js date
+        jQplotDate = e.date;
 
         statInputActive(true);
 
-        {literal}
-
         retrieveJQPlotJson(
-                month,
-                year,
-                function(){statInputActive(false);},
+                jQplotDate,
+                function() {
+                    statInputActive(false);
+                },
                 0
         );
-
-        {/literal}
     });
 
     $("#span-calendar").click(function(e){
@@ -401,7 +395,7 @@ jQuery(function($){
     {literal}
 
     // Get initial data Json
-    retrieveJQPlotJson(jQplotDate.getMonth(), jQplotDate.getFullYear());
+    retrieveJQPlotJson(jQplotDate);
 
     $('[data-toggle="jqplot"]').click(function(){
 
@@ -413,32 +407,26 @@ jQuery(function($){
     $('.js-stats-refresh').click(function(e){
         statInputActive(true);
 
-        jQplotDate.setMonth(parseInt(jQplotDate.getMonth()));
-
         retrieveJQPlotJson(
-                jQplotDate.getMonth(),
-                jQplotDate.getFullYear(),
+                jQplotDate,
                 function(){statInputActive(false);},
                 1
         );
     });
 
     /**
-     * @param {number} month Note: January is 0, February is 1, and so on.
-     * @param {number} year Example : 2015
+     * @param {moment} moment date
      * @param {function=} callback
      * @param {number=} flush
      */
-    function retrieveJQPlotJson(month, year, callback, flush) {
-
-        month = parseInt(month);
-        year = parseInt(year);
+    function retrieveJQPlotJson(moment, callback, flush) {
 
         if (typeof flush === "undefined") {
             flush = 0;
         }
 
-        $.getJSON(url, {month: month + 1, year: year, flush: flush})
+        // JS month range is [0..11], the url requires a PHP month range [1..12]
+        $.getJSON(url, {month: moment.month() + 1, year: moment.year(), flush: flush})
             .done(function(data) {
                 jQplotData = data;
                 jsonSuccessLoad();
