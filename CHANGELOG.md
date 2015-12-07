@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1830) Fix attribute title in the modal "create a new combination"
 - (related to #1825) Add message if thelia project is not installed
 - (related to #1824 #1829) Fix the admin home stats, On page load, the month sent to Thelia was bad
 - (related to #1821) Fix the value for constant AdminForm::LANG_DEFAULT_BEHAVIOR, Resolve ##1820
