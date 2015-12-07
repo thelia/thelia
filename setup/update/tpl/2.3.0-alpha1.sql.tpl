@@ -116,4 +116,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 {/foreach}
 ;
 
+-- Add new column in lang table
+ALTER TABLE  `lang` ADD  `active` BOOLEAN NOT NULL DEFAULT FALSE AFTER  `decimals` ;
+ALTER TABLE  `lang` ADD  `visible` TINYINT NOT NULL DEFAULT  '0' AFTER  `active` ;
+
+-- Update lang
+UPDATE `lang` SET `active` = 1 AND `visible` = 1 WHERE 1;
+
 SET FOREIGN_KEY_CHECKS = 1;
