@@ -12,6 +12,8 @@
 
 namespace Thelia\Controller\Admin;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -184,7 +186,7 @@ class ExportController extends BaseAdminController
             /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
-            $archiveBuilder = null;
+            $archiver = null;
 //            if ($validatedForm->get('do_compress')->getData()) {
 //                $archiveBuilderManager = $this->container->get("thelia.manager.archive_builder_manager");
 //                /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
@@ -201,18 +203,31 @@ class ExportController extends BaseAdminController
                 ];
             }
 
-            $class = $export->getHandleClass();
-
-            return $exportHandler->export(
-//                $export->getHandleClassInstance($this->container),
-                new $class,
+            $exportEvent = $exportHandler->export(
+                $export,
                 $serializer,
-                $archiveBuilder,
+                $archiver,
                 $lang,
                 $validatedForm->get('images')->getData(),
                 $validatedForm->get('documents')->getData(),
                 $rangeDate
             );
+
+            $header = [
+                'Content-Type' => $exportEvent->getSerializer()->getMimeType(),
+                'Content-Disposition' => sprintf(
+                    '%s; filename="%s.%s"',
+                    ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                    $exportEvent->getExport()->getFileName(),
+                    $exportEvent->getSerializer()->getExtension()
+                )
+            ];
+
+            if ($exportEvent->archiver !== null) {
+                // Todo
+            }
+
+            return new BinaryFileResponse($exportEvent->getFilePath(), 200, $header, false);
         } catch (FormValidationException $e) {
             $form->setErrorMessage($this->createStandardFormValidationErrorMessage($e));
         } catch (\Exception $e) {

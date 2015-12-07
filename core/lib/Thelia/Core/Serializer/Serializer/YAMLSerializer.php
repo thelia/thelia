@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Serializer\Serializer;
 
+use Symfony\Component\Yaml\Yaml;
 use Thelia\Core\Serializer\SerializerInterface;
 
 /**
@@ -42,22 +43,22 @@ class YAMLSerializer implements SerializerInterface
 
     public function wrapOpening()
     {
-        // TODO: Implement wrapOpening() method.
+        return null;
     }
 
     public function serialize($data)
     {
-        // TODO: Implement serialize() method.
+        return Yaml::dump([$data]);
     }
 
     public function separator()
     {
-        // TODO: Implement separator() method.
+        return null;
     }
 
     public function wrapClosing()
     {
-        // TODO: Implement wrapClosing() method.
+        return null;
     }
 
     public function unserialize()

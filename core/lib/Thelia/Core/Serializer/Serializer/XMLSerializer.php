@@ -12,6 +12,7 @@
 
 namespace Thelia\Core\Serializer\Serializer;
 
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Thelia\Core\Serializer\SerializerInterface;
 
 /**
@@ -20,6 +21,24 @@ use Thelia\Core\Serializer\SerializerInterface;
  */
 class XMLSerializer implements SerializerInterface
 {
+    /**
+     * @var \Symfony\Component\Serializer\Encoder\XmlEncoder An xml encoder instance
+     */
+    private $xmlEncoder;
+
+    /**
+     * @var integer Position of data start
+     */
+    private $xmlDataStart;
+
+    /**
+     * Class constructor.
+     */
+    public function __construct()
+    {
+        $this->xmlEncoder = new XmlEncoder;
+    }
+
     public function getId()
     {
         return 'thelia.xml';
@@ -42,22 +61,31 @@ class XMLSerializer implements SerializerInterface
 
     public function wrapOpening()
     {
-        // TODO: Implement wrapOpening() method.
+        $this->xmlEncoder->setRootNodeName('data');
+        $this->xmlDataStart = null;
+
+        return '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<root>' . PHP_EOL;
     }
 
     public function serialize($data)
     {
-        // TODO: Implement serialize() method.
+        $xml = $this->xmlEncoder->encode($data, 'array');
+
+        if ($this->xmlDataStart === null) {
+            $this->xmlDataStart = strpos($xml, '<data>');
+        }
+
+        return substr($xml, $this->xmlDataStart, -1);
     }
 
     public function separator()
     {
-        // TODO: Implement separator() method.
+        return PHP_EOL;
     }
 
     public function wrapClosing()
     {
-        // TODO: Implement wrapClosing() method.
+        return PHP_EOL . '</root>';
     }
 
     public function unserialize()

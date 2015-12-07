@@ -20,6 +20,16 @@ use Thelia\Core\Serializer\SerializerInterface;
  */
 class CSVSerializer implements SerializerInterface
 {
+    /**
+     * @var string CSV delimiter char
+     */
+    const DELIMITER = ',';
+
+    /**
+     * @var string CSV enclosure char
+     */
+    const ENCLOSURE = '"';
+
     public function getId()
     {
         return 'thelia.csv';
@@ -42,22 +52,28 @@ class CSVSerializer implements SerializerInterface
 
     public function wrapOpening()
     {
-        // TODO: Implement wrapOpening() method.
+        return null;
     }
 
     public function serialize($data)
     {
-        // TODO: Implement serialize() method.
+        $fd = fopen('php://memory', 'r+b');
+        fputcsv($fd, $data, static::DELIMITER, static::ENCLOSURE);
+        rewind($fd);
+        $csvRow = stream_get_contents($fd);
+        fclose($fd);
+
+        return $csvRow;
     }
 
     public function separator()
     {
-        // TODO: Implement separator() method.
+        return null;
     }
 
     public function wrapClosing()
     {
-        // TODO: Implement wrapClosing() method.
+        return null;
     }
 
     public function unserialize()

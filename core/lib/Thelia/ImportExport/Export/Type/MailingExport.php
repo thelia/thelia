@@ -31,6 +31,24 @@ class MailingExport extends AbstractExport
         return new NewsletterQuery;
     }
 
+    public function getFileName()
+    {
+        return 'mailing';
+    }
+
+    public function beforeSerialize(&$data)
+    {
+//        var_dump($data);
+        $data['CreatedAt'] = $data['CreatedAt']->format('c');
+        $data['UpdatedAt'] = $data['UpdatedAt']->format('c');
+    }
+
+    public function afterSerialize(&$data)
+    {
+//        var_dump($data);
+//        exit;
+    }
+
     protected function getAliases()
     {
         $email = "email";

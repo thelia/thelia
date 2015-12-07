@@ -14,6 +14,7 @@ namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\ImportExport\Export\AbstractExport;
 
 /**
  * Class ExportEvent
@@ -21,22 +22,58 @@ use Thelia\Core\Serializer\SerializerInterface;
  */
 class ExportEvent extends Event
 {
-    protected $handler;
+    /**
+     * @var \Thelia\ImportExport\Export\AbstractExport An export instance
+     */
+    protected $export;
 
     /**
-     * @var \Thelia\Core\Serializer\SerializerInterface
+     * @var \Thelia\Core\Serializer\SerializerInterface A serializer instance
      */
     protected $serializer;
+
+    public $archiver;
+
+    /**
+     * @var string Path to generated export
+     */
+    protected $filePath;
 
     /**
      * Event constructor
      *
-     * @param SerializerInterface $serializer A serializer instance
+     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export instance
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer instance
      */
-    public function __construct($handler, SerializerInterface $serializer)
+    public function __construct(AbstractExport $export, SerializerInterface $serializer, $archiver = null)
     {
-        $this->handler = $handler;
+        $this->export = $export;
         $this->serializer = $serializer;
+        $this->archiver = $archiver;
+    }
+
+    /**
+     * Get export
+     *
+     * @return AbstractExport
+     */
+    public function getExport()
+    {
+        return $this->export;
+    }
+
+    /**
+     * Set export
+     *
+     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setExport(AbstractExport $export)
+    {
+        $this->export = $export;
+
+        return $this;
     }
 
     /**
@@ -59,6 +96,30 @@ class ExportEvent extends Event
     public function setSerializer(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
+
+        return $this;
+    }
+
+    /**
+     * Get export file path
+     *
+     * @return string
+     */
+    public function getFilePath()
+    {
+        return $this->filePath;
+    }
+
+    /**
+     * Set export file path
+     *
+     * @param string $filePath Export file path
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setFilePath($filePath)
+    {
+        $this->filePath = $filePath;
 
         return $this;
     }

@@ -13,17 +13,16 @@
 namespace Thelia\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Event\ExportEvent;
-use Thelia\Core\Event\ImportExport;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\ImportExport\Export\DocumentsExportInterface;
 use Thelia\ImportExport\Export\ImagesExportInterface;
+use Thelia\Model\Export;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
 use Thelia\Model\Lang;
@@ -104,12 +103,10 @@ class ExportHandler
         return $category;
     }
 
-    /*---------- Copied code from old controller - NOT YET REWORKED ----------*/
-
     public function export(
-        AbstractExport $handler,
+        Export $export,
         SerializerInterface $serializer,
-        AbstractArchiveBuilder $archiveBuilder = null,
+        AbstractArchiveBuilder $archiver = null,
         Lang $lang = null,
         $includeImages = false,
         $includeDocuments = false,
@@ -119,44 +116,21 @@ class ExportHandler
 //            $handler->setRangeDate($rangeDate);
 //        }
 
-        $event = new ExportEvent($handler, $serializer);
+        $exportHandleClass = $export->getHandleClass();
+
+        $event = new ExportEvent(new $exportHandleClass, $serializer, $archiver);
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEGIN, $event);
 
-        $this->processExport($handler, $serializer);
+        $filePath = $this->processExport($event->getExport(), $event->getSerializer());
 
-        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);
+        $event->setFilePath($filePath);
 
+        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_FINISHED, $event);
 
-        /*$event = new ImportExport($serializer, $handler);
-
-        $filename = $handler->getFilename() . '.' . $serializer->getExtension();
-
-        if ($archiveBuilder === null) {
-            $data = $handler->buildData($lang);
-
-            $event->setData($data);
-            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
-
-            $serializedContent = $serializer
-                ->setOrder($handler->getOrder())
-                ->encode($data)
-            ;
-
-            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($serializedContent));
-
-            return new Response(
-                $event->getContent(),
-                200,
-                [
-                    'Content-Type' => $serializer->getMimeType(),
-                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
-                ]
-            );
-        } else {
-            $event->setArchiveBuilder($archiveBuilder);
-
-            if ($includeImages && $handler instanceof ImagesExportInterface) {
+        if ($event->archiver !== null) {
+            // Todo
+            /*if ($includeImages && $handler instanceof ImagesExportInterface) {
                 $this->processExportImages($handler, $archiveBuilder);
 
                 $handler->setImageExport(true);
@@ -186,41 +160,61 @@ class ExportHandler
             $archiveBuilder->addFileFromString(
                 $event->getContent(),
                 $filename
-            );
+            );*/
+        }
 
-            return $archiveBuilder->buildArchiveResponse($handler->getFilename());
-        }*/
+        $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);
+
+        return $event;
     }
 
-    protected function processExport($handler, SerializerInterface $serializer)
+    /**
+     * Process export
+     *
+     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export instance
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer instance
+     *
+     * @return string Export file path
+     */
+    protected function processExport(AbstractExport $export, SerializerInterface $serializer)
     {
-//        $filename = sprintf(
-//            '%s-%s-%s.%s',
-//            (new \DateTime)->format('Ymd'),
-//            uniqid(),
-//            $handler->getFilename(),
-//            $serializer->getExtension()
-//        );
-        $fd = fopen('/dev/null', 'w');
+        $filename = sprintf(
+            '%s-%s-%s.%s',
+            (new \DateTime)->format('Ymd'),
+            uniqid(),
+            $export->getFileName(),
+            $serializer->getExtension()
+        );
+
+        $filePath = THELIA_CACHE_DIR . 'export' . DS . $filename;
+
+        $fileSystem = new Filesystem;
+        $fileSystem->mkdir(dirname($filePath));
+
+        $fd = fopen($filePath, 'w');
 
         fwrite($fd, $serializer->wrapOpening());
 
-        foreach ($handler as $idx => $test) {
+        foreach ($export as $idx => $data) {
             if ($idx > 0) {
                 fwrite($fd, $serializer->separator());
             }
-            fwrite($fd, $serializer->serialize($test));
+
+            $export->beforeSerialize($data);
+            $serializedData = $serializer->serialize($data);
+            $export->afterSerialize($serializedData);
+
+            fwrite($fd, $serializedData);
         }
 
         fwrite($fd, $serializer->wrapClosing());
 
         fclose($fd);
 
-        var_dump(memory_get_usage() / 1024 / 1024 . 'Mb', memory_get_peak_usage() / 1024 / 1024 . 'Mb');
-        var_dump(memory_get_usage(true) / 1024 / 1024 . 'Mb', memory_get_peak_usage(true) / 1024 / 1024 . 'Mb');
-
-        exit('sweeeeeeeeeeet');
+        return $filePath;
     }
+
+    /*---------- Copied code from old controller - NOT YET REWORKED ----------*/
 
     /**
      * @param ImagesExportInterface  $handler

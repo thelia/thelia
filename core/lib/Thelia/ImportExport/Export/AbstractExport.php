@@ -103,7 +103,26 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
-     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria
+     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
      */
     abstract protected function getData();
+
+    /**
+     * @return string Export file name
+     */
+    abstract public function getFileName();
+
+    /**
+     * Process data before serialization
+     *
+     * @param mixed $data Data before serialization
+     */
+    abstract public function beforeSerialize(&$data);
+
+    /**
+     * Process data after serialization
+     *
+     * @param mixed $data Data after serialization
+     */
+    abstract public function afterSerialize(&$data);
 }

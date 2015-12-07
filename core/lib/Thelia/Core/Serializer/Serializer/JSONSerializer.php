@@ -52,7 +52,7 @@ class JSONSerializer implements SerializerInterface
 
     public function separator()
     {
-        return ',';
+        return ',' . PHP_EOL;
     }
 
     public function wrapClosing()
