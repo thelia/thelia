@@ -954,7 +954,9 @@ class ProductController extends AbstractSeoCrudController
         if ($attributeAv !== null) {
             $addIt = true;
 
-            $attribute = $attributeAv->getAttribute();
+            $attribute = AttributeQuery::create()
+                ->joinWithI18n($this->getCurrentEditionLocale())
+                ->findPk($attributeAv->getAttributeId());
 
             // Check if this attribute is not already present
             $combinationArray = explode(',', $combination);
@@ -972,7 +974,11 @@ class ProductController extends AbstractSeoCrudController
                         $addIt = false;
                     }
 
-                    $result[] = array('id' => $attrAv->getId(), 'title' => $attrAv->getAttribute()->getTitle() . " : " . $attrAv->getTitle());
+                    $subAttribute = AttributeQuery::create()
+                        ->joinWithI18n($this->getCurrentEditionLocale())
+                        ->findPk($attributeAv->getAttributeId());
+
+                    $result[] = array('id' => $attrAv->getId(), 'title' => $subAttribute->getTitle() . " : " . $attrAv->getTitle());
                 }
             }
 
