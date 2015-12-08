@@ -832,6 +832,8 @@ final class TheliaEvents
     const LANG_FIX_MISSING_FLAG                 = 'action.lang.fix_missing_flag';
 
     const LANG_TOGGLEDEFAULT                    = 'action.lang.toggleDefault';
+    const LANG_TOGGLEACTIVE                    = 'action.lang.toggleActive';
+    const LANG_TOGGLEVISIBLE                    = 'action.lang.toggleVisible';
 
     const BEFORE_UPDATELANG                     = 'action.lang.beforeUpdate';
     const AFTER_UPDATELANG                      = 'action.lang.afterUpdate';
