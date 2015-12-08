@@ -13,6 +13,7 @@
 namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Model\Lang;
 
 /**
  * Class AbstractExport
@@ -20,6 +21,11 @@ use Propel\Runtime\ActiveQuery\ModelCriteria;
  */
 abstract class AbstractExport implements \Iterator
 {
+    /**
+     * @var string Default file name
+     */
+    const FILE_NAME = 'export';
+
     /**
      * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
      */
@@ -29,6 +35,16 @@ abstract class AbstractExport implements \Iterator
      * @var boolean True if data is array, false otherwise
      */
     private $dataIsArray;
+
+    /**
+     * @var \Thelia\Model\Lang A language model
+     */
+    protected $language;
+
+    /**
+     * @var null|array List of fields in order in which they must be exported and there alias name
+     */
+    protected $orderAndAliases;
 
     public function current()
     {
@@ -102,27 +118,102 @@ abstract class AbstractExport implements \Iterator
         return $this->data->getIterator()->valid();
     }
 
-    /**
-     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
-     */
-    abstract protected function getData();
 
     /**
+     * Get language
+     *
+     * @return \Thelia\Model\Lang A language model
+     */
+    public function getLang()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Set language
+     *
+     * @param \Thelia\Model\Lang $language A language model
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setLang(Lang $language)
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    /**
+     * Get file name
+     *
      * @return string Export file name
      */
-    abstract public function getFileName();
+    public function getFileName()
+    {
+        return static::FILE_NAME;
+    }
+
+    /**
+     * Apply order and aliases on data
+     *
+     * @param array $data Raw data
+     *
+     * @return array Ordered and aliased data
+     */
+    public function applyOrderAndAliases(array $data)
+    {
+        if ($this->orderAndAliases === null) {
+            return $data;
+        }
+
+        $processedData = [];
+
+        foreach ($this->orderAndAliases as $key => $value) {
+            if (is_integer($key)) {
+                $fieldName = $value;
+                $fieldAlias = $value;
+            } else {
+                $fieldName = $key;
+                $fieldAlias = $value;
+            }
+
+            $processedData[$fieldAlias] = null;
+            if (array_key_exists($fieldName, $data)) {
+                $processedData[$fieldAlias] = $data[$fieldName];
+            }
+        }
+
+        return $processedData;
+    }
 
     /**
      * Process data before serialization
      *
-     * @param mixed $data Data before serialization
+     * @param array $data Data before serialization
+     *
+     * @return array Processed data before serialization
      */
-    abstract public function beforeSerialize(&$data);
+    public function beforeSerialize(array $data)
+    {
+        return $data;
+    }
 
     /**
      * Process data after serialization
      *
-     * @param mixed $data Data after serialization
+     * @param string $data Data after serialization
+     *
+     * @return string Processed after before serialization
      */
-    abstract public function afterSerialize(&$data);
+    public function afterSerialize($data)
+    {
+        return $data;
+    }
+
+    /**
+     * Get data to export
+     *
+     * @return array|\Propel\Runtime\ActiveQuery\ModelCriteria Data to export
+     */
+    abstract protected function getData();
 }

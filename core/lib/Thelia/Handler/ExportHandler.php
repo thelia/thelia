@@ -107,7 +107,7 @@ class ExportHandler
         Export $export,
         SerializerInterface $serializer,
         AbstractArchiveBuilder $archiver = null,
-        Lang $lang = null,
+        Lang $language = null,
         $includeImages = false,
         $includeDocuments = false,
         $rangeDate = null
@@ -118,7 +118,11 @@ class ExportHandler
 
         $exportHandleClass = $export->getHandleClass();
 
-        $event = new ExportEvent(new $exportHandleClass, $serializer, $archiver);
+        /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
+        $instance = new $exportHandleClass;
+        $instance->setLang($language);
+
+        $event = new ExportEvent($instance, $serializer, $archiver);
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEGIN, $event);
 
@@ -128,7 +132,7 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_FINISHED, $event);
 
-        if ($event->archiver !== null) {
+        if ($event->getArchiver() !== null) {
             // Todo
             /*if ($includeImages && $handler instanceof ImagesExportInterface) {
                 $this->processExportImages($handler, $archiveBuilder);
@@ -178,6 +182,8 @@ class ExportHandler
      */
     protected function processExport(AbstractExport $export, SerializerInterface $serializer)
     {
+        set_time_limit(0);
+
         $filename = sprintf(
             '%s-%s-%s.%s',
             (new \DateTime)->format('Ymd'),
@@ -200,11 +206,12 @@ class ExportHandler
                 fwrite($fd, $serializer->separator());
             }
 
-            $export->beforeSerialize($data);
-            $serializedData = $serializer->serialize($data);
-            $export->afterSerialize($serializedData);
+            $data = $export->beforeSerialize($data);
+            $data = $export->applyOrderAndAliases($data);
+            $data = $serializer->serialize($data);
+            $data = $export->afterSerialize($data);
 
-            fwrite($fd, $serializedData);
+            fwrite($fd, $data);
         }
 
         fwrite($fd, $serializer->wrapClosing());

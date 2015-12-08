@@ -223,7 +223,7 @@ class ExportController extends BaseAdminController
                 )
             ];
 
-            if ($exportEvent->archiver !== null) {
+            if ($exportEvent->getArchiver() !== null) {
                 // Todo
             }
 

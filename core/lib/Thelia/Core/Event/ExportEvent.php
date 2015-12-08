@@ -23,16 +23,19 @@ use Thelia\ImportExport\Export\AbstractExport;
 class ExportEvent extends Event
 {
     /**
-     * @var \Thelia\ImportExport\Export\AbstractExport An export instance
+     * @var \Thelia\ImportExport\Export\AbstractExport An export
      */
     protected $export;
 
     /**
-     * @var \Thelia\Core\Serializer\SerializerInterface A serializer instance
+     * @var \Thelia\Core\Serializer\SerializerInterface A serializer interface
      */
     protected $serializer;
 
-    public $archiver;
+    /**
+     * @var null|mixed An archiver interface
+     */
+    protected $archiver;
 
     /**
      * @var string Path to generated export
@@ -42,11 +45,15 @@ class ExportEvent extends Event
     /**
      * Event constructor
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export instance
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer instance
+     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
+     * @param mixed                                       $archiver   An archiver interface
      */
-    public function __construct(AbstractExport $export, SerializerInterface $serializer, $archiver = null)
-    {
+    public function __construct(
+        AbstractExport $export,
+        SerializerInterface $serializer,
+        $archiver = null
+    ) {
         $this->export = $export;
         $this->serializer = $serializer;
         $this->archiver = $archiver;
@@ -55,7 +62,7 @@ class ExportEvent extends Event
     /**
      * Get export
      *
-     * @return AbstractExport
+     * @return \Thelia\ImportExport\Export\AbstractExport An export
      */
     public function getExport()
     {
@@ -65,7 +72,7 @@ class ExportEvent extends Event
     /**
      * Set export
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport $export An export instance
+     * @param \Thelia\ImportExport\Export\AbstractExport $export An export
      *
      * @return $this Return $this, allow chaining
      */
@@ -79,7 +86,7 @@ class ExportEvent extends Event
     /**
      * Get serializer
      *
-     * @return SerializerInterface
+     * @return \Thelia\Core\Serializer\SerializerInterface A serializer interface
      */
     public function getSerializer()
     {
@@ -89,7 +96,7 @@ class ExportEvent extends Event
     /**
      * Set serializer
      *
-     * @param SerializerInterface $serializer A serializer instance
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
      *
      * @return $this Return $this, allow chaining
      */
@@ -101,9 +108,33 @@ class ExportEvent extends Event
     }
 
     /**
+     * Get archiver
+     *
+     * @return mixed|null An archiver interface
+     */
+    public function getArchiver()
+    {
+        return $this->archiver;
+    }
+
+    /**
+     * Set archiver
+     *
+     * @param mixed|null $archiver An archiver interface
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setArchiver($archiver)
+    {
+        $this->archiver = $archiver;
+
+        return $this;
+    }
+
+    /**
      * Get export file path
      *
-     * @return string
+     * @return string Export file path
      */
     public function getFilePath()
     {
