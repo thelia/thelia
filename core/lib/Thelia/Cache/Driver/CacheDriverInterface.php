@@ -18,7 +18,6 @@ namespace Thelia\Cache\Driver;
  */
 interface CacheDriverInterface
 {
-
     /**
      * Retrieves cached information from the data store.
      *
@@ -45,8 +44,9 @@ interface CacheDriverInterface
 
     /**
      * Init the cache.
+     * @param array $params
      */
-    public function init(array $params = null);
+    public function init(array $params = []);
 
     /**
      * Tests if an entry exists in the cache.

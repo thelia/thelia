@@ -24,8 +24,9 @@ class XCacheDriver extends BaseCacheDriver
 {
     /**
      * Init the cache.
+     * @param array $params
      */
-    public function initDriver(array $params = null)
+    public function initDriver(array $params = [])
     {
         $this->cache = new XcacheCache();
     }

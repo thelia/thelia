@@ -21,9 +21,9 @@ namespace Thelia\Cache\Driver;
 class NullDriver extends BaseCacheDriver
 {
     /**
-     * Init the cache.
+     * @param array $params
      */
-    public function initDriver(array $params = null)
+    public function initDriver(array $params = [])
     {
     }
 

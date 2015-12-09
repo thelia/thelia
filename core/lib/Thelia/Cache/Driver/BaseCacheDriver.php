@@ -23,7 +23,6 @@ use Thelia\Model\ConfigQuery;
  */
 abstract class BaseCacheDriver implements CacheDriverInterface
 {
-
     const CONFIG_ENABLED = 'tcache_enabled';
 
     const CONFIG_DRIVER = 'tcache_driver';
@@ -37,7 +36,6 @@ abstract class BaseCacheDriver implements CacheDriverInterface
     const CONFIG_LIFE_TIME = 'tcache_life_time';
 
     const DEFAULT_LIFE_TIME = 30;
-
 
     /** @var CacheProvider The doctrine cache instance */
     protected $cache = null;
@@ -106,11 +104,10 @@ abstract class BaseCacheDriver implements CacheDriverInterface
         return $ret;
     }
 
-    protected abstract function initDriver();
+    abstract protected function initDriver();
 
     protected function postInit($params)
     {
-
         if (null !== $this->cache) {
             $this->cache->setNamespace($this->namespace);
         }

@@ -30,20 +30,23 @@ class FileDriver extends BaseCacheDriver
 
     /**
      * Init the cache.
+     * @param array $params
      */
-    public function initDriver(array $params = null)
+    public function initDriver(array $params = [])
     {
         $directory = $this->getParam(
             $params,
             "directory",
             self::CONFIG_DIRECTORY,
-            THELIA_CACHE_DIR . self::DEFAULT_DIRECTORY);
+            THELIA_CACHE_DIR . self::DEFAULT_DIRECTORY
+        );
 
         $extension = $this->getParam(
             $params,
             "extension",
             self::CONFIG_EXTENSION,
-            null);
+            null
+        );
 
         $this->cache = new FilesystemCache($directory, $extension);
     }

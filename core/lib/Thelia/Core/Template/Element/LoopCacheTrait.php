@@ -14,6 +14,7 @@
 namespace Thelia\Core\Template\Element;
 
 use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Log\Tlog;
 use Thelia\Type\TypeCollection;
 
@@ -22,15 +23,12 @@ use Thelia\Type\TypeCollection;
  *
  * @package Thelia\Core\Template\Smarty\Plugins
  * @author  Julien Chanséaume <jchanseaume@openstudio.fr>
+ *
+ * @property Request $request
+ * @property ArgumentCollection $args
  */
 trait LoopCacheTrait
 {
-    /** @var Request $request */
-    protected $request;
-
-    /** @var \Thelia\Core\Template\Loop\Argument\ArgumentCollection $args */
-    protected $args;
-
     /** @var bool Use the CacheFactory feature */
     protected $isCacheable = false;
 

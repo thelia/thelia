@@ -18,9 +18,7 @@ use Thelia\Cache\Driver\BaseCacheDriver;
 use Thelia\Cache\Driver\FileDriver;
 use Thelia\Cache\Driver\MemcachedDriver;
 use Thelia\Cache\Driver\NullDriver;
-use Thelia\Log\Tlog;
 use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class CacheFactory
@@ -29,11 +27,13 @@ use Thelia\Model\ConfigQuery;
  */
 class CacheFactory
 {
-
     /**
-     * Create a new CacheFactory instance, that could be configured without interfering with the "main" instance
+     *  Create a new CacheFactory instance, that could be configured without interfering with the "main" instance
      *
-     * @return \Thelia\Cache\Driver\BaseCacheDriver a new CacheFactory instance.
+     * @param string|null $driver The driver name
+     * @param array $params
+     * @param bool $fallback
+     * @return null|ArrayDriver|BaseCacheDriver|FileDriver|MemcachedDriver|NullDriver
      */
     public function get($driver = null, array $params = null, $fallback = true)
     {
