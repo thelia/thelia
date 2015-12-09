@@ -13,13 +13,13 @@
 namespace Thelia\Core\Serializer\Serializer;
 
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
  * Class XMLSerializer
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class XMLSerializer implements SerializerInterface
+class XMLSerializer extends AbstractSerializer
 {
     /**
      * @var \Symfony\Component\Serializer\Encoder\XmlEncoder An xml encoder instance
@@ -31,12 +31,15 @@ class XMLSerializer implements SerializerInterface
      */
     private $xmlDataStart;
 
+    private $rootNodeName = 'data';
+
     /**
      * Class constructor.
      */
     public function __construct()
     {
         $this->xmlEncoder = new XmlEncoder;
+        $this->xmlEncoder->setRootNodeName($this->rootNodeName);
     }
 
     public function getId()
@@ -59,12 +62,11 @@ class XMLSerializer implements SerializerInterface
         return 'application/xml';
     }
 
-    public function wrapOpening()
+    public function prepareFile(\SplFileObject $fileObject)
     {
-        $this->xmlEncoder->setRootNodeName('data');
         $this->xmlDataStart = null;
 
-        return '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<root>' . PHP_EOL;
+        $fileObject->fwrite('<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . '<root>' . PHP_EOL);
     }
 
     public function serialize($data)
@@ -72,7 +74,7 @@ class XMLSerializer implements SerializerInterface
         $xml = $this->xmlEncoder->encode($data, 'array');
 
         if ($this->xmlDataStart === null) {
-            $this->xmlDataStart = strpos($xml, '<data>');
+            $this->xmlDataStart = strpos($xml, '<' . $this->rootNodeName . '>');
         }
 
         return substr($xml, $this->xmlDataStart, -1);
@@ -83,9 +85,9 @@ class XMLSerializer implements SerializerInterface
         return PHP_EOL;
     }
 
-    public function wrapClosing()
+    public function finalizeFile(\SplFileObject $fileObject)
     {
-        return PHP_EOL . '</root>';
+        $fileObject->fwrite(PHP_EOL . '</root>');
     }
 
     public function unserialize()

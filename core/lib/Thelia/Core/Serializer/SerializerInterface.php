@@ -47,11 +47,11 @@ interface SerializerInterface
     public function getMimeType();
 
     /**
-     * Get start string that must wrap serialized data
+     * Prepare file to receive serialized data
      *
-     * @return string Wrap opening string
+     * @param \SplFileObject $fileObject A file object
      */
-    public function wrapOpening();
+    public function prepareFile(\SplFileObject $fileObject);
 
     /**
      * Serialize data
@@ -65,16 +65,16 @@ interface SerializerInterface
     /**
      * Get string that separate serialized data
      *
-     * @return string Wrap separator string
+     * @return null|string Wrap separator string
      */
     public function separator();
 
     /**
-     * Get close string that must wrap serialized data
+     * Finalize file with serialized data
      *
-     * @return string Wrap closing string
+     * @param \SplFileObject $fileObject A file object
      */
-    public function wrapClosing();
+    public function finalizeFile(\SplFileObject $fileObject);
 
     public function unserialize();
 }

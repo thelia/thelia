@@ -12,13 +12,13 @@
 
 namespace Thelia\Core\Serializer\Serializer;
 
-use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
  * Class CSVSerializer
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class CSVSerializer implements SerializerInterface
+class CSVSerializer extends AbstractSerializer
 {
     /**
      * @var string CSV delimiter char
@@ -29,6 +29,11 @@ class CSVSerializer implements SerializerInterface
      * @var string CSV enclosure char
      */
     const ENCLOSURE = '"';
+
+    /**
+     * @var array Headers
+     */
+    private $headers;
 
     public function getId()
     {
@@ -50,14 +55,18 @@ class CSVSerializer implements SerializerInterface
         return 'text/csv';
     }
 
-    public function wrapOpening()
+    public function prepareFile(\SplFileObject $fileObject)
     {
-        return null;
+        $this->headers = null;
     }
 
     public function serialize($data)
     {
-        $fd = fopen('php://memory', 'r+b');
+        if ($this->headers === null) {
+            $this->headers = array_keys($data);
+        }
+
+        $fd = fopen('php://memory', 'w+b');
         fputcsv($fd, $data, static::DELIMITER, static::ENCLOSURE);
         rewind($fd);
         $csvRow = stream_get_contents($fd);
@@ -66,14 +75,28 @@ class CSVSerializer implements SerializerInterface
         return $csvRow;
     }
 
-    public function separator()
+    public function finalizeFile(\SplFileObject $fileObject)
     {
-        return null;
-    }
+        if ($this->headers !== null) {
+            // Create tmp file with header
+            $fd = fopen('php://temp', 'w+b');
+            fputcsv($fd, $this->headers);
 
-    public function wrapClosing()
-    {
-        return null;
+            // Copy file content into tmp file
+            $fileObject->rewind();
+            fwrite($fd, $fileObject->fread($fileObject->getSize()));
+
+            // Overwrite file content with tmp content
+            rewind($fd);
+            $fileObject->rewind();
+            $fileObject->fwrite(stream_get_contents($fd));
+            clearstatcache(true, $fileObject->getPathname());
+
+            fclose($fd);
+        }
+
+        // Remove last line feed
+        $fileObject->ftruncate($fileObject->getSize() - 1);
     }
 
     public function unserialize()

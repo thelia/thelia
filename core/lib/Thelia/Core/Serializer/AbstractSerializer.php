@@ -10,58 +10,24 @@
 /*      file that was distributed with this source code.                             */
 /*************************************************************************************/
 
-namespace Thelia\Core\Serializer\Serializer;
 
-use Thelia\Core\Serializer\AbstractSerializer;
+namespace Thelia\Core\Serializer;
 
 /**
- * Class JSONSerializer
+ * Class AbstractSerializer
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class JSONSerializer extends AbstractSerializer
+abstract class AbstractSerializer implements SerializerInterface
 {
-    public function getId()
-    {
-        return 'thelia.json';
-    }
-
-    public function getName()
-    {
-        return 'JSON';
-    }
-
-    public function getExtension()
-    {
-        return 'json';
-    }
-
-    public function getMimeType()
-    {
-        return 'application/json';
-    }
-
     public function prepareFile(\SplFileObject $fileObject)
     {
-        $fileObject->fwrite('[');
-    }
-
-    public function serialize($data)
-    {
-        return json_encode($data);
     }
 
     public function separator()
     {
-        return ',' . PHP_EOL;
     }
 
     public function finalizeFile(\SplFileObject $fileObject)
     {
-        $fileObject->fwrite(']');
-    }
-
-    public function unserialize()
-    {
-        // TODO: Implement decode() method.
     }
 }

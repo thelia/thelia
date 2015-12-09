@@ -13,13 +13,13 @@
 namespace Thelia\Core\Serializer\Serializer;
 
 use Symfony\Component\Yaml\Yaml;
-use Thelia\Core\Serializer\SerializerInterface;
+use Thelia\Core\Serializer\AbstractSerializer;
 
 /**
  * Class YAMLSerializer
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class YAMLSerializer implements SerializerInterface
+class YAMLSerializer extends AbstractSerializer
 {
     public function getId()
     {
@@ -41,24 +41,9 @@ class YAMLSerializer implements SerializerInterface
         return 'application/x-yaml';
     }
 
-    public function wrapOpening()
-    {
-        return null;
-    }
-
     public function serialize($data)
     {
         return Yaml::dump([$data]);
-    }
-
-    public function separator()
-    {
-        return null;
-    }
-
-    public function wrapClosing()
-    {
-        return null;
     }
 
     public function unserialize()

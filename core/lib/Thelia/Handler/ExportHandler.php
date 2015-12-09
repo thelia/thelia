@@ -197,26 +197,26 @@ class ExportHandler
         $fileSystem = new Filesystem;
         $fileSystem->mkdir(dirname($filePath));
 
-        $fd = fopen($filePath, 'w');
+        $file = new \SplFileObject($filePath, 'w+b');
 
-        fwrite($fd, $serializer->wrapOpening());
+        $serializer->prepareFile($file);
 
         foreach ($export as $idx => $data) {
-            if ($idx > 0) {
-                fwrite($fd, $serializer->separator());
-            }
-
             $data = $export->beforeSerialize($data);
             $data = $export->applyOrderAndAliases($data);
             $data = $serializer->serialize($data);
             $data = $export->afterSerialize($data);
 
-            fwrite($fd, $data);
+            if ($idx > 0) {
+                $data = $serializer->separator() . $data;
+            }
+
+            $file->fwrite($data);
         }
 
-        fwrite($fd, $serializer->wrapClosing());
+        $serializer->finalizeFile($file);
 
-        fclose($fd);
+        unset($file);
 
         return $filePath;
     }
