@@ -14,6 +14,7 @@ namespace Thelia\Handler;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
@@ -106,7 +107,7 @@ class ExportHandler
     public function export(
         Export $export,
         SerializerInterface $serializer,
-        AbstractArchiveBuilder $archiver = null,
+        ArchiverInterface $archiver = null,
         Lang $language = null,
         $includeImages = false,
         $includeDocuments = false,
@@ -140,31 +141,19 @@ class ExportHandler
                 $handler->setImageExport(true);
             }
 
+            // Todo
             if ($includeDocuments && $handler instanceof DocumentsExportInterface) {
                 $this->processExportDocuments($handler, $archiveBuilder);
 
                 $handler->setDocumentExport(true);
-            }
+            }*/
 
-            $data = $handler
-                ->buildData($lang)
-                ->setLang($lang)
+            $event->getArchiver()
+                ->create($filePath)
+                ->add($filePath)
+                ->save()
             ;
-
-            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEFORE_ENCODE, $event);
-
-            $formattedContent = $formatter
-                ->setOrder($handler->getOrder())
-                ->encode($data)
-            ;
-
-            $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_AFTER_ENCODE, $event->setContent($formattedContent));
-
-
-            $archiveBuilder->addFileFromString(
-                $event->getContent(),
-                $filename
-            );*/
+            $event->setFilePath($event->getArchiver()->getArchivePath());
         }
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_SUCCESS, $event);

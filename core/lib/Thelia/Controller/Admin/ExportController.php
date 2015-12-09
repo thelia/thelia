@@ -14,6 +14,7 @@ namespace Thelia\Controller\Admin;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Event\UpdatePositionEvent;
@@ -182,16 +183,14 @@ class ExportController extends BaseAdminController
 
             /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
             $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
-
-            /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
             $serializer = $serializerManager->get($validatedForm->get('serializer')->getData());
 
             $archiver = null;
-//            if ($validatedForm->get('do_compress')->getData()) {
-//                $archiveBuilderManager = $this->container->get("thelia.manager.archive_builder_manager");
-//                /** @var \Thelia\Core\FileFormat\Archive\ArchiveBuilderInterface $archiveBuilder */
-//                $archiveBuilder = $archiveBuilderManager->get($validatedForm->get("archive_builder")->getData());
-//            }
+            if ($validatedForm->get('do_compress')->getData()) {
+                /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+                $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
+                $archiver = $archiverManager->get($validatedForm->get('archiver')->getData());
+            }
 
             $rangeDate = null;
             if ($validatedForm->get('range_date_start')->getData()
@@ -213,19 +212,23 @@ class ExportController extends BaseAdminController
                 $rangeDate
             );
 
+            $contentType = $exportEvent->getSerializer()->getMimeType();
+            $fileExt = $exportEvent->getSerializer()->getExtension();
+
+            if ($exportEvent->getArchiver() !== null) {
+                $contentType = $exportEvent->getArchiver()->getMimeType();
+                $fileExt = $exportEvent->getArchiver()->getExtension();
+            }
+
             $header = [
-                'Content-Type' => $exportEvent->getSerializer()->getMimeType(),
+                'Content-Type' => $contentType,
                 'Content-Disposition' => sprintf(
                     '%s; filename="%s.%s"',
                     ResponseHeaderBag::DISPOSITION_ATTACHMENT,
                     $exportEvent->getExport()->getFileName(),
-                    $exportEvent->getSerializer()->getExtension()
+                    $fileExt
                 )
             ];
-
-            if ($exportEvent->getArchiver() !== null) {
-                // Todo
-            }
 
             return new BinaryFileResponse($exportEvent->getFilePath(), 200, $header, false);
         } catch (FormValidationException $e) {

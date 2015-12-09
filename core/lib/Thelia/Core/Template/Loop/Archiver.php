@@ -12,7 +12,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\DependencyInjection\Compiler\RegisterSerializerPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterArchiverPass;
 use Thelia\Core\Template\Element\ArraySearchLoopInterface;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
@@ -23,16 +23,16 @@ use Thelia\Type\EnumType;
 use Thelia\Type\TypeCollection;
 
 /**
- * Class Serializer
+ * Class ArchiveBuilder
  * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class Serializer extends BaseLoop implements ArraySearchLoopInterface
+class Archiver extends BaseLoop implements ArraySearchLoopInterface
 {
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createAnyTypeArgument('serializer'),
+            Argument::createAnyTypeArgument('archiver'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -45,14 +45,14 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
 
     public function buildArray()
     {
-        /** @var \Thelia\Core\Serializer\SerializerManager $serializerManager */
-        $serializerManager = $this->container->get(RegisterSerializerPass::MANAGER_SERVICE_ID);
+        /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
+        $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
 
-        $serializerId = $this->getArgValue('serializer');
-        if ($serializerId === null) {
-            $serializers = $serializerManager->getSerializers();
+        $archiverId = $this->getArgValue('archiver');
+        if ($archiverId === null) {
+            $serializers = $archiverManager->getArchivers();
         } else {
-            $serializers = $serializerManager->get($serializerId);
+            $serializers = $archiverManager->get($archiverId);
         }
 
         switch ($this->getArgValue('order')) {
@@ -69,15 +69,15 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
 
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var \Thelia\Core\Serializer\SerializerInterface $serializer */
-        foreach ($loopResult->getResultDataCollection() as $serializer) {
+        /** @var \Thelia\Core\Archiver\ArchiverInterface $archiver */
+        foreach ($loopResult->getResultDataCollection() as $archiver) {
             $loopResultRow = new LoopResultRow;
 
             $loopResultRow
-                ->set('ID', $serializer->getId())
-                ->set('NAME', $serializer->getName())
-                ->set('EXTENSION', $serializer->getExtension())
-                ->set('MIME_TYPE', $serializer->getMimeType());
+                ->set('ID', $archiver->getId())
+                ->set('NAME', $archiver->getName())
+                ->set('EXTENSION', $archiver->getExtension())
+                ->set('MIME_TYPE', $archiver->getMimeType());
 
             $loopResult->addRow($loopResultRow);
         }

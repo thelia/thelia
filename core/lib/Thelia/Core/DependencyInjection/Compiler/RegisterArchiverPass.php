@@ -14,41 +14,40 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class RegisterArchiveBuilderPass
- * @package Thelia\Core\DependencyInjection\Compiler
+ * Class RegisterArchiverPass
  * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class RegisterArchiveBuilderPass implements CompilerPassInterface
+class RegisterArchiverPass implements CompilerPassInterface
 {
-    const MANAGER_DEFINITION = "thelia.manager.archive_builder_manager";
-
-    const SERVICE_TAG = "thelia.archive_builder";
+    /**
+     * @var string Archiver manager service ID
+     */
+    const MANAGER_SERVICE_ID = 'thelia.archiver.manager';
 
     /**
-     * You can modify the container here before it is dumped to PHP code.
-     *
-     * @param ContainerBuilder $container Container
-     *
-     * @api
+     * @var string Archiver tag name
      */
+    const ARCHIVER_SERVICE_TAG = 'thelia.archiver';
+
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(static::MANAGER_DEFINITION)) {
+        try {
+            $manager = $container->getDefinition(self::MANAGER_SERVICE_ID);
+        } catch (InvalidArgumentException $e) {
             return;
         }
 
-        $manager = $container->getDefinition(static::MANAGER_DEFINITION);
-        $services = $container->findTaggedServiceIds(static::SERVICE_TAG);
-
-        foreach ($services as $id => $condition) {
+        foreach (array_keys($container->findTaggedServiceIds(self::ARCHIVER_SERVICE_TAG)) as $serviceId) {
             $manager->addMethodCall(
                 'add',
-                array(
-                    new Reference($id)
-                )
+                [
+                    new Reference($serviceId)
+                ]
             );
         }
     }

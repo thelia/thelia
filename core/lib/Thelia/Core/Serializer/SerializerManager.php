@@ -51,7 +51,7 @@ class SerializerManager
      * Determine if a serializer exists under the given identifier
      *
      * @param string  $serializerId   A serializer identifier
-     * @param boolean $throwException Throw exception if serializer exists or not
+     * @param boolean $throwException Throw exception if serializer doesn't exists or not
      *
      * @throws \InvalidArgumentException if the serializer identifier does not exist
      *
@@ -104,6 +104,7 @@ class SerializerManager
 
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
+                // Todo
                 throw new \Exception('TODO: ' . __FILE__);
             }
 
@@ -116,7 +117,7 @@ class SerializerManager
     /**
      * Add a serializer
      *
-     * @param SerializerInterface $serializer A serializer
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer
      *
      * @return $this Return $this, allow chaining
      */

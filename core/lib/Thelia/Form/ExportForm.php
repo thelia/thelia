@@ -66,11 +66,18 @@ class ExportForm extends BaseForm
                 "label_attr" => ["for" => "do_compress"],
                 "required" => false,
             ))
-            ->add("archive_builder", "text", array(
-                "label" => $this->translator->trans("Archive Format"),
-                "label_attr" => ["for" => "archive_builder"],
-                "required" => false,
-            ))
+            // Todo: use list
+            ->add(
+                'archiver',
+                'text',
+                [
+                    'required' => false,
+                    'label' => $this->translator->trans('Archive Format'),
+                    'label_attr' => [
+                        'for' => 'archiver'
+                    ],
+                ]
+            )
             ->add("images", "checkbox", array(
                 "label" => $this->translator->trans("Include images"),
                 "label_attr" => ["for" => "with_images"],

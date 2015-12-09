@@ -13,6 +13,7 @@
 namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
+use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\ImportExport\Export\AbstractExport;
 
@@ -33,7 +34,7 @@ class ExportEvent extends Event
     protected $serializer;
 
     /**
-     * @var null|mixed An archiver interface
+     * @var null|\Thelia\Core\Archiver\ArchiverInterface An archiver interface
      */
     protected $archiver;
 
@@ -47,12 +48,12 @@ class ExportEvent extends Event
      *
      * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
      * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
-     * @param mixed                                       $archiver   An archiver interface
+     * @param \Thelia\Core\Archiver\ArchiverInterface     $archiver   An archiver interface
      */
     public function __construct(
         AbstractExport $export,
         SerializerInterface $serializer,
-        $archiver = null
+        ArchiverInterface $archiver = null
     ) {
         $this->export = $export;
         $this->serializer = $serializer;
@@ -110,7 +111,7 @@ class ExportEvent extends Event
     /**
      * Get archiver
      *
-     * @return mixed|null An archiver interface
+     * @return mixed|\Thelia\Core\Archiver\ArchiverInterface An archiver interface
      */
     public function getArchiver()
     {
@@ -120,11 +121,11 @@ class ExportEvent extends Event
     /**
      * Set archiver
      *
-     * @param mixed|null $archiver An archiver interface
+     * @param mixed|\Thelia\Core\Archiver\ArchiverInterface $archiver An archiver interface
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArchiver($archiver)
+    public function setArchiver(ArchiverInterface $archiver)
     {
         $this->archiver = $archiver;
 
