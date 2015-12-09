@@ -248,15 +248,20 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
                 if ($moduleHook->getTemplates()) {
                     if ($container->hasDefinition($moduleHook->getClassname())) {
+                        $moduleHookEventName = 'hook.' . $hook->getType() . '.' . $hook->getCode();
+                        if (true === $moduleHook->getHook()->getByModule()) {
+                            $moduleHookEventName .= '.' . $moduleHook->getModuleId();
+                        }
                         $container
                             ->getDefinition($moduleHook->getClassname())
                             ->addMethodCall(
                                 'addTemplate',
                                 array(
-                                    'hook.' . $hook->getType() . '.' . $hook->getCode(),
+                                    $moduleHookEventName,
                                     $moduleHook->getTemplates()
                                 )
-                            );
+                            )
+                        ;
                     }
                 }
             }
