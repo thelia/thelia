@@ -884,10 +884,38 @@ class Form extends AbstractSmartyPlugin
             $this->buildFieldName($formField),
             $formField->getViewData(),
             $formFieldConfig->getType(),
-            $formField->createView()->vars
+            $this->findCollectionFieldFormView($form->getView(), $formField)
         );
 
         return '';
+    }
+
+    /**
+     * @param FormView $formView
+     * @param SymfonyForm $formField
+     * @return array
+     */
+    protected function findCollectionFieldFormView(FormView $formView, SymfonyForm $formField)
+    {
+        $formFieldParentList = [];
+
+        do {
+            // don't need to set first form name child
+            if (null === $formField->getParent()) {
+                break;
+            }
+
+            $formFieldParentList[] = $formField->getConfig()->getName();
+
+        } while (null !== $formField = $formField->getParent());
+
+        $formFieldParentList = array_reverse($formFieldParentList);
+
+        foreach ($formFieldParentList as $val) {
+            $formView = $formView->children[$val];
+        }
+
+        return $formView->vars;
     }
 
     /**
