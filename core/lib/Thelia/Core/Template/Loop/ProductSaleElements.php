@@ -282,4 +282,9 @@ class ProductSaleElements extends BaseLoop implements PropelSearchLoopInterface,
     {
         $search->filterByRef($searchTerm, $searchCriteria);
     }
+
+    public function getCacheRef()
+    {
+        return sprintf("product::%s", $this->getProduct());
+    }
 }

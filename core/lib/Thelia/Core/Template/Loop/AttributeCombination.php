@@ -155,4 +155,9 @@ class AttributeCombination extends BaseI18nLoop implements PropelSearchLoopInter
 
         return $search;
     }
+
+    public function getCacheRef()
+    {
+        return sprintf("product_sale_element::%s", $this->getProduct_sale_elements());
+    }
 }

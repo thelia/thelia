@@ -814,6 +814,14 @@ final class TheliaEvents
     const CACHE_CLEAR = 'thelia.cache.clear';
 
     /**
+     * sent for clearing tcache
+     */
+    const TCACHE_UPDATE      = 'thelia.tcache.update';
+    const TCACHE_DISCARD_REF = 'thelia.tcache.clear.ref';
+    const TCACHE_DISCARD_KEY = 'thelia.tcache.clear.key';
+    const TCACHE_FLUSH       = 'thelia.tcache.flush';
+
+    /**
      * sent for subscribing to the newsletter
      */
     const NEWSLETTER_SUBSCRIBE = 'thelia.newsletter.subscribe';

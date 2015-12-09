@@ -210,6 +210,16 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
+        <!-- cache -->
+        <service id="thelia.cache.factory" class="Thelia\Cache\CacheFactory" />
+
+        <service
+            id="thelia.cache"
+            class="Thelia\Cache\Driver\CacheDriverInterface"
+            factory-service="thelia.cache.factory"
+            factory-method="get">
+        </service>
+
         <!-- Archive builders -->
 
         <service id="thelia.manager.archive_builder_manager" class="Thelia\Core\FileFormat\Archive\ArchiveBuilderManager">
