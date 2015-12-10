@@ -29,6 +29,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method     ChildOrderCouponQuery orderByShortDescription($order = Criteria::ASC) Order by the short_description column
  * @method     ChildOrderCouponQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method     ChildOrderCouponQuery orderByStartDate($order = Criteria::ASC) Order by the start_date column
  * @method     ChildOrderCouponQuery orderByExpirationDate($order = Criteria::ASC) Order by the expiration_date column
  * @method     ChildOrderCouponQuery orderByIsCumulative($order = Criteria::ASC) Order by the is_cumulative column
  * @method     ChildOrderCouponQuery orderByIsRemovingPostage($order = Criteria::ASC) Order by the is_removing_postage column
@@ -46,6 +47,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCouponQuery groupByTitle() Group by the title column
  * @method     ChildOrderCouponQuery groupByShortDescription() Group by the short_description column
  * @method     ChildOrderCouponQuery groupByDescription() Group by the description column
+ * @method     ChildOrderCouponQuery groupByStartDate() Group by the start_date column
  * @method     ChildOrderCouponQuery groupByExpirationDate() Group by the expiration_date column
  * @method     ChildOrderCouponQuery groupByIsCumulative() Group by the is_cumulative column
  * @method     ChildOrderCouponQuery groupByIsRemovingPostage() Group by the is_removing_postage column
@@ -82,6 +84,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     ChildOrderCoupon findOneByTitle(string $title) Return the first ChildOrderCoupon filtered by the title column
  * @method     ChildOrderCoupon findOneByShortDescription(string $short_description) Return the first ChildOrderCoupon filtered by the short_description column
  * @method     ChildOrderCoupon findOneByDescription(string $description) Return the first ChildOrderCoupon filtered by the description column
+ * @method     ChildOrderCoupon findOneByStartDate(string $start_date) Return the first ChildOrderCoupon filtered by the start_date column
  * @method     ChildOrderCoupon findOneByExpirationDate(string $expiration_date) Return the first ChildOrderCoupon filtered by the expiration_date column
  * @method     ChildOrderCoupon findOneByIsCumulative(boolean $is_cumulative) Return the first ChildOrderCoupon filtered by the is_cumulative column
  * @method     ChildOrderCoupon findOneByIsRemovingPostage(boolean $is_removing_postage) Return the first ChildOrderCoupon filtered by the is_removing_postage column
@@ -99,6 +102,7 @@ use Thelia\Model\Map\OrderCouponTableMap;
  * @method     array findByTitle(string $title) Return ChildOrderCoupon objects filtered by the title column
  * @method     array findByShortDescription(string $short_description) Return ChildOrderCoupon objects filtered by the short_description column
  * @method     array findByDescription(string $description) Return ChildOrderCoupon objects filtered by the description column
+ * @method     array findByStartDate(string $start_date) Return ChildOrderCoupon objects filtered by the start_date column
  * @method     array findByExpirationDate(string $expiration_date) Return ChildOrderCoupon objects filtered by the expiration_date column
  * @method     array findByIsCumulative(boolean $is_cumulative) Return ChildOrderCoupon objects filtered by the is_cumulative column
  * @method     array findByIsRemovingPostage(boolean $is_removing_postage) Return ChildOrderCoupon objects filtered by the is_removing_postage column
@@ -195,7 +199,7 @@ abstract class OrderCouponQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `ORDER_ID`, `CODE`, `TYPE`, `AMOUNT`, `TITLE`, `SHORT_DESCRIPTION`, `DESCRIPTION`, `START_DATE`, `EXPIRATION_DATE`, `IS_CUMULATIVE`, `IS_REMOVING_POSTAGE`, `IS_AVAILABLE_ON_SPECIAL_OFFERS`, `SERIALIZED_CONDITIONS`, `PER_CUSTOMER_USAGE_COUNT`, `CREATED_AT`, `UPDATED_AT` FROM `order_coupon` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -552,6 +556,49 @@ abstract class OrderCouponQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(OrderCouponTableMap::DESCRIPTION, $description, $comparison);
+    }
+
+    /**
+     * Filter the query on the start_date column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStartDate('2011-03-14'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate('now'); // WHERE start_date = '2011-03-14'
+     * $query->filterByStartDate(array('max' => 'yesterday')); // WHERE start_date > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $startDate The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildOrderCouponQuery The current query, for fluid interface
+     */
+    public function filterByStartDate($startDate = null, $comparison = null)
+    {
+        if (is_array($startDate)) {
+            $useMinMax = false;
+            if (isset($startDate['min'])) {
+                $this->addUsingAlias(OrderCouponTableMap::START_DATE, $startDate['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($startDate['max'])) {
+                $this->addUsingAlias(OrderCouponTableMap::START_DATE, $startDate['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(OrderCouponTableMap::START_DATE, $startDate, $comparison);
     }
 
     /**
