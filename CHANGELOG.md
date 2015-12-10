@@ -1,5 +1,6 @@
 # 2.1.8
 
+- Fix Colissimo module external-schema (related to #1838)
 - Fix attribute title in the modal "create a new combination" (related to #1830)
 - Add message if thelia project is not installed (related to #1825)
 - Fix the event dispatched before decoding of the import, TheliaEvents::IMPORT_AFTER_DECODE to TheliaEvents::IMPORT_BEFORE_DECODE (related to #1806)
