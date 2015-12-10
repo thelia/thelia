@@ -56,6 +56,26 @@ abstract class AbstractExport implements \Iterator
      */
     protected $orderAndAliases;
 
+    /**
+     * @var boolean Whether to export images or not
+     */
+    protected $exportImages = false;
+
+    /**
+     * @var array Images paths list
+     */
+    protected $imagesPaths = [];
+
+    /**
+     * @var boolean Whether to export documents or not
+     */
+    protected $exportDocuments = false;
+
+    /**
+     * @var array Documents paths list
+     */
+    protected $documentsPaths = [];
+
     public function current()
     {
         if ($this->dataIsArray) {
@@ -155,6 +175,7 @@ abstract class AbstractExport implements \Iterator
         return $this;
     }
 
+
     /**
      * Whether images has to be exported as data
      *
@@ -166,6 +187,55 @@ abstract class AbstractExport implements \Iterator
     }
 
     /**
+     * Get export images
+     *
+     * @return boolean Whether to export images or not
+     */
+    public function isExportImages()
+    {
+        return $this->exportImages;
+    }
+
+    /**
+     * Set export images
+     *
+     * @param boolean $exportImages Whether to export images or not
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setExportImages($exportImages)
+    {
+        $this->exportImages = $exportImages;
+
+        return $this;
+    }
+
+    /**
+     * Get images paths
+     *
+     * @return null|array Images paths list
+     */
+    public function getImagesPaths()
+    {
+        return $this->imagesPaths;
+    }
+
+    /**
+     * Set images paths
+     *
+     * @param array $imagesPaths Images paths list
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setImagesPaths(array $imagesPaths)
+    {
+        $this->imagesPaths = $imagesPaths;
+
+        return $this;
+    }
+
+
+    /**
      * Whether documents has to be exported as data
      *
      * @return bool
@@ -174,6 +244,55 @@ abstract class AbstractExport implements \Iterator
     {
         return static::EXPORT_DOCUMENT;
     }
+
+    /**
+     * Get export documents
+     *
+     * @return boolean Whether to export documents or not
+     */
+    public function isExportDocuments()
+    {
+        return $this->exportDocuments;
+    }
+
+    /**
+     * Set export documents
+     *
+     * @param boolean $exportDocuments Whether to export documents or not
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setExportDocuments($exportDocuments)
+    {
+        $this->exportDocuments = $exportDocuments;
+
+        return $this;
+    }
+
+    /**
+     * Get documents paths
+     *
+     * @return null|array Documents paths list
+     */
+    public function getDocumentsPaths()
+    {
+        return $this->documentsPaths;
+    }
+
+    /**
+     * Set documents paths
+     *
+     * @param array $documentsPaths Documents paths list
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function setDocumentsPaths(array $documentsPaths)
+    {
+        $this->documentsPaths = $documentsPaths;
+
+        return $this;
+    }
+
 
     /**
      * Get file name

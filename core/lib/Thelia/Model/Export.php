@@ -5,8 +5,6 @@ namespace Thelia\Model;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
-use Thelia\ImportExport\Export\DocumentsExportInterface;
-use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\Base\Export as BaseExport;
 use Thelia\Model\Tools\ModelEventDispatcherTrait;
 use Thelia\Model\Tools\PositionManagementTrait;
@@ -16,6 +14,9 @@ class Export extends BaseExport
     use PositionManagementTrait;
     use ModelEventDispatcherTrait;
 
+    /**
+     * @var \Thelia\ImportExport\Export\AbstractExport
+     */
     protected static $cache;
 
     /**
@@ -60,25 +61,25 @@ class Export extends BaseExport
             );
         }
 
-        return static::$cache = $instance;
+        return $instance;
     }
 
     public function hasImages()
     {
         if (static::$cache === null) {
-            $this->getHandleClassInstance();
+            static::$cache = $this->getHandleClassInstance();
         }
 
-        return static::$cache instanceof ImagesExportInterface;
+        return static::$cache->hasImages();
     }
 
     public function hasDocuments()
     {
         if (static::$cache === null) {
-            $this->getHandleClassInstance();
+            static::$cache = $this->getHandleClassInstance();
         }
 
-        return static::$cache instanceof DocumentsExportInterface;
+        return static::$cache->hasDocuments();
     }
 
     /**

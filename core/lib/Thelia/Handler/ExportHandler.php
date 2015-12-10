@@ -17,12 +17,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\ArchiverInterface;
 use Thelia\Core\Event\ExportEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Core\FileFormat\Archive\AbstractArchiveBuilder;
 use Thelia\Core\Serializer\SerializerInterface;
 use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
-use Thelia\ImportExport\Export\DocumentsExportInterface;
-use Thelia\ImportExport\Export\ImagesExportInterface;
 use Thelia\Model\Export;
 use Thelia\Model\ExportCategoryQuery;
 use Thelia\Model\ExportQuery;
@@ -106,6 +103,19 @@ class ExportHandler
         return $category;
     }
 
+    /**
+     * Export
+     *
+     * @param \Thelia\Model\Export                         $export
+     * @param \Thelia\Core\Serializer\SerializerInterface  $serializer
+     * @param null|\Thelia\Core\Archiver\ArchiverInterface $archiver
+     * @param null|\Thelia\Model\Lang                      $language
+     * @param boolean                                      $includeImages
+     * @param boolean                                      $includeDocuments
+     * @param null|array                                   $rangeDate
+     *
+     * @return \Thelia\Core\Event\ExportEvent
+     */
     public function export(
         Export $export,
         SerializerInterface $serializer,
@@ -115,6 +125,7 @@ class ExportHandler
         $includeDocuments = false,
         $rangeDate = null
     ) {
+        // Todo
 //        if ($rangeDate !== null) {
 //            $handler->setRangeDate($rangeDate);
 //        }
@@ -123,8 +134,19 @@ class ExportHandler
 
         /** @var \Thelia\ImportExport\Export\AbstractExport $instance */
         $instance = new $exportHandleClass;
-        $instance->setLang($language);
 
+        // Configure handle class
+        $instance->setLang($language);
+        if ($archiver !== null) {
+            if ($includeImages && $instance->hasImages()) {
+                $instance->setExportImages(true);
+            }
+            if ($includeDocuments && $instance->hasDocuments()) {
+                $instance->setExportDocuments(true);
+            }
+        }
+
+        // Process export
         $event = new ExportEvent($instance, $serializer, $archiver);
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_BEGIN, $event);
@@ -135,26 +157,25 @@ class ExportHandler
 
         $this->eventDispatcher->dispatch(TheliaEvents::EXPORT_FINISHED, $event);
 
-        if ($event->getArchiver() !== null) {
-            // Todo
-            /*if ($includeImages && $handler instanceof ImagesExportInterface) {
-                $this->processExportImages($handler, $archiveBuilder);
 
-                $handler->setImageExport(true);
+        if ($event->getArchiver() !== null) {
+            // Create archive
+            $event->getArchiver()->create($filePath);
+
+            // Add images
+            if ($includeImages && $event->getExport()->hasImages()) {
+                $this->processExportImages($event->getExport(), $event->getArchiver());
             }
 
-            // Todo
-            if ($includeDocuments && $handler instanceof DocumentsExportInterface) {
-                $this->processExportDocuments($handler, $archiveBuilder);
+            // Add documents
+            if ($includeDocuments && $event->getExport()->hasDocuments()) {
+                $this->processExportDocuments($event->getExport(), $event->getArchiver());
+            }
 
-                $handler->setDocumentExport(true);
-            }*/
+            // Finalize archive
+            $event->getArchiver()->add($filePath)->save();
 
-            $event->getArchiver()
-                ->create($filePath)
-                ->add($filePath)
-                ->save()
-            ;
+            // Change returned file path
             $event->setFilePath($event->getArchiver()->getArchivePath());
         }
 
@@ -212,39 +233,29 @@ class ExportHandler
         return $filePath;
     }
 
-    /*---------- Copied code from old controller - NOT YET REWORKED ----------*/
-
     /**
-     * @param ImagesExportInterface  $handler
-     * @param AbstractArchiveBuilder $archiveBuilder
+     * Add images to archive
      *
-     * Procedure that add images in the export's archive
+     * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
+     * @param \Thelia\Core\Archiver\ArchiverInterface    $archiver
      */
-    protected function processExportImages(ImagesExportInterface $handler, AbstractArchiveBuilder $archiveBuilder)
+    protected function processExportImages(AbstractExport $export, ArchiverInterface $archiver)
     {
-        foreach ($handler->getImagesPaths() as $name => $documentPath) {
-            $archiveBuilder->addFile(
-                $documentPath,
-                $handler::IMAGES_DIRECTORY,
-                is_integer($name) ? null : $name
-            );
+        foreach ($export->getImagesPaths() as $imagePath) {
+            $archiver->add($imagePath);
         }
     }
 
     /**
-     * @param DocumentsExportInterface $handler
-     * @param AbstractArchiveBuilder   $archiveBuilder
+     * Add documents to archive
      *
-     * Procedure that add documents in the export's archive
+     * @param \Thelia\ImportExport\Export\AbstractExport $export   An export instance
+     * @param \Thelia\Core\Archiver\ArchiverInterface    $archiver
      */
-    protected function processExportDocuments(DocumentsExportInterface $handler, AbstractArchiveBuilder $archiveBuilder)
+    protected function processExportDocuments(AbstractExport $export, ArchiverInterface $archiver)
     {
-        foreach ($handler->getDocumentsPaths() as $name => $documentPath) {
-            $archiveBuilder->addFile(
-                $documentPath,
-                $handler::DOCUMENTS_DIRECTORY,
-                is_integer($name) ? null : $name
-            );
+        foreach ($export->getDocumentsPaths() as $documentPath) {
+            $archiver->add($documentPath);
         }
     }
 }
