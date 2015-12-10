@@ -39,6 +39,7 @@ use Thelia\Core\Template\Element\BaseI18nLoop;
  * @method int getCategory()
  * @method int getDepth()
  * @method bool getNeedCountChild()
+ * @method bool getNeedUrl()
  * @method bool|string getVisible()
  * @method int[] getExclude()
  * @method string[] getOrder()
@@ -56,6 +57,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth', PHP_INT_MAX),
             Argument::createBooleanTypeArgument('need_count_child', false),
+            Argument::createBooleanTypeArgument('need_url', false),
             Argument::createBooleanOrBothTypeArgument('visible', true, false),
             Argument::createIntListTypeArgument('exclude', array()),
             new Argument(
@@ -80,8 +82,6 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
 
             $search = CategoryQuery::create();
             $this->configureI18nProcessing($search, array('TITLE'));
-
-            //$search->filterByParent($parent);
 
             if ($visible !== BooleanOrBothType::ANY) {
                 $search->filterByVisible($visible);
@@ -119,6 +119,7 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
             $results = $search->find();
 
             $needCountChild = $this->getNeedCountChild();
+            $needUrl = $this->getNeedUrl();
 
             foreach ($results as $result) {
                 if (!isset($this->categories[$result->getParent()])) {
@@ -128,10 +129,11 @@ class CategoryTree extends BaseI18nLoop implements ArraySearchLoopInterface
                     "ID" => $result->getId(),
                     "TITLE" => $result->getVirtualColumn('i18n_TITLE'),
                     "PARENT" => $result->getParent(),
-                    //URL never used but getUrl is very slow
-                    //"URL" => $result->getUrl($this->locale),
                     "VISIBLE" => $result->getVisible() ? "1" : "0",
                 ];
+                if ($needUrl) {
+                    $row['URL'] = $result->getUrl($this->locale);
+                }
                 if ($needCountChild) {
                     $row['CHILD_COUNT'] = $result->countChild();
                 }
