@@ -156,7 +156,7 @@
         <form name="thelia_api_create" class="Thelia\Form\Api\ApiCreateForm"/>
         <form name="thelia_api_update" class="Thelia\Form\Api\ApiUpdateForm"/>
 
-        <form name="thelia.admin.translationsdb" class="Thelia\Form\TranslationsDbForm" />
+        <form name="thelia.admin.translations.customer_title" class="Thelia\Form\TranslationsCustomerTitleForm" />
 
     </forms>
 
