@@ -52,4 +52,14 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `description`, `chapo`, `pos
 
 ALTER TABLE `module` MODIFY `version` varchar(25) NOT NULL DEFAULT '';
 
+-- Add new column in coupon table
+ALTER TABLE `coupon` ADD `start_date` DATETIME AFTER`is_enabled`;
+ALTER TABLE `coupon` ADD INDEX `idx_start_date` (`start_date`);
+
+-- Add new column in coupon version table
+ALTER TABLE `coupon_version` ADD `start_date` DATETIME AFTER`is_enabled`;
+
+-- Add new column in order coupon table
+ALTER TABLE `order_coupon` ADD `start_date` DATETIME AFTER`description`;
+
 SET FOREIGN_KEY_CHECKS = 1;
