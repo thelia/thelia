@@ -38,13 +38,28 @@ class ArchiverManager
     }
 
     /**
-     * Get all archivers
+     * Get all archivers or only those match availability
      *
-     * @return array
+     * @param null|boolean $isAvailable Filter archivers by availability
+     *
+     * @return array All, or filtered by availability, archivers
      */
-    public function getArchivers()
+    public function getArchivers($isAvailable = null)
     {
-        return $this->archivers;
+        if ($isAvailable === null) {
+            return $this->archivers;
+        }
+
+        $filteredArchivers = [];
+
+        /** @var \Thelia\Core\Archiver\ArchiverInterface $archiver */
+        foreach ($this->archivers as $archiver) {
+            if ($archiver->isAvailable() === (bool) $isAvailable) {
+                $filteredArchivers[] = $archiver;
+            }
+        }
+
+        return $filteredArchivers;
     }
 
     /**
@@ -78,15 +93,24 @@ class ArchiverManager
     /**
      * Get an archiver
      *
-     * @param string $archiverId An archiver identifier
+     * @param string       $archiverId  An archiver identifier
+     * @param null|boolean $isAvailable Filter archiver by availability
      *
-     * @return \Thelia\Core\Archiver\ArchiverInterface Return an archiver
+     * @return null|\Thelia\Core\Archiver\ArchiverInterface Return an archiver or null depends on availability
      */
-    public function get($archiverId)
+    public function get($archiverId, $isAvailable = null)
     {
         $this->has($archiverId, true);
 
-        return $this->archivers[$archiverId];
+        if ($isAvailable === null) {
+            return $this->archivers[$archiverId];
+        }
+
+        if ($this->archivers[$archiverId]->isAvailable() === (bool) $isAvailable) {
+            return $this->archivers[$archiverId];
+        }
+
+        return null;
     }
 
     /**
@@ -105,7 +129,7 @@ class ArchiverManager
         foreach ($archivers as $archiver) {
             if (!($archiver instanceof ArchiverInterface)) {
                 // Todo
-                throw new \Exception('TODO: ' . __FILE__);
+                throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
             }
 
             $this->archivers[$archiver->getId()] = $archiver;

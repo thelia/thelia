@@ -32,6 +32,7 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
+            Argument::createBooleanTypeArgument('available'),
             Argument::createAnyTypeArgument('archiver'),
             new Argument(
                 'order',
@@ -48,11 +49,13 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
         /** @var \Thelia\Core\Archiver\ArchiverManager $archiverManager */
         $archiverManager = $this->container->get(RegisterArchiverPass::MANAGER_SERVICE_ID);
 
+        $availability = $this->getArgValue('available');
+
         $archiverId = $this->getArgValue('archiver');
         if ($archiverId === null) {
-            $serializers = $archiverManager->getArchivers();
+            $serializers = $archiverManager->getArchivers($availability);
         } else {
-            $serializers = $archiverManager->get($archiverId);
+            $serializers = $archiverManager->get($archiverId, $availability);
         }
 
         switch ($this->getArgValue('order')) {

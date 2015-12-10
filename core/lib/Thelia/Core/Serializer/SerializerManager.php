@@ -40,7 +40,7 @@ class SerializerManager
     /**
      * Get all serializers
      *
-     * @return array
+     * @return array All serializers
      */
     public function getSerializers()
     {
@@ -105,7 +105,7 @@ class SerializerManager
         foreach ($serializers as $serializer) {
             if (!($serializer instanceof SerializerInterface)) {
                 // Todo
-                throw new \Exception('TODO: ' . __FILE__);
+                throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
             }
 
             $this->serializers[$serializer->getId()] = $serializer;

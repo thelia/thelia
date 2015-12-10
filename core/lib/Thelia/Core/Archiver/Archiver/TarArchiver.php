@@ -12,52 +12,63 @@
 
 namespace Thelia\Core\Archiver\Archiver;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\AbstractArchiver;
 
 /**
- * Class ZipArchiver
+ * Class TarArchiver
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ZipArchiver extends AbstractArchiver
+class TarArchiver extends AbstractArchiver
 {
+    /**
+     * @var integer Compression method
+     */
+    const COMPRESSION_METHOD = \Phar::NONE;
+
     public function getId()
     {
-        return 'thelia.zip';
+        return 'thelia.tar';
     }
 
     public function getName()
     {
-        return 'Zip';
+        return 'Tar';
     }
 
     public function getExtension()
     {
-        return 'zip';
+        return 'tar';
     }
 
     public function getMimeType()
     {
-        return 'application/zip';
+        return 'application/x-tar';
     }
 
     public function isAvailable()
     {
-        return class_exists('\\ZipArchive');
+        return class_exists('\\PharData');
     }
 
     public function create($baseName)
     {
-        $this->archive = new \ZipArchive;
-
         $this->archivePath = $baseName . '.' . $this->getExtension();
 
-        $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $this->archive = new \PharData($this->archivePath);
 
         return $this;
     }
 
     public function save()
     {
-        return $this->archive->close();
+        /** @var \PharData $newArchive */
+        $newArchive = $this->archive->compress(static::COMPRESSION_METHOD, $this->getExtension());
+
+        $fileSystem = new Filesystem;
+        $fileSystem->remove($this->archivePath);
+        $fileSystem->rename($newArchive->getPath(), $this->archivePath);
+
+        $this->archive = new \PharData($this->archivePath);
     }
 }

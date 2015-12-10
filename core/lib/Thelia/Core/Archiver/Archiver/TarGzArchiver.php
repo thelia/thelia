@@ -12,52 +12,36 @@
 
 namespace Thelia\Core\Archiver\Archiver;
 
-use Thelia\Core\Archiver\AbstractArchiver;
-
 /**
- * Class ZipArchiver
+ * Class TarGzArchiver
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ZipArchiver extends AbstractArchiver
+class TarGzArchiver extends TarArchiver
 {
+    const COMPRESSION_METHOD = \Phar::GZ;
+
     public function getId()
     {
-        return 'thelia.zip';
+        return 'thelia.tar.gz';
     }
 
     public function getName()
     {
-        return 'Zip';
+        return 'Gz';
     }
 
     public function getExtension()
     {
-        return 'zip';
+        return 'tgz';
     }
 
     public function getMimeType()
     {
-        return 'application/zip';
+        return 'application/x-gzip';
     }
 
     public function isAvailable()
     {
-        return class_exists('\\ZipArchive');
-    }
-
-    public function create($baseName)
-    {
-        $this->archive = new \ZipArchive;
-
-        $this->archivePath = $baseName . '.' . $this->getExtension();
-
-        $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-
-        return $this;
-    }
-
-    public function save()
-    {
-        return $this->archive->close();
+        return parent::isAvailable() && extension_loaded('zlib');
     }
 }

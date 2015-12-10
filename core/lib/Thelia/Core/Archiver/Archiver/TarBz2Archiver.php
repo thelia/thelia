@@ -12,52 +12,36 @@
 
 namespace Thelia\Core\Archiver\Archiver;
 
-use Thelia\Core\Archiver\AbstractArchiver;
-
 /**
- * Class ZipArchiver
+ * Class TarBz2Archiver
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ZipArchiver extends AbstractArchiver
+class TarBz2Archiver extends TarArchiver
 {
+    const COMPRESSION_METHOD = \Phar::BZ2;
+
     public function getId()
     {
-        return 'thelia.zip';
+        return 'thelia.tar.bz2';
     }
 
     public function getName()
     {
-        return 'Zip';
+        return 'Bzip2';
     }
 
     public function getExtension()
     {
-        return 'zip';
+        return 'bz2';
     }
 
     public function getMimeType()
     {
-        return 'application/zip';
+        return 'application/x-bzip2';
     }
 
     public function isAvailable()
     {
-        return class_exists('\\ZipArchive');
-    }
-
-    public function create($baseName)
-    {
-        $this->archive = new \ZipArchive;
-
-        $this->archivePath = $baseName . '.' . $this->getExtension();
-
-        $this->archive->open($this->archivePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-
-        return $this;
-    }
-
-    public function save()
-    {
-        return $this->archive->close();
+        return parent::isAvailable() && extension_loaded('bzip2');
     }
 }

@@ -39,4 +39,30 @@ abstract class AbstractArchiver implements ArchiverInterface
 
         return $this;
     }
+
+    public function add($path, $pathInArchive = null)
+    {
+        $path = realpath($path);
+        if (!file_exists($path)) {
+            //Todo
+            throw new \Exception('TODO: ' . __FILE__ . ' ' . __LINE__);
+        }
+
+        if ($pathInArchive === null) {
+            $pathInArchive = basename($path);
+        }
+
+        if (is_dir($path)) {
+            foreach (new \DirectoryIterator($path) as $dirItem) {
+                if ($dirItem->isDot()) {
+                    continue;
+                }
+                $this->add($dirItem->getPathname(), $pathInArchive . DS . $dirItem->getFilename());
+            }
+        } else {
+            $this->archive->addFile($path, $pathInArchive);
+        }
+
+        return $this;
+    }
 }

@@ -244,19 +244,19 @@
         </service>
 
         <!-- tar -->
-        <!--<service id="thelia.archiver.tar" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarArchiveBuilder">-->
-            <!--<tag name="thelia.archiver" />-->
-        <!--</service>-->
+        <service id="thelia.archiver.tar" class="Thelia\Core\Archiver\Archiver\TarArchiver">
+            <tag name="thelia.archiver" />
+        </service>
 
-        <!--&lt;!&ndash; tar.gz &ndash;&gt;-->
-        <!--<service id="thelia.archiver.tar_gz" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarGzArchiveBuilder">-->
-            <!--<tag name="thelia.archiver" />-->
-        <!--</service>-->
+        <!-- tar.gz -->
+        <service id="thelia.archiver.tgz" class="Thelia\Core\Archiver\Archiver\TarGzArchiver">
+            <tag name="thelia.archiver" />
+        </service>
 
-        <!--&lt;!&ndash; tar.bz2 &ndash;&gt;-->
-        <!--<service id="thelia.archiver.tar_bz2" class="Thelia\Core\FileFormat\Archive\ArchiveBuilder\TarBz2ArchiveBuilder">-->
-            <!--<tag name="thelia.archiver" />-->
-        <!--</service>-->
+        <!-- tar.bz2 -->
+        <service id="thelia.archiver.bz2" class="Thelia\Core\Archiver\Archiver\TarBz2Archiver">
+            <tag name="thelia.archiver" />
+        </service>
 
 
         <!-- Thelia simple token provider -->
