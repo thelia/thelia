@@ -212,6 +212,22 @@ class RegisterHookListenersPass implements CompilerPassInterface
         $hookId = 0;
         /** @var ModuleHook $moduleHook */
         foreach ($moduleHooks as $moduleHook) {
+            // check if class and method exists
+            if (!$container->hasDefinition($moduleHook->getClassname())) {
+                continue;
+            }
+
+            $hook = $moduleHook->getHook();
+
+            if (!$this->isValidHookMethod(
+                $container->getDefinition($moduleHook->getClassname())->getClass(),
+                $moduleHook->getMethod(),
+                $hook->getBlock()
+            )
+            ) {
+                continue;
+            }
+
             // manage module hook position for new hook
             if ($hookId !== $moduleHook->getHookId()) {
                 $hookId = $moduleHook->getHookId();
@@ -229,7 +245,6 @@ class RegisterHookListenersPass implements CompilerPassInterface
 
             // Add the the new listener for active hooks, we have to reverse the priority and the position
             if ($moduleHook->getActive() && $moduleHook->getModuleActive() && $moduleHook->getHookActive()) {
-                $hook = $moduleHook->getHook();
                 $eventName = sprintf('hook.%s.%s', $hook->getType(), $hook->getCode());
 
                 // we a register an event which is relative to a specific module
