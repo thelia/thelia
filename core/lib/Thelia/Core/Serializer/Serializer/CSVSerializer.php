@@ -31,7 +31,7 @@ class CSVSerializer extends AbstractSerializer
     const ENCLOSURE = '"';
 
     /**
-     * @var array Headers
+     * @var null|array Headers
      */
     private $headers;
 

@@ -151,8 +151,8 @@ class ExportController extends BaseAdminController
             $templateName,
             [
                 'exportId' => $id,
-                'HAS_IMAGES' => /*$export->hasImages($this->container)*/false,
-                'HAS_DOCUMENTS' => /*$export->hasDocuments($this->container)*/false
+                'hasImages' => $export->hasImages(),
+                'hasDocuments' => $export->hasDocuments()
             ]
         );
     }
@@ -162,7 +162,7 @@ class ExportController extends BaseAdminController
      *
      * @param integer $id An export ID
      *
-     * @return \Thelia\Core\HttpFoundation\Response
+     * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function exportAction($id)
     {

@@ -27,6 +27,16 @@ abstract class AbstractExport implements \Iterator
     const FILE_NAME = 'export';
 
     /**
+     * @var boolean Export images with data
+     */
+    const EXPORT_IMAGE = false;
+
+    /**
+     * @var boolean Export documents with data
+     */
+    const EXPORT_DOCUMENT = false;
+
+    /**
      * @var array|\Propel\Runtime\Util\PropelModelPager Data to export
      */
     private $data;
@@ -134,15 +144,35 @@ abstract class AbstractExport implements \Iterator
     /**
      * Set language
      *
-     * @param \Thelia\Model\Lang $language A language model
+     * @param null|\Thelia\Model\Lang $language A language model
      *
      * @return $this Return $this, allow chaining
      */
-    public function setLang(Lang $language)
+    public function setLang(Lang $language = null)
     {
         $this->language = $language;
 
         return $this;
+    }
+
+    /**
+     * Whether images has to be exported as data
+     *
+     * @return bool
+     */
+    public function hasImages()
+    {
+        return static::EXPORT_IMAGE;
+    }
+
+    /**
+     * Whether documents has to be exported as data
+     *
+     * @return bool
+     */
+    public function hasDocuments()
+    {
+        return static::EXPORT_DOCUMENT;
     }
 
     /**

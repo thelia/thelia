@@ -125,7 +125,7 @@ class ExportEvent extends Event
      *
      * @return $this Return $this, allow chaining
      */
-    public function setArchiver(ArchiverInterface $archiver)
+    public function setArchiver(ArchiverInterface $archiver = null)
     {
         $this->archiver = $archiver;
 

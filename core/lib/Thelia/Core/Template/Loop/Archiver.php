@@ -53,21 +53,25 @@ class Archiver extends BaseLoop implements ArraySearchLoopInterface
 
         $archiverId = $this->getArgValue('archiver');
         if ($archiverId === null) {
-            $serializers = $archiverManager->getArchivers($availability);
+            $archivers = $archiverManager->getArchivers($availability);
         } else {
-            $serializers = $archiverManager->get($archiverId, $availability);
+            $archivers = [];
+            $archiver = $archiverManager->get($archiverId, $availability);
+            if ($archiver !== null) {
+                $archivers[] = $archiver;
+            }
         }
 
         switch ($this->getArgValue('order')) {
             case 'alpha':
-                ksort($serializers);
+                ksort($archivers);
                 break;
             case 'alpha_reverse':
-                krsort($serializers);
+                krsort($archivers);
                 break;
         }
 
-        return $serializers;
+        return $archivers;
     }
 
     public function parseResults(LoopResult $loopResult)

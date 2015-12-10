@@ -52,7 +52,7 @@ class Serializer extends BaseLoop implements ArraySearchLoopInterface
         if ($serializerId === null) {
             $serializers = $serializerManager->getSerializers();
         } else {
-            $serializers = $serializerManager->get($serializerId);
+            $serializers = [$serializerManager->get($serializerId)];
         }
 
         switch ($this->getArgValue('order')) {
