@@ -4,7 +4,7 @@
     {$admin_current_location = 'configuration'}
 {/block}
 
-{block name="page-title"}{intl l='Translations-db'}{/block}
+{block name="page-title"}{intl l='Translations-customers-title'}{/block}
 
 {block name="check-resource"}admin.configuration.variable{/block}
 {block name="check-access"}update{/block}
@@ -17,7 +17,7 @@
         <ul class="breadcrumb">
 			<li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
             <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
-            <li><a href="{url path='/admin/configuration/translations-db'}">{intl l="Translations-db"}</a></li>
+            <li><a href="{url path='/admin/configuration/translations-db'}">{intl l="Translations-customers-title"}</a></li>
         </ul>
 
 		<div class="row">
@@ -25,18 +25,18 @@
 				<div class="row">
 
 					<div class="col-md-12 title title-without-tabs">
-					   {intl l="Translation-db"}
+					   {intl l="Translations-customers-title"}
 					</div>
 
                     <div class="form-container">
-                         <div class="col-md-12">
-                             {form name="thelia.admin.translationsdb"}
+                        <div class="col-md-12">
+                            {form name="thelia.admin.translations.customer_title"}
 
-                             {if $form_error}
-                             <div class="alert alert-danger">{$form_error_message}</div>
-                             {/if}
+                            {if $form_error}
+                            <div class="alert alert-danger">{$form_error_message}</div>
+                            {/if}
 
-                            <form method="POST"class="form-horizontal" id="translation_form" action="{url path='/admin/configuration/translations-db/update'}">
+                            <form method="POST"class="form-horizontal" id="translation_form" action="{url path='/admin/configuration/translations-customers-title/update'}">
 
 	                                {include
 	                                    file      = "includes/inner-form-toolbar.html"
@@ -47,7 +47,7 @@
                                     {form_hidden_fields}
 
                                     {form_field field='success_url'}
-                                        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/translations-db/update'}"/>
+                                        <input type="hidden" name="{$name}" value="{url path='/admin/configuration/translations-customers-title/update'}"/>
                                     {/form_field}
 
                                     {form_field field='locale'}
@@ -57,26 +57,26 @@
                                     {loop name="titlei18n" type="title" backend_context="on" lang=$edit_language_id}
                                         {form_field field="short_title_$ID"}
                                             <div class="form-group">
-                                                <label class="col-md-3 col-sm-4 control-label">Short title (#{$ID})</label>
+                                                <label class="col-md-3 col-sm-4 control-label" for="short_title_{$ID}">{$label} : {$SHORT}</label>
                                                 <div class="col-md-9 col-sm-8">
-                                                <input type="text" class="form-control"  name="{$name}" value="{$SHORT}" />
+                                                <input type="text" class="form-control" id="short_title_{$ID}" name="{$name}" value="{$SHORT}" required />
                                                 </div>
                                             </div>
                                         {/form_field}
                                         {form_field field="long_title_$ID"}
                                             <div class="form-group">
-                                                <label class="col-md-3 col-sm-4 control-label">Long title (#{$ID})</label>
+                                                <label class="col-md-3 col-sm-4 control-label"for="long_title_{$ID}">{$label} : {$LONG}</label>
                                                 <div class="col-md-9 col-sm-8">
-                                                <input type="text" class="form-control"  name="{$name}" value="{$LONG}" />
+                                                <input type="text" class="form-control" id="long_title_{$ID}"  name="{$name}" value="{$LONG}" required />
                                                 </div>
                                             </div>
                                         {/form_field}
-
+                                        <hr style="margin: 10px 0px;" />
                                     {/loop}
 
-							</form>
+                            </form>
                              {/form}
-						</div>
+                        </div>
 					</div>
 				</div>
 			</div>

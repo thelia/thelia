@@ -10,9 +10,11 @@ namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\GreaterThan;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\CustomerTitleQuery;
 
-class TranslationsDbForm extends BaseForm
+
+class TranslationsCustomerTitleForm extends BaseForm
 {
     public function buildForm()
     {
@@ -38,12 +40,14 @@ class TranslationsDbForm extends BaseForm
                     "data" => $id
                 ))
                 ->add("short_title_".$id,"text",array(
+                    "label" => Translator::getInstance()->trans("Change short title for"),
                     "required" => true,
                     "constraints" => array(
                         new NotBlank()
                     )
                 ))
                 ->add("long_title_".$id,"text",array(
+                    "label" => Translator::getInstance()->trans("Change long title for"),
                     "required" => true,
                     "constraints" => array(
                         new NotBlank()
@@ -53,6 +57,6 @@ class TranslationsDbForm extends BaseForm
     }
     public function getName()
     {
-        return 'thelia_translationdb';
+        return 'thelia_translation_customer_title';
     }
 }
