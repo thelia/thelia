@@ -284,14 +284,25 @@ class CountryController extends AbstractCrudController
         return new CountryToggleVisibilityEvent($this->getExistingObject());
     }
 
-    public function getDataAction()
+    public function getDataAction($visible = true, $locale = null)
     {
+        $response = $this->checkAuth($this->resourceCode, array(), AccessManager::VIEW);
+        if (null !== $response) {
+            return $response;
+        }
+
+        if (null === $locale) {
+            $locale = $this->getCurrentEditionLocale();
+        }
+
         $responseData = [];
 
         /** @var CountryQuery $search */
         $countries = CountryQuery::create()
-            ->filterByVisible(true)
-            ->joinWithI18n($this->getCurrentEditionLocale())
+            ->_if($visible)
+                ->filterByVisible(true)
+            ->_endif()
+            ->joinWithI18n($locale)
         ;
 
         /** @var Country $country */
@@ -306,8 +317,10 @@ class CountryController extends AbstractCrudController
             if ($country->getHasStates()) {
                 $states = StateQuery::create()
                     ->filterByCountryId($country->getId())
-                    ->filterByVisible(true)
-                    ->joinWithI18n($this->getCurrentEditionLocale())
+                    ->_if($visible)
+                        ->filterByVisible(true)
+                    ->_endif()
+                    ->joinWithI18n($locale)
                 ;
 
                 /** @var State $state */
