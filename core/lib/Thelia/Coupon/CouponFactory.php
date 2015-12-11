@@ -15,6 +15,7 @@ namespace Thelia\Coupon;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Condition\ConditionFactory;
 use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Exception\CouponNotReleaseException;
 use Thelia\Exception\InactiveCouponException;
 use Thelia\Exception\CouponExpiredException;
 use Thelia\Exception\CouponNoUsageLeftException;
@@ -51,10 +52,10 @@ class CouponFactory
      * Build a CouponInterface from its database data
      *
      * @param string $couponCode Coupon code ex: XMAS
-     *
-     * @throws \Thelia\Exception\CouponExpiredException
-     * @throws \Thelia\Exception\InvalidConditionException
-     * @return CouponInterface                             ready to be processed
+     * @return CouponInterface
+     * @throws CouponExpiredException
+     * @throws CouponNoUsageLeftException
+     * @throws CouponNotReleaseException
      */
     public function buildCouponFromCode($couponCode)
     {
@@ -69,8 +70,15 @@ class CouponFactory
             throw new InactiveCouponException($couponCode);
         }
 
+        $nowDateTime = new \DateTime();
+
+        // Check coupon start date
+        if ($couponModel->getStartDate() !== null && $couponModel->getStartDate() > $nowDateTime) {
+            throw new CouponNotReleaseException($couponCode);
+        }
+
         // Check coupon expiration date
-        if ($couponModel->getExpirationDate() < new \DateTime()) {
+        if ($couponModel->getExpirationDate() < $nowDateTime) {
             throw new CouponExpiredException($couponCode);
         }
 

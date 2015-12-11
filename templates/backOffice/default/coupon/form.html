@@ -109,6 +109,14 @@
                             </div>
                         {/form_field}
 
+                        {form_field field='startDate'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="expiration-date" class="control-label">{intl l='Start Date'} :</label>
+                                <input type="text" id="expiration-date" name="{$name}" class="form-control" value="{if $nowDate}{$nowDate}{else}{$value}{/if}" placeholder="{intl l='Format: %fmt, e.g. %date' fmt=$dateFormat date={$smarty.now|date_format:$dateFormat}}">
+                                {if $error}{$message}{/if}
+                            </div>
+                        {/form_field}
+
                         {form_field field='expirationDate'}
                             <div class="form-group {if $error}has-error{/if}">
                                 <label for="expiration-date" class="control-label">{intl l='Expiration date * :'}</label>

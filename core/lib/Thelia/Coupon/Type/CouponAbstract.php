@@ -85,6 +85,9 @@ abstract class CouponAbstract implements CouponInterface
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
 
+    /** @var \DateTime Coupon start date */
+    protected $startDate = null;
+
     /** @var \DateTime Coupon expiration date */
     protected $expirationDate = null;
 

@@ -76,6 +76,16 @@
 
                                     <th class="text-center">{admin_sortable_header
                                         current_order=$coupon_order
+                                        order='start-date'
+                                        reverse_order='start-date-reverse'
+                                        path={url path='/admin/coupon'}
+                                        request_parameter_name='coupon_order'
+                                        label="{intl l='Start Date'}"
+                                        }
+                                    </th>
+
+                                    <th class="text-center">{admin_sortable_header
+                                        current_order=$coupon_order
                                         order='expiration-date'
                                         reverse_order='expiration-date-reverse'
                                         path={url path='/admin/coupon'}
@@ -128,6 +138,14 @@
                                                 <span class="label label-success">{intl l="Enabled"}</span>
                                             {else}
                                                 <span class="label label-default">{intl l="Disabled"}</span>
+                                            {/if}
+                                        </td>
+
+                                        <td class="text-center">
+                                            {if $START_DATE == null}
+                                                /
+                                            {else}
+                                                {format_date date=$START_DATE output="date"}
                                             {/if}
                                         </td>
 

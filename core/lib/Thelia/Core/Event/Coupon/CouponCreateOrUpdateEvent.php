@@ -43,6 +43,9 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     /** @var bool if Coupon is enabled */
     protected $isEnabled = false;
 
+    /** @var \DateTime Coupon start date */
+    protected $startDate = null;
+
     /** @var \DateTime Coupon expiration date */
     protected $expirationDate = null;
 
@@ -103,6 +106,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
      * @param array     $freeShippingForCountries   ID of Countries to which shipping is free
      * @param array     $freeShippingForMethods     ID of Shipping modules for which shipping is free
      * @param boolean   $perCustomerUsageCount      Usage count is per customer
+     * @param \DateTime $startDate                  Coupon start date
      */
     public function __construct(
         $code,
@@ -120,7 +124,8 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $locale,
         $freeShippingForCountries,
         $freeShippingForMethods,
-        $perCustomerUsageCount
+        $perCustomerUsageCount,
+        \DateTime $startDate = null
     ) {
         $this->code = $code;
         $this->description = $description;
@@ -138,6 +143,7 @@ class CouponCreateOrUpdateEvent extends ActionEvent
         $this->freeShippingForCountries = $freeShippingForCountries;
         $this->freeShippingForMethods = $freeShippingForMethods;
         $this->perCustomerUsageCount = $perCustomerUsageCount;
+        $this->startDate = $startDate;
     }
 
     /**
@@ -266,6 +272,19 @@ class CouponCreateOrUpdateEvent extends ActionEvent
     public function getAmount()
     {
         return $this->effects['amount'];
+    }
+
+    /**
+     * Return Coupon start date
+     *
+     * @return \DateTime
+     */
+    public function getStartDate()
+    {
+        if ($this->startDate === null) {
+            return null;
+        }
+        return clone $this->startDate;
     }
 
     /**
