@@ -13,6 +13,7 @@
 
     <hooks>
         <hook id="tinymce.hook" class="Tinymce\Hook\HookManager" scope="request">
+            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
             <tag name="hook.event_listener" event="wysiwyg.js" type="back" method="onJsWysiwyg" />
         </hook>
     </hooks>

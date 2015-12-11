@@ -5,9 +5,9 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <hooks>
-        <hook id="hookcustomer.hook.front" class="HookCustomer\Hook\FrontHook" scope="request">
-            <tag name="hook.event_listener" event="main.head-bottom" />
-            <tag name="hook.event_listener" event="main.navbar-secondary" />
+        <hook id="hookcustomer.hook.front">
+            <tag name="hook.event_listener" event="main.head-bottom" templates="css:assets/css/styles.css"/>
+            <tag name="hook.event_listener" event="main.navbar-secondary" templates="render:main-navbar-secondary.html"/>
         </hook>
     </hooks>
 

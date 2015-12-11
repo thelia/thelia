@@ -225,6 +225,7 @@ class RegisterHookListenersPass implements CompilerPassInterface
                 $hook->getBlock()
             )
             ) {
+                $moduleHook->delete();
                 continue;
             }
 

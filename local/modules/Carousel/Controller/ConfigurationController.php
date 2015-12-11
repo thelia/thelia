@@ -12,8 +12,6 @@
 
 namespace Carousel\Controller;
 
-use Carousel\Form\CarouselImageForm;
-use Carousel\Form\CarouselUpdateForm;
 use Carousel\Model\Carousel;
 use Carousel\Model\CarouselQuery;
 use Symfony\Component\Form\Form;

@@ -24,9 +24,6 @@
 
 namespace Tinymce\Form;
 
-use Cheque\Cheque;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Tinymce\Tinymce;
 

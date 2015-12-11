@@ -4,19 +4,17 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-    </loops>
-
     <forms>
         <form name="hookanalytics.configuration.form" class="HookAnalytics\Form\Configuration" />
     </forms>
 
-    <commands>
-    </commands>
-
     <hooks>
         <hook id="hookanalytics.hook.front" class="HookAnalytics\Hook\FrontHook" scope="request">
-            <tag name="hook.event_listener" event="main.head-bottom" />
+            <tag name="hook.event_listener" event="main.head-bottom" type="front" method="onMainHeadBottom" />
+        </hook>
+        <hook id="hookanalytics.hook.back">
+            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" templates="js:assets/js/module-configuration.js" />
         </hook>
     </hooks>
 

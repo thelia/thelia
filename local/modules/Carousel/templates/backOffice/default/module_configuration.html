@@ -1,0 +1,130 @@
+<div class="general-block-decorator">
+    <div class="row">
+        <div class="col-md-12 title title-without-tabs">
+            {intl l='Edit your carousel.' d='carousel.bo.default'}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-container">
+                {form name="carousel.image"}
+                    <form method="POST" action="{url path="/admin/module/carousel/upload"}" {form_enctype} class="clearfix">
+
+                        {form_hidden_fields}
+
+                        {form_field field='file'}
+                            <div class="form-group {if $error}has-error{/if}">
+                                <label for="{$label_attr.for}" class="control-label">{intl d='carousel.bo.default' l='Add an image to the carousel'}</label>
+                                <div class="input-group">
+                                    <input type="file" id="{$label_attr.for}" {if $required}required="required"{/if} name="{$name}" value="{$value}" title="{intl l='Carousel image' d='carousel.bo.default'}" placeholder="{intl l='Carousel image' d='carousel.bo.default'}" class="form-control">
+                                    <span class="input-group-btn">
+                                        <input type="submit" class="form-submit-button btn btn-sm btn-success" value="{intl d='carousel.bo.default' l='Add this image to the carousel'}" >
+                                    </span>
+                                </div>
+                            </div>
+                        {/form_field}
+                    </form>
+                {/form}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 title title-without-tabs">
+            {intl l='Carousel images' d='carousel.bo.default'}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-container">
+                {ifloop rel="carousel.image"}
+                    {form name="carousel.update"}
+                    <form method="post" action="{url path="/admin/module/carousel/update"}" {form_enctype} class="clearfix">
+
+                        {include
+                            file = "includes/inner-form-toolbar.html"
+                            page_url   = "{url path='/admin/module/Carousel'}"
+                            close_url  = "{url path='/admin/modules'}"
+                        }
+
+                        {form_hidden_fields}
+
+                        {loop name="carousel.image" type="carousel" width="550" height="200" resize_mode="borders" backend_context="1" lang="$edit_language_id"}
+
+                        {* Not yet implemented *}
+                        {form_field field="position{$ID}"}
+                            <input type="hidden" name="{$name}" value={$POSITION}>
+                        {/form_field}
+
+                        <div class="well well-sm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>
+                                        <a href="{$ORIGINAL_IMAGE_URL}" class="thumbnail" target="_blank">
+                                            <img src="{$IMAGE_URL}" alt="{$ALT}">
+                                        </a>
+                                    </p>
+
+                                    <div class="btn-group">
+                                        <a class="btn btn-default btn-sm image-delete" href="#delete_carousel_dialog" data-toggle="modal" data-id="{$ID}">
+                                            <i class="glyphicon glyphicon-trash"></i> {intl d='carousel.bo.default' l='Remove this image'}
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    {* Not yet implemented
+                                    {render_form_field field="chapo{$ID} value=$CHAPO"}
+                                    *}
+                                    {render_form_field field="title{$ID}" value=$TITLE}
+                                    {render_form_field field="alt{$ID}" value=$ALT}
+                                    {render_form_field field="url{$ID}" value=$URL}
+                                    {render_form_field field="description{$ID}" extra_class="wysiwyg" value=$DESCRIPTION}
+                                    {* Not yet implemented
+                                    {render_form_field field="postscriptum{$ID}" value=$POSTSCRIPTUM}
+                                    *}
+                                </div>
+                            </div>
+                        </div>
+                        {/loop}
+
+                        {include
+                            file = "includes/inner-form-toolbar.html"
+                            page_url   = "{url path='/admin/module/Carousel'}"
+                            close_url  = "{url path='/admin/modules'}"
+                            page_bottom = true
+                        }
+                    </form>
+                    {/form}
+                {/ifloop}
+
+                {elseloop rel="carousel.image"}
+                    <div class="alert alert-info">
+                        {intl d='carousel.bo.default' l="Your carousel contains no image. Please add one using the form above."}
+                    </div>
+                {/elseloop}
+            </div>
+        </div>
+    </div>
+</div>
+
+{capture "delete_dialog"}
+    <input type="hidden" name="image_id" id="image_delete_id" value="" />
+{/capture}
+
+{include
+file = "includes/generic-confirm-dialog.html"
+
+dialog_id       = "delete_carousel_dialog"
+dialog_title    = {intl l="Delete a carousel image" d="carousel.bo.default"}
+dialog_message  = {intl l="Do you really want to remove this image from the carousel ?" d="carousel.bo.default"}
+
+form_action         = {url path='/admin/module/carousel/delete'}
+form_content        = {$smarty.capture.delete_dialog nofilter}
+}
+
+
+
+

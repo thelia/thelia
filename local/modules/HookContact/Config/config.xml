@@ -4,15 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-    </loops>
-
-    <forms>
-    </forms>
-
-    <commands>
-    </commands>
-
     <hooks>
         <hook id="hookcontact.hook.front" class="HookContact\Hook\FrontHook" scope="request">
             <tag name="hook.event_listener" event="main.footer-body" />

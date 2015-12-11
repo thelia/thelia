@@ -8,13 +8,15 @@
     </loops>
 
     <forms>
-         <form name="carousel.image" class="Carousel\Form\CarouselImageForm" />
+        <form name="carousel.image" class="Carousel\Form\CarouselImageForm" />
         <form name="carousel.update" class="Carousel\Form\CarouselUpdateForm" />
     </forms>
 
     <hooks>
-        <hook id="carousel.hook" class="Carousel\Hook\CarouselHook" scope="request">
-            <tag name="hook.event_listener" event="home.body" />
+        <hook id="carousel.hook">
+            <tag name="hook.event_listener" event="home.body" type="front" templates="render:carousel.html" />
+            <tag name="hook.event_listener" event="module.configuration" type="back" templates="render:module_configuration.html" />
+            <tag name="hook.event_listener" event="module.config-js" type="back" templates="js:assets/js/module-configuration.js" />
         </hook>
     </hooks>
 </config>

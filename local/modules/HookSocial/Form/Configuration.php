@@ -11,10 +11,10 @@
 /*************************************************************************************/
 
 namespace HookSocial\Form;
+
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
-
 
 /**
  * Class Configuration
@@ -72,7 +72,6 @@ class Configuration extends BaseForm {
                 )
             );
         }
-
     }
 
     /**
