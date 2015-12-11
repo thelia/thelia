@@ -250,7 +250,7 @@
 (function($) {
 
     var configuration = {$configuration|json_encode nofilter};
-    var countries = {render action='Thelia\Controller\Admin\CountryController::getDataAction' areaId=$area_id};
+    var countries = {render action='Thelia\Controller\Admin\CountryController::getDataAction'};
     var $countriesAdded = $("#countries-added");
     var $countriesToAdd = $("#countries-add");
     var $countriesFilter = $("#countries-filter");

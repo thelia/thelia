@@ -282,10 +282,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 /* countries and states */
 
-ALTER TABLE `country` ADD COLUMN `visible` TINYINT DEFAULT 0 NOT NULL AFTER  `id`;
-ALTER TABLE `country` ADD COLUMN `has_states` TINYINT DEFAULT 0 AFTER `isoalpha3`;
-ALTER TABLE `country` ADD COLUMN `need_zip_code` TINYINT DEFAULT 0 AFTER  `has_states`;
-ALTER TABLE `country` ADD COLUMN `zip_code_format` VARCHAR(20) AFTER `need_zip_code`;
+ALTER TABLE `country`
+    ADD COLUMN `visible` TINYINT DEFAULT 0 NOT NULL AFTER  `id`,
+    ADD COLUMN `has_states` TINYINT DEFAULT 0 AFTER `isoalpha3`,
+    ADD COLUMN `need_zip_code` TINYINT DEFAULT 0 AFTER  `has_states`,
+    ADD COLUMN `zip_code_format` VARCHAR(20) AFTER `need_zip_code`;
 
 CREATE TABLE `state`
 (
@@ -304,29 +305,58 @@ CREATE TABLE `state`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
-ALTER TABLE `address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
-ALTER TABLE product_sale_elements_product_document
+CREATE TABLE `state_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `state_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `state` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+ALTER TABLE `address`
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
     ADD CONSTRAINT `fk_address_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT;
-ALTER TABLE `address` ADD INDEX INDEX `FI_address_state_id` (`state_id`);
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    ADD INDEX `FI_address_state_id` (`state_id`);
 
-ALTER TABLE `order_address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
-ALTER TABLE product_sale_elements_product_document
+ALTER TABLE `order_address`
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
     ADD CONSTRAINT `fk_order_address_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT;
-ALTER TABLE `order_address` ADD INDEX INDEX `FI_order_address_state_id` (`state_id`);
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    ADD INDEX `FI_order_address_state_id` (`state_id`);
 
+ALTER TABLE `tax_rule_country`
+    DROP PRIMARY KEY,
+    ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST,
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
+    ADD CONSTRAINT `fk_tax_rule_country_state_id`
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    ADD INDEX `idx_tax_rule_country_state_id` (`state_id`);
+
+ALTER TABLE `country_area`
+    ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST,
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
+    ADD INDEX `fk_country_area_state_id_idx` (`state_id`);
 
 /*
-for United States and Canada we create new country (not visible) and link them to states
-as states already existed as country
+we create new countries (not visible) and link them to states
+the migration will be done with the module migrateCountryState
 */
+
+UPDATE `country` SET `visible` = 1 WHERE 1;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `country`;
 
@@ -341,34 +371,34 @@ INSERT INTO `country` (`visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by_defau
 ;
 
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
+    (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'de_DE', 'Argentinien', NULL, NULL, NULL),
     (@max_id + 4, 'de_DE', 'Indonesien', NULL, NULL, NULL),
     (@max_id + 5, 'de_DE', 'Italien', NULL, NULL, NULL),
     (@max_id + 6, 'de_DE', NULL, NULL, NULL, NULL),
     (@max_id + 7, 'de_DE', 'Mexiko', NULL, NULL, NULL),
-    (@max_id + 1, 'de_DE', NULL, NULL, NULL, NULL),
-    (@max_id + 2, 'de_DE', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'en_US', 'USA', NULL, NULL, NULL),
+    (@max_id + 2, 'en_US', 'Canada', NULL, NULL, NULL),
     (@max_id + 3, 'en_US', 'Argentina', NULL, NULL, NULL),
     (@max_id + 4, 'en_US', 'Indonesia', NULL, NULL, NULL),
     (@max_id + 5, 'en_US', 'Italy', NULL, NULL, NULL),
     (@max_id + 6, 'en_US', 'Japan', NULL, NULL, NULL),
     (@max_id + 7, 'en_US', 'Mexico', NULL, NULL, NULL),
-    (@max_id + 1, 'en_US', 'USA', NULL, NULL, NULL),
-    (@max_id + 2, 'en_US', 'Canada', NULL, NULL, NULL),
+    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 4, 'es_ES', NULL, NULL, NULL, NULL),
     (@max_id + 5, 'es_ES', 'Italia', NULL, NULL, NULL),
     (@max_id + 6, 'es_ES', 'Japón', NULL, NULL, NULL),
     (@max_id + 7, 'es_ES', 'Méjico', NULL, NULL, NULL),
-    (@max_id + 1, 'es_ES', NULL, NULL, NULL, NULL),
-    (@max_id + 2, 'es_ES', NULL, NULL, NULL, NULL),
+    (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL),
+    (@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL),
     (@max_id + 3, 'fr_FR', 'Argentine', NULL, NULL, NULL),
     (@max_id + 4, 'fr_FR', 'Indonésie', NULL, NULL, NULL),
     (@max_id + 5, 'fr_FR', 'Italie', NULL, NULL, NULL),
     (@max_id + 6, 'fr_FR', 'Japon', NULL, NULL, NULL),
-    (@max_id + 7, 'fr_FR', 'Mexique', NULL, NULL, NULL),
-    (@max_id + 1, 'fr_FR', NULL, NULL, NULL, NULL),
-    (@max_id + 2, 'fr_FR', NULL, NULL, NULL, NULL)
+    (@max_id + 7, 'fr_FR', 'Mexique', NULL, NULL, NULL)
 ;
 
 INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `updated_at`) VALUES
@@ -683,7 +713,12 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (309, 1, '30', @max_id + 6, NOW(), NOW()),
 (310, 1, '06', @max_id + 6, NOW(), NOW()),
 (311, 1, '35', @max_id + 6, NOW(), NOW()),
-(312, 1, '19', @max_id + 6, NOW(), NOW());
+(312, 1, '19', @max_id + 6, NOW(), NOW()),
+(313, 1, '', @max_id + 3, NOW(), NOW()),
+(314, 1, '', @max_id + 4, NOW(), NOW()),
+(315, 1, '', @max_id + 5, NOW(), NOW()),
+(316, 1, '', @max_id + 6, NOW(), NOW()),
+(317, 1, '', @max_id + 7, NOW(), NOW());
 
 
 INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
@@ -1000,6 +1035,11 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (310, 'de_DE', NULL),
     (311, 'de_DE', NULL),
     (312, 'de_DE', NULL),
+    (313, 'de_DE', ''),
+    (314, 'de_DE', ''),
+    (315, 'de_DE', ''),
+    (316, 'de_DE', ''),
+    (317, 'de_DE', ''),
 
     (1, 'en_US', 'Alabama'),
     (2, 'en_US', 'Alaska'),
@@ -1313,6 +1353,11 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (310, 'en_US', 'Yamagata'),
     (311, 'en_US', 'Yamaguchi'),
     (312, 'en_US', 'Yamanashi'),
+    (313, 'en_US', ''),
+    (314, 'en_US', ''),
+    (315, 'en_US', ''),
+    (316, 'en_US', ''),
+    (317, 'en_US', ''),
 
     (1, 'es_ES', NULL),
     (2, 'es_ES', NULL),
@@ -1626,6 +1671,11 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (310, 'es_ES', NULL),
     (311, 'es_ES', NULL),
     (312, 'es_ES', NULL),
+    (313, 'es_ES', ''),
+    (314, 'es_ES', ''),
+    (315, 'es_ES', ''),
+    (316, 'es_ES', ''),
+    (317, 'es_ES', ''),
 
     (1, 'fr_FR', 'Alabama'),
     (2, 'fr_FR', 'Alaska'),
@@ -1938,7 +1988,12 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (309, 'fr_FR', NULL),
     (310, 'fr_FR', NULL),
     (311, 'fr_FR', NULL),
-    (312, 'fr_FR', NULL)
+    (312, 'fr_FR', NULL),
+    (313, 'fr_FR', ''),
+    (314, 'fr_FR', ''),
+    (315, 'fr_FR', ''),
+    (316, 'fr_FR', ''),
+    (317, 'fr_FR', '')
 ;
 
 -- Add new column in lang table

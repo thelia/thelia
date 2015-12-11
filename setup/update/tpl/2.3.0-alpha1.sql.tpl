@@ -150,10 +150,11 @@ INSERT INTO  `hook_i18n` (`id`, `locale`, `title`, `description`, `chapo`) VALUE
 
 /* countries and states */
 
-ALTER TABLE `country` ADD COLUMN `visible` TINYINT DEFAULT 0 NOT NULL AFTER  `id`;
-ALTER TABLE `country` ADD COLUMN `has_states` TINYINT DEFAULT 0 AFTER `isoalpha3`;
-ALTER TABLE `country` ADD COLUMN `need_zip_code` TINYINT DEFAULT 0 AFTER  `has_states`;
-ALTER TABLE `country` ADD COLUMN `zip_code_format` VARCHAR(20) AFTER `need_zip_code`;
+ALTER TABLE `country`
+    ADD COLUMN `visible` TINYINT DEFAULT 0 NOT NULL AFTER  `id`,
+    ADD COLUMN `has_states` TINYINT DEFAULT 0 AFTER `isoalpha3`,
+    ADD COLUMN `need_zip_code` TINYINT DEFAULT 0 AFTER  `has_states`,
+    ADD COLUMN `zip_code_format` VARCHAR(20) AFTER `need_zip_code`;
 
 CREATE TABLE `state`
 (
@@ -172,52 +173,58 @@ CREATE TABLE `state`
         ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET='utf8';
 
-ALTER TABLE `address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
+CREATE TABLE `state_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `state_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `state` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
 ALTER TABLE `address`
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
     ADD CONSTRAINT `fk_address_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT;
-ALTER TABLE `address` ADD INDEX `FI_address_state_id` (`state_id`);
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    ADD INDEX `FI_address_state_id` (`state_id`);
 
-ALTER TABLE `order_address` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
 ALTER TABLE `order_address`
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
     ADD CONSTRAINT `fk_order_address_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE RESTRICT;
-ALTER TABLE `order_address` ADD INDEX `FI_order_address_state_id` (`state_id`);
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    ADD INDEX `FI_order_address_state_id` (`state_id`);
 
-ALTER TABLE `tax_rule_country` DROP PRIMARY KEY;
-ALTER TABLE `tax_rule_country` ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
-ALTER TABLE `tax_rule_country` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
 ALTER TABLE `tax_rule_country`
+    DROP PRIMARY KEY,
+    ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST,
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
     ADD CONSTRAINT `fk_tax_rule_country_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE CASCADE;
-ALTER TABLE `tax_rule_country` INDEX `idx_tax_rule_country_state_id` (`state_id`);
+        FOREIGN KEY (`state_id`)
+        REFERENCES `state` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    ADD INDEX `idx_tax_rule_country_state_id` (`state_id`);
 
-ALTER TABLE `country_area` DROP PRIMARY KEY;
-ALTER TABLE `country_area` ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;
-ALTER TABLE `country_area` ADD COLUMN `state_id` INTEGER AFTER `country_id`;
-/*
 ALTER TABLE `country_area`
-    ADD CONSTRAINT `fk_country_area_state_id`
-    FOREIGN KEY (`state_id`)
-    REFERENCES `state` (`id`)
-    ON UPDATE RESTRICT
-    ON DELETE CASCADE;
-*/
-ALTER TABLE `country_area` INDEX `fk_country_area_state_id_idx` (`state_id`);
+    ADD COLUMN `id` INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST,
+    ADD COLUMN `state_id` INTEGER AFTER `country_id`,
+    ADD INDEX `fk_country_area_state_id_idx` (`state_id`);
 
 /*
-for United States and Canada we create new country (not visible) and link them to states
-as states already existed as country
+we create new countries (not visible) and link them to states
+the migration will be done with the module migrateCountryState
 */
+
+UPDATE `country` SET `visible` = 1 WHERE 1;
 
 SELECT @max_id := IFNULL(MAX(`id`),0) FROM `country`;
 
@@ -233,13 +240,13 @@ INSERT INTO `country` (`visible`, `isocode`, `isoalpha2`, `isoalpha3`, `by_defau
 
 INSERT INTO `country_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `postscriptum`) VALUES
 {foreach $locales as $locale}
+    (@max_id + 1, '{$locale}', {intl l='USA' locale=$locale}, NULL, NULL, NULL),
+    (@max_id + 2, '{$locale}', {intl l='Canada' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 3, '{$locale}', {intl l='Argentina' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 4, '{$locale}', {intl l='Indonesia' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 5, '{$locale}', {intl l='Italy' locale=$locale}, NULL, NULL, NULL),
     (@max_id + 6, '{$locale}', {intl l='Japan' locale=$locale}, NULL, NULL, NULL),
-    (@max_id + 7, '{$locale}', {intl l='Mexico' locale=$locale}, NULL, NULL, NULL),
-    (@max_id + 1, '{$locale}', {intl l='USA' locale=$locale}, NULL, NULL, NULL),
-    (@max_id + 2, '{$locale}', {intl l='Canada' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (@max_id + 7, '{$locale}', {intl l='Mexico' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
@@ -556,7 +563,12 @@ INSERT INTO `state` (`id`, `visible`, `isocode`, `country_id`, `created_at`, `up
 (309, 1, '30', @max_id + 6, NOW(), NOW()),
 (310, 1, '06', @max_id + 6, NOW(), NOW()),
 (311, 1, '35', @max_id + 6, NOW(), NOW()),
-(312, 1, '19', @max_id + 6, NOW(), NOW());
+(312, 1, '19', @max_id + 6, NOW(), NOW()),
+(313, 1, '', @max_id + 3, NOW(), NOW()),
+(314, 1, '', @max_id + 4, NOW(), NOW()),
+(315, 1, '', @max_id + 5, NOW(), NOW()),
+(316, 1, '', @max_id + 6, NOW(), NOW()),
+(317, 1, '', @max_id + 7, NOW(), NOW());
 
 
 INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
@@ -873,7 +885,12 @@ INSERT INTO `state_i18n` (`id`, `locale`, `title`) VALUES
     (309, '{$locale}', {intl l='Wakayama' locale=$locale}),
     (310, '{$locale}', {intl l='Yamagata' locale=$locale}),
     (311, '{$locale}', {intl l='Yamaguchi' locale=$locale}),
-    (312, '{$locale}', {intl l='Yamanashi' locale=$locale}){if ! $locale@last},{/if}
+    (312, '{$locale}', {intl l='Yamanashi' locale=$locale}),
+    (313, '{$locale}', ''),
+    (314, '{$locale}', ''),
+    (315, '{$locale}', ''),
+    (316, '{$locale}', ''),
+    (317, '{$locale}', ''){if ! $locale@last},{/if}
 
 {/foreach}
 ;
