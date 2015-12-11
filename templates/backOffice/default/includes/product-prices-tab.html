@@ -375,12 +375,6 @@
                                     {form_field field='product_sale_element_id' value_key=$idx}
                                         <input type="hidden" name="{$name}" value="{$value}" />
                                         {$current_pse_id = $value}
-
-                                        {capture assign="combination_label"}
-                                            {loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
-                                            {if $LOOP_COUNT > 1} / {/if}{$ATTRIBUTE_TITLE}: {$ATTRIBUTE_AVAILABILITY_TITLE}
-                                            {/loop}
-                                        {/capture}
                                     {/form_field}
 
                                     <div class="btn-group">
@@ -399,8 +393,13 @@
 
                                     <a class="btn btn-default btn-xs combination-delete" title="{intl l='Delete this combination'}"  href="#combination_delete_dialog" data-id="{$current_pse_id}" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i></a>
 
-                                    {$combination_label}
-                                </td>
+									{assign var='combination_list' value=array()}
+									{loop name="product.sales.elements.combinations" type="attribute_combination" product_sale_elements=$current_pse_id backend_context="1" order="manual"}
+										{$combination_list[$ATTRIBUTE_TITLE][] = $ATTRIBUTE_AVAILABILITY_TITLE}
+									{/loop}
+
+									{format_array_2d values=$combination_list}
+								</td>
 
                                 <td class="text-right">ID: {$current_pse_id}</td>
                             </tr>

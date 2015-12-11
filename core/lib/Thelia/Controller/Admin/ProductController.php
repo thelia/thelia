@@ -965,10 +965,11 @@ class ProductController extends AbstractSeoCrudController
                 $attrAv = AttributeAvQuery::create()->joinWithI18n($this->getCurrentEditionLocale())->findPk($id);
 
                 if ($attrAv !== null) {
-                    if ($attrAv->getAttributeId() == $attribute->getId()) {
+                    if ($attrAv->getId() == $attributeAv->getId()) {
+
                         $result['error'] = $this->getTranslator()->trans(
                             'A value for attribute "%name" is already present in the combination',
-                            array('%name' => $attribute->getTitle())
+                            array('%name' => $attribute->getTitle() . " : " . $attributeAv->getTitle())
                         );
 
                         $addIt = false;

@@ -21,20 +21,28 @@ use TheliaSmarty\Template\Plugins\Format;
  * Class FormatTest
  * @package TheliaSmarty\Tests\Template\Plugin
  * @author Gilles Bourgeat <gbourgeat@openstudio.fr>
+ * @author Baixas Alban <abaixas@openstudio.fr>
  */
 class FormatTest extends SmartyPluginTestCase
 {
     /** @var  Request */
     protected $request;
 
-    /**
-     * @return \TheliaSmarty\Template\AbstractSmartyPlugin
-     */
-    protected function getPlugin(ContainerBuilder $container)
+    public function testFormatTwoDimensionalArray()
     {
-        $this->request = $container->get("request");
+        $plugin = new Format(new Request());
 
-        return new Format($this->request);
+        $params['values'] = [
+            'Colors' => ['Green', 'Yellow', 'Red'],
+            'Material' => ['Wood']
+        ];
+
+        $output = $plugin->formatTwoDimensionalArray($params);
+
+        $this->assertEquals(
+            "Colors : Green / Yellow / Red | Material : Wood",
+            $output
+        );
     }
 
     public function testFormatMoneyNotForceCurrency()
@@ -111,5 +119,15 @@ class FormatTest extends SmartyPluginTestCase
         ]);
 
         $this->assertEquals($currency->getSymbol() . "10.00", $data);
+    }
+
+    /**
+     * @return \TheliaSmarty\Template\AbstractSmartyPlugin
+     */
+    protected function getPlugin(ContainerBuilder $container)
+    {
+        $this->request = $container->get("request");
+
+        return new Format($this->request);
     }
 }
