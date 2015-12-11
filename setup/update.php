@@ -140,6 +140,14 @@ try {
 
 if (null === $updateError) {
     echo sprintf(PHP_EOL . 'Thelia as been successfully updated to version %s' . PHP_EOL, $update->getCurrentVersion());
+    if ($update->hasPostInstructions()) {
+        echo PHP_EOL . '===================================' . PHP_EOL;
+        echo sprintf(PHP_EOL . 'Thelia as been successfully updated to version %s' . PHP_EOL);
+        echo PHP_EOL . '===================================' . PHP_EOL;
+        echo $update->getPostInstructions();
+        echo PHP_EOL . '===================================' . PHP_EOL;
+    }
+
 } else {
     echo sprintf(PHP_EOL . 'Sorry, an unexpected error has occured : %s' . PHP_EOL, $updateError->getMessage());
     print $updateError->getTraceAsString() . PHP_EOL;

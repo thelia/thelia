@@ -97,6 +97,17 @@ $updateError = null;
                             ?></p>
                     </div>
 
+                    <?php
+                    if ($update->hasPostInstructions()) {
+                    ?>
+                    <div class="alert alert-info">
+                        <h2><?php echo $trans->trans("Post update instructions"); ?></h2>
+                        <?php echo $update->getPostInstructions('html'); ?>
+                    </div>
+                    <?php
+                    }
+                    ?>
+
                     <p class="lead text-center">
                         <a href="<?php echo $website_url; ?>/index.php/admin"
                            id="admin_url"><?php echo $trans->trans('Go to back office'); ?></a>
