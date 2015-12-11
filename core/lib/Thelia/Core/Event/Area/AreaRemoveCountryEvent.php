@@ -22,7 +22,7 @@ class AreaRemoveCountryEvent extends AreaAddCountryEvent
     /** @var int|null  */
     protected $stateId;
 
-    public function __construct($areaId, $countryId, $stateId)
+    public function __construct($areaId, $countryId, $stateId = null)
     {
         parent::__construct($areaId, $countryId);
 

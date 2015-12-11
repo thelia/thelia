@@ -112,6 +112,7 @@ class AreaTest extends \PHPUnit_Framework_TestCase
 
         $updatedCountry = CountryAreaQuery::create()
             ->filterByCountryId($country->getId())
+            ->filterByStateId(null)
             ->filterByAreaId($area->getId())
             ->findOne();
 
