@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <forms>
+        <form name="thelia.admin.country.state.migration" class="TheliaMigrateCountry\Form\CountryStateMigrationForm"/>
+    </forms>
+
+    <services>
+        <service id="theliamigratecountry.action" class="TheliaMigrateCountry\EventListeners\MigrateCountryListener" >
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.form.type.country.state.migrate" class="TheliaMigrateCountry\Form\Type\CountryStateMigrationType">
+            <tag name="thelia.form.type" />
+        </service>
+    </services>
+
+    <hooks>
+        <hook id="theliamigratecountry.hook">
+            <tag name="hook.event_listener" event="configuration.shipping-bottom" type="back" templates="configuration-shipping-bottom.html" />
+        </hook>
+    </hooks>
+
+</config>
