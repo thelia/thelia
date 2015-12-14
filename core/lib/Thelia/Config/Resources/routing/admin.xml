@@ -1375,24 +1375,25 @@
     <!-- import management -->
 
     <route id="import.list" path="/admin/import">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::indexAction</default>
+        <default key="_controller">Thelia:Admin\Import:index</default>
     </route>
 
-    <route id="import.position" path="/admin/import/position">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changePosition</default>
+    <route id="import.position" path="/admin/import/position" methods="get">
+        <default key="_controller">Thelia:Admin\Import:changeImportPosition</default>
     </route>
 
-    <route id="import.category.position" path="/admin/import/position/category">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::changeCategoryPosition</default>
-    </route>
-
-    <route id="import.mode" path="/admin/import/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
-        <requirement key="id">\d+</requirement>
+    <route id="import.category.position" path="/admin/import/position/category" methods="get">
+        <default key="_controller">Thelia:Admin\Import:changeCategoryPosition</default>
     </route>
 
     <route id="import.view" path="/admin/import/{id}" methods="get">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::importView</default>
+        <default key="_controller">Thelia:Admin\Import:configure</default>
+
+        <requirement key="id">\d+</requirement>
+    </route>
+
+    <route id="import.process" path="/admin/import/{id}" methods="post">
+        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
         <requirement key="id">\d+</requirement>
     </route>
 

@@ -35,13 +35,15 @@ use Thelia\Model\Lang;
 class ExportHandler
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface An event dispatcher interface instance
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface An event dispatcher interface
      */
     protected $eventDispatcher;
 
     /**
+     * Class constructor
+     *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     *  An event dispatcher interface instance
+     *  An event dispatcher interface
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -49,9 +51,9 @@ class ExportHandler
     }
 
     /**
-     * Get export model based on given ID
+     * Get export model based on given identifier
      *
-     * @param integer $exportId          An export ID
+     * @param integer $exportId          An export identifier
      * @param boolean $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException
@@ -77,9 +79,9 @@ class ExportHandler
     }
 
     /**
-     * Get export category model based on given ID
+     * Get export category model based on given identifier
      *
-     * @param integer $exportCategoryId  An export category ID
+     * @param integer $exportCategoryId  An export category identifier
      * @param boolean $dispatchException Dispatch exception if model doesn't exist
      *
      * @throws \ErrorException

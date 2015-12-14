@@ -26,12 +26,12 @@ use Thelia\Model\ExportQuery;
 class Export extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var \Thelia\Handler\ExportHandler  An export handler instance
+     * @var \Thelia\Handler\ExportHandler The export handler
      */
     protected $handler;
 
     /**
-     * @param \Thelia\Handler\ExportHandler $exportHandler  An export handler instance
+     * @param \Thelia\Handler\ExportHandler $exportHandler The export handler
      */
     public function __construct(ExportHandler $exportHandler)
     {

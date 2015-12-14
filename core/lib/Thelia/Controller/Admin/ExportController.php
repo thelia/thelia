@@ -33,7 +33,7 @@ class ExportController extends BaseAdminController
     /**
      * Handle default action, that is, list available exports
      *
-     * @param string $_view
+     * @param string $_view View to render
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */
@@ -127,7 +127,7 @@ class ExportController extends BaseAdminController
     /**
      * Display export configuration view
      *
-     * @param integer $id An export ID
+     * @param integer $id An export identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response
      */

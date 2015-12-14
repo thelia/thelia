@@ -861,6 +861,15 @@ final class TheliaEvents
     const BEFORE_UPDATEBRAND = "action.before_updateBrand";
     const AFTER_UPDATEBRAND  = "action.after_updateBrand";
 
+    // -- Import ----------------------------------------------
+
+    const IMPORT_CHANGE_POSITION = 'import.change.position';
+    const IMPORT_CATEGORY_CHANGE_POSITION = 'import.category.change.position';
+
+    const IMPORT_BEGIN = 'import.begin';
+    const IMPORT_BEFORE_DECODE = 'import.decode.before';
+    const IMPORT_AFTER_DECODE = '.import.decode.after';
+
     // -- Export ----------------------------------------------
 
     const EXPORT_CHANGE_POSITION = 'export.change.position';
@@ -869,12 +878,6 @@ final class TheliaEvents
     const EXPORT_BEGIN = 'export.begin';
     const EXPORT_FINISHED = 'export.finished';
     const EXPORT_SUCCESS = 'export.success';
-
-    const IMPORT_BEFORE_DECODE = "Thelia.import.decode.before";
-    const IMPORT_AFTER_DECODE = "Thelia.import.decode.after";
-
-    const IMPORT_CATEGORY_CHANGE_POSITION = "Thelia.import.change_category_position";
-    const IMPORT_CHANGE_POSITION = "Thelia.import.change_position";
 
     // -- Sales management -----------------------------------------------
 
