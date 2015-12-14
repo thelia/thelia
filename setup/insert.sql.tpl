@@ -757,7 +757,18 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+
+(2037, 'brand.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2038, 'brand.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2039, 'category.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2040, 'category.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2041, 'content.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2042, 'content.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2043, 'folder.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2044, 'folder.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2045, 'product.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2046, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2190,7 +2201,18 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
-    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
+
+    (2037, '{$locale}', {intl l='Brand edit - right column top' locale=$locale}, NULL, NULL),
+    (2038, '{$locale}', {intl l='Brand edit - right column bottom' locale=$locale}, NULL, NULL),
+    (2039, '{$locale}', {intl l='Category edit - right column top' locale=$locale}, NULL, NULL),
+    (2040, '{$locale}', {intl l='Category edit - right column bottom' locale=$locale}, NULL, NULL),
+    (2041, '{$locale}', {intl l='Content edit - right column top' locale=$locale}, NULL, NULL),
+    (2042, '{$locale}', {intl l='Content edit - right column bottom' locale=$locale}, NULL, NULL),
+    (2043, '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
+    (2044, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
+    (2045, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
+    (2046, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
