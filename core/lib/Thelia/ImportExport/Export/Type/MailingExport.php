@@ -18,24 +18,17 @@ use Thelia\Model\NewsletterQuery;
 
 /**
  * Class MailingExport
- * @author Benjamin Perche <bperche@openstudio.fr>
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
 class MailingExport extends AbstractExport
 {
     const FILE_NAME = 'mailing';
 
-    const EXPORT_IMAGE = true;
-
     protected $orderAndAliases = [
-        'Id' => 'Identifiant',
+        'Id' => 'Identifier',
         'Email' => 'Email',
-        'Fistname' => 'Prénom',
-        'Lastname' => 'Nom'
-    ];
-
-    protected $imagesPaths = [
-        THELIA_LOCAL_DIR . 'media/images'
+        'Fistname' => 'FirstName',
+        'Lastname' => 'LastName'
     ];
 
     protected function getData()
