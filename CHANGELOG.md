@@ -1,5 +1,26 @@
 # 2.3.0-alpha1
 
+- #1844 Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
+    - ```brand.modification.form-right.top```, ```brand.modification.form-right.bottom```
+    - ```category.modification.form-right.top```, ```category.modification.form-right.bottom```
+    - ```content.modification.form-right.top```, ```content.modification.form-right.bottom```
+    - ```folder.modification.form-right.top```, ```folder.modification.form-right.bottom```
+    - ```product.modification.form-right.top```, ```product.modification.form-right.bottom```
+- #1835 Add the product combination in PDF delivery
+- #1788 Remove all the AdminIncludes from the core modules.
+- #1841 Add the possibility to create a product combination with several same attribute inside (2 colors in one product sales elements).
+- #1830 Fix attribute title in the modal "create a new combination"
+- #1780 Currency improvements. Add the possibility to disable a currency. Add the possibility to change the position of the currency symbol. Resolve #1446
+- #1825 Add message if thelia project is not installed
+- #1714 #1839 #1833 Hook improvements
+    - Add new syntax to hook on a hook. Documentation ```http://doc.thelia.net/en/documentation/modules/hooks/index.html```
+    - Add command ```php Thelia hook```
+- #1824 #1829 Fix the admin home stats, On page load, the month sent to Thelia was bad
+- #1821 Fix the value for constant ```AdminForm::LANG_DEFAULT_BEHAVIOR```, Resolve ##1820
+- #1818 Fix BackOffice menu, hook block to integrate main link if it's used
+- #1816 Fix the total price of cart if the items have a quantity greater than one, Resolve #1772, add new methods ```getTotalRealTaxedPrice```, ```getTotalTaxedPrice```, ```getTotalTaxedPromoPrice``` in the model ```Thelia\Model\CartItem```
+- #1783 Fix product price exports. Resolve #1078 #1610
+- #1808 Add customer's company in order mails and PDF
 - #1780 Adds the ability to disable a currency and change the position of the currency symbol
 - #1806 Fix the event dispatched before decoding of the import, ```TheliaEvents::IMPORT_AFTER_DECODE``` to ```TheliaEvents::IMPORT_BEFORE_DECODE```
 - #1799 Fixed the redirection to rewritten URL
@@ -52,17 +73,6 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
-- Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
-    - brand.modification.form-right.top
-    - brand.modification.form-right.bottom
-    - category.modification.form-right.top
-    - category.modification.form-right.bottom
-    - content.modification.form-right.top
-    - content.modification.form-right.bottom
-    - folder.modification.form-right.top
-    - folder.modification.form-right.bottom
-    - product.modification.form-right.top
-    - product.modification.form-right.bottom
 
 # 2.2.0
 
