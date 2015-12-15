@@ -14,6 +14,7 @@ namespace Thelia\Core\Archiver\Archiver;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Archiver\AbstractArchiver;
+use Thelia\Core\Archiver\ArchiverInterface;
 
 /**
  * Class TarArchiver
@@ -54,6 +55,15 @@ class TarArchiver extends AbstractArchiver
     public function create($baseName)
     {
         $this->archivePath = $baseName . '.' . $this->getExtension();
+
+        $this->archive = new \PharData($this->archivePath);
+
+        return $this;
+    }
+
+    public function open($path)
+    {
+        $this->archivePath = $path;
 
         $this->archive = new \PharData($this->archivePath);
 

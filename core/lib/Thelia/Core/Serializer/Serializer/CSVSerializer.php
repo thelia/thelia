@@ -99,8 +99,22 @@ class CSVSerializer extends AbstractSerializer
         $fileObject->ftruncate($fileObject->getSize() - 1);
     }
 
-    public function unserialize()
+    public function unserialize(\SplFileObject $fileObject)
     {
-        // TODO: Implement unserialize() method.
+        $data = [];
+
+        foreach ($fileObject as $index => $row) {
+            if ($index === 0) {
+                $this->headers = str_getcsv($row, static::DELIMITER, static::ENCLOSURE);
+                continue;
+            }
+
+            $data[] = array_combine(
+                $this->headers,
+                str_getcsv($row, static::DELIMITER, static::ENCLOSURE)
+            );
+        }
+
+        return $data;
     }
 }

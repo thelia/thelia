@@ -230,9 +230,9 @@
         </service>
 
         <!-- yaml -->
-        <service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">
-            <tag name="thelia.serializer" />
-        </service>
+        <!--<service id="thelia.serializer.yaml" class="Thelia\Core\Serializer\Serializer\YAMLSerializer">-->
+            <!--<tag name="thelia.serializer" />-->
+        <!--</service>-->
 
 
         <!-- Archiver -->
@@ -313,6 +313,8 @@
 
         <service id="thelia.import.handler" class="Thelia\Handler\ImportHandler">
             <argument type="service" id="event_dispatcher" />
+            <argument type="service" id="thelia.serializer.manager" />
+            <argument type="service" id="thelia.archiver.manager" />
         </service>
     </services>
 </config>

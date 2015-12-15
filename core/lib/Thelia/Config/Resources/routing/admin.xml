@@ -1393,7 +1393,8 @@
     </route>
 
     <route id="import.process" path="/admin/import/{id}" methods="post">
-        <default key="_controller">Thelia\Controller\Admin\ImportController::import</default>
+        <default key="_controller">Thelia:Admin\Import:import</default>
+
         <requirement key="id">\d+</requirement>
     </route>
 

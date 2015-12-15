@@ -60,8 +60,8 @@ class JSONSerializer extends AbstractSerializer
         $fileObject->fwrite(']');
     }
 
-    public function unserialize()
+    public function unserialize(\SplFileObject $fileObject)
     {
-        // TODO: Implement decode() method.
+        return json_decode(file_get_contents($fileObject->getPathname()), true);
     }
 }

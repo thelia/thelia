@@ -90,8 +90,10 @@ class XMLSerializer extends AbstractSerializer
         $fileObject->fwrite(PHP_EOL . '</root>');
     }
 
-    public function unserialize()
+    public function unserialize(\SplFileObject $fileObject)
     {
-        // TODO: Implement unserialize() method.
+        $unserializedXml = $this->xmlEncoder->decode(file_get_contents($fileObject->getPathname()), 'null');
+
+        return reset($unserializedXml);
     }
 }

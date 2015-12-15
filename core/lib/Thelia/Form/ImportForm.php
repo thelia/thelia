@@ -12,10 +12,8 @@
 
 namespace Thelia\Form;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Core\Translation\Translator;
 use Thelia\Model\LangQuery;
 
 /**
@@ -32,13 +30,16 @@ class ImportForm extends BaseForm
             "label" => $this->translator->trans("File to upload"),
             "label_attr" => ["for" => "file_to_upload"],
             "required" => true,
+                "constraints" => [
+                    new Assert\NotNull
+                ]
             ))
             ->add("language", "integer", array(
                 "label" => $this->translator->trans("Language"),
                 "label_attr" => ["for" => "language"],
                 "required" => true,
                 "constraints" => [
-                    new Callback([
+                    new Assert\Callback([
                         "methods" => [
                             [$this, "checkLanguage"],
                         ],

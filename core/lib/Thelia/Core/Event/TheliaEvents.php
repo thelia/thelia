@@ -867,8 +867,8 @@ final class TheliaEvents
     const IMPORT_CATEGORY_CHANGE_POSITION = 'import.category.change.position';
 
     const IMPORT_BEGIN = 'import.begin';
-    const IMPORT_BEFORE_DECODE = 'import.decode.before';
-    const IMPORT_AFTER_DECODE = '.import.decode.after';
+    const IMPORT_FINISHED = 'import.finished';
+    const IMPORT_SUCCESS = 'import.success';
 
     // -- Export ----------------------------------------------
 

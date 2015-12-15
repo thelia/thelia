@@ -69,6 +69,6 @@ class Import extends BaseAction implements EventSubscriberInterface
     public function importCategoryChangePosition(UpdatePositionEvent $updatePositionEvent)
     {
         $this->handler->getCategory($updatePositionEvent->getObjectId(), true);
-        $this->genericUpdatePosition(new importCategoryQuery, $updatePositionEvent);
+        $this->genericUpdatePosition(new ImportCategoryQuery, $updatePositionEvent);
     }
 }

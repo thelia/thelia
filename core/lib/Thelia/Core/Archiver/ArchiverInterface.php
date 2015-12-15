@@ -79,6 +79,15 @@ interface ArchiverInterface
     public function create($baseName);
 
     /**
+     * Open an archive
+     *
+     * @param string $path Path to archive
+     *
+     * @return $this Return $this, allow chaining
+     */
+    public function open($path);
+
+    /**
      * Add directory or file to archive
      *
      * @param string      $path
@@ -94,4 +103,13 @@ interface ArchiverInterface
      * @return boolean True on success, false otherwise
      */
     public function save();
+
+    /**
+     * Extract archive
+     *
+     * @param string $toPath Where to extract
+     *
+     * @return \Symfony\Component\HttpFoundation\File\File
+     */
+    public function extract($toPath);
 }

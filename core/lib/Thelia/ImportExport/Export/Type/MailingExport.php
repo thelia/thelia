@@ -12,6 +12,7 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
+use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\NewsletterQuery;
 
@@ -24,6 +25,8 @@ class MailingExport extends AbstractExport
 {
     const FILE_NAME = 'mailing';
 
+    const EXPORT_IMAGE = true;
+
     protected $orderAndAliases = [
         'Id' => 'Identifiant',
         'Email' => 'Email',
@@ -31,8 +34,19 @@ class MailingExport extends AbstractExport
         'Lastname' => 'Nom'
     ];
 
+    protected $imagesPaths = [
+        THELIA_LOCAL_DIR . 'media/images'
+    ];
+
     protected function getData()
     {
+        if ($this->language !== null) {
+            Translator::getInstance()->setLocale($this->language->getLocale());
+            foreach ($this->orderAndAliases as &$alias) {
+                $alias = Translator::getInstance()->trans($alias);
+            }
+        }
+
         return new NewsletterQuery;
     }
 }

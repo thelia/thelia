@@ -12,83 +12,43 @@
 
 namespace Thelia\ImportExport\Import\Type;
 
-use Thelia\Core\FileFormat\Formatting\FormatterData;
-use Thelia\Core\FileFormat\FormatType;
-use Thelia\ImportExport\Import\ImportHandler;
+use Thelia\Core\Translation\Translator;
+use Thelia\ImportExport\Import\AbstractImport;
 use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * Class ControllerTestBase
- * @package Thelia\ImportExport\Import
- * @author Benjamin Perche <bperche@openstudio.fr>
+ * @author Jérôme Billiras <jbilliras@openstudio.fr>
  */
-class ProductStockImport extends ImportHandler
+class ProductStockImport extends AbstractImport
 {
-    /**
-     * @param \Thelia\Core\FileFormat\Formatting\FormatterData
-     * @return string|array error messages
-     *
-     * The method does the import routine from a FormatterData
-     */
-    public function retrieveFromFormatterData(FormatterData $data)
+    protected $mandatoryColumns = [
+        'id',
+        'stock'
+    ];
+
+    public function importData(array $data)
     {
-        $errors = [];
+        $pse = ProductSaleElementsQuery::create()->findPk($data['id']);
 
-        while (null !== $row = $data->popRow()) {
-            /**
-             * Check for mandatory columns
-             */
-            $this->checkMandatoryColumns($row);
+        if ($pse === null) {
+            return Translator::getInstance()->trans(
+                'The product sale element reference %id doesn\'t exist',
+                [
+                    '%id' => $data['id']
+                ]
+            );
+        } else {
+            $pse->setQuantity($data['stock']);
 
-            $obj = ProductSaleElementsQuery::create()->findPk($row["id"]);
-
-            if ($obj === null) {
-                $errors[] = $this->translator->trans(
-                    "The product sale element reference %id doesn't exist",
-                    [
-                        "%id" => $row["id"]
-                    ]
-                );
-            } else {
-                $obj->setQuantity($row["stock"]);
-
-                if (isset($row["ean"]) && !empty($row["ean"])) {
-                    $obj->setEanCode($row["ean"]);
-                }
-
-                $obj->save();
-                $this->importedRows++;
+            if (isset($data['ean']) && !empty($data['ean'])) {
+                $pse->setEanCode($data['ean']);
             }
+
+            $pse->save();
+            $this->importedRows++;
         }
 
-        return $errors;
-    }
-
-    protected function getMandatoryColumns()
-    {
-        return ["id", "stock"];
-    }
-
-    /**
-     * @return string|array
-     *
-     * Define all the type of import/formatters that this can handle
-     * return a string if it handle a single type ( specific exports ),
-     * or an array if multiple.
-     *
-     * Thelia types are defined in \Thelia\Core\FileFormat\FormatType
-     *
-     * example:
-     * return array(
-     *     FormatType::TABLE,
-     *     FormatType::UNBOUNDED,
-     * );
-     */
-    public function getHandledTypes()
-    {
-        return array(
-            FormatType::TABLE,
-            FormatType::UNBOUNDED,
-        );
+        return null;
     }
 }

@@ -39,8 +39,7 @@ class ExportHandler
     /**
      * Class constructor
      *
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
-     *  An event dispatcher interface
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher An event dispatcher interface
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -187,8 +186,8 @@ class ExportHandler
     /**
      * Process export
      *
-     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export instance
-     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer instance
+     * @param \Thelia\ImportExport\Export\AbstractExport  $export     An export
+     * @param \Thelia\Core\Serializer\SerializerInterface $serializer A serializer interface
      *
      * @return string Export file path
      */

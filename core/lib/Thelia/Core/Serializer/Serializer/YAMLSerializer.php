@@ -46,8 +46,8 @@ class YAMLSerializer extends AbstractSerializer
         return Yaml::dump([$data]);
     }
 
-    public function unserialize()
+    public function unserialize(\SplFileObject $fileObject)
     {
-        // TODO: Implement unserialize() method.
+        return Yaml::parse(file_get_contents($fileObject->getPathname()));
     }
 }

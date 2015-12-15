@@ -160,7 +160,7 @@ class ExportController extends BaseAdminController
     /**
      * Handle export action
      *
-     * @param integer $id An export ID
+     * @param integer $id An export identifier
      *
      * @return \Thelia\Core\HttpFoundation\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
      */

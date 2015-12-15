@@ -134,11 +134,11 @@ abstract class AbstractExport implements \Iterator
             }
 
             // Todo
-            throw new \Exception('TODO ' . __FILE__);
+            throw new \Exception('TODO ' . __FILE__ . ':' . __LINE__);
         }
 
         // Todo
-        throw new \Exception('TODO ' . __FILE__);
+        throw new \Exception('TODO ' . __FILE__ . ':' . __LINE__);
     }
 
     public function valid()

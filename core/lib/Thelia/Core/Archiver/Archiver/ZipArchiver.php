@@ -56,6 +56,17 @@ class ZipArchiver extends AbstractArchiver
         return $this;
     }
 
+    public function open($path)
+    {
+        $this->archive = new \ZipArchive;
+
+        $this->archivePath = $path;
+
+        $this->archive->open($this->archivePath);
+
+        return $this;
+    }
+
     public function save()
     {
         return $this->archive->close();

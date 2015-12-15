@@ -12,6 +12,8 @@
 
 namespace Thelia\Core\Serializer;
 
+use Symfony\Component\HttpFoundation\File\File;
+
 /**
  * Interface SerializerInterface
  * @author Jérôme Billiras <jbilliras@openstudio.fr>
@@ -76,5 +78,12 @@ interface SerializerInterface
      */
     public function finalizeFile(\SplFileObject $fileObject);
 
-    public function unserialize();
+    /**
+     * Unserialize data
+     *
+     * @param \SplFileObject $fileObject A file object
+     *
+     * @return array Unserialized data
+     */
+    public function unserialize(\SplFileObject $fileObject);
 }

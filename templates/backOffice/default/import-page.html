@@ -37,6 +37,26 @@
                 </div>
             {/if}
 
+            {flash type="thelia.import.error"}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class=" alert alert-danger">
+                            {$MESSAGE nofilter}
+                        </div>
+                    </div>
+                </div>
+            {/flash}
+
+            {flash type="thelia.import.success"}
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class=" alert alert-success">
+                            {$MESSAGE nofilter}
+                        </div>
+                    </div>
+                </div>
+            {/flash}
+
             {form name="thelia.import"}
                 <form action="{$URL nofilter}" method="post" {form_enctype}>
                     {form_hidden_fields}
