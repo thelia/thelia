@@ -22,7 +22,7 @@ use Thelia\Model\ProfileResourceQuery;
 trait UserPermissionsTrait
 {
     
-    abstract public function getAdminProfiles($criteria = null, ConnectionInterface $con = null);
+    //abstract public function getAdminProfiles($criteria = null, ConnectionInterface $con = null);
 
     public function getPermissions()
     {
