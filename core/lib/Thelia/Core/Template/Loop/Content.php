@@ -283,7 +283,7 @@ class Content extends BaseI18nLoop implements PropelSearchLoopInterface, SearchL
                 ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
-                ->set("URL", $content->getUrl($this->locale))
+                ->set("URL", $this->getReturnUrl() ? $content->getUrl($this->locale) : null)
                 ->set("META_TITLE", $content->getVirtualColumn('i18n_META_TITLE'))
                 ->set("META_DESCRIPTION", $content->getVirtualColumn('i18n_META_DESCRIPTION'))
                 ->set("META_KEYWORDS", $content->getVirtualColumn('i18n_META_KEYWORDS'))
