@@ -886,6 +886,7 @@ return array(
     'Spain' => 'Espagne',
     'Sri Lanka' => 'Sri Lanka',
     'St Pierre et Miquelon' => 'St Pierre et Miquelon',
+    'Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page' => 'Rester sur la langue par défaut pour l\'utilisation des flèches "Suivant" et "Précédent" sur les pages produit, catégorie, contenu, dossier et marque',
     'Store Information - JavaScript' => 'Information boutique - JavaScript',
     'Store information configuration' => 'Configuration des informations sur la boutique',
     'Sudan' => 'Soudan',

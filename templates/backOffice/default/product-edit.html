@@ -31,13 +31,18 @@
                             {intl l='Edit product %title' title={$TITLE}}{if $REF} ({intl l='ref.:'} {$REF}){/if}
                         </div>
 
+                        {$default_edit_language_id = $edit_language_id}
+                        {if {config key="default_language_on_change"} eq 1}
+                        {$default_edit_language_id = {lang attr="id"}}
+                        {/if}
+
                         <div class="col-md-5 actions">
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#cloneProductModal">
                                 {intl l="Clone"}
                             </button>
-                            <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                            <a {if $HAS_PREVIOUS != 0}href="{url path='/admin/products/update' edit_language_id={$default_edit_language_id} product_id=$PREVIOUS}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit previous product'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview product page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
-                            <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                            <a {if $HAS_NEXT != 0}href="{url path='/admin/products/update' edit_language_id={$default_edit_language_id} product_id=$NEXT}"{else}disabled="disabled"{/if} class="btn btn-default" title="{intl l='Edit next product'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                         </div>
                     </div>
 

@@ -36,10 +36,15 @@
                             {intl l='Edit brand %title' title={$TITLE}}
                         </div>
 
+                        {$default_edit_language_id = $edit_language_id}
+                        {if {config key="default_language_on_change"} eq 1}
+                        {$default_edit_language_id = {lang attr="id"}}
+                        {/if}
+
                         <div class="col-md-5 actions">
 
                             {if $HAS_PREVIOUS != 0}
-                                <a href="{url path="/admin/brand/update/%previous" previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous brand'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
+                                <a href="{url path="/admin/brand/update/%previous" edit_language_id={$default_edit_language_id} previous=$PREVIOUS}" class="btn btn-default" title="{intl l='Edit previous brand'}"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             {else}
                                 <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span></a>
                             {/if}
@@ -47,7 +52,7 @@
                             <a href="{$URL nofilter}" target="_blank" class="btn btn-default" title="{intl l='Preview brand page'}"><span class="glyphicon glyphicon-eye-open"></span></a>
 
                             {if $HAS_NEXT != 0}
-                                <a href="{url path="/admin/brand/update/%next" next=$NEXT}" class="btn btn-default" title="{intl l='Edit next brand'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
+                                <a href="{url path="/admin/brand/update/%next" edit_language_id={$default_edit_language_id} next=$NEXT}" class="btn btn-default" title="{intl l='Edit next brand'}"><span class="glyphicon glyphicon-arrow-right"></span></a>
                             {else}
                                 <a href="#" disabled="disabled" class="btn btn-default"><span class="glyphicon glyphicon-arrow-right"></span></a>
                             {/if}
