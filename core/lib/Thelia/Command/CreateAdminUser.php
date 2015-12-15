@@ -130,7 +130,7 @@ class CreateAdminUser extends ContainerAwareCommand
             $output->writeln("Passwords are different, please try again.");
         } while (true);
 
-        $admin->setProfile(null);
+        //$admin->setProfile(null);
 
         return $admin;
     }
