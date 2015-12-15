@@ -114,6 +114,8 @@
                                                 </div>
 
                                                 <div class="col-md-4">
+                                                    {hook name="category.modification.form-right.top" category_id=$category_id}
+
                                                     {custom_render_form_field field='parent'}
                                                          <select {form_field_attributes field='parent' extra_class="form_control"}>
                                                               <option value="0">{intl l="Top level"}</option>
@@ -132,6 +134,8 @@
                                                         <input type="checkbox" {if $value != 0}checked{/if} name="{$name}" value="1"> {$label}
                                                     </label>
                                                     {/form_field}
+
+                                                    {hook name="category.modification.form-right.bottom" category_id=$category_id}
                                                 </div>
                                             </div>
 

@@ -52,6 +52,17 @@
 - #1669 Add options ```exclude_status, status_code, exclude_status_code``` and output value ```STATUS_CODE``` in Order loop
 - #1674 Add options ```free_text, exclude_free_text``` in FeatureValue loop
 - #1725 Add `weight` and `total_price_without_discount` attributes to the `{cart}` substitution, and some aliases to provide a better english syntax, or a more accurate name to existing attributes : `product_count`, alias of `count_product`, `item_count`, alias of `count_item`, `total_price_with_discount` alias of `total_price`, `total_taxed_price_with_discount` alias of `total_taxed_price`, `contains_virtual_product` alias of `is_virtual`, `total_tax_amount` alias of `total_vat`
+- Added hooks in the right column part of the edtion form of brand, content, category folder and product templates :
+    - brand.modification.form-right.top
+    - brand.modification.form-right.bottom
+    - category.modification.form-right.top
+    - category.modification.form-right.bottom
+    - content.modification.form-right.top
+    - content.modification.form-right.bottom
+    - folder.modification.form-right.top
+    - folder.modification.form-right.bottom
+    - product.modification.form-right.top
+    - product.modification.form-right.bottom
 
 # 2.2.0
 

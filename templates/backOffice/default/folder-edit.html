@@ -110,8 +110,9 @@
                                             </div>
 
                                             <div class="col-md-4">
+                                                {hook name="folder.modification.form-right.top" folder_id=$folder_id}
 
-  		                                        {form_field field='parent'}
+                                                {form_field field='parent'}
 		                                            <div class="form-group {if $error}has-error{/if}">
 
 		                                                <label for="{$label_attr.for}" class="control-label">
@@ -141,6 +142,8 @@
 									                    </div>
 									                </div>
 									            {/form_field}
+
+                                                {hook name="folder.modification.form-right.bottom" folder_id=$folder_id}
                                             </div>
 						                </div>
 

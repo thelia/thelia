@@ -11,7 +11,7 @@
             close_url = "{url path='/admin/categories' category_id=$DEFAULT_CATEGORY}"
         }
 
-        {hook name="product.modification.form_top"}
+        {hook name="product.modification.form_top" product_id=$ID}
 
         {* Be sure to get the product ID, even if the form could not be validated*}
         <input type="hidden" name="page" value="{$page}" />
@@ -51,6 +51,7 @@
             </div>
 
             <div class="col-md-4">
+                {hook name="product.modification.form-right.top" product_id=$ID}
 
                 {form_field field='default_category'}
                     <div class="form-group {if $error}has-error{/if}">
@@ -132,10 +133,12 @@
                         </div>
                     </div>
                 {/form_field}
+
+                {hook name="product.modification.form-right.bottom" product_id=$ID}
             </div>
         </div>
 
-        {hook name="product.modification.form_bottom"}
+        {hook name="product.modification.form_bottom" product_id=$ID}
 
         {include
             file = "includes/inner-form-toolbar.html"

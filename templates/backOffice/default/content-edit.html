@@ -121,6 +121,8 @@
 
                                                         <div class="col-md-4">
 
+                                                            {hook name="content.modification.form-right.top" content_id=$content_id}
+
                                                             {form_field field='default_folder'}
                                                                 <div class="form-group {if $error}has-error{/if}">
 
@@ -152,6 +154,8 @@
                                                                     </div>
                                                                 </div>
                                                             {/form_field}
+
+                                                            {hook name="content.modification.form-right.bottom" content_id=$content_id}
                                                         </div>
                                                     </div>
 
