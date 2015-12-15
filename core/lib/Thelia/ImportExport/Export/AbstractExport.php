@@ -13,6 +13,7 @@
 namespace Thelia\ImportExport\Export;
 
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Translation\Translator;
 use Thelia\Model\Lang;
 
 /**
@@ -55,6 +56,11 @@ abstract class AbstractExport implements \Iterator
      * @var null|array List of fields in order in which they must be exported and there alias name
      */
     protected $orderAndAliases;
+
+    /**
+     * @var null|array Keep untranslated $orderAndAliases
+     */
+    private $originalOrderAndAliases;
 
     /**
      * @var boolean Whether to export images or not
@@ -171,6 +177,21 @@ abstract class AbstractExport implements \Iterator
     public function setLang(Lang $language = null)
     {
         $this->language = $language;
+
+        if ($this->originalOrderAndAliases === null) {
+            $this->originalOrderAndAliases = $this->orderAndAliases;
+        }
+
+        if ($this->language !== null) {
+            $previousLocale = Translator::getInstance()->getLocale();
+
+            Translator::getInstance()->setLocale($this->language->getLocale());
+            foreach ($this->orderAndAliases as &$alias) {
+                $alias = Translator::getInstance()->trans($alias);
+            }
+
+            Translator::getInstance()->setLocale($previousLocale);
+        }
 
         return $this;
     }

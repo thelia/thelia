@@ -12,7 +12,6 @@
 
 namespace Thelia\ImportExport\Export\Type;
 
-use Thelia\Core\Translation\Translator;
 use Thelia\ImportExport\Export\AbstractExport;
 use Thelia\Model\NewsletterQuery;
 
@@ -33,13 +32,6 @@ class MailingExport extends AbstractExport
 
     protected function getData()
     {
-        if ($this->language !== null) {
-            Translator::getInstance()->setLocale($this->language->getLocale());
-            foreach ($this->orderAndAliases as &$alias) {
-                $alias = Translator::getInstance()->trans($alias);
-            }
-        }
-
         return new NewsletterQuery;
     }
 }
