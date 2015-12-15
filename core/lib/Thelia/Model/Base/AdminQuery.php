@@ -19,10 +19,9 @@ use Thelia\Model\Map\AdminTableMap;
 /**
  * Base class that represents a query for the 'admin' table.
  *
- *
+ * 
  *
  * @method     ChildAdminQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildAdminQuery orderByProfileId($order = Criteria::ASC) Order by the profile_id column
  * @method     ChildAdminQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildAdminQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildAdminQuery orderByLogin($order = Criteria::ASC) Order by the login column
@@ -36,7 +35,6 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAdminQuery groupById() Group by the id column
- * @method     ChildAdminQuery groupByProfileId() Group by the profile_id column
  * @method     ChildAdminQuery groupByFirstname() Group by the firstname column
  * @method     ChildAdminQuery groupByLastname() Group by the lastname column
  * @method     ChildAdminQuery groupByLogin() Group by the login column
@@ -53,15 +51,14 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdminQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildAdminQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildAdminQuery leftJoinProfile($relationAlias = null) Adds a LEFT JOIN clause to the query using the Profile relation
- * @method     ChildAdminQuery rightJoinProfile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Profile relation
- * @method     ChildAdminQuery innerJoinProfile($relationAlias = null) Adds a INNER JOIN clause to the query using the Profile relation
+ * @method     ChildAdminQuery leftJoinAdminProfile($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminProfile relation
+ * @method     ChildAdminQuery rightJoinAdminProfile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminProfile relation
+ * @method     ChildAdminQuery innerJoinAdminProfile($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminProfile relation
  *
  * @method     ChildAdmin findOne(ConnectionInterface $con = null) Return the first ChildAdmin matching the query
  * @method     ChildAdmin findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAdmin matching the query, or a new ChildAdmin object populated from the query conditions when no match is found
  *
  * @method     ChildAdmin findOneById(int $id) Return the first ChildAdmin filtered by the id column
- * @method     ChildAdmin findOneByProfileId(int $profile_id) Return the first ChildAdmin filtered by the profile_id column
  * @method     ChildAdmin findOneByFirstname(string $firstname) Return the first ChildAdmin filtered by the firstname column
  * @method     ChildAdmin findOneByLastname(string $lastname) Return the first ChildAdmin filtered by the lastname column
  * @method     ChildAdmin findOneByLogin(string $login) Return the first ChildAdmin filtered by the login column
@@ -75,7 +72,6 @@ use Thelia\Model\Map\AdminTableMap;
  * @method     ChildAdmin findOneByUpdatedAt(string $updated_at) Return the first ChildAdmin filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildAdmin objects filtered by the id column
- * @method     array findByProfileId(int $profile_id) Return ChildAdmin objects filtered by the profile_id column
  * @method     array findByFirstname(string $firstname) Return ChildAdmin objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildAdmin objects filtered by the lastname column
  * @method     array findByLogin(string $login) Return ChildAdmin objects filtered by the login column
@@ -91,7 +87,7 @@ use Thelia\Model\Map\AdminTableMap;
  */
 abstract class AdminQuery extends ModelCriteria
 {
-
+    
     /**
      * Initializes internal state of \Thelia\Model\Base\AdminQuery object.
      *
@@ -175,9 +171,9 @@ abstract class AdminQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PROFILE_ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `LOCALE`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `LOCALE`, `ALGO`, `SALT`, `REMEMBER_ME_TOKEN`, `REMEMBER_ME_SERIAL`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
         try {
-            $stmt = $con->prepare($sql);
+            $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
@@ -303,49 +299,6 @@ abstract class AdminQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AdminTableMap::ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the profile_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByProfileId(1234); // WHERE profile_id = 1234
-     * $query->filterByProfileId(array(12, 34)); // WHERE profile_id IN (12, 34)
-     * $query->filterByProfileId(array('min' => 12)); // WHERE profile_id > 12
-     * </code>
-     *
-     * @see       filterByProfile()
-     *
-     * @param     mixed $profileId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAdminQuery The current query, for fluid interface
-     */
-    public function filterByProfileId($profileId = null, $comparison = null)
-    {
-        if (is_array($profileId)) {
-            $useMinMax = false;
-            if (isset($profileId['min'])) {
-                $this->addUsingAlias(AdminTableMap::PROFILE_ID, $profileId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($profileId['max'])) {
-                $this->addUsingAlias(AdminTableMap::PROFILE_ID, $profileId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AdminTableMap::PROFILE_ID, $profileId, $comparison);
     }
 
     /**
@@ -696,42 +649,40 @@ abstract class AdminQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Profile object
+     * Filter the query by a related \Thelia\Model\AdminProfile object
      *
-     * @param \Thelia\Model\Profile|ObjectCollection $profile The related object(s) to use as filter
+     * @param \Thelia\Model\AdminProfile|ObjectCollection $adminProfile  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAdminQuery The current query, for fluid interface
      */
-    public function filterByProfile($profile, $comparison = null)
+    public function filterByAdminProfile($adminProfile, $comparison = null)
     {
-        if ($profile instanceof \Thelia\Model\Profile) {
+        if ($adminProfile instanceof \Thelia\Model\AdminProfile) {
             return $this
-                ->addUsingAlias(AdminTableMap::PROFILE_ID, $profile->getId(), $comparison);
-        } elseif ($profile instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
+                ->addUsingAlias(AdminTableMap::ID, $adminProfile->getAdminId(), $comparison);
+        } elseif ($adminProfile instanceof ObjectCollection) {
             return $this
-                ->addUsingAlias(AdminTableMap::PROFILE_ID, $profile->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->useAdminProfileQuery()
+                ->filterByPrimaryKeys($adminProfile->getPrimaryKeys())
+                ->endUse();
         } else {
-            throw new PropelException('filterByProfile() only accepts arguments of type \Thelia\Model\Profile or Collection');
+            throw new PropelException('filterByAdminProfile() only accepts arguments of type \Thelia\Model\AdminProfile or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Profile relation
+     * Adds a JOIN clause to the query using the AdminProfile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAdminQuery The current query, for fluid interface
      */
-    public function joinProfile($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAdminProfile($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Profile');
+        $relationMap = $tableMap->getRelation('AdminProfile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -746,14 +697,14 @@ abstract class AdminQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Profile');
+            $this->addJoinObject($join, 'AdminProfile');
         }
 
         return $this;
     }
 
     /**
-     * Use the Profile relation Profile object
+     * Use the AdminProfile relation AdminProfile object
      *
      * @see useQuery()
      *
@@ -761,13 +712,13 @@ abstract class AdminQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProfileQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AdminProfileQuery A secondary query class using the current class as primary query
      */
-    public function useProfileQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAdminProfileQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinProfile($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Profile', '\Thelia\Model\ProfileQuery');
+            ->joinAdminProfile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AdminProfile', '\Thelia\Model\AdminProfileQuery');
     }
 
     /**
@@ -846,10 +797,10 @@ abstract class AdminQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-
+            
 
         AdminTableMap::removeInstanceFromPool($criteria);
-
+        
             $affectedRows += ModelCriteria::delete($con);
             AdminTableMap::clearRelatedInstancePool();
             $con->commit();
@@ -862,7 +813,7 @@ abstract class AdminQuery extends ModelCriteria
     }
 
     // timestampable behavior
-
+    
     /**
      * Filter by the latest updated
      *
@@ -874,7 +825,7 @@ abstract class AdminQuery extends ModelCriteria
     {
         return $this->addUsingAlias(AdminTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Filter by the latest created
      *
@@ -886,7 +837,7 @@ abstract class AdminQuery extends ModelCriteria
     {
         return $this->addUsingAlias(AdminTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Order by update date desc
      *
@@ -896,7 +847,7 @@ abstract class AdminQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(AdminTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by update date asc
      *
@@ -906,7 +857,7 @@ abstract class AdminQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(AdminTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by create date desc
      *
@@ -916,7 +867,7 @@ abstract class AdminQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(AdminTableMap::CREATED_AT);
     }
-
+    
     /**
      * Order by create date asc
      *

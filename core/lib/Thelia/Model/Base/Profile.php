@@ -17,8 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Admin as ChildAdmin;
-use Thelia\Model\AdminQuery as ChildAdminQuery;
+use Thelia\Model\AdminProfile as ChildAdminProfile;
+use Thelia\Model\AdminProfileQuery as ChildAdminProfileQuery;
 use Thelia\Model\Api as ChildApi;
 use Thelia\Model\ApiQuery as ChildApiQuery;
 use Thelia\Model\Profile as ChildProfile;
@@ -33,7 +33,7 @@ use Thelia\Model\Resource as ChildResource;
 use Thelia\Model\ResourceQuery as ChildResourceQuery;
 use Thelia\Model\Map\ProfileTableMap;
 
-abstract class Profile implements ActiveRecordInterface
+abstract class Profile implements ActiveRecordInterface 
 {
     /**
      * TableMap class name
@@ -92,10 +92,10 @@ abstract class Profile implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ObjectCollection|ChildAdmin[] Collection to store aggregation of ChildAdmin objects.
+     * @var        ObjectCollection|ChildAdminProfile[] Collection to store aggregation of ChildAdminProfile objects.
      */
-    protected $collAdmins;
-    protected $collAdminsPartial;
+    protected $collAdminProfiles;
+    protected $collAdminProfilesPartial;
 
     /**
      * @var        ObjectCollection|ChildProfileResource[] Collection to store aggregation of ChildProfileResource objects.
@@ -135,13 +135,13 @@ abstract class Profile implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     // i18n behavior
-
+    
     /**
      * Current locale
      * @var        string
      */
     protected $currentLocale = 'en_US';
-
+    
     /**
      * Current translation objects
      * @var        array[ChildProfileI18n]
@@ -158,7 +158,7 @@ abstract class Profile implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $adminsScheduledForDeletion = null;
+    protected $adminProfilesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -444,7 +444,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Get the [id] column value.
-     *
+     * 
      * @return   int
      */
     public function getId()
@@ -455,7 +455,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Get the [code] column value.
-     *
+     * 
      * @return   string
      */
     public function getCode()
@@ -466,7 +466,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Get the [optionally formatted] temporal [created_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -486,7 +486,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Get the [optionally formatted] temporal [updated_at] column value.
-     *
+     * 
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
      *                            If format is NULL, then the raw \DateTime object will be returned.
@@ -506,7 +506,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Set the value of [id] column.
-     *
+     * 
      * @param      int $v new value
      * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
@@ -527,7 +527,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Set the value of [code] column.
-     *
+     * 
      * @param      string $v new value
      * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
@@ -548,7 +548,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\Profile The current object (for fluent API support)
@@ -569,7 +569,7 @@ abstract class Profile implements ActiveRecordInterface
 
     /**
      * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
+     * 
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\Profile The current object (for fluent API support)
@@ -711,7 +711,7 @@ abstract class Profile implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAdmins = null;
+            $this->collAdminProfiles = null;
 
             $this->collProfileResources = null;
 
@@ -882,18 +882,17 @@ abstract class Profile implements ActiveRecordInterface
                 }
             }
 
-            if ($this->adminsScheduledForDeletion !== null) {
-                if (!$this->adminsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->adminsScheduledForDeletion as $admin) {
-                        // need to save related object because we set the relation to null
-                        $admin->save($con);
-                    }
-                    $this->adminsScheduledForDeletion = null;
+            if ($this->adminProfilesScheduledForDeletion !== null) {
+                if (!$this->adminProfilesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AdminProfileQuery::create()
+                        ->filterByPrimaryKeys($this->adminProfilesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->adminProfilesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collAdmins !== null) {
-            foreach ($this->collAdmins as $referrerFK) {
+                if ($this->collAdminProfiles !== null) {
+            foreach ($this->collAdminProfiles as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1018,16 +1017,16 @@ abstract class Profile implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`ID`':                        
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`CODE`':                        
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`CREATED_AT`':                        
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`UPDATED_AT`':                        
                         $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                 }
@@ -1142,10 +1141,10 @@ abstract class Profile implements ActiveRecordInterface
         foreach ($virtualColumns as $key => $virtualColumn) {
             $result[$key] = $virtualColumn;
         }
-
+        
         if ($includeForeignObjects) {
-            if (null !== $this->collAdmins) {
-                $result['Admins'] = $this->collAdmins->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAdminProfiles) {
+                $result['AdminProfiles'] = $this->collAdminProfiles->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collProfileResources) {
                 $result['ProfileResources'] = $this->collProfileResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1320,9 +1319,9 @@ abstract class Profile implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getAdmins() as $relObj) {
+            foreach ($this->getAdminProfiles() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAdmin($relObj->copy($deepCopy));
+                    $copyObj->addAdminProfile($relObj->copy($deepCopy));
                 }
             }
 
@@ -1391,8 +1390,8 @@ abstract class Profile implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Admin' == $relationName) {
-            return $this->initAdmins();
+        if ('AdminProfile' == $relationName) {
+            return $this->initAdminProfiles();
         }
         if ('ProfileResource' == $relationName) {
             return $this->initProfileResources();
@@ -1409,31 +1408,31 @@ abstract class Profile implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collAdmins collection
+     * Clears out the collAdminProfiles collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addAdmins()
+     * @see        addAdminProfiles()
      */
-    public function clearAdmins()
+    public function clearAdminProfiles()
     {
-        $this->collAdmins = null; // important to set this to NULL since that means it is uninitialized
+        $this->collAdminProfiles = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collAdmins collection loaded partially.
+     * Reset is the collAdminProfiles collection loaded partially.
      */
-    public function resetPartialAdmins($v = true)
+    public function resetPartialAdminProfiles($v = true)
     {
-        $this->collAdminsPartial = $v;
+        $this->collAdminProfilesPartial = $v;
     }
 
     /**
-     * Initializes the collAdmins collection.
+     * Initializes the collAdminProfiles collection.
      *
-     * By default this just sets the collAdmins collection to an empty array (like clearcollAdmins());
+     * By default this just sets the collAdminProfiles collection to an empty array (like clearcollAdminProfiles());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1442,17 +1441,17 @@ abstract class Profile implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initAdmins($overrideExisting = true)
+    public function initAdminProfiles($overrideExisting = true)
     {
-        if (null !== $this->collAdmins && !$overrideExisting) {
+        if (null !== $this->collAdminProfiles && !$overrideExisting) {
             return;
         }
-        $this->collAdmins = new ObjectCollection();
-        $this->collAdmins->setModel('\Thelia\Model\Admin');
+        $this->collAdminProfiles = new ObjectCollection();
+        $this->collAdminProfiles->setModel('\Thelia\Model\AdminProfile');
     }
 
     /**
-     * Gets an array of ChildAdmin objects which contain a foreign key that references this object.
+     * Gets an array of ChildAdminProfile objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1462,109 +1461,112 @@ abstract class Profile implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildAdmin[] List of ChildAdmin objects
+     * @return Collection|ChildAdminProfile[] List of ChildAdminProfile objects
      * @throws PropelException
      */
-    public function getAdmins($criteria = null, ConnectionInterface $con = null)
+    public function getAdminProfiles($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collAdminsPartial && !$this->isNew();
-        if (null === $this->collAdmins || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAdmins) {
+        $partial = $this->collAdminProfilesPartial && !$this->isNew();
+        if (null === $this->collAdminProfiles || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAdminProfiles) {
                 // return empty collection
-                $this->initAdmins();
+                $this->initAdminProfiles();
             } else {
-                $collAdmins = ChildAdminQuery::create(null, $criteria)
+                $collAdminProfiles = ChildAdminProfileQuery::create(null, $criteria)
                     ->filterByProfile($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collAdminsPartial && count($collAdmins)) {
-                        $this->initAdmins(false);
+                    if (false !== $this->collAdminProfilesPartial && count($collAdminProfiles)) {
+                        $this->initAdminProfiles(false);
 
-                        foreach ($collAdmins as $obj) {
-                            if (false == $this->collAdmins->contains($obj)) {
-                                $this->collAdmins->append($obj);
+                        foreach ($collAdminProfiles as $obj) {
+                            if (false == $this->collAdminProfiles->contains($obj)) {
+                                $this->collAdminProfiles->append($obj);
                             }
                         }
 
-                        $this->collAdminsPartial = true;
+                        $this->collAdminProfilesPartial = true;
                     }
 
-                    reset($collAdmins);
+                    reset($collAdminProfiles);
 
-                    return $collAdmins;
+                    return $collAdminProfiles;
                 }
 
-                if ($partial && $this->collAdmins) {
-                    foreach ($this->collAdmins as $obj) {
+                if ($partial && $this->collAdminProfiles) {
+                    foreach ($this->collAdminProfiles as $obj) {
                         if ($obj->isNew()) {
-                            $collAdmins[] = $obj;
+                            $collAdminProfiles[] = $obj;
                         }
                     }
                 }
 
-                $this->collAdmins = $collAdmins;
-                $this->collAdminsPartial = false;
+                $this->collAdminProfiles = $collAdminProfiles;
+                $this->collAdminProfilesPartial = false;
             }
         }
 
-        return $this->collAdmins;
+        return $this->collAdminProfiles;
     }
 
     /**
-     * Sets a collection of Admin objects related by a one-to-many relationship
+     * Sets a collection of AdminProfile objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $admins A Propel collection.
+     * @param      Collection $adminProfiles A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildProfile The current object (for fluent API support)
      */
-    public function setAdmins(Collection $admins, ConnectionInterface $con = null)
+    public function setAdminProfiles(Collection $adminProfiles, ConnectionInterface $con = null)
     {
-        $adminsToDelete = $this->getAdmins(new Criteria(), $con)->diff($admins);
+        $adminProfilesToDelete = $this->getAdminProfiles(new Criteria(), $con)->diff($adminProfiles);
 
+        
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->adminProfilesScheduledForDeletion = clone $adminProfilesToDelete;
 
-        $this->adminsScheduledForDeletion = $adminsToDelete;
-
-        foreach ($adminsToDelete as $adminRemoved) {
-            $adminRemoved->setProfile(null);
+        foreach ($adminProfilesToDelete as $adminProfileRemoved) {
+            $adminProfileRemoved->setProfile(null);
         }
 
-        $this->collAdmins = null;
-        foreach ($admins as $admin) {
-            $this->addAdmin($admin);
+        $this->collAdminProfiles = null;
+        foreach ($adminProfiles as $adminProfile) {
+            $this->addAdminProfile($adminProfile);
         }
 
-        $this->collAdmins = $admins;
-        $this->collAdminsPartial = false;
+        $this->collAdminProfiles = $adminProfiles;
+        $this->collAdminProfilesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Admin objects.
+     * Returns the number of related AdminProfile objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related Admin objects.
+     * @return int             Count of related AdminProfile objects.
      * @throws PropelException
      */
-    public function countAdmins(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countAdminProfiles(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collAdminsPartial && !$this->isNew();
-        if (null === $this->collAdmins || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAdmins) {
+        $partial = $this->collAdminProfilesPartial && !$this->isNew();
+        if (null === $this->collAdminProfiles || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAdminProfiles) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getAdmins());
+                return count($this->getAdminProfiles());
             }
 
-            $query = ChildAdminQuery::create(null, $criteria);
+            $query = ChildAdminProfileQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1574,56 +1576,81 @@ abstract class Profile implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collAdmins);
+        return count($this->collAdminProfiles);
     }
 
     /**
-     * Method called to associate a ChildAdmin object to this object
-     * through the ChildAdmin foreign key attribute.
+     * Method called to associate a ChildAdminProfile object to this object
+     * through the ChildAdminProfile foreign key attribute.
      *
-     * @param    ChildAdmin $l ChildAdmin
+     * @param    ChildAdminProfile $l ChildAdminProfile
      * @return   \Thelia\Model\Profile The current object (for fluent API support)
      */
-    public function addAdmin(ChildAdmin $l)
+    public function addAdminProfile(ChildAdminProfile $l)
     {
-        if ($this->collAdmins === null) {
-            $this->initAdmins();
-            $this->collAdminsPartial = true;
+        if ($this->collAdminProfiles === null) {
+            $this->initAdminProfiles();
+            $this->collAdminProfilesPartial = true;
         }
 
-        if (!in_array($l, $this->collAdmins->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddAdmin($l);
+        if (!in_array($l, $this->collAdminProfiles->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAdminProfile($l);
         }
 
         return $this;
     }
 
     /**
-     * @param Admin $admin The admin object to add.
+     * @param AdminProfile $adminProfile The adminProfile object to add.
      */
-    protected function doAddAdmin($admin)
+    protected function doAddAdminProfile($adminProfile)
     {
-        $this->collAdmins[]= $admin;
-        $admin->setProfile($this);
+        $this->collAdminProfiles[]= $adminProfile;
+        $adminProfile->setProfile($this);
     }
 
     /**
-     * @param  Admin $admin The admin object to remove.
+     * @param  AdminProfile $adminProfile The adminProfile object to remove.
      * @return ChildProfile The current object (for fluent API support)
      */
-    public function removeAdmin($admin)
+    public function removeAdminProfile($adminProfile)
     {
-        if ($this->getAdmins()->contains($admin)) {
-            $this->collAdmins->remove($this->collAdmins->search($admin));
-            if (null === $this->adminsScheduledForDeletion) {
-                $this->adminsScheduledForDeletion = clone $this->collAdmins;
-                $this->adminsScheduledForDeletion->clear();
+        if ($this->getAdminProfiles()->contains($adminProfile)) {
+            $this->collAdminProfiles->remove($this->collAdminProfiles->search($adminProfile));
+            if (null === $this->adminProfilesScheduledForDeletion) {
+                $this->adminProfilesScheduledForDeletion = clone $this->collAdminProfiles;
+                $this->adminProfilesScheduledForDeletion->clear();
             }
-            $this->adminsScheduledForDeletion[]= $admin;
-            $admin->setProfile(null);
+            $this->adminProfilesScheduledForDeletion[]= clone $adminProfile;
+            $adminProfile->setProfile(null);
         }
 
         return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Profile is new, it will return
+     * an empty collection; or if this Profile has previously
+     * been saved, it will retrieve related AdminProfiles from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Profile.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAdminProfile[] List of ChildAdminProfile objects
+     */
+    public function getAdminProfilesJoinAdmin($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAdminProfileQuery::create(null, $criteria);
+        $query->joinWith('Admin', $joinBehavior);
+
+        return $this->getAdminProfiles($query, $con);
     }
 
     /**
@@ -1743,7 +1770,7 @@ abstract class Profile implements ActiveRecordInterface
     {
         $profileResourcesToDelete = $this->getProfileResources(new Criteria(), $con)->diff($profileResources);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -1989,7 +2016,7 @@ abstract class Profile implements ActiveRecordInterface
     {
         $profileModulesToDelete = $this->getProfileModules(new Criteria(), $con)->diff($profileModules);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -2235,7 +2262,7 @@ abstract class Profile implements ActiveRecordInterface
     {
         $apisToDelete = $this->getApis(new Criteria(), $con)->diff($apis);
 
-
+        
         $this->apisScheduledForDeletion = $apisToDelete;
 
         foreach ($apisToDelete as $apiRemoved) {
@@ -2453,7 +2480,7 @@ abstract class Profile implements ActiveRecordInterface
     {
         $profileI18nsToDelete = $this->getProfileI18ns(new Criteria(), $con)->diff($profileI18ns);
 
-
+        
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
@@ -2772,8 +2799,8 @@ abstract class Profile implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAdmins) {
-                foreach ($this->collAdmins as $o) {
+            if ($this->collAdminProfiles) {
+                foreach ($this->collAdminProfiles as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2808,7 +2835,7 @@ abstract class Profile implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        $this->collAdmins = null;
+        $this->collAdminProfiles = null;
         $this->collProfileResources = null;
         $this->collProfileModules = null;
         $this->collApis = null;
@@ -2827,7 +2854,7 @@ abstract class Profile implements ActiveRecordInterface
     }
 
     // timestampable behavior
-
+    
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
@@ -2836,12 +2863,12 @@ abstract class Profile implements ActiveRecordInterface
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[ProfileTableMap::UPDATED_AT] = true;
-
+    
         return $this;
     }
 
     // i18n behavior
-
+    
     /**
      * Sets the locale for translations
      *
@@ -2852,10 +2879,10 @@ abstract class Profile implements ActiveRecordInterface
     public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
-
+    
         return $this;
     }
-
+    
     /**
      * Gets the locale for translations
      *
@@ -2865,7 +2892,7 @@ abstract class Profile implements ActiveRecordInterface
     {
         return $this->currentLocale;
     }
-
+    
     /**
      * Returns the current translation for a given locale
      *
@@ -2880,7 +2907,7 @@ abstract class Profile implements ActiveRecordInterface
                 foreach ($this->collProfileI18ns as $translation) {
                     if ($translation->getLocale() == $locale) {
                         $this->currentTranslations[$locale] = $translation;
-
+    
                         return $translation;
                     }
                 }
@@ -2896,10 +2923,10 @@ abstract class Profile implements ActiveRecordInterface
             }
             $this->addProfileI18n($translation);
         }
-
+    
         return $this->currentTranslations[$locale];
     }
-
+    
     /**
      * Remove the translation for a given locale
      *
@@ -2924,10 +2951,10 @@ abstract class Profile implements ActiveRecordInterface
                 break;
             }
         }
-
+    
         return $this;
     }
-
+    
     /**
      * Returns the current translation
      *
@@ -2938,100 +2965,100 @@ abstract class Profile implements ActiveRecordInterface
     {
         return $this->getTranslation($this->getLocale(), $con);
     }
-
-
+    
+    
         /**
          * Get the [title] column value.
-         *
+         * 
          * @return   string
          */
         public function getTitle()
         {
         return $this->getCurrentTranslation()->getTitle();
     }
-
-
+    
+    
         /**
          * Set the value of [title] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setTitle($v)
         {    $this->getCurrentTranslation()->setTitle($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [description] column value.
-         *
+         * 
          * @return   string
          */
         public function getDescription()
         {
         return $this->getCurrentTranslation()->getDescription();
     }
-
-
+    
+    
         /**
          * Set the value of [description] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setDescription($v)
         {    $this->getCurrentTranslation()->setDescription($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [chapo] column value.
-         *
+         * 
          * @return   string
          */
         public function getChapo()
         {
         return $this->getCurrentTranslation()->getChapo();
     }
-
-
+    
+    
         /**
          * Set the value of [chapo] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setChapo($v)
         {    $this->getCurrentTranslation()->setChapo($v);
-
+    
         return $this;
     }
-
-
+    
+    
         /**
          * Get the [postscriptum] column value.
-         *
+         * 
          * @return   string
          */
         public function getPostscriptum()
         {
         return $this->getCurrentTranslation()->getPostscriptum();
     }
-
-
+    
+    
         /**
          * Set the value of [postscriptum] column.
-         *
+         * 
          * @param      string $v new value
          * @return   \Thelia\Model\ProfileI18n The current object (for fluent API support)
          */
         public function setPostscriptum($v)
         {    $this->getCurrentTranslation()->setPostscriptum($v);
-
+    
         return $this;
     }
 

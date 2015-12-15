@@ -18,6 +18,8 @@ use Thelia\Core\Event\Administrator\AdministratorUpdatePasswordEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\Admin as AdminModel;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\AdminProfile;
+use Thelia\Model\AdminProfileQuery;
 
 class Administrator extends BaseAction implements EventSubscriberInterface
 {
@@ -34,11 +36,21 @@ class Administrator extends BaseAction implements EventSubscriberInterface
             ->setLastname($event->getLastname())
             ->setLogin($event->getLogin())
             ->setPassword($event->getPassword())
-            ->setProfileId($event->getProfile())
             ->setLocale($event->getLocale())
         ;
 
         $administrator->save();
+
+        /*
+         * Update profiles list of admin
+         */
+        $profilesList = $event->getProfilesList();
+        foreach($profilesList as $aProfile){
+            $myAdminProfile = new AdminProfile();
+            $myAdminProfile->setAdminId($administrator->getId())
+                ->setProfileId($aProfile)
+                ->save();
+        }
 
         $event->setAdministrator($administrator);
     }
@@ -54,7 +66,6 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 ->setFirstname($event->getFirstname())
                 ->setLastname($event->getLastname())
                 ->setLogin($event->getLogin())
-                ->setProfileId($event->getProfile())
                 ->setLocale($event->getLocale())
             ;
 
@@ -62,6 +73,19 @@ class Administrator extends BaseAction implements EventSubscriberInterface
                 $administrator->setPassword($event->getPassword());
             }
 
+            /*
+             * Update profiles list of admin
+             */
+            $profilesListe = $event->getProfilesList();
+            AdminProfileQuery::create()->filterByAdminId($event->getId())->delete();
+            if(!empty($profilesListe) && !in_array('0',$profilesListe)){
+                foreach($profilesListe as $aProfile){
+                    $myAdminProfile = new AdminProfile();
+                    $myAdminProfile->setAdminId($event->getId())
+                        ->setProfileId($aProfile)
+                        ->save();
+                }
+            }
             $administrator->save();
 
             $event->setAdministrator($administrator);

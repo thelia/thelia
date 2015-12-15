@@ -60,24 +60,25 @@
                                 {/loop}
 
                                 <tr class="js-admin-{$ID}">
-                                    <td data-field-class="js-login">
+                                    <td data-field-class="js-login" class="field-class">
                                         {if $can_update}
                                             <a class="js-update-administrator" title="{intl l='Change this administrator'}" href="#administrator_update_dialog" data-id="{$ID}" data-toggle="modal">{$LOGIN}</a>
                                         {else}
                                             {$LOGIN}
                                         {/if}
                                     </td>
-                                    <td data-field-class="js-firstname">{$FIRSTNAME}</td>
-                                    <td data-field-class="js-lastname">{$LASTNAME}</td>
-                                    <td data-field-class="js-locale">{$LOCALE}</td>
-                                    <td data-field-class="js-profile" data-value="{$PROFILE}">
-                                       {if $PROFILE}
-                                            {loop type="profile" name="admin-profile" id={$PROFILE}}
-                                                <a title="{intl l='Afficher ce profil'}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>
+                                    <td data-field-class="js-firstname" class="field-class">{$FIRSTNAME}</td>
+                                    <td data-field-class="js-lastname" class="field-class">{$LASTNAME}</td>
+                                    <td data-field-class="js-locale" class="field-class">{$LOCALE}</td>
+                                    <td>
+                                        {loop type="adminprofile" name="admin-profile" admin=$ID}
+                                            {loop type="profile" name="theprofile" id=$PROFILEID}
+                                                <a title="{intl l='Afficher ce profil'}" class="field-class" data-field-class="js-profile" data-value="{$ID}" href="{url path="/admin/configuration/profiles/update/%id" id=$ID}">{$TITLE}</a>,
                                             {/loop}
-                                        {else}
+                                        {/loop}
+                                        {elseloop rel="admin-profile"}
                                             {intl l='Superadministrator'}
-                                        {/if}
+                                        {/elseloop}
                                     </td>
                                     {hook name="administrators.row" location="administrator_list_row" admin_id={$ID}}
                                     <td class="actions">
@@ -184,24 +185,27 @@
         </div>
     {/form_field}
 
-    {form_field field='profile'}
-        <div class="form-group {if $error}has-error{/if}">
-            <label for="{$label_attr.for}" class="control-label">{$label} : </label>
+    {form_field field='profileslist'}
+    <div class="form-group {if $error}has-error{/if}">
+        <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker">
-                {foreach $choices as $choice}
-                    {if $choice->value == 0}
-                        <option value="0">{intl l='Superadministrator'}</option>
-                    {else}
-                        {loop name='profile' type="profile" id=$choice->value}
-                            <option value="{$ID}">{$TITLE}</option>
-                        {/loop}
-                    {/if}
-                {/foreach}
-            </select>
+        <select id="{$label_attr.for}" name="{$name}" required="required" {*data-toggle="selectpicker"*} class="form-control {*js-profile*}" multiple >
+            {foreach $choices as $choice}
+            {if $choice->value == 0}
+            <option value="0">{intl l='Superadministrator'}</option>
+            {else}
+            {loop name='profile' type="profile" id=$choice->value}
+            <option value="{$ID}">{$TITLE}</option>
+            {/loop}
+            {/if}
+            {/foreach}
+        </select>
 
-        </div>
+    </div>
     {/form_field}
+
+
+
     {hook name="administrator.create-form" location="administrator_create_form" }
 {/capture}
 
@@ -288,24 +292,26 @@
         </div>
     {/form_field}
 
-    {form_field field='profile'}
+    {form_field field='profileslist'}
         <div class="form-group {if $error}has-error{/if}">
             <label for="{$label_attr.for}" class="control-label">{$label} : </label>
 
-            <select id="{$label_attr.for}" name="{$name}" required="required" data-toggle="selectpicker" class="js-profile">
+            <select id="{$label_attr.for}" name="{$name}" required="required" {*data-toggle="selectpicker"*} class="form-control js-profile" multiple >
                 {foreach $choices as $choice}
                     {if $choice->value == 0}
                         <option value="0">{intl l='Superadministrator'}</option>
                     {else}
-                        {loop name='profile' type="profile" id=$choice->value}
-                            <option value="{$ID}">{$TITLE}</option>
-                        {/loop}
+                    {loop name='profile' type="profile" id=$choice->value}
+                        <option value="{$ID}" >{$TITLE}</option>
+                    {/loop}
                     {/if}
                 {/foreach}
             </select>
 
         </div>
     {/form_field}
+
+
     {hook name="administrator.update-form" location="administrator_update_form" }
 {/capture}
 
@@ -380,21 +386,29 @@ jQuery(function($) {
     $(".js-update-administrator").click(function(e){
         $('#administrator_update_id').val($(this).data('id'));
 
-        $('.js-admin-' + $(this).data('id')).find('td').each(function(k, v) {
+        $('.js-admin-' + $(this).data('id') + ' .field-class').each(function(k,v){
+
             if(!$(v).data('field-class')) {
                 return true;
             }
+
             if($(v).data('value')) {
                 var fieldValue = $(v).data('value');
             } else {
                 var fieldValue = $(v).text();
             }
 
-            $('.' + $(v).data('field-class')).val($.trim(fieldValue));
-            if($('.' + $(v).data('field-class')).is('select')) {
-                $('.' + $(v).data('field-class')).selectpicker('refresh');
+            if($('.' + $(v).data('field-class')).is('select') && $('.' + $(v).data('field-class')).attr('multiple') !== false) {
+                $('.' + $(v).data('field-class') + ' option[value="'+fieldValue+'"]').prop('selected',true);
+            }
+            else{
+                $('.' + $(v).data('field-class')).val($.trim(fieldValue));
+                if($('.' + $(v).data('field-class')).is('select')){
+                    $('.' + $(v).data('field-class')).selectpicker('refresh');
+                }
             }
         });
+
     });
 })
 </script>

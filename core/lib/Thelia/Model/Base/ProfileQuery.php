@@ -20,7 +20,7 @@ use Thelia\Model\Map\ProfileTableMap;
 /**
  * Base class that represents a query for the 'profile' table.
  *
- *
+ * 
  *
  * @method     ChildProfileQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProfileQuery orderByCode($order = Criteria::ASC) Order by the code column
@@ -36,9 +36,9 @@ use Thelia\Model\Map\ProfileTableMap;
  * @method     ChildProfileQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildProfileQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildProfileQuery leftJoinAdmin($relationAlias = null) Adds a LEFT JOIN clause to the query using the Admin relation
- * @method     ChildProfileQuery rightJoinAdmin($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Admin relation
- * @method     ChildProfileQuery innerJoinAdmin($relationAlias = null) Adds a INNER JOIN clause to the query using the Admin relation
+ * @method     ChildProfileQuery leftJoinAdminProfile($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminProfile relation
+ * @method     ChildProfileQuery rightJoinAdminProfile($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminProfile relation
+ * @method     ChildProfileQuery innerJoinAdminProfile($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminProfile relation
  *
  * @method     ChildProfileQuery leftJoinProfileResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProfileResource relation
  * @method     ChildProfileQuery rightJoinProfileResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProfileResource relation
@@ -72,7 +72,7 @@ use Thelia\Model\Map\ProfileTableMap;
  */
 abstract class ProfileQuery extends ModelCriteria
 {
-
+    
     /**
      * Initializes internal state of \Thelia\Model\Base\ProfileQuery object.
      *
@@ -158,7 +158,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         $sql = 'SELECT `ID`, `CODE`, `CREATED_AT`, `UPDATED_AT` FROM `profile` WHERE `ID` = :p0';
         try {
-            $stmt = $con->prepare($sql);
+            $stmt = $con->prepare($sql);            
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
@@ -402,40 +402,40 @@ abstract class ProfileQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Admin object
+     * Filter the query by a related \Thelia\Model\AdminProfile object
      *
-     * @param \Thelia\Model\Admin|ObjectCollection $admin  the related object to use as filter
+     * @param \Thelia\Model\AdminProfile|ObjectCollection $adminProfile  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function filterByAdmin($admin, $comparison = null)
+    public function filterByAdminProfile($adminProfile, $comparison = null)
     {
-        if ($admin instanceof \Thelia\Model\Admin) {
+        if ($adminProfile instanceof \Thelia\Model\AdminProfile) {
             return $this
-                ->addUsingAlias(ProfileTableMap::ID, $admin->getProfileId(), $comparison);
-        } elseif ($admin instanceof ObjectCollection) {
+                ->addUsingAlias(ProfileTableMap::ID, $adminProfile->getProfileId(), $comparison);
+        } elseif ($adminProfile instanceof ObjectCollection) {
             return $this
-                ->useAdminQuery()
-                ->filterByPrimaryKeys($admin->getPrimaryKeys())
+                ->useAdminProfileQuery()
+                ->filterByPrimaryKeys($adminProfile->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByAdmin() only accepts arguments of type \Thelia\Model\Admin or Collection');
+            throw new PropelException('filterByAdminProfile() only accepts arguments of type \Thelia\Model\AdminProfile or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Admin relation
+     * Adds a JOIN clause to the query using the AdminProfile relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProfileQuery The current query, for fluid interface
      */
-    public function joinAdmin($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAdminProfile($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Admin');
+        $relationMap = $tableMap->getRelation('AdminProfile');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -450,14 +450,14 @@ abstract class ProfileQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Admin');
+            $this->addJoinObject($join, 'AdminProfile');
         }
 
         return $this;
     }
 
     /**
-     * Use the Admin relation Admin object
+     * Use the AdminProfile relation AdminProfile object
      *
      * @see useQuery()
      *
@@ -465,13 +465,13 @@ abstract class ProfileQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\AdminQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AdminProfileQuery A secondary query class using the current class as primary query
      */
-    public function useAdminQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAdminProfileQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinAdmin($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Admin', '\Thelia\Model\AdminQuery');
+            ->joinAdminProfile($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AdminProfile', '\Thelia\Model\AdminProfileQuery');
     }
 
     /**
@@ -859,10 +859,10 @@ abstract class ProfileQuery extends ModelCriteria
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-
+            
 
         ProfileTableMap::removeInstanceFromPool($criteria);
-
+        
             $affectedRows += ModelCriteria::delete($con);
             ProfileTableMap::clearRelatedInstancePool();
             $con->commit();
@@ -875,7 +875,7 @@ abstract class ProfileQuery extends ModelCriteria
     }
 
     // timestampable behavior
-
+    
     /**
      * Filter by the latest updated
      *
@@ -887,7 +887,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         return $this->addUsingAlias(ProfileTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Filter by the latest created
      *
@@ -899,7 +899,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         return $this->addUsingAlias(ProfileTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
-
+    
     /**
      * Order by update date desc
      *
@@ -909,7 +909,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(ProfileTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by update date asc
      *
@@ -919,7 +919,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ProfileTableMap::UPDATED_AT);
     }
-
+    
     /**
      * Order by create date desc
      *
@@ -929,7 +929,7 @@ abstract class ProfileQuery extends ModelCriteria
     {
         return $this->addDescendingOrderByColumn(ProfileTableMap::CREATED_AT);
     }
-
+    
     /**
      * Order by create date asc
      *
@@ -941,7 +941,7 @@ abstract class ProfileQuery extends ModelCriteria
     }
 
     // i18n behavior
-
+    
     /**
      * Adds a JOIN clause to the query using the i18n relation
      *
@@ -954,12 +954,12 @@ abstract class ProfileQuery extends ModelCriteria
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'ProfileI18n';
-
+    
         return $this
             ->joinProfileI18n($relationAlias, $joinType)
             ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
     }
-
+    
     /**
      * Adds a JOIN clause to the query and hydrates the related I18n object.
      * Shortcut for $c->joinI18n($locale)->with()
@@ -975,10 +975,10 @@ abstract class ProfileQuery extends ModelCriteria
             ->joinI18n($locale, null, $joinType)
             ->with('ProfileI18n');
         $this->with['ProfileI18n']->setIsWithOneToMany(false);
-
+    
         return $this;
     }
-
+    
     /**
      * Use the I18n relation query object
      *

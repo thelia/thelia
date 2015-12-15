@@ -8,6 +8,7 @@
         <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
         <loop class="Thelia\Core\Template\Loop\Admin" name="admin"/>
+        <loop class="Thelia\Core\Template\Loop\AdminProfile" name="adminprofile"/>
         <loop class="Thelia\Core\Template\Loop\Area" name="area"/>
         <loop class="Thelia\Core\Template\Loop\AssociatedContent" name="associated_content"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>

@@ -18,4 +18,31 @@ UPDATE `currency` SET `visible` = 1 WHERE 1;
 UPDATE `currency` SET `format` = '%n %s' WHERE `code` NOT IN ('USD', 'GBP');
 UPDATE `currency` SET `format` = '%s%n' WHERE `code` IN ('USD', 'GBP');
 
+-- Update admin profile
+CREATE TABLE `admin_profile`
+(
+`admin_id` INTEGER NOT NULL,
+`profile_id` INTEGER NOT NULL,
+`created_at` DATETIME,
+`updated_at` DATETIME,
+PRIMARY KEY (`admin_id`,`profile_id`),
+INDEX `idx_admin_profile_profile_id` (`profile_id`),
+INDEX `idx_admin_profile_admin_id` (`admin_id`),
+CONSTRAINT `fk_admin_profile_profile_id`
+FOREIGN KEY (`profile_id`)
+REFERENCES `profile` (`id`)
+ON UPDATE RESTRICT
+ON DELETE CASCADE,
+CONSTRAINT `fk_admin_profile_admin_id`
+FOREIGN KEY (`admin_id`)
+REFERENCES `admin` (`id`)
+ON UPDATE RESTRICT
+ON DELETE CASCADE
+) ENGINE=InnoDB CHARACTER SET='utf8';
+
+INSERT INTO `admin_profile` (`admin_id`,`profile_id`,`created_at`,`updated_at`) (SELECT id, profile_id ,NOW(), NOW() FROM admin WHERE profile_id IS NOT NULL);
+
+ALTER TABLE `admin` DROP FOREIGN KEY  `fk_admin_profile_id`;
+ALTER TABLE `admin` DROP `profile_id`;
+
 SET FOREIGN_KEY_CHECKS = 1;

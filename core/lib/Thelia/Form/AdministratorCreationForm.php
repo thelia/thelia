@@ -77,17 +77,15 @@ class AdministratorCreationForm extends BaseForm
                 ),
             ))
             ->add(
-                'profile',
+                'profileslist',
                 "choice",
                 array(
                     "choices" => ProfileQuery::getProfileList(),
-                    "constraints" => array(
-                        new Constraints\NotBlank(),
-                    ),
+                    "multiple" => true,
                     "label" => Translator::getInstance()->trans('Profile'),
                     "label_attr" => array(
                         "for" => "profile",
-                    ),
+                    )
                 )
             )
             ->add(

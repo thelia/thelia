@@ -11,12 +11,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Admin;
-use Thelia\Model\AdminQuery;
+use Thelia\Model\AdminProfile;
+use Thelia\Model\AdminProfileQuery;
 
 
 /**
- * This class defines the structure of the 'admin' table.
+ * This class defines the structure of the 'admin_profile' table.
  *
  *
  *
@@ -26,14 +26,14 @@ use Thelia\Model\AdminQuery;
  * (i.e. if it's a text column type).
  *
  */
-class AdminTableMap extends TableMap
+class AdminProfileTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.AdminTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.AdminProfileTableMap';
 
     /**
      * The default database name for this class
@@ -43,22 +43,22 @@ class AdminTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'admin';
+    const TABLE_NAME = 'admin_profile';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Admin';
+    const OM_CLASS = '\\Thelia\\Model\\AdminProfile';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Admin';
+    const CLASS_DEFAULT = 'Thelia.Model.AdminProfile';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 12;
+    const NUM_COLUMNS = 4;
 
     /**
      * The number of lazy-loaded columns
@@ -68,67 +68,27 @@ class AdminTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 12;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /**
-     * the column name for the ID field
+     * the column name for the ADMIN_ID field
      */
-    const ID = 'admin.ID';
+    const ADMIN_ID = 'admin_profile.ADMIN_ID';
 
     /**
-     * the column name for the FIRSTNAME field
+     * the column name for the PROFILE_ID field
      */
-    const FIRSTNAME = 'admin.FIRSTNAME';
-
-    /**
-     * the column name for the LASTNAME field
-     */
-    const LASTNAME = 'admin.LASTNAME';
-
-    /**
-     * the column name for the LOGIN field
-     */
-    const LOGIN = 'admin.LOGIN';
-
-    /**
-     * the column name for the PASSWORD field
-     */
-    const PASSWORD = 'admin.PASSWORD';
-
-    /**
-     * the column name for the LOCALE field
-     */
-    const LOCALE = 'admin.LOCALE';
-
-    /**
-     * the column name for the ALGO field
-     */
-    const ALGO = 'admin.ALGO';
-
-    /**
-     * the column name for the SALT field
-     */
-    const SALT = 'admin.SALT';
-
-    /**
-     * the column name for the REMEMBER_ME_TOKEN field
-     */
-    const REMEMBER_ME_TOKEN = 'admin.REMEMBER_ME_TOKEN';
-
-    /**
-     * the column name for the REMEMBER_ME_SERIAL field
-     */
-    const REMEMBER_ME_SERIAL = 'admin.REMEMBER_ME_SERIAL';
+    const PROFILE_ID = 'admin_profile.PROFILE_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'admin.CREATED_AT';
+    const CREATED_AT = 'admin_profile.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'admin.UPDATED_AT';
+    const UPDATED_AT = 'admin_profile.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -142,12 +102,12 @@ class AdminTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Firstname', 'Lastname', 'Login', 'Password', 'Locale', 'Algo', 'Salt', 'RememberMeToken', 'RememberMeSerial', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'firstname', 'lastname', 'login', 'password', 'locale', 'algo', 'salt', 'rememberMeToken', 'rememberMeSerial', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AdminTableMap::ID, AdminTableMap::FIRSTNAME, AdminTableMap::LASTNAME, AdminTableMap::LOGIN, AdminTableMap::PASSWORD, AdminTableMap::LOCALE, AdminTableMap::ALGO, AdminTableMap::SALT, AdminTableMap::REMEMBER_ME_TOKEN, AdminTableMap::REMEMBER_ME_SERIAL, AdminTableMap::CREATED_AT, AdminTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'FIRSTNAME', 'LASTNAME', 'LOGIN', 'PASSWORD', 'LOCALE', 'ALGO', 'SALT', 'REMEMBER_ME_TOKEN', 'REMEMBER_ME_SERIAL', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'firstname', 'lastname', 'login', 'password', 'locale', 'algo', 'salt', 'remember_me_token', 'remember_me_serial', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('AdminId', 'ProfileId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('adminId', 'profileId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AdminProfileTableMap::ADMIN_ID, AdminProfileTableMap::PROFILE_ID, AdminProfileTableMap::CREATED_AT, AdminProfileTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ADMIN_ID', 'PROFILE_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('admin_id', 'profile_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -157,12 +117,12 @@ class AdminTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Firstname' => 1, 'Lastname' => 2, 'Login' => 3, 'Password' => 4, 'Locale' => 5, 'Algo' => 6, 'Salt' => 7, 'RememberMeToken' => 8, 'RememberMeSerial' => 9, 'CreatedAt' => 10, 'UpdatedAt' => 11, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'locale' => 5, 'algo' => 6, 'salt' => 7, 'rememberMeToken' => 8, 'rememberMeSerial' => 9, 'createdAt' => 10, 'updatedAt' => 11, ),
-        self::TYPE_COLNAME       => array(AdminTableMap::ID => 0, AdminTableMap::FIRSTNAME => 1, AdminTableMap::LASTNAME => 2, AdminTableMap::LOGIN => 3, AdminTableMap::PASSWORD => 4, AdminTableMap::LOCALE => 5, AdminTableMap::ALGO => 6, AdminTableMap::SALT => 7, AdminTableMap::REMEMBER_ME_TOKEN => 8, AdminTableMap::REMEMBER_ME_SERIAL => 9, AdminTableMap::CREATED_AT => 10, AdminTableMap::UPDATED_AT => 11, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FIRSTNAME' => 1, 'LASTNAME' => 2, 'LOGIN' => 3, 'PASSWORD' => 4, 'LOCALE' => 5, 'ALGO' => 6, 'SALT' => 7, 'REMEMBER_ME_TOKEN' => 8, 'REMEMBER_ME_SERIAL' => 9, 'CREATED_AT' => 10, 'UPDATED_AT' => 11, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'firstname' => 1, 'lastname' => 2, 'login' => 3, 'password' => 4, 'locale' => 5, 'algo' => 6, 'salt' => 7, 'remember_me_token' => 8, 'remember_me_serial' => 9, 'created_at' => 10, 'updated_at' => 11, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, )
+        self::TYPE_PHPNAME       => array('AdminId' => 0, 'ProfileId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        self::TYPE_STUDLYPHPNAME => array('adminId' => 0, 'profileId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        self::TYPE_COLNAME       => array(AdminProfileTableMap::ADMIN_ID => 0, AdminProfileTableMap::PROFILE_ID => 1, AdminProfileTableMap::CREATED_AT => 2, AdminProfileTableMap::UPDATED_AT => 3, ),
+        self::TYPE_RAW_COLNAME   => array('ADMIN_ID' => 0, 'PROFILE_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        self::TYPE_FIELDNAME     => array('admin_id' => 0, 'profile_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, )
     );
 
     /**
@@ -175,22 +135,14 @@ class AdminTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('admin');
-        $this->setPhpName('Admin');
-        $this->setClassName('\\Thelia\\Model\\Admin');
+        $this->setName('admin_profile');
+        $this->setPhpName('AdminProfile');
+        $this->setClassName('\\Thelia\\Model\\AdminProfile');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 100, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 100, null);
-        $this->addColumn('LOGIN', 'Login', 'VARCHAR', true, 100, null);
-        $this->addColumn('PASSWORD', 'Password', 'VARCHAR', true, 128, null);
-        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', true, 45, null);
-        $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
-        $this->addColumn('SALT', 'Salt', 'VARCHAR', false, 128, null);
-        $this->addColumn('REMEMBER_ME_TOKEN', 'RememberMeToken', 'VARCHAR', false, 255, null);
-        $this->addColumn('REMEMBER_ME_SERIAL', 'RememberMeSerial', 'VARCHAR', false, 255, null);
+        $this->addForeignPrimaryKey('ADMIN_ID', 'AdminId', 'INTEGER' , 'admin', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('PROFILE_ID', 'ProfileId', 'INTEGER' , 'profile', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -200,7 +152,8 @@ class AdminTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminProfile', '\\Thelia\\Model\\AdminProfile', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT', 'AdminProfiles');
+        $this->addRelation('Profile', '\\Thelia\\Model\\Profile', RelationMap::MANY_TO_ONE, array('profile_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Admin', '\\Thelia\\Model\\Admin', RelationMap::MANY_TO_ONE, array('admin_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -215,15 +168,59 @@ class AdminTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
+
     /**
-     * Method to invalidate the instance pool of all tables related to admin     * by a foreign key with ON DELETE CASCADE
+     * Adds an object to the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
+     *
+     * @param \Thelia\Model\AdminProfile $obj A \Thelia\Model\AdminProfile object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public static function clearRelatedInstancePool()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AdminProfileTableMap::clearInstancePool();
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getAdminId(), (string) $obj->getProfileId()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\AdminProfile object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\AdminProfile) {
+                $key = serialize(array((string) $value->getAdminId(), (string) $value->getProfileId()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\AdminProfile object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
             }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -239,11 +236,11 @@ class AdminTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('AdminId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('AdminId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProfileId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -261,11 +258,7 @@ class AdminTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
     
     /**
@@ -281,7 +274,7 @@ class AdminTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? AdminTableMap::CLASS_DEFAULT : AdminTableMap::OM_CLASS;
+        return $withPrefix ? AdminProfileTableMap::CLASS_DEFAULT : AdminProfileTableMap::OM_CLASS;
     }
 
     /**
@@ -295,21 +288,21 @@ class AdminTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Admin object, last column rank)
+     * @return array (AdminProfile object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = AdminTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = AdminTableMap::getInstanceFromPool($key))) {
+        $key = AdminProfileTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = AdminProfileTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + AdminTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + AdminProfileTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = AdminTableMap::OM_CLASS;
+            $cls = AdminProfileTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            AdminTableMap::addInstanceToPool($obj, $key);
+            AdminProfileTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -332,8 +325,8 @@ class AdminTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = AdminTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = AdminTableMap::getInstanceFromPool($key))) {
+            $key = AdminProfileTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = AdminProfileTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -342,7 +335,7 @@ class AdminTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                AdminTableMap::addInstanceToPool($obj, $key);
+                AdminProfileTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -363,29 +356,13 @@ class AdminTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(AdminTableMap::ID);
-            $criteria->addSelectColumn(AdminTableMap::FIRSTNAME);
-            $criteria->addSelectColumn(AdminTableMap::LASTNAME);
-            $criteria->addSelectColumn(AdminTableMap::LOGIN);
-            $criteria->addSelectColumn(AdminTableMap::PASSWORD);
-            $criteria->addSelectColumn(AdminTableMap::LOCALE);
-            $criteria->addSelectColumn(AdminTableMap::ALGO);
-            $criteria->addSelectColumn(AdminTableMap::SALT);
-            $criteria->addSelectColumn(AdminTableMap::REMEMBER_ME_TOKEN);
-            $criteria->addSelectColumn(AdminTableMap::REMEMBER_ME_SERIAL);
-            $criteria->addSelectColumn(AdminTableMap::CREATED_AT);
-            $criteria->addSelectColumn(AdminTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(AdminProfileTableMap::ADMIN_ID);
+            $criteria->addSelectColumn(AdminProfileTableMap::PROFILE_ID);
+            $criteria->addSelectColumn(AdminProfileTableMap::CREATED_AT);
+            $criteria->addSelectColumn(AdminProfileTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.LOGIN');
-            $criteria->addSelectColumn($alias . '.PASSWORD');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.ALGO');
-            $criteria->addSelectColumn($alias . '.SALT');
-            $criteria->addSelectColumn($alias . '.REMEMBER_ME_TOKEN');
-            $criteria->addSelectColumn($alias . '.REMEMBER_ME_SERIAL');
+            $criteria->addSelectColumn($alias . '.ADMIN_ID');
+            $criteria->addSelectColumn($alias . '.PROFILE_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -400,7 +377,7 @@ class AdminTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(AdminTableMap::DATABASE_NAME)->getTable(AdminTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(AdminProfileTableMap::DATABASE_NAME)->getTable(AdminProfileTableMap::TABLE_NAME);
     }
 
     /**
@@ -408,16 +385,16 @@ class AdminTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(AdminTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(AdminTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new AdminTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(AdminProfileTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(AdminProfileTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new AdminProfileTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Admin or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a AdminProfile or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Admin object or primary key or array of primary keys
+     * @param mixed               $values Criteria or AdminProfile object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -428,25 +405,35 @@ class AdminTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AdminProfileTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Admin) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\AdminProfile) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(AdminTableMap::DATABASE_NAME);
-            $criteria->add(AdminTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(AdminProfileTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(AdminProfileTableMap::ADMIN_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(AdminProfileTableMap::PROFILE_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = AdminQuery::create()->mergeWith($criteria);
+        $query = AdminProfileQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { AdminTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { AdminProfileTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { AdminTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { AdminProfileTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -454,20 +441,20 @@ class AdminTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the admin table.
+     * Deletes all rows from the admin_profile table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return AdminQuery::create()->doDeleteAll($con);
+        return AdminProfileQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Admin or Criteria object.
+     * Performs an INSERT on the database, given a AdminProfile or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Admin object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or AdminProfile object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -476,22 +463,18 @@ class AdminTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AdminTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(AdminProfileTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Admin object
-        }
-
-        if ($criteria->containsKey(AdminTableMap::ID) && $criteria->keyContainsValue(AdminTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AdminTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from AdminProfile object
         }
 
 
         // Set the correct dbName
-        $query = AdminQuery::create()->mergeWith($criteria);
+        $query = AdminProfileQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -507,7 +490,7 @@ class AdminTableMap extends TableMap
         return $pk;
     }
 
-} // AdminTableMap
+} // AdminProfileTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-AdminTableMap::buildTableMap();
+AdminProfileTableMap::buildTableMap();

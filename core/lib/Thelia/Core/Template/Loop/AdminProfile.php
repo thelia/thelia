@@ -19,23 +19,23 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Model\AdminQuery;
-use Thelia\Model\Admin as AdminModel;
+use Thelia\Model\AdminProfileQuery;
+use Thelia\Model\AdminProfile as AdminProfileModel;
+use Thelia\Log\Tlog;
 
 /**
  *
- * Admin loop
+ * AdminProfile loop
  *
  *
- * Class Admin
+ * Class AdminProfile
  * @package Thelia\Core\Template\Loop
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Julien Vigouroux <jvigouroux@openstudio.fr>
  *
  * {@inheritdoc}
  * @method int[] getId()
- * @method int[] getProfile()
  */
-class Admin extends BaseLoop implements PropelSearchLoopInterface
+class AdminProfile extends BaseLoop implements PropelSearchLoopInterface
 {
     protected $timestampable = true;
 
@@ -45,37 +45,37 @@ class Admin extends BaseLoop implements PropelSearchLoopInterface
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('admin'),
+            Argument::createIntListTypeArgument('profile')
         );
     }
 
     public function buildModelCriteria()
     {
-        $search = AdminQuery::create();
+        $search = AdminProfileQuery::create();
 
-        $id = $this->getId();
-
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
+        if (null !== $admin = $this->getAdmin()) {
+            $search->filterByAdminId($admin, Criteria::IN);
         }
 
-        $search->orderByFirstname(Criteria::ASC);
+        if (null !== $profile = $this->getProfile()) {
+            $search->filterByProfileId($admin, Criteria::IN);
+        }
+
+        $search->orderByAdminId(Criteria::ASC);
 
         return $search;
     }
 
     public function parseResults(LoopResult $loopResult)
     {
-        /** @var AdminModel $admin */
-        foreach ($loopResult->getResultDataCollection() as $admin) {
-            $loopResultRow = new LoopResultRow($admin);
-            $loopResultRow->set("ID", $admin->getId())
-                ->set("FIRSTNAME", $admin->getFirstname())
-                ->set("LASTNAME", $admin->getLastname())
-                ->set("LOGIN", $admin->getLogin())
-                ->set("LOCALE", $admin->getLocale())
+        /** @var AdminProfileModel $profile */
+        foreach ($loopResult->getResultDataCollection() as $profile) {
+            $loopResultRow = new LoopResultRow($profile);
+            $loopResultRow->set("ADMINID", $profile->getAdminId())
+                ->set("PROFILEID", $profile->getProfileId())
             ;
-            $this->addOutputFields($loopResultRow, $admin);
+            $this->addOutputFields($loopResultRow, $profile);
 
             $loopResult->addRow($loopResultRow);
         }

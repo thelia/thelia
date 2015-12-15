@@ -23,12 +23,21 @@ class AdministratorEvent extends ActionEvent
     protected $lastname = null;
     protected $login = null;
     protected $password = null;
-    protected $profile = null;
     protected $locale = null;
+    protected $profilesList = array();
 
     public function __construct(Admin $administrator = null)
     {
         $this->administrator = $administrator;
+    }
+
+    public function getProfilesList(){
+        return $this->profilesList;
+    }
+
+    public function setProfilesList($profilesList){
+        $this->profilesList = $profilesList;
+        return $this;
     }
 
     public function hasAdministrator()
@@ -106,22 +115,6 @@ class AdministratorEvent extends ActionEvent
     public function getPassword()
     {
         return $this->password;
-    }
-
-    public function setProfile($profile)
-    {
-        if (0 === $profile) {
-            $profile = null;
-        }
-
-        $this->profile = $profile;
-
-        return $this;
-    }
-
-    public function getProfile()
-    {
-        return $this->profile;
     }
 
     public function setLocale($locale)
