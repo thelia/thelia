@@ -19,6 +19,10 @@ use Thelia\Model\Lang;
 use TheliaSmarty\Template\AbstractSmartyPlugin;
 use TheliaSmarty\Template\SmartyPluginDescriptor;
 
+/**
+ * Class TinyMCELanguage
+ * @package Tinymce\Smarty
+ */
 class TinyMCELanguage extends AbstractSmartyPlugin
 {
     /** @var  string $locale */
@@ -27,7 +31,7 @@ class TinyMCELanguage extends AbstractSmartyPlugin
     public function __construct(Request $request)
     {
         if ($request->getSession() != null) {
-            $this->locale = $request->getSession()->getLang()->getLocale();
+            $this->locale = $request->getLocale();
         } else {
             $this->locale = Lang::getDefaultLanguage()->getLocale();
         }
