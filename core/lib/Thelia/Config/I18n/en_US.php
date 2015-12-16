@@ -590,6 +590,8 @@ return array(
     'To activate module %name, the following modules should be activated first: %modules' => 'To activate module %name, the following modules should be activated first: %modules',
     'Tools' => 'Tools',
     'Translations' => 'Translations',
+    'Change short title for' => 'Change short title for',
+    'Change long title for' => 'Change long title for',
     'Tried to download a file, but the URL was not valid: %url' => 'Tried to download a file, but the URL was not valid: %url',
     'Type' => 'Type',
     'URL_ALREADY_EXISTS' => 'This URL already exists',

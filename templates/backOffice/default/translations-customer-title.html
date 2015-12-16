@@ -1,0 +1,93 @@
+{extends file="admin-layout.tpl"}
+
+{block name="no-return-functions"}
+{$admin_current_location = 'configuration'}
+{/block}
+
+{block name="page-title"}{intl l='Translations-customers-titles'}{/block}
+
+{block name="check-resource"}admin.configuration.variable{/block}
+{block name="check-access"}update{/block}
+
+{block name="main-content"}
+<div class="variables translations">
+
+    <div id="wrapper" class="container">
+
+        <ul class="breadcrumb">
+            <li><a href="{url path='/admin/home'}">{intl l="Home"}</a></li>
+            <li><a href="{url path='/admin/configuration'}">{intl l="Configuration"}</a></li>
+            <li><a href="{url path='/admin/configuration/translations-db'}">{intl l="Translations-customers-titles"}</a></li>
+        </ul>
+
+        <div class="row">
+            <div class="col-md-12 general-block-decorator">
+                <div class="row">
+
+                    <div class="col-md-12 title title-without-tabs">
+                        {intl l="Translations-customers-titles"}
+                    </div>
+
+                    <div class="form-container">
+                        <div class="col-md-12">
+                            {form name="thelia.admin.translations.customer_title"}
+
+                            {if $form_error}
+                            <div class="alert alert-danger">{$form_error_message}</div>
+                            {/if}
+
+                            <form method="POST"class="form-horizontal" id="translation_form" action="{url path='/admin/configuration/translations-customers-title/update'}">
+
+                                {include
+                                file      = "includes/inner-form-toolbar.html"
+                                close_url = {url path='/admin/configuration'}
+                                }
+
+                                {*<input type="hidden" name="edit_language_id" value="{$edit_language_id}" />*}
+                                {form_hidden_fields}
+
+                                {form_field field='success_url'}
+                                <input type="hidden" name="{$name}" value="{url path='/admin/configuration/translations-customers-title/update'}"/>
+                                {/form_field}
+
+                                {form_field field='locale'}
+                                <input type="hidden" name="{$name}" value="{$edit_language_locale}"/>
+                                {/form_field}
+
+                                {loop name="titlei18n" type="title" backend_context="on" lang=$edit_language_id}
+                                {form_field field="short_title_$ID"}
+                                <div class="form-group">
+                                    <label class="col-md-3 col-sm-4 control-label" for="short_title_{$ID}">{$label} : {$SHORT}</label>
+                                    <div class="col-md-9 col-sm-8">
+                                        <input type="text" class="form-control" id="short_title_{$ID}" name="{$name}" value="{$SHORT}" required />
+                                    </div>
+                                </div>
+                                {/form_field}
+                                {form_field field="long_title_$ID"}
+                                <div class="form-group">
+                                    <label class="col-md-3 col-sm-4 control-label"for="long_title_{$ID}">{$label} : {$LONG}</label>
+                                    <div class="col-md-9 col-sm-8">
+                                        <input type="text" class="form-control" id="long_title_{$ID}"  name="{$name}" value="{$LONG}" required />
+                                    </div>
+                                </div>
+                                {/form_field}
+                                <hr style="margin: 10px 0px;" />
+                                {/loop}
+
+                            </form>
+                            {/form}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{/block}
+
+{block name="javascript-initialization"}
+{/block}
+
+{block name="javascript-last-call"}
+{/block}

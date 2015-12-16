@@ -1127,6 +1127,7 @@ return array(
     'Transaction reference' => 'Référence de la transaction',
     'Translation' => 'Traductions',
     'Translations' => 'Traductions',
+    'Translations-customers-titles' => 'Traduction des civilités',
     'Type:' => 'Type :',
     'Unit taxed price' => 'Prix unitaire TTC',
     'Unit. price' => 'Prix unitaire',

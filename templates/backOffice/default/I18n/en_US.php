@@ -1127,6 +1127,7 @@ return array(
     'Transaction reference' => 'Transaction reference',
     'Translation' => 'Translation',
     'Translations' => 'Translation',
+    'Translations-customers-titles' => 'Translations of customers titles',
     'Type:' => 'Type:',
     'Unit taxed price' => 'Unit taxed price',
     'Unit. price' => 'Unit. price',

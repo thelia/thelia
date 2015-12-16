@@ -167,6 +167,13 @@
                                     </tr>
                                 {/loop}
 
+                                {loop type="auth" name="pcc5.2" role="ADMIN" resource="admin.configuration.translations" access="VIEW"}
+                                <tr>
+                                    <td><a href="{url path='/admin/configuration/translations-customers-title'}">{intl l='Translations-customers-titles'}</a></td>
+                                    <td><a class="btn btn-default btn-xs" href="{url path='/admin/configuration/translations-customers-titles'}"><i class="glyphicon glyphicon-edit"></i></a></td>
+                                </tr>
+                                {/loop}
+
                                 {loop type="auth" name="pcc6" role="ADMIN" resource="admin.configuration.mailing-system" access="VIEW"}
                                     <tr>
                                         <td><a href="{url path='/admin/configuration/mailingSystem'}">{intl l='Mailing system'}</a></td>
