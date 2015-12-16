@@ -111,8 +111,6 @@ class ConfigurationController extends BaseAdminController
             return $response;
         }
 
-        $request = $this->getRequest();
-
         $form = $this->createForm('carousel.update');
 
         $error_message = null;
