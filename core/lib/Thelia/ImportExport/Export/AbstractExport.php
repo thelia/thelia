@@ -367,6 +367,13 @@ abstract class AbstractExport implements \Iterator
      */
     public function beforeSerialize(array $data)
     {
+        foreach ($data as &$value) {
+            if ($value instanceof \DateTime) {
+                $value = $value->format('Y-m-d H:i:s');
+            }
+        }
+
+
         return $data;
     }
 
