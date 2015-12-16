@@ -1503,7 +1503,7 @@ INSERT INTO `config_i18n` (`id`, `locale`, `title`, `chapo`, `description`, `pos
     (60, '{$locale}', {intl l='Allow customers to change their email. 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (61, '{$locale}', {intl l='Ask the customers to confirm their email, 1 for yes, 0 for no' locale=$locale}, NULL, NULL, NULL),
     (62, '{$locale}', {intl l='Secret key for form CSRF token' locale=$locale}, NULL, NULL, NULL),
-    (62, '{$locale}', {intl l='Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
+    (63, '{$locale}', {intl l='Stay on the default language at use arrows "Next" and "Previous" on the product, category, content, folder and brand page' locale=$locale}, NULL, NULL, NULL){if ! $locale@last},{/if}
 {/foreach}
 ;
 
