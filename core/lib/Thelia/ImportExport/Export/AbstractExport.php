@@ -182,7 +182,7 @@ abstract class AbstractExport implements \Iterator
             $this->originalOrderAndAliases = $this->orderAndAliases;
         }
 
-        if ($this->language !== null) {
+        if ($this->language !== null && $this->orderAndAliases !== null) {
             $previousLocale = Translator::getInstance()->getLocale();
 
             Translator::getInstance()->setLocale($this->language->getLocale());
