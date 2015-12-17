@@ -17,30 +17,38 @@
 
 {* Content  *}
 {block name="email-content"}
-        {loop name="order.invoice" type="order" id=$order_id customer="*"}
-            {loop name="currency.order" type="currency" id=$CURRENCY}
-                {assign var="orderCurrencyIsoCode" value=$ISOCODE}
-            {/loop}
+    {loop name="order.invoice" type="order" id=$order_id customer="*"}
+        {loop name="currency.order" type="currency" id=$CURRENCY}
+            {assign var="orderCurrencyIsoCode" value=$ISOCODE}
+        {/loop}
 
-            {loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}
-                {assign var="customerRef" value=$REF}
-            {/loop}
+        {loop type="customer" name="customer.invoice" id=$CUSTOMER current="0"}
+            {assign var="customerRef" value=$REF}
+        {/loop}
 
-            <p><a href="{url path="/admin/order/update/%id" id=$ID}">{intl l="View this order in your shop back-office."}</a></p>
+        <p><a href="{url path="/admin/order/update/%id" id=$ID}">{intl l="View this order in your shop back-office."}</a></p>
+
+        {hook name="email.order-notification.before-address" order=$order_id}
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr>
                 <td valign="top" width="55%">
                     <strong>{intl l="Customer delivery address:"}</strong><br>
-                    {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-                    {if $COMPANY != ""}{$COMPANY}<br />{/if}
-                    {$FIRSTNAME} {$LASTNAME}<br />
-                    {$ADDRESS1}<br>
-                    {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
-                    {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
-                    {$CITY}<br />
-                    {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
-                    {/loop}
+                    {ifhook rel="email.order-notification.delivery-address"}
+                        {* delivery module can customize the delivery address *}
+                        {hook name="email.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+                    {/ifhook}
+                    {elsehook rel="email.order-notification.delivery-address"}
+                        {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+                        {if $COMPANY != ""}{$COMPANY}<br />{/if}
+                        {$FIRSTNAME} {$LASTNAME}<br />
+                        {$ADDRESS1}<br>
+                        {if $ADDRESS2 != ""}{$ADDRESS2}<br />{/if}
+                        {if $ADDRESS3 != ""}{$ADDRESS3}<br />{/if}
+                        {$CITY}<br />
+                        {$ZIPCODE}, {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}<br />
+                        {/loop}
+                    {/elsehook}
                 </td>
                 <td valign="top">
                     <strong>{intl l="Customer billing address:"}</strong><br />
@@ -57,6 +65,8 @@
             </tr>
         </table>
 
+        {hook name="email.order-notification.after-address" order=$order_id}
+
         <p>
             {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}<br />
             {intl l="Order Number:"} {$REF}<br />
@@ -64,6 +74,8 @@
             {intl l="Purchase Date:"} {format_date date=$CREATE_DATE output="datetime"}<br />
             {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
         </p>
+
+        {hook name="email.order-notification.before-products" order=$order_id}
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
             <tr style="color:#999;font-size:11px">
@@ -93,6 +105,9 @@
                         {$QUANTITY} x {format_money number=$realTaxedPrice currency_id=$CURRENCY}
                     </td>
                 </tr>
+
+                {hook name="email.order-notification.order-product" order="{$order_id}" order_product="{$ID}"}
+
             {/loop}
             <tr>
                 <td align="right" style="text-align:right">{intl l="Total"}</td>
@@ -108,6 +123,8 @@
             </tr>
         </table>
     {/loop}
+
+    {hook name="email.order-notification.after-products" order=$order_id}
 
     <br />
 

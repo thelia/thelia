@@ -768,7 +768,22 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2043, 'folder.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2044, 'folder.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2045, 'product.modification.form-right.top', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2046, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW())
+(2046, 'product.modification.form-right.bottom', 2, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2047, 'email.layout.css', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2048, 'email.layout.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2049, 'email.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2050, 'email.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(2051, 'email.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2052, 'email.order-confirmation.order-product, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2053, 'email.order-confirmation.before-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2054, 'email.order-confirmation.after-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2055, 'email.order-confirmation.footer, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2056, 'email.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2057, 'email.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
+(2058, 'email.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2059, 'email.order-notification.order-product, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2060, 'email.order-notification.before-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2061, 'email.order-notification.after-products, 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2212,7 +2227,22 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2043, '{$locale}', {intl l='Folder edit - right column top' locale=$locale}, NULL, NULL),
     (2044, '{$locale}', {intl l='Folder edit - right column bottom' locale=$locale}, NULL, NULL),
     (2045, '{$locale}', {intl l='Product edit - right column top' locale=$locale}, NULL, NULL),
-    (2046, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (2046, '{$locale}', {intl l='Product edit - right column bottom' locale=$locale}, NULL, NULL),
+    (2047, '{$locale}', {intl l='Email - layout - CSS' locale=$locale}, NULL, NULL),
+    (2048, '{$locale}', {intl l='Email - layout - footer' locale=$locale}, NULL, NULL),
+    (2049, '{$locale}', {intl l='Email - order confirmation - before address' locale=$locale}, NULL, NULL),
+    (2050, '{$locale}', {intl l='Email - order confirmation - delivery address' locale=$locale}, NULL, NULL),
+    (2051, '{$locale}', {intl l='Email - order confirmation - after address' locale=$locale}, NULL, NULL),
+    (2052, '{$locale}', {intl l='Email - order confirmation - order product' locale=$locale}, NULL, NULL),
+    (2053, '{$locale}', {intl l='Email - order confirmation - before products' locale=$locale}, NULL, NULL),
+    (2054, '{$locale}', {intl l='Email - order confirmation - after products' locale=$locale}, NULL, NULL),
+    (2055, '{$locale}', {intl l='Email - order confirmation - footer' locale=$locale}, NULL, NULL),
+    (2056, '{$locale}', {intl l='Email - order notification - before address' locale=$locale}, NULL, NULL),
+    (2057, '{$locale}', {intl l='Email - order notification - delivery address' locale=$locale}, NULL, NULL),
+    (2058, '{$locale}', {intl l='Email - order notification - after address' locale=$locale}, NULL, NULL),
+    (2059, '{$locale}', {intl l='Email - order notification - order product' locale=$locale}, NULL, NULL),
+    (2060, '{$locale}', {intl l='Email - order notification - before products' locale=$locale}, NULL, NULL),
+    (2061, '{$locale}', {intl l='Email - order notification - after products' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;
