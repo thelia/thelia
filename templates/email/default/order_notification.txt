@@ -32,6 +32,7 @@
 {intl l="* Items ordered:"}
 {hook name="email-txt.order-notification.before-products" order=$order_id}
 {loop type="order_product" name="order-products" order=$ID}
+{strip}
 {if $WAS_IN_PROMO == 1}
     {assign "realPrice" $PROMO_PRICE}
     {assign "realTax" $PROMO_PRICE_TAX}
@@ -41,6 +42,7 @@
     {assign "realTax" $PRICE_TAX}
     {assign "realTaxedPrice" $TAXED_PRICE}
 {/if}
+{/strip}
     {intl l="Item : %item" item=$TITLE}
 {ifloop rel="combinations"}
     {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
