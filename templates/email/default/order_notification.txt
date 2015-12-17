@@ -3,6 +3,21 @@
 {intl l="Hello"}
 
 {intl l="A new order ref. %ref has been placed on %date. Here are the details :" ref={$REF} date={format_date date=$INVOICE_DATE}}
+{hook name="email-txt.order-notification.before-address" order=$order_id}
+
+{intl l="* Delivery address"}
+{ifhook rel="email-txt.order-notification.delivery-address"}
+{hook name="email-txt.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+{/ifhook}
+{elsehook rel="email-txt.order-notification.delivery-address"}
+{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
+{if $COMPANY != ""}{$COMPANY}
+{/if}{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
+{$ZIPCODE} {$CITY}
+{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
+{/loop}
+{/elsehook}
 
 {intl l="* Billing address"}
 {loop type="order_address" name="invoice_address" id=$INVOICE_ADDRESS}
@@ -12,43 +27,35 @@
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
 {/loop}
-
-{intl l="* Delivery address"}
-{loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
-{if $COMPANY != ""}{$COMPANY}
-{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
-{$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
-{$ZIPCODE} {$CITY}
-{loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
-{/loop}
+{hook name="email-txt.order-notification.after-address" order=$order_id}
 
 {intl l="* Items ordered:"}
-
+{hook name="email-txt.order-notification.before-products" order=$order_id}
 {loop type="order_product" name="order-products" order=$ID}
-{strip}
-    {if $WAS_IN_PROMO == 1}
-        {assign "realPrice" $PROMO_PRICE}
-        {assign "realTax" $PROMO_PRICE_TAX}
-        {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
-    {else}
-        {assign "realPrice" $PRICE}
-        {assign "realTax" $PRICE_TAX}
-        {assign "realTaxedPrice" $TAXED_PRICE}
-    {/if}
-{/strip}
+{if $WAS_IN_PROMO == 1}
+    {assign "realPrice" $PROMO_PRICE}
+    {assign "realTax" $PROMO_PRICE_TAX}
+    {assign "realTaxedPrice" $TAXED_PROMO_PRICE}
+{else}
+    {assign "realPrice" $PRICE}
+    {assign "realTax" $PRICE_TAX}
+    {assign "realTaxedPrice" $TAXED_PRICE}
+{/if}
     {intl l="Item : %item" item=$TITLE}
-    {ifloop rel="combinations"}
-        {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
-        - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
-        {/loop}
-    {/ifloop}
+{ifloop rel="combinations"}
+    {loop type="order_product_attribute_combination" name="combinations" order_product=$ID}
+    - {$ATTRIBUTE_TITLE} - {$ATTRIBUTE_AVAILABILITY_TITLE}
+    {/loop}
+{/ifloop}
     {intl l="Quantity : %qty" qty=$QUANTITY}
     {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice currency_id=$CURRENCY}}
+    {hook name="email-txt.order-notification.order-product" order="{$order_id}" order_product="{$ID}"}
 {/loop}
 -----------------------------------------
 {intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}}
 {intl l="Shipping    : %amount" amount={format_money number=$POSTAGE currency_id=$CURRENCY}}
 {intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}}
-{/loop}
+{hook name="email-txt.order-notification.after-products" order=$order_id}
 
 {intl l="Have a nice day."}
+{/loop}

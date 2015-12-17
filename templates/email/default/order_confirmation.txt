@@ -3,15 +3,21 @@
 {intl l="Hello,"}
 
 {intl l="Here is the details of your order %ref placed on %date" ref={$REF} date={format_date date=$INVOICE_DATE}}
+{hook name="email-txt.order-confirmation.before-address" order=$order_id}
 
 {intl l="Your delivery address"}
+{ifhook rel="email-txt.order-confirmation.delivery-address"}
+{hook name="email-txt.order-confirmation.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+{/ifhook}
+{elsehook rel="email-txt.order-confirmation.delivery-address"}
 {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
 {if $COMPANY != ""}{$COMPANY}
-{/if}{loop type="title" name="order-invoice-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
+{/if}{loop type="title" name="order-delivery-address-title" id=$TITLE}{$LONG}{/loop} {$FIRSTNAME} {$LASTNAME}
 {$ADDRESS1} {$ADDRESS2} {$ADDRESS3}
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
 {/loop}
+{/elsehook}
 
 {intl l="Your billing address"}
 {loop type="order_address" name="billing_address" id=$INVOICE_ADDRESS}
@@ -21,9 +27,10 @@
 {$ZIPCODE} {$CITY}
 {loop type="country" name="country_delivery" id=$COUNTRY}{$TITLE}{/loop}
 {/loop}
+{hook name="email-txt.order-confirmation.after-address" order=$order_id}
 
 {intl l="Items ordered:"}
-
+{hook name="email-txt.order-confirmation.before-products" order=$order_id}
 {loop type="order_product" name="order-products" order=$ID}
 {if $WAS_IN_PROMO == 1}
     {assign "realPrice" $PROMO_PRICE}
@@ -42,13 +49,15 @@
     {/loop}
 {/ifloop}
     {intl l="Quantity : %qty" qty=$QUANTITY}
-    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice} currency_id=$CURRENCY}
+    {intl l="Unit price : %amount" amount={format_money number=$realTaxedPrice currency_id=$CURRENCY}}
+    {hook name="email-txt.order-confirmation.order-product" order="{$order_id}" order_product="{$ID}"}
 {/loop}
 -----------------------------------------
 {intl l="Items total : %amount" amount={format_money number={$TOTAL_TAXED_AMOUNT - $POSTAGE} currency_id=$CURRENCY}}
 {intl l="Shipping    : %amount" amount={format_money number=$POSTAGE currency_id=$CURRENCY}}
 {intl l="Total due   : %amount" amount={format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}}
 ==================================
+{hook name="email-txt.order-confirmation.after-products" order=$order_id}
 
 {intl l="Your invoice is available in your customer account at %url" url={config key="url_site"}}
 {/loop}

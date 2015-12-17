@@ -28,17 +28,17 @@
 
         <p><a href="{url path="/admin/order/update/%id" id=$ID}">{intl l="View this order in your shop back-office."}</a></p>
 
-        {hook name="email.order-notification.before-address" order=$order_id}
+        {hook name="email-html.order-notification.before-address" order=$order_id}
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0">
             <tr>
                 <td valign="top" width="55%">
                     <strong>{intl l="Customer delivery address:"}</strong><br>
-                    {ifhook rel="email.order-notification.delivery-address"}
+                    {ifhook rel="email-html.order-notification.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="email.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+                        {hook name="email-html.order-notification.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                     {/ifhook}
-                    {elsehook rel="email.order-notification.delivery-address"}
+                    {elsehook rel="email-html.order-notification.delivery-address"}
                         {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
                         {if $COMPANY != ""}{$COMPANY}<br />{/if}
                         {$FIRSTNAME} {$LASTNAME}<br />
@@ -65,7 +65,7 @@
             </tr>
         </table>
 
-        {hook name="email.order-notification.after-address" order=$order_id}
+        {hook name="email-html.order-notification.after-address" order=$order_id}
 
         <p>
             {intl l="Order Total:"} {format_money number=$TOTAL_TAXED_AMOUNT currency_id=$CURRENCY}<br />
@@ -75,7 +75,7 @@
             {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
         </p>
 
-        {hook name="email.order-notification.before-products" order=$order_id}
+        {hook name="email-html.order-notification.before-products" order=$order_id}
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
             <tr style="color:#999;font-size:11px">
@@ -106,7 +106,7 @@
                     </td>
                 </tr>
 
-                {hook name="email.order-notification.order-product" order="{$order_id}" order_product="{$ID}"}
+                {hook name="email-html.order-notification.order-product" order="{$order_id}" order_product="{$ID}"}
 
             {/loop}
             <tr>
@@ -124,7 +124,7 @@
         </table>
     {/loop}
 
-    {hook name="email.order-notification.after-products" order=$order_id}
+    {hook name="email-html.order-notification.after-products" order=$order_id}
 
     <br />
 

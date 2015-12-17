@@ -22,7 +22,7 @@
             {assign var="customerRef" value=$REF}
         {/loop}
 
-        {hook name="email.order-confirmation.before-address" order=$order_id}
+        {hook name="email-html.order-confirmation.before-address" order=$order_id}
 
         {intl l="Here are the details of your purchase:"}<br /><br />
 
@@ -30,11 +30,11 @@
             <tr>
                 <td valign="top" width="55%">
                     <strong>{intl l="Delivery address:"}</strong><br>
-                    {ifhook rel="email.order-confirmation.delivery-address"}
+                    {ifhook rel="email-html.order-confirmation.delivery-address"}
                         {* delivery module can customize the delivery address *}
-                        {hook name="email.order-confirmation.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
+                        {hook name="email-html.order-confirmation.delivery-address" module={$DELIVERY_MODULE} order=$order_id}
                     {/ifhook}
-                    {elsehook rel="email.order-confirmation.delivery-address"}
+                    {elsehook rel="email-html.order-confirmation.delivery-address"}
                         {loop type="order_address" name="delivery_address" id=$DELIVERY_ADDRESS}
                         {if $COMPANY != ""}{$COMPANY}<br />{/if}
                         {$FIRSTNAME} {$LASTNAME}<br />
@@ -61,7 +61,7 @@
             </tr>
         </table>
 
-        {hook name="email.order-confirmation.after-address" order=$order_id}
+        {hook name="email-html.order-confirmation.after-address" order=$order_id}
 
         <br />
 
@@ -73,7 +73,7 @@
             {intl l="Delivery method:"} {loop name="delivery-module" type="module" id=$DELIVERY_MODULE}{$TITLE}{/loop}<br />
         </p>
 
-        {hook name="email.order-confirmation.before-products" order=$order_id}
+        {hook name="email-html.order-confirmation.before-products" order=$order_id}
 
         <table width="100%" border="0" cellpadding="0" cellspacing="0" style="font-size:13px;line-height:2em">
             <tr style="color:#999;font-size:11px">
@@ -104,7 +104,7 @@
                     </td>
                 </tr>
 
-                {hook name="email.order-confirmation.order-product" order="{$order_id}" order_product="{$ID}"}
+                {hook name="email-html.order-confirmation.order-product" order="{$order_id}" order_product="{$ID}"}
 
             {/loop}
             <tr>
@@ -122,14 +122,14 @@
         </table>
     {/loop}
 
-    {hook name="email.order-confirmation.after-products" order=$order_id}
+    {hook name="email-html.order-confirmation.after-products" order=$order_id}
 
     <br />
 
-    {ifhook rel="email.order-confirmation.footer"}
-        {hook name="email.order-confirmation.footer" order=$order_id}
+    {ifhook rel="email-html.order-confirmation.footer"}
+        {hook name="email-html.order-confirmation.footer" order=$order_id}
     {/ifhook}
-    {elsehook rel="email.order-confirmation.footer"}
+    {elsehook rel="email-html.order-confirmation.footer"}
         <p><a href="{url path="/account"}">{intl l="View this order in your account at %shop_name" shop_name={config key="store_name"}}</a></p>
 
         <br />
