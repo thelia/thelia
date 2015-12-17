@@ -774,16 +774,16 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2049, 'email.order-confirmation.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2050, 'email.order-confirmation.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
 (2051, 'email.order-confirmation.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2052, 'email.order-confirmation.order-product, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2053, 'email.order-confirmation.before-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2054, 'email.order-confirmation.after-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2055, 'email.order-confirmation.footer, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2052, 'email.order-confirmation.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2053, 'email.order-confirmation.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2054, 'email.order-confirmation.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2055, 'email.order-confirmation.footer', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2056, 'email.order-notification.before-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2057, 'email.order-notification.delivery-address', 4, 1, 0, 1, 1, 1, NOW(), NOW()),
 (2058, 'email.order-notification.after-address', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2059, 'email.order-notification.order-product, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2060, 'email.order-notification.before-products, 4, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2061, 'email.order-notification.after-products, 4, 0, 0, 1, 1, 1, NOW(), NOW())
+(2059, 'email.order-notification.order-product', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2060, 'email.order-notification.before-products', 4, 0, 0, 1, 1, 1, NOW(), NOW()),
+(2061, 'email.order-notification.after-products', 4, 0, 0, 1, 1, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
