@@ -84,6 +84,15 @@ class CouponManager
     }
 
     /**
+     * @param $code
+     * @return mixed|void
+     */
+    public function pushCouponInSession($code)
+    {
+        $this->facade->pushCouponInSession($code);
+    }
+
+    /**
      * Check if there is a Coupon removing Postage
      *
      * @param Order $order the order for which we have to check if postage is free
@@ -157,6 +166,14 @@ class CouponManager
         }
 
         return false;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCouponsKept()
+    {
+        return $this->sortCoupons($this->facade->getCurrentCoupons());
     }
 
     /**

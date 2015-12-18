@@ -179,4 +179,12 @@ interface FacadeInterface
      * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher();
+
+    /**
+     * Add a coupon in session
+     *
+     * @param $couponCode
+     * @return mixed|void
+     */
+    public function pushCouponInSession($couponCode);
 }
