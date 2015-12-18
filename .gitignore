@@ -47,6 +47,7 @@ templates/*
 !templates/frontOffice
 templates/frontOffice/*
 !templates/frontOffice/default
+!templates/frontOffice/**/*.transpiled.js
 !templates/backOffice
 templates/backOffice/*
 !templates/backOffice/default
