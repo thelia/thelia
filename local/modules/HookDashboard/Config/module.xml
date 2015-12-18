@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="http://thelia.net/schema/dic/module"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/module http://thelia.net/schema/dic/module/module-2_2.xsd">
+    <fullnamespace>HookDashboard\HookDashboard</fullnamespace>
+    <descriptive locale="en_US">
+        <title>Displaying the dashboard in administration's home page</title>
+    </descriptive>
+    <descriptive locale="fr_FR">
+        <title>Affichage du tableau de bord dans l'accueil de l'administration</title>
+    </descriptive>
+    <languages>
+        <language>en_US</language>
+        <language>fr_FR</language>
+    </languages>
+    <version>1.0</version>
+    <authors>
+        <author>
+            <name>Julien Vigouroux</name>
+            <email>jvigouroux@openstudio.fr</email>
+        </author>
+    </authors>
+    <type>classic</type>
+    <thelia>2.2.0</thelia>
+    <stability>other</stability>
+</module>

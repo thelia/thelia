@@ -757,7 +757,9 @@ INSERT INTO `hook` (`id`, `code`, `type`, `by_module`, `block`, `native`, `activ
 (2033, 'invoice.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2034, 'delivery.after-delivery-module', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
 (2035, 'invoice.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
-(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW())
+(2036, 'delivery.order-product', 3, 0, 0, 1, 1, 1, NOW(), NOW()),
+
+(2037, 'home.dashboard', 2, 0, 1, 1, 0, 1, NOW(), NOW())
 ;
 
 INSERT INTO `customer_title`(`id`, `by_default`, `position`, `created_at`, `updated_at`) VALUES
@@ -2190,7 +2192,8 @@ INSERT INTO `hook_i18n` (`id`, `locale`, `title`, `chapo`, `description`) VALUES
     (2033, '{$locale}', {intl l='Invoice - After delivery module' locale=$locale}, NULL, NULL),
     (2034, '{$locale}', {intl l='Delivery - After delivery module' locale=$locale}, NULL, NULL),
     (2035, '{$locale}', {intl l='Invoice - additional product information' locale=$locale}, NULL, NULL),
-    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
+    (2036, '{$locale}', {intl l='Delivery - additional product information' locale=$locale}, NULL, NULL),
+    (2037, '{$locale}', {intl l='Home - dashboard' locale=$locale}, NULL, NULL){if ! $locale@last},{/if}
 
 {/foreach}
 ;

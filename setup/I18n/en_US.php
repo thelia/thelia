@@ -458,6 +458,7 @@ return array(
     'Home - at the top' => 'Home - at the top',
     'Home - block' => 'Home - block',
     'Home - bottom' => 'Home - bottom',
+    'Home - dashboard' => 'Home - dashboard',
     'Home page - CSS stylesheet' => 'Home page - CSS stylesheet',
     'Home page - after javascript include' => 'Home page - after javascript include',
     'Home page - after javascript initialisation' => 'Home page - after javascript initialisation',

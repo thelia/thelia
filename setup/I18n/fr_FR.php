@@ -458,6 +458,7 @@ return array(
     'Home - at the top' => 'Accueil - en haut',
     'Home - block' => 'Accueil - bloc',
     'Home - bottom' => 'Accueil - bas',
+    'Home - dashboard' => 'Accueil - tableau de bord',
     'Home page - CSS stylesheet' => 'Page d\'accueil - feuille de style CSS',
     'Home page - after javascript include' => 'Page d\'accueil - après l\'inclusion du JavaScript',
     'Home page - after javascript initialisation' => 'Page d\'accueil - après l\'initialisation du JavaScript',
