@@ -11,10 +11,6 @@ use Thelia\Core\Hook\BaseHook;
  */
 class AdminHook extends BaseHook
 {
-    public function onHomeTop(HookRenderEvent $event)
-    {
-        $event->add($this->render('dashboard.html'));
-    }
     public function onHomeDashboard(HookRenderEvent $event)
     {
         $event->add($this->render('dashboard.html'));
