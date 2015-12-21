@@ -1,5 +1,6 @@
 # 2.2.2
 
+- (related to #1857) Fix of hookblack : order.tab
 - (related to #1843) Fix smarty form_collection_field, a performance problem was introduced after this PR: #1613 because ​the Form::createView() method create all form view on each call.
 - (related to #1830) Fix attribute title in the modal "create a new combination"
 - (related to #1825) Add message if thelia project is not installed
