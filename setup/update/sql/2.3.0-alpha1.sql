@@ -6,6 +6,10 @@ UPDATE `config` SET `value`='3' WHERE `name`='thelia_minus_version';
 UPDATE `config` SET `value`='0' WHERE `name`='thelia_release_version';
 UPDATE `config` SET `value`='alpha1' WHERE `name`='thelia_extra_version';
 
+-- Update order.invoice_date column to datetime
+ALTER TABLE `order` MODIFY COLUMN invoice_date DATETIME
+ALTER TABLE `order_version` MODIFY COLUMN invoice_date DATETIME
+
 -- Add new column in module_hook table
 ALTER TABLE `module_hook` ADD `templates` TEXT AFTER`position`;
 
